@@ -14,81 +14,85 @@
   <section class="progress">
   <h3 class="sr">Your Progress</h3>
   <ol>
-    <li class="progress-step current" id="progress-step1"><span class="sr">Current: </span>Step 1 Take Photo</li>
-    <li class="progress-step" id="progress-step2">Step 2 Take ID Photo</li>
-    <li class="progress-step" id="progress-step3">Step 3 Confirm Submission</li>
-    <li class="progress-step" id="progress-step4">Step 4 Make Payment</li>
-    <li class="progress-step" id="progress-step5">Finished Confirmation</li>
+    <li class="progress-step current" id="progress-step1"><span class="sr">Current Step: </span> <span class="number">1</span> Take Photo</li>
+    <li class="progress-step" id="progress-step2"> <span class="number">2</span> Take ID Photo</li>
+    <li class="progress-step" id="progress-step3"> <span class="number">3</span> Confirm Submission</li>
+    <li class="progress-step" id="progress-step4"> <span class="number">4</span> Make Payment</li>
+    <li class="progress-step" id="progress-step5"><span class="number"><i class="icon-ok"></i></span> Finished Confirmation</li>
   </ol>
   </section>
 
-  <h3 class="title">What You Will Need to Register</h3>
+  <section class="needs">
+    <h3 class="title">What You Will Need to Register</h3>
 
-  <p>There are a few things you will need to register as an ID verified student :</p>
-  <div class="reqs">
-    <div class="req1 req">
-      <h4>Identification</h4>
-        <p>A photo identification document like a drivers license, passport, or student ID.</p>
+    <p>There are a few things you will need to register as an ID verified student :</p>
+    <div class="reqs">
+      <div class="req1 req">
+        <h4>Identification</h4>
+          <p>A photo identification document like a drivers license, passport, or student ID.</p>
+      </div>
+
+      <div class="req2 req">
+      <h4>Webcam</h4>
+          <p>A webcam that connects to your computer and a modern browser.</p>
+      </div>
+
+        <div class="req3 req">
+        <h4>Credit or Debit Card</h4>
+          <p>A major credit or debit card.</p>
+      </div>
     </div>
 
-    <div class="req2 req">
-    <h4>Webcam</h4>
-        <p>A webcam that connects to your computer and a modern browser.</p>
-    </div>
-
-      <div class="req3 req">
-      <h4>Credit or Debit Card</h4>
-        <p>A major credit or debit card.</p>
-    </div>
-  </div>
-
-  <p class="tip">Missing something? <a href="">You can always take the Audit track</a>.</p>
+    <p class="tip">Missing something? <a href="">You can always Audit the course</a>.</p>
+  </section>
 
   <hr />
 
-  <h3>Steps to get Verified</h3>
+  <section class="steps">
+    <h3 class="title">Steps to get Verified</h3>
 
-    <div class="next-step">
-      <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
-    </div>
+      <div class="next-step">
+        <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+      </div>
 
-  <h4>Step 1: Take Your Photo</h4>
-  <p>To verify your identity, we need a clear and well-lit photo of your face to match it with your ID.</p>
+    <h4 class="step"><span class="number">1</span> Take Your Photo</h4>
+    <p>To verify your identity, we need a clear and well-lit photo of your face to match it with your ID.</p>
 
-  <h4>Step 2: Take a photo of your ID</h4>
-  <p>To verify your identity, we need a clear and well-lit photo of your ID to match it with your face.</p>
+    <h4 class="step"><span class="number">2</span>Take a photo of your ID</h4>
+    <p>To verify your identity, we need a clear and well-lit photo of your ID to match it with your face.</p>
 
-  <h4>Step 3: Verify your submissions</h4>
-  <p>Review your photos to verify they are correct.</p>
+    <h4 class="step"><span class="number">3</span> Verify your submissions</h4>
+    <p>Review your photos to verify they are correct.</p>
 
-  <h4>Step 4:  Submit payment</h4>
-  <p>Pay for your course using a major credit of debit cards.</p>
-  <ul>
-    <li>Cards accepted:</li>
-    <li>Visa</li>
-    <li>Master Card</li>
-    <li>Maestro</li>
-    <li>Amex</li>
-    <li>Discover</li>
-    <li>JCB (provided it has the Discover logo on the card)</li>
-    <li>Diners Club</li>
-    <li>...need to list several more once firm</li>
-  </ul>
+    <h4 class="step"><span class="number">4</span> Submit payment</h4>
+    <p>Pay for your course using a major credit of debit cards.</p>
+    <ul>
+      <li>Cards accepted:</li>
+      <li>Visa</li>
+      <li>Master Card</li>
+      <li>Maestro</li>
+      <li>Amex</li>
+      <li>Discover</li>
+      <li>JCB (provided it has the Discover logo on the card)</li>
+      <li>Diners Club</li>
+      <li>...need to list several more once firm</li>
+    </ul>
 
-  <h4>You're Ready to Start Learning</h4>
+    <h4 class="step"><span class="number"><i class="icon-ok"></i></span>You're Ready to Start Learning</h4>
 
-  <p>You are now verified. You can sign up for more courses, or get started on your course once it starts. While you will need to re-verify in the course prior to exams or expercises, you may also have to re-verify if we feel your photo we have on file may be out of date.</p>
+    <p>You are now verified. You can sign up for more courses, or get started on your course once it starts. While you will need to re-verify in the course prior to exams or expercises, you may also have to re-verify if we feel your photo we have on file may be out of date.</p>
 
 
-    <div class="next-step">
-      <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
-    </div>
+      <div class="next-step">
+        <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+      </div>
+    </section>
 
-  </section>
+    <section class="support">
+      <p class="tip">More questions? <a rel="external" href="">Check out our FAQs.</a></p>
+      <p class="tip">Change your mind? <a href="">You can always Audit the course for free without verifying.</a></p>
+    </section>
 
-  <section class="support">
-    <p class="tip">More questions? <a rel="external" href="">Check out our FAQs.</a></p>
-    <p class="tip">Change your mind? <a href="">You can always Audit the course for free without verifying.</a></p>
   </section>
 
 </div>
