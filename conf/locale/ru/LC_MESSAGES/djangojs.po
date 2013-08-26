@@ -1,0 +1,446 @@
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
+# Copyright (C) 2013 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# viktoria <viktoria@cde.ifmo.ru>, 2013
+# Nichik <dmi.nichik@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: translation_team@edx.org\n"
+"POT-Creation-Date: 2013-08-16 13:50-0400\n"
+"PO-Revision-Date: 2013-08-16 17:54+0000\n"
+"Last-Translator: jtauber <jtauber@jtauber.com>\n"
+"Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: cms/static/js/base.js:83
+msgid "This link will open in a new browser window/tab"
+msgstr "Эта ссылка откроется в новом окне или в новой вкладке браузера."
+
+#: cms/static/js/base.js:86
+msgid "This link will open in a modal window"
+msgstr "Эта ссылка откроется в новом модальном окне."
+
+#: cms/static/js/base.js:204
+msgid "Collapse All Sections"
+msgstr "Свернуть все разделы"
+
+#: cms/static/js/base.js:206
+msgid "Expand All Sections"
+msgstr "Развернуть все разделы"
+
+#: cms/static/js/base.js:245
+msgid ""
+"File format not supported. Please upload a file with a <code>tar.gz</code> "
+"extension."
+msgstr "Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением <code>tar.gz</code>."
+
+#: cms/static/js/base.js:335
+msgid "There has been an error while saving your changes."
+msgstr "Произошла ошибка при сохранении изменений."
+
+#: cms/static/js/base.js:382
+msgid "Delete this "
+msgstr "Удалить"
+
+#: cms/static/js/base.js:383
+msgid "Deleting this "
+msgstr "Удаление"
+
+#: cms/static/js/base.js:386
+msgid "Yes, delete this "
+msgstr "Да, удалить"
+
+#: cms/static/js/base.js:398 cms/static/js/views/course_info_edit.js:170
+#: cms/static/js/views/textbook.js:38
+msgid "Deleting"
+msgstr "Удаление"
+
+#: cms/static/js/base.js:414 cms/static/js/views/assets.js:43
+#: cms/static/js/views/course_info_edit.js:188
+#: cms/static/js/views/textbook.js:48
+#: cms/static/js/views/validating_view.js:112
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:92
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "Отмена"
+
+#: cms/static/js/base.js:462
+msgid "Hide Studio Help"
+msgstr "Скрытая помощь студии"
+
+#: cms/static/js/base.js:464
+msgid "Looking for Help with Studio?"
+msgstr "Нужна помощь со студией?"
+
+#: cms/static/js/base.js:626
+msgid "Please do not use any spaces or special characters in this field."
+msgstr ""
+
+#: cms/static/js/base.js:641
+msgid ""
+"Course fields must have a combined length of no more than 80 characters."
+msgstr ""
+
+#: cms/static/js/base.js:676
+msgid "Required field."
+msgstr ""
+
+#: cms/static/js/base.js:843 cms/static/js/models/section.js:26
+#: cms/static/js/views/course_info_edit.js:101
+#: cms/static/js/views/course_info_edit.js:315
+#: cms/static/js/views/grader-select-view.js:85
+#: cms/static/js/views/overview.js:229 cms/static/js/views/textbook.js:125
+msgid "Saving"
+msgstr "Сохранение"
+
+#: cms/static/js/base.js:868
+msgid "Will Release:"
+msgstr "Будет начат:"
+
+#: cms/static/js/base.js:869
+msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
+msgstr ""
+
+#: cms/static/js/base.js:872
+msgid "Edit"
+msgstr "Редактировать"
+
+#: cms/static/js/models/course.js:7 cms/static/js/models/section.js:7
+msgid "You must specify a name"
+msgstr "Вы должны указать имя"
+
+#: cms/static/js/models/settings/course_details.js:41
+msgid "The course must have an assigned start date."
+msgstr "Для курса должна быть указана дата начала."
+
+#: cms/static/js/models/settings/course_details.js:44
+msgid "The course end date cannot be before the course start date."
+msgstr "Конец курса не может предшествовать началу курса. "
+
+#: cms/static/js/models/settings/course_details.js:47
+msgid "The course start date cannot be before the enrollment start date."
+msgstr "Дата начала курса не может предшествовать дате начала регистрации на курс."
+
+#: cms/static/js/models/settings/course_details.js:50
+msgid "The enrollment start date cannot be after the enrollment end date."
+msgstr "Дата конца регистрации на курс не может предшествовать дате начала регистрации на курс."
+
+#: cms/static/js/models/settings/course_details.js:53
+msgid "The enrollment end date cannot be after the course end date."
+msgstr "Дата конца курса не может предшествовать дате конца регистрации на курс."
+
+#: cms/static/js/models/settings/course_details.js:57
+msgid "Key should only contain letters, numbers, _, or -"
+msgstr "Ключ должен содержать только буквы, цифры, _ или -"
+
+#: cms/static/js/models/settings/course_grading_policy.js:82
+msgid "There's already another assignment type with this name."
+msgstr "Задание с таким именем уже существует."
+
+#: cms/static/js/models/settings/course_grading_policy.js:89
+msgid "Please enter an integer between 0 and 100."
+msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
+
+#: cms/static/js/models/settings/course_grading_policy.js:103
+#: cms/static/js/models/settings/course_grading_policy.js:109
+msgid "Please enter an integer."
+msgstr "Пожалуйста, введите целое число."
+
+#: cms/static/js/models/settings/course_grading_policy.js:115
+msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
+
+#: cms/static/js/views/assets.js:13
+msgid "Delete File Confirmation"
+msgstr "Удалить файл подтверждения"
+
+#: cms/static/js/views/assets.js:14
+msgid ""
+"Are you sure you wish to delete this item. It cannot be reversed!\n"
+"\n"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
+msgstr "Вы уверены, что хотите удалить этот раздел? Операция не может быть отменена.\n\nКроме того, любой контент, который ссылается на данный элемент, больше не будет работать (например, поломка изображения и/или ссылки)"
+
+#: cms/static/js/views/assets.js:17
+#: cms/static/js/views/course_info_edit.js:162
+msgid "OK"
+msgstr "ОК"
+
+#: cms/static/js/views/assets.js:27
+msgid "Your file has been deleted."
+msgstr "Ваш файл был удален."
+
+#: cms/static/js/views/assets.js:70
+msgid "Uploading…"
+msgstr "Загрузка..."
+
+#: cms/static/js/views/assets.js:103
+msgid "Load Another File"
+msgstr "Загрузить другой файл"
+
+#: cms/static/js/views/course_info_edit.js:158
+msgid "Are you sure you want to delete this update?"
+msgstr ""
+
+#: cms/static/js/views/course_info_edit.js:159
+msgid "This action cannot be undone."
+msgstr ""
+
+#: cms/static/js/views/section.js:71
+msgid "Your change could not be saved"
+msgstr "Ваши изменения не были сохранены"
+
+#: cms/static/js/views/section.js:75
+msgid "Return and resolve this issue"
+msgstr "Вернитесь и решите эту проблему"
+
+#: cms/static/js/views/textbook.js:29
+msgid "Delete “<%= name %>”?"
+msgstr "Удалить “<%= name %>”?"
+
+#: cms/static/js/views/textbook.js:31
+msgid ""
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr "Удаление учебника не может быть отменено, и после удаления какие-либо ссылки на него в вашей навигации курсов также будут удалены."
+
+#: cms/static/js/views/textbook.js:34
+msgid "Delete"
+msgstr "Удалить"
+
+#: cms/static/js/views/textbook.js:244
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "Загрузить новый PDF “<%= name %>”"
+
+#: cms/static/js/views/textbook.js:359
+msgid "We're sorry, there was an error"
+msgstr "Извините, произошла ошибка"
+
+#: cms/static/js/views/validating_view.js:12
+msgid "You've made some changes"
+msgstr "Вы сделали некоторые изменения"
+
+#: cms/static/js/views/validating_view.js:13
+msgid "Your changes will not take effect until you save your progress."
+msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
+
+#: cms/static/js/views/validating_view.js:14
+msgid "You've made some changes, but there are some errors"
+msgstr "Вы сделали некоторые изменения, но возникли ошибки"
+
+#: cms/static/js/views/validating_view.js:15
+msgid ""
+"Please address the errors on this page first, and then save your progress."
+msgstr "Пожалуйста, присылайте ошибки на эту страницу, а затем сохраните."
+
+#: cms/static/js/views/validating_view.js:103
+msgid "Save Changes"
+msgstr "Сохранить изменения"
+
+#: cms/static/js/views/validating_view.js:131
+msgid "Your changes have been saved."
+msgstr "Ваши изменения были сохранены."
+
+#: cms/static/js/views/settings/advanced_view.js:55
+msgid ""
+"Your changes will not take effect until you save your progress. Take care "
+"with key and value formatting, as validation is not implemented."
+msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их. Будьте осторожны с редактированием ключей и значений, так как проверка не реализована."
+
+#: cms/static/js/views/settings/advanced_view.js:104
+msgid "Your policy changes have been saved."
+msgstr "Ваши политические изменения были сохранены."
+
+#: cms/static/js/views/settings/advanced_view.js:105
+msgid ""
+"Please note that validation of your policy key and value pairs is not "
+"currently in place yet. If you are having difficulties, please review your "
+"policy pairs."
+msgstr "Пожалуйста, обратите внимание, что проверки пар ключей и значений в настоящее время еще нет. Если у вас возникли трудности, пожалуйста, пересмотрите политику пар."
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:130
+msgid "Pause"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:135
+msgid "Play"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:157
+msgid "Fullscreen"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:162
+msgid "Exit fullscreen"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:140
+msgid "Caption will be displayed when you start playing the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:369
+msgid "Turn on captions"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:374
+msgid "Turn off captions"
+msgstr ""
+
+#: lms/static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "Доступно %s"
+
+#: lms/static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr "Это список доступных  %s. Вы можете выбрать некоторые выделенные темы в поле ниже, а затем кликнуть стрелку \"Выбрать\" между двумя полями. "
+
+#: lms/static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Введите значение в это поле, чтобы внизу появился фильтр доступных %s."
+
+#: lms/static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "Фильтр"
+
+#: lms/static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "Выбрать все"
+
+#: lms/static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Кликните, чтобы выбрать все %s один раз."
+
+#: lms/static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Выбрать "
+
+#: lms/static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "Удалить"
+
+#: lms/static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "Выбрано %s"
+
+#: lms/static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr "Это список выбранных %s.  Вы можете удалить некоторые выбранные темы в поле ниже, кликните стрелку \"Удалить\" между двумя полями."
+
+#: lms/static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Удалить все"
+
+#: lms/static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Кликните, чтобы удалить все выбранные %s один раз."
+
+#: lms/static/admin/js/actions.js:18 lms/static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s из %(cnt)s выбранного"
+msgstr[1] "%(sel)s из %(cnt)s выбранных"
+msgstr[2] "%(sel)s из %(cnt)s выбранных"
+
+#: lms/static/admin/js/actions.js:109 lms/static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr "Вы не сохранили изменения в отдельных полях. Если вы начнете действовать, ваши несохраненные изменения будут утеряны. "
+
+#: lms/static/admin/js/actions.js:121 lms/static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr "Вы выбрали действие, но вы еще не сохранили ваши изменения в отдельных полях. Пожалуйста, кликните ОК для сохранения. Тогда вам понадобится перезапустить действие."
+
+#: lms/static/admin/js/actions.js:123 lms/static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr "Вы выбрали действие, и не сделали никаких изменений в отдельных полях. ВЫ, вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
+
+#: lms/static/admin/js/calendar.js:26 lms/static/admin/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November"
+" December"
+msgstr "Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь"
+
+#: lms/static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "Пн Вт Ср Чт Пт Сб Вс"
+
+#: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js.c:19
+#: lms/static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "Показать"
+
+#: lms/static/admin/js/collapse.js:15 lms/static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "Спрятать"
+
+#: lms/static/admin/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:49
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "Сейчас"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "Часы"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "Выбрать время"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "Полночь"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "6 часов утра"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "Полдень"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:144
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "Сегодня"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "Календарь"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "Вчера"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "Завтра"
