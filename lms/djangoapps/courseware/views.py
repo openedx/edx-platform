@@ -510,6 +510,7 @@ def jump_to(request, course_id, location):
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
 
+@login_required
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -525,6 +526,7 @@ def course_info(request, course_id):
             'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
+@login_required
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
     """
@@ -556,6 +558,7 @@ def static_tab(request, course_id, tab_slug):
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
 
 
+@login_required
 @ensure_csrf_cookie
 def syllabus(request, course_id):
     """
@@ -566,8 +569,12 @@ def syllabus(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access, })
+    return render_to_response(
+        'courseware/syllabus.html', {
+            'course': course,
+            'staff_access': staff_access,
+        }
+    )
 
 
 def registered_for_course(course, user):
