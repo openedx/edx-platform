@@ -54,6 +54,7 @@ task :quality => dquality_dir do
     sh("diff-quality --violations=pep8")
 
     # Generage diff-quality html report for pylint, and print to console
-    sh("diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html")
-    sh("diff-quality --violations=pylint")
+    pythonpath_prefix = "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:common:common/djangoapps:common/lib"
+    sh("#{pythonpath_prefix} diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html")
+    sh("#{pythonpath_prefix} diff-quality --violations=pylint")
 end

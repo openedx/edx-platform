@@ -5,10 +5,11 @@ from uuid import uuid4
 from pytz import UTC
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import editable_modulestore
 from xmodule.course_module import CourseDescriptor
 from xblock.core import Scope
 from xmodule.x_module import XModuleDescriptor
+
 
 class XModuleCourseFactory(Factory):
     """
@@ -25,10 +26,7 @@ class XModuleCourseFactory(Factory):
         display_name = kwargs.pop('display_name', None)
         location = Location('i4x', org, number, 'course', Location.clean(display_name))
 
-        try:
-            store = modulestore('direct')
-        except KeyError:
-            store = modulestore()
+        store = editable_modulestore('direct')
 
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location)
@@ -117,7 +115,7 @@ class XModuleItemFactory(Factory):
             if not isinstance(data, basestring):
                 data.update(template.get('data'))
 
-        store = modulestore('direct')
+        store = editable_modulestore('direct')
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = store.get_item(parent_location)

@@ -153,7 +153,7 @@ task :coverage => :report_dirs do
         puts "No coverage info found.  Run `rake test` before running `rake coverage`."
     else
         xml_report_str = xml_reports.join(' ')
-        diff_html_path = report_dir_path('diff_cover.html')
+        diff_html_path = report_dir_path('diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
         sh("diff-cover #{xml_report_str} --html-report #{diff_html_path}")

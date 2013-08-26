@@ -13,13 +13,13 @@ from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import editable_modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MIXED_MODULESTORE
 
 from instructor_task.api_helper import encode_problem_and_student_input
 from instructor_task.models import PROGRESS, QUEUING
@@ -95,7 +95,7 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -106,7 +106,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
 
     def initialize_course(self):
         """Create a course in the store, with a chapter and section."""
-        self.module_store = modulestore()
+        self.module_store = editable_modulestore()
 
         # Create the course
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,

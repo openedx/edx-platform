@@ -6,7 +6,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from nose.tools import assert_true
 from mock import patch, Mock
 
@@ -15,7 +15,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})

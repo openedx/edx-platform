@@ -439,12 +439,12 @@ class CourseGraderUpdatesTest(CourseTestCase):
 
     def test_get(self):
         resp = self.client.get(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
 
     def test_delete(self):
         resp = self.client.delete(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
     def test_post(self):
         grader = {
@@ -455,5 +455,5 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "weight": 17.3,
         }
         resp = self.client.post(self.url, grader)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
