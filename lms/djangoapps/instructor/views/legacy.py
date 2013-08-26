@@ -171,6 +171,9 @@ def instructor_dashboard(request, course_id):
         Form is either urlname or modulename/urlname.  If no modulename
         is provided, "problem" is assumed.
         """
+        # remove whitespace
+        urlname = _clean_field(urlname)
+
         # tolerate an XML suffix in the urlname
         if urlname[-4:] == ".xml":
             urlname = urlname[:-4]
@@ -185,6 +188,7 @@ def instructor_dashboard(request, course_id):
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
+        unique_student_identifier = _clean_field(unique_student_identifier)
         msg = ""
         try:
             if "@" in unique_student_identifier:
@@ -706,12 +710,14 @@ def instructor_dashboard(request, course_id):
         html_message = request.POST.get("message")
         text_message = html_to_text(html_message)
 
-        email = CourseEmail(course_id=course_id,
-                            sender=request.user,
-                            to_option=email_to_option,
-                            subject=email_subject,
-                            html_message=html_message,
-                            text_message=text_message)
+        email = CourseEmail(
+            course_id=course_id,
+            sender=request.user,
+            to_option=email_to_option,
+            subject=email_subject,
+            html_message=html_message,
+            text_message=text_message
+        )
 
         email.save()
 
@@ -994,6 +1000,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
     to do.
     """
     user = None
+    username_or_email = _clean_field(username_or_email)
     try:
         if '@' in username_or_email:
             user = User.objects.get(email=username_or_email)
@@ -1561,3 +1568,9 @@ def get_background_task_table(course_id, problem_url, student=None):
             datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
     return msg, datatable
+
+def _clean_field(field):
+    if field:
+        return field.strip()
+    return field
+
