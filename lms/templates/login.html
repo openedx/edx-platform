@@ -50,7 +50,9 @@
           next=u.split("next=")[1];
           if (next && !isExternal(next)) {
             location.href=next;
-          }  else {
+          }  else if(json.redirect_url){
+            location.href=json.redirect_url;
+          } else {
             location.href="${reverse('dashboard')}";
           }
         } else {

@@ -325,10 +325,12 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
+            if enrollment_response.content != '':
+                return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
-@login_required
+
 @require_POST
 def change_enrollment(request):
     """
@@ -353,6 +355,9 @@ def change_enrollment(request):
     course_id = request.POST.get("course_id")
     if course_id is None:
         return HttpResponseBadRequest(_("Course id not specified"))
+
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
 
     if action == "enroll":
         # Make sure the course exists
@@ -458,10 +463,10 @@ def login_user(request, error=""):
             log.exception(e)
             raise
 
-        try_change_enrollment(request)
+        redirect_url = try_change_enrollment(request)
 
         statsd.increment("common.student.successful_login")
-        response = HttpResponse(json.dumps({'success': True}))
+        response = HttpResponse(json.dumps({'success': True, 'redirect_url': redirect_url}))
 
         # set the login cookie for the edx marketing site
         # we want this cookie to be accessed via javascript
@@ -724,14 +729,14 @@ def create_account(request, post_override=None):
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
-    try_change_enrollment(request)
+    redirect_url = try_change_enrollment(request)
 
     statsd.increment("common.student.account_created")
 
-    js = {'success': True}
-    HttpResponse(json.dumps(js), mimetype="application/json")
+    response_params = {'success': True,
+                       'redirect_url': redirect_url}
 
-    response = HttpResponse(json.dumps({'success': True}))
+    response = HttpResponse(json.dumps(response_params))
 
     # set the login cookie for the edx marketing site
     # we want this cookie to be accessed via javascript

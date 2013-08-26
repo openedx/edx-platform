@@ -6,6 +6,8 @@ from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from mitxmako.shortcuts import render_to_response
 
@@ -16,12 +18,13 @@ from student.views import course_from_id
 
 class ChooseModeView(View):
 
+    @method_decorator(login_required)
     def get(self, request):
         course_id = request.GET.get("course_id")
         context = {
-            "course_id" : course_id,
-            "modes" : CourseMode.modes_for_course_dict(course_id),
-            "course_name" : course_from_id(course_id).display_name
+            "course_id": course_id,
+            "modes": CourseMode.modes_for_course_dict(course_id),
+            "course_name": course_from_id(course_id).display_name
         }
         return render_to_response("course_modes/choose.html", context)
 

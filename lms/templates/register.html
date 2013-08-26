@@ -53,7 +53,12 @@
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          location.href="${reverse('dashboard')}";
+          if(json.redirect_url){
+            location.href=json.redirect_url;
+          }
+          else {
+            location.href="${reverse('dashboard')}";
+          }
        } else {
          toggleSubmitButton(true);
          $('.status.message.submission-error').addClass('is-shown').focus();
