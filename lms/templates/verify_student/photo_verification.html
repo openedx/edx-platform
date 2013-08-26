@@ -16,21 +16,9 @@
     window.URL = window.URL || window.webkitURL;
     navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-    // // Make all the video pieces active
-    // $('video').each(function(i, video) {
-    //   if (navigator.getUserMedia) {
-    //     navigator.getUserMedia({video: true}, function(stream) {
-    //       video.src = window.URL.createObjectURL(stream);
-    //     }, onVideoFail);
-    //   } else {
-    //     video.src = 'somevideo.webm'; // fallback.
-    //   }
-    // });
   }
 
   var submitToPaymentProcessing = function() {
-    // $("#pay_form")
     var xhr = $.post(
       "create_order",
       {
@@ -59,6 +47,7 @@
     var captureButton = $("#" + name + "_capture_button");
     var resetButton = $("#" + name + "_reset_button");
     var approveButton = $("#" + name + "_approve_button");
+    var nextButton = $("#" + name + "_next_button");
 
     var ctx = canvas[0].getContext('2d');
     var localMediaStream = null;
@@ -69,19 +58,50 @@
         image[0].src = canvas[0].toDataURL('image/png');
       }
       video[0].pause();
+
+      captureButton.hide();
+      resetButton.show();
+      approveButton.show();
       return false;
     }
 
     function reset() {
       $('#face_image')[0].src = "";
       video[0].play();
+
+      approveButton.removeClass('approved');
+      nextButton.addClass('disabled');
+
+      captureButton.show();
+//      captureButton.removeClass('is-hidden');
+      resetButton.hide();
+//      resetButton.addClass('is-hidden');
+      approveButton.hide();
+//      approveButton.addClass('is-hidden');
+
       return false;
     }
 
     function approve() {
+      approveButton.addClass('approved');
+      nextButton.removeClass('disabled');
+
       return false;
     }
 
+    // Initialize state for this picture taker
+    captureButton.show();
+    //captureButton.removeClass('is-hidden');
+
+    resetButton.hide();
+    //resetButton.addClass('is-hidden');
+
+    approveButton.hide();
+    //approveButton.addClass('is-hidden');
+
+    nextButton.addClass('disabled');
+
+    // Connect event handlers...
     video.click(snapshot);
     captureButton.click(snapshot);
     resetButton.click(reset);
@@ -95,7 +115,7 @@
 
   function initPhotoBlocks() {
     // Photo wrapping
-    $('.block-photo .control-redo').addClass('is-hidden');
+/*    $('.block-photo .control-redo').addClass('is-hidden');
     $('.block-photo .control-approve').addClass('is-hidden');
     $('.block-photo .m-btn-primary').addClass('disabled');
     $( "#wrapper-facephoto .control-do" ).click(function(e) {
@@ -119,12 +139,19 @@
         e.preventDefault();
         $(this).addClass('approved');
         $('#wrapper-idphoto .m-btn-primary').removeClass('disabled');
-    });
+    }); */
   }
 
   $(document).ready(function() {
     $(".carousel-nav").addClass('sr');
     $("#pay_button").click(submitToPaymentProcessing);
+    $("#confirm_pics_good").click(function() {
+      if (this.checked) {
+        $("#pay_button").removeClass('disabled');
+      }
+    });
+
+    $("#pay_button").addClass('disabled');
 
     initPhotoBlocks();
     initVideoCapture();
@@ -172,14 +199,14 @@
 
           <div class="controls photo-controls">
             <ul class="controls-list">
-              <li class="control control-redo">
-                <a class="action action-redo" id="face_reset_button" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+              <li class="control control-redo" id="face_reset_button">
+                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
-              <li class="control control-do">
-                <a class="action action-do" id="face_capture_button" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
+              <li class="control control-do" id="face_capture_button">
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
-              <li class="control control-approve">
-                <a class="action action-approve" id="face_approve_button" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
+              <li class="control control-approve" id="face_approve_button">
+                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
@@ -210,7 +237,7 @@
         </div>
 
         <div class="next-step">
-              <p class="m-btn-primary">
+              <p class="m-btn-primary" id="face_next_button">
                 <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
               </p>
               <p class="tip">Once you verify your photo looks good, you can move on to step 2.</p>
@@ -233,14 +260,14 @@
 
           <div class="controls photo-controls">
             <ul class="controls-list">
-              <li class="control control-redo">
-                <a class="action action-redo" id="photo_id_reset_button" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+              <li class="control control-redo" id="photo_id_reset_button">
+                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
-              <li class="control control-do">
-                <a class="action action-do" id="photo_id_capture_button" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
+              <li class="control control-do" id="photo_id_capture_button">
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
-              <li class="control control-approve">
-                <a class="action action-approve" id="photo_id_approve_button" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
+              <li class="control control-approve" id="photo_id_approve_button">
+                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
@@ -274,7 +301,7 @@
         </div>
 
         <div class="next-step">
-              <p class="m-btn-primary">
+              <p class="m-btn-primary" id="photo_id_next_button">
                 <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
               </p>
               <p class="tip">Once you verify your ID photo looks good, you can move on to step 3.</p>
@@ -357,9 +384,9 @@
       <div class="next-step">
 
         <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
-        <input type="checkbox" name="match" /> <label for="match">Yes! My details all match.</label>
+        <input type="checkbox" name="match" id="confirm_pics_good" /> <label for="match">Yes! My details all match.</label>
 
-            <p  class="m-btn-primary"><a href="#">Go to Step 4: Secure Payment</a></p>
+            <p  class="m-btn-primary" id="pay_button"><a href="#">Go to Step 4: Secure Payment</a></p>
             <p class="tip">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
 
     </div>
