@@ -10,6 +10,7 @@ from .component import *
 from .course import *
 from .error import *
 from .item import *
+from .import_export import *
 from .preview import *
 from .public import *
 from .user import *
