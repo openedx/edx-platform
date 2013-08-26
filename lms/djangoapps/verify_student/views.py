@@ -77,7 +77,7 @@ def create_order(request):
 
 def show_requirements(request):
     """This might just be a plain template without a view."""
-    context = { "course_id" : "edX/Certs101/2013_Test" }
+    context = { "course_id" : request.GET.get("course_id") }
     return render_to_response("verify_student/show_requirements.html", context)
 
 def face_upload(request):

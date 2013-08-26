@@ -58,9 +58,11 @@ class ChooseModeView(View):
             donation_for_course[course_id] = float(amount)
             request.session["donation_for_course"] = donation_for_course
 
+            # TODO: Check here for minimum pricing
+
             return redirect(
                 "{}?{}".format(
-                    reverse('verify_student_verify'),
+                    reverse('verify_student_show_requirements'),
                     urlencode(dict(course_id=course_id))
                 )
             )

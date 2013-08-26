@@ -8,7 +8,7 @@
   <section class="wrapper">
 
   <header class="page-header header-white">
-    <h2 class="title header-white-title">You are registering for [coursename] (ID Verified)</h2>
+    <h2 class="title header-white-title">You are registering for ${course_id} (ID Verified)</h2>
   </header>
 
   <section class="progress">
@@ -52,7 +52,7 @@
     <h3 class="title">Steps to get Verified</h3>
 
       <div class="next-step">
-        <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+        <p class="m-btn-primary"><a href="${reverse('verify_student_verify') + '?course_id=' + course_id}">Go to Step 1: Take my Photo</a></p>
       </div>
 
     <h4 class="step"><span class="number">1</span> Take Your Photo</h4>
@@ -82,9 +82,8 @@
 
     <p>You are now verified. You can sign up for more courses, or get started on your course once it starts. While you will need to re-verify in the course prior to exams or expercises, you may also have to re-verify if we feel your photo we have on file may be out of date.</p>
 
-
       <div class="next-step">
-        <p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+        <p class="m-btn-primary"><a href="${reverse('verify_student_verify') + '?course_id=' + course_id}">Go to Step 1: Take my Photo</a></p>
       </div>
     </section>
 
