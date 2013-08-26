@@ -57,6 +57,11 @@ body.course.import {
       color: $error-red;
     }
 
+    .status-block {
+      display: none;
+      font-size: 13px;
+    }
+
     .choose-file-button {
       @include blue-button;
       padding: 10px 50px 11px;
