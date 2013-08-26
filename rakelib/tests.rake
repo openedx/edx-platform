@@ -133,6 +133,7 @@ task :coverage => :report_dirs do
 
     found_coverage_info = false
 
+    reports = []
     TEST_TASK_DIRS.each do |dir|
         report_dir = report_dir_path(dir)
 
@@ -142,11 +143,16 @@ task :coverage => :report_dirs do
             found_coverage_info = true
         end
 
+        puts "***************"
+        puts "Generating diff coverage report for: #{dir}"
+        puts "***************\n"
+
         # Generate the coverage.py HTML report
         sh("coverage html --rcfile=#{dir}/.coveragerc")
 
         # Generate the coverage.py XML report
         sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+        reports << "#{report_dir}/coverage.xml"
 
         # Generate the diff coverage HTML report, based on the XML report
         sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
@@ -158,5 +164,13 @@ task :coverage => :report_dirs do
 
     if not found_coverage_info
         puts "No coverage info found.  Run `rake test` before running `rake coverage`."
+    else
+        puts "***************"
+        puts "Generating combined diff coverage report"
+        puts "Combined over: #{TEST_TASK_DIRS.join(', ')}"
+        puts "***************\n"
+        sh("diff-cover #{reports.join(' ')} --html-report #{REPORT_DIR}/diff_coverage_combined.html")
+        sh("diff-cover #{reports.join(' ')}")
+        puts "\n"
     end
 end
