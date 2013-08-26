@@ -4,23 +4,56 @@ It is incomplete - we do not test answer_distributions or
 progress_summary.
 """
 from mock import MagicMock
-
 import unittest
-from xmodule.modulestore.django import modulestore
-import courseware.grades as grades
-import courseware.module_render as module_render
-from courseware.model_data import LmsKeyValueStore, ModelDataCache
 
+from xmodule.capa_module import CapaModule
 from xmodule.graders import Score
+from xmodule.modulestore.django import modulestore, editable_modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, XModuleItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
 
+import courseware.grades as grades
+import courseware.module_render as module_render
+from courseware.model_data import LmsKeyValueStore, ModelDataCache
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_XML_MODULESTORE
 from courseware.tests.tests import LoginEnrollmentTestCase
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+
+class ProblemFactory(XModuleItemFactory):
+    """
+    A factory for problems.  Fills in the data needed for problems
+    with sane defaults.
+    """
+    FACTORY_FOR = CapaModule
+    
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Does some pre-processing, before calling the XModuleItemFactory
+        _create.
+        """
+        name = kwargs.pop('problem_name')
+        answer = kwargs.pop('answer', 42)
+        weight = kwargs.pop('weight', 1)
+        text = '''
+        <problem display_name="{name}" url_name="{name}" weight="{weight}">
+          <numericalresponse answer="{answer}">
+            <responseparam type="tolerance" default="0.00001"/> 
+            <textline size="20" inline="true" trailing_text="kN"/>
+          </numericalresponse>
+        </problem>
+        '''.format(name=name, answer=answer, weight=weight)
+        kwargs.update({'data': text,})
+        descriptor = XModuleItemFactory.create(**kwargs)
+        # Now, change the graded flag, and do a bunch of voodoo to save this change.
+        descriptor.lms.graded = True
+        descriptor.save()
+        editable_modulestore().update_metadata(descriptor.location, descriptor._model_data._kvs._metadata)
+        return descriptor
 
 class RequestFactoryForModules(RequestFactory):
     """
@@ -43,6 +76,195 @@ def _flat(thing):
         return thing[0]
     else:
         return thing
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class FactoryScoringTest(LoginEnrollmentTestCase):
+    """
+    Tests grading on a sample mongo course.
+    """
+    def setUp(self):
+        # Set up Mako correctly.
+        from mitxmako.middleware import MakoMiddleware
+        MakoMiddleware()
+        
+        # Make the fake course
+        self.toy_course = CourseFactory.create(grading_policy={
+            "GRADER": [
+                    {
+                        "type": "Problem Set",
+                        "min_count": 4,
+                        "drop_count": 0,
+                        "short_label": "PSET",
+                        "weight": 0.4
+                    },
+                    {
+                        "type": "Final",
+                        "short_label": "Final",
+                        "min_count": 1,
+                        "drop_count": 0,
+                        "weight": 0.6
+                    }
+                ],
+                "GRADE_CUTOFFS": {
+                    "Pass": 0.5
+                }
+            }
+        )
+        self.mock_user = UserFactory()
+        self.mock_user.id = 1
+        self.request_factory = RequestFactoryForModules()
+
+        self.model_data_cache = ModelDataCache(
+            [self.toy_course],
+            self.toy_course.id,
+            self.mock_user,
+        )
+
+        # Make some psets and an exam.  Course structure is as follows:
+        # Pset 1
+        #    1_1 - 2pts - Correct
+        #    1_2 - 3pts - Correct
+        #    1_3 - 4pts - Unanswered
+        #    1_4 - 5pts - Correct
+        # Pset 2 (ps02.xml)
+        #    2_1 - 10pts - Correct
+        #    2_2 - 10pts - Incorrect
+        # Final (exam.xml)
+        #    e_1 - 20pts - Unanswered
+        #    e_2 - 10pts - Correct
+        self.ps1 = XModuleItemFactory(
+            parent_location=self.toy_course.location,
+            category='problemset',
+        )
+        self.ps1.lms.format = 'Problem Set'
+        self.section1 = XModuleItemFactory(
+            parent_location=self.ps1.location,
+            category='sequential'
+        )
+        self.problem1_1 = ProblemFactory(
+            parent_location=self.section1.location,
+            problem_name='ps1_1',
+            weight=2
+        )
+        self._answer_correctly(self.problem1_1)
+        self.problem1_2 = ProblemFactory(
+            parent_location=self.section1.location,
+            problem_name='ps1_2',
+            weight=3
+        )
+        self._answer_correctly(self.problem1_2)
+        self.problem1_3 = ProblemFactory(
+            parent_location=self.section1.location,
+            problem_name='ps1_3',
+            weight=4
+        )
+        self.problem1_4 = ProblemFactory(
+            parent_location=self.section1.location,
+            problem_name='ps1_4',
+            weight=5
+        )
+        self._answer_correctly(self.problem1_4)
+
+        self.ps2 = XModuleItemFactory(
+            parent_location=self.toy_course.location,
+            category='problemset',
+        )
+        self.ps2.lms.format = 'Problem Set'
+        self.section2 = XModuleItemFactory(
+            parent_location=self.ps2.location,
+            category='sequential'
+        )
+        self.problem2_1 = ProblemFactory(
+            parent_location=self.section2.location,
+            problem_name='ps2_1',
+            weight=10
+        )
+        self._answer_correctly(self.problem2_1)
+        self.problem2_2 = ProblemFactory(
+            parent_location=self.section2.location,
+            problem_name='ps2_2',
+            weight=10
+        )
+        self._answer_incorrectly(self.problem2_2)
+
+        self.final_exam = XModuleItemFactory(
+            parent_location=self.toy_course.location,
+            category='problemset',
+        )
+        self.final_exam.lms.format = 'Final'
+        self.section3 = XModuleItemFactory(
+            parent_location=self.final_exam.location,
+            category='sequential'
+        )
+        self.probleme_1 = ProblemFactory(
+            parent_location=self.section3.location,
+            problem_name='e_1',
+            weight=20
+        )
+        self.probleme_2 = ProblemFactory(
+            parent_location=self.section3.location,
+            problem_name='e_2',
+            weight=10
+        )
+        self._answer_correctly(self.probleme_2)
+
+
+    def _fetch_problem(self, descriptor):
+        """
+        Given a descriptor, return an xmodule.
+        """
+        return module_render.get_module_for_descriptor_internal(
+            self.mock_user,
+            descriptor,
+            self.model_data_cache,
+            self.toy_course.id,
+            lambda *args: None,
+            'blah',
+        )
+
+    def _answer_correctly(self, problem_descriptor):
+        """
+        Answer all parts of the given problem correctly.
+        """
+        problem_module = self._fetch_problem(problem_descriptor)
+        answers = problem_module.lcp.get_question_answers()
+        answers = {'input_' + key: _flat(value) for key, value in answers.iteritems()}
+        problem_module.check_problem(answers)
+
+    def _answer_incorrectly(self, problem_descriptor):
+        """
+        Answer all parts of this problem incorrectly.
+        """
+        problem_module = self._fetch_problem(problem_descriptor)
+        answers = problem_module.lcp.get_question_answers()
+        answers = {'input_' + key: 'wrong' for key in answers}
+        problem_module.check_problem(answers)
+
+    def test_course_grading(self):
+        """
+        Run the toy course through the grader, and check what comes out.
+        """
+        # First, reload the toy course descriptor.
+        store = editable_modulestore('direct')
+        self.toy_course = store.get_item(self.toy_course.location)
+        grader_out = grades.grade(self.mock_user, self.request_factory, self.toy_course)
+        import nose.tools
+        nose.tools.set_trace()
+        print grader_out
+        # Overall score
+        self.assertAlmostEqual(grader_out['percent'], 0.32)
+        breakdown = grader_out['section_breakdown']
+        # Pset 1
+        self.assertAlmostEqual(breakdown[0]['percent'], 0.7142857142857143)
+        # Pset 2
+        self.assertAlmostEqual(breakdown[1]['percent'], 0.5)
+        # Pset 3 (unreleased)
+        self.assertAlmostEqual(breakdown[2]['percent'], 0.0)
+        # Overall problem sets
+        self.assertAlmostEqual(grader_out['grade_breakdown'][0]['percent'], 0.12142857142857144)
+        # Final
+        self.assertAlmostEqual(grader_out['grade_breakdown'][1]['percent'], 0.2)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
