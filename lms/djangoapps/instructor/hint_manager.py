@@ -215,7 +215,7 @@ def add_hint(request, course_id, field):
     # Validate the answer.  This requires initializing the xmodules, which
     # is annoying.
     loc = Location(problem_id)
-    descriptors = modulestore().get_items(loc)
+    descriptors = modulestore().get_items(loc, course_id=course_id)
     m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
     hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
     if not hinter_module.validate_answer(answer):
