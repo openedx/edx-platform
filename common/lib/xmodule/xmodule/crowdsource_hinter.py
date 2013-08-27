@@ -229,12 +229,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # The brackets surrounding the index are for backwards compatability purposes.
         # (It used to be that each answer was paired with multiple hints in a list.)
         self.previous_answers += [[best_hint_answer, [best_hint_index]]]
-        for i in xrange(min(2, n_hints - 1)):
+        for _ in xrange(min(2, n_hints - 1)):
             # Keep making random hints until we hit a target, or run out.
             while True:
                 # random.choice randomly chooses an element from its input list.
                 # (We then unpack the item, in this case data for a hint.)
-                (hint_index, (rand_hint, votes, hint_answer)) =\
+                (hint_index, (rand_hint, _, hint_answer)) =\
                     random.choice(matching_hints.items())
                 if rand_hint not in hints:
                     break

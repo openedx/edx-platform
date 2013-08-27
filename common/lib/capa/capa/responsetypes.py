@@ -915,16 +915,14 @@ class NumericalResponse(LoncapaResponse):
         else:
             return CorrectMap(self.answer_id, 'incorrect')
 
-    # TODO: add check_hint_condition(self, hxml_set, student_answers)
-
-    def compare_answer(self, a, b):
+    def compare_answer(self, ans1, ans2):
         """
         Outside-facing function that lets us compare two numerical answers,
         with this problem's tolerance.
         """
         return compare_with_tolerance(
-            evaluator({}, {}, a),
-            evaluator({}, {}, b),
+            evaluator({}, {}, ans1),
+            evaluator({}, {}, ans2),
             self.tolerance
         )
 
@@ -1886,11 +1884,11 @@ class FormulaResponse(LoncapaResponse):
         else:
             return "incorrect"
 
-    def compare_answer(self, a, b):
+    def compare_answer(self, ans1, ans2):
         """
         An external interface for comparing whether a and b are equal.
         """
-        internal_result = self.check_formula(a, b, self.samples)
+        internal_result = self.check_formula(ans1, ans2, self.samples)
         return internal_result == "correct"
 
     def validate_answer(self, answer):

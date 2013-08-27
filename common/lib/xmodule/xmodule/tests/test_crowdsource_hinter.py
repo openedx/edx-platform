@@ -120,9 +120,9 @@ class CHModuleFactory(object):
                 return False
         responder.validate_answer = validate_answer
 
-        def compare_answer(a, b):
+        def compare_answer(ans1, ans2):
             """ A fake answer comparer """
-            return a == b
+            return ans1 == ans2
         responder.compare_answer = compare_answer
 
         capa_module.lcp.responders = {'responder0': responder}
@@ -189,11 +189,13 @@ class VerticalWithModulesFactory(object):
 
     @staticmethod
     def next_num():
+        """Increments a global counter for naming."""
         CHModuleFactory.num += 1
         return CHModuleFactory.num
 
     @staticmethod
     def create():
+        """Make a vertical."""
         model_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
         system = get_test_system()
         descriptor = VerticalDescriptor.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
@@ -532,7 +534,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         """
         mock_module = CHModuleFactory.create()
 
-        def fake_get_hint(get):
+        def fake_get_hint(_):
             """
             Creates a rendering dictionary, with which we can test
             the templates.
