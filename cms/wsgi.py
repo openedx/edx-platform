@@ -1,8 +1,8 @@
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cms.envs.aws")
 
-import lms.startup as startup
+import cms.startup as startup
 startup.run()
 
 # This application object is used by the development server

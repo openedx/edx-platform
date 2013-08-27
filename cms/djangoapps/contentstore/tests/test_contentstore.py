@@ -1140,12 +1140,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
+        print module_store.metadata_inheritance_cache_subsystem
+        print module_store.request_cache
         course = module_store.get_item(location, depth=2)
 
         # make sure we haven't done too many round trips to DB
-        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
-        # 4) because of the RT due to calculating the inherited metadata
-        self.assertEqual(wrapper.counter, 4)
+        # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
+        # Because we're querying from the top of the tree, we cache information needed for inheritance,
+        # so we don't need to make an extra query to compute it.
+        self.assertEqual(wrapper.counter, 3)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
         self.assertTrue(Location(['i4x', 'edX', 'toy', 'sequential',

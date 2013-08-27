@@ -11,6 +11,9 @@ It is hidden behind a false defaulted course level flag.
 Studio: Allow course authors to set their course image on the schedule
 and details page, with support for JPEG and PNG images.
 
+LMS, Studio: Centralized startup code to manage.py and wsgi.py files.
+Made studio runnable using wsgi.
+
 Blades: Took videoalpha out of alpha, replacing the old video player
 
 Common: Allow instructors to input complicated expressions as answers to

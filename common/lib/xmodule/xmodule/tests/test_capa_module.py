@@ -322,7 +322,8 @@ class CapaModuleTest(unittest.TestCase):
 
         # We have to set up Django settings in order to use QueryDict
         from django.conf import settings
-        settings.configure()
+        if not settings.configured:
+            settings.configure()
 
         # Valid GET param dict
         valid_get_dict = self._querydict_from_dict({'input_1': 'test',

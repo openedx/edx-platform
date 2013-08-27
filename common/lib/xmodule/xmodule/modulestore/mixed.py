@@ -17,12 +17,12 @@ class MixedModuleStore(ModuleStoreBase):
     """
     ModuleStore that can be backed by either XML or Mongo
     """
-    def __init__(self, mappings, stores):
+    def __init__(self, mappings, stores, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration informations
         """
-        super(MixedModuleStore, self).__init__()
+        super(MixedModuleStore, self).__init__(**kwargs)
 
         self.modulestores = {}
         self.mappings = mappings
@@ -131,14 +131,6 @@ class MixedModuleStore(ModuleStoreBase):
         returns the parent locations for a given lcoation and course_id
         """
         return self._get_modulestore_for_courseid(course_id).get_parent_locations(location, course_id)
-
-    def set_modulestore_configuration(self, config_dict):
-        """
-        This implementation of the interface method will pass along the configuration to all ModuleStore
-        instances
-        """
-        for store in self.modulestores.values():
-            store.set_modulestore_configuration(config_dict)
 
     def get_modulestore_type(self, course_id):
         """
