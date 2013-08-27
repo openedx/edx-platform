@@ -47,7 +47,6 @@ class TestLTI(BaseTestXmodule):
             'lti_url': '',  # default value
         }
         self.correct_headers.update(expected_context)
-        # import ipdb; ipdb.set_trace()
         self.assertEqual(
             fragment.content,
             self.runtime.render_template('lti.html', self.correct_headers)
