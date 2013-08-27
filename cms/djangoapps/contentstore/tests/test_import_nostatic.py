@@ -12,6 +12,7 @@ import copy
 from django.contrib.auth.models import User
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -30,7 +31,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.

@@ -25,6 +25,7 @@ from contentstore.tests.utils import parse_json
 from auth.authz import add_user_to_creator_group
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location, mongo
@@ -68,7 +69,7 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy courses.
@@ -1180,7 +1181,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -1707,6 +1708,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         content_store.find(location)
 
 
+@override_settings(MODULESTORE=TEST_MODULESTORE)
 class MetadataSaveTestCase(ModuleStoreTestCase):
     """Test that metadata is correctly cached and decached."""
 
