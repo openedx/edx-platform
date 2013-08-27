@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoPlayer', function() {
+  describe('VideoPlayer', function() {
     var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl, oldOTBD;
 
     function initialize(fixture) {

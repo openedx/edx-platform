@@ -166,43 +166,29 @@ then browse reports/common/lib/xmodule/cover/index.html
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
 
+
 ### Running Javascript Unit Tests
 
-To run all of the javascript unit tests, use
+We use Jasmine to run JavaScript unit tests.  To run all the JavaScript tests:
 
-    rake jasmine
+    rake test:js
 
-If the `phantomjs` binary is on the path, or the `PHANTOMJS_PATH` environment variable is
-set to point to it, then the tests will be run headless. Otherwise, they will be run in
-your default browser
+To run a specific set of JavaScript tests and print the results to the console:
 
-    export PATH=/path/to/phantomjs:$PATH
-    rake jasmine  # Runs headless
+    rake test:js:run[lms]
+    rake test:js:run[cms]
+    rake test:js:run[xmodule]
+    rake test:js:run[common]
 
-or
+To run JavaScript tests in your default browser:
 
-    PHANTOMJS_PATH=/path/to/phantomjs rake jasmine  # Runs headless
+    rake test:js:dev[lms]
+    rake test:js:dev[cms]
+    rake test:js:dev[xmodule]
+    rake test:js:dev[common]
 
-or
+These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
-    rake jasmine  # Runs in browser
-
-You can also force a run using phantomjs or the browser using the commands
-
-    rake jasmine:browser  # Runs in browser
-    rake jasmine:phantomjs  # Runs headless
-
-You can run tests for a specific subsystems as well
-
-    rake jasmine:lms  # Runs all lms javascript unit tests using the default method
-    rake jasmine:cms:browser  # Runs all cms javascript unit tests in the browser
-
-Use `rake -T` to get a list of all available subsystems
-
-**Troubleshooting**: If you get an error message while running the `rake` task,
-try running `bundle install` to install the required ruby gems.
-
-Unit tests can be run in parallel to each other and while acceptance tests are running
 
 ### Running Acceptance Tests
 

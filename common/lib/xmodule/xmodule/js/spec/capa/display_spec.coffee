@@ -14,7 +14,6 @@ describe 'Problem', ->
     # this msg is coming from the stubRequests function else clause.
     jasmine.stubRequests()
 
-    # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
 
     spyOn Logger, 'log'

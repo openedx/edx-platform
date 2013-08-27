@@ -1,5 +1,5 @@
 (function () {
-    xdescribe('Video', function () {
+    describe('Video', function () {
         var oldOTBD;
 
         beforeEach(function () {
@@ -154,9 +154,9 @@
 
                     it('parse Html5 sources', function () {
                         var html5Sources = {
-                            mp4: 'test_files/test.mp4',
-                            webm: 'test_files/test.webm',
-                            ogg: 'test_files/test.ogv'
+                            mp4: 'xmodule/include/fixtures/test.mp4',
+                            webm: 'xmodule/include/fixtures/test.webm',
+                            ogg: 'xmodule/include/fixtures/test.ogv'
                         };
 
                         expect(state.html5Sources).toEqual(html5Sources);
