@@ -103,6 +103,10 @@ You can run tests using `rake` commands.  For example,
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
+You can re-run all failed python tests by running (all JS tests will still run)
+
+    rake test[--failed]
+
 You can also run the tests without `collectstatic`, which tends to be faster:
 
     rake fasttest_lms
@@ -128,6 +132,10 @@ To run a single django test:
 
     rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
 
+To re-run all failing django tests from lms or cms:
+
+    rake test_lms[--failed]
+
 To run a single nose test file:
 
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py
@@ -142,18 +150,18 @@ To run a single test and get stdout, with proper env config:
 
 To run a single test and get stdout and get coverage:
 
-    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example 
+    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
     python -m coverage run --rcfile=./lms/.coveragerc which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
 
 generate coverage report:
 
-    coverage report --rcfile=./common/lib/xmodule/.coveragerc 
+    coverage report --rcfile=./common/lib/xmodule/.coveragerc
 
 or to get html report:
 
     coverage html --rcfile=./common/lib/xmodule/.coveragerc
-    
-then browse reports/common/lib/xmodule/cover/index.html    
+
+then browse reports/common/lib/xmodule/cover/index.html
 
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
