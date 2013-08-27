@@ -62,6 +62,9 @@
         ctx.drawImage(video[0], 0, 0);
         image[0].src = canvas[0].toDataURL('image/png');
       }
+      else {
+        return false;
+      }
       video[0].pause();
 
       captureButton.hide();
@@ -126,7 +129,7 @@
     $("#pay_button_frame").addClass('disabled');
 
     initVideoCapture();
-    initSnapshotHandler(["face", "photo_id"]);
+    initSnapshotHandler(["photo_id", "face"]);
 
   });
 
@@ -321,7 +324,7 @@
 
 
       </div>
-        <p>Photos don't meet the requirements? <a href="#">Retake the photos</a>.</p>
+        <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
 
 <hr />
 
@@ -374,8 +377,8 @@
 
 
   <section class="support">
-    <p class="tip">More questions? <a rel="external" href="">Check out our FAQs.</a></p>
-    <p class="tip">Change your mind? <a href="">You can always Audit the course for free without verifying.</a></p>
+    <p class="tip">More questions? <a rel="external" href="#">Check out our FAQs. (not active yet)</a></p>
+    <p class="tip">Change your mind? <a href="${reverse('course_modes_choose') + '?course_id=' + course_id }">You can always Audit the course for free without verifying.</a></p>
   </section>
 
 
