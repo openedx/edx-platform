@@ -84,8 +84,8 @@ def instructor_dashboard(request, course_id):
 
     msg = ''
     email_msg = ''
-    to_option = None
-    subject = None
+    email_to_option = None
+    email_subject = None
     html_message = ''
     show_email_tab = False
     problems = []
@@ -703,30 +703,26 @@ def instructor_dashboard(request, course_id):
     # email
 
     elif action == 'Send email':
-        to_option = request.POST.get("to_option")
-        subject = request.POST.get("subject")
+        email_to_option = request.POST.get("to_option")
+        email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
         text_message = html_to_text(html_message)
 
         email = CourseEmail(course_id=course_id,
                             sender=request.user,
-                            to_option=to_option,
-                            subject=subject,
+                            to_option=email_to_option,
+                            subject=email_subject,
                             html_message=html_message,
                             text_message=text_message)
 
         email.save()
 
-        course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
         tasks.delegate_email_batches.delay(
             email.id,
-            email.to_option,
-            course_id,
-            course_url,
             request.user.id
         )
 
-        if to_option == "all":
+        if email_to_option == "all":
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
@@ -799,9 +795,9 @@ def instructor_dashboard(request, course_id):
     # HTML editor for email
     if idash_mode == 'Email':
         html_module = HtmlDescriptor(course.system, {'data': html_message})
-        editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+        email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
     else:
-        editor = None
+        email_editor = None
 
     # Flag for whether or not we display the email tab (depending upon
     # what backing store this course using (Mongo vs. XML))
@@ -825,11 +821,13 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to_option': to_option,            # email
-               'subject': subject,                # email
-               'editor': editor,                  # email
+
+               'to_option': email_to_option,      # email
+               'subject': email_subject,          # email
+               'editor': email_editor,            # email
                'email_msg': email_msg,            # email
                'show_email_tab': show_email_tab,  # email
+
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),

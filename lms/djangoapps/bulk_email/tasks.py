@@ -27,24 +27,16 @@ log = get_task_logger(__name__)
 
 
 @task(default_retry_delay=10, max_retries=5)  # pylint: disable=E1102
-def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
+def delegate_email_batches(email_id, user_id):
     """
     Delegates emails by querying for the list of recipients who should
     get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
     and queueing up worker jobs.
 
-    `to_option` is {'myself', 'staff', or 'all'}
-
     Returns the number of batches (workers) kicked off.
     """
     try:
-        course = get_course_by_id(course_id)
-    except Http404 as exc:
-        log.error("get_course_by_id failed: %s", exc.args[0])
-        raise Exception("get_course_by_id failed: " + exc.args[0])
-
-    try:
-        CourseEmail.objects.get(id=email_id)
+        email_obj = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
         # The retry behavior here is necessary because of a race condition between the commit of the transaction
         # that creates this CourseEmail row and the celery pipeline that starts this task.
@@ -87,7 +79,6 @@ def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
-    image_url = course_image_url(course)
     recipient_qset = recipient_qset.order_by('pk')
     total_num_emails = recipient_qset.count()
     num_queries = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_QUERY)))
@@ -135,9 +126,10 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
                                      user__in=[i['pk'] for i in to_list])
                              .values_list('user__email', flat=True))
 
+    optouts = set(optouts)
     num_optout = len(optouts)
 
-    to_list = filter(lambda x: x['email'] not in set(optouts), to_list)
+    to_list = filter(lambda x: x['email'] not in optouts, to_list)
 
     subject = "[" + course_title + "] " + msg.subject
 
@@ -208,6 +200,9 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
         # Error caught here cause the email to be retried.  The entire task is actually retried without popping the list
+        # Reasoning is that all of these errors may be temporary condition.
+        log.warning('Email with id %d not delivered due to temporary error %s, retrying send to %d recipients',
+                    email_id, exc, len(to_list))
         raise course_email.retry(
             arg=[
                 email_id,
@@ -220,6 +215,11 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
             exc=exc,
             countdown=(2 ** current_task.request.retries) * 15
         )
+    except:
+        log.exception('Email with id %d caused course_email task to fail with uncaught exception. To list: %s',
+                      email_id,
+                      [i['email'] for i in to_list])
+        raise
 
 
 # This string format code is wrapped in this function to allow mocking for a unit test

@@ -99,12 +99,12 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         # URL for dashboard
         self.url = reverse('dashboard')
         # URL for email settings modal
-        self.email_modal_link = '<a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="{0}/{1}/{2}" data-course-number="{1}" data-optout="False">Email Settings</a>'.format(
-            self.course.org,
-            self.course.number,
-            self.course.display_name.replace(' ', '_')
-            )
-
+        self.email_modal_link = (('<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
+                                 'data-course-id="{0}/{1}/{2}" data-course-number="{1}" '
+                                 'data-optout="False">Email Settings</a>')
+                                 .format(self.course.org,
+                                         self.course.number,
+                                         self.course.display_name.replace(' ', '_')))
 
     def tearDown(self):
         """
@@ -117,7 +117,6 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertTrue(self.email_modal_link in response.content)
-
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):
