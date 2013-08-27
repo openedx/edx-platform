@@ -270,15 +270,18 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, **kwargs):
+                 user=None, password=None, mongo_options=None, **kwargs):
 
-        super(MongoModuleStore, self).__init__()
+        super(MongoModuleStore, self).__init__(**kwargs)
+
+        if mongo_options is None:
+            mongo_options = {}
 
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port,
             tz_aware=True,
-            **kwargs
+            **mongo_options
         )[db][collection]
 
         if user is not None and password is not None:
