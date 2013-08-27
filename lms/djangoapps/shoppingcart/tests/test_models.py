@@ -6,6 +6,8 @@ from factory import DjangoModelFactory
 from mock import patch
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.core import mail
+from django.conf import settings
 from django.db import DatabaseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -76,6 +78,12 @@ class OrderTest(TestCase):
         cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
+        # test e-mail sending
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
+        self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
+        self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
+
     def test_purchase_item_failure(self):
         # once again, we're testing against the specific implementation of
         # CertificateItem
@@ -86,7 +94,56 @@ class OrderTest(TestCase):
                 cart.purchase()
                 # verify that we rolled back the entire transaction
                 self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
+                # verify that e-mail wasn't sent
+                self.assertEquals(len(mail.outbox), 0)
 
+    def purchase_with_data(self, cart):
+        """ purchase a cart with billing information """
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+        cart.purchase(
+            first='John',
+            last='Smith',
+            street1='11 Cambridge Center',
+            street2='Suite 101',
+            city='Cambridge',
+            state='MA',
+            postalcode='02412',
+            country='US',
+            ccnum='1111',
+            cardtype='001',
+        )
+
+    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
+    def test_billing_info_storage_on(self):
+        cart = Order.get_cart_for_user(self.user)
+        self.purchase_with_data(cart)
+        self.assertNotEqual(cart.bill_to_first, '')
+        self.assertNotEqual(cart.bill_to_last, '')
+        self.assertNotEqual(cart.bill_to_street1, '')
+        self.assertNotEqual(cart.bill_to_street2, '')
+        self.assertNotEqual(cart.bill_to_postalcode, '')
+        self.assertNotEqual(cart.bill_to_ccnum, '')
+        self.assertNotEqual(cart.bill_to_cardtype, '')
+        self.assertNotEqual(cart.bill_to_city, '')
+        self.assertNotEqual(cart.bill_to_state, '')
+        self.assertNotEqual(cart.bill_to_country, '')
+
+    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
+    def test_billing_info_storage_off(self):
+        cart = Order.get_cart_for_user(self.user)
+        cart = Order.get_cart_for_user(self.user)
+        self.purchase_with_data(cart)
+        self.assertNotEqual(cart.bill_to_first, '')
+        self.assertNotEqual(cart.bill_to_last, '')
+        self.assertNotEqual(cart.bill_to_city, '')
+        self.assertNotEqual(cart.bill_to_state, '')
+        self.assertNotEqual(cart.bill_to_country, '')
+        self.assertNotEqual(cart.bill_to_postalcode, '')
+        # things we expect to be missing when the feature is off
+        self.assertEqual(cart.bill_to_street1, '')
+        self.assertEqual(cart.bill_to_street2, '')
+        self.assertEqual(cart.bill_to_ccnum, '')
+        self.assertEqual(cart.bill_to_cardtype, '')
 
 class OrderItemTest(TestCase):
     def setUp(self):
