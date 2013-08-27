@@ -33,7 +33,7 @@ window.LTI = (function () {
         if (form.attr('action')) {
             form.submit();
 
-            element.find('h2.error_message').addClass('hidden');
+            element.find('.error_message').addClass('hidden');
             frame.show();
             frame.width('100%').height(800);
         }
@@ -41,7 +41,7 @@ window.LTI = (function () {
         // If no action URL was specified, we show an error message.
         else {
             frame.hide();
-            element.find('h2.error_message').removeClass('hidden');
+            element.find('.error_message').removeClass('hidden');
         }
     }
 
