@@ -135,10 +135,6 @@ urlpatterns += (
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
-
-if settings.ENABLE_JASMINE:
-    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
-
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),

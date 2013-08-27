@@ -85,7 +85,6 @@ rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
 django_nose==1.1
-django-jasmine==0.3.2
 django_debug_toolbar
 django-debug-toolbar-mongo
 nose-ignore-docstring

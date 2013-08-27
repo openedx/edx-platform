@@ -131,46 +131,33 @@ task :test => :test_docs
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
 
-    found_coverage_info = false
-
-    reports = []
+    # Generate coverage for Python sources
     TEST_TASK_DIRS.each do |dir|
         report_dir = report_dir_path(dir)
 
-        if !File.file?("#{report_dir}/.coverage")
-            next
-        else
-            found_coverage_info = true
+        if File.file?("#{report_dir}/.coverage")
+
+            # Generate the coverage.py HTML report
+            sh("coverage html --rcfile=#{dir}/.coveragerc")
+
+            # Generate the coverage.py XML report
+            sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+
         end
-
-        puts "***************"
-        puts "Generating diff coverage report for: #{dir}"
-        puts "***************\n"
-
-        # Generate the coverage.py HTML report
-        sh("coverage html --rcfile=#{dir}/.coveragerc")
-
-        # Generate the coverage.py XML report
-        sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
-        reports << "#{report_dir}/coverage.xml"
-
-        # Generate the diff coverage HTML report, based on the XML report
-        sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
-
-        # Print the diff coverage report to the console
-        sh("diff-cover #{report_dir}/coverage.xml")
-        puts "\n"
     end
+    
+    # Find all coverage XML files (both Python and JavaScript)
+    xml_reports = FileList[File.join(REPORT_DIR, '**/coverage.xml')]
 
-    if not found_coverage_info
+    if xml_reports.length < 1
         puts "No coverage info found.  Run `rake test` before running `rake coverage`."
     else
-        puts "***************"
-        puts "Generating combined diff coverage report"
-        puts "Combined over: #{TEST_TASK_DIRS.join(', ')}"
-        puts "***************\n"
-        sh("diff-cover #{reports.join(' ')} --html-report #{REPORT_DIR}/diff_coverage_combined.html")
-        sh("diff-cover #{reports.join(' ')}")
+        xml_report_str = xml_reports.join(' ')
+        diff_html_path = report_dir_path('diff_coverage_combined.html')
+
+        # Generate the diff coverage reports (HTML and console)
+        sh("diff-cover #{xml_report_str} --html-report #{diff_html_path}")
+        sh("diff-cover #{xml_report_str}")
         puts "\n"
     end
 end
