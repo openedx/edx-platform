@@ -4,6 +4,7 @@
 <h1> ${field_label} </h1>
 Switch to <a id="switch-fields" other-field="${other_field}">${other_field_label}</a>
 
+<p style="color:red"> ${error} </p>
 
 % for definition_id in all_hints:
     <h2> Problem: ${id_to_name[definition_id]} </h2>
@@ -36,6 +37,7 @@ Switch to <a id="switch-fields" other-field="${other_field}">${other_field_label
     <br />
 % endfor
 
+<p style="color:red"> ${error} </p>
 <button id="hint-delete"> Delete selected </button> <button id="update-votes"> Update votes </button>
 
 % if field == 'mod_queue':
