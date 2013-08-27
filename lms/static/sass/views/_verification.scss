@@ -586,13 +586,10 @@ body.register.verification-process {
       .title {
         @extend .t-title5;
         border-bottom: 1px solid #ddd;
-        padding: $baseline 0 ($baseline/4) 0;
+        padding-bottom: ($baseline/4);
         font-weight: bold;
       }
 
-      li {
-        margin-bottom: $baseline;
-      }
     }
 
     .next-step {
@@ -610,6 +607,11 @@ body.register.verification-process {
     .review-photo {
       width: 500px;
       float: left;
+
+      .title {
+        @extend .t-title5;
+        margin-top: $baseline;
+      }
     }
 
     #review-facephoto {
