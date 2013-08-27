@@ -20,7 +20,6 @@ import courseware.grades as grades
 import courseware.module_render as module_render
 from courseware.model_data import LmsKeyValueStore, ModelDataCache
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_XML_MODULESTORE
-from courseware.tests.tests import LoginEnrollmentTestCase
 from student.tests.factories import UserFactory
 
 
@@ -36,6 +35,10 @@ class ProblemFactory(XModuleItemFactory):
         """
         Does some pre-processing, before calling the XModuleItemFactory
         _create.
+        kwargs:
+        - problem_name - Mandatory, the url_name of the problem
+        - parent_location - Mandatory, the parent of this xmodule
+        - answer - The answer
         """
         name = kwargs.pop('problem_name')
         answer = kwargs.pop('answer', 42)
@@ -103,7 +106,7 @@ def _flat(thing):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class FactoryScoringTest(LoginEnrollmentTestCase):
+class FactoryScoringTest(ModuleStoreTestCase):
     """
     Tests grading on a sample mongo course.
     """
@@ -287,7 +290,7 @@ class FactoryScoringTest(LoginEnrollmentTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class ScoringTestCase(LoginEnrollmentTestCase):
+class ScoringTestCase(ModuleStoreTestCase):
     """
     Tests grading on a small sample xml course, found in
     common/test/data/score_test.
@@ -306,8 +309,6 @@ class ScoringTestCase(LoginEnrollmentTestCase):
         self.mock_user.id = 1
         self.request_factory = RequestFactoryForModules()
 
-        import nose.tools
-        nose.tools.set_trace()
         self.model_data_cache = ModelDataCache(
             [self.toy_course],
             self.course_id,
