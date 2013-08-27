@@ -7,6 +7,7 @@ from mock import MagicMock
 import unittest
 
 from xmodule.capa_module import CapaModule
+from xmodule.seq_module import SequenceModule
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore, editable_modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, XModuleItemFactory
@@ -38,22 +39,45 @@ class ProblemFactory(XModuleItemFactory):
         """
         name = kwargs.pop('problem_name')
         answer = kwargs.pop('answer', 42)
-        weight = kwargs.pop('weight', 1)
         text = '''
-        <problem display_name="{name}" url_name="{name}" weight="{weight}">
+        <problem display_name="{name}" url_name="{name}">
           <numericalresponse answer="{answer}">
             <responseparam type="tolerance" default="0.00001"/> 
             <textline size="20" inline="true" trailing_text="kN"/>
           </numericalresponse>
         </problem>
-        '''.format(name=name, answer=answer, weight=weight)
+        '''.format(name=name, answer=answer)
         kwargs.update({'data': text,})
         descriptor = XModuleItemFactory.create(**kwargs)
         # Now, change the graded flag, and do a bunch of voodoo to save this change.
         descriptor.lms.graded = True
+        descriptor.weight = kwargs.pop('weight', 1)
         descriptor.save()
         editable_modulestore().update_metadata(descriptor.location, descriptor._model_data._kvs._metadata)
         return descriptor
+
+
+class ProblemSetFactory(XModuleItemFactory):
+    """
+    A factory for problemsets.  They are marked as `graded`.
+    Mandatory kwarg 'format' determines descriptor.lms.format.
+    """
+    FACTORY_FOR = SequenceModule
+
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Sets some properties of descriptor.lms.
+        """
+        format = kwargs.pop('format')
+        kwargs['category'] = 'problemset'
+        descriptor = XModuleItemFactory.create(**kwargs)
+        descriptor.lms.graded = True
+        descriptor.lms.format = format
+        descriptor.save()
+        editable_modulestore().update_metadata(descriptor.location, descriptor._model_data._kvs._metadata)
+        return descriptor
+
 
 class RequestFactoryForModules(RequestFactory):
     """
@@ -127,83 +151,80 @@ class FactoryScoringTest(LoginEnrollmentTestCase):
         #    1_2 - 3pts - Correct
         #    1_3 - 4pts - Unanswered
         #    1_4 - 5pts - Correct
-        # Pset 2 (ps02.xml)
+        # Pset 2
         #    2_1 - 10pts - Correct
         #    2_2 - 10pts - Incorrect
-        # Final (exam.xml)
+        # Final
         #    e_1 - 20pts - Unanswered
         #    e_2 - 10pts - Correct
-        self.ps1 = XModuleItemFactory(
+        self.chapter1 = XModuleItemFactory(
             parent_location=self.toy_course.location,
-            category='problemset',
+            category='chapter',
         )
-        self.ps1.lms.format = 'Problem Set'
-        self.section1 = XModuleItemFactory(
-            parent_location=self.ps1.location,
-            category='sequential'
+        self.ps1 = ProblemSetFactory(
+            parent_location=self.chapter1.location,
+            format='Problem Set'
         )
         self.problem1_1 = ProblemFactory(
-            parent_location=self.section1.location,
+            parent_location=self.ps1.location,
             problem_name='ps1_1',
             weight=2
         )
         self._answer_correctly(self.problem1_1)
         self.problem1_2 = ProblemFactory(
-            parent_location=self.section1.location,
+            parent_location=self.ps1.location,
             problem_name='ps1_2',
             weight=3
         )
         self._answer_correctly(self.problem1_2)
         self.problem1_3 = ProblemFactory(
-            parent_location=self.section1.location,
+            parent_location=self.ps1.location,
             problem_name='ps1_3',
             weight=4
         )
         self.problem1_4 = ProblemFactory(
-            parent_location=self.section1.location,
+            parent_location=self.ps1.location,
             problem_name='ps1_4',
             weight=5
         )
         self._answer_correctly(self.problem1_4)
 
-        self.ps2 = XModuleItemFactory(
+        self.chapter2 = XModuleItemFactory(
             parent_location=self.toy_course.location,
-            category='problemset',
+            category='chapter',
         )
-        self.ps2.lms.format = 'Problem Set'
-        self.section2 = XModuleItemFactory(
-            parent_location=self.ps2.location,
-            category='sequential'
+        self.ps2 = ProblemSetFactory(
+            parent_location=self.chapter2.location,
+            format='Problem Set',
         )
         self.problem2_1 = ProblemFactory(
-            parent_location=self.section2.location,
+            parent_location=self.ps2.location,
             problem_name='ps2_1',
             weight=10
         )
         self._answer_correctly(self.problem2_1)
         self.problem2_2 = ProblemFactory(
-            parent_location=self.section2.location,
+            parent_location=self.ps2.location,
             problem_name='ps2_2',
             weight=10
         )
         self._answer_incorrectly(self.problem2_2)
 
-        self.final_exam = XModuleItemFactory(
+        self.chapter3 = XModuleItemFactory(
             parent_location=self.toy_course.location,
-            category='problemset',
+            category='chapter',
         )
-        self.final_exam.lms.format = 'Final'
-        self.section3 = XModuleItemFactory(
-            parent_location=self.final_exam.location,
-            category='sequential'
+        self.final_exam = ProblemSetFactory(
+            parent_location=self.chapter3.location,
+            format='Final',
         )
         self.probleme_1 = ProblemFactory(
-            parent_location=self.section3.location,
+            parent_location=self.final_exam.location,
             problem_name='e_1',
             weight=20
         )
         self.probleme_2 = ProblemFactory(
-            parent_location=self.section3.location,
+            parent_location=self.final_exam.location,
             problem_name='e_2',
             weight=10
         )
@@ -249,8 +270,6 @@ class FactoryScoringTest(LoginEnrollmentTestCase):
         store = editable_modulestore('direct')
         self.toy_course = store.get_item(self.toy_course.location)
         grader_out = grades.grade(self.mock_user, self.request_factory, self.toy_course)
-        import nose.tools
-        nose.tools.set_trace()
         print grader_out
         # Overall score
         self.assertAlmostEqual(grader_out['percent'], 0.32)
@@ -270,7 +289,7 @@ class FactoryScoringTest(LoginEnrollmentTestCase):
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class ScoringTestCase(LoginEnrollmentTestCase):
     """
-    Tests grading on a small sample course, found in
+    Tests grading on a small sample xml course, found in
     common/test/data/score_test.
 
     This test is designed to detect whether changes to xmodule,
@@ -287,6 +306,8 @@ class ScoringTestCase(LoginEnrollmentTestCase):
         self.mock_user.id = 1
         self.request_factory = RequestFactoryForModules()
 
+        import nose.tools
+        nose.tools.set_trace()
         self.model_data_cache = ModelDataCache(
             [self.toy_course],
             self.course_id,
