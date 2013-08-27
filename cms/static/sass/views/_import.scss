@@ -1,5 +1,14 @@
 // studio - views - course import
 // ====================
+@-webkit-keyframes opacity {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@-moz-keyframes opacity {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 
 body.course.import {
 
@@ -85,6 +94,8 @@ body.course.import {
     }
   }
 
+
+
   .progress-bar {
     display: none;
     width: 350px;
@@ -109,3 +120,41 @@ body.course.import {
     line-height: 48px;
   }
 }
+
+.not-started {
+  opacity: 0.4;
+}
+
+.not-started span {
+  display: none;
+}
+
+.done {
+  opacity: 0.7;
+}
+
+.done span {
+  display: none;
+}
+
+.in-progress span {
+  -webkit-animation-name: opacity;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+
+  -moz-animation-name: opacity;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: infinite;
+}
+
+.in-progress span:nth-child(2) {
+  -webkit-animation-delay: 300ms;
+  -moz-animation-delay: 300ms;
+}
+
+.in-progress span:nth-child(3) {
+  -webkit-animation-delay: 600ms;
+  -moz-animation-delay: 600ms;
+}
+
+

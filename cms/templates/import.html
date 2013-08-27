@@ -34,7 +34,26 @@
         <input type="file" name="course-data" class="file-input" >
         <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <p class="status-block">Unpacking...</p>
+        <div id="status-infos" class="status-infos">
+            <p class="status-info in-progress">
+            Unpacking
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            </p>
+            <p class="status-info not-started">
+            Verifying
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            </p>
+            <p class="status-info not-started">
+            Importing
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            <span class="loading-dots">.</span>
+            </p>
+        </div>
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -58,6 +77,8 @@ var percent = $('.percent');
 var status = $('#status');
 var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
+
+var allStats = $('#status-infos');
 
 
 $('#fileupload').fileupload({

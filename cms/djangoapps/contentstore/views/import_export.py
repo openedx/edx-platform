@@ -229,6 +229,34 @@ def import_course(request, org, course, name):
             })
         })
 
+@ensure_csrf_cookie
+@login_required
+def get_import_status(request, course, filename):
+    """
+    Returns an integer corresponding to the status of a file import. These are:
+
+        0 : No status file found (import done or upload still in progress)
+        1 : Extracting file
+        2 : Validating.
+        3 : Importing to mongo
+
+        4 : Error reading file (e.g., converting contents to int)
+
+    """
+    data_root = path(settings.GITHUB_REPO_ROOT)
+    status_file = data_root / (course + filename + ".lock")
+    if not os.path.isfile(status_file):
+        return JsonResponse({"ImportStatus": 0 })
+
+    with open(status_file, "r") as f:
+        try:
+            status = int(f.read())
+        except ValueError:
+            status = 4
+        return JsonResponse({"ImportStatus": status})
+
+
+
 
 @ensure_csrf_cookie
 @login_required
@@ -307,7 +335,6 @@ def generate_export_course(request, org, course, name):
     response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
     response['Content-Length'] = os.path.getsize(export_file.name)
     return response
-
 
 @ensure_csrf_cookie
 @login_required
