@@ -315,7 +315,7 @@ class MongoModuleStore(ModuleStoreBase):
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
         query = {'_id.org': location.org,
                  '_id.course': location.course,
-                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical', 'videosequence',
                                           'wrapper', 'problemset', 'conditional', 'randomize']}
                  }
         # we just want the Location, children, and inheritable metadata
