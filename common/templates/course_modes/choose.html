@@ -2,13 +2,13 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%block name="bodyclass">register verification select-track</%block>
+<%block name="bodyclass">register verification-process step-select-track</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
 
   $(document).ready(function() {
-    $( ".more" ).slideUp();
+    $( ".more" ).hide();
     $( ".expand" ).click(function(e) {
         e.preventDefault();
         $(this).next().slideToggle();
@@ -54,7 +54,6 @@
           <span class="ribbon"></span>
           <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
 
-          <form>
           <dl>
             <dt>
               Select your contribution for this course:
@@ -78,7 +77,7 @@
             </dd>
           </dl>
 
-          <p class="tip tip-input expand">
+          <p class="tip expand">
             <a href="">Why do I have to pay? What if I don't meet all the requirements?</a>
           </p>
 
@@ -86,6 +85,10 @@
             <dl class="faq">
               <dt>Why do I have to pay?</dt>
               <dd>Your payment helps cover the costs of verification. As a non-profit, edX  keeps these costs as low as possible, Your payment will also help edX with our mission to provide quality education to anyone.</dd>
+
+              <dt>I'd like to pay more than the minimum.  Is my contribution tax deductible?</dt>
+              <dd>Please check with your tax advisor to determine whether your contribution is tax deductible.</dd>
+
 
               % if "honor" in modes:
               <dt>What if I can't afford it?</dt>
@@ -102,13 +105,10 @@
                 </dd>
               % endif
 
-              <dt>I'd like to pay more than the minimum. Is my contribution tax deductible?</dt>
-                <dd>Please check with your tax advisor to determine whether your contribution is tax deductible.</dd>
-
               % if "honor" in modes:
               <dt>What if I don't meet all of the requirements for financial assistance but I   still want to work toward a certificate?</dt>
                 <dd>If you don't have a webcam, credit or debit card or acceptable ID, you can  opt to simply audit this course, or select to work towards a free Honor Code Certificate of Achievement for this course by checking the box below. Then  click the Select Certificate button to complete registration. We won't ask you to verify your identity.
-                  <p><input type="checkbox" name="honor-code"> <label for="honor-code">Select   Honor Code Certificate</label></p>
+                  <p><input type="checkbox" name="honor-code"> <label for="honor-code">Select Honor Code Certificate</label></p>
                 </dd>
               % endif
             </dl>
@@ -125,7 +125,7 @@
 
         <div class="tips">
           <p>
-            To register for a Verified Certificate of Achievement option, you will need a webcam,   a credit or debit card, and an ID. <a href="">View requirements</a>
+            To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a>
           </p>
         </div>
     % endif
