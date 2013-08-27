@@ -40,7 +40,12 @@
     .fail(function() { alert("error"); });
   }
 
-  function initSnapshotHandler(name) {
+  function initSnapshotHandler(names) {
+    var name = names.pop();
+    if (name == undefined) {
+      return;
+    }
+
     var video = $('#' + name + '_video');
     var canvas = $('#' + name + '_canvas');
     var image = $('#' + name + "_image");
@@ -52,7 +57,7 @@
     var ctx = canvas[0].getContext('2d');
     var localMediaStream = null;
 
-    function snapshot() {
+    function snapshot(event) {
       if (localMediaStream) {
         ctx.drawImage(video[0], 0, 0);
         image[0].src = canvas[0].toDataURL('image/png');
@@ -73,11 +78,8 @@
       nextButton.addClass('disabled');
 
       captureButton.show();
-//      captureButton.removeClass('is-hidden');
       resetButton.hide();
-//      resetButton.addClass('is-hidden');
       approveButton.hide();
-//      approveButton.addClass('is-hidden');
 
       return false;
     }
@@ -91,14 +93,8 @@
 
     // Initialize state for this picture taker
     captureButton.show();
-    //captureButton.removeClass('is-hidden');
-
     resetButton.hide();
-    //resetButton.addClass('is-hidden');
-
     approveButton.hide();
-    //approveButton.addClass('is-hidden');
-
     nextButton.addClass('disabled');
 
     // Connect event handlers...
@@ -110,36 +106,12 @@
     navigator.getUserMedia({video: true}, function(stream) {
       video[0].src = window.URL.createObjectURL(stream);
       localMediaStream = stream;
-    }, onVideoFail);
-  }
 
-  function initPhotoBlocks() {
-    // Photo wrapping
-/*    $('.block-photo .control-redo').addClass('is-hidden');
-    $('.block-photo .control-approve').addClass('is-hidden');
-    $('.block-photo .m-btn-primary').addClass('disabled');
-    $( "#wrapper-facephoto .control-do" ).click(function(e) {
-        e.preventDefault();
-        $(this).toggleClass('is-hidden');
-        $('#wrapper-facephoto .control-redo').toggleClass('is-shown');
-        $('#wrapper-facephoto .control-approve').toggleClass('is-shown');
-    });
-    $( "#wrapper-facephoto .control-approve" ).click(function(e) {
-        e.preventDefault();
-        $(this).addClass('approved');
-        $('#wrapper-facephoto .m-btn-primary').removeClass('disabled');
-    });
-    $( "#wrapper-idphoto .control-do" ).click(function(e) {
-        e.preventDefault();
-        $(this).toggleClass('is-hidden');
-        $('#wrapper-idphoto .control-redo').toggleClass('is-shown');
-        $('#wrapper-idphoto .control-approve').toggleClass('is-shown');
-    });
-    $( "#wrapper-idphoto .control-approve" ).click(function(e) {
-        e.preventDefault();
-        $(this).addClass('approved');
-        $('#wrapper-idphoto .m-btn-primary').removeClass('disabled');
-    }); */
+      // We do this in a recursive call on success because Firefox seems to
+      // simply eat the request if you stack up two on top of each other before
+      // the user has a chance to approve the first one.
+      initSnapshotHandler(names);
+    }, onVideoFail);
   }
 
   $(document).ready(function() {
@@ -153,10 +125,8 @@
 
     $("#pay_button_frame").addClass('disabled');
 
-    initPhotoBlocks();
     initVideoCapture();
-    initSnapshotHandler("face");
-    initSnapshotHandler("photo_id");
+    initSnapshotHandler(["face", "photo_id"]);
 
   });
 
