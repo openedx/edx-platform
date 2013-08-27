@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
 from django.conf import settings
