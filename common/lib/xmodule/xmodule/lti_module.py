@@ -73,7 +73,6 @@ class LTIModule(LTIFields, XModule):
             body=body,
             headers=headers)
         params = headers['Authorization']
-        # import ipdb; ipdb.set_trace()
         # parse headers to pass to template as part of context:
         params = dict([param.strip().replace('"', '').split('=') for param in params.split('",')])
 
