@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_raises
+from nose.tools import assert_equals, assert_raises  # pylint: disable=E0611
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location

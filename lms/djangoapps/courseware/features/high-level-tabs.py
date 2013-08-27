@@ -1,5 +1,4 @@
 from lettuce import world, step
-from nose.tools import assert_equals
 
 
 @step(u'I click on the tabs then the page title should contain the following titles:')

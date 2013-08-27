@@ -3,7 +3,7 @@ Tests for the wrapping layer that provides the XBlock API using XModule/Descript
 functionality
 """
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
