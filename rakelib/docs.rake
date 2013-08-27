@@ -31,15 +31,15 @@ task :showdocs, [:options] do |t, args|
         path = "docs/course_authors"
     elsif args.options == 'data'
         path = "docs/data"
-    else
-        path = "docs"
     end
 
-    Launchy.open("#{path}/build/html/index.html")
+    if defined? path 
+        Launchy.open("#{path}/build/html/index.html")
+    end
 end
 
 desc "Build docs and show them in browser"
 task :doc, [:type, :quiet] =>  :builddocs do |t, args|
-    Rake::Task["showdocs"].invoke(args.type, args.quiet)
+    Rake::Task["builddocs"].invoke(args.type, args.quiet)
 end
 # --- Develop and public documentation ---
