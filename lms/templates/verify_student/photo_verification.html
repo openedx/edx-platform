@@ -194,8 +194,8 @@
       <div class="wrapper-up">
 
         <div id="facecam" class="cam">
-          <div class="placeholder-cam">
-            <video id="face_video" width="400" height="300" autoplay></video><br/>
+          <div class="wrapper-cam">
+            <video id="face_video" width="500" height="375" autoplay></video><br/>
             <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
           </div>
 
@@ -216,19 +216,16 @@
         </div>
 
         <div class="help photo-tips facetips">
-          <h4>Tips on taking a successful photo</h4>
+          <h4 class="title">Tips on taking a successful photo</h4>
           <ul>
-            <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
-            <li>Maecenas faucibus mollis interdum.</li>
-            <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
-            <li>Cras mattis consectetur purus sit amet fermentum.</li>
+            <li>Make sure your face is well-lit</li>
+            <li>Be sure your entire face is inside the frame</li>
+            <li>Can we match the photo you took with the one on your ID?</li>
+            <li>Click the checkmark once you are happy with the photo</li>
           </ul>
-        </div>
-      </div>
 
-      <div class="wrapper-down">
-        <div class="faq facefaq">
-          <h4 class="sr title">Common Questions</h4>
+
+          <h4 class="title">Common Questions</h4>
             <dl>
               <dt>Why do you need my photo?</dt>
                 <dd>We need your photo to confirm that you are you.</dd>
@@ -236,7 +233,12 @@
               <dt>What do you do with this picture?</dt>
                 <dd>We only use it to verify your identity.  It is not displayed anywhere.</dd>
             </dl>
+
+
         </div>
+      </div>
+
+      <div class="wrapper-down">
 
         <div class="next-step">
               <p class="m-btn-primary" id="face_next_button">
@@ -255,8 +257,8 @@
 
         <div id="idcam" class="cam">
 
-          <div class="placeholder-cam">
-            <video id="photo_id_video" width="400" height="300" autoplay></video><br/>
+          <div class="wrapper-cam">
+            <video id="photo_id_video" width="500" height="375" autoplay></video><br/>
             <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
           </div>
 
@@ -276,31 +278,28 @@
         </div>
 
         <div class="photo-tips idtips">
-          <h4>Tips on taking a successful photo</h4>
+          <h4 class="title">Tips on taking a successful photo</h4>
           <ul>
-            <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
-            <li>Maecenas faucibus mollis interdum.</li>
-            <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
-            <li>Cras mattis consectetur purus sit amet fermentum.</li>
+            <li>Make sure your ID is well-lit</li>
+            <li>Check that there isn't any glare</li>
+            <li>Ensure that you can see your photo and read your name</li>
+            <li>Try to keep your fingers at the edge to avoid covering important information</li>
           </ul>
+
+          <h4 class="title">Common Questions</h4>
+            <dl>
+              <dt>Why do you need a photo of my ID?</dt>
+                <dd>We need to match your ID with your photo and name to confirm that you are you.</dd>
+
+              <dt>What do you do with this picture?</dt>
+                <dd>We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.</dd>
+            </dl>
+
         </div>
 
       </div>
 
       <div class="wrapper-down">
-
-        <div class="faq idfaq">
-          <h4 class="sr">Common Questions</h4>
-          <dl class="faq">
-            <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
-              <dd>Aenean eu leo quam.</dd>
-            <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
-              <dd>Maecenas faucibus mollis interdum.</dd>
-            <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
-            <dt>Vestibulum id ligula porta felis euismod semper.</dt>
-          </dl>
-        </div>
 
         <div class="next-step">
               <p class="m-btn-primary" id="photo_id_next_button">
@@ -325,11 +324,11 @@
 
       <div class="wrapper-up">
         <div id="review-facephoto" class="review-photo">
-          <div class="placeholder-photo">
-            <img id="face_image" width="512" height="384" src=""/>
+          <div class="wrapper-photo">
+            <img id="face_image" width="500" height="375" src=""/>
           </div>
 
-          <h4>The photo above needs to meet the following requirements:</h4>
+          <h4 class="title">The photo above needs to meet the following requirements:</h4>
           <ul>
             <li>Be well lit</li>
             <li>Show your whole face</li>
@@ -338,18 +337,21 @@
         </div>
 
         <div id="review-idphoto" class="review-photo">
-          <div class="placeholder-photo">
-            <img id="photo_id_image" width="512" height="384" src=""/>
+          <div class="wrapper-photo">
+            <img id="photo_id_image" width="500" height="375" src=""/>
           </div>
 
-          <h4>The photo above needs to meet the following requirements:</h4>
+          <h4 class="title">The photo above needs to meet the following requirements:</h4>
           <ul>
             <li>Be readable (not too far away, no glare)</li>
             <li>Show your name</li>
             <li>Match the photo of your face and your name above</li>
           </ul>
         </div>
+
+
       </div>
+        <p>Photos don't meet the requirements? <a href="#">Retake the photos</a>.</p>
 
 <hr />
 
@@ -382,10 +384,10 @@
         </dl>
       </div>
 
+<hr />
 
       <div class="next-step">
 
-        <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
         <form id="pay_form" method="post" action="${purchase_endpoint}">
           <!-- <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"> -->
           <input type="checkbox" name="match" id="confirm_pics_good" /> <label for="match">Yes! My details all match.</label>
@@ -394,7 +396,7 @@
             <input type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
           </p>
         </form>
-        <p class="tip">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
+        <p class="tip">Once you verify your details match the requirements, <br />you can move on to step 4, payment on our secure server.</p>
       </div>
     </div>
   </section>
