@@ -4,6 +4,10 @@ CLOBBER.include(REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles')
 # Create the directory to hold coverage reports, if it doesn't already exist.
 directory REPORT_DIR
 
+def test_id_dir(path)
+    return File.join(".testids", path.to_s)
+end
+
 def run_under_coverage(cmd, root)
     cmd0, cmd_rest = cmd.split(" ", 2)
     # We use "python -m coverage" so that the proper python will run the importable coverage
@@ -14,9 +18,15 @@ end
 
 def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+    test_id_file = File.join(test_id_dir(system), "noseids")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
     test_id = dirs.join(' ') if test_id.nil? or test_id == ''
-    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', '--liveserver=localhost:8000-9000', test_id)
+    cmd = django_admin(
+        system, :test, 'test',
+        '--logging-clear-handlers',
+        '--liveserver=localhost:8000-9000',
+        "--id-file=#{test_id_file}",
+        test_id)
     test_sh(run_under_coverage(cmd, system))
 end
 
@@ -64,14 +74,17 @@ TEST_TASK_DIRS = []
 
 [:lms, :cms].each do |system|
     report_dir = report_dir_path(system)
+    test_id_dir = test_id_dir(system)
 
-    # Per System tasks
+    directory test_id_dir
+
+    # Per System tasks/
     desc "Run all django tests on our djangoapps for the #{system}"
     task "test_#{system}", [:test_id] => [:clean_test_files, :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:test_id] => [report_dir, :clean_reports_dir, :install_prereqs, :predjango] do |t, args|
+    task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir, :install_prereqs, :predjango] do |t, args|
         args.with_defaults(:test_id => nil)
         run_tests(system, report_dir, args.test_id)
     end
@@ -97,12 +110,16 @@ end
 Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
 
     report_dir = report_dir_path(lib)
+    test_id_dir = test_id_dir(lib)
+    test_ids = File.join(test_id_dir(lib), '.noseids')
+
+    directory test_id_dir
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}", [:test_id] => [report_dir, :clean_reports_dir] do |t, args|
+    task "test_#{lib}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
         args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        cmd = "nosetests #{args.test_id}"
+        cmd = "nosetests --id-file=#{test_ids} #{args.test_id}"
         test_sh(run_under_coverage(cmd, lib))
     end
     TEST_TASK_DIRS << lib
@@ -126,7 +143,7 @@ TEST_TASK_DIRS.each do |dir|
 end
 
 desc "Run all tests"
-task :test => :test_docs
+task :test, [:test_id] => :test_docs
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
