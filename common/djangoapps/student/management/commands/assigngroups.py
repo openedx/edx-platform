@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-import mitxmako.middleware as middleware
 from student.models import UserTestGroup
 
 import random
@@ -10,8 +9,6 @@ import datetime
 
 import json
 from pytz import UTC
-
-middleware.MakoMiddleware()
 
 
 def group_from_value(groups, v):
