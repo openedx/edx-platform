@@ -28,11 +28,9 @@ function () {
         // Depending on whether captions file could be loaded, the following
         // function invocation can succeed or fail. If it fails, we do not
         // go on with binding handlers to events.
-        if (!state.videoCaption.renderElements()) {
-            return;
+        if (state.videoCaption.renderElements()) {
+            state.videoCaption.bindHandlers();
         }
-
-        state.videoCaption.bindHandlers();
     };
 
     // ***************************************************************
@@ -102,9 +100,6 @@ function () {
         this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
-        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
-
         // Fetch the captions file. If no file was specified, then we hide
         // the "CC" button, and return.
         if (!this.videoCaption.fetchCaption()) {
@@ -112,6 +107,9 @@ function () {
 
             return false;
         }
+
+        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
+        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
         this.videoCaption.setSubtitlesHeight();
 
