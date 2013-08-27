@@ -154,6 +154,24 @@ function (HTML5Video) {
         });
     }
 
+    function _startHeartbeatLogging(state) {
+        if (!state.videoPlayer.heartbeatsInterval) {
+            state.videoPlayer.heartbeatsInterval = window.setInterval(
+                _.bind(state.videoPlayer.log, state, 'is_video_playing'),
+                state.config.heartbeatsLoggingDelay
+            );
+        }
+    }
+
+    function _stopHeartbeatLogging(state) {
+        window.clearInterval(state.videoPlayer.heartbeatsInterval);
+    }
+
+    function _restartHeartbeatLogging(state) {
+        _stopHeartbeatLogging();
+        _startHeartbeatLogging();
+    }
+
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -244,6 +262,7 @@ function (HTML5Video) {
         if (this.videoPlayer.isPlaying()) {
             clearInterval(this.videoPlayer.updateInterval);
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
+            _restartHeartbeatLogging(this);
         } else {
             this.videoPlayer.currentTime = params.time;
         }
@@ -267,6 +286,7 @@ function (HTML5Video) {
             }
         );
 
+        _stopHeartbeatLogging(this);
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
 
@@ -284,6 +304,8 @@ function (HTML5Video) {
                 'currentTime': this.videoPlayer.currentTime
             }
         );
+
+        _startHeartbeatLogging(this);
 
         if (!this.videoPlayer.updateInterval) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
