@@ -25,7 +25,7 @@
             loadFixtures('lti.html');
 
             element = $('#lti_id');
-            errorMessage = element.find('h2.error_message');
+            errorMessage = element.find('error_message');
             form = element.find('form#ltiLaunchForm');
             frame = element.find('iframe#ltiLaunchFrame');
 
