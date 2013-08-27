@@ -29,7 +29,7 @@ class ProblemFactory(XModuleItemFactory):
     with sane defaults.
     """
     FACTORY_FOR = CapaModule
-    
+
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
@@ -45,12 +45,12 @@ class ProblemFactory(XModuleItemFactory):
         text = '''
         <problem display_name="{name}" url_name="{name}">
           <numericalresponse answer="{answer}">
-            <responseparam type="tolerance" default="0.00001"/> 
+            <responseparam type="tolerance" default="0.00001"/>
             <textline size="20" inline="true" trailing_text="kN"/>
           </numericalresponse>
         </problem>
         '''.format(name=name, answer=answer)
-        kwargs.update({'data': text,})
+        kwargs.update({'data': text})
         descriptor = XModuleItemFactory.create(**kwargs)
         # Now, change the graded flag, and do a bunch of voodoo to save this change.
         descriptor.lms.graded = True
@@ -72,11 +72,11 @@ class ProblemSetFactory(XModuleItemFactory):
         """
         Sets some properties of descriptor.lms.
         """
-        format = kwargs.pop('format')
+        grading_format = kwargs.pop('format')
         kwargs['category'] = 'problemset'
         descriptor = XModuleItemFactory.create(**kwargs)
         descriptor.lms.graded = True
-        descriptor.lms.format = format
+        descriptor.lms.format = grading_format
         descriptor.save()
         editable_modulestore().update_metadata(descriptor.location, descriptor._model_data._kvs._metadata)
         return descriptor
@@ -86,7 +86,7 @@ class RequestFactoryForModules(RequestFactory):
     """
     Makes fake requests good for instantiating modules.
     """
-    def __new__(self):
+    def __new__(cls):
         out = RequestFactory()
         out.META = MagicMock()
         out.is_secure = lambda: False
@@ -114,10 +114,11 @@ class FactoryScoringTest(ModuleStoreTestCase):
         # Set up Mako correctly.
         from mitxmako.middleware import MakoMiddleware
         MakoMiddleware()
-        
+
         # Make the fake course
-        self.toy_course = CourseFactory.create(grading_policy={
-            "GRADER": [
+        self.toy_course = CourseFactory.create(grading_policy=
+            {"GRADER": 
+                [
                     {
                         "type": "Problem Set",
                         "min_count": 4,
@@ -232,7 +233,6 @@ class FactoryScoringTest(ModuleStoreTestCase):
             weight=10
         )
         self._answer_correctly(self.probleme_2)
-
 
     def _fetch_problem(self, descriptor):
         """
@@ -636,7 +636,6 @@ class TestGrades(unittest.TestCase):
         self.assertTrue(grade_summary['grade'] == 'A')
 
 
-
 class TestShouldGradeSection(unittest.TestCase):
     """
     Test should_grade_section.
@@ -648,8 +647,8 @@ class TestShouldGradeSection(unittest.TestCase):
     """
 
     def setUp(self):
-
         def fake_find_key(key):
+            """Mock out model_data_cache key-finding."""
             self.assertIsInstance(key, LmsKeyValueStore.Key)
             if key.block_scope_id:
                 fake_found = MagicMock()
@@ -662,6 +661,7 @@ class TestShouldGradeSection(unittest.TestCase):
         self.fake_model_data_cache.find = fake_find_key
 
     def fake_module(self, is_in_cache, recalculate):
+        """A fake xmodule."""
         output = MagicMock()
         output.location = is_in_cache
         output.always_recalculate_grades = recalculate
@@ -669,31 +669,31 @@ class TestShouldGradeSection(unittest.TestCase):
 
     def test_not_in_cache(self):
         #Test returning false when not always-recalculating-grades and when no problem has been seen in cache
-        fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(5)]
+        fake_xmoduledescriptors = [self.fake_module(False, False) for _ in range(5)]
         result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertFalse(result)
 
     def test_first_in_cache(self):
         #Test returning true when the first problem has been seen in cache
-        fake_xmoduledescriptors = [self.fake_module(True, False)] + [self.fake_module(False, False) for i in range(7)]
+        fake_xmoduledescriptors = [self.fake_module(True, False)] + [self.fake_module(False, False) for _ in range(7)]
         result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_last_in_cache(self):
         #Test returning true when the last problem has been seen in cache
-        fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(3)] + [self.fake_module(True, False)]
+        fake_xmoduledescriptors = [self.fake_module(False, False) for _ in range(3)] + [self.fake_module(True, False)]
         result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_all_in_cache(self):
         #Test returning true when all problems have been seen in cache
-        fake_xmoduledescriptors = [self.fake_module(True, False) for i in range(9)]
+        fake_xmoduledescriptors = [self.fake_module(True, False) for _ in range(9)]
         result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_always_recalculate(self):
         #Test returning true when a module's grades should always be recalculated, even if False otherwise
-        fake_xmoduledescriptors = [self.fake_module(False, True) for i in range(2)]
+        fake_xmoduledescriptors = [self.fake_module(False, True) for _ in range(2)]
         result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
@@ -711,6 +711,7 @@ class TestFindAttempted(unittest.TestCase):
     def setUp(self):
 
         def fake_find_key(key):
+            """Mock out model_data_cache key-finding."""
             self.assertIsInstance(key, LmsKeyValueStore.Key)
             if key.block_scope_id:
                 fake_found = MagicMock()
@@ -723,6 +724,7 @@ class TestFindAttempted(unittest.TestCase):
         self.fake_model_data_cache.find = fake_find_key
 
     def fake_module(self, is_in_cache):
+        """A fake xmodule."""
         output = MagicMock()
         output.location = is_in_cache
         return output
@@ -763,6 +765,7 @@ class TestGetScore(unittest.TestCase):
     def setUp(self):
 
         def fake_find_key(key):
+            """Mock out model_data_cache key-finding."""
             self.assertIsInstance(key, LmsKeyValueStore.Key)
             if key.block_scope_id:
                 fake_found = MagicMock()
@@ -776,7 +779,7 @@ class TestGetScore(unittest.TestCase):
         self.fake_model_data_cache.find = fake_find_key
 
         def module_creator(descriptor):
-            #Returns a problem mock
+            """Returns a problem mock"""
             output = MagicMock()
             output.get_score = lambda: {'score': 8.0, 'total': 9.0}
             output.max_score = lambda: 9.0
@@ -856,7 +859,7 @@ class TestGetScore(unittest.TestCase):
     def test_always_recalculate_get_score_is_none(self):
 
         def module_creator(descriptor):
-            #Returns a problem mock
+            """Returns a problem mock"""
             output = MagicMock()
             output.get_score = lambda: None
             output.max_score = lambda: 9.0
@@ -878,7 +881,7 @@ class TestGetScore(unittest.TestCase):
     def test_not_in_cache_and_total_is_none(self):
 
         def module_creator(descriptor):
-            #Returns a problem mock
+            """Returns a problem mock"""
             output = MagicMock()
             output.get_score = lambda: {'score': 8.0, 'total': None}
             output.max_score = lambda: None
