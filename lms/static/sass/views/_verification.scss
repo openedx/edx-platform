@@ -13,6 +13,7 @@ body.register.verification-process {
   // reset: typography - copy
   p, ol, ul, dl, input, select, textarea {
     font-family: $f-sans-serif;
+    @extend .t-copy-base;
   }
 
   // reset: copy/text
@@ -211,20 +212,20 @@ body.register.verification-process {
       color: #ccc;
 
       &.current {
-        color: #000;
-
-        .number {
-          border: 4px solid #000;
-          color: #000;
-        }
-      }
-
-      &.done {
         color: #008801;
 
         .number {
           border: 4px solid #008801;
           color: #008801;
+        }
+      }
+
+      &.done {
+        color: #777;
+
+        .number {
+          border: 4px solid #777;
+          color: #777;
         }
       }
     }
@@ -382,10 +383,11 @@ body.register.verification-process {
     }
 
     .reqs {
-      margin: $baseline;
+      margin: $baseline $baseline ($baseline*1.5) $baseline;
     }
 
     .req {
+      height: 13em;
       width: 27%;
       display: inline-block;
       margin-right: 1%;
@@ -394,16 +396,17 @@ body.register.verification-process {
       text-align: center;
       vertical-align: top;
 
-      // for placement only
-      .placeholder-art {
-        height: 150px;
+      [class^="icon-"] {
+        display: block;
         width: 150px;
         margin: $baseline auto;
-        background-color: #eee;
+        font-size: 75px;
 
-        i {
-          font-size: 24px;
+        &.icon-id {
+          background: transparent url('../images/icon-id.png') no-repeat center center;
+          height: 70px;
         }
+
       }
 
     }
@@ -467,9 +470,10 @@ body.register.verification-process {
   &.step-photos {
 
     // TEMP: for dev placement only
-    .placeholder-cam,
-    .placeholder-photo  {
-      height: 300px;
+    .wrapper-cam,
+    .wrapper-photo  {
+      height: 375px;
+      width: 500px;
       background-color: #eee;
       position: relative;
 
@@ -486,7 +490,7 @@ body.register.verification-process {
       background-color: $white;
 
       .title {
-        font-weight: bold;
+        @extend .t-title4;
       }
 
       .wrapper-up,
@@ -495,7 +499,7 @@ body.register.verification-process {
       }
 
       .cam {
-        width: 45%;
+        width: 500px;
         float: left;
         padding-right: $baseline;
       }
@@ -509,6 +513,7 @@ body.register.verification-process {
           margin: 0;
           padding: ($baseline*.25) ($baseline*.75);
           list-style-type: none;
+          height: 60px;
 
           .control {
             display: inline-block;
@@ -518,7 +523,10 @@ body.register.verification-process {
               display: block;
               background-color: $blue;
               color: $white;
-              border: none;
+              border: 3px solid #1A74A0;
+              border-radius: 40px;
+              padding: 10px 5px;
+              text-align: center;
 
               i {
                 padding: ($baseline*.25) ($baseline*.5);
@@ -571,13 +579,15 @@ body.register.verification-process {
     }
 
     .photo-tips {
+      @extend .t-copy-sub1;
       width: 45%;
       float: left;
 
-      ul {
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
+      .title {
+        @extend .t-title5;
+        border-bottom: 1px solid #ddd;
+        padding: $baseline 0 ($baseline/4) 0;
+        font-weight: bold;
       }
 
       li {
@@ -586,8 +596,7 @@ body.register.verification-process {
     }
 
     .next-step {
-      width: 45%;
-      float: right;
+      margin-top: $baseline;
 
       .tip {
         margin-top: $baseline;
@@ -599,7 +608,7 @@ body.register.verification-process {
     }
 
     .review-photo {
-      width: 45%;
+      width: 500px;
       float: left;
     }
 
