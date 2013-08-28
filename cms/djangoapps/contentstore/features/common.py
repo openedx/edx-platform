@@ -5,15 +5,19 @@ from lettuce import world, step
 from nose.tools import assert_true
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
+from django.conf import settings
 
 from selenium.webdriver.common.keys import Keys
 import time
+import os
 from django.contrib.auth.models import Group
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 from terrain.browser import reset_data
+
+TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
 ###########  STEP HELPERS ##############
 
@@ -152,7 +156,8 @@ def log_into_studio(
     world.log_in(username=uname, password=password, email=email, name=name)
     # Navigate to the studio dashboard
     world.visit('/')
-    world.wait_for(lambda _driver: uname in world.css_find('h2.title')[0].text)
+
+    assert uname in world.css_text('h2.title', max_attempts=15)
 
 def create_a_course():
     course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
@@ -257,3 +262,11 @@ def type_in_codemirror(index, text):
     g._element.send_keys(text)
     if world.is_firefox():
         world.trigger_event('div.CodeMirror', index=index, event='blur')
+
+
+def upload_file(filename):
+    path = os.path.join(TEST_ROOT, filename)
+    world.browser.execute_script("$('input.file-input').css('display', 'block')")
+    world.browser.attach_file('file', os.path.abspath(path))
+    button_css = '.upload-dialog .action-upload'
+    world.css_click(button_css)

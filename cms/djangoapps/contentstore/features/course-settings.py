@@ -4,9 +4,12 @@
 from lettuce import world, step
 from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
-from common import type_in_codemirror
+from common import type_in_codemirror, upload_file
+from django.conf import settings
 
 from nose.tools import assert_true, assert_false, assert_equal
+
+TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
 COURSE_START_DATE_CSS = "#course-start-date"
 COURSE_END_DATE_CSS = "#course-end-date"
@@ -145,6 +148,38 @@ def test_i_do_not_see_changes(_step):
 def test_change_course_overview(_step):
     type_in_codemirror(0, "<h1>Overview</h1>")
 
+
+@step('I click the "Upload Course Image" button')
+def click_upload_button(_step):
+    button_css = '.action-upload-image'
+    world.css_click(button_css)
+
+
+@step('I upload a new course image$')
+def upload_new_course_image(_step):
+    upload_file('image.jpg')
+
+
+@step('I should see the new course image$')
+def i_see_new_course_image(_step):
+    img_css = '#course-image'
+    images = world.css_find(img_css)
+    assert len(images) == 1
+    img = images[0]
+    expected_src = '/c4x/MITx/999/asset/image.jpg'
+    # Don't worry about the domain in the URL
+    try:
+        assert img['src'].endswith(expected_src)
+    except AssertionError as e:
+        e.args += ('Was looking for {}'.format(expected_src), 'Found {}'.format(img['src']))
+        raise
+
+
+@step('the image URL should be present in the field')
+def image_url_present(_step):
+    field_css = '#course-image-url'
+    expected_value = '/c4x/MITx/999/asset/image.jpg'
+    assert world.css_value(field_css) == expected_value
 
 
 ############### HELPER METHODS ####################

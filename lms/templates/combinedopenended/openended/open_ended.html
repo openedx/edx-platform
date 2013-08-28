@@ -4,7 +4,11 @@
    <div class="prompt">
     ${prompt|n}
    </div>
-  <h4>${_("Response")}</h4>
+    <div class="visibility-control visibility-control-response">
+        <div class="inner">
+        </div>
+        <span class="section-header section-header-response">${_("Response")}</span>
+    </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
@@ -12,7 +16,7 @@
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">${_("Unanswered")}</span>
     % elif state == 'assessing':
-      <span class="grading" id="status_${id}">${_("Submitted for grading.")}
+      <span class="grading" id="status_${id}">
       % if eta_message is not None:
          ${eta_message}
       % endif
@@ -27,8 +31,8 @@
 
   <div class="file-upload"></div>
 
-  <input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
-  <input name="skip" class="skip-button" type="button" value="${_("Skip Post-Assessment")}"/>
+  <input type="button" value="${_('Submit')}" class="submit-button" name="show"/>
+  <input name="skip" class="skip-button" type="button" value="${_('Skip Post-Assessment')}"/>
 
   <div class="open-ended-action"></div>
 

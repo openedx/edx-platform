@@ -25,7 +25,7 @@ $(document).ready(function(){
 });
 
 function goto_page(n) {
-  log_event("book", {"type":"gotopage","old":page,"new":n});
+  Logger.log("book", {"type":"gotopage","old":page,"new":n});
   page=n;
   var prefix = "";
   if(n<100) {
@@ -42,14 +42,14 @@ function prev_page() {
   var newpage=page-1;
   if(newpage< ${start_page}) newpage=${start_page};
   goto_page(newpage);
-  log_event("book", {"type":"prevpage","new":page});
+  Logger.log("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   var newpage=page+1;
   if(newpage> ${end_page}) newpage=${end_page};
   goto_page(newpage);
-  log_event("book", {"type":"nextpage","new":page});
+  Logger.log("book", {"type":"nextpage","new":page});
 }
 
 $("#open_close_accordion a").click(function(){

@@ -17,6 +17,7 @@ import logging
 import numbers
 import numpy
 import os
+from pyparsing import ParseException
 import sys
 import random
 import re
@@ -826,45 +827,89 @@ class NumericalResponse(LoncapaResponse):
     required_attributes = ['answer']
     max_inputfields = 1
 
+    def __init__(self, *args, **kwargs):
+        self.correct_answer = ''
+        self.tolerance = '0'  # Default value
+        super(NumericalResponse, self).__init__(*args, **kwargs)
+
     def setup_response(self):
         xml = self.xml
         context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
+
+        # Find the tolerance
+        tolerance_xml = xml.xpath(
+            '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+            id=xml.get('id')
+        )
+        if tolerance_xml:  # If it isn't an empty list...
+            self.tolerance = contextualize_text(tolerance_xml[0], context)
+
+    def get_staff_ans(self):
+        """
+        Given the staff answer as a string, find its float value.
+
+        Use `evaluator` for this, but for backward compatability, try the
+        built-in method `complex` (which used to be the standard).
+        """
+
         try:
-            self.tolerance_xml = xml.xpath(
-                '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                id=xml.get('id'))[0]
-            self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except IndexError:  # xpath found an empty list, so (...)[0] is the error
-            self.tolerance = '0'
+            correct_ans = complex(self.correct_answer)
+        except ValueError:
+            # When `correct_answer` is not of the form X+Yj, it raises a
+            # `ValueError`. Then test if instead it is a math expression.
+            # `complex` seems to only generate `ValueErrors`, only catch these.
+            try:
+                correct_ans = evaluator({}, {}, self.correct_answer)
+            except Exception:
+                log.debug("Content error--answer '%s' is not a valid number", self.correct_answer)
+                raise StudentInputError(
+                    "There was a problem with the staff answer to this problem"
+                )
+
+        return correct_ans
 
     def get_score(self, student_answers):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
 
+        correct_float = self.get_staff_ans()
+
+        general_exception = StudentInputError(
+            u"Could not interpret '{0}' as a number".format(cgi.escape(student_answer))
+        )
+
+        # Begin `evaluator` block
+        # Catch a bunch of exceptions and give nicer messages to the student.
         try:
-            correct_ans = complex(self.correct_answer)
-        except ValueError:
-            log.debug("Content error--answer '{0}' is not a valid complex number".format(
-                self.correct_answer))
+            student_float = evaluator({}, {}, student_answer)
+        except UndefinedVariable as undef_var:
             raise StudentInputError(
-                "There was a problem with the staff answer to this problem")
+                u"You may not use variables ({0}) in numerical problems".format(undef_var.message)
+            )
+        except ValueError as val_err:
+            if 'factorial' in val_err.message:
+                # This is thrown when fact() or factorial() is used in an answer
+                #   that evaluates on negative and/or non-integer inputs
+                # ve.message will be: `factorial() only accepts integral values` or
+                # `factorial() not defined for negative values`
+                raise StudentInputError(
+                    ("factorial function evaluated outside its domain:"
+                     "'{0}'").format(cgi.escape(student_answer))
+                )
+            else:
+                raise general_exception
+        except ParseException:
+            raise StudentInputError(
+                u"Invalid math syntax: '{0}'".format(cgi.escape(student_answer))
+            )
+        except Exception:
+            raise general_exception
+        # End `evaluator` block -- we figured out the student's answer!
 
-        try:
-            correct = compare_with_tolerance(
-                evaluator(dict(), dict(), student_answer),
-                correct_ans, self.tolerance)
-        # We should catch this explicitly.
-        # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
-        # But we'd need to confirm
-        except:
-            # Use the traceback-preserving version of re-raising with a
-            # different type
-            type, value, traceback = sys.exc_info()
-
-            raise StudentInputError, ("Could not interpret '%s' as a number" %
-                                      cgi.escape(student_answer)), traceback
-
+        correct = compare_with_tolerance(
+            student_float, correct_float, self.tolerance
+        )
         if correct:
             return CorrectMap(self.answer_id, 'correct')
         else:
@@ -1691,18 +1736,26 @@ class FormulaResponse(LoncapaResponse):
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
 
+    def __init__(self, *args, **kwargs):
+        self.correct_answer = ''
+        self.samples = ''
+        self.tolerance = '1e-5'  # Default value
+        self.case_sensitive = False
+        super(FormulaResponse, self).__init__(*args, **kwargs)
+
     def setup_response(self):
         xml = self.xml
         context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
-        try:
-            self.tolerance_xml = xml.xpath(
-                '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                id=xml.get('id'))[0]
-            self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception:
-            self.tolerance = '0.00001'
+
+        # Find the tolerance
+        tolerance_xml = xml.xpath(
+            '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+            id=xml.get('id')
+        )
+        if tolerance_xml:  # If it isn't an empty list...
+            self.tolerance = contextualize_text(tolerance_xml[0], context)
 
         ts = xml.get('type')
         if ts is None:
@@ -1734,7 +1787,7 @@ class FormulaResponse(LoncapaResponse):
         ranges = dict(zip(variables, sranges))
         for _ in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
-            student_variables = dict()
+            student_variables = {}
             # ranges give numerical ranges for testing
             for var in ranges:
                 # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
@@ -1746,7 +1799,7 @@ class FormulaResponse(LoncapaResponse):
 
             # Call `evaluator` on the instructor's answer and get a number
             instructor_result = evaluator(
-                instructor_variables, dict(),
+                instructor_variables, {},
                 expected, case_sensitive=self.case_sensitive
             )
             try:
@@ -1756,7 +1809,7 @@ class FormulaResponse(LoncapaResponse):
                 # Call `evaluator` on the student's answer; look for exceptions
                 student_result = evaluator(
                     student_variables,
-                    dict(),
+                    {},
                     given,
                     case_sensitive=self.case_sensitive
                 )
@@ -2422,7 +2475,7 @@ class ChoiceTextResponse(LoncapaResponse):
             # if all that is important is verifying numericality
             try:
                 partial_correct = compare_with_tolerance(
-                    evaluator(dict(), dict(), answer_value),
+                    evaluator({}, {}, answer_value),
                     correct_ans,
                     tolerance
                 )
