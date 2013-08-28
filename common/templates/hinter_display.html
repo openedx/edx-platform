@@ -1,10 +1,11 @@
 ## The hinter module passes in a field called ${op}, which determines which
 ## sub-function to render.
 
+<%! from django.utils.translation import ugettext as _ %>
 
 <%def name="get_hint()">
     % if len(hints) > 0:
-        <h4> Hints from students who made similar mistakes: </h4>
+        <h4> ${_('Hints from students who made similar mistakes:')} </h4>
         <ul>
         % for hint in hints:
             <li> ${hint} </li>
@@ -41,7 +42,7 @@
   <div class="wizard-viewbox"><div class="wizard-container">
     <div class="wizard-view" id="p1">
       <p>
-      <em> Optional. </em> Help us improve our hints!  Which hint was most helpful to you?
+      ${_('<em> Optional. </em> Help us improve our hints!  Which hint was most helpful to you?')}
       </p>
 
       <div id="pk-list" data-pk-list='${json_pk_list}' style="display:none"> </div>
@@ -49,28 +50,28 @@
       % for answer, pk_dict in answer_to_hints.items():
           % for hint_pk, hint_text in pk_dict.items():
               <p>
-              <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
+              <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="${_('Vote')}">
               ${hint_text}
               </p>
           % endfor
       % endfor
 
       <p>
-      Don't like any of the hints above? 
+      ${_('Don\'t like any of the hints above?')}
       <a class="wizard-link" dest="p2" href="javascript: void(0);">
-        Write your own!
+        ${_('Write your own!')}
       </a></p>
     </div>
 
     <div class="wizard-view" id="p2">
       % if hints_exist:
         <p>
-        Choose the incorrect answer for which you want to write a hint:
+        ${_('Choose the incorrect answer for which you want to write a hint:')}
         </p>
       % else:
       <p>
-        <em>Optional.</em>  Help other students by submitting a hint!  Pick one of your previous
-        answers for which you would like to write a hint:
+        ${_('''<em>Optional.</em>  Help other students by submitting a hint!  Pick one of your previous
+        answers for which you would like to write a hint:''')}
       </p>
       % endif
       % for answer in user_submissions:
@@ -78,7 +79,7 @@
       % endfor
       % if hints_exist:
         <p class="bottom">
-          <a href="javascript: void(0);" class="wizard-link" dest="p1"> Back </a>
+          <a href="javascript: void(0);" class="wizard-link" dest="p1"> ${_('Back')} </a>
         </p>
       % endif
 
@@ -87,16 +88,18 @@
     <div class="wizard-view" id="p3">
 
       <p>
-        Write a hint for other students who get the wrong answer of <span id="blank-answer"></span>.
+        ${_('''Write a hint for other students who get the wrong answer of <span id="blank-answer"></span>.''')}
       </p>
-      <p>Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
+      <!-- i18n note: Make sure you keep the link. -->
+      <p>${_('''Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.''')}</p>
 
       <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
-Write your hint here.  Please don't give away the correct answer.
+${_('Write your hint here.  Please don\'t give away the correct answer.')}
       </textarea>
       <br /><br />
-      <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
+      <input class="submit-hint" data-answer="${answer}" type="button" value="${_('Submit')}">
       <div id="goodhint" style="display:none">
+        ${_('''
         <h4>What makes a good hint?</h4>
 
         <p>It depends on the type of problem you ran into. For stupid errors --
@@ -126,9 +129,10 @@ Write your hint here.  Please don't give away the correct answer.
         <p>
           <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
         </p>
+        ''')}
       </div>
       <p class="bottom">
-        <a href="javascript: void(0);" class="wizard-link" dest="p2"> Back </a>
+        <a href="javascript: void(0);" class="wizard-link" dest="p2"> ${_('Back')} </a>
       </p>
     </div>
   <!-- Close wizard contaner and wizard viewbox. -->
@@ -139,12 +143,12 @@ Write your hint here.  Please don't give away the correct answer.
 
 <%def name="show_votes()">
     % if hint_and_votes is UNDEFINED:
-      Sorry, but you've already voted!
+      ${_('Sorry, but you\'ve already voted!')}
     % else:
-      Thank you for voting!
+      ${_('Thank you for voting!')}
       <br />
       % for hint, votes in hint_and_votes:
-          <span style="color:green"> ${votes} votes. </span>
+          <span style="color:green"> ${_('{vote_count} votes.').format(vote_count=votes)} </span>
           ${hint}
           <br />
       % endfor
