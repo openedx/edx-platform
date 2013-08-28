@@ -95,7 +95,10 @@ function () {
         this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        this.videoCaption.fetchCaption();
+        if (!this.videoCaption.fetchCaption()) {
+            this.videoCaption.hideCaptions(true);
+            this.videoCaption.hideSubtitlesEl.hide();
+        }
     }
 
     // function bindHandlers()
@@ -190,7 +193,6 @@ function () {
                 console.log(
                     'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
                 );
-                console.log('arguments:', arguments);
 
                 _this.videoCaption.hideCaptions(true);
                 _this.videoCaption.hideSubtitlesEl.hide();
@@ -281,9 +283,8 @@ function () {
     }
 
     function renderCaption() {
-        var container,
+        var container = $('<ol>'),
             _this = this;
-        container = $('<ol>');
 
         this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);

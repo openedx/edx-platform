@@ -53,7 +53,8 @@
               expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                 url: videoCaption.captionURL(),
                 notifyOnError: false,
-                success: jasmine.any(Function)
+                success: jasmine.any(Function),
+                error: jasmine.any(Function),
               });
           });
         });
@@ -462,7 +463,7 @@
         });
 
         // Temporarily disabled due to intermittent failures
-        // Fails with error: "InvalidStateError: An attempt was made to 
+        // Fails with error: "InvalidStateError: An attempt was made to
         // use an object that is not, or is no longer, usable
         // Expected 0 to equal 14.91."
         // on Firefox
