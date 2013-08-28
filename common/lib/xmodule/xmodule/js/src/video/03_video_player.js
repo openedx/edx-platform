@@ -154,6 +154,11 @@ function (HTML5Video) {
         });
     }
 
+    // Start heartbeats logging.
+    // Send logs to the server each state.config.heartbeatsLoggingDelay seconds
+    // and provide an indication of whether students still have a video playing
+    // on their screen so that we have a better idea of whether they are getting
+    // the educational benefit of watching the lecture.
     function _startHeartbeatLogging(state) {
         if (!state.videoPlayer.heartbeatsInterval) {
             state.videoPlayer.heartbeatsInterval = window.setInterval(
@@ -163,13 +168,9 @@ function (HTML5Video) {
         }
     }
 
+    // Stop heartbeats logging.
     function _stopHeartbeatLogging(state) {
         window.clearInterval(state.videoPlayer.heartbeatsInterval);
-    }
-
-    function _restartHeartbeatLogging(state) {
-        _stopHeartbeatLogging();
-        _startHeartbeatLogging();
     }
 
     // ***************************************************************
@@ -262,7 +263,6 @@ function (HTML5Video) {
         if (this.videoPlayer.isPlaying()) {
             clearInterval(this.videoPlayer.updateInterval);
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
-            _restartHeartbeatLogging(this);
         } else {
             this.videoPlayer.currentTime = params.time;
         }
