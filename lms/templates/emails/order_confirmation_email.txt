@@ -8,7 +8,7 @@ ${_("Items in your order:")}
 
 ${_("Quantity - Description - Price")}
 %for order_item in order_items:
-    ${order_item.qty} - ${order_item.line_desc} - $(order_item.line_cost}
+    ${order_item.qty} - ${order_item.line_desc} - ${order_item.line_cost}
 %endfor
 ${_("Total: {total_cost}").format(total_cost=order.total_cost)}
 
