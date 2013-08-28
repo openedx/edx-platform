@@ -5,136 +5,193 @@
 <%block name="bodyclass">register verification-process step-select-track</%block>
 
 <%block name="js_extra">
-  <script type="text/javascript">
+<script type="text/javascript">
 
-  $(document).ready(function() {
-    $( ".more" ).hide();
-    $( ".expand" ).click(function(e) {
-        e.preventDefault();
-        $(this).next().slideToggle();
-    });
+$(document).ready(function() {
+  $( ".more" ).hide();
+  $( ".expand" ).click(function(e) {
+      e.preventDefault();
+      $(this).next().slideToggle();
   });
-
-  </script>
+});
+</script>
 </%block>
 
 <%block name="content">
 <div class="container">
   <section class="wrapper">
 
-    <header class="page-header header-white">
-      <h2 class="title header-white-title">You are registering for ${course_name} (ID Verified)</h2>
+    <header class="page-header">
+      <h2 class="title">
+        <span class="status-track">(ID Verified)</span>
+        <span class="status">You are registering for</span>
+        <span class="status-course">${course_id} </span>
+      </h2>
     </header>
-    <h3 class="title">Select your track:</h3>
 
-    <form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+    <div class="wrapper-register-choose wrapper-content-main">
+      <article class="register-choose content-main">
+        <h3 class="title">Select your track:</h3>
 
-    % if "audit" in modes:
-      <div class="select">
-        <div class="block block-audit">
-          <div class="wrap-copy">
-            <h4 class="title">Audit This Course</h4>
-            <p>Sign up to audit this course for free and track your own progress.</p>
+        <form cass="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+
+          % if "audit" in modes:
+          <div class="register-choice register-choice-audit">
+            <div class="wrapper-copy">
+              <h4 class="title">Audit This Course</h4>
+              <div class="copy">
+                <p>Sign up to audit this course for free and track your own progress.</p>
+              </div>
+            </div>
+
+            <ul class="actions">
+              <li class="action action-select">
+                <input type="submit" name="mode" value="Select Audit" />
+              </li>
+            </ul>
           </div>
 
-          <div class="wrap-action">
-            <p class="m-btn-primary">
-            <input type="submit" name="mode" value="Select Audit" />
-            </p>
-          </div>
-        </div>
+          <span class="deco-divider">
+            <span class="copy">or</span>
+          </span>
+          % endif
 
-      <div class="divider"><p>or</p></div>
-    % endif
+          % if "verified" in modes:
+          <div class="register-choice register-choice-certificate">
+            <div class="wrapper-copy">
+              <span class="deco-ribbon"></span>
+              <h4 class="title">Certificate of Achievement</h4>
+              <div class="copy">
+                <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
+              </div>
+            </div>
 
-    % if "verified" in modes:
-      <div class="select">
-        <div class="block block-cert">
-          <h4 class="title">Certificate of Achievement</h4>
-          <span class="ribbon"></span>
-          <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
+            <div class="field field-certificate-contribution">
+              <h5 class="label">Select your contribution for this course:</h5>
 
-          <dl>
-            <dt>
-              Select your contribution for this course:
-            </dt>
-            <dd>
-              <ul class="pay-options">
+              <ul class="contribution-options">
                 % for price in modes["verified"].suggested_prices.split(","):
-                <li>
-                  <input type="radio" name="contribution" value="${price|h}"><label for="contribution-${price|h}">$${price} ${modes["verified"].currency.upper()}</label>
+                <li class="contribution-option">
+                  <input type="radio" name="contribution" value="${price|h}" />
+                  <label for="contribution-${price|h}" />
+                    <span class="deco-denomination">$</span>
+                    <span class="label-value">${price} ${modes["verified"].currency.upper()}</span>
+                    <span class="denomination-name">USD</span>
+                  </label>
                 </li>
                 % endfor
 
-                <li class="other1">
+                <li class="contribution-option contribution-option-other1">
                   <input type="radio" id="contribution-other" name="contribution" value=""/>
                   <label for=" contribution-other"><span class="sr">Other</span></label>
                 </li>
-                <li class="other2">
-                  <label for="contribution-other-amt"><span class="sr">Other Amount</span> </label>$<input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
+
+                <li class="contribution-option contribution-option-other2">
+                  <label for="contribution-other-amt">
+                    <span class="sr">Other Amount</span>
+                  </label>
+                  <div class="wrapper">
+                    <span class="deco-denomination">$</span>
+                    <input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
+                    <span class="denomination-name">USD</span>
+                  </div>
                 </li>
               </ul>
-            </dd>
-          </dl>
 
-          <p class="tip expand">
-            <a href="">Why do I have to pay? What if I don't meet all the requirements?</a>
-          </p>
+              <div class="help-tip is-expandable">
+                <h5 class="title">Why do I have to pay? What if I don't meet all the requirements?</h5>
 
-          <div class="more">
-            <dl class="faq">
-              <dt>Why do I have to pay?</dt>
-              <dd>Your payment helps cover the costs of verification. As a non-profit, edX  keeps these costs as low as possible, Your payment will also help edX with our mission to provide quality education to anyone.</dd>
+                <div class="copy more">
+                  <dl class="list-faq">
+                    <dt class="faq-question">Why do I have to pay?</dt>
+                    <dd class="faq-answer">
+                      <p>Your payment helps cover the costs of verification. As a non-profit, edX  keeps these costs as low as possible, Your payment will also help edX with our mission to provide quality education to anyone.</p>
+                    </dd>
 
-              <dt>I'd like to pay more than the minimum.  Is my contribution tax deductible?</dt>
-              <dd>Please check with your tax advisor to determine whether your contribution is tax deductible.</dd>
+                    <dt class="faq-question">I'd like to pay more than the minimum.  Is my contribution tax deductible?</dt>
+                    <dd class="faq-answer">
+                      <p>Please check with your tax advisor to determine whether your contribution is tax deductible.</p>
+                    </dd>
 
+                    % if "honor" in modes:
+                    <dt class="faq-question">What if I can't afford it?</dt>
+                    <dd class="faq-answer">
+                      <p>If you cannot afford the minimum payment, you can always work towards a free  Honor Code Certificate of Achievement for this course.</p>
 
-              % if "honor" in modes:
-              <dt>What if I can't afford it?</dt>
-              <dd>If you cannot afford the minimum payment, you can always work towards a free  Honor Code Certificate of Achievement for this course.
+                      <p>Enter $0 above and explain why you would like the fee waived below. Then click Select Certificate button to move on to the next step.</p>
 
-                Enter $0 above and explain why you would like the fee waived below. Then click Select Certificate button to move on to the next step.
-                <dl>
-                  <dt><label class="sr" for="explain">Explain your situation:</label></dt>
-                  <dd><p>Tell us why you need help paying for this course in 180 characters   or more.</p>
-                  <textarea name="explain" rows="5" cols="50"></textarea>
+                      <ul class="fields">
+                        <li class="field field-explain">
+                          <label for="explain"><span class="sr">Explain your situation: </span>Tell us why you need help paying for this course in 180 characters or more.</label>
+                          <textarea name="explain"></textarea>
+                        </li>
+                      </ul>
+                    </dd>
 
-                  </dd>
-                </dl>
-                </dd>
-              % endif
+                    <dt class="faq-question">What if I don't meet all of the requirements for financial assistance but I   still want to work toward a certificate?</dt>
 
-              % if "honor" in modes:
-              <dt>What if I don't meet all of the requirements for financial assistance but I   still want to work toward a certificate?</dt>
-                <dd>If you don't have a webcam, credit or debit card or acceptable ID, you can  opt to simply audit this course, or select to work towards a free Honor Code Certificate of Achievement for this course by checking the box below. Then  click the Select Certificate button to complete registration. We won't ask you to verify your identity.
-                  <p><input type="checkbox" name="honor-code"> <label for="honor-code">Select Honor Code Certificate</label></p>
-                </dd>
-              % endif
-            </dl>
+                    <dd class="faq-answer">
+                      <p>If you don't have a webcam, credit or debit card or acceptable ID, you can  opt to simply audit this course, or select to work towards a free Honor Code Certificate of Achievement for this course by checking the box below. Then  click the Select Certificate button to complete registration. We won't ask you to verify your identity.</p>
+
+                      <ul class="fields">
+                        <li class="field field-explain">
+                          <input type="checkbox" name="honor-code" id="honor-code">
+                          <label for="honor-code">Select Honor Code Certificate</label>
+                        </li>
+                      </ul>
+                    </dd>
+                    % endif
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <ul class="actions">
+              <li class="action action-select">
+                <input type="submit" name="mode" value="Select Certificate" />
+              </li>
+            </ul>
           </div>
+          % endif
 
-          <hr />
-            <p class="tip">
-              <a href="">What is an ID Verified Certificate?</a>
-            </p>
-            <p class="m-btn-primary green">
-              <input type="submit" name="mode" value="Select Certificate" />
-            </p>
-        </div>
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        </form>
+      </article>
+    </div> <!-- /wrapper-content-main -->
 
-        <div class="tips">
-          <p>
-            To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a>
-          </p>
-        </div>
-    % endif
-      </div>
-      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-    </form>
+    <div class="wrapper-content-supplementary">
+      <aside class="content-supplementary">
+        <ul class="list-help">
+          <li class="help-item">
+            <h3 class="title">What is an ID Verified Certificate?</h3>
+            <div class="copy">
+              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.</p>
+            </div>
+          </li>
 
-    <p class="tip"><i class="icon-question-sign"></i> Have questions? <a href="">Check out our FAQs.</a></p>
-    <p class="tip">Not the course you wanted? <a href="">Return to our course listings</a>.</p>
+          <li class="help-item">
+            <h3 class="title">Verified Certificate of Achievement Requirememts</h3>
+            <div class="copy">
+              <p>To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a></p>
+            </div>
+          </li>
+
+          <li class="help-item">
+            <h3 class="title"><i class="icon-question-sign"></i> Have questions?</h3>
+            <div class="copy">
+              <p>Please read <a href="">our FAQs to view common questions about our certificates</a>.</p>
+            </div>
+          </li>
+
+          <li class="help-item">
+            <h3 class="title">Not the course you wanted?</h3>
+            <div class="copy">
+              <p><a href="">Return to our course listings to find another course</a></p>
+            </div>
+          </li>
+        </ul>
+      </aside>
+    </div> <!-- /wrapper-content-supplementary -->
   </section>
 </div>
 </%block>
