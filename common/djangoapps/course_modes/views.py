@@ -49,6 +49,8 @@ class ChooseModeView(View):
             return self.get(request, error=error_msg)
 
         requested_mode = self.get_requested_mode(request.POST.get("mode"))
+        if requested_mode == "verified" and request.POST.get("honor-code"):
+            requested_mode = "honor"
 
         allowed_modes = CourseMode.modes_for_course_dict(course_id)
         if requested_mode not in allowed_modes:
