@@ -26,6 +26,7 @@ class ChooseModeView(View):
             "course_id": course_id,
             "modes": modes,
             "course_name": course_from_id(course_id).display_name,
+            "chosen_price" : None,
         }
         if "verified" in modes:
             context["suggested_prices"] = modes["verified"].suggested_prices.split(",")
@@ -57,10 +58,10 @@ class ChooseModeView(View):
         if requested_mode == "verified":
             amount = request.POST.get("contribution") or \
                      request.POST.get("contribution-other-amt") or \
-                     requested_mode.min_price
+                     requested_mode.min_price.format("{:g}")
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_id] = float(amount)
+            donation_for_course[course_id] = amount
             request.session["donation_for_course"] = donation_for_course
 
             # TODO: Check here for minimum pricing

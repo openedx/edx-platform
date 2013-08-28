@@ -42,15 +42,19 @@ class VerifyView(View):
 
         course_id = request.GET['course_id']
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        if course_id in request.session.get("donation_for_course", {}):
+            chosen_price = request.session["donation_for_course"][course_id]
+        else:
+            chosen_price = verify_mode.min_price.format("{:g}")
         context = {
             "progress_state" : progress_state,
             "user_full_name" : request.user.profile.name,
             "course_id" : course_id,
             "course_name" : course_from_id(course_id).display_name,
             "purchase_endpoint" : get_purchase_endpoint(),
-            "suggested_prices" : [int(price) for price in verify_mode.suggested_prices.split(",")],
+            "suggested_prices" : verify_mode.suggested_prices.split(","),
             "currency" : verify_mode.currency.upper(),
-            "chosen_price" : request.session.get("donation_for_course", verify_mode.min_price)
+            "chosen_price" : chosen_price,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
