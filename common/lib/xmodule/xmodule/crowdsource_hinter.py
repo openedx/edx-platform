@@ -119,7 +119,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 be enabled on the first response blank of the problem you choose.  Right now,
                 hinting only works on numerical and formula response blanks.''')
             return
-        problem_descriptors = modulestore().get_items(problem_loc)
+        course_id = '/'.join(str(problem_loc).split('/')[1:3])
+        problem_descriptors = modulestore().get_items(problem_loc, course_id=course_id)
         try:
             self.problem_module = self.system.get_module(problem_descriptors[0])
         except IndexError:

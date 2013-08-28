@@ -99,7 +99,7 @@ def get_hints(request, course_id, field):
     # Get all of the hinters in this course.
     org, course_number, course_name = course_id.split('/')
     hinter_filter = Location('i4x', org, course_number, 'crowdsource_hinter', None)
-    hinters = modulestore().get_items(hinter_filter)
+    hinters = modulestore().get_items(hinter_filter, course_id=course_id)
     model_data_cache = model_data.ModelDataCache(hinters, course_id, request.user)
 
     def answer_sorter(thing):
@@ -130,7 +130,7 @@ def get_hints(request, course_id, field):
         big_out_dict[loc_string] = sorted(hints.items(), key=answer_sorter)
 
         # Also generate the name of the problem to which this hinter is pointed.
-        problem_descriptor = modulestore().get_item(hinter_module.target_problem)
+        problem_descriptor = modulestore().get_items(hinter_module.target_problem, course_id=course_id)[0]
         id_to_name[loc_string] = problem_descriptor.display_name_with_default
 
     render_dict = {'field': field,
@@ -148,7 +148,7 @@ def _location_to_module(location, request, course_id):
     objects.
     """
     loc = Location(location)
-    descriptor = modulestore().get_item(loc)
+    descriptor = modulestore().get_items(loc, course_id=course_id)[0]
     model_data_cache = model_data.ModelDataCache([descriptor], course_id, request.user)
     return module_render.get_module(
         request.user,
@@ -172,8 +172,6 @@ def delete_hints(request, course_id, field):
       1: ['problem_whatever', '42.0', '3'],
       2: ['problem_whatever', '32.5', '12']}
     """
-    import pdb
-    pdb.set_trace()
     for key in request.POST:
         if key == 'op' or key == 'field':
             continue
@@ -232,7 +230,6 @@ def add_hint(request, course_id, field):
     problem_id = request.POST['problem']
     answer = request.POST['answer']
     hint_text = request.POST['hint']
-
     hinter_module = _location_to_module(problem_id, request, course_id)
     if not hinter_module.validate_answer(answer):
         return 'Invalid answer for this problem: {ans}'.format(ans=answer)
