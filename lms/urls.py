@@ -10,6 +10,11 @@ if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
+
+        # ...
+        url(r"^announcements/", include("announcements.urls")),
+        # ...
+
     # certificate view
 
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
