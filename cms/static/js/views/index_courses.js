@@ -1,7 +1,7 @@
 function indexCourses(){
     $("body").css("cursor", "progress");
     var course = "";
-    var url = "/index";
+    var url = "/index_courseware";
     var courseTitle = $("#index-courses").eq(0).attr("data-course");
     $.ajax({
         type: "POST",

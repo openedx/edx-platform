@@ -12,6 +12,9 @@ class MockCsrfProtection(object):
     Has to be initialized here because the decorators will be applied as soon as a module is imported,
     which sadly means that standard patching doesn't work.
     """
+
+    __name__ = "MockCsrfProtection"
+
     def __init__(self, func):
         self.func = func
 
@@ -20,19 +23,17 @@ class MockCsrfProtection(object):
 
 django_future.csrf.ensure_csrf_cookie = MockCsrfProtection
 
-import requests
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
 
 import search.views as views
-from search.models import SearchResults
-from search.es_requests import MongoIndexer
+from search.indexing import MongoIndexer
 from mocks import StubServer, StubRequestHandler
 
 
-def mock_render_to_response(template, context):
+def mock_render_to_response(template, context):  # pylint: disable=W0613
     """
     Stand-in for testing allowing a quick check
     """
@@ -40,7 +41,7 @@ def mock_render_to_response(template, context):
     return context
 
 
-def mock_get_course_with_access(*args):
+def mock_get_course_with_access(*args):  # pylint: disable=W0613
     """
     Another testing stand-in for course authentication
 
@@ -70,6 +71,9 @@ class PersonalServer(StubServer):
 
 
 class MockMongoIndexer(MongoIndexer):
+    """
+    Minimal version of the MongoIndexer that rewrites the relevant methods.
+    """
 
     def __init__(self):
         pass
@@ -88,14 +92,6 @@ class ViewTest(TestCase):
 
     def setUp(self):
         self.stub = PersonalServer(StubRequestHandler, 9203)
-
-    def test_basic_view(self):
-        response = views._find(HttpRequest(), "org/test-course/run")
-        self.assertTrue(isinstance(response, SearchResults))
-        test = views._construct_search_context(response, 1, "all")
-        self.assertEqual(set(test.keys()), set(["all", "video", "problem"]))
-        self.assertFalse(bool(test["all"]["results"]))
-        self.assertEqual(test["video"]["results"], {})
 
     def test_search_endpoint(self):
         request = HttpRequest()

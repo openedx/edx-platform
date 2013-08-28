@@ -66,6 +66,9 @@ class ModelTest(TestCase):
     def test_search_result_init(self):
         check = SearchResult(dummy_entry(1.0), ["fake-query"])
         self.assertTrue(bool(re.match(r"^[a-zA-Z0-9]+$", check.snippets)))
+        self.assertTrue(check.url.startswith("/courses"))
+        self.assertTrue("/jump_to/" in check.url)
+        self.assertEqual(check.category, json.loads(check.data["id"])["category"])
 
     def test_snippet_generation(self):
         document = dummy_entry(1.0, TEST_TEXT)

@@ -3,7 +3,7 @@ Models for representation of search results
 """
 
 import json
-import string
+import string  # pylint: disable=W0402
 
 from django.conf import settings
 import nltk
@@ -135,11 +135,11 @@ def _snippet_generator(transcript, query, language):
 
     if settings.SENTENCE_TOKENIZER and settings.SENTENCE_TOKENIZER.lower() != "detect":
         punkt = nltk.data.load(settings.SENTENCE_TOKENIZER)
-        sentences = punkt.tokenize(transcript)
+        sentences = punkt.tokenize(transcript)  # pylint disable=E1103
     else:
         try:
             punkt = nltk.data.load('tokenizers/punkt/%s.pickle' % language)
-            sentences = punkt.tokenize(transcript)
+            sentences = punkt.tokenize(transcript)  # pylint disable=E1103
         except LookupError:
             sentences = transcript.split(".")
 

@@ -75,7 +75,7 @@ class ElasticDatabase(object):
     instance. Additionly there are methods for running basic queries and content indexing.
     """
 
-    def __init__(self, settings_file=None):
+    def __init__(self):
         """
         Instantiates the ElasticDatabase file.
 
@@ -84,13 +84,14 @@ class ElasticDatabase(object):
         that should be specified in the application settings file.
         """
 
-        self.url = settings.ES_DATABASE
-        if settings_file is None:
-            current_directory = os.path.dirname(os.path.realpath(__file__))
-            settings_file = os.path.join(current_directory, "settings.json")
-
-        with open(settings_file) as source:
-            self.index_settings = json.load(source)
+        try:
+            self.url = settings.ES_DATABASE
+        except AttributeError:
+            self.url = "http://localhost:9200"
+        try:
+            self.index_settings = settings.ES_SETTINGS
+        except AttributeError:
+            self.index_settings = '{}'
 
     def index_data(self, index, data, type_, id_):
         """
@@ -130,8 +131,14 @@ class MongoIndexer(object):
         host = settings.MODULESTORE['default']['OPTIONS']['host']
         port = 27017
         client = MongoClient(host, port)
-        content_db = settings.CONTENTSTORE["OPTIONS"]['db']
-        module_db = settings.MODULESTORE['default']['OPTIONS']['db']
+        try:
+            content_db = settings.CONTENTSTORE["OPTIONS"]['db']
+        except AttributeError:
+            content_db = 'xcontent'
+        try:
+            module_db = settings.MODULESTORE['default']['OPTIONS']['db']
+        except AttributeError:
+            module_db = 'xmodule'
         self._chunk_collection = client[content_db]["fs.chunks"]
         self._module_collection = client[module_db]["modulestore"]
         self._es_instance = es_instance
@@ -295,7 +302,7 @@ class MongoIndexer(object):
         elif type_.lower() == "transcript":
             return self._find_transcript_for_video_module(mongo_module)
         else:
-            log.error("%s is not a recognized type" % type_)
+            log.error("%s is not a recognized type", type_)
             raise NotImplementedError
 
     def _get_thumbnail(self, mongo_module, type_):
@@ -310,7 +317,7 @@ class MongoIndexer(object):
         elif type_.lower() == "transcript":
             return self._get_thumbnail_from_video_module(mongo_module)
         else:
-            log.error("%s is not a recognized type" % type_)
+            log.error("%s is not a recognized type", type_)
             raise NotImplementedError
 
     def _get_full_dict(self, mongo_module, type_):
@@ -384,6 +391,6 @@ class MongoIndexer(object):
             if counter % CHUNK_SIZE == 0:
                 index_status_code = self._es_instance.bulk_index(index_string).status_code
                 if index_status_code == 400:
-                    log.error("The following bulk index failed: %s" % error_string)
+                    log.error("The following bulk index failed: %s", error_string)
                 index_string = ""
                 error_string = ""

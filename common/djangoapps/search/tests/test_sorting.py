@@ -26,8 +26,6 @@ class SortingTest(TestCase):
         sorted_list = sorting.sort(dummy_results, "relevance")
         sorted_results = [result.score for result in sorted_list]
         self.assertEqual(sorted_results, [48391023, 2939.3434, 32.123678, 10, 1.1, 0.0])
-        unsorted_list = sorting.sort(dummy_results, "fake")
-        self.assertEqual(test_scores, [item.score for item in unsorted_list])
 
 
 class DummyResult():

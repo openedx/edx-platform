@@ -434,6 +434,10 @@ ES_DATABASE = "http://localhost:9200"
 SENTENCE_TOKENIZER = "tokenizers/punkt/english.pickle"
 # Same as SENTENCE_TOKENIZER, STEMMER is also currently for English, but allows for a detect value
 STEMMER = "english"
+# Settings file for Elastic Search with relevant analyzers and tokenizers
+current_directory = os.path.dirname(os.path.realpath(__file__))
+settings_file = os.path.join(current_directory, "es_settings.json")
+ES_SETTINGS = open(settings_file).read()
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'

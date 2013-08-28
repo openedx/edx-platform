@@ -1,17 +1,15 @@
 """
-Tests for the ElasticDatabase class in es_requests
+Tests for the ElasticDatabase class in indexing
 """
 
 import json
-import time
-import os
 
 from django.test import TestCase
 import requests
 from pyfuzz.generator import random_regex
 from django.test.utils import override_settings
 
-from search.es_requests import ElasticDatabase, flaky_request
+from search.indexing import ElasticDatabase, flaky_request
 from mocks import StubServer, StubRequestHandler
 
 
@@ -35,6 +33,7 @@ class PersonalServer(StubServer):
 
 
 @override_settings(ES_DATABASE="http://127.0.0.1:9203")
+@override_settings(ES_SETTINGS=open("common/djangoapps/search/tests/test_settings.json").read())
 class EsTest(TestCase):
     """
     Test suite for ElasticDatabase class
@@ -44,27 +43,15 @@ class EsTest(TestCase):
         self.stub = PersonalServer(StubRequestHandler, 9203)
         es_instance = "http://127.0.0.1:9203"
         # Making sure that there is actually a running es_instance before testing
-        database_request = requests.get(es_instance)
-        self.assertEqual(database_request.status_code, 200)
         requests.put(es_instance)
-        self.elastic_search = ElasticDatabase("common/djangoapps/search/tests/test_settings.json")
-        index_request = setup_index(self.elastic_search.url, "test-index", self.elastic_search.index_settings)
-        self.assertEqual(index_request.status_code, 200)
-        type_request = setup_type(
+        self.elastic_search = ElasticDatabase()
+        setup_index(self.elastic_search.url, "test-index", self.elastic_search.index_settings)
+        setup_type(
             self.elastic_search.url,
             "test-index",
             "test-type",
             "common/djangoapps/search/tests/test_mapping.json"
         )
-        time.sleep(0.1)  # Without sleep, tests will run without setUp finishing.
-        self.assertEqual(type_request.status_code, 201)
-        self.current_path = os.path.dirname(os.path.abspath(__file__))
-
-    def test_type_existence(self):
-        self.assertTrue(has_type(self.elastic_search.url, "test-index", "test-type"))
-        self.assertFalse(has_type(self.elastic_search.url, "test-index", "fake-type"))
-        self.assertFalse(has_type(self.elastic_search.url, "fake-index", "test-type"))
-        self.assertFalse(has_type(self.elastic_search.url, "fake-index", "fake-type"))
 
     def test_bulk_index(self):
         test_string = ""
@@ -74,16 +61,21 @@ class EsTest(TestCase):
         test_string += "\n"
         success = self.elastic_search.bulk_index(test_string)
         self.assertEqual(success.status_code, 200)
+        self.assertEqual(success.request.method, "POST")
+        self.assertEqual(success.request.data, test_string)
 
     def test_index_data(self):
-        fake_data = {"data": "Test String"}
-        fake_data.update({"hash": random_regex(regex="[a-zA-Z0-9]", length=50)})
-        fake_data.update({"type_hash": random_regex(regex="[a-zA-Z0-9]", length=50)})
+        fake_data = {
+            "data": "Test String",
+            "hash": random_regex(regex="[a-zA-Z0-9]", length=50),
+            "type_hash": random_regex(regex="[a-zA-Z0-9]", length=50)
+        }
         response = self.elastic_search.index_data("test-index", fake_data, "test-type", "1234")
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.request.method, "POST")
+        self.assertEqual(response.request.data, json.dumps(fake_data))
 
     def tearDown(self):
-        delete_index(self.elastic_search.url, "test-index")
         self.stub.stop()
 
 

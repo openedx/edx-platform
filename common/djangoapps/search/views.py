@@ -15,7 +15,7 @@ from django_future.csrf import ensure_csrf_cookie
 
 from courseware.courses import get_course_with_access
 from search.models import SearchResults
-from search.es_requests import MongoIndexer
+from search.indexing import MongoIndexer
 
 
 CONTENT_TYPES = set(["transcript", "problem"])
@@ -71,7 +71,10 @@ def _find(request, course_id):
     Method in charge of getting search results and associated metadata
     """
 
-    database = settings.ES_DATABASE
+    try:
+        database = settings.ES_DATABASE
+    except AttributeError:  # If settings has no ES_DATABASE
+        database = "http://localhost:9200"
     query = request.GET.get("s", "*.*")
     full_query_data = \
         {
