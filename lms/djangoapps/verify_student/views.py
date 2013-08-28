@@ -4,6 +4,7 @@
 """
 import json
 import logging
+import decimal
 
 from mitxmako.shortcuts import render_to_response
 
@@ -68,19 +69,23 @@ def create_order(request):
 
     course_id = request.POST['course_id']
     contribution = request.POST.get("contribution", 0)
+    try:
+        amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+    except decimal.InvalidOperation:
+        return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     verified_mode = CourseMode.modes_for_course_dict(course_id).get('verified', None)
     # make sure this course has a verified mode
     if not verified_mode:
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
-    if int(contribution) < verified_mode.min_price:
+    if amount < verified_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     # I know, we should check this is valid. All kinds of stuff missing here
     cart = Order.get_cart_for_user(request.user)
     cart.clear()
-    CertificateItem.add_to_order(cart, course_id, contribution, 'verified')
+    CertificateItem.add_to_order(cart, course_id, amount, 'verified')
 
     params = get_signed_purchase_params(cart)
 

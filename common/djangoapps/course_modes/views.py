@@ -1,3 +1,4 @@
+import decimal
 from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
@@ -63,14 +64,21 @@ class ChooseModeView(View):
             amount = request.POST.get("contribution") or \
                 request.POST.get("contribution-other-amt") or 0
 
-            donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_id] = amount
-            request.session["donation_for_course"] = donation_for_course
+            try:
+                # validate the amount passed in and force it into two digits
+                amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
+            except decimal.InvalidOperation:
+                error_msg = _("Invalid amount selected.")
+                return self.get(request, error=error_msg)
 
             # Check for minimum pricing
-            if int(amount) < mode_info.min_price:
+            if amount_value < mode_info.min_price:
                 error_msg = _("No selected price or selected price is too low.")
                 return self.get(request, error=error_msg)
+
+            donation_for_course = request.session.get("donation_for_course", {})
+            donation_for_course[course_id] = donation_for_course
+            request.session["donation_for_course"] = donation_for_course
 
             return redirect(
                 "{}?{}".format(
