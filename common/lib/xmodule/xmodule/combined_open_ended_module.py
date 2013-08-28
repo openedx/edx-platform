@@ -369,7 +369,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     css = {
             'scss': 
             [
-                resource_string(__name__, 'css/combinedopenended/display.scss')
+                resource_string(__name__, 'css/combinedopenended/display.scss'),
                 resource_string(__name__, 'css/combinedopenended/clip_video.scss')
             ]
           }
