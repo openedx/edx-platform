@@ -156,7 +156,7 @@ def add_histogram(get_html, module, user):
                 # if original, unmangled filename exists then use it (github
                 # doesn't like symlinks)
                 filepath = filename
-            data_dir = osfs.root_path.rsplit('/')[-1]
+            data_dir = module.lms.static_asset_path or osfs.root_path.rsplit('/')[-1]
             giturl = module.lms.giturl or 'https://github.com/MITx'
             edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
         else:
