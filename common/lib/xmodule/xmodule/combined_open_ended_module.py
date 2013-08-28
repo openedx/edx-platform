@@ -366,7 +366,13 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     }
     js_module_name = "CombinedOpenEnded"
 
-    css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
+    css = {
+            'scss': 
+            [
+                resource_string(__name__, 'css/combinedopenended/display.scss')
+                resource_string(__name__, 'css/combinedopenended/clip_video.scss')
+            ]
+          }
 
     def __init__(self, *args, **kwargs):
         """
