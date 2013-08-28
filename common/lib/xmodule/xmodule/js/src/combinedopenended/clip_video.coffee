@@ -22,6 +22,7 @@ class @VideoClipper
   @generateHtml: true
   @clipper: ""
   @clippers: []
+  @callback = false
   @prepared:
     snippet: false
 
@@ -518,3 +519,8 @@ class @VideoClipper
     val = @secondsToTime val
     $("input[name='bl-start']").val val
     return val
+
+VideoClipper.generate()
+if window.onVideoClipperReady?
+  VideoClipper.callback = true
+  window.onVideoClipperReady()
