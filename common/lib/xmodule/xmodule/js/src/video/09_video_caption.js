@@ -25,12 +25,7 @@ function () {
 
         _makeFunctionsPublic(state);
 
-        // Depending on whether captions file could be loaded, the following
-        // function invocation can succeed or fail. If it fails, we do not
-        // go on with binding handlers to events.
-        if (state.videoCaption.renderElements()) {
-            state.videoCaption.bindHandlers();
-        }
+        state.videoCaption.renderElements();
     };
 
     // ***************************************************************
@@ -100,27 +95,7 @@ function () {
         this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        // Fetch the captions file. If no file was specified, then we hide
-        // the "CC" button, and return.
-        if (!this.videoCaption.fetchCaption()) {
-            this.videoCaption.hideSubtitlesEl.hide();
-
-            return false;
-        }
-
-        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
-        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
-
-        this.videoCaption.setSubtitlesHeight();
-
-        if (this.videoType === 'html5') {
-            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
-
-            this.videoCaption.subtitlesEl.addClass('html5');
-            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
-        }
-
-        return true;
+        this.videoCaption.fetchCaption();
     }
 
     // function bindHandlers()
@@ -181,8 +156,6 @@ function () {
     function fetchCaption() {
         var _this = this;
 
-        this.videoCaption.hideCaptions(this.hide_captions);
-
         // Check whether the captions file was specified. This is the point
         // where we either stop with the caption panel (so that a white empty
         // panel to the right of the video will not be shown), or carry on
@@ -191,10 +164,12 @@ function () {
             return false;
         }
 
+        // Fetch the captions file. If no file was specified, or if an error
+        // occurred, then we hide the captions panel, and the "CC" button
         $.ajaxWithPrefix({
             url: _this.videoCaption.captionURL(),
             notifyOnError: false,
-            success: function(captions) {
+            success: function (captions) {
                 _this.videoCaption.captions = captions.text;
                 _this.videoCaption.start = captions.start;
                 _this.videoCaption.loaded = true;
@@ -209,6 +184,16 @@ function () {
                 } else {
                     _this.videoCaption.renderCaption();
                 }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('ERROR while fetching captions.');
+                console.log(
+                    'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
+                );
+                console.log('arguments:', arguments);
+
+                _this.videoCaption.hideCaptions(true);
+                _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
 
@@ -299,6 +284,22 @@ function () {
         var container,
             _this = this;
         container = $('<ol>');
+
+        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
+        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
+
+        this.videoCaption.setSubtitlesHeight();
+
+        if (this.videoType === 'html5') {
+            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
+
+            this.videoCaption.subtitlesEl.addClass('html5');
+            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+        }
+
+        this.videoCaption.hideCaptions(this.hide_captions);
+
+        this.videoCaption.bindHandlers();
 
         $.each(this.videoCaption.captions, function(index, text) {
             var liEl = $('<li>');
