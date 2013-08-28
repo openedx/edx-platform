@@ -13,6 +13,7 @@
 
     beforeEach(function() {
       oldOTBD = window.onTouchBasedDevice;
+      spyOn(window, 'setTimeout').andReturn(100);
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
       initialize();
     });
@@ -130,8 +131,6 @@
 
     describe('mouse movement', function() {
       beforeEach(function() {
-        window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; })
-        window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
       });
 
@@ -446,7 +445,7 @@
         });
 
         // Temporarily disabled due to intermittent failures
-        // Fails with error: "InvalidStateError: An attempt was made to 
+        // Fails with error: "InvalidStateError: An attempt was made to
         // use an object that is not, or is no longer, usable
         // Expected 0 to equal 14.91."
         // on Firefox
