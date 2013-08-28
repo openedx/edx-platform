@@ -140,7 +140,7 @@
         });
 
         it('captions panel is not shown', function () {
-          expect(videoCaption.hideSubtitlesEl.css('display')).toBe('none');
+          expect(videoCaption.hideSubtitlesEl).toBeHidden();
         });
       });
     });
