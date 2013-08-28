@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%! from student.models import UserProfile %>
 
 <%block name="title">${_("Sign Up")}</%block>
 <%block name="bodyclass">not-signedin view-signup</%block>
