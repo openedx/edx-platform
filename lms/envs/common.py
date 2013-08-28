@@ -814,6 +814,9 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
 }
 
 ############################### THEME ################################
