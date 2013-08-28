@@ -19,10 +19,21 @@
   }
 
   var submitToPaymentProcessing = function() {
+    var contribution_input = $("input[name='contribution']:checked")
+    var contribution = 0;
+    if(contribution_input.attr('id') == 'contribution-other')
+    {
+        contribution = $("input[name='contribution-other-amt']").val();
+    }
+    else
+    {
+        contribution = contribution_input.val();
+    }
     var xhr = $.post(
       "create_order",
       {
-        "course_id" : "${course_id}"
+        "course_id" : "${course_id}",
+        "contribution": contribution
       },
       function(data) {
         for (prop in data) {

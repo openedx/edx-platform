@@ -74,7 +74,7 @@ def create_order(request):
     if not verified_mode:
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
-    if contribution < verified_mode.min_price:
+    if int(contribution) < verified_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     # I know, we should check this is valid. All kinds of stuff missing here
