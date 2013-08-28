@@ -23,10 +23,9 @@
         <div id="register_error" name="register_error"></div>
 
         <div class="input-group">
-	  % if has_extauth_info is UNDEFINED:
           <span class="field required text" id="field-lastname">
           <label data-field="email" for="signup_email">${_('E-mail')}</label>
-	    <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
+	       <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
           </span>
           <label data-field="password" for="signup_password">${_('Password')}</label>
 	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
