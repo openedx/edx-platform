@@ -183,3 +183,14 @@ class CertificateItemTest(TestCase):
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')
+
+    def test_single_item_template(self):
+        cart = Order.get_cart_for_user(user=self.user)
+        cert_item = CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+
+        self.assertEquals(cert_item.single_item_receipt_template,
+                          'shoppingcart/verified_cert_receipt.html')
+
+        cert_item = CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
+        self.assertEquals(cert_item.single_item_receipt_template,
+                          'shoppingcart/receipt.html')

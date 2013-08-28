@@ -179,6 +179,13 @@ class OrderItem(models.Model):
         """
         raise NotImplementedError
 
+    @property
+    def single_item_receipt_template(self):
+        """
+        the template that should be used when there's
+        only one item in the order
+        """
+        return'shoppingcart/receipt.html'
 
 class PaidCourseRegistration(OrderItem):
     """
@@ -320,3 +327,10 @@ class CertificateItem(OrderItem):
         self.course_enrollment.mode = self.mode
         self.course_enrollment.save()
         self.course_enrollment.activate()
+
+    @property
+    def single_item_receipt_template(self):
+        if self.mode == 'verified':
+            return 'shoppingcart/verified_cert_receipt.html'
+        else:
+            return super(CertificateItem, self).single_item_receipt_template

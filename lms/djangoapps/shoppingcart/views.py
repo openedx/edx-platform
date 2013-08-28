@@ -99,8 +99,13 @@ def show_receipt(request, ordernum):
     if order.user != request.user or order.status != 'purchased':
         raise Http404('Order not found!')
 
-    order_items = order.orderitem_set.all()
+    order_items = OrderItem.objects.filter(order=order).select_subclasses()
     any_refunds = any(i.status == "refunded" for i in order_items)
-    return render_to_response('shoppingcart/receipt.html', {'order': order,
-                                                            'order_items': order_items,
-                                                            'any_refunds': any_refunds})
+    receipt_template = 'shoppingcart/receipt.html'
+    # we want to have the ability to override the default receipt page when
+    # there is only one item in the order
+    if order_items.count() == 1:
+        receipt_template = order_items[0].single_item_receipt_template
+    return render_to_response(receipt_template, {'order': order,
+                                                 'order_items': order_items,
+                                                 'any_refunds': any_refunds})

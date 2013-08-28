@@ -159,7 +159,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('ERROR_TEST!!!', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _tmp) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/error.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['error_html'], 'ERROR_TEST!!!')
@@ -194,11 +194,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('StreetTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _tmp) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item.orderitem_ptr, context['order_items'])
-        self.assertIn(cert_item.orderitem_ptr, context['order_items'])
+        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(cert_item, context['order_items'])
         self.assertFalse(context['any_refunds'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
@@ -214,9 +214,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('40.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _tmp) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item.orderitem_ptr, context['order_items'])
-        self.assertIn(cert_item.orderitem_ptr, context['order_items'])
+        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(cert_item, context['order_items'])
         self.assertTrue(context['any_refunds'])
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_custom_receipt_page(self):
+        cert_item = CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
+        self.cart.purchase()
+        self.login_user()
+        receipt_url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(receipt_url)
+        self.assertEqual(resp.status_code, 200)
+        ((template, _context), _tmp) = render_mock.call_args
+        self.assertEqual(template, cert_item.single_item_receipt_template)
