@@ -21,11 +21,16 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def get(self, request):
         course_id = request.GET.get("course_id")
+        modes = CourseMode.modes_for_course_dict(course_id)
         context = {
             "course_id": course_id,
-            "modes": CourseMode.modes_for_course_dict(course_id),
-            "course_name": course_from_id(course_id).display_name
+            "modes": modes,
+            "course_name": course_from_id(course_id).display_name,
         }
+        if "verified" in modes:
+            context["suggested_prices"] = modes["verified"].suggested_prices.split(",")
+            context["currency"] = modes["verified"].currency.upper()
+
         return render_to_response("course_modes/choose.html", context)
 
 

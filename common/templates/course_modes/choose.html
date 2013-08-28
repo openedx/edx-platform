@@ -54,28 +54,7 @@
           <span class="ribbon"></span>
           <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
 
-          <dl>
-            <dt>
-              Select your contribution for this course:
-            </dt>
-            <dd>
-              <ul class="pay-options">
-                % for price in modes["verified"].suggested_prices.split(","):
-                <li>
-                  <input type="radio" name="contribution" value="${price|h}"><label for="contribution-${price|h}">$${price} ${modes["verified"].currency.upper()}</label>
-                </li>
-                % endfor
-
-                <li class="other1">
-                  <input type="radio" id="contribution-other" name="contribution" value=""/>
-                  <label for=" contribution-other"><span class="sr">Other</span></label>
-                </li>
-                <li class="other2">
-                  <label for="contribution-other-amt"><span class="sr">Other Amount</span> </label>$<input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
-                </li>
-              </ul>
-            </dd>
-          </dl>
+          <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency"/>
 
           <p class="tip expand">
             <a href="">Why do I have to pay? What if I don't meet all the requirements?</a>
