@@ -179,6 +179,59 @@
         });
       });
 
+      describe('Check heartbeats logging', function() {
+        beforeEach(function() {
+          initialize();
+          spyOn(videoPlayer, 'log').andCallThrough();
+          state.config.heartbeatsLoggingDelay = 1000;
+
+          videoPlayer.onStateChange({
+            data: YT.PlayerState.PLAYING
+          });
+        });
+
+        function initHeartbets(expectation, waitsForTime) {
+          var runsTimer = waitsForTime - 100,
+              flag;
+
+          runs(function() {
+            flag = false;
+            var timer = window.setTimeout(function(){
+              flag = true;
+            }, runsTimer);
+          });
+
+          waitsFor(function() {
+            return flag;
+          }, "The Flag should be True", waitsForTime);
+
+          runs(expectation);
+
+        }
+
+        it('heartbeat log called twice', function() {
+          initHeartbets(function() {
+            var heartbeatsLogsArray = videoPlayer.log.calls.slice(-2);
+
+            $.each(heartbeatsLogsArray, function(index, log){
+              expect(log.args[0]).toEqual('is_video_playing');
+            });
+          }, 2200);
+        });
+
+        it('heartbeat log did\'t called after pausing', function() {
+          videoPlayer.onStateChange({
+            data: YT.PlayerState.PAUSED
+          });
+
+          initHeartbets(function() {
+            var log = videoPlayer.log.mostRecentCall.args[0];
+            expect(log).not.toEqual('is_video_playing');
+          }, 1200);
+        });
+
+      });
+
       describe('when the video is playing', function() {
         var oldState;
 

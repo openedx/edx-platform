@@ -154,6 +154,25 @@ function (HTML5Video) {
         });
     }
 
+    // Start heartbeats logging.
+    // Send logs to the server each state.config.heartbeatsLoggingDelay seconds
+    // and provide an indication of whether students still have a video playing
+    // on their screen so that we have a better idea of whether they are getting
+    // the educational benefit of watching the lecture.
+    function _startHeartbeatLogging(state) {
+        if (!state.videoPlayer.heartbeatsInterval) {
+            state.videoPlayer.heartbeatsInterval = window.setInterval(
+                _.bind(state.videoPlayer.log, state, 'is_video_playing'),
+                state.config.heartbeatsLoggingDelay
+            );
+        }
+    }
+
+    // Stop heartbeats logging.
+    function _stopHeartbeatLogging(state) {
+        window.clearInterval(state.videoPlayer.heartbeatsInterval);
+    }
+
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -267,6 +286,7 @@ function (HTML5Video) {
             }
         );
 
+        _stopHeartbeatLogging(this);
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
 
@@ -284,6 +304,8 @@ function (HTML5Video) {
                 'currentTime': this.videoPlayer.currentTime
             }
         );
+
+        _startHeartbeatLogging(this);
 
         if (!this.videoPlayer.updateInterval) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);

@@ -13,6 +13,7 @@
 
     beforeEach(function() {
       oldOTBD = window.onTouchBasedDevice;
+      spyOn(window, 'setTimeout').andReturn(100);
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
       initialize();
     });
@@ -147,8 +148,6 @@
 
     describe('mouse movement', function() {
       beforeEach(function() {
-        window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; })
-        window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
       });
 

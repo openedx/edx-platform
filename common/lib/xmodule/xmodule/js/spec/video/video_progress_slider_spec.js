@@ -146,6 +146,7 @@
 
     describe('onStop', function() {
       beforeEach(function() {
+        spyOn(window, 'setTimeout');
         initialize();
         spyOn(videoPlayer, 'onSlideSeek').andCallThrough();
         videoProgressSlider.onStop({}, {

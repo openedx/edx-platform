@@ -218,22 +218,23 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
-            start:              this.el.data('start'),
-            end:                this.el.data('end'),
+            start:                  this.el.data('start'),
+            end:                    this.el.data('end'),
 
-            caption_data_dir:   this.el.data('caption-data-dir'),
-            caption_asset_path: this.el.data('caption-asset-path'),
-            show_captions:      (this.el.data('show-captions').toString().toLowerCase() === 'true'),
-            youtubeStreams:     this.el.data('streams'),
+            caption_data_dir:       this.el.data('caption-data-dir'),
+            caption_asset_path:     this.el.data('caption-asset-path'),
+            show_captions:          (this.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:         this.el.data('streams'),
 
-            sub:                this.el.data('sub'),
-            mp4Source:          this.el.data('mp4-source'),
-            webmSource:         this.el.data('webm-source'),
-            oggSource:          this.el.data('ogg-source'),
+            sub:                    this.el.data('sub'),
+            mp4Source:              this.el.data('mp4-source'),
+            webmSource:             this.el.data('webm-source'),
+            oggSource:              this.el.data('ogg-source'),
 
-            fadeOutTimeout:     1400,
+            fadeOutTimeout:         1400,
 
-            availableQualities: ['hd720', 'hd1080', 'highres']
+            availableQualities:     ['hd720', 'hd1080', 'highres'],
+            heartbeatsLoggingDelay: 30*1000
         };
 
         if (!(_parseYouTubeIDs(this))) {
