@@ -9,9 +9,10 @@ from mitxmako.shortcuts import render_to_response
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
+from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -47,14 +48,14 @@ class VerifyView(View):
         else:
             chosen_price = verify_mode.min_price.format("{:g}")
         context = {
-            "progress_state" : progress_state,
-            "user_full_name" : request.user.profile.name,
-            "course_id" : course_id,
-            "course_name" : course_from_id(course_id).display_name,
-            "purchase_endpoint" : get_purchase_endpoint(),
-            "suggested_prices" : verify_mode.suggested_prices.split(","),
-            "currency" : verify_mode.currency.upper(),
-            "chosen_price" : chosen_price,
+            "progress_state": progress_state,
+            "user_full_name": request.user.profile.name,
+            "course_id": course_id,
+            "course_name": course_from_id(course_id).display_name,
+            "purchase_endpoint": get_purchase_endpoint(),
+            "suggested_prices": verify_mode.suggested_prices.split(","),
+            "currency": verify_mode.currency.upper(),
+            "chosen_price": chosen_price,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -66,17 +67,20 @@ def create_order(request):
     attempt.save()
 
     course_id = request.POST['course_id']
-    donation_for_course = request.session.get("donation_for_course", {})
+    contribution = request.POST.get("contribution", 0)
 
-    # FIXME: When this isn't available we do...?
-    verified_mode = CourseMode.modes_for_course_dict(course_id)["verified"]
-    amount = donation_for_course.get(course_id, verified_mode.min_price)
+    verified_mode = CourseMode.modes_for_course_dict(course_id).get('verified', None)
+    # make sure this course has a verified mode
+    if not verified_mode:
+        return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
+
+    if contribution < verified_mode.min_price:
+        return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     # I know, we should check this is valid. All kinds of stuff missing here
-    # enrollment = CourseEnrollment.create_enrollment(request.user, course_id)
     cart = Order.get_cart_for_user(request.user)
     cart.clear()
-    CertificateItem.add_to_order(cart, course_id, amount, 'verified')
+    CertificateItem.add_to_order(cart, course_id, contribution, 'verified')
 
     params = get_signed_purchase_params(cart)
 

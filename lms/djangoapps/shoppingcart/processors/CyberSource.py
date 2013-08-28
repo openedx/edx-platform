@@ -104,7 +104,7 @@ def render_purchase_form_html(cart):
     """
     return render_to_string('shoppingcart/cybersource_form.html', {
         'action': get_purchase_endpoint(),
-        'params': get_signed_purchase_params(params),
+        'params': get_signed_purchase_params(cart),
     })
 
 def get_signed_purchase_params(cart):

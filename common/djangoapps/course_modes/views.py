@@ -19,14 +19,15 @@ from student.views import course_from_id
 class ChooseModeView(View):
 
     @method_decorator(login_required)
-    def get(self, request):
+    def get(self, request, error=None):
         course_id = request.GET.get("course_id")
         modes = CourseMode.modes_for_course_dict(course_id)
         context = {
             "course_id": course_id,
             "modes": modes,
             "course_name": course_from_id(course_id).display_name,
-            "chosen_price" : None,
+            "chosen_price": None,
+            "error": error,
         }
         if "verified" in modes:
             context["suggested_prices"] = modes["verified"].suggested_prices.split(",")
@@ -43,7 +44,8 @@ class ChooseModeView(View):
         # but I don't really have the time to refactor it more nicely and test.
         course = course_from_id(course_id)
         if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest(_("Enrollment is closed"))
+            error_msg = _("Enrollment is closed")
+            return self.get(request, error=error_msg)
 
         requested_mode = self.get_requested_mode(request.POST.get("mode"))
 
@@ -55,16 +57,20 @@ class ChooseModeView(View):
             CourseEnrollment.enroll(user, course_id)
             return redirect('dashboard')
 
+        mode_info = allowed_modes[requested_mode]
+
         if requested_mode == "verified":
             amount = request.POST.get("contribution") or \
-                     request.POST.get("contribution-other-amt") or \
-                     requested_mode.min_price.format("{:g}")
+                request.POST.get("contribution-other-amt") or 0
 
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_id] = amount
             request.session["donation_for_course"] = donation_for_course
 
-            # TODO: Check here for minimum pricing
+            # Check for minimum pricing
+            if int(amount) < mode_info.min_price:
+                error_msg = _("No selected price or selected price is too low.")
+                return self.get(request, error=error_msg)
 
             return redirect(
                 "{}?{}".format(
@@ -75,7 +81,7 @@ class ChooseModeView(View):
 
     def get_requested_mode(self, user_choice):
         choices = {
-            "Select Audit" : "audit",
-            "Select Certificate" : "verified"
+            "Select Audit": "audit",
+            "Select Certificate": "verified"
         }
         return choices.get(user_choice)

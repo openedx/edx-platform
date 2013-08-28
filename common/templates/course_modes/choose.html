@@ -25,6 +25,11 @@
     <header class="page-header header-white">
       <h2 class="title header-white-title">You are registering for ${course_name} (ID Verified)</h2>
     </header>
+    %if error:
+    <div class="error">
+        ${error}
+    </div>
+    %endif
     <h3 class="title">Select your track:</h3>
 
     <form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
