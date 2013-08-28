@@ -166,7 +166,7 @@ def upload_asset(request, org, course, coursename):
     sc_partial = partial(StaticContent, content_loc, filename, mime_type)
     if chunked:
         content = sc_partial(upload_file.chunks())
-        temp_filepath = upload_file.temporary_file_path()
+        tempfile_path = upload_file.temporary_file_path()
     else:
         content = sc_partial(upload_file.read())
         tempfile_path = None

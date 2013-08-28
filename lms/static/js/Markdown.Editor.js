@@ -1,4 +1,4 @@
-﻿// needs Markdown.Converter.js at the moment
+// needs Markdown.Converter.js at the moment
 
 (function () {
 

@@ -9,14 +9,11 @@ from xmodule.course_module import CourseDescriptor
 from .prompt import query_yes_no
 
 from auth.authz import _delete_course_group
-from request_cache.middleware import RequestCache
-from django.core.cache import get_cache
+
 
 #
 # To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
 #
-
-CACHE = get_cache('mongo_metadata_inheritance')
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
 
@@ -35,11 +32,6 @@ class Command(BaseCommand):
 
         ms = modulestore('direct')
         cs = contentstore()
-
-        ms.set_modulestore_configuration({
-            'metadata_inheritance_cache_subsystem': CACHE,
-            'request_cache': RequestCache.get_request_cache()
-        })
 
         org, course_num, run = course_id.split("/")
         ms.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))

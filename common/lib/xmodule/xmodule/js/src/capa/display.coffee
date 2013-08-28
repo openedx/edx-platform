@@ -19,7 +19,6 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     @$('section.action input.reset').click @reset
@@ -247,6 +246,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
+        Logger.log 'problem_graded', [@answers, response.contents], @url
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)

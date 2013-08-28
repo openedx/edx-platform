@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 
 

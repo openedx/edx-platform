@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_raises, assert_not_equals
+from nose.tools import assert_equals, assert_raises, assert_not_equals  # pylint: disable=E0611
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import InvalidLocationError
 

@@ -1,12 +1,22 @@
-from nose.tools import assert_equals, assert_raises, assert_false, assert_true, assert_not_equals
+# pylint: disable=E0611
+from nose.tools import assert_equals, assert_raises, assert_false, \
+    assert_true, assert_not_equals
+# pylint: enable=E0611
 import pymongo
 from uuid import uuid4
 
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml
+
+# Mixed modulestore depends on django, so we'll manually configure some django settings
+# before importing the module
+from django.conf import settings
+if not settings.configured:
+    settings.configure()
+
+from xmodule.modulestore.mixed import MixedModuleStore
 
 
 HOST = 'localhost'
@@ -234,22 +244,3 @@ class TestMixedModuleStore(object):
         assert_equals(Location(parents[0]).org, 'edX')
         assert_equals(Location(parents[0]).course, 'toy')
         assert_equals(Location(parents[0]).name, '2012_Fall')
-
-    # pylint: disable=W0212
-    def test_set_modulestore_configuration(self):
-        config = {'foo': 'bar'}
-        self.store.set_modulestore_configuration(config)
-        assert_equals(
-            config,
-            self.store._get_modulestore_for_courseid(IMPORT_COURSEID).modulestore_configuration
-        )
-
-        assert_equals(
-            config,
-            self.store._get_modulestore_for_courseid(XML_COURSEID1).modulestore_configuration
-        )
-
-        assert_equals(
-            config,
-            self.store._get_modulestore_for_courseid(XML_COURSEID2).modulestore_configuration
-        )

@@ -29,7 +29,7 @@ def correct_video_settings(_step):
                                       ['Download Track', '', False],
                                       ['Download Video', '', False],
                                       ['End Time', '0', False],
-                                      ['HTML5 Subtitles', '', False],
+                                      ['HTML5 Timed Transcript', '', False],
                                       ['Show Captions', 'True', False],
                                       ['Start Time', '0', False],
                                       ['Video Sources', '', False],

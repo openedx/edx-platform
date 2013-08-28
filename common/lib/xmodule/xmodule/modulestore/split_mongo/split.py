@@ -50,15 +50,18 @@ class SplitMongoModuleStore(ModuleStoreBase):
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
                  user=None, password=None,
+                 mongo_options=None,
                  **kwargs):
 
         ModuleStoreBase.__init__(self)
+        if mongo_options is None:
+            mongo_options = {}
 
         self.db = pymongo.database.Database(pymongo.MongoClient(
             host=host,
             port=port,
             tz_aware=True,
-            **kwargs
+            **mongo_options
         ), db)
 
         self.course_index = self.db[collection + '.active_versions']
