@@ -64,10 +64,8 @@ function showUploadModal(e) {
             showUploadFeedback(e, percentComplete);
         },
         maxFileSize: 10 * 1000 * 1000,   // 100 MB
-        maxNumberofFiles: 30,
+        maxNumberofFiles: 100,
         add: function(e, data) {
-            // Uncomment this line to get html template on load
-            // var html = assetUploadTemplate(data.files);
             data.process().done(function () {
                 data.submit();
             });
@@ -79,18 +77,6 @@ function showUploadModal(e) {
     });
     $('.file-input').bind('change', startUpload);
     $modalCover.show();
-}
-
-function assetUploadTemplate(files) {
-    var compiled = _.template('<tr class="modal-asset>' +
-               '<td><span class="modal-asset new"></span></td>' +
-                '<td><p class="modal-asset name"> <%= file.name %></td>' +
-                '</tr>');
-    var html = '';
-    for (var i=0; i < files.length; i++) {
-        html += compiled({ file: files[i]});
-    }
-    return html;
 }
 
 function showFileSelectionMenu(e) {
