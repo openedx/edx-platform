@@ -1,8 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
-
 <%block name="bodyclass">register verification-process step-photos</%block>
+<%block name="title"><title>${("Register for [Course Name] | Verification")}</title></%block>
 
 <%block name="js_extra">
 <!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
@@ -168,9 +168,14 @@
 
     <header class="page-header">
       <h2 class="title">
-        <span class="status-track">(ID Verified)</span>
-        <span class="status">You are registering for</span>
-        <span class="status-course">${course_id} </span>
+        <span class="wrapper-sts">
+          <span class="sts">You are registering for</span>
+          <span class="sts-course">${course_id} </span>
+        </span>
+        <span class="sts-track">
+          <span class="sts-track-label">Registering as: </span>
+          <span class="sts-track-value">ID Verified</span>
+        </span>
       </h2>
     </header>
 
@@ -178,41 +183,43 @@
       <section class="progress">
         <h3 class="sr title">Your Progress</h3>
 
-        <span class="progress-status">
-          <span class="progress-status-value"></span>
-        </span>
-
         <ol class="progress-steps">
           <li class="progress-step is-completed" id="progress-step0">
-            <span class="step-number">0</span>
+            <span class="wrapper-step-number"><span class="step-number">0</span></span>
             <span class="step-name">Intro</span>
           </li>
 
-          <li class="progress-step" id="progress-step1">
-            <span class="step-number">1</span>
+          <li class="progress-step is-current" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
             <span class="step-name"><span class="sr">Current Step: </span>Take Photo</span>
           </li>
 
           <li class="progress-step" id="progress-step2">
-            <span class="step-number">2</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">Take ID Photo</span>
           </li>
 
           <li class="progress-step" id="progress-step3">
-            <span class="step-number">3</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">Review</span>
           </li>
 
           <li class="progress-step" id="progress-step4">
-            <span class="step-number">4</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">4</span></span>
+            <span class="step-name">Make Payment</span>
           </li>
 
           <li class="progress-step" id="progress-step5">
-            <span class="step-number">5</span>
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
             <span class="step-name">Confirmation</span>
           </li>
         </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
       </section>
     </div>
 
@@ -220,7 +227,7 @@
       <article class="content-main">
 
         <section class="wrapper carousel"  data-transition="slide">
-          <div id="wrapper-view wrapper-facephoto" class="block-photo">
+          <div id="wrapper-facephoto" class="wrapper-view block-photo">
             <div class="facephoto view">
               <h3 class="title">Take Your Photo</h3>
               <div class="instruction">
@@ -230,7 +237,7 @@
               <div class="wrapper-task">
                 <div id="facecam" class="task cam">
                   <div class="placeholder-cam">
-                    <video id="face_video" width="400" height="300" autoplay></video><br/>
+                    <video id="face_video" width="500" height="375" autoplay></video><br/>
                     <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
                   </div>
 
@@ -258,20 +265,20 @@
                 </div>
 
                 <div class="wrapper-help">
-                  <div class="help-task photo-tips facetips">
+                  <div class="help help-task photo-tips facetips">
                     <h4 class="title">Tips on taking a successful photo</h4>
 
                     <div class="copy">
-                      <ul>
-                        <li>Make sure your face is well-lit</li>
-                        <li>Be sure your entire face is inside the frame</li>
-                        <li>Can we match the photo you took with the one on your ID?</li>
-                        <li>Click the checkmark once you are happy with the photo</li>
+                      <ul class="list-help">
+                        <li class="help-item">Make sure your face is well-lit</li>
+                        <li class="help-item">Be sure your entire face is inside the frame</li>
+                        <li class="help-item">Can we match the photo you took with the one on your ID?</li>
+                        <li class="help-item">Click the checkmark once you are happy with the photo</li>
                       </ul>
                     </div>
                   </div>
 
-                  <div class="help-faq facefaq">
+                  <div class="help help-faq facefaq">
                     <h4 class="sr title">Common Questions</h4>
 
                     <div class="copy">
@@ -292,7 +299,7 @@
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next" id="face_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
+                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
                   </li>
                 </ol>
               </nav>
@@ -300,7 +307,7 @@
             </div> <!-- /view -->
           </div> <!-- /wrapper-view -->
 
-          <div id="wrapper-view wrapper-idphoto" class="block-photo">
+          <div id="wrapper-idphoto" class="wrapper-view block-photo">
             <div class="idphoto view">
               <h3 class="title">Show Us Your ID</h3>
               <div class="instruction">
@@ -310,7 +317,7 @@
               <div class="wrapper-task">
                 <div id="idcam" class="task cam">
                   <div class="placeholder-cam">
-                    <video id="photo_id_video" width="400" height="300" autoplay></video><br/>
+                    <video id="photo_id_video" width="500" height="375" autoplay></video><br/>
                     <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
                   </div>
 
@@ -338,7 +345,7 @@
                 </div>
 
                 <div class="wrapper-help">
-                  <div class="help-task photo-tips facetips">
+                  <div class="help help-task photo-tips facetips">
                     <h4 class="title">Tips on taking a successful photo</h4>
 
                     <div class="copy">
@@ -351,7 +358,7 @@
                     </div>
                   </div>
 
-                  <div class="help-faq facefaq">
+                  <div class="help help-faq facefaq">
                     <h4 class="sr title">Common Questions</h4>
 
                     <div class="copy">
@@ -372,14 +379,14 @@
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
+                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
                   </li>
                 </ol>
               </nav>
             </div> <!-- /view -->
           </div> <!-- /wrapper-view -->
 
-          <div id="wrapper-view wrapper-review">
+          <div id="wrapper-review" class="wrapper-view">
             <div class="review view">
               <h3 class="title">Verify Your Submission</h3>
               <div class="instruction">
@@ -388,36 +395,36 @@
 
               <div class="wrapper-task">
                 <ol class="review-tasks">
-                  <li class="review-task">
+                  <li class="review-task review-task-name">
                     <h4 class="title">Check Your Name</h4>
 
                     <div class="copy">
                       <p>Make sure your full name on your edX account, [User Name], matches your ID. We will also use this as the name on your certificate.</p>
                     </div>
 
-                    <ul class="actions">
+                    <ul class="list-actions">
                       <li class="action action-editname">
                         <a rel="modal" class="edit-name" href="#">Edit my name</a>
                       </li>
                     </ul>
                   </li>
 
-                  <li class="review-task">
+                  <li class="review-task review-task-photos">
                     <h4 class="title">Review the Photos You've Taken</h4>
 
                     <div class="copy">
-                      <p>Make sure your full name on your edX account, [User Name], matches your ID. We will also use this as the name on your certificate.</p>
+                      <p>Make sure your full name on your edX account, <strong>[User Name]</strong>, matches your ID. We will also use this as the name on your certificate.</p>
                     </div>
 
                     <ol class="wrapper-photos">
                       <li class="wrapper-photo">
                         <div class="placeholder-photo">
-                          <img id="face_image" width="512" height="384" src=""/>
+                          <img id="face_image" src=""/>
                         </div>
 
                         <div class="help-tips">
-                          <h5>The photo above needs to meet the following requirements:</h5>
-                          <ul class="list-tips">
+                          <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                          <ul class="list-help list-tips copy">
                             <li class="tip">Be well lit</li>
                             <li class="tip">Show your whole face</li>
                             <li class="tip">Match your ID</li>
@@ -427,12 +434,12 @@
 
                       <li class="wrapper-photo">
                        <div class="placeholder-photo">
-                         <img id="photo_id_image" width="512" height="384" src=""/>
+                         <img id="photo_id_image" src=""/>
                        </div>
 
                        <div class="help-tips">
-                         <h5>The photo above needs to meet the following requirements:</h5>
-                         <ul class="list-tips">
+                         <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                         <ul class="list-help list-tips copy">
                            <li class="tip">Be readable (not too far away, no glare)</li>
                            <li class="tip">Show your name</li>
                            <li class="tip">Match the photo of your face and your name above</li>
@@ -440,53 +447,69 @@
                        </div>
                       </li>
                     </ol>
+
+                    <div class="msg msg-retake msg-followup">
+                      <div class="copy">
+                        <p>Photos don't meet the requirements?</p>
+                      </div>
+
+                      <ul class="list-actions">
+                        <li class="action action-retakephotos">
+                          <a class="retake-photos" href="#">Retake Your Photos</a>
+                        </li>
+                      </ul>
+                    </div>
                   </li>
 
-                  <li class="review-task">
+                  <li class="review-task  review-task-contribution">
                     <h4 class="title">Check Your Contribution Level</h4>
 
                     <div class="copy">
                       <p>Please confirm your contribution for this course:</p>
                     </div>
 
-                    <ul class="contribution-options">
-                      <li class="contribution-option">
+                    <ul class="contribution-options list-fields">
+                      <li class="contribution-option field">
                         <input type="radio" id="contribution-25" name="contribution">
                         <label for="contribution-25">
                           <span class="deco-denomination">$</span>
                           <span class="label-value">25</span>
-                          <span class="denomination-name">USD</span>
+                          <span class="denomination-name"><abbr title="United States Dollars"><abbr title="United States Dollars">USD</abbr></abbr></span>
                         </label>
                       </li>
-                      <li class="contribution-option">
+                      <li class="field contribution-option">
                         <input type="radio" id="contribution-50" name="contribution">
                         <label for="contribution-50">
                           <span class="deco-denomination">$</span>
                           <span class="label-value">50</span>
-                          <span class="denomination-name">USD</span>
+                          <span class="denomination-name"><abbr title="United States Dollars">USD</abbr></span>
                         </label>
                       </li>
-                      <li class="contribution-option">
+                      <li class="field contribution-option">
                         <input type="radio" id="contribution-100" name="contribution">
                         <label for="contribution-100">
                           <span class="deco-denomination">$</span>
                           <span class="label-value">100</span>
-                          <span class="denomination-name">USD</span>
+                          <span class="denomination-name"><abbr title="United States Dollars">USD</abbr></span>
                         </label>
                       </li>
-                      <li class="contribution-option contribution-option-other1">
-                        <input type="radio" id="contribution-other" name="contribution">
-                        <label for="contribution-other"><span class="sr">Other</span></label>
-                      </li>
-                      <li class="contribution-option contribution-option-other2">
-                        <label for="contribution-other-amt">
-                          <span class="sr">Other Amount</span>
-                        </label>
-                        <div class="wrapper">
-                          <span class="deco-denomination">$</span>
-                          <input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
-                          <span class="denomination-name">USD</span>
-                        </div>
+                      <li class="field">
+                        <ul class="field-group field-group-other">
+                          <li class="contribution-option contribution-option-other1">
+                            <input type="radio" id="contribution-other" name="contribution">
+                            <label for="contribution-other"><span class="sr">Other</span></label>
+                          </li>
+                          <li class="contribution-option contribution-option-other2">
+                            <label for="contribution-other-amt">
+                              <span class="sr">Other Amount</span>
+                            </label>
+                            <div class="wrapper">
+                              <span class="deco-denomination">$</span>
+                              <input type="text" size="5" id="contribution-other-amt" name="contribution-other-amt" id="contribution-other-amt" />
+                              <span class="denomination-name"><abbr title="United States Dollars">USD</abbr></span>
+                            </div>
+                          </li>
+                        </ul>
                       </li>
                     </ul>
                   </li>
@@ -497,19 +520,16 @@
                 <span class="help help-inline">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</span>
 
                 <ol class="wizard-steps">
-                  <li class="wizard-step">
+                  <li class="wizard-step step-match">
+                    <input type="checkbox" name="match" id="confirm_pics_good" />
+                    <label for="confirm_pics_good">Yes! My details all match.</label>
+                  </li>
+                  <li class="wizard-step step-proceed">
                     <form id="pay_form" method="post" action="${purchase_endpoint}">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id | h}" />
-
-                      <ul class="list-fields">
-                        <li class="field field-match">
-                          <input type="checkbox" name="match" id="confirm_pics_good" />
-                          <label for="match">Yes! My details all match.</label>
-                        </li>
-                      </ul>
-
-                      <input type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
+                      <button type="submit" class="action-primary" id="pay_button">Go to Step 4: Secure Payment</button>
+                      <!-- <input class="action-primary" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment"> -->
                     </form>
                   </li>
                 </ol>
@@ -524,7 +544,7 @@
       <aside class="content-supplementary">
         <ul class="list-help">
           <li class="help-item">
-            <h3 class="title"><i class="icon-question-sign"></i> Have questions?</h3>
+            <h3 class="title">Have questions?</h3>
             <div class="copy">
               <p>Please read <a rel="external" href="">our FAQs to view common questions about our certificates</a>.</p>
             </div>

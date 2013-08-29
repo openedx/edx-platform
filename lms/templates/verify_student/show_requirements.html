@@ -2,6 +2,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements</%block>
+<%block name="title"><title>${("Register for [Course Name]")}</title></%block>
 
 <%block name="content">
 <div class="container">
@@ -9,9 +10,14 @@
 
     <header class="page-header">
       <h2 class="title">
-        <span class="status-track">(ID Verified)</span>
-        <span class="status">You are registering for</span>
-        <span class="status-course">${course_id} </span>
+        <span class="wrapper-sts">
+          <span class="sts">You are registering for</span>
+          <span class="sts-course">${course_id}</span>
+        </span>
+        <span class="sts-track">
+          <span class="sts-track-label">Registering as: </span>
+          <span class="sts-track-value">ID Verified</span>
+        </span>
       </h2>
     </header>
 
@@ -19,41 +25,43 @@
       <section class="progress">
         <h3 class="sr title">Your Progress</h3>
 
-        <span class="progress-status">
-          <span class="progress-status-value"></span>
-        </span>
-
         <ol class="progress-steps">
-          <li class="progress-step is-completed" id="progress-step0">
-            <span class="step-number">0</span>
+          <li class="progress-step is-current" id="progress-step0">
+            <span class="wrapper-step-number"><span class="step-number">0</span></span>
             <span class="step-name">Intro</span>
           </li>
 
           <li class="progress-step" id="progress-step1">
-            <span class="step-number">1</span>
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
             <span class="step-name"><span class="sr">Current Step: </span>Take Photo</span>
           </li>
 
           <li class="progress-step" id="progress-step2">
-            <span class="step-number">2</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">Take ID Photo</span>
           </li>
 
           <li class="progress-step" id="progress-step3">
-            <span class="step-number">3</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">Review</span>
           </li>
 
           <li class="progress-step" id="progress-step4">
-            <span class="step-number">4</span>
-            <span class="step-name">Intro</span>
+            <span class="wrapper-step-number"><span class="step-number">4</span></span>
+            <span class="step-name">Make Payment</span>
           </li>
 
           <li class="progress-step" id="progress-step5">
-            <span class="step-number">5</span>
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
             <span class="step-name">Confirmation</span>
           </li>
         </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
       </section>
     </div>
 
@@ -68,9 +76,10 @@
 
         <ul class="list-reqs">
           <li class="req req-1 req-id">
-            <h4>Identification</h4>
+            <h4 class="title">Identification</h4>
             <div class="placeholder-art">
-              <i class="icon-credit-card"></i>
+              <i class="icon-list-alt icon-under"></i>
+              <i class="icon-user icon-over"></i>
             </div>
 
             <div class="copy">
@@ -82,7 +91,7 @@
           </li>
 
           <li class="req req-2 req-webcam">
-            <h4>Webcam</h4>
+            <h4 class="title">Webcam</h4>
             <div class="placeholder-art">
               <i class="icon-facetime-video"></i>
             </div>
@@ -96,7 +105,7 @@
           </li>
 
           <li class="req req-3 req-payment">
-            <h4>Credit or Debit Card</h4>
+            <h4 class="title">Credit or Debit Card</h4>
             <div class="placeholder-art">
               <i class="icon-credit-card"></i>
             </div>
@@ -111,11 +120,11 @@
         </ul>
 
         <nav class="nav-wizard">
-          <span class="help help-inline">Once you verify your photo looks good, you can move on to step 2.</span>
+          <span class="help help-inline">Missing something? You can always <a href="">audit this course instead</a></span>
 
           <ol class="wizard-steps">
             <li class="wizard-step">
-              <a class="next" id="face_next_button" href="${reverse('verify_student_verify') + '?course_id=' + course_id}">Go to Step 1: Take my Photo</a>
+              <a class="next action-primary" id="face_next_button" href="${reverse('verify_student_verify') + '?course_id=' + course_id}">Go to Step 1: Take my Photo</a>
             </li>
           </ol>
         </nav>
@@ -126,7 +135,7 @@
       <aside class="content-supplementary">
         <ul class="list-help">
           <li class="help-item">
-            <h3 class="title"><i class="icon-question-sign"></i> Have questions?</h3>
+            <h3 class="title">Have questions?</h3>
             <div class="copy">
               <p>Please read <a rel="external" href="">our FAQs to view common questions about our certificates</a>.</p>
             </div>

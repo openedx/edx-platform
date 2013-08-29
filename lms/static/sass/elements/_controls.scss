@@ -56,6 +56,34 @@
   }
 }
 
+// blue primary gray
+.btn-primary-gray {
+  @extend .btn-primary;
+  box-shadow: 0 2px 1px 0 $m-gray-d2;
+  background: $m-gray;
+  color: $white;
+
+  &:hover, &:active {
+    background: $m-gray-l1;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-gray-d2;
+    background: $m-gray;
+    color: $m-gray-l1;
+
+    &:hover, &:active {
+      box-shadow: inset 0 2px 1px 1px $m-gray-d3;
+      color: $m-gray-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
 // blue primary button
 .btn-primary-blue {
   @extend .btn-primary;

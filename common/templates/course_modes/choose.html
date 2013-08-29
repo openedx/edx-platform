@@ -3,15 +3,16 @@
 <%inherit file="../main.html" />
 
 <%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="title"><title>${("Register for [Course Name] | Choose Your Track")}</title></%block>
 
 <%block name="js_extra">
 <script type="text/javascript">
 
 $(document).ready(function() {
-  $( ".more" ).hide();
-  $( ".expand" ).click(function(e) {
+  $('.is-expandable .expandable-more').addClass('is-hidden');
+  $('.is-expandable .title-expand').click(function(e) {
       e.preventDefault();
-      $(this).next().slideToggle();
+      $(this).parent().find('.expandable-more').toggleClass('is-hidden');
   });
 });
 </script>
@@ -23,9 +24,14 @@ $(document).ready(function() {
 
     <header class="page-header">
       <h2 class="title">
-        <span class="status-track">(ID Verified)</span>
-        <span class="status">You are registering for</span>
-        <span class="status-course">${course_id} </span>
+        <span class="wrapper-sts">
+          <span class="sts">You are registering for</span>
+          <span class="sts-course">${course_id} </span>
+        </span>
+        <span class="sts-track">
+          <span class="sts-track-label">Registering as: </span>
+          <span class="sts-track-value">ID Verified</span>
+        </span>
       </h2>
     </header>
 
@@ -33,7 +39,7 @@ $(document).ready(function() {
       <article class="register-choose content-main">
         <h3 class="title">Select your track:</h3>
 
-        <form cass="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+        <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
 
           % if "audit" in modes:
           <div class="register-choice register-choice-audit">
@@ -44,7 +50,7 @@ $(document).ready(function() {
               </div>
             </div>
 
-            <ul class="actions">
+            <ul class="list-actions">
               <li class="action action-select">
                 <input type="submit" name="mode" value="Select Audit" />
               </li>
@@ -69,39 +75,42 @@ $(document).ready(function() {
             <div class="field field-certificate-contribution">
               <h5 class="label">Select your contribution for this course:</h5>
 
-              <ul class="contribution-options">
+              <ul class="list-fields contribution-options">
                 % for price in modes["verified"].suggested_prices.split(","):
-                <li class="contribution-option">
+                <li class="field contribution-option">
                   <input type="radio" name="contribution" value="${price|h}" />
                   <label for="contribution-${price|h}" />
                     <span class="deco-denomination">$</span>
                     <span class="label-value">${price} ${modes["verified"].currency.upper()}</span>
-                    <span class="denomination-name">USD</span>
+                    <span class="denomination-name"><abbr title="United States Dollars"><abbr title="United States Dollars">USD</abbr></span>
                   </label>
                 </li>
                 % endfor
+                <li class="field">
+                  <ul class="field-group field-group-other">
+                    <li class="contribution-option contribution-option-other1">
+                      <input type="radio" id="contribution-other" name="contribution" value=""/>
+                      <label for=" contribution-other"><span class="sr">Other</span></label>
+                    </li>
 
-                <li class="contribution-option contribution-option-other1">
-                  <input type="radio" id="contribution-other" name="contribution" value=""/>
-                  <label for=" contribution-other"><span class="sr">Other</span></label>
-                </li>
-
-                <li class="contribution-option contribution-option-other2">
-                  <label for="contribution-other-amt">
-                    <span class="sr">Other Amount</span>
-                  </label>
-                  <div class="wrapper">
-                    <span class="deco-denomination">$</span>
-                    <input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
-                    <span class="denomination-name">USD</span>
-                  </div>
+                    <li class="contribution-option contribution-option-other2">
+                      <label for="contribution-other-amt">
+                        <span class="sr">Other Amount</span>
+                      </label>
+                      <div class="wrapper">
+                        <span class="deco-denomination">$</span>
+                        <input type="text" size="5" name="contribution-other-amt" id="contribution-other-amt" />
+                        <span class="denomination-name"><abbr title="United States Dollars"><abbr title="United States Dollars">USD</abbr></span>
+                      </div>
+                    </li>
+                  </ul>
                 </li>
               </ul>
 
               <div class="help-tip is-expandable">
-                <h5 class="title">Why do I have to pay? What if I don't meet all the requirements?</h5>
+                <h5 class="title title-expand">Why do I have to pay? What if I don't meet all the requirements?</h5>
 
-                <div class="copy more">
+                <div class="copy expandable-more">
                   <dl class="list-faq">
                     <dt class="faq-question">Why do I have to pay?</dt>
                     <dd class="faq-answer">
@@ -128,7 +137,7 @@ $(document).ready(function() {
                       </ul>
                     </dd>
 
-                    <dt class="faq-question">What if I don't meet all of the requirements for financial assistance but I   still want to work toward a certificate?</dt>
+                    <dt class="faq-question">What if I don't meet all of the requirements for financial assistance but I still want to work toward a certificate?</dt>
 
                     <dd class="faq-answer">
                       <p>If you don't have a webcam, credit or debit card or acceptable ID, you can  opt to simply audit this course, or select to work towards a free Honor Code Certificate of Achievement for this course by checking the box below. Then  click the Select Certificate button to complete registration. We won't ask you to verify your identity.</p>
@@ -146,11 +155,22 @@ $(document).ready(function() {
               </div>
             </div>
 
-            <ul class="actions">
+            <ul class="list-actions">
+              <li class="action action-intro">
+                <a href="">What is an ID Verified Certificate?</a>
+              </li>
               <li class="action action-select">
                 <input type="submit" name="mode" value="Select Certificate" />
               </li>
             </ul>
+          </div>
+
+          <div class="help help-register">
+            <h3 class="title">Verified Registration Requirements</h3>
+
+            <div class="copy">
+              <p>To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a></p>
+            </div>
           </div>
           % endif
 
@@ -177,7 +197,7 @@ $(document).ready(function() {
           </li>
 
           <li class="help-item">
-            <h3 class="title"><i class="icon-question-sign"></i> Have questions?</h3>
+            <h3 class="title">Have questions?</h3>
             <div class="copy">
               <p>Please read <a href="">our FAQs to view common questions about our certificates</a>.</p>
             </div>
