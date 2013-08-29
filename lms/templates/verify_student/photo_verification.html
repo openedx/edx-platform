@@ -1,10 +1,14 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="bodyclass">register verification-process step-photos</%block>
 
 <%block name="js_extra">
+  <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
+  <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
+
 <!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
 <script type="text/javascript">
 
