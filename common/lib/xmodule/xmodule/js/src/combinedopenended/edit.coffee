@@ -242,7 +242,7 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
           if(options[i].length > 0) {
             var value = options[i].replace(/^\s+|\s+$/g,'');
             var lower_option = value.toLowerCase();
-            type = lower_option.match(/(peer|self|ai)/gmi)
+            type = lower_option.match(/(peer|self|ai|edx)/gmi)
             if(type != null) {
               type = type[0]
               var min_max = value.match(/\{\n?([^\]]*)\}/gmi);
@@ -259,6 +259,9 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
                 groupString +="<selfassessment" + min_max_string + "/>"
               } else if (type=="peer") {
                 config = "peer_grading.conf"
+                groupString += template(open_ended_template,{min_max_string: min_max_string, grading_config: config});
+              } else if (type=="edx") {
+                config = "edX"
                 groupString += template(open_ended_template,{min_max_string: min_max_string, grading_config: config});
               } else if (type=="ai") {
                                        config = "ml_grading.conf"
