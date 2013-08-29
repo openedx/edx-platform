@@ -5,11 +5,11 @@ from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-import self_assessment_module
-import open_ended_module
+from  xmodule.open_ended_grading_classes import self_assessment_module
+from  xmodule.open_ended_grading_classes import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 
 log = logging.getLogger("mitx.courseware")
 
@@ -547,6 +547,11 @@ class CombinedOpenEndedV1Module():
         return last_response_dict
 
     def extract_human_name_from_task(self, task_xml):
+        """
+        Given the xml for a task, pull out the human name for it.
+        Input: xml string
+        Output: a human readable task name (ie Self Assessment)
+        """
         tree = etree.fromstring(task_xml)
         payload = tree.xpath("/openended/openendedparam/grader_payload")
         if len(payload) == 0:
@@ -644,7 +649,13 @@ class CombinedOpenEndedV1Module():
         all_responses = []
         success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
         if not can_see_rubric:
-            return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
+            return {
+                'html': self.system.render_template(
+                    '{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR),
+                    {'error': error}),
+                'success': True,
+                'hide_reset': True
+            }
 
         contexts = []
         rubric_number = self.current_task_number
@@ -717,6 +728,9 @@ class CombinedOpenEndedV1Module():
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_current_state(self, data):
+        """
+        Gets the current state of the module.
+        """
         return self.get_context()
 
     def get_last_response_ajax(self, data):
@@ -866,7 +880,6 @@ class CombinedOpenEndedV1Module():
             if len(score_mat) > 0:
                 # Currently, assume that the final step is the correct one, and that those are the final scores.
                 # This will change in the future, which is why the machinery above exists to extract all scores on all steps
-                # TODO: better final score handling.
                 scores = score_mat[-1]
                 score = max(scores)
             else:
