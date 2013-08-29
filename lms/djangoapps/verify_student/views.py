@@ -54,7 +54,10 @@ class VerifyView(View):
             "course_id": course_id,
             "course_name": course_from_id(course_id).display_name,
             "purchase_endpoint": get_purchase_endpoint(),
-            "suggested_prices": verify_mode.suggested_prices.split(","),
+            "suggested_prices": [
+                decimal.Decimal(price)
+                for price in verify_mode.suggested_prices.split(",")
+            ],
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
         }

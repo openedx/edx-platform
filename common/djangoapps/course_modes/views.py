@@ -79,7 +79,7 @@ class ChooseModeView(View):
                 return self.get(request, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_id] = donation_for_course
+            donation_for_course[course_id] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             return redirect(
