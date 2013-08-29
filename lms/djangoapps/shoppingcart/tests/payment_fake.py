@@ -63,7 +63,7 @@ class PaymentFakeView(View):
         served by the shopping cart app.
         """
         if self._is_signature_valid(request.POST):
-            return self._payment_page_response(request.POST, '/postpay_callback')
+            return self._payment_page_response(request.POST, '/shoppingcart/postpay_callback/')
 
         else:
             return render_to_response('shoppingcart/test/fake_payment_error.html')

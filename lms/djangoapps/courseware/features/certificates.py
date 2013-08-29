@@ -65,7 +65,7 @@ def select_the_verified_track(step):
     select_contribution(32)
     btn_css = 'input[value="Select Certificate"]'
     world.css_click(btn_css)
-    assert world.is_css_present('li.current#progress-step0')
+    assert world.is_css_present('section.progress')
 
 
 @step(u'I should see the course on my dashboard$')
@@ -77,9 +77,9 @@ def should_see_the_course_on_my_dashboard(step):
 @step(u'I go to step "([^"]*)"$')
 def goto_next_step(step, step_num):
     btn_css = {
-        '1': 'p.m-btn-primary a',
-        '2': '#face_next_button a.next',
-        '3': '#photo_id_next_button a.next',
+        '1': '#face_next_button',
+        '2': '#face_next_button',
+        '3': '#photo_id_next_button',
         '4': '#pay_button',
     }
     next_css = {
