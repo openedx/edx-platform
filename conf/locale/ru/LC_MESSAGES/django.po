@@ -30,8 +30,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-08-29 11:37+0400\n"
-"Last-Translator: Павел <pavelyushchenko@gmail.com>\n"
+"PO-Revision-Date: 2013-08-29 12:07+0400\n"
+"Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,7 +40,7 @@ msgstr ""
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1377761849.541389\n"
+"X-POOTLE-MTIME: 1377763641.166309\n"
 
 #: cms/djangoapps/contentstore/utils.py:17
 msgid "Open Ended Panel"
@@ -178,8 +178,13 @@ msgstr ""
 "Дата, когда состояние было последний раз обновлено"
 
 #: cms/djangoapps/course_creators/models.py:43
+#, fuzzy
 msgid "Current course creator state"
-msgstr "Текущее состояние создателя курса"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Текущее состояние создателя курса\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Текущий статус создателя курса"
 
 #: cms/djangoapps/course_creators/models.py:44
 #, fuzzy
@@ -1123,10 +1128,13 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Это может случиться из-за ошибки на нашем сервере или Вашего интернет-"
+"соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
+"подключены к интернету."
 
 #: cms/static/coffee/src/main.js:41
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Студия не может сохранить Вашу работу"
 
 #: cms/static/coffee/src/views/module_edit.js:67
 #, python-format
@@ -1221,11 +1229,11 @@ msgstr "Удалить?"
 
 #: cms/static/js/base.js:383
 msgid "Deleting this  is permanent and cannot be undone."
-msgstr ""
+msgstr "Операция удаления не может быть отменена."
 
 #: cms/static/js/base.js:386
 msgid "Yes, delete this "
-msgstr ""
+msgstr "Да, удалить"
 
 #: cms/static/js/base.js:462
 msgid "Hide Studio Help"
@@ -1242,7 +1250,7 @@ msgstr "Не используйте пробелы и специальные с�
 #: cms/static/js/base.js:641
 msgid ""
 "Course fields must have a combined length of no more than 80 characters."
-msgstr ""
+msgstr "Поля курса должны иметь суммарную длину не более 80 символов."
 
 #: cms/static/js/base.js:676
 msgid "Required field."
@@ -1294,15 +1302,15 @@ msgstr "Дата окончания набора не может быть поз
 
 #: cms/static/js/models/settings/course_details.js:59
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr ""
+msgstr "Ключ должен содержать только буквы, цифры, _ или -"
 
 #: cms/static/js/models/settings/course_grading_policy.js:70
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "Период разрешения (grace period) должен быть задан в формате HH:MM."
 
 #: cms/static/js/models/settings/course_grading_policy.js:107
 msgid "There's already another assignment type with this name."
-msgstr ""
+msgstr "Уже существует тип задания с данным именем."
 
 #: cms/static/js/models/settings/course_grading_policy.js:114
 msgid "Please enter an integer between 0 and 100."
@@ -1315,7 +1323,7 @@ msgstr "Введите целое число."
 
 #: cms/static/js/models/settings/course_grading_policy.js:140
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
+msgstr "Невозможно удалить больше <% attrs.types %>, чем было назначено."
 
 #: cms/static/js/views/assets.js:13
 msgid "Delete File Confirmation"
@@ -1373,6 +1381,8 @@ msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
+"Удаление учебника не может быть отменено, после удаление все ссылки на него "
+"будут удалены из вашего курса."
 
 #: cms/static/js/views/textbook.js:244
 msgid "Upload a new PDF to <%= name %>"
@@ -1380,24 +1390,27 @@ msgstr "Загрузить новый PDF в <%= name %>"
 
 #: cms/static/js/views/uploads.js:102
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "Сожалеем, но произошла ошибка"
 
 #: cms/static/js/views/validating_view.js:12
 msgid "You've made some changes"
-msgstr ""
+msgstr "Вы сделали изменения"
 
 #: cms/static/js/views/validating_view.js:13
 msgid "Your changes will not take effect until you save your progress."
 msgstr ""
+"Ваши изменения не будут иметь эффекта до тех пор, пока вы их не сохраните"
 
 #: cms/static/js/views/validating_view.js:14
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "Вы сделали некоторые изменения, но есть ошибки"
 
 #: cms/static/js/views/validating_view.js:15
 msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr ""
+"Пожалуйста, сначала исправьте ошибки на данной странице, затем сохраните "
+"свои изменения."
 
 #: cms/static/js/views/validating_view.js:103
 msgid "Save Changes"
@@ -1544,7 +1557,7 @@ msgstr ""
 
 #: cms/templates/activation_invalid.html:27
 msgid "Contact edX Support"
-msgstr ""
+msgstr "Связаться со службой поддержки edX"
 
 #: cms/templates/asset_index.html:5 cms/templates/widgets/header.html:40
 msgid "Files &amp; Uploads"
@@ -1731,11 +1744,10 @@ msgid "UTC"
 msgstr "UTC"
 
 #: cms/templates/edit_subsection.html:52
-#, fuzzy
 msgid ""
 "The date above differs from the release date of {name}, which is unset."
 msgstr ""
-"Вышеуказанная дата отличается от даты конца {name}, которая не сохраняется."
+"Вышеуказанная дата отличается от даты конца {name}, которая не установлена."
 
 #: cms/templates/edit_subsection.html:54
 msgid "The date above differs from the release date of {name} - {start_time}"
@@ -2178,11 +2190,11 @@ msgstr "Добро пожаловать, {0}!"
 
 #: cms/templates/index.html:72
 msgid "Here are all of the courses you currently have access to in Studio:"
-msgstr ""
+msgstr "Вот все курсы, к которым Вы имеете доступ в Студии:"
 
 #: cms/templates/index.html:77
 msgid "You currently aren't associated with any Studio Courses."
-msgstr ""
+msgstr "В настоящий момент Вы не ассоциированы ни с какими курсами Студии."
 
 #: cms/templates/index.html:87
 msgid "Please correct the highlighted fields below."
@@ -2203,7 +2215,7 @@ msgstr "Имя курса"
 
 #: cms/templates/index.html:100
 msgid "e.g. Introduction to Computer Science"
-msgstr ""
+msgstr "например Введение в Математический Анализ"
 
 #: cms/templates/index.html:101
 msgid "The public display name for your course."
@@ -2254,7 +2266,7 @@ msgstr "к примеру 2013_Весна"
 
 #: cms/templates/index.html:121
 msgid "The term in which your course will run"
-msgstr ""
+msgstr "Правила по которым читается курс"
 
 #: cms/templates/index.html:130
 msgid "Create"
@@ -2262,11 +2274,11 @@ msgstr "Создать"
 
 #: cms/templates/index.html:147
 msgid "Organization:"
-msgstr ""
+msgstr "Организация:"
 
 #: cms/templates/index.html:150
 msgid "Course Number:"
-msgstr ""
+msgstr "Номер курса:"
 
 #: cms/templates/index.html:154
 msgid "Course Run:"
@@ -2430,6 +2442,8 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
+"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во "
+"\"Входящих\". Если письма нет и там, запросите помощь по ссылке"
 
 #: cms/templates/login.html:4 cms/templates/widgets/header.html:156
 msgid "Sign In"
@@ -2484,19 +2498,19 @@ msgstr "Команда курса"
 
 #: cms/templates/manage_users.html:23
 msgid "New Team Member"
-msgstr ""
+msgstr "Новый член команды"
 
 #: cms/templates/manage_users.html:38
 msgid "Add a User to Your Course's Team"
-msgstr ""
+msgstr "Добавить пользователя к команде Вашего курса"
 
 #: cms/templates/manage_users.html:41
 msgid "New Team Member Information"
-msgstr ""
+msgstr "Информация о новом члене команды"
 
 #: cms/templates/manage_users.html:45
 msgid "User's Email Address"
-msgstr ""
+msgstr "Адрес e-mail пользователя"
 
 #: cms/templates/manage_users.html:46
 msgid "e.g. jane.doe@gmail.com"
@@ -2543,19 +2557,19 @@ msgstr ""
 
 #: cms/templates/manage_users.html:114
 msgid "Remove Admin Access"
-msgstr ""
+msgstr "Забрать права администратора"
 
 #: cms/templates/manage_users.html:114
 msgid "Add Admin Access"
-msgstr ""
+msgstr "Предоставить права администратора"
 
 #: cms/templates/manage_users.html:118
 msgid "Delete the user, {username}"
-msgstr ""
+msgstr "Удалить пользователя {username}"
 
 #: cms/templates/manage_users.html:131
 msgid "Add Team Members to This Course"
-msgstr ""
+msgstr "Добавить членов команды в этот курс"
 
 #: cms/templates/manage_users.html:133
 msgid ""
@@ -2565,11 +2579,11 @@ msgstr ""
 
 #: cms/templates/manage_users.html:139
 msgid "Add a New Team Member"
-msgstr ""
+msgstr "Добавить нового члена команды"
 
 #: cms/templates/manage_users.html:148
 msgid "About Roles within Your Course Team"
-msgstr ""
+msgstr "Добавить роли членам команды курса"
 
 #: cms/templates/manage_users.html:149
 msgid ""
@@ -3620,12 +3634,16 @@ msgid ""
 "Your request for course creation rights to edX Studio have been denied. If "
 "you believe this was in error, please contact: "
 msgstr ""
+"Ваш запрос на право создания курсов в Студии edX был отклонен. Если Вы "
+"считаете, что это по ошибке, обратитесь к"
 
 #: cms/templates/emails/course_creator_granted.txt:3
 msgid ""
 "Your request for course creation rights to edX Studio have been granted. To "
 "create your first course, visit:"
 msgstr ""
+"Ваш запрос на право создания курсов в Студии edX был удовлетворен. Для "
+"создания Вашего первого курса перейдите:"
 
 #: cms/templates/emails/course_creator_revoked.txt:3
 msgid ""
