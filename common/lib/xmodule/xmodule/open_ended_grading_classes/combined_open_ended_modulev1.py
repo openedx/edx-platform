@@ -906,17 +906,11 @@ class CombinedOpenEndedV1Module():
         """
 
         d = self.get_score()
-        score = d['score']
-        total = d['total']
 
-        if total > 0 and self.is_scored:
-            if self.weight is not None:
-                # scale score and total by weight/total:
-                score = score * self.get_weight() / total
-                total = self.get_weight()
+        if d['total'] > 0 and self.is_scored:
 
             try:
-                return Progress(score, total)
+                return Progress(d['score'], d['total'])
             except (TypeError, ValueError):
                 log.exception("Got bad progress")
                 return None

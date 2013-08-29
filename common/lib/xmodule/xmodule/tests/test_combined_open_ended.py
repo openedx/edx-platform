@@ -498,10 +498,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         progress = self.combinedoe.get_progress()
         self.assertIsInstance(progress, Progress)
 
-        #progress._a is the score of the xmodule, which is 0 right now
+        # progress._a is the score of the xmodule, which is 0 right now.
         self.assertEqual(progress._a, 0)
 
-        #progress._b is the max_score (which is 1), divided by the weight (which is 1)
+        # progress._b is the max_score (which is 1), divided by the weight (which is 1).
         self.assertEqual(progress._b, 1)
 
     def test_container_weight(self):
