@@ -24,6 +24,14 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
             }
             attributes.graders = graderCollection;
         }
+        // If grace period is unset or equal to 00:00 on the server,
+        // it's received as null
+        if (attributes['grace_period'] === null) {
+            attributes.grace_period = {
+                hours: 0,
+                minutes: 0
+            }
+        }
         return attributes;
     },
     url : function() {
@@ -44,8 +52,25 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
 
         return newDate;
     },
-    dateToGracePeriod : function(date) {
-        return {hours : date.getHours(), minutes : date.getMinutes(), seconds : date.getSeconds() };
+    parseGracePeriod : function(grace_period) {
+        // Enforce hours:minutes format
+        if(!/^\d{2,3}:\d{2}$/.test(grace_period)) {
+            return null;
+        }
+        var pieces = grace_period.split(/:/);
+        return {
+            hours: parseInt(pieces[0], 10),
+            minutes: parseInt(pieces[1], 10)
+        }
+    },
+    validate : function(attrs) {
+        if(_.has(attrs, 'grace_period')) {
+            if(attrs['grace_period'] === null) {
+                return {
+                    'grace_period': gettext('Grace period must be specified in HH:MM format.')
+                }
+            }
+        }
     }
 });
 
@@ -79,14 +104,14 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
                 var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs['type']);}, this);
                 if (existing) {
-                    errors.type = "There's already another assignment type with this name.";
+                    errors.type = gettext("There's already another assignment type with this name.");
                 }
             }
         }
         if (_.has(attrs, 'weight')) {
             var intWeight = parseInt(attrs.weight); // see if this ensures value saved is int
             if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
-                errors.weight = "Please enter an integer between 0 and 100.";
+                errors.weight = gettext("Please enter an integer between 0 and 100.");
             }
             else {
                 attrs.weight = intWeight;
@@ -100,18 +125,20 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
             }}
         if (_.has(attrs, 'min_count')) {
             if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
-                errors.min_count = "Please enter an integer.";
+                errors.min_count = gettext("Please enter an integer.");
             }
             else attrs.min_count = parseInt(attrs.min_count);
         }
         if (_.has(attrs, 'drop_count')) {
             if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
-                errors.drop_count = "Please enter an integer.";
+                errors.drop_count = gettext("Please enter an integer.");
             }
             else attrs.drop_count = parseInt(attrs.drop_count);
         }
         if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
-            errors.drop_count = "Cannot drop more " + attrs.type + " than will assigned.";
+            errors.drop_count = _.template(
+                gettext("Cannot drop more <% attrs.types %> than will assigned."),
+                attrs, {variable: 'attrs'});
         }
         if (!_.isEmpty(errors)) return errors;
     }

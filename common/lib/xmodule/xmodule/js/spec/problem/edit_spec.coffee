@@ -11,13 +11,13 @@ describe 'MarkdownEditingDescriptor', ->
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       @descriptor.createXMLEditor('replace with markdown')
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('replace with markdown')
     it 'saves xml from the xml editor', ->
       loadFixtures 'problem-without-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('xml only')
 
   describe 'insertMultipleChoice', ->
@@ -121,18 +121,18 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Enter the numerical value of Pi:</p>
         <numericalresponse answer="3.14159">
           <responseparam type="tolerance" default=".02" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <p>Enter the approximate value of 502*9:</p>
         <numericalresponse answer="4518">
           <responseparam type="tolerance" default="15%" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <p>Enter the number of fingers on a human hand:</p>
         <numericalresponse answer="5">
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <solution>
@@ -157,7 +157,7 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Enter 0 with a tolerance:</p>
         <numericalresponse answer="0">
           <responseparam type="tolerance" default=".02" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
 
 

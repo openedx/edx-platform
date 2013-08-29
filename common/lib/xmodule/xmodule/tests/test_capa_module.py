@@ -636,10 +636,10 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem was reset
         module.new_lcp.assert_called_once_with(None)
-        module.choose_new_seed.assert_called_once_with()
 
     def test_reset_problem_closed(self):
-        module = CapaFactory.create()
+        # pre studio default
+        module = CapaFactory.create(rerandomize="always")
 
         # Simulate that the problem is closed
         with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
@@ -900,13 +900,13 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(done=False)
         self.assertFalse(module.should_show_reset_button())
 
-        # Otherwise, DO show the reset button
-        module = CapaFactory.create(done=True)
+        # pre studio default value, DO show the reset button
+        module = CapaFactory.create(rerandomize="always", done=True)
         self.assertTrue(module.should_show_reset_button())
 
         # If survey question for capa (max_attempts = 0),
         # DO show the reset button
-        module = CapaFactory.create(max_attempts=0, done=True)
+        module = CapaFactory.create(rerandomize="always", max_attempts=0, done=True)
         self.assertTrue(module.should_show_reset_button())
 
     def test_should_show_save_button(self):
@@ -940,8 +940,8 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts=None, rerandomize="per_student", done=True)
         self.assertFalse(module.should_show_save_button())
 
-        # Otherwise, DO show the save button
-        module = CapaFactory.create(done=False)
+        # pre-studio default, DO show the save button
+        module = CapaFactory.create(rerandomize="always", done=False)
         self.assertTrue(module.should_show_save_button())
 
         # If we're not randomizing and we have limited attempts,  then we can save
@@ -1232,6 +1232,37 @@ class CapaModuleTest(unittest.TestCase):
             self.assertIsNone(module.get_progress())
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
+
+    @patch('xmodule.capa_module.Progress')
+    def test_get_progress_calculate_progress_fraction(self, mock_progress):
+        """
+        Check that score and total are calculated correctly for the progress fraction.
+        """
+        module = CapaFactory.create()
+        module.weight = 1
+        module.get_progress()
+        mock_progress.assert_called_with(0, 1)
+
+        other_module = CapaFactory.create(correct=True)
+        other_module.weight = 1
+        other_module.get_progress()
+        mock_progress.assert_called_with(1, 1)
+
+    def test_get_html(self):
+        """
+        Check that get_html() calls get_progress() with no arguments.
+        """
+        module = CapaFactory.create()
+        module.get_progress = Mock(wraps=module.get_progress)
+        module.get_html()
+        module.get_progress.assert_called_once_with()
+
+    def test_get_problem(self):
+        """
+        Check that get_problem() returns the expected dictionary.
+        """
+        module = CapaFactory.create()
+        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
 
 class ComplexEncoderTest(unittest.TestCase):

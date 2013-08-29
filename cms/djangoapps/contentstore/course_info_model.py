@@ -1,7 +1,7 @@
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from lxml import html
+from lxml import html, etree
 import re
 from django.http import HttpResponseBadRequest
 import logging
@@ -20,8 +20,8 @@ def get_course_updates(location):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        template = Location(['i4x', 'edx', "templates", 'course_info', "Empty"])
-        course_updates = modulestore('direct').clone_item(template, Location(location))
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
 
     # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()
@@ -74,34 +74,44 @@ def update_course_updates(location, update, passed_id=None):
         escaped = django.utils.html.escape(course_updates.data)
         course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
 
+    # if there's no ol, create it
+    if course_html_parsed.tag != 'ol':
+        # surround whatever's there w/ an ol
+        if course_html_parsed.tag != 'li':
+            # but first wrap in an li
+            li = etree.Element('li')
+            li.append(course_html_parsed)
+            course_html_parsed = li
+        ol = etree.Element('ol')
+        ol.append(course_html_parsed)
+        course_html_parsed = ol
+
     # No try/catch b/c failure generates an error back to client
     new_html_parsed = html.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>')
 
-    # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
-    if course_html_parsed.tag == 'ol':
-        # ??? Should this use the id in the json or in the url or does it matter?
-        if passed_id is not None:
-            idx = get_idx(passed_id)
-            # idx is count from end of list
-            course_html_parsed[-idx] = new_html_parsed
-        else:
-            course_html_parsed.insert(0, new_html_parsed)
+    # ??? Should this use the id in the json or in the url or does it matter?
+    if passed_id is not None:
+        idx = get_idx(passed_id)
+        # idx is count from end of list
+        course_html_parsed[-idx] = new_html_parsed
+    else:
+        course_html_parsed.insert(0, new_html_parsed)
 
-            idx = len(course_html_parsed)
-            passed_id = course_updates.location.url() + "/" + str(idx)
+        idx = len(course_html_parsed)
+        passed_id = course_updates.location.url() + "/" + str(idx)
 
-        # update db record
-        course_updates.data = html.tostring(course_html_parsed)
-        modulestore('direct').update_item(location, course_updates.data)
+    # update db record
+    course_updates.data = html.tostring(course_html_parsed)
+    modulestore('direct').update_item(location, course_updates.data)
 
-        if (len(new_html_parsed) == 1):
-            content = new_html_parsed[0].tail
-        else:
-            content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
+    if (len(new_html_parsed) == 1):
+        content = new_html_parsed[0].tail
+    else:
+        content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
 
-        return {"id": passed_id,
-                "date": update['date'],
-                "content": content}
+    return {"id": passed_id,
+            "date": update['date'],
+            "content": content}
 
 
 def delete_course_update(location, update, passed_id):

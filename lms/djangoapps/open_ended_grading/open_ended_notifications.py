@@ -93,7 +93,6 @@ def peer_grading_notifications(course, user):
         log.info(
             "Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id,
                                                                                                            student_id))
-
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
 
@@ -146,19 +145,7 @@ def combined_notifications(course, user):
 
     #Get the time of the last login of the user
     last_login = user.last_login
-
-    #Find the modules they have seen since they logged in
-    last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
-                                                    modified__gt=last_login).values('modified').order_by(
-        '-modified')
-    last_module_seen_count = last_module_seen.count()
-
-    if last_module_seen_count > 0:
-        #The last time they viewed an updated notification (last module seen minus how long notifications are cached)
-        last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
-    else:
-        #If they have not seen any modules since they logged in, then don't refresh
-        return {'pending_grading': False, 'img_path': img_path, 'response': notifications}
+    last_time_viewed = last_login - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
 
     try:
         #Get the notifications from the grading controller
@@ -166,7 +153,7 @@ def combined_notifications(course, user):
                                                                          last_time_viewed)
         notifications = json.loads(controller_response)
         if notifications['success']:
-            if notifications['overall_need_to_check']:
+            if notifications['staff_needs_to_grade'] or notifications['student_needs_to_peer_grade']:
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action

@@ -10,6 +10,8 @@ from unittest import TestCase, skip
 from .utils import CourseTestCase
 from django.core.urlresolvers import reverse
 from contentstore.views import assets
+from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore import Location
 
 
 class AssetsTestCase(CourseTestCase):
@@ -35,6 +37,11 @@ class AssetsTestCase(CourseTestCase):
         content = json.loads(resp.content)
         self.assertIsInstance(content, list)
 
+    def test_static_url_generation(self):
+        location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
+        path = StaticContent.get_static_path_from_location(location)
+        self.assertEquals(path, '/static/my_file_name.jpg')
+
 
 class UploadTestCase(CourseTestCase):
     """
@@ -50,14 +57,14 @@ class UploadTestCase(CourseTestCase):
 
     @skip("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
-        file = BytesIO("sample content")
-        file.name = "sample.txt"
-        resp = self.client.post(self.url, {"name": "my-name", "file": file})
-        self.assert2XX(resp.status_code)
+        f = BytesIO("sample content")
+        f.name = "sample.txt"
+        resp = self.client.post(self.url, {"name": "my-name", "file": f})
+        self.assertEquals(resp.status_code, 200)
 
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"})
-        self.assert4XX(resp.status_code)
+        self.assertEquals(resp.status_code, 400)
 
     def test_get(self):
         resp = self.client.get(self.url)

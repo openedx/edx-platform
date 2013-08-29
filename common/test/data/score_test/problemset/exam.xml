@@ -1,0 +1,17 @@
+<problemset display_name="Final Exam">
+  <sequential>
+    <problem display_name="e-1" url_name="e_1" weight="20">
+      <numericalresponse answer="1">
+        <responseparam type="tolerance" default="0.00001"/> 
+        <textline size="20" inline="true"/>
+      </numericalresponse>
+    </problem>
+
+    <problem display_name="e-2" url_name="e_2" weight="10">
+      <numericalresponse answer="2">
+        <responseparam type="tolerance" default="0.00001"/> 
+        <textline size="20" inline="true"/>
+      </numericalresponse>
+    </problem>
+  </sequential>
+</problemset>

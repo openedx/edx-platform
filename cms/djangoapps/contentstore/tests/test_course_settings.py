@@ -18,7 +18,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 from models.settings.course_metadata import CourseMetadata
-from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.fields import Date
 
 from .utils import CourseTestCase
@@ -31,12 +30,12 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course.location)
         self.assertEqual(details.course_location, self.course.location, "Location not copied into")
+        self.assertEqual(details.course_image_name, self.course.course_image)
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertEqual(details.overview, "", "overview somehow initialized" + details.overview)
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
@@ -45,11 +44,11 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertTupleEqual(Location(jsondetails['course_location']), self.course.location, "Location !=")
+        self.assertEqual(jsondetails['course_image_name'], self.course.course_image)
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
-        self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
@@ -99,6 +98,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(jsondetails.__dict__).start_date,
             jsondetails.start_date
+        )
+        jsondetails.course_image_name = "an_image.jpg"
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).course_image_name,
+            jsondetails.course_image_name
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -168,8 +172,8 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
     @staticmethod
-    def convert_datetime_to_iso(dt):
-        return Date().to_json(dt)
+    def convert_datetime_to_iso(datetime_obj):
+        return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
         loc = self.course.location
@@ -191,6 +195,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
+        self.alter_field(url, details, 'course_image_name', "course_image_name")
 
     def compare_details_with_encoding(self, encoded, details, context):
         self.compare_date_fields(details, encoded, context, 'start_date')
@@ -200,6 +205,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
+        self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
 
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
@@ -291,6 +297,71 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
 
+    def test_update_cutoffs_from_json(self):
+        test_grader = CourseGradingModel.fetch(self.course.location)
+        CourseGradingModel.update_cutoffs_from_json(test_grader.course_location, test_grader.grade_cutoffs)
+        # Unlike other tests, need to actually perform a db fetch for this test since update_cutoffs_from_json
+        #  simply returns the cutoffs you send into it, rather than returning the db contents.
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "Noop update")
+
+        test_grader.grade_cutoffs['D'] = 0.3
+        CourseGradingModel.update_cutoffs_from_json(test_grader.course_location, test_grader.grade_cutoffs)
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff add D")
+
+        test_grader.grade_cutoffs['Pass'] = 0.75
+        CourseGradingModel.update_cutoffs_from_json(test_grader.course_location, test_grader.grade_cutoffs)
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff change 'Pass'")
+
+    def test_delete_grace_period(self):
+        test_grader = CourseGradingModel.fetch(self.course.location)
+        CourseGradingModel.update_grace_period_from_json(test_grader.course_location, test_grader.grace_period)
+        # update_grace_period_from_json doesn't return anything, so query the db for its contents.
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertEqual(test_grader.grace_period, altered_grader.grace_period, "Noop update")
+
+        test_grader.grace_period = {'hours': 15, 'minutes': 5, 'seconds': 30}
+        CourseGradingModel.update_grace_period_from_json(test_grader.course_location, test_grader.grace_period)
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertDictEqual(test_grader.grace_period, altered_grader.grace_period, "Adding in a grace period")
+
+        test_grader.grace_period = {'hours': 1, 'minutes': 10, 'seconds': 0}
+        # Now delete the grace period
+        CourseGradingModel.delete_grace_period(test_grader.course_location)
+        # update_grace_period_from_json doesn't return anything, so query the db for its contents.
+        altered_grader = CourseGradingModel.fetch(self.course.location)
+        # Once deleted, the grace period should simply be None
+        self.assertEqual(None, altered_grader.grace_period, "Delete grace period")
+
+    def test_update_section_grader_type(self):
+        # Get the descriptor and the section_grader_type and assert they are the default values
+        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+
+        self.assertEqual('Not Graded', section_grader_type['graderType'])
+        self.assertEqual(None, descriptor.lms.format)
+        self.assertEqual(False, descriptor.lms.graded)
+
+        # Change the default grader type to Homework, which should also mark the section as graded
+        CourseGradingModel.update_section_grader_type(self.course.location, {'graderType': 'Homework'})
+        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+
+        self.assertEqual('Homework', section_grader_type['graderType'])
+        self.assertEqual('Homework', descriptor.lms.format)
+        self.assertEqual(True, descriptor.lms.graded)
+
+        # Change the grader type back to Not Graded, which should also unmark the section as graded
+        CourseGradingModel.update_section_grader_type(self.course.location, {'graderType': 'Not Graded'})
+        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+
+        self.assertEqual('Not Graded', section_grader_type['graderType'])
+        self.assertEqual(None, descriptor.lms.format)
+        self.assertEqual(False, descriptor.lms.graded)
+
 
 class CourseMetadataEditingTest(CourseTestCase):
     """
@@ -352,7 +423,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         # check for deletion effectiveness
-        self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
+        self.assertEqual('finished', test_model['showanswer'], 'showanswer field still in')
         self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
 
 
@@ -368,12 +439,12 @@ class CourseGraderUpdatesTest(CourseTestCase):
 
     def test_get(self):
         resp = self.client.get(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
 
     def test_delete(self):
         resp = self.client.delete(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
     def test_post(self):
         grader = {
@@ -384,5 +455,5 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "weight": 17.3,
         }
         resp = self.client.post(self.url, grader)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)

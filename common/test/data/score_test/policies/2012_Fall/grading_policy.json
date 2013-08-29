@@ -1,0 +1,24 @@
+{
+  "GRADER" : [
+    {
+      "type" : "Problem Set",
+      "min_count" : 4,
+      "drop_count" : 0,
+      "short_label" : "PSET",
+      "weight" : 0.4
+    },
+    {
+      "type" : "Final",
+      "min_count": 1,
+      "drop_count": 0,
+      "short_label" : "Final",
+      "weight" : 0.6
+    }
+  ],
+  "GRADE_CUTOFFS" : {
+    "A" : 0.8,
+    "B" : 0.65,
+    "C" : 0.55
+  }
+ 
+}

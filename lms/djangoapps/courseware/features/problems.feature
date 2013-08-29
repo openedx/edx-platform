@@ -21,6 +21,8 @@ Feature: Answer problems
         | formula           |
         | script            |
         | code              |
+        | radio_text        |
+        | checkbox_text     |
 
     Scenario: I can answer a problem incorrectly
         Given External graders respond "incorrect"
@@ -40,6 +42,8 @@ Feature: Answer problems
         | formula           |
         | script            |
         | code              |
+        | radio_text        |
+        | checkbox_text     |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -57,6 +61,8 @@ Feature: Answer problems
         | numerical         |
         | formula           |
         | script            |
+        | radio_text        |
+        | checkbox_text     |
 
 
     Scenario: I can reset a problem
@@ -84,6 +90,10 @@ Feature: Answer problems
         | formula           | incorrect     |
         | script            | correct       |
         | script            | incorrect     |
+        | radio_text        | correct       |
+        | radio_text        | incorrect     |
+        | checkbox_text     | correct       |
+        | checkbox_text     | incorrect     |
 
 
     Scenario: I can answer a problem with one attempt correctly and not reset
@@ -119,3 +129,45 @@ Feature: Answer problems
         When I press the button with the label "Hide Answer(s)"
         Then the button with the label "Show Answer(s)" does appear
         And I should not see "4.14159" anywhere on the page
+    
+    Scenario: I can see my score on a problem when I answer it and after I reset it
+        Given I am viewing a "<ProblemType>" problem
+        When I answer a "<ProblemType>" problem "<Correctness>ly"
+        Then I should see a score of "<Score>"
+        When I reset the problem
+        Then I should see a score of "<Points Possible>"
+
+        Examples:
+        | ProblemType       | Correctness   | Score               | Points Possible    |
+        | drop down         | correct       | 1/1 points          | 1 point possible   |
+        | drop down         | incorrect     | 1 point possible    | 1 point possible   |
+        | multiple choice   | correct       | 1/1 points          | 1 point possible   |
+        | multiple choice   | incorrect     | 1 point possible    | 1 point possible   |
+        | checkbox          | correct       | 1/1 points          | 1 point possible   |
+        | checkbox          | incorrect     | 1 point possible    | 1 point possible   |
+        | radio             | correct       | 1/1 points          | 1 point possible   |
+        | radio             | incorrect     | 1 point possible    | 1 point possible   |
+        | string            | correct       | 1/1 points          | 1 point possible   |
+        | string            | incorrect     | 1 point possible    | 1 point possible   |
+        | numerical         | correct       | 1/1 points          | 1 point possible   |
+        | numerical         | incorrect     | 1 point possible    | 1 point possible   |
+        | formula           | correct       | 1/1 points          | 1 point possible   |
+        | formula           | incorrect     | 1 point possible    | 1 point possible   |
+        | script            | correct       | 2/2 points          | 2 points possible  |
+        | script            | incorrect     | 2 points possible   | 2 points possible  |
+
+    Scenario: I can see my score on a problem to which I submit a blank answer
+        Given I am viewing a "<ProblemType>" problem
+        When I check a problem
+        Then I should see a score of "<Points Possible>"
+
+        Examples:
+        | ProblemType       | Points Possible    |
+        | drop down         | 1 point possible   |
+        | multiple choice   | 1 point possible   |
+        | checkbox          | 1 point possible   |
+        | radio             | 1 point possible   |
+        | string            | 1 point possible   |
+        | numerical         | 1 point possible   |
+        | formula           | 1 point possible   |
+        | script            | 2 points possible  |

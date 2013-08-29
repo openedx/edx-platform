@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">Course Checklists</%block>
@@ -30,8 +31,8 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Tools</small>
-      <span class="sr">&gt; </span>Course Checklists
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Course Checklists")}
     </h1>
   </header>
 </div>
@@ -40,18 +41,18 @@
   <section class="content">
     <article class="content-primary" role="main">
       <form id="course-checklists" class="course-checklists" method="post" action="">
-        <h2 class="title title-3 sr">Current Checklists</h2>
+        <h2 class="title title-3 sr">${_("Current Checklists")}</h2>
       </form>
     </article>
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title title-3">What are checklists?</h3>
+        <h3 class="title title-3">${_("What are checklists?")}</h3>
         <p>
-          Running a course on edX is a complex undertaking. Course checklists are designed to help you understand and keep track of all the steps necessary to get your course ready for students.
+          ${_("Running a course on edX is a complex undertaking. Course checklists are designed to help you understand and keep track of all the steps necessary to get your course ready for students.")}
         </p>
         <p>
-          These checklists are shared among your course team, and any changes you make are immediately visible to other members of the team and saved automatically.
+          ${_("These checklists are shared among your course team, and any changes you make are immediately visible to other members of the team and saved automatically.")}
         </p>
       </div>
 

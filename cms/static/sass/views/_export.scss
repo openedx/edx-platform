@@ -2,9 +2,9 @@
 // ====================
 
 body.course.export {
-  
+
   .export-overview {
-    @extend .window;
+    @extend .ui-window;
     @include clearfix;
     padding: 30px 40px;
   }
@@ -40,7 +40,7 @@ body.course.export {
   }
 
   .export-form-wrapper {
-  
+
     .export-form {
       float: left;
       width: 35%;

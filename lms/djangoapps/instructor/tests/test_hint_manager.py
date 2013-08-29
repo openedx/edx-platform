@@ -5,14 +5,14 @@ from django.test.utils import override_settings
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -42,7 +42,7 @@ class HintManagerTest(ModuleStoreTestCase):
                               value=5)
         # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
         # (I can't figure out how to get fake structures into the modulestore.)
-        view.location_to_problem_name = lambda loc: "Test problem"
+        view.location_to_problem_name = lambda course_id, loc: "Test problem"
 
     def test_student_block(self):
         """

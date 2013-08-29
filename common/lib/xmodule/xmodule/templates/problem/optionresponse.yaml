@@ -1,21 +1,16 @@
 ---
 metadata:
     display_name: Dropdown
-    rerandomize: never
-    showanswer: finished
-    markdown: 
-        "Dropdown problems give a limited set of options for students to respond with, and present those options
+    markdown: |
+        Dropdown problems give a limited set of options for students to respond with, and present those options
         in a format that encourages them to search for a specific answer rather than being immediately presented 
         with options from which to recognize the correct answer.
-        
 
         The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
-        
 
         Translation between Dropdown and __________ is extremely straightforward:
-        
-        [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
 
+        [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
 
         [explanation]
         Multiple Choice also allows students to select from a variety of pre-written responses, although the 
@@ -23,7 +18,6 @@ metadata:
         slightly because students are more likely to think of an answer and then search for it rather than 
         relying purely on recognition to answer the question.
         [explanation]
-        "
 data: |
   <problem>
   <p>Dropdown problems give a limited set of options for students to respond with, and present those options
@@ -45,4 +39,3 @@ data: |
           </div>
       </solution>
   </problem>
-children: []

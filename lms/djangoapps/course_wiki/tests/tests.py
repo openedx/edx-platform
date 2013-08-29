@@ -3,21 +3,18 @@ from django.test.utils import override_settings
 
 import xmodule.modulestore.django
 
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class WikiRedirectTestCase(LoginEnrollmentTestCase):
+
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(name):
-            """Assumes the course is present"""
-            return [c for c in courses if c.location.course == name][0]
-
-        self.toy = find_course("toy")
+        # Load the toy course
+        self.toy = modulestore().get_course('edX/toy/2012_Fall')
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -90,8 +87,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         """
         Ensure that the response has the course navigator.
         """
-        self.assertTrue("course info" in resp.content.lower())
-        self.assertTrue("courseware" in resp.content.lower())
+        self.assertContains(resp, "Course Info")
+        self.assertContains(resp, "courseware")
 
     def test_course_navigator(self):
         """"

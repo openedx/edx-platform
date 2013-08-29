@@ -4,7 +4,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%block name="title">${_("Textbooks")}</%block>
-<%block name="bodyclass">is-signedin course textbooks</%block>
+<%block name="bodyclass">is-signedin course textbooks feature-upload</%block>
 
 <%block name="header_extras">
 % for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "upload-dialog"]:
@@ -76,7 +76,7 @@ $(function() {
         </div>
         <div class="bit">
           <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
-          <p>${_("If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.")}</p>
+          <p>${_("If you haven't broken your text into chapters, you can upload the entire text as a single chapter and enter a name of your choice in the Chapter Name field.")}</p>
         </div>
       </aside>
     </section>

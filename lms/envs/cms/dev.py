@@ -13,6 +13,13 @@ MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
 SUBDOMAIN_BRANDING['edge'] = 'edge'
 SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
 VIRTUAL_UNIVERSITIES = ['edge']
+
+# Turn off this flag because it will render 'Edit / QA' links for all instructor viewings of
+# modules. Since - for now - those links point to github (for XML based authoring), it seems broken
+# to people using it. Once we can update those links to properly link back to Studio,
+# then we can turn this flag back on, as well as enabling in aws.py configurations.
+MITX_FEATURES['ENABLE_LMS_MIGRATION'] = False
+
 META_UNIVERSITIES = {}
 
 modulestore_options = {

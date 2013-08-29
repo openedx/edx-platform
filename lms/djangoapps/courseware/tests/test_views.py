@@ -7,41 +7,58 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
+
 from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
+
 from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
 from xmodule.modulestore import Location
 from pytz import UTC
-from modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from course_modes.models import CourseMode
 
 
-class Stub():
-    pass
-
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestJumpTo(TestCase):
-    """Check the jumpto link for a course"""
-    def setUp(self):
-        self._MODULESTORES = {}
+    """
+        Check the jumpto link for a course.
+    """
 
-        # Toy courses should be loaded
+    def setUp(self):
+
+        # Load toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
-        self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
+        self.toy_course = modulestore().get_course(self.course_name)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
         location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_id(self):
+        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_id_invalid_location(self):
+        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        response = self.client.get(jumpto_url)
+        self.assertEqual(response.status_code, 404)
 
 
 class ViewsTestCase(TestCase):
@@ -50,11 +67,11 @@ class ViewsTestCase(TestCase):
                                         email='test@mit.edu')
         self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
-        self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                                 course_id=self.course_id,
-                                                                 created=self.date)[0]
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
+        self.enrollment.created = self.date
+        self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
-        self._MODULESTORES = {}
+
         # This is a CourseDescriptor object
         self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
@@ -68,7 +85,7 @@ class ViewsTestCase(TestCase):
         self.assertEquals(views.user_groups(mock_user), [])
 
     def test_get_current_child(self):
-        self.assertIsNone(views.get_current_child(Stub()))
+        self.assertIsNone(views.get_current_child(MagicMock()))
         mock_xmodule = MagicMock()
         mock_xmodule.position = -1
         mock_xmodule.get_display_items.return_value = ['one', 'two']
@@ -124,3 +141,79 @@ class ViewsTestCase(TestCase):
             self.assertContains(result, expected_end_text)
         else:
             self.assertNotContains(result, "Classes End")
+
+    def test_chat_settings(self):
+        mock_user = MagicMock()
+        mock_user.username = "johndoe"
+
+        mock_course = MagicMock()
+        mock_course.id = "a/b/c"
+
+        # Stub this out in the case that it's not in the settings
+        domain = "jabber.edx.org"
+        settings.JABBER_DOMAIN = domain
+
+        chat_settings = views.chat_settings(mock_course, mock_user)
+
+        # Test the proper format of all chat settings
+        self.assertEquals(chat_settings['domain'], domain)
+        self.assertEquals(chat_settings['room'], "a-b-c_class")
+        self.assertEquals(chat_settings['username'], "johndoe@%s" % domain)
+
+        # TODO: this needs to be changed once we figure out how to
+        #       generate/store a real password.
+        self.assertEquals(chat_settings['password'], "johndoe@%s" % domain)
+
+    def test_course_mktg_about_coming_soon(self):
+        # we should not be able to find this course
+        url = reverse('mktg_about_course', kwargs={'course_id': 'no/course/here'})
+        response = self.client.get(url)
+        self.assertIn('Coming Soon', response.content)
+
+    def test_course_mktg_register(self):
+        admin = AdminFactory()
+        self.client.login(username=admin.username, password='test')
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        response = self.client.get(url)
+        self.assertIn('Register for', response.content)
+        self.assertNotIn('and choose your student track', response.content)
+
+    def test_course_mktg_register_multiple_modes(self):
+        admin = AdminFactory()
+        CourseMode.objects.get_or_create(mode_slug='honor',
+                                         mode_display_name='Honor Code Certificate',
+                                         course_id=self.course_id)
+        CourseMode.objects.get_or_create(mode_slug='verified',
+                                         mode_display_name='Verified Certificate',
+                                         course_id=self.course_id)
+        self.client.login(username=admin.username, password='test')
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        response = self.client.get(url)
+        self.assertIn('Register for', response.content)
+        self.assertIn('and choose your student track', response.content)
+        # clean up course modes
+        CourseMode.objects.all().delete()
+
+    def test_submission_history_xss(self):
+        # log into a staff account
+        admin = AdminFactory()
+
+        self.client.login(username=admin.username, password='test')
+
+        # try it with an existing user and a malicious location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': 'dummy',
+            'location': '<script>alert("hello");</script>'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)
+
+        # try it with a malicious user and a non-existent location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': '<script>alert("hello");</script>',
+            'location': 'dummy'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)

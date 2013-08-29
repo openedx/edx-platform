@@ -5,6 +5,7 @@
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
+      ## "edX Studio" should not be translated
       <h1 class="branding"><a href="/"><img src="/static/img/logo-edx-studio.png" alt="edX Studio" /></a></h1>
 
       % if context_course:
@@ -12,13 +13,13 @@
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
-          <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
+          <span class="course-org">${context_course.display_org_with_default | h}</span><span class="course-number">${context_course.display_number_with_default | h}</span>
           <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{}'s Navigation:".format(context_course.display_name_with_default))}</h2>
+        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -59,7 +60,7 @@
                     <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
-                    <a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">${_("Course Team")}</a>
+                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a>
@@ -96,23 +97,23 @@
     <div class="wrapper wrapper-r">
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        <h2 class="sr">Help &amp; Account Navigation</h2>
+        <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
 
         <ol>
           <li class="nav-item nav-account-help">
-            <h3 class="title"><span class="label">Help</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-help-documentation">
-                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="This is a PDF Document">Studio Documentation</a>
+                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_("This is a PDF Document")}">${_("Studio Documentation")}</a>
                   </li>
                   <li class="nav-item nav-help-helpcenter">
-                    <a href="http://help.edge.edx.org/" rel="external">Studio Help Center</a>
+                    <a href="http://help.edge.edx.org/" rel="external">${_("Studio Help Center")}</a>
                   </li>
                   <li class="nav-item nav-help-feedback">
-                    <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback">Contact Us</a>
+                    <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}">${_("Contact Us")}</a>
                   </li>
                 </ul>
               </div>
@@ -120,7 +121,7 @@
           </li>
 
           <li class="nav-item nav-account-user">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">Currently signed in as:</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">

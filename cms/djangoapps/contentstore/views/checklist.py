@@ -4,14 +4,15 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.urlresolvers import reverse
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 
-from ..utils import get_modulestore, get_url_reverse
+from ..utils import get_modulestore
 from .access import get_location_and_verify_access
+from xmodule.course_module import CourseDescriptor
 
 __all__ = ['get_checklists', 'update_checklist']
 
@@ -28,17 +29,17 @@ def get_checklists(request, org, course, name):
 
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
-    new_course_template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
-    template_module = modulestore.get_item(new_course_template)
 
-    # If course was created before checklists were introduced, copy them over from the template.
+    # If course was created before checklists were introduced, copy them over
+    # from the template.
     copied = False
     if not course_module.checklists:
-        course_module.checklists = template_module.checklists
+        course_module.checklists = CourseDescriptor.checklists.default
         copied = True
 
     checklists, modified = expand_checklist_action_urls(course_module)
     if copied or modified:
+        course_module.save()
         modulestore.update_metadata(location, own_metadata(course_module))
     return render_to_response('checklists.html',
                               {
@@ -68,19 +69,25 @@ def update_checklist(request, org, course, name, checklist_index=None):
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
             course_module.checklists[index] = json.loads(request.body)
-            # seeming noop which triggers kvs to record that the metadata is not default
+            # seeming noop which triggers kvs to record that the metadata is
+            # not default
             course_module.checklists = course_module.checklists
             checklists, _ = expand_checklist_action_urls(course_module)
+            course_module.save()
             modulestore.update_metadata(location, own_metadata(course_module))
             return JsonResponse(checklists[index])
         else:
             return HttpResponseBadRequest(
-                "Could not save checklist state because the checklist index was out of range or unspecified.",
-                content_type="text/plain")
+                ( "Could not save checklist state because the checklist index "
+                "was out of range or unspecified."),
+                content_type="text/plain"
+            )
     elif request.method == 'GET':
-        # In the JavaScript view initialize method, we do a fetch to get all the checklists.
+        # In the JavaScript view initialize method, we do a fetch to get all
+        # the checklists.
         checklists, modified = expand_checklist_action_urls(course_module)
         if modified:
+            course_module.save()
             modulestore.update_metadata(location, own_metadata(course_module))
         return JsonResponse(checklists)
 
@@ -95,10 +102,25 @@ def expand_checklist_action_urls(course_module):
     """
     checklists = course_module.checklists
     modified = False
+    urlconf_map = {
+        "ManageUsers": "manage_users",
+        "SettingsDetails": "settings_details",
+        "SettingsGrading": "settings_grading",
+        "CourseOutline": "course_index",
+        "Checklists": "checklists",
+    }
     for checklist in checklists:
         if not checklist.get('action_urls_expanded', False):
             for item in checklist.get('items'):
-                item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+                action_url = item.get('action_url')
+                if action_url not in urlconf_map:
+                    continue
+                urlconf_name = urlconf_map[action_url]
+                item['action_url'] = reverse(urlconf_name, kwargs={
+                    'org': course_module.location.org,
+                    'course': course_module.location.course,
+                    'name': course_module.location.name,
+                })
             checklist['action_urls_expanded'] = True
             modified = True
 

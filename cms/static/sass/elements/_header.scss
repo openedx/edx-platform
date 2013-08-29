@@ -2,10 +2,10 @@
 // ====================
 
 .wrapper-header {
-  @extend .depth3;
-  box-shadow: 0 1px 2px 0 $shadow-l1;
+  @extend .ui-depth3;
   position: relative;
   width: 100%;
+  box-shadow: 0 1px 2px 0 $shadow-l1;
   margin: 0;
   padding: 0 $baseline;
   background: $white;
@@ -22,7 +22,6 @@
   // ====================
 
   // basic layout
-
   .wrapper-l, .wrapper-r {
     background: $white;
   }
@@ -76,7 +75,7 @@
 
     .title {
       @extend .t-action2;
-      @extend .btn-dd-nav-primary;
+      @extend .ui-btn-dd-nav-primary;
       @include transition(all $tmg-f2 ease-in-out 0s);
 
       .label, .icon-caret-down {

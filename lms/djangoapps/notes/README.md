@@ -30,8 +30,7 @@ Developer Overview
 ### Quickstart
 
 ```
-$ rake django-admin[syncdb]
-$ rake django-admin[migrate]
+$ ./manage.py lms syncdb --migrate
 ```
 
 Then follow the steps above to enable the *My Notes* tab or manually add a tab to the policy tab configuration with ```{"type": "notes", "name": "My Notes"}```.

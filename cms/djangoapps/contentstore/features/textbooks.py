@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from django.conf import settings
-import os
+from common import upload_file
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -11,8 +11,8 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 @step(u'I go to the textbooks page')
 def go_to_uploads(_step):
     world.click_course_content()
-    menu_css = 'li.nav-course-courseware-textbooks'
-    world.css_find(menu_css).click()
+    menu_css = 'li.nav-course-courseware-textbooks a'
+    world.css_click(menu_css)
 
 
 @step(u'I should see a message telling me to create a new textbook')
@@ -24,14 +24,8 @@ def assert_create_new_textbook_msg(_step):
 
 
 @step(u'I upload the textbook "([^"]*)"$')
-def upload_file(_step, file_name):
-    file_css = '.upload-dialog input[type=file]'
-    upload = world.css_find(file_css)
-    # uploading the file itself
-    path = os.path.join(TEST_ROOT, 'uploads', file_name)
-    upload._element.send_keys(os.path.abspath(path))
-    button_css = ".upload-dialog .action-upload"
-    world.css_click(button_css)
+def upload_textbook(_step, file_name):
+    upload_file(file_name)
 
 
 @step(u'I click (on )?the New Textbook button')
@@ -45,6 +39,8 @@ def click_new_textbook(_step, on):
 def name_textbook(_step, name):
     input_css = ".textbook input[name=textbook-name]"
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I name the (first|second|third) chapter "([^"]*)"')
@@ -52,6 +48,8 @@ def name_chapter(_step, ordinal, name):
     index = ["first", "second", "third"].index(ordinal)
     input_css = ".textbook .chapter{i} input.chapter-name".format(i=index+1)
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I type in "([^"]*)" for the (first|second|third) chapter asset')
@@ -59,6 +57,8 @@ def asset_chapter(_step, name, ordinal):
     index = ["first", "second", "third"].index(ordinal)
     input_css = ".textbook .chapter{i} input.chapter-asset-path".format(i=index+1)
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I click the Upload Asset link for the (first|second|third) chapter')

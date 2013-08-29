@@ -24,11 +24,11 @@ def view_course_multiple_sections(step):
                                        display_name=section_name(2))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
+                                               category='sequential',
                                                display_name=subsection_name(1))
 
     place2 = world.ItemFactory.create(parent_location=section2.location,
-                                               template='i4x://edx/templates/sequential/Empty',
+                                               category='sequential',
                                                display_name=subsection_name(2))
 
     add_problem_to_course_section('model_course', 'multiple choice', place1.location)
@@ -46,7 +46,7 @@ def view_course_multiple_subsections(step):
                                        display_name=section_name(1))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
+                                               category='sequential',
                                                display_name=subsection_name(1))
 
     place2 = world.ItemFactory.create(parent_location=section1.location,
@@ -66,7 +66,7 @@ def view_course_multiple_sequences(step):
                                        display_name=section_name(1))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
+                                               category='sequential',
                                                display_name=subsection_name(1))
 
     add_problem_to_course_section('model_course', 'multiple choice', place1.location)
@@ -149,9 +149,9 @@ def create_user_and_visit_course():
     world.create_user('robot', 'test')
     u = User.objects.get(username='robot')
 
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(world.scenario_dict['COURSE'].number))
+    CourseEnrollment.enroll(u, course_id(world.scenario_dict['COURSE'].number))
 
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
     chapter_name = (TEST_SECTION_NAME + "1").replace(" ", "_")
     section_name = (TEST_SUBSECTION_NAME + "1").replace(" ", "_")
     url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
@@ -177,9 +177,8 @@ def add_problem_to_course_section(course, problem_type, parent_location, extraMe
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
     world.ItemFactory.create(parent_location=parent_location,
-                            template=template_name,
+                            category='problem',
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)

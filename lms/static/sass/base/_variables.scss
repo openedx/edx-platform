@@ -29,32 +29,47 @@ $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
 $red: rgb(178, 6, 16);
 $error-red: rgb(253, 87, 87);
+$danger-red: rgb(212, 64, 64);
 $light-gray: rgb(221, 221, 221);
 $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
+$green: rgb(37, 184, 90);
 
 // old variables
 $light-gray: #ddd;
 $dark-gray: #333;
 
-// edx.org-related
-$m-gray-l1: rgb(203,203,203);
-$m-gray-l2: rgb(246,246,246);
-$m-gray: rgb(153,153,153);
-$m-gray-d1: rgb(102,102,102);
-$m-gray-d2: rgb(51,51,51);
-$m-gray-a1: rgb(80,80,80);
-$m-blue: rgb(65, 116, 170);
-// $m-blue: rgb(85, 151, 221); (used in marketing redesign)
-$m-blue-l1: rgb(85, 151, 221);
-$m-blue-d1: shade($m-blue,15%);
-$m-blue-s1: saturate($m-blue,15%);
-$m-pink: rgb(204,51,102);
+// edx.org marketing site variables
+$m-gray: #8A8C8F;
+$m-gray-l1: #97999B;
+$m-gray-l2: #A4A6A8;
+$m-gray-l3: #B1B2B4;
+$m-gray-l4: #F5F5F5;
+$m-gray-d1: #7D7F83;
+$m-gray-d2: #707276;
+$m-gray-d3: #646668;
+$m-gray-d4: #050505;
+
+$m-blue: #1AA1DE;
+$m-blue-l1: #2BACE6;
+$m-blue-l2: #42B5E9;
+$m-blue-l3: #59BEEC;
+$m-blue-d1: #1790C7;
+$m-blue-d2: #1580B0;
+$m-blue-d3: #126F9A;
+$m-blue-d4: #0A4A67;
+
+$m-pink: #B52A67;
+$m-pink-l1: #CA2F73;
+$m-pink-l2: #D33F80;
+$m-pink-l3: #D7548E;
+$m-pink-d1: #A0255B;
+$m-pink-d2: #8C204F;
+$m-pink-d3: #771C44;
 
 $m-base-font-size: em(15);
-
 
 $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
@@ -74,9 +89,56 @@ $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
 
+
+// actions
 $button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
 $button-bg-hover-color: #fff;
+
+// actions - primary
+$action-primary-bg: $m-blue-d3;
+$action-primary-fg: $white;
+$action-primary-shadow: $m-blue-d4;
+
+// focused - hover/active pseudo states
+$action-primary-focused-bg: $m-blue-d1;
+$action-primary-focused-fg: $white;
+
+// current or active navigation item
+$action-primary-active-bg: $m-blue;
+$action-primary-active-fg: $m-blue-d3;
+$action-primary-active-shadow: $m-blue-d2;
+$action-primary-active-focused-fg: $m-blue-d4;
+$action-primary-active-focused-shadow: $m-blue-d3;
+
+// disabled
+$action-primary-disabled-bg: $m-gray-d3;
+$action-prmary-disabled-fg: $white;
+
+
+
+// actions - secondary
+$action-secondary-bg: $m-pink;
+$action-secondary-fg: $white;
+$action-secondary-shadow: $m-pink-d2;
+
+// focused - hover/active pseudo states
+$action-secondary-focused-bg: $m-pink-l3;
+$action-secondary-focused-fg: $white;
+
+// current or active navigation item
+$action-secondary-active-bg: $m-pink-l2;
+$action-secondary-active-fg: $m-pink-d1;
+$action-secondary-active-shadow: $m-pink-d1;
+$action-secondary-active-focused-fg: $m-pink-d3;
+$action-secondary-active-focused-shadow: $m-pink-d2;
+
+// disabled
+$action-secondary-disabled-bg: $m-gray-d3;
+$action-secondary-disabled-fg: $white;
+
+
+
 
 $faded-hr-image-1: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1) 50%, rgba(200,200,200, 0));
 $faded-hr-image-2: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1));
@@ -104,7 +166,7 @@ $border-color-3: rgb(100,100,100);
 $border-color-4: rgb(252,252,252);
 
 $link-color: $blue;
-$link-color-d1: $m-blue;
+$link-color-d1: $m-blue-d2;
 $link-hover: $pink;
 $site-status-color: $pink;
 

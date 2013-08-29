@@ -56,14 +56,15 @@ class CMS.Views.ModuleEdit extends Backbone.View
   changedMetadata: ->
     return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
-  cloneTemplate: (parent, template) ->
-    $.post("/clone_item", {
-      parent_location: parent
-      template: template
-    }, (data) => 
-      @model.set(id: data.id)
-      @$el.data('id', data.id)
-      @render()
+  createItem: (parent, payload) ->
+    payload.parent_location = parent
+    $.post(
+        "/create_item"
+        payload 
+        (data) => 
+            @model.set(id: data.id)
+            @$el.data('id', data.id)
+            @render()
     )
 
   render: ->
@@ -83,11 +84,15 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
     data.metadata = _.extend(data.metadata || {}, @changedMetadata())
     @hideModal()
+    saving = new CMS.Views.Notification.Mini
+      title: gettext('Saving') + '&hellip;'
+    saving.show()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
       @module = null
       @render()
       @$el.removeClass('editing')
+      saving.hide()
     ).fail( ->
       showToastMessage(gettext("There was an error saving your changes. Please try again."), null, 3)
     )

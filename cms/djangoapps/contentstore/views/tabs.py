@@ -1,3 +1,6 @@
+"""
+Views related to course tabs
+"""
 from access import has_access
 from util.json_request import expect_json
 
@@ -13,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from ..utils import get_course_for_item, get_modulestore
 from .access import get_location_and_verify_access
 
-__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']
+__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages']
 
 
 def initialize_course_tabs(course):
@@ -39,6 +42,7 @@ def initialize_course_tabs(course):
 @login_required
 @expect_json
 def reorder_static_tabs(request):
+    "Order the static tabs in the requested order"
     tabs = request.POST['tabs']
     course = get_course_for_item(tabs[0])
 
@@ -76,6 +80,9 @@ def reorder_static_tabs(request):
 
     # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
+    # Save the data that we've just changed to the underlying
+    # MongoKeyValueStore before we update the mongo datastore.
+    course.save()
     modulestore('direct').update_metadata(course.location, own_metadata(course))
     return HttpResponse()
 
@@ -83,6 +90,7 @@ def reorder_static_tabs(request):
 @login_required
 @ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
+    "Edit tabs"
     location = ['i4x', org, course, 'course', coursename]
     store = get_modulestore(location)
     course_item = store.get_item(location)
@@ -119,6 +127,7 @@ def edit_tabs(request, org, course, coursename):
 @login_required
 @ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
+    "Static pages view"
 
     location = get_location_and_verify_access(request, org, course, coursename)
 
@@ -127,7 +136,3 @@ def static_pages(request, org, course, coursename):
     return render_to_response('static-pages.html', {
         'context_course': course,
     })
-
-
-def edit_static(request, org, course, coursename):
-    return render_to_response('edit-static-page.html', {})

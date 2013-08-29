@@ -39,7 +39,8 @@ class TestFields(object):
     float_non_select = Float(scope=Scope.settings, default=.999, values={'min': 0, 'step': .3})
     # Used for testing that Booleans get mapped to select type
     boolean_select = Boolean(scope=Scope.settings)
-
+    # Used for testing Lists
+    list_field = List(scope=Scope.settings, default=[])
 
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):
@@ -63,7 +64,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def test_integer_field(self):
         descriptor = self.get_descriptor({'max_attempts': '7'})
         editable_fields = descriptor.editable_metadata_fields
-        self.assertEqual(6, len(editable_fields))
+        self.assertEqual(7, len(editable_fields))
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
             explicitly_set=True, inheritable=False, value=7, default_value=1000, type='Integer',
@@ -137,11 +138,17 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             type='Float', options={'min': 0, 'step': .3}
         )
 
+        self.assert_field_values(
+            editable_fields, 'list_field', TestFields.list_field,
+            explicitly_set=False, inheritable=False, value=[], default_value=[],
+            type='List'
+        )
 
     # Start of helper methods
     def get_xml_editable_fields(self, model_data):
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        model_data['category'] = 'test'
         return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
     def get_descriptor(self, model_data):
@@ -179,19 +186,19 @@ class TestSerialize(unittest.TestCase):
     def test_serialize(self):
         assert_equals('null', serialize_field(None))
         assert_equals('-2', serialize_field(-2))
-        assert_equals('"2"', serialize_field('2'))
+        assert_equals('2', serialize_field('2'))
         assert_equals('-3.41', serialize_field(-3.41))
-        assert_equals('"2.589"', serialize_field('2.589'))
+        assert_equals('2.589', serialize_field('2.589'))
         assert_equals('false', serialize_field(False))
-        assert_equals('"false"', serialize_field('false'))
-        assert_equals('"fAlse"', serialize_field('fAlse'))
-        assert_equals('"hat box"', serialize_field('hat box'))
-        assert_equals('{"bar": "hat", "frog": "green"}', serialize_field({'bar': 'hat', 'frog' : 'green'}))
+        assert_equals('false', serialize_field('false'))
+        assert_equals('fAlse', serialize_field('fAlse'))
+        assert_equals('hat box', serialize_field('hat box'))
+        assert_equals('{"bar": "hat", "frog": "green"}', serialize_field({'bar': 'hat', 'frog': 'green'}))
         assert_equals('[3.5, 5.6]', serialize_field([3.5, 5.6]))
         assert_equals('["foo", "bar"]', serialize_field(['foo', 'bar']))
-        assert_equals('"2012-12-31T23:59:59Z"', serialize_field("2012-12-31T23:59:59Z"))
-        assert_equals('"1 day 12 hours 59 minutes 59 seconds"',
-            serialize_field("1 day 12 hours 59 minutes 59 seconds"))
+        assert_equals('2012-12-31T23:59:59Z', serialize_field("2012-12-31T23:59:59Z"))
+        assert_equals('1 day 12 hours 59 minutes 59 seconds',
+                      serialize_field("1 day 12 hours 59 minutes 59 seconds"))
 
 
 class TestDeserialize(unittest.TestCase):
@@ -200,7 +207,6 @@ class TestDeserialize(unittest.TestCase):
         Asserts the result of deserialize_field.
         """
         assert_equals(expected, deserialize_field(self.test_field(), arg))
-
 
     def assertDeserializeNonString(self):
         """

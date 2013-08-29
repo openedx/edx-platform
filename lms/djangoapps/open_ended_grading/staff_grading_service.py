@@ -15,6 +15,7 @@ from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
+from utils import does_location_exist
 
 log = logging.getLogger(__name__)
 
@@ -240,7 +241,6 @@ def get_next(request, course_id):
     return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 
-
 def get_problem_list(request, course_id):
     """
     Get all the problems for the given course id
@@ -266,6 +266,20 @@ def get_problem_list(request, course_id):
     _check_access(request.user, course_id)
     try:
         response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
+        response = json.loads(response)
+        problem_list = response['problem_list']
+        valid_problem_list = []
+        for i in xrange(0,len(problem_list)):
+            #Needed to ensure that the 'location' key can be accessed
+            try:
+                problem_list[i] = json.loads(problem_list[i])
+            except Exception:
+                pass
+            if does_location_exist(course_id, problem_list[i]['location']):
+                valid_problem_list.append(problem_list[i])
+        response['problem_list'] = valid_problem_list
+        response = json.dumps(response)
+
         return HttpResponse(response,
                             mimetype="application/json")
     except GradingServiceError:

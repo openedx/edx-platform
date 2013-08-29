@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
@@ -24,6 +25,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
+from course_modes.models import CourseMode
 
 from django_comment_client.utils import get_discussion_title
 
@@ -33,13 +35,13 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.course_module import CourseDescriptor
 
 import comment_client
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
 
 def user_groups(user):
     """
@@ -167,6 +169,8 @@ def save_child_position(seq_module, child_name):
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
+    # Save this new position to the underlying KeyValueStore
+    seq_module.save()
 
 
 def check_for_active_timelimit_module(request, course_id, course):
@@ -234,6 +238,36 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
+def chat_settings(course, user):
+    """
+    Returns a dict containing the settings required to connect to a
+    Jabber chat server and room.
+    """
+    domain = getattr(settings, "JABBER_DOMAIN", None)
+    if domain is None:
+        log.warning('You must set JABBER_DOMAIN in the settings to '
+                    'enable the chat widget')
+        return None
+
+    return {
+        'domain': domain,
+
+        # Jabber doesn't like slashes, so replace with dashes
+        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
+
+        'username': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+
+        # TODO: clearly this needs to be something other than the username
+        #       should also be something that's not necessarily tied to a
+        #       particular course
+        'password': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+    }
+
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -298,6 +332,18 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
+        # Only show the chat if it's enabled by the course and in the
+        # settings.
+        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
+        if show_chat:
+            context['chat'] = chat_settings(course, user)
+            # If we couldn't load the chat settings, then don't show
+            # the widget in the courseware.
+            if context['chat'] is None:
+                show_chat = False
+
+        context['show_chat'] = show_chat
+
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
             save_child_position(course_module, chapter)
@@ -355,7 +401,7 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.get_html()
+            context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
@@ -401,6 +447,30 @@ def index(request, course_id, chapter=None, section=None,
                 raise
 
     return result
+
+
+@ensure_csrf_cookie
+def jump_to_id(request, course_id, module_id):
+    """
+    This entry point allows for a shorter version of a jump to where just the id of the element is
+    passed in. This assumes that id is unique within the course_id namespace
+    """
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+
+    items = modulestore().get_items(
+        ['i4x', course_location.org, course_location.course, None, module_id],
+        course_id=course_id
+    )
+
+    if len(items) == 0:
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+    if len(items) > 1:
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+
+    return jump_to(request, course_id, items[0].location.url())
 
 
 @ensure_csrf_cookie
@@ -502,12 +572,12 @@ def syllabus(request, course_id):
 
 def registered_for_course(course, user):
     """
-    Return CourseEnrollment if user is registered for course, else False
+    Return True if user is registered for course, else False
     """
     if user is None:
         return False
     if user.is_authenticated():
-        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+        return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
 
@@ -534,9 +604,14 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def mktg_course_about(request, course_id):
+    """
+    This is the button that gets put into an iframe on the Drupal site
+    """
 
     try:
         course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -544,7 +619,7 @@ def mktg_course_about(request, course_id):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response('courseware/mktg_coming_soon.html',
-                              {'course_id': course_id})
+                                  {'course_id': course_id})
 
     registered = registered_for_course(course, request.user)
 
@@ -557,64 +632,17 @@ def mktg_course_about(request, course_id):
 
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+    course_modes = CourseMode.modes_for_course(course.id)
 
     return render_to_response('courseware/mktg_course_about.html',
-                              {'course': course,
-                               'registered': registered,
-                               'allow_registration': allow_registration,
-                               'course_target': course_target,
-                               'show_courseware_link': show_courseware_link})
-
-
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def static_university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id that does not have any courses.
-    """
-    # Redirect to the properly capitalized org_id
-    last_path = request.path.split('/')[-1]
-    if last_path != org_id:
-        return redirect('static_university_profile', org_id=org_id)
-
-    # Render template
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-    context = dict(courses=[], org_id=org_id)
-    return render_to_response(template_file, context)
-
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id.  404 if it's not valid.
-    """
-    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
-    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
-
-    # Get all the ids associated with this organization
-    all_courses = modulestore().get_courses()
-    valid_orgs_ids = set(c.org for c in all_courses)
-    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
-
-    if org_id not in valid_orgs_ids:
-        raise Http404("University Profile not found for {0}".format(org_id))
-
-    # Grab all courses for this organization(s)
-    org_ids = set([org_id] + meta_orgs.get(org_id, []))
-    org_courses = []
-    domain = request.META.get('HTTP_HOST')
-    for key in org_ids:
-        cs = get_courses_by_university(request.user, domain=domain)[key]
-        org_courses.extend(cs)
-
-    org_courses = sort_by_announcement(org_courses)
-
-    context = dict(courses=org_courses, org_id=org_id)
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-
-    return render_to_response(template_file, context)
+                              {
+                                  'course': course,
+                                  'registered': registered,
+                                  'allow_registration': allow_registration,
+                                  'course_target': course_target,
+                                  'show_courseware_link': show_courseware_link,
+                                  'course_modes': course_modes,
+                              })
 
 
 def render_notifications(request, course, notifications):
@@ -709,19 +737,20 @@ def submission_history(request, course_id, student_username, location):
                                                    module_state_key=location,
                                                    student_id=student.id)
     except User.DoesNotExist:
-        return HttpResponse("User {0} does not exist.".format(student_username))
+        return HttpResponse(escape("User {0} does not exist.".format(student_username)))
     except StudentModule.DoesNotExist:
-        return HttpResponse("{0} has never accessed problem {1}"
-                            .format(student_username, location))
+        return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(
+        student_module=student_module
+    ).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        ).order_by('-id')
 
     context = {
         'history_entries': history_entries,

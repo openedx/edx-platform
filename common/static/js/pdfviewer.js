@@ -157,7 +157,7 @@ PDFJS.disableWorker = true;
             }
 
             // Update logging:
-            log_event("book", { "type" : "gotopage", "old" : pageNum, "new" : num });
+            Logger.log("book", { "type" : "gotopage", "old" : pageNum, "new" : num });
 
             parentElement = viewerElement;
             while (parentElement.hasChildNodes())
@@ -207,7 +207,7 @@ PDFJS.disableWorker = true;
             if (pageNum <= 1)
                 return;
             renderPage(pageNum - 1);
-            log_event("book", { "type" : "prevpage", "new" : pageNum });
+            Logger.log("book", { "type" : "prevpage", "new" : pageNum });
         }
 
         // Go to next page
@@ -215,7 +215,7 @@ PDFJS.disableWorker = true;
             if (pageNum >= pdfDocument.numPages)
                 return;
             renderPage(pageNum + 1);
-            log_event("book", { "type" : "nextpage", "new" : pageNum });
+            Logger.log("book", { "type" : "nextpage", "new" : pageNum });
         }
 
         selectScaleOption = function(value) {

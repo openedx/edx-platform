@@ -2,9 +2,9 @@
 // ====================
 
 body.course.import {
-  
+
   .import-overview {
-    @extend .window;
+    @extend .ui-window;
     @include clearfix;
     padding: 30px 40px;
   }
@@ -55,6 +55,11 @@ body.course.import {
 
     .error-block {
       color: $error-red;
+    }
+
+    .status-block {
+      display: none;
+      font-size: 13px;
     }
 
     .choose-file-button {

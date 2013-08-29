@@ -45,7 +45,7 @@ def i_can_check_and_uncheck_tasks(step):
     verifyChecklist2Status(2, 7, 29)
 
 
-@step('They are correctly selected after I reload the page$')
+@step('They are correctly selected after reloading the page$')
 def tasks_correctly_selected_after_reload(step):
     reload_the_page(step)
     verifyChecklist2Status(2, 7, 29)

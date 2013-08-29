@@ -1,21 +1,20 @@
 
+from ast import literal_eval
 import json
 import unittest
+
 from fs.memoryfs import MemoryFS
-from ast import literal_eval
 from mock import Mock, patch
 
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.conditional_module import ConditionalModule
+from xmodule.tests import DATA_DIR, get_test_system
 
-from xmodule.tests.test_export import DATA_DIR
 
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
-
-from . import get_test_system
 
 
 class DummySystem(ImportSystem):
@@ -217,8 +216,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
 
-        # now change state of the capa problem to make it completed
-        inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob')).attempts = 1
+        # Now change state of the capa problem to make it completed
+        inner_module = inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob'))
+        inner_module.attempts = 1
+        # Save our modifications to the underlying KeyValueStore so they can be persisted
+        inner_module.save()
 
         ajax = json.loads(module.handle_ajax('', ''))
         print "post-attempt ajax: ", ajax

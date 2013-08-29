@@ -1,10 +1,13 @@
-@function em($pxval, $base: 16) {
-  @return #{$pxval / $base}em;
+// mixins - font sizing
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+  font-size: ($sizeValue/10) + rem;
 }
 
-// Line-height
-@function lh($amount: 1) {
-  @return $body-line-height * $amount;
+// mixins - line height
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+  line-height: (($fontSize/10)*1.48) + rem;
 }
 
 // image-replacement hidden text
@@ -29,6 +32,15 @@
   text-indent: -9999px;
   overflow: hidden;
   display: block;
+}
+
+@function em($pxval, $base: 16) {
+  @return #{$pxval / $base}em;
+}
+
+// Line-height
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
 }
 
 

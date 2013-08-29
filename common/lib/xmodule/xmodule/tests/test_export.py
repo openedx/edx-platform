@@ -2,28 +2,19 @@
 Tests of XML export
 """
 
-import unittest
-import pytz
-
 from datetime import datetime, timedelta, tzinfo
-from fs.osfs import OSFS
-from path import path
 from tempfile import mkdtemp
+import unittest
 import shutil
 
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.xml_exporter import EdxJSONEncoder
+import pytz
+from fs.osfs import OSFS
+from path import path
 
 from xmodule.modulestore import Location
-
-# from ~/mitx_all/mitx/common/lib/xmodule/xmodule/tests/
-# to   ~/mitx_all/mitx/common/test
-TEST_DIR = path(__file__).abspath().dirname()
-for i in range(4):
-    TEST_DIR = TEST_DIR.dirname()
-TEST_DIR = TEST_DIR / 'test'
-
-DATA_DIR = TEST_DIR / 'data'
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
+from xmodule.tests import DATA_DIR
 
 
 def strip_filenames(descriptor):
@@ -39,6 +30,8 @@ def strip_filenames(descriptor):
 
     for d in descriptor.get_children():
         strip_filenames(d)
+
+    descriptor.save()
 
 
 class RoundTripTestCase(unittest.TestCase):
@@ -96,12 +89,6 @@ class RoundTripTestCase(unittest.TestCase):
         print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
             print("Checking", location)
-            if location.category == 'html':
-                print(
-                    "Skipping html modules--they can't import in"
-                    " final form without writing files..."
-                )
-                continue
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
 

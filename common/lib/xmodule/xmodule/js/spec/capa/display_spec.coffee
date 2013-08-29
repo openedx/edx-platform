@@ -77,6 +77,25 @@ describe 'Problem', ->
         [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
       ]
 
+  describe 'renderProgressState', ->
+    beforeEach ->
+      @problem = new Problem($('.xmodule_display'))
+      #@renderProgressState = @problem.renderProgressState
+
+    describe 'with a status of "none"', ->
+      it 'reports the number of points possible', ->
+        @problem.el.data('progress_status', 'none')
+        @problem.el.data('progress_detail', '0/1')
+        @problem.renderProgressState()
+        expect(@problem.$('.problem-progress').html()).toEqual "(1 point possible)"
+
+    describe 'with any other valid status', ->
+      it 'reports the current score', ->
+        @problem.el.data('progress_status', 'foo')
+        @problem.el.data('progress_detail', '1/1')
+        @problem.renderProgressState()
+        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 points)"
+
   describe 'render', ->
     beforeEach ->
       @problem = new Problem($('.xmodule_display'))
@@ -222,6 +241,58 @@ describe 'Problem', ->
           expect($('label[for="input_1_1_2"]')).toHaveAttr 'correct_answer', 'true'
           expect($('label[for="input_1_1_3"]')).toHaveAttr 'correct_answer', 'true'
           expect($('label[for="input_1_2_1"]')).not.toHaveAttr 'correct_answer', 'true'
+
+      describe 'radio text question', ->
+        radio_text_xml='''
+<section class="problem">
+  <div><p></p><span><section id="choicetextinput_1_2_1" class="choicetextinput">
+
+<form class="choicetextgroup capa_inputtype" id="inputtype_1_2_1">
+  <div class="indicator_container">
+    <span class="unanswered" style="display:inline-block;" id="status_1_2_1"></span>
+  </div>
+  <fieldset>
+    <section id="forinput1_2_1_choiceinput_0bc">
+      <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_0bc" value="choiceinput_0"">
+      <input class="ctinput" type="text" name="choiceinput_0_textinput_0" id="1_2_1_choiceinput_0_textinput_0" value=" ">
+      <p id="answer_1_2_1_choiceinput_0bc" class="answer"></p>
+    </>
+    <section id="forinput1_2_1_choiceinput_1bc">
+      <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_1bc" value="choiceinput_1" >
+      <input class="ctinput" type="text" name="choiceinput_1_textinput_0" id="1_2_1_choiceinput_1_textinput_0" value=" " >
+      <p id="answer_1_2_1_choiceinput_1bc" class="answer"></p>
+    </section>
+    <section id="forinput1_2_1_choiceinput_2bc">
+      <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_2bc" value="choiceinput_2" >
+      <input class="ctinput" type="text" name="choiceinput_2_textinput_0" id="1_2_1_choiceinput_2_textinput_0" value=" " >
+      <p id="answer_1_2_1_choiceinput_2bc" class="answer"></p>
+    </section></fieldset><input class="choicetextvalue" type="hidden" name="input_1_2_1" id="input_1_2_1"></form>
+</section></span></div>
+</section>
+'''
+        beforeEach ->
+          # Append a radiotextresponse problem to the problem, so we can check it's javascript functionality
+          @problem.el.prepend(radio_text_xml)
+
+        it 'sets the correct class on the section for the correct choice', ->
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+            callback answers: "1_2_1": ["1_2_1_choiceinput_0bc"], "1_2_1_choiceinput_0bc": "3"
+          @problem.show()
+
+          expect($('#forinput1_2_1_choiceinput_0bc').attr('class')).toEqual(
+            'choicetextgroup_show_correct')
+          expect($('#answer_1_2_1_choiceinput_0bc').text()).toEqual('3')
+          expect($('#answer_1_2_1_choiceinput_1bc').text()).toEqual('')
+          expect($('#answer_1_2_1_choiceinput_2bc').text()).toEqual('')
+
+        it 'Should not disable input fields', ->
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+            callback answers: "1_2_1": ["1_2_1_choiceinput_0bc"], "1_2_1_choiceinput_0bc": "3"
+          @problem.show()
+          expect($('input#1_2_1_choiceinput_0bc').attr('disabled')).not.toEqual('disabled')
+          expect($('input#1_2_1_choiceinput_1bc').attr('disabled')).not.toEqual('disabled')
+          expect($('input#1_2_1_choiceinput_2bc').attr('disabled')).not.toEqual('disabled')
+          expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled')
 
     describe 'when the answers are already shown', ->
       beforeEach ->

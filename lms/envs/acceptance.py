@@ -8,6 +8,7 @@ so that we can run the lettuce acceptance tests.
 # pylint: disable=W0401, W0614
 
 from .test import *
+from .sauce import *
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly
@@ -17,7 +18,7 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 import os
-import random
+from random import choice, randint
 
 
 def seed():
@@ -35,14 +36,20 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
-    },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'mappings': {},
+            'stores': {
+                'default': {
+                    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'OPTIONS': modulestore_options
+                }
+            }
+        }
     }
 }
+
+MODULESTORE['direct'] = MODULESTORE['default']
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -65,7 +72,7 @@ DATABASES = {
 
 # Set up XQueue information so that the lms will send
 # requests to a mock XQueue server running locally
-XQUEUE_PORT = random.randint(1024, 65535)
+XQUEUE_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 XQUEUE_INTERFACE = {
     "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
     "django_auth": {
@@ -75,12 +82,23 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
-# Do not display the YouTube videos in the browser while running the
-# acceptance tests. This makes them faster and more reliable
-MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
+# Forums are disabled in test.py to speed up unit tests, but we do not have
+# per-test control for acceptance tests
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
+# Use the auto_auth workflow for creating users and logging them in
+MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# HACK
+# Setting this flag to false causes imports to not load correctly in the lettuce python files
+# We do not yet understand why this occurs. Setting this to true is a stopgap measure
+USE_I18N = True
+
+MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
+FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
-LETTUCE_SERVER_PORT = random.randint(1024, 65535)
-LETTUCE_BROWSER = 'chrome'
+LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
+LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')

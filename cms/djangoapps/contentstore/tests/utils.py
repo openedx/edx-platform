@@ -54,7 +54,6 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         self.course = CourseFactory.create(
-            template='i4x://edx/templates/course/Empty',
             org='MITx',
             number='999',
             display_name='Robot Super Course',

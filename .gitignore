@@ -45,3 +45,4 @@ node_modules
 autodeploy.properties
 .ws_migrations_complete
 .vagrant/
+logs

@@ -1,11 +1,19 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware ${course.css_class}</%block>
-<%block name="title"><title>${course.number} Courseware</title></%block>
+<%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
   <%include file="../discussion/_js_head_dependencies.html" />
+  % if show_chat:
+    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
+    ## It'd be better to have this in a place like lms/css/vendor/candy,
+    ## but the candy_res/ folder contains images and other junk, and it
+    ## all needs to stay together for the Candy.js plugin to work.
+    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
+  % endif
 </%block>
 
 <%block name="js_extra">
@@ -108,13 +116,47 @@
   </script>
 % endif
 
+% if show_chat:
+  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
+
+  <script type="text/javascript">
+    // initialize the Candy.js plugin
+    $(document).ready(function() {
+      Candy.init("http://${chat['domain']}:5280/http-bind/", {
+        core: { debug: true, autojoin: ["${chat['room']}@conference.${chat['domain']}"] },
+        view: { resources: "${static.url('candy_res/')}"}
+      });
+      Candy.Core.connect("${chat['username']}", "${chat['password']}");
+
+      // show/hide the chat widget
+      $('#chat-toggle').click(function() {
+        var toggle = $(this);
+        if (toggle.hasClass('closed')) {
+          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
+            $('#chat-open').hide();
+            $('#chat-close').show();
+          });
+        } else {
+          $('#chat-block').animate({height: '0px'}, 'slow', function() {
+            $('#chat-open').show();
+            $('#chat-close').hide();
+            $(this).hide(); // do this at the very end
+          });
+        }
+        toggle.toggleClass('closed');
+      });
+    });
+  </script>
+% endif
+
 </%block>
 
 % if timer_expiration_duration:
 <div class="timer-main">
   <div id="timer_wrapper">
     % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">Return to Exam</a>
+    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
     % endif
     <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
   </div>
@@ -129,9 +171,9 @@
   <div class="course-wrapper">
 
 % if accordion:
-    <section aria-label="Course Navigation" class="course-index">
+    <section aria-label="${_('Course Navigation')}" class="course-index">
       <header id="open_close_accordion">
-        <a href="#">close</a>
+        <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">
@@ -148,10 +190,22 @@
   </div>
 </section>
 
+% if show_chat:
+  <div id="chat-wrapper">
+    <div id="chat-toggle" class="closed">
+      <span id="chat-open">Open Chat <em class="icon-chevron-up"></em></span>
+      <span id="chat-close">Close Chat <em class="icon-chevron-down"></em></span>
+    </div>
+    <div id="chat-block">
+      ## The Candy.js plugin wants to render in an element with #candy
+      <div id="candy"></div>
+    </div>
+  </div>
+% endif
 
 % if course.show_calculator:
     <div class="calc-main">
-        <a aria-label="Open Calculator" href="#" class="calc">Calculator</a>
+        <a aria-label="${_('Open Calculator')}" href="#" class="calc">${_("Calculator")}</a>
 
         <div id="calculator_wrapper">
             <form id="calculator">
@@ -159,15 +213,15 @@
                     <input type="text" id="calculator_input" title="Calculator Input Field" />
 
                     <div class="help-wrapper">
-                        <a href="#">Hints</a>
+                        <a href="#">${_("Hints")}</a>
                         <dl class="help">
-                            <dt>Suffixes:</dt>
+                            <dt>${_("Suffixes:")}</dt>
                             <dd> %kMGTcmunp</dd>
-                            <dt>Operations:</dt>
+                            <dt>${_("Operations:")}</dt>
                             <dd>^ * / + - ()</dd>
-                            <dt>Functions:</dt>
+                            <dt>${_("Functions:")}</dt>
                             <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
-                            <dt>Constants</dt>
+                            <dt>${_("Constants")}</dt>
                             <dd>e, pi</dd>
 
                             <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.

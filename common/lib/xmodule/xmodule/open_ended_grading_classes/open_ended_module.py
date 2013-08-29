@@ -19,6 +19,7 @@ import openendedchild
 from numpy import median
 
 from datetime import datetime
+from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
@@ -117,6 +118,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'answer': self.answer,
             'problem_id': self.display_name,
             'skip_basic_checks': self.skip_basic_checks,
+            'control': json.dumps(self.control),
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
@@ -170,7 +172,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return {'success': False, 'msg': "Couldn't submit feedback."}
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
@@ -224,7 +226,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return False
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = system.anonymous_student_id
 
@@ -525,7 +527,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback = "".join(feedback_items)
             else:
                 feedback = feedback_items
-            score = int(median(score_result['score']))
+            score = int(round(median(score_result['score'])))
         else:
             # This is for instructor and ML grading
             feedback, rubric_score = self._format_feedback(score_result, system)
@@ -639,6 +641,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         # Once we close the problem, we should not allow students
         # to save answers
+        error_message = ""
         closed, msg = self.check_if_closed()
         if closed:
             return msg
@@ -648,17 +651,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # add new history element with answer and empty score and hint.
         success, data = self.append_image_to_student_answer(data)
-        error_message = ""
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
-            if allowed_to_submit:
-                data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
-                self.new_history_entry(data['student_answer'])
-                self.send_to_grader(data['student_answer'], system)
-                self.change_state(self.ASSESSING)
-            else:
-                # Error message already defined
-                success = False
+            data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
+            self.new_history_entry(data['student_answer'])
+            self.send_to_grader(data['student_answer'], system)
+            self.change_state(self.ASSESSING)
         else:
             # This is a student_facing_error
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
@@ -666,7 +663,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer']
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def update_score(self, data, system):
@@ -697,12 +694,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = self.get_eta()
+                eta_string = "Your response has been submitted.  Please check back later for your grade."
         else:
             post_assessment = ""
             correct = ""
-            previous_answer = self.initial_display
-
+            previous_answer = ""
+        previous_answer = previous_answer.replace("\n","<br/>")
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -730,7 +727,6 @@ class OpenEndedDescriptor():
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "openended"
 
     def __init__(self, system):
         self.system = system

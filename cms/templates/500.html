@@ -1,16 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 
-<%block name="title">Studio Server Error</%block>
+<%block name="title">${_("Studio Server Error")}</%block>
 
 <%block name="content">
 
 <div class="wrapper-content wrapper">
   <section class="content">
-    <h1>The <em>Studio</em> servers encountered an error</h1>
+    <h1>${_("The <em>Studio</em> servers encountered an error")}</h1>
     <p>
-      An error occurred in Studio and the page could not be loaded. Please try again in a few moments.
-      We've logged the error and our staff is currently working to resolve this error as soon as possible. 
-      If the problem persists, please email us at <a href="mailto:technical@edx.org">technical@edx.org</a>.
+      ${_("An error occurred in Studio and the page could not be loaded. Please try again in a few moments.")}
+      ${_("We've logged the error and our staff is currently working to resolve this error as soon as possible.")}
+      ${_('If the problem persists, please email us at {email}.').format(email='<a href="mailto:technical@edx.org">technical@edx.org</a>')}
     </p>
   </section>
 </div>

@@ -1,7 +1,7 @@
 """
 Tests for open ended grading interfaces
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
+./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
 
 import json
@@ -27,14 +27,15 @@ log = logging.getLogger(__name__)
 from django.test.utils import override_settings
 
 from xmodule.tests import test_util_open_ended
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests import factories
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestStaffGradingService(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -42,8 +43,6 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -138,8 +137,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         self.assertIsNotNone(content['problem_list'])
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPeerGradingService(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -147,8 +146,6 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -161,7 +158,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location}
+        model_data = {'data': "<peergrading/>", 'location': location, 'category':'peergrading'}
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
@@ -205,7 +202,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             'submission_key': 'fake key',
             'score': 2,
             'feedback': 'feedback',
-            'submission_flagged': 'false'
+            'submission_flagged': 'false',
+            'answer_unknown': 'false',
+            'rubric_scores_complete' : 'true'
         }
 
         qdict = MagicMock()
@@ -291,8 +290,8 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.assertFalse('actual_score' in response)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPanel(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Run tests on the open ended panel
     """

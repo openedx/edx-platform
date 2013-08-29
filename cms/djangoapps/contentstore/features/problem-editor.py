@@ -18,8 +18,9 @@ def i_created_blank_common_problem(step):
     world.create_component_instance(
         step,
         '.large-problem-icon',
-        'i4x://edx/templates/problem/Blank_Common_Problem',
-        '.xmodule_CapaModule'
+        'problem',
+        '.xmodule_CapaModule',
+        'blank_common.yaml'
     )
 
 
@@ -35,8 +36,8 @@ def i_see_five_settings_with_values(step):
             [DISPLAY_NAME, "Blank Common Problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
-            [RANDOMIZATION, "Never", True],
-            [SHOW_ANSWER, "Finished", True]
+            [RANDOMIZATION, "Never", False],
+            [SHOW_ANSWER, "Finished", False]
         ])
 
 
@@ -44,7 +45,10 @@ def i_see_five_settings_with_values(step):
 def i_can_modify_the_display_name(step):
     # Verifying that the display name can be a string containing a floating point value
     # (to confirm that we don't throw an error because it is of the wrong type).
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('3.4')
+    index = world.get_setting_entry_index(DISPLAY_NAME)
+    world.css_fill('.wrapper-comp-setting .setting-input', '3.4', index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name()
 
 
@@ -56,7 +60,10 @@ def my_display_name_change_is_persisted_on_save(step):
 
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
+    index = world.get_setting_entry_index(DISPLAY_NAME)
+    world.css_fill('.wrapper-comp-setting .setting-input', "updated ' \" &", index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name_with_special_chars()
 
 
@@ -94,7 +101,7 @@ def my_change_to_randomization_is_persisted(step):
 def i_can_revert_to_default_for_randomization(step):
     world.revert_setting_entry(RANDOMIZATION)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
+    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Never", False)
 
 
 @step('I can set the weight to "(.*)"?')
@@ -126,12 +133,16 @@ def set_the_weight_to_abc(step, bad_weight):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-@step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
-def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
-    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill(max_attempts_set)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
+@step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
+def set_the_max_attempts(step, max_attempts_set):
+    # on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
+    index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
+    world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
+    value =  int(world.css_value('input.setting-input', index=index))
+    assert value >= 0
 
 
 @step('Edit High Level Source is not visible')
@@ -154,9 +165,13 @@ def cancel_does_not_save_changes(step):
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
+
+    def animation_done(_driver):
+        return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
+    world.wait_for(animation_done)
     # Go to advanced tab.
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 
 @step('I edit and compile the High Level Source')
@@ -169,7 +184,8 @@ def edit_latex_source(step):
 @step('my change to the High Level Source is persisted')
 def high_level_source_persisted(step):
     def verify_text(driver):
-        return world.css_text('.problem') == 'hi'
+        css_sel = '.problem div>span'
+        return world.css_text(css_sel) == 'hi'
 
     world.wait_for(verify_text)
 
@@ -203,11 +219,15 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'Blank Advanced Problem', False)
 
 
 def set_weight(weight):
-    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)
+    index = world.get_setting_entry_index(PROBLEM_WEIGHT)
+    world.css_fill('.wrapper-comp-setting .setting-input', weight, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index, event='blur')
+        world.trigger_event('a.save-button', event='focus')
 
 
 def open_high_level_source():

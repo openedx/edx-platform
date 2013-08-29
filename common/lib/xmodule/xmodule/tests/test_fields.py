@@ -44,7 +44,8 @@ class DateTest(unittest.TestCase):
     def test_return_None(self):
         self.assertIsNone(DateTest.date.from_json(""))
         self.assertIsNone(DateTest.date.from_json(None))
-        self.assertIsNone(DateTest.date.from_json(['unknown value']))
+        with self.assertRaises(TypeError):
+            DateTest.date.from_json(['unknown value'])
 
     def test_old_due_date_format(self):
         current = datetime.datetime.today()
@@ -83,6 +84,8 @@ class DateTest(unittest.TestCase):
             DateTest.date.to_json(
                 DateTest.date.from_json("2012-12-31T23:00:01-01:00")),
             "2012-12-31T23:00:01-01:00")
+        with self.assertRaises(TypeError):
+            DateTest.date.to_json('2012-12-31T23:00:01-01:00')
 
 
 class TimedeltaTest(unittest.TestCase):

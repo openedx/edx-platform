@@ -89,7 +89,7 @@ def get_hints(request, course_id, field):
 
     for hints_by_problem in all_hints:
         loc = Location(hints_by_problem.definition_id)
-        name = location_to_problem_name(loc)
+        name = location_to_problem_name(course_id, loc)
         if name is None:
             continue
         id_to_name[hints_by_problem.definition_id] = name
@@ -119,13 +119,13 @@ def get_hints(request, course_id, field):
     return render_dict
 
 
-def location_to_problem_name(loc):
+def location_to_problem_name(course_id, loc):
     """
     Given the location of a crowdsource_hinter module, try to return the name of the
     problem it wraps around.  Return None if the hinter no longer exists.
     """
     try:
-        descriptor = modulestore().get_items(loc)[0]
+        descriptor = modulestore().get_items(loc, course_id=course_id)[0]
         return descriptor.get_children()[0].display_name
     except IndexError:
         # Sometimes, the problem is no longer in the course.  Just

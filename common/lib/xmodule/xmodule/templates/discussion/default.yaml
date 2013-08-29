@@ -1,9 +1,0 @@
----
-metadata:
-    display_name: Discussion Tag
-    for: Topic-Level Student-Visible Label 
-    id: $$GUID$$
-    discussion_category: Week 1
-data: |
-  <discussion />
-children: []

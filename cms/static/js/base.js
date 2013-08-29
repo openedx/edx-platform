@@ -60,12 +60,10 @@ $(document).ready(function() {
         $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dd .nav-item .title').click(function(e) {
+    $('.nav-dd .nav-item').click(function(e) {
 
-        $subnav = $(this).parent().find('.wrapper-nav-sub');
-        $title = $(this).parent().find('.title');
-        e.preventDefault();
-        e.stopPropagation();
+        $subnav = $(this).find('.wrapper-nav-sub');
+        $title = $(this).find('.title');
 
         if ($subnav.hasClass('is-shown')) {
             $subnav.removeClass('is-shown');
@@ -75,14 +73,17 @@ $(document).ready(function() {
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
             $subnav.addClass('is-shown');
+            // if propogation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            e.stopPropagation();
         }
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({
+    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -199,8 +200,10 @@ function toggleSections(e) {
     $section = $('.courseware-section');
     sectionCount = $section.length;
     $button = $(this);
-    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>');
-    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>');
+    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+        gettext('Collapse All Sections') + '</span>');
+    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+        gettext('Expand All Sections') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -250,25 +253,20 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    var edxTimeStr = null;
-
-    if (date_val != '') {
-        if (time_val == '') time_val = '00:00';
-
-        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        var date = Date.parse(date_val + " " + time_val);
-        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
+function getDatetime(datepickerInput, timepickerInput) {
+    // given a pair of inputs (datepicker and timepicker), return a JS Date
+    // object that corresponds to the datetime that they represent. Assume
+    // UTC timezone, NOT the timezone of the user's browser.
+    var date = $(datepickerInput).datepicker("getDate");
+    var time = $(timepickerInput).timepicker("getTime");
+    if(date && time) {
+        return new Date(Date.UTC(
+            date.getFullYear(), date.getMonth(), date.getDate(),
+            time.getHours(), time.getMinutes()
+        ));
+    } else {
+        return null;
     }
-
-    return edxTimeStr;
-}
-
-function getEdxTimeFromDateTimeInputs(date_id, time_id) {
-    var input_date = $('#' + date_id).val();
-    var input_time = $('#' + time_id).val();
-
-    return getEdxTimeFromDateTimeVals(input_date, input_time);
 }
 
 function autosaveInput(e) {
@@ -308,9 +306,17 @@ function saveSubsection() {
         metadata[$(el).data("metadata-name")] = el.value;
     }
 
-    // Piece back together the date/time UI elements into one date/time string
-    metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
+    // get datetimes for start and due, stick into metadata
+    _(["start", "due"]).each(function(name) {
+
+        var datetime = getDatetime(
+            document.getElementById(name+"_date"),
+            document.getElementById(name+"_time")
+        );
+        // if datetime is null, we want to set that in metadata anyway;
+        // its an indication to the server to clear the datetime in the DB
+        metadata[name] = datetime;
+    });
 
     $.ajax({
         url: "/save_item",
@@ -326,7 +332,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage('There has been an error while saving your changes.');
+            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -336,7 +342,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var template = $(this).data('template');
+    var category = $(this).data('category');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -344,9 +350,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': 'New Unit'
     },
 
@@ -358,39 +364,61 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'));
+    _deleteItem($(this).parents('li.leaf'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'));
+    _deleteItem($(this).parents('li.branch'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'));
+    _deleteItem($(this).parents('section.branch'), 'Section');
 }
 
-function _deleteItem($el) {
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+function _deleteItem($el, type) {
+    var confirm = new CMS.Views.Prompt.Warning({
+        title: gettext('Delete this ' + type + '?'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        actions: {
+            primary: {
+                text: gettext('Yes, delete this ' + type),
+                click: function(view) {
+                    view.hide();
 
-    var id = $el.data('id');
+                    var id = $el.data('id');
 
-    analytics.track('Deleted an Item', {
-        'course': course_location_analytics,
-        'id': id
+                    analytics.track('Deleted an Item', {
+                        'course': course_location_analytics,
+                        'id': id
+                    });
+
+                    var deleting = new CMS.Views.Notification.Mini({
+                        title: gettext('Deleting') + '&hellip;'
+                    });
+                    deleting.show();
+
+                    $.post('/delete_item',
+                           {'id': id,
+                            'delete_children': true,
+                            'delete_all_versions': true},
+                           function(data) {
+                               $el.remove();
+                               deleting.hide();
+                           }
+                          );
+                }
+            },
+            secondary: {
+                text: gettext('Cancel'),
+                click: function(view) {
+                    view.hide();
+                }
+            }
+        }
     });
-
-
-    $.post('/delete_item', {
-        'id': id,
-        'delete_children': true,
-        'delete_all_versions': true
-    },
-
-    function(data) {
-        $el.remove();
-    });
+    confirm.show();
 }
 
 function markAsLoaded() {
@@ -549,7 +577,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var template = $saveButton.data('template');
+    var category = $saveButton.data('category');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -557,9 +585,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name,
     },
 
@@ -576,59 +604,158 @@ function cancelNewSection(e) {
 
 function addNewCourse(e) {
     e.preventDefault();
-
-    $(e.target).hide();
-    var $newCourse = $($('#new-course-template').html());
+    $('.new-course-button').addClass('is-disabled');
+    $('.new-course-save').addClass('is-disabled');
+    var $newCourse = $('.wrapper-create-course').addClass('is-shown');
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.inner-wrapper').prepend($newCourse);
-    $newCourse.find('.new-course-name').focus().select();
-    $newCourse.find('form').bind('submit', saveNewCourse);
+    var $courseName = $('.new-course-name');
+    $courseName.focus().select();
+    $('.new-course-save').on('click', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
     $body.bind('keyup', {
         $cancelButton: $cancelButton
     }, checkForCancel);
+
+    // Check that a course (org, number, run) doesn't use any special characters
+    var validateCourseItemEncoding = function(item) {
+        var required = validateRequiredField(item);
+        if(required) {
+            return required;
+        }
+        if(item !== encodeURIComponent(item)) {
+            return gettext('Please do not use any spaces or special characters in this field.');
+        }
+        return '';
+    }
+
+    // Ensure that all items are less than 80 characters.
+    var validateTotalCourseItemsLength = function() {
+        var totalLength = _.reduce(
+            ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+            function(sum, ele) {
+                return sum + $(ele).val().length;
+        }, 0
+        );
+        if(totalLength > 80) {
+            $('.wrap-error').addClass('is-shown');
+            $('#course_creation_error').html('<p>' + gettext('Course fields must have a combined length of no more than 80 characters.') + '</p>');
+            $('.new-course-save').addClass('is-disabled');
+        }
+        else {
+            $('.wrap-error').removeClass('is-shown');
+        }
+    }
+
+    // Handle validation asynchronously
+    _.each(
+        ['.new-course-org', '.new-course-number', '.new-course-run'],
+        function(ele) {
+            var $ele = $(ele);
+            $ele.on('keyup', function(event) {
+                // Don't bother showing "required field" error when
+                // the user tabs into a new field; this is distracting
+                // and unnecessary
+                if(event.keyCode === 9) {
+                    return;
+                }
+                var error = validateCourseItemEncoding($ele.val());
+                setNewCourseFieldInErr($ele.parent('li'), error);
+                validateTotalCourseItemsLength();
+            });
+        }
+    );
+    var $name = $('.new-course-name');
+    $name.on('keyup', function() {
+        var error = validateRequiredField($name.val());
+        setNewCourseFieldInErr($name.parent('li'), error);
+        validateTotalCourseItemsLength();
+    });
 }
+
+function validateRequiredField(msg) {
+    return msg.length === 0 ? gettext('Required field.') : '';
+}
+
+function setNewCourseFieldInErr(el, msg) {
+    if(msg) {
+        el.addClass('error');
+        el.children('span.tip-error').addClass('is-showing').removeClass('is-hiding').text(msg);
+        $('.new-course-save').addClass('is-disabled');
+    }
+    else {
+        el.removeClass('error');
+        el.children('span.tip-error').addClass('is-hiding').removeClass('is-showing');
+        // One "error" div is always present, but hidden or shown
+        if($('.error').length === 1) {
+            $('.new-course-save').removeClass('is-disabled');
+        }
+    }
+};
 
 function saveNewCourse(e) {
     e.preventDefault();
 
-    var $newCourse = $(this).closest('.new-course');
-    var template = $(this).find('.new-course-save').data('template');
-    var org = $newCourse.find('.new-course-org').val();
-    var number = $newCourse.find('.new-course-number').val();
-    var display_name = $newCourse.find('.new-course-name').val();
+    // One final check for empty values
+    var errors = _.reduce(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(acc, ele) {
+            var $ele = $(ele);
+            var error = validateRequiredField($ele.val());
+            setNewCourseFieldInErr($ele.parent('li'), error);
+            return error ? true : acc;
+        },
+        false
+    );
 
-    if (org == '' || number == '' || display_name == '') {
-        alert('You must specify all fields in order to create a new course.');
+    if(errors) {
         return;
     }
+
+    var $newCourseForm = $(this).closest('#create-course-form');
+    var display_name = $newCourseForm.find('.new-course-name').val();
+    var org = $newCourseForm.find('.new-course-org').val();
+    var number = $newCourseForm.find('.new-course-number').val();
+    var run = $newCourseForm.find('.new-course-run').val();
 
     analytics.track('Created a Course', {
         'org': org,
         'number': number,
-        'display_name': display_name
+        'display_name': display_name,
+        'run': run
     });
 
     $.post('/create_new_course', {
-        'template': template,
-        'org': org,
-        'number': number,
-        'display_name': display_name
-    },
-
-    function(data) {
-        if (data.id != undefined) {
-            window.location = '/' + data.id.replace(/.*:\/\//, '');
-        } else if (data.ErrMsg != undefined) {
-            alert(data.ErrMsg);
+            'org': org,
+            'number': number,
+            'display_name': display_name,
+            'run': run
+        },
+        function(data) {
+            if (data.id !== undefined) {
+                window.location = '/' + data.id.replace(/.*:\/\//, '');
+            } else if (data.ErrMsg !== undefined) {
+                $('.wrap-error').addClass('is-shown');
+                $('#course_creation_error').html('<p>' + data.ErrMsg + '</p>');
+                $('.new-course-save').addClass('is-disabled');
+            }
         }
-    });
+    );
 }
 
 function cancelNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').show();
-    $(this).parents('section.new-course').remove();
+    $('.new-course-button').removeClass('is-disabled');
+    $('.wrapper-create-course').removeClass('is-shown');
+    // Clear out existing fields and errors
+    _.each(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(field) {
+            $(field).val('');
+        }
+    );
+    $('#course_creation_error').html('');
+    $('.wrap-error').removeClass('is-shown');
+    $('.new-course-save').off('click');
 }
 
 function addNewSubsection(e) {
@@ -644,7 +771,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('template', $(this).data('template'));
+    $saveButton.data('category', $(this).data('category'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -657,7 +784,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var template = $(this).find('.new-subsection-name-save').data('template');
+    var category = $(this).find('.new-subsection-name-save').data('category');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -666,9 +793,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name
     },
 
@@ -699,21 +826,21 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    var input_date = $('.edit-subsection-publish-settings .start-date').val();
-    var input_time = $('.edit-subsection-publish-settings .start-time').val();
-
-    var start = getEdxTimeFromDateTimeVals(input_date, input_time);
+    var datetime = getDatetime(
+        $('.edit-subsection-publish-settings .start-date'),
+        $('.edit-subsection-publish-settings .start-time')
+    );
 
     var id = $modal.attr('data-id');
 
     analytics.track('Edited Section Release Date', {
         'course': course_location_analytics,
         'id': id,
-        'start': start
+        'start': datetime
     });
 
     var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;",
+        title: gettext("Saving") + "&hellip;"
     });
     saving.show();
     // call into server to commit the new order
@@ -725,23 +852,30 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({
             'id': id,
             'metadata': {
-                'start': start
+                'start': datetime
             }
         })
     }).success(function() {
+        var pad2 = function(number) {
+            // pad a number to two places: useful for formatting months, days, hours, etc
+            // when displaying a date/time
+            return (number < 10 ? '0' : '') + number;
+        };
+
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-        var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
-        var willReleaseAt = interpolate(format, {
-            'date': input_date,
-            'time': input_time
-        },
-        true);
-        $thisSection.find('.section-published-date').html(
-            '<span class="published-status">' + willReleaseAt + '</span>' +
-            '<a href="#" class="edit-button" ' +
-            '" data-date="' + input_date +
-            '" data-time="' + input_time +
-            '" data-id="' + id + '">' + gettext('Edit') + '</a>');
+        var html = _.template(
+            '<span class="published-status">' +
+                '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
+            '</span>' +
+            '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-id="{id}">' +
+                gettext("Edit") +
+            '</a>',
+            {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
+             hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
+             id: id},
+            {interpolate: /\{(.+?)\}/g});
+        $thisSection.find('.section-published-date').html(html);
         hideModal();
         saving.hide();
     });

@@ -71,8 +71,13 @@ body.index {
         color: $white;
       }
 
+      .wrapper-text-welcome, .logo {
+        display: inline-block;
+      }
+
       .logo {
         font-weight: 600;
+        margin-left: ($baseline/2);
       }
 
       .tagline {

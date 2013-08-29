@@ -2,9 +2,9 @@
   <chapter url_name="Overview">
     <videosequence url_name="Toy_Videos">
       <html url_name="toylab"/>
-      <video url_name="Video_Resources" youtube_id_1_0="&quot;1bK-WdDi6Qw&quot;"/>
+      <video url_name="Video_Resources" youtube_id_1_0="1bK-WdDi6Qw"/>
     </videosequence>
-    <video url_name="Welcome" youtube_id_1_0="&quot;p2Q6BrNhdh8&quot;"/>
+    <video url_name="Welcome" youtube_id_1_0="p2Q6BrNhdh8"/>
   </chapter>
   <chapter url_name="Ch2">
      <html url_name="test_html">

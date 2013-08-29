@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
@@ -6,14 +7,14 @@
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">Activation Invalid</h1>
+    <h1 class="invalid">${_("Activation Invalid")}</h1>
     <hr class="horizontal-divider">
 
-    <p>Something went wrong. Check to make sure the URL you went to was
-      correct -- e-mail programs will sometimes split it into two
-      lines. If you still have issues, e-mail us to let us know what happened
-      at <a href="mailto:${settings.BUGS_EMAIL}">${settings.BUGS_EMAIL}</a>.</p>
+    <p>${_('Something went wrong. Check to make sure the URL you went to was '
+           'correct -- e-mail programs will sometimes split it into two '
+           'lines. If you still have issues, e-mail us to let us know what happened '
+           'at {email}.').format(email='<a href="mailto:{email}">{email}</a>'.format(email=settings.BUGS_EMAIL))}</p>
 
-    <p>Or you can go back to the <a href="/">home page</a>.</p>
+    <p>${_('Or you can go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
   </section>
 </section>

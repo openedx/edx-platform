@@ -3,6 +3,9 @@ import json
 import os
 import tarfile
 import shutil
+import cgi
+import re
+from functools import partial
 from tempfile import mkdtemp
 from path import path
 
@@ -13,7 +16,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
@@ -27,15 +30,13 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, SerializationError
 
-from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
 
-__all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
-
+__all__ = ['asset_index', 'upload_asset']
 
 def assets_to_json_dict(assets):
     """
@@ -58,13 +59,14 @@ def assets_to_json_dict(assets):
             obj["thumbnail"] = thumbnail
         id_info = asset.get("_id")
         if id_info:
-            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}".format(
-                org=id_info.get("org", ""),
-                course=id_info.get("course", ""),
-                revision=id_info.get("revision", ""),
-                tag=id_info.get("tag", ""),
-                category=id_info.get("category", ""),
-                name=id_info.get("name", ""),
+            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}" \
+                .format(
+                    org=id_info.get("org", ""),
+                    course=id_info.get("course", ""),
+                    revision=id_info.get("revision", ""),
+                    tag=id_info.get("tag", ""),
+                    category=id_info.get("category", ""),
+                    name=id_info.get("name", ""),
             )
         ret.append(obj)
     return ret
@@ -106,6 +108,7 @@ def asset_index(request, org, course, name):
 
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        display_info['portable_url'] = StaticContent.get_static_path_from_location(asset_location)
 
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
@@ -131,14 +134,14 @@ def asset_index(request, org, course, name):
 @login_required
 def upload_asset(request, org, course, coursename):
     '''
-    This method allows for POST uploading of files into the course asset library, which will
-    be supported by GridFS in MongoDB.
+    This method allows for POST uploading of files into the course asset
+    library, which will be supported by GridFS in MongoDB.
     '''
     # construct a location from the passed in path
     location = get_location_and_verify_access(request, org, course, coursename)
 
-    # Does the course actually exist?!? Get anything from it to prove its existance
-
+    # Does the course actually exist?!? Get anything from it to prove its
+    # existence
     try:
         modulestore().get_item(location)
     except:
@@ -149,9 +152,10 @@ def upload_asset(request, org, course, coursename):
     if 'file' not in request.FILES:
         return HttpResponseBadRequest()
 
-    # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
-    # nomenclature since we're using a FileSystem paradigm here. We're just imposing
-    # the Location string formatting expectations to keep things a bit more consistent
+    # compute a 'filename' which is similar to the location formatting, we're
+    # using the 'filename' nomenclature since we're using a FileSystem paradigm
+    # here. We're just imposing the Location string formatting expectations to
+    # keep things a bit more consistent
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
@@ -159,20 +163,25 @@ def upload_asset(request, org, course, coursename):
     content_loc = StaticContent.compute_location(org, course, filename)
 
     chunked = upload_file.multiple_chunks()
+    sc_partial = partial(StaticContent, content_loc, filename, mime_type)
     if chunked:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.chunks())
+        content = sc_partial(upload_file.chunks())
+        temp_filepath = upload_file.temporary_file_path()
     else:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.read())
+        content = sc_partial(upload_file.read())
+        tempfile_path = None
 
     thumbnail_content = None
     thumbnail_location = None
 
     # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content,
-                                                                                tempfile_path=None if not chunked else
-                                                                                upload_file.temporary_file_path())
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
+            content,
+            tempfile_path=tempfile_path
+    )
 
-    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    # delete cached thumbnail even if one couldn't be created this time (else
+    # the old thumbnail will continue to show)
     del_cached_content(thumbnail_location)
     # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
@@ -185,15 +194,17 @@ def upload_asset(request, org, course, coursename):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
 
-    response_payload = {'displayname': content.name,
-                        'uploadDate': get_default_time_display(readback.last_modified_at),
-                        'url': StaticContent.get_url_path_from_location(content.location),
-                        'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
-                        'msg': 'Upload completed'
-                        }
+    response_payload = {
+            'displayname': content.name,
+            'uploadDate': get_default_time_display(readback.last_modified_at),
+            'url': StaticContent.get_url_path_from_location(content.location),
+            'portable_url': StaticContent.get_static_path_from_location(content.location),
+            'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location)
+                if thumbnail_content is not None else None,
+            'msg': 'Upload completed'
+    }
 
     response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
 
@@ -201,8 +212,8 @@ def upload_asset(request, org, course, coursename):
 @login_required
 def remove_asset(request, org, course, name):
     '''
-    This method will perform a 'soft-delete' of an asset, which is basically to copy the asset from
-    the main GridFS collection and into a Trashcan
+    This method will perform a 'soft-delete' of an asset, which is basically to
+    copy the asset from the main GridFS collection and into a Trashcan
     '''
     get_location_and_verify_access(request, org, course, name)
 
@@ -248,126 +259,3 @@ def remove_asset(request, org, course, name):
     return HttpResponse()
 
 
-@ensure_csrf_cookie
-@login_required
-def import_course(request, org, course, name):
-    """
-    This method will handle a POST request to upload and import a .tar.gz file into a specified course
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'POST':
-        filename = request.FILES['course-data'].name
-
-        if not filename.endswith('.tar.gz'):
-            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
-
-        data_root = path(settings.GITHUB_REPO_ROOT)
-
-        course_subdir = "{0}-{1}-{2}".format(org, course, name)
-        course_dir = data_root / course_subdir
-        if not course_dir.isdir():
-            os.mkdir(course_dir)
-
-        temp_filepath = course_dir / filename
-
-        logging.debug('importing course to {0}'.format(temp_filepath))
-
-        # stream out the uploaded files in chunks to disk
-        temp_file = open(temp_filepath, 'wb+')
-        for chunk in request.FILES['course-data'].chunks():
-            temp_file.write(chunk)
-        temp_file.close()
-
-        tar_file = tarfile.open(temp_filepath)
-        tar_file.extractall(course_dir + '/')
-
-        # find the 'course.xml' file
-
-        for dirpath, _dirnames, filenames in os.walk(course_dir):
-            for filename in filenames:
-                if filename == 'course.xml':
-                    break
-            if filename == 'course.xml':
-                break
-
-        if filename != 'course.xml':
-            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
-
-        logging.debug('found course.xml at {0}'.format(dirpath))
-
-        if dirpath != course_dir:
-            for fname in os.listdir(dirpath):
-                shutil.move(dirpath / fname, course_dir)
-
-        _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                      [course_subdir], load_error_modules=False,
-                                                      static_content_store=contentstore(),
-                                                      target_location_namespace=location,
-                                                      draft_store=modulestore())
-
-        # we can blow this away when we're done importing.
-        shutil.rmtree(course_dir)
-
-        logging.debug('new course at {0}'.format(course_items[0].location))
-
-        create_all_course_groups(request.user, course_items[0].location)
-
-        return HttpResponse(json.dumps({'Status': 'OK'}))
-    else:
-        course_module = modulestore().get_item(location)
-
-        return render_to_response('import.html', {
-            'context_course': course_module,
-            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
-        })
-
-
-@ensure_csrf_cookie
-@login_required
-def generate_export_course(request, org, course, name):
-    """
-    This method will serialize out a course to a .tar.gz file which contains a XML-based representation of
-    the course
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    loc = Location(location)
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
-
-    root_dir = path(mkdtemp())
-
-    # export out to a tempdir
-    logging.debug('root = {0}'.format(root_dir))
-
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-
-    logging.debug('tar file being generated at {0}'.format(export_file.name))
-    tar_file = tarfile.open(name=export_file.name, mode='w:gz')
-    tar_file.add(root_dir / name, arcname=name)
-    tar_file.close()
-
-    # remove temp dir
-    shutil.rmtree(root_dir / name)
-
-    wrapper = FileWrapper(export_file)
-    response = HttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
-    response['Content-Length'] = os.path.getsize(export_file.name)
-    return response
-
-
-@ensure_csrf_cookie
-@login_required
-def export_course(request, org, course, name):
-    """
-    This method serves up the 'Export Course' page
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    return render_to_response('export.html', {
-        'context_course': course_module,
-        'successful_import_redirect_url': ''
-    })

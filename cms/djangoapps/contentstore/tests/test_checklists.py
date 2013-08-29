@@ -1,5 +1,5 @@
 """ Unit tests for checklist methods in views.py. """
-from contentstore.utils import get_modulestore, get_url_reverse
+from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
@@ -27,6 +27,7 @@ class ChecklistTestCase(CourseTestCase):
         """
         self.assertEqual(persisted['short_description'], request['short_description'])
         compare_urls = (persisted.get('action_urls_expanded') == request.get('action_urls_expanded'))
+        pers, req = None, None
         for pers, req in zip(persisted['items'], request['items']):
             self.assertEqual(pers['short_description'], req['short_description'])
         self.assertEqual(pers['long_description'], req['long_description'])
@@ -38,7 +39,11 @@ class ChecklistTestCase(CourseTestCase):
 
     def test_get_checklists(self):
         """ Tests the get checklists method. """
-        checklists_url = get_url_reverse('Checklists', self.course)
+        checklists_url = reverse("checklists", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': self.course.location.name,
+        })
         response = self.client.get(checklists_url)
         self.assertContains(response, "Getting Started With Studio")
         payload = response.content
@@ -46,6 +51,8 @@ class ChecklistTestCase(CourseTestCase):
         # Now delete the checklists from the course and verify they get repopulated (for courses
         # created before checklists were introduced).
         self.course.checklists = None
+        # Save the changed `checklists` to the underlying KeyValueStore before updating the modulestore
+        self.course.save()
         modulestore = get_modulestore(self.course.location)
         modulestore.update_metadata(self.course.location, own_metadata(self.course))
         self.assertEqual(self.get_persisted_checklists(), None)

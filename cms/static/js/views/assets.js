@@ -9,7 +9,7 @@ function removeAsset(e){
     e.preventDefault();
 
     var that = this;
-    var msg = new CMS.Views.Prompt.Confirmation({
+    var msg = new CMS.Views.Prompt.Warning({
         title: gettext("Delete File Confirmation"),
         message: gettext("Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)"),
         actions: {
@@ -96,7 +96,7 @@ function displayFinishedUpload(xhr) {
     }
 
     var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .embeddable-xml-input').val(xhr.getResponseHeader('asset_url'));
+    $('.upload-modal .embeddable-xml-input').val(resp.portable_url);
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);

@@ -2,6 +2,7 @@
 from contentstore.tests.test_course_settings import CourseTestCase
 from django.core.urlresolvers import reverse
 import json
+from xmodule.modulestore.django import modulestore
 
 
 class CourseUpdateTest(CourseTestCase):
@@ -36,8 +37,11 @@ class CourseUpdateTest(CourseTestCase):
                                            'provided_id': payload['id']})
         content += '<div>div <p>p<br/></p></div>'
         payload['content'] = content
+        # POST requests were coming in w/ these header values causing an error; so, repro error here
         resp = self.client.post(first_update_url, json.dumps(payload),
-                                "application/json")
+                                "application/json",
+                                HTTP_X_HTTP_METHOD_OVERRIDE="PUT",
+                                REQUEST_METHOD="POST")
 
         self.assertHTMLEqual(content, json.loads(resp.content)['content'],
                              "iframe w/ div")
@@ -142,3 +146,36 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.delete(url)
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == before_delete - 1)
+
+    def test_no_ol_course_update(self):
+        '''Test trying to add to a saved course_update which is not an ol.'''
+        # get the updates and set to something wrong
+        location = self.course.location.replace(category='course_info', name='updates')
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
+        course_updates.data = 'bad news'
+        modulestore('direct').update_item(location, course_updates.data)
+
+        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
+        content = init_content + '</iframe>'
+        payload = {'content': content,
+                   'date': 'January 8, 2013'}
+        url = reverse('course_info_json',
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
+                              'provided_id': ''})
+
+        resp = self.client.post(url, json.dumps(payload), "application/json")
+
+        payload = json.loads(resp.content)
+
+        self.assertHTMLEqual(payload['content'], content)
+
+        # now confirm that the bad news and the iframe make up 2 updates
+        url = reverse('course_info_json',
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
+                              'provided_id': ''})
+        resp = self.client.get(url)
+        payload = json.loads(resp.content)
+        self.assertTrue(len(payload) == 2)

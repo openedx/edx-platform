@@ -37,23 +37,27 @@ class CorrectMap(object):
         return self.cmap.__iter__()
 
     # See the documentation for 'set_dict' for the use of kwargs
-    def set(self,
-            answer_id=None,
-            correctness=None,
-            npoints=None,
-            msg='',
-            hint='',
-            hintmode=None,
-            queuestate=None, **kwargs):
+    def set(
+        self,
+        answer_id=None,
+        correctness=None,
+        npoints=None,
+        msg='',
+        hint='',
+        hintmode=None,
+        queuestate=None,
+        **kwargs
+    ):
 
         if answer_id is not None:
-            self.cmap[str(answer_id)] = {'correctness': correctness,
-                                    'npoints': npoints,
-                                    'msg': msg,
-                                    'hint': hint,
-                                    'hintmode': hintmode,
-                                    'queuestate': queuestate,
-                                    }
+            self.cmap[str(answer_id)] = {
+                'correctness': correctness,
+                'npoints': npoints,
+                'msg': msg,
+                'hint': hint,
+                'hintmode': hintmode,
+                'queuestate': queuestate,
+            }
 
     def __repr__(self):
         return repr(self.cmap)

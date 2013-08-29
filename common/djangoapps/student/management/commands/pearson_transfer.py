@@ -20,7 +20,7 @@ class Command(BaseCommand):
     files and then uploads over SFTP to Pearson and stuffs the entry in an
     S3 bucket for archive purposes.
 
-    Usage: django-admin.py pearson-transfer --mode [import|export|both]
+    Usage: ./manage.py pearson-transfer --mode [import|export|both]
     """
 
     option_list = BaseCommand.option_list + (

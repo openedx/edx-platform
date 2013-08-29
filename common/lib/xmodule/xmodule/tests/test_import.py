@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import unittest
-from fs.memoryfs import MemoryFS
 
+from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+
+from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.fields import Date
+from xmodule.tests import DATA_DIR
 
-from .test_export import DATA_DIR
-import datetime
-from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -156,11 +157,7 @@ class ImportTestCase(BaseCourseTestCase):
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(2, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC())
-        )
+        self.assertEqual(1, len(child._inherited_metadata))
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -218,10 +215,8 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, None)
         # pylint: disable=W0212
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(1, len(child._inherited_metadata))
-        # why do these tests look in the internal structure v just calling child.start?
         self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            child.lms.start,
             datetime.datetime.now(UTC())
         )
 
@@ -249,12 +244,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
         self.assertEqual(child.lms.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
-        self.assertEqual(1, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC()))
-        # Test inheritable metadata. This has the course inheritable value for due.
-        self.assertEqual(2, len(child._inheritable_metadata))
+        self.assertEqual(1, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])
 
     def test_is_pointer_tag(self):
@@ -456,7 +446,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+        self.assertIn(render_string_from_sample_gst_xml, gst_sample.data)
 
     def test_word_cloud_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])

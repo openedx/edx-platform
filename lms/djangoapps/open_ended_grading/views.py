@@ -178,6 +178,7 @@ def student_problem_list(request, course_id):
     error_text = ""
     problem_list = []
     base_course_url = reverse('courses')
+    list_to_remove = []
 
     try:
         #Get list of all open ended problems that the grading server knows about
@@ -191,7 +192,6 @@ def student_problem_list(request, course_id):
             problem_list = problem_list_dict['problem_list']
 
         #A list of problems to remove (problems that can't be found in the course)
-        list_to_remove = []
         for i in xrange(0, len(problem_list)):
             try:
                 #Try to load each problem in the courseware to get links to them

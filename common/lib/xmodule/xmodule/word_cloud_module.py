@@ -10,11 +10,11 @@ import json
 import logging
 
 from pkg_resources import resource_string
-from xmodule.raw_module import RawDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, Dict, Boolean, List, Integer
+from xblock.core import Scope, Dict, Boolean, List, Integer, String
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +31,12 @@ def pretty_bool(value):
 
 class WordCloudFields(object):
     """XFields for word cloud."""
+    display_name = String(
+        display_name="Display Name",
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="Word cloud"
+    )
     num_inputs = Integer(
         display_name="Inputs",
         help="Number of text boxes available for students to input words/sentences.",
@@ -234,7 +240,7 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(MetadataOnlyEditingDescriptor, RawDescriptor, WordCloudFields):
+class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
