@@ -17,11 +17,6 @@
   padding: ($baseline*0.75) $baseline;
 }
 
-// MISC: custom link
-.custom-link {
-  @extend .ui-fake-link;
-
-}
 
 // MISC: expandable UI
 .is-expandable {
@@ -30,11 +25,48 @@
 
   }
 
-  .expandable-more {
-    display: block;
+  .expandable-icon {
+    @include transition(all 0.25s ease-in-out 0s);
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: ($baseline/4);
+  }
 
-    &.is-hidden {
+  .expandable-area {
+    @include transition(opacity 0.25s ease-in-out 0s);
+  }
+
+  // STATE: active
+  &.is-ready {
+
+    .title-expand {
+      @extend .ui-fake-link;
+      color: $m-blue-d2;
+      border-bottom: 1px dotted transparent;
+
+      &:hover {
+        color: $m-blue-d2;
+        border-bottom: 1px dotted $m-blue-d2;
+      }
+    }
+
+    .expandable-area {
       display: none;
+      opacity: 0.0;
+    }
+  }
+
+  // STATE: expanded
+  &.is-expanded {
+
+    .expandable-icon {
+      @include transform(rotate(-180deg));
+      @include transform-origin(50% 50%);
+    }
+
+    .expandable-area {
+      display: block;
+      opacity: 1.0;
     }
   }
 }
@@ -408,16 +440,6 @@
           // help - faq
           .list-faq {
             margin-bottom: $baseline;
-
-            .faq-question {
-              @extend .hd-lv3;
-              border-bottom: 1px solid $m-gray-l4;
-              padding-bottom: ($baseline/4);
-            }
-
-            .faq-answer {
-              margin-bottom: ($baseline*1.25);
-            }
           }
         }
       }
@@ -765,6 +787,7 @@
 
       .label, label {
         margin-bottom: 0;
+        padding: 6px 0;
       }
 
       input {
@@ -790,11 +813,25 @@
 
       // specific fields
       #contribution-other-amt {
-        position: relative;
-        top: -($baseline/4);
         width: ($baseline*3);
         padding: ($baseline/4) ($baseline/2);
       }
+    }
+  }
+
+  // ====================
+
+  // help - faq
+  .list-faq {
+
+    .faq-question {
+      @extend .hd-lv3;
+      border-bottom: 1px solid $m-gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+
+    .faq-answer {
+      margin-bottom: ($baseline*1.25);
     }
   }
 
@@ -963,6 +1000,18 @@
       .action-intro {
 
       }
+
+      // extra register options/info
+      .title-expand {
+        @extend .t-copy-sub1;
+        font-weight: 500 !important;
+        display: inline-block;
+        margin: 0;
+      }
+
+      .expandable-area {
+        margin: $baseline 0;
+      }
     }
 
     .help-register {
@@ -982,10 +1031,6 @@
     // progress indicator
     .progress-sts-value {
       width: 0%;
-    }
-
-   .wrapper-content-supplementary .content-supplementary .help-item {
-      width: flex-grid(3,12);
     }
 
     // contribution selection

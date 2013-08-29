@@ -9,10 +9,10 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-  $('.is-expandable .expandable-more').addClass('is-hidden');
+  $('.is-expandable').addClass('is-ready');
   $('.is-expandable .title-expand').click(function(e) {
       e.preventDefault();
-      $(this).parent().find('.expandable-more').toggleClass('is-hidden');
+      $(this).parent().toggleClass('is-expanded');
   });
 });
 </script>
@@ -36,13 +36,13 @@ $(document).ready(function() {
     </header>
 
     %if error:
-    <div class="error">
-        ${error}
+    <div class="wrapper-msg wrapper-msg-error">
+      <div class=" msg msg-error">
+      <h3 class="title">Sorry, there was an error with your registration</h3>
+      <div class="copy">${error}</div>
+      </div>
     </div>
     %endif
-    <h3 class="title">Select your track:</h3>
-
-    <form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
 
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
@@ -87,9 +87,9 @@ $(document).ready(function() {
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand">Why do I have to pay? What if I don't meet all the requirements?</h5>
+                <h5 class="title title-expand">Why do I have to pay? What if I don't meet all the requirements? <i class="icon-caret-down expandable-icon"></i></h5>
 
-                <div class="copy expandable-more">
+                <div class="copy expandable-area">
                   <dl class="list-faq">
                     <dt class="faq-question">Why do I have to pay?</dt>
                     <dd class="faq-answer">
@@ -165,13 +165,6 @@ $(document).ready(function() {
             <h3 class="title">What is an ID Verified Certificate?</h3>
             <div class="copy">
               <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.</p>
-            </div>
-          </li>
-
-          <li class="help-item">
-            <h3 class="title">Verified Certificate of Achievement Requirememts</h3>
-            <div class="copy">
-              <p>To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a></p>
             </div>
           </li>
 
