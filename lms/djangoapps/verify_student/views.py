@@ -78,6 +78,7 @@ def create_order(request):
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     verified_mode = CourseMode.modes_for_course_dict(course_id).get('verified', None)
+
     # make sure this course has a verified mode
     if not verified_mode:
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))

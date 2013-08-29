@@ -53,7 +53,9 @@
     .done(function(data) {
       $("#pay_form").submit();
     })
-    .fail(function(jqXhr,text_status, error_thrown) { alert(jqXhr.responseText); });
+    .fail(function(jqXhr,text_status, error_thrown) {
+      alert(jqXhr.responseText);
+    });
   }
 
   function initSnapshotHandler(names) {
@@ -136,16 +138,16 @@
   $(document).ready(function() {
     $(".carousel-nav").addClass('sr');
     $("#pay_button").click(submitToPaymentProcessing);
-    $("#confirm_pics_good").click(function() {
-      if (this.checked) {
-        $("#pay_button_frame").removeClass('disabled');
-      }
-      else {
-        $("#pay_button_frame").addClass('disabled');
-      }
-    });
-
-    $("#pay_button_frame").addClass('disabled');
+    // $("#confirm_pics_good").click(function() {
+    //   if (this.checked) {
+    //     $("#pay_button_frame").removeClass('disabled');
+    //   }
+    //   else {
+    //     $("#pay_button_frame").addClass('disabled');
+    //   }
+    // });
+    //
+    // $("#pay_button_frame").addClass('disabled');
 
     initVideoCapture();
     initSnapshotHandler(["photo_id", "face"]);
@@ -478,8 +480,8 @@
                     <form id="pay_form" method="post" action="${purchase_endpoint}">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id | h}" />
-                      <button type="submit" class="action-primary" id="pay_button">Go to Step 4: Secure Payment</button>
-                      <!-- <input class="action-primary" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment"> -->
+                      <!-- <button class="action-primary" type="submit" id="pay_button">Go to Step 4: Secure Payment</button> -->
+                      <input class="action-primary" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
                     </form>
                   </li>
                 </ol>
