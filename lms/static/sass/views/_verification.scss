@@ -179,11 +179,7 @@
 
   // ====================
 
-  //  elements : help
-  .help {
-
-  }
-
+  // UI: help
   .help-item {
 
     .title {
@@ -196,8 +192,34 @@
     }
   }
 
-  .list-help {
+  // ====================
 
+  // UI: error
+  .wrapper-msg-error {
+    width: flex-grid(12,12);
+    border-radius: ($baseline/5);
+    margin-bottom: $baseline;
+    padding: $baseline ($baseline*1.25);
+    box-shadow: 0 2px 1px 0 tint($red,90%);
+    background: $red;
+
+    .msg-error {
+      @include clearfix();
+
+      .title {
+        @extend .t-title5;
+        @extend .t-weight4;
+        margin-bottom: ($baseline/2);
+        border-bottom: ($baseline/10) solid tint($red,35%);
+        padding-bottom: ($baseline/2);
+        color: tint($red,90%);
+      }
+
+      .copy {
+        @extend .t-copy-base;
+        color: tint($red,65%);
+      }
+    }
   }
 
   // ====================
