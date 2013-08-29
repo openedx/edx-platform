@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, tzinfo
 from tempfile import mkdtemp
 import unittest
 import shutil
+from textwrap import dedent
+import mock
 
 import pytz
 from fs.osfs import OSFS
@@ -35,12 +37,23 @@ def strip_filenames(descriptor):
 
 
 class RoundTripTestCase(unittest.TestCase):
-    ''' Check that our test courses roundtrip properly.
-        Same course imported , than exported, then imported again.
-        And we compare original import with second import (after export).
-        Thus we make sure that export and import work properly.
-    '''
-    def check_export_roundtrip(self, data_dir, course_dir):
+    """
+    Check that our test courses roundtrip properly.
+    Same course imported , than exported, then imported again.
+    And we compare original import with second import (after export).
+    Thus we make sure that export and import work properly.
+    """
+
+    @mock.patch('xmodule.course_module.requests.get')
+    def check_export_roundtrip(self, data_dir, course_dir, mock_get):
+
+        # Patch network calls to retrieve the textbook TOC
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         root_dir = path(self.temp_dir)
         print("Copying test course to temp dir {0}".format(root_dir))
 
