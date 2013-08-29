@@ -14,7 +14,7 @@ import textwrap
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
-    "display_name", "max_attempts", "graded", "accept_file_upload",
+    "display_name", "video_id", "max_attempts", "graded", "accept_file_upload",
     "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
     "max_to_calibrate", "peer_grader_count", "required_peer_grading",
 ]
@@ -176,6 +176,12 @@ class CombinedOpenEndedFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         default="Open Response Assessment",
+        scope=Scope.settings
+    )
+    video_id = String(
+        display_name = "Video ID",
+        help="This is used for video response",
+        default="",
         scope=Scope.settings
     )
     current_task_number = Integer(
@@ -377,7 +383,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
             'scss': 
             [
                 resource_string(__name__, 'css/combinedopenended/display.scss'),
-                resource_string(__name__, 'css/combinedopenended/clip_video.scss')
+                resource_string(__name__, 'css/combinedopenended/clip_video.scss'),
             ]
           }
 

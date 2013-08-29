@@ -520,6 +520,17 @@ class @VideoClipper
     $("input[name='bl-start']").val val
     return val
 
+if $('#combined-open-ended').length > 0
+  textarea = $('#combined-open-ended').find('textarea')
+  videoId = $('#combined-open-ended').data('videoId')
+  textarea.attr('id','video-clipper')
+
+  new VideoClipper
+    textareaId: "video-clipper"
+    videoType: "YT"
+    videoId: videoId
+
+
 VideoClipper.generate()
 if window.onVideoClipperReady?
   VideoClipper.callback = true
