@@ -1,0 +1,43 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="js_extra">
+<script type="text/javascript">
+var submitToPaymentProcessing = function(event) {
+    event.preventDefault();
+    var xhr = $.post(
+      "create_order",
+      {
+        "course_id" : "${course_id}",
+      },
+      function(data) {
+        for (prop in data) {
+          $('<input>').attr({
+              type: 'hidden',
+              name: prop,
+              value: data[prop]
+          }).appendTo('#pay_form');
+        }
+      }
+    )
+    .done(function(data) {
+      $("#pay_form").submit();
+    })
+    .fail(function(jqXhr,text_status, error_thrown) { alert(jqXhr.responseText); });
+}
+$(document).ready(function() {
+    $("#pay_button").click(submitToPaymentProcessing);
+});
+</script>
+</%block>
+<%block name="content">
+  <p>You have already been verified. Hooray!</p>
+  <p>You have decided to pay $${chosen_price}</p>
+                    <form id="pay_form" method="post" action="${purchase_endpoint}">
+                      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                      <input type="hidden" name="course_id" value="${course_id | h}" />
+                      <button type="submit" class="action-primary" id="pay_button">Go to Secure Payment</button>
+                    </form>
+
+</%block>

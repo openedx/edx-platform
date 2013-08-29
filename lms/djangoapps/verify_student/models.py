@@ -175,7 +175,7 @@ class PhotoVerification(StatusModel):
         return cls.objects.filter(
             user=user,
             status="approved",
-            created_at__lte=earliest_allowed_date
+            created_at__gte=earliest_allowed_date
         ).exists()
 
     @classmethod
@@ -191,7 +191,7 @@ class PhotoVerification(StatusModel):
         return cls.objects.filter(
             user=user,
             status__in=valid_statuses,
-            created_at__lte=earliest_allowed_date
+            created_at__gte=earliest_allowed_date
         ).exists()
 
     @classmethod

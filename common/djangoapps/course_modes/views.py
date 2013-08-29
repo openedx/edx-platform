@@ -16,6 +16,7 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from student.views import course_from_id
+from verify_student.models import SoftwareSecurePhotoVerification
 
 class ChooseModeView(View):
 
@@ -81,6 +82,13 @@ class ChooseModeView(View):
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_id] = amount_value
             request.session["donation_for_course"] = donation_for_course
+            if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
+                return redirect(
+                    "{}?{}".format(
+                        reverse('verify_student_verified'),
+                        urlencode(dict(course_id=course_id))
+                    )
+                )
 
             return redirect(
                 "{}?{}".format(

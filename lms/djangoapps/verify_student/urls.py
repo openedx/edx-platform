@@ -36,6 +36,12 @@ urlpatterns = patterns(
     ),
 
     url(
+        r'^verified',
+        views.VerifiedView.as_view(),
+        name="verify_student_verified"
+    ),
+
+    url(
         r'^create_order',
         views.create_order,
         name="verify_student_create_order"

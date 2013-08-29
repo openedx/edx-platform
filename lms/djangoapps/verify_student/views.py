@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
+from django.utils.http import urlencode
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -31,10 +32,16 @@ class VerifyView(View):
     def get(self, request):
         """
         """
+        course_id = request.GET['course_id']
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
-            progress_state = "payment"
+            return redirect(
+                "{}?{}".format(
+                    reverse('verify_student_verified'),
+                    urlencode(dict(course_id=course_id))
+                )
+            )
         else:
             # If they haven't completed a verification attempt, we have to
             # restart with a new one. We can't reuse an older one because we
@@ -42,7 +49,6 @@ class VerifyView(View):
             # bookkeeping-wise just to start over.
             progress_state = "start"
 
-        course_id = request.GET['course_id']
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
@@ -65,13 +71,43 @@ class VerifyView(View):
         return render_to_response('verify_student/photo_verification.html', context)
 
 
+class VerifiedView(View):
+    """
+    View that gets shown once the user has already gone through the
+    verification flow
+    """
+    def get(self, request):
+        """
+        Handle the case where we have a get request
+        """
+        course_id = request.GET['course_id']
+        verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        if course_id in request.session.get("donation_for_course", {}):
+            chosen_price = request.session["donation_for_course"][course_id]
+        else:
+            chosen_price = verify_mode.min_price.format("{:g}")
+
+        context = {
+            "course_id": course_id,
+            "course_name": course_from_id(course_id).display_name,
+            "purchase_endpoint": get_purchase_endpoint(),
+            "currency": verify_mode.currency.upper(),
+            "chosen_price": chosen_price,
+        }
+        return render_to_response('verify_student/verified.html', context)
+
+
 def create_order(request):
+    """
+    Submit PhotoVerification and create a new Order for this verified cert
+    """
     attempt = SoftwareSecurePhotoVerification(user=request.user)
-    attempt.status = "pending"
+    attempt.status = "ready"
     attempt.save()
 
     course_id = request.POST['course_id']
-    contribution = request.POST.get("contribution", 0)
+    donation_for_course = request.session.get('donation_for_course', {})
+    contribution = request.POST.get("contribution", donation_for_course.get(course_id, 0))
     try:
         amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
     except decimal.InvalidOperation:
@@ -98,19 +134,19 @@ def create_order(request):
 
 def show_requirements(request):
     """This might just be a plain template without a view."""
-    context = { "course_id" : request.GET.get("course_id") }
+    context = { "course_id": request.GET.get("course_id") }
     return render_to_response("verify_student/show_requirements.html", context)
 
 def face_upload(request):
-    context = { "course_id" : "edX/Certs101/2013_Test" }
+    context = { "course_id": "edX/Certs101/2013_Test" }
     return render_to_response("verify_student/face_upload.html", context)
 
 def photo_id_upload(request):
-    context = { "course_id" : "edX/Certs101/2013_Test" }
+    context = { "course_id": "edX/Certs101/2013_Test" }
     return render_to_response("verify_student/photo_id_upload.html", context)
 
 def final_verification(request):
-    context = { "course_id" : "edX/Certs101/2013_Test" }
+    context = { "course_id": "edX/Certs101/2013_Test" }
     return render_to_response("verify_student/final_verification.html", context)
 
 def show_verification_page(request):
