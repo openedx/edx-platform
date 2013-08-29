@@ -242,3 +242,6 @@ class @OmniPlayer
       @loadVideoByUrl = (options) -> 
         return 0
 
+if window.onOmniPlayerReady?
+  OmniPlayer.ranCallback = true
+  window.onOmniPlayerReady()

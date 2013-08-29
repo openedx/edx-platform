@@ -57,4 +57,30 @@
         </div>
     </div>
 </section>
+<script type='text/javascript'>
+    var onVideoClipperReadyTried = VideoClipper;
+    var onVideoClipperReady = function(){
+        if ($('#combined-open-ended').length > 0) {
+            textarea = $('#combined-open-ended').find('textarea');
+            videoId = $('#combined-open-ended').data('videoId');
+            textarea.attr('id', 'video-clipper');
+            new VideoClipper({
+              textareaId: "video-clipper",
+              videoType: "YT",
+              videoId: videoId
+            });
+        };
+    };
+    if(onVideoClipperReadyTried !== undefined){
+        onVideoClipperReady();
+    };
+
+    var onOmniPlayerReadyTried = OmniPlayer;
+    var onOmniPlayerReady = function(){
+        OmniPlayer.loaded.YT = true;
+    };
+    if(onOmniPlayerReadyTried !== undefined){
+        onOmniPlayerReady();
+    };
+</script>
 
