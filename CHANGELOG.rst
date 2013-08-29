@@ -33,6 +33,9 @@ logic has been consolidated into the model -- you should use new class methods
 to `enroll()`, `unenroll()`, and to check `is_enrolled()`, instead of creating
 CourseEnrollment objects or querying them directly.
 
+LMS: Added bulk email for course feature, with option to optout of individual
+course emails.
+
 Studio: Email will be sent to admin address when a user requests course creator
 privileges for Studio (edge only).
 
