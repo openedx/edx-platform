@@ -39,14 +39,10 @@
         describe('constructor', function () {
             describe('before settings were filled in', function () {
                 it(
-                    'when URL setting is empty error message is shown',
+                    'when URL setting is filled form is not submited',
                     function () {
 
-                    expect(errorMessage).not.toHaveClass('hidden');
-                });
-
-                it('when URL setting is empty iframe is hidden', function () {
-                    expect(frame).toHaveClass('hidden');
+                    expect($.fn.submit).not.toHaveBeenCalled();
                 });
             });
 
@@ -61,17 +57,6 @@
 
                 it('when URL setting is filled form is submited', function () {
                     expect($.fn.submit).toHaveBeenCalled();
-                });
-
-                it(
-                    'when URL setting is filled error message is hidden',
-                    function () {
-
-                    expect(errorMessage).toHaveClass('hidden');
-                });
-
-                it('when URL setting is filled iframe is shown', function () {
-                    expect(frame).not.toHaveClass('hidden');
                 });
             });
         });
