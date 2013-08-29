@@ -4,6 +4,7 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="bodyclass">register verification-process step-photos</%block>
+<%block name="title"><title>${("Register for [Course Name] | Verification")}</title></%block>
 
 <%block name="js_extra">
   <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
@@ -150,237 +151,366 @@
     initSnapshotHandler(["photo_id", "face"]);
 
   });
-
 </script>
 </%block>
 
-
 <%block name="content">
 <div class="container">
-  <header class="page-header">
-    <h2 class="title">You are registering for ${course_name} (ID Verified)</h2>
-  </header>
+  <section class="wrapper">
 
-  <section class="progress">
-    <header class="section-head">
-      <h3 class="sr title">Your Progress</h3>
+    <header class="page-header">
+      <h2 class="title">
+        <span class="wrapper-sts">
+          <span class="sts">You are registering for</span>
+          <span class="sts-course">${course_id} </span>
+        </span>
+        <span class="sts-track">
+          <span class="sts-track-label">Registering as: </span>
+          <span class="sts-track-value">ID Verified</span>
+        </span>
+      </h2>
     </header>
 
-    <!--<span class="progress-status"></span><span class="progress-status-value"></span>-->
-    <ol class="progress-steps">
-      <li class="progress-step done" id="progress-step0"><span class="mini number"></span> Intro</li>
-      <li class="progress-step current" id="progress-step1"><span class="sr">Current Step: </span> <span class="number">1</span> Take Photo</li>
-      <li class="progress-step" id="progress-step2"> <span class="number">2</span> Take ID Photo</li>
-      <li class="progress-step" id="progress-step3"> <span class="number">3</span> Confirm Submission</li>
-      <li class="progress-step" id="progress-step4"> <span class="number">4</span> Make Payment</li>
-      <li class="progress-step" id="progress-step5"><span class="number"><i class="icon-ok"></i></span> Confirmation</li>
-    </ol>
-  </section>
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">Your Progress</h3>
 
-  <section class="wrapper carousel"  data-transition="slide">
-    <div id="wrapper-facephoto" class="block-photo">
-      <h3 class="title">Take Your Photo</h3>
-      <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+        <ol class="progress-steps">
+          <li class="progress-step is-completed" id="progress-step0">
+            <span class="wrapper-step-number"><span class="step-number">0</span></span>
+            <span class="step-name">Intro</span>
+          </li>
 
-      <div class="wrapper-up">
+          <li class="progress-step is-current" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name"><span class="sr">Current Step: </span>Take Photo</span>
+          </li>
 
-        <div id="facecam" class="cam">
-          <div class="wrapper-cam">
-            <video id="face_video" width="500" height="375" autoplay></video><br/>
-            <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
-          </div>
+          <li class="progress-step" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">Take ID Photo</span>
+          </li>
 
-          <div class="controls photo-controls">
-            <ul class="controls-list">
-              <li class="control control-redo" id="face_reset_button">
-                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
-              </li>
-              <li class="control control-do" id="face_capture_button">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
-              </li>
-              <li class="control control-approve" id="face_approve_button">
-                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
-              </li>
-            </ul>
-          </div>
+          <li class="progress-step" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">Review</span>
+          </li>
 
-        </div>
+          <li class="progress-step" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">4</span></span>
+            <span class="step-name">Make Payment</span>
+          </li>
 
-        <div class="help photo-tips facetips">
-          <h4 class="title">Tips on taking a successful photo</h4>
-          <ul>
-            <li>Make sure your face is well-lit</li>
-            <li>Be sure your entire face is inside the frame</li>
-            <li>Can we match the photo you took with the one on your ID?</li>
-            <li>Click the checkmark once you are happy with the photo</li>
-          </ul>
+          <li class="progress-step" id="progress-step5">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name">Confirmation</span>
+          </li>
+        </ol>
 
-
-          <h4 class="title">Common Questions</h4>
-            <dl>
-              <dt>Why do you need my photo?</dt>
-                <dd>We need your photo to confirm that you are you.</dd>
-
-              <dt>What do you do with this picture?</dt>
-                <dd>We only use it to verify your identity.  It is not displayed anywhere.</dd>
-            </dl>
-
-
-        </div>
-      </div>
-
-      <div class="wrapper-down">
-
-        <div class="next-step">
-              <p class="m-btn-primary" id="face_next_button">
-                <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
-              </p>
-              <p class="tip">Once you verify your photo looks good, you can move on to step 2.</p>
-        </div>
-      </div>
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
     </div>
 
-    <div id="wrapper-idphoto" class="block block-photo">
-      <h3 class="title">Take Your Photo</h3>
-      <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+    <div class="wrapper-content-main">
+      <article class="content-main">
 
-      <div class="wrapper-up">
+        <section class="wrapper carousel"  data-transition="slide">
+          <div id="wrapper-facephoto" class="wrapper-view block-photo">
+            <div class="facephoto view">
+              <h3 class="title">Take Your Photo</h3>
+              <div class="instruction">
+                <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+              </div>
 
-        <div id="idcam" class="cam">
+              <div class="wrapper-task">
+                <div id="facecam" class="task cam">
+                  <div class="placeholder-cam">
+                    <video id="face_video" width="500" height="375" autoplay></video><br/>
+                    <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
+                  </div>
 
-          <div class="wrapper-cam">
-            <video id="photo_id_video" width="500" height="375" autoplay></video><br/>
-            <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
-          </div>
+                  <div class="controls photo-controls">
+                    <ul class="list-controls">
+                      <li class="control control-redo" id="face_reset_button">
+                        <a class="action action-redo" href="">
+                          <i class="icon-undo"></i> <span class="sr">Retake</span>
+                        </a>
+                      </li>
 
-          <div class="controls photo-controls">
-            <ul class="controls-list">
-              <li class="control control-redo" id="photo_id_reset_button">
-                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
-              </li>
-              <li class="control control-do" id="photo_id_capture_button">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
-              </li>
-              <li class="control control-approve" id="photo_id_approve_button">
-                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
-              </li>
-            </ul>
-          </div>
-        </div>
+                      <li class="control control-do" id="face_capture_button">
+                        <a class="action action-do" href="">
+                          <i class="icon-camera"></i><span class="sr">Take photo</span>
+                        </a>
+                      </li>
 
-        <div class="photo-tips idtips">
-          <h4 class="title">Tips on taking a successful photo</h4>
-          <ul>
-            <li>Make sure your ID is well-lit</li>
-            <li>Check that there isn't any glare</li>
-            <li>Ensure that you can see your photo and read your name</li>
-            <li>Try to keep your fingers at the edge to avoid covering important information</li>
-          </ul>
+                      <li class="control control-approve" id="face_approve_button">
+                        <a class="action action-approve" href="">
+                          <i class="icon-ok"></i> <span class="sr">Looks good</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
 
-          <h4 class="title">Common Questions</h4>
-            <dl>
-              <dt>Why do you need a photo of my ID?</dt>
-                <dd>We need to match your ID with your photo and name to confirm that you are you.</dd>
+                <div class="wrapper-help">
+                  <div class="help help-task photo-tips facetips">
+                    <h4 class="title">Tips on taking a successful photo</h4>
 
-              <dt>What do you do with this picture?</dt>
-                <dd>We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.</dd>
-            </dl>
+                    <div class="copy">
+                      <ul class="list-help">
+                        <li class="help-item">Make sure your face is well-lit</li>
+                        <li class="help-item">Be sure your entire face is inside the frame</li>
+                        <li class="help-item">Can we match the photo you took with the one on your ID?</li>
+                        <li class="help-item">Click the checkmark once you are happy with the photo</li>
+                      </ul>
+                    </div>
+                  </div>
 
-        </div>
+                  <div class="help help-faq facefaq">
+                    <h4 class="sr title">Common Questions</h4>
 
-      </div>
+                    <div class="copy">
+                      <dl class="list-faq">
+                        <dt class="faq-question">Why do you need my photo?</dt>
+                        <dd class="faq-answer">We need your photo to confirm that you are you.</dd>
 
-      <div class="wrapper-down">
+                        <dt class="faq-question">What do you do with this picture?</dt>
+                        <dd class="faq-answer">We only use it to verify your identity.  It is not displayed anywhere.</dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <div class="next-step">
-              <p class="m-btn-primary" id="photo_id_next_button">
-                <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
-              </p>
-              <p class="tip">Once you verify your ID photo looks good, you can move on to step 3.</p>
-        </div>
-      </div>
+              <nav class="nav-wizard">
+                <span class="help help-inline">Once you verify your photo looks good, you can move on to step 2.</span>
 
-    </div>
+                <ol class="wizard-steps">
+                  <li class="wizard-step">
+                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
+                  </li>
+                </ol>
+              </nav>
 
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
 
-    <div id="wrapper-review" class="block block-photo">
-      <h3 class="title">Verify Your Submission</h3>
-      <p>Make sure we can verify your identity with the photos and information below.</p>
+          <div id="wrapper-idphoto" class="wrapper-view block-photo">
+            <div class="idphoto view">
+              <h3 class="title">Show Us Your ID</h3>
+              <div class="instruction">
+                <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+              </div>
 
-      <div class="review-name">
-        <h3>Check Your Name</h3>
-        <p>Make sure your full name on your edX account, <b>${user_full_name}</b>, matches your ID. We will also use this as the name on your certificate.</p>
-        <p><a href="#">Edit my name</a></p>
-      </div>
+              <div class="wrapper-task">
+                <div id="idcam" class="task cam">
+                  <div class="placeholder-cam">
+                    <video id="photo_id_video" width="500" height="375" autoplay></video><br/>
+                    <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
+                  </div>
 
-      <div class="wrapper-up">
-        <div id="review-facephoto" class="review-photo">
-          <div class="wrapper-photo">
-            <img id="face_image" width="500" height="375" src=""/>
-          </div>
+                  <div class="controls photo-controls">
+                    <ul class="list-controls">
+                      <li class="control control-redo" id="photo_id_reset_button">
+                        <a class="action action-redo" href="">
+                          <i class="icon-undo"></i> <span class="sr">Retake</span>
+                        </a>
+                      </li>
 
-          <h4 class="title">The photo above needs to meet the following requirements:</h4>
-          <ul>
-            <li>Be well lit</li>
-            <li>Show your whole face</li>
-            <li>Match your ID</li>
-          </ul>
-        </div>
+                      <li class="control control-do" id="photo_id_capture_button">
+                        <a class="action action-do" href="">
+                          <i class="icon-camera"></i> <span class="sr">Take photo</span>
+                        </a>
+                      </li>
 
-        <div id="review-idphoto" class="review-photo">
-          <div class="wrapper-photo">
-            <img id="photo_id_image" width="500" height="375" src=""/>
-          </div>
+                      <li class="control control-approve" id="photo_id_approve_button">
+                        <a class="action action-approve" href="">
+                          <i class="icon-ok"></i> <span class="sr">Looks good</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
 
-          <h4 class="title">The photo above needs to meet the following requirements:</h4>
-          <ul>
-            <li>Be readable (not too far away, no glare)</li>
-            <li>Show your name</li>
-            <li>Match the photo of your face and your name above</li>
-          </ul>
-        </div>
+                <div class="wrapper-help">
+                  <div class="help help-task photo-tips facetips">
+                    <h4 class="title">Tips on taking a successful photo</h4>
 
+                    <div class="copy">
+                      <ul>
+                        <li>Make sure your ID is well-lit</li>
+                        <li>Check that there isn't any glare</li>
+                        <li>Ensure that you can see your photo and read your name</li>
+                        <li>Try to keep your fingers at the edge to avoid covering important information</li>
+                      </ul>
+                    </div>
+                  </div>
 
-      </div>
-        <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
+                  <div class="help help-faq facefaq">
+                    <h4 class="sr title">Common Questions</h4>
 
-<hr />
+                    <div class="copy">
+                      <dl class="list-faq">
+                        <dt class="faq-question">Why do you need a photo of my ID?</dt>
+                        <dd class="faq-answer">We need to match your ID with your photo and name to confirm that you are you.</dd>
 
-      <div class="wrapper-down">
-        <h3>Check Your Contribution</h3>
+                        <dt class="faq-question">What do you do with this picture?</dt>
+                        <dd class="faq-answer">We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.</dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price"/>
+              <nav class="nav-wizard">
+                <span class="help help-inline">Once you verify your ID photo looks good, you can move on to step 3.</span>
 
-      </div>
+                <ol class="wizard-steps">
+                  <li class="wizard-step">
+                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
+                  </li>
+                </ol>
+              </nav>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
 
-<hr />
+          <div id="wrapper-review" class="wrapper-view">
+            <div class="review view">
+              <h3 class="title">Verify Your Submission</h3>
+              <div class="instruction">
+                <p>Make sure we can verify your identity with the photos and information below.</p>
+              </div>
 
-      <div class="next-step">
+              <div class="wrapper-task">
+                <ol class="review-tasks">
+                  <li class="review-task review-task-name">
+                    <h4 class="title">Check Your Name</h4>
 
-        <form id="pay_form" method="post" action="${purchase_endpoint}">
-          <!-- <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"> -->
-          <input type="checkbox" name="match" id="confirm_pics_good" /> <label for="match">Yes! My details all match.</label>
-          <input type="hidden" name="course_id" value="${course_id | h}" />
-          <p class="m-btn-primary" id="pay_button_frame">
-            <input type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
-          </p>
-        </form>
-        <p class="tip">Once you verify your details match the requirements, <br />you can move on to step 4, payment on our secure server.</p>
-      </div>
-    </div>
+                    <div class="copy">
+                      <p>Make sure your full name on your edX account, ${user_full_name}, matches your ID. We will also use this as the name on your certificate.</p>
+                    </div>
+
+                    <ul class="list-actions">
+                      <li class="action action-editname">
+                        <a rel="modal" class="edit-name" href="#">Edit my name</a>
+                      </li>
+                    </ul>
+                  </li>
+
+                  <li class="review-task review-task-photos">
+                    <h4 class="title">Review the Photos You've Taken</h4>
+
+                    <div class="copy">
+                      <p>Make sure your full name on your edX account, <strong>${user_full_name}</strong>, matches your ID. We will also use this as the name on your certificate.</p>
+                    </div>
+
+                    <ol class="wrapper-photos">
+                      <li class="wrapper-photo">
+                        <div class="placeholder-photo">
+                          <img id="face_image" src=""/>
+                        </div>
+
+                        <div class="help-tips">
+                          <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                          <ul class="list-help list-tips copy">
+                            <li class="tip">Be well lit</li>
+                            <li class="tip">Show your whole face</li>
+                            <li class="tip">Match your ID</li>
+                          </ul>
+                        </div>
+                      </li>
+
+                      <li class="wrapper-photo">
+                       <div class="placeholder-photo">
+                         <img id="photo_id_image" src=""/>
+                       </div>
+
+                       <div class="help-tips">
+                         <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                         <ul class="list-help list-tips copy">
+                           <li class="tip">Be readable (not too far away, no glare)</li>
+                           <li class="tip">Show your name</li>
+                           <li class="tip">Match the photo of your face and your name above</li>
+                         </ul>
+                       </div>
+                      </li>
+                    </ol>
+
+                    <div class="msg msg-retake msg-followup">
+                      <div class="copy">
+                        <p>Photos don't meet the requirements?</p>
+                      </div>
+
+                      <ul class="list-actions">
+                        <li class="action action-retakephotos">
+                          <a class="retake-photos" href="#">Retake Your Photos</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+
+                  <li class="review-task  review-task-contribution">
+                    <h4 class="title">Check Your Contribution Level</h4>
+
+                    <div class="copy">
+                      <p>Please confirm your contribution for this course:</p>
+                    </div>
+
+                    <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price"/>
+
+                  </li>
+                </ol>
+              </div>
+
+              <nav class="nav-wizard">
+                <span class="help help-inline">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</span>
+
+                <ol class="wizard-steps">
+                  <li class="wizard-step step-match">
+                    <input type="checkbox" name="match" id="confirm_pics_good" />
+                    <label for="confirm_pics_good">Yes! My details all match.</label>
+                  </li>
+                  <li class="wizard-step step-proceed">
+                    <form id="pay_form" method="post" action="${purchase_endpoint}">
+                      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                      <input type="hidden" name="course_id" value="${course_id | h}" />
+                      <button type="submit" class="action-primary" id="pay_button">Go to Step 4: Secure Payment</button>
+                      <!-- <input class="action-primary" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment"> -->
+                    </form>
+                  </li>
+                </ol>
+              </nav>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+        </section>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <div class="wrapper-content-supplementary">
+      <aside class="content-supplementary">
+        <ul class="list-help">
+          <li class="help-item">
+            <h3 class="title">Have questions?</h3>
+            <div class="copy">
+              <p>Please read <a rel="external" href="">our FAQs to view common questions about our certificates</a>.</p>
+            </div>
+          </li>
+
+          <li class="help-item">
+            <h3 class="title">Change your mind?</h3>
+            <div class="copy">
+              <p>You can always <a href="">Audit the course for free</a> without verifying.</p>
+            </div>
+          </li>
+        </ul>
+      </aside>
+    </div> <!-- /wrapper-content-supplementary -->
   </section>
-
-
-
-  <section class="support">
-    <p class="tip">More questions? <a rel="external" href="#">Check out our FAQs. (not active yet)</a></p>
-    <p class="tip">Change your mind? <a href="${reverse('course_modes_choose') + '?course_id=' + course_id }">You can always Audit the course for free without verifying.</a></p>
-  </section>
-
-
 </div>
-
-
 
 <section id="edit-name" class="modal">
 <header>
@@ -407,6 +537,4 @@
     <span class="label">close</span>
   </a>
 </section>
-
-
 </%block>

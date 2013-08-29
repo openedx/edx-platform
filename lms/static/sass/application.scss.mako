@@ -44,6 +44,7 @@
 
 // base - elements
 @import 'elements/typography';
+@import 'elements/controls';
 
 // base - specific views
 @import 'views/verification';
