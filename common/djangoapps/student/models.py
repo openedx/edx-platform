@@ -107,13 +107,12 @@ class UserProfile(models.Model):
         blank=True, null=True, max_length=6, db_index=True,
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
-    
+
     education_place = models.CharField(blank=False, null=True, max_length=255, db_index=False)
     education_year = models.IntegerField(blank=False, null=True, db_index=True)
     education_qualification = models.CharField(blank=True, null=True, max_length=30)
     education_specialty = models.CharField(blank=True, null=True, max_length=30)
-    
-    
+
     WORK_TYPE_CHOICES = (
         ('sch', _("School")),
         ('lyc', _("Lyceum")),
@@ -131,21 +130,21 @@ class UserProfile(models.Model):
     work_name = models.CharField(blank=False, null=True, max_length=255, db_index=False)
     work_login = models.CharField(blank=False, null=True, max_length=10, db_index=False)
     WORK_LOCATION_CHOICES = (
-        ('CAO', 'Central Administrative Okrug'),
-        ('EAO', 'Eastern Administrative Okrug'),
-        ('WAO', 'Western Administrative Okrug'),
-        ('NAO', 'Northern Administrative Okrug'),
-        ('NEAO', 'North-Eastern Administrative Okrug'),
-        ('NWAO', 'North-Western Administrative Okrug'),
-        ('SWAO', 'South-Western Administrative Okrug'),
-        ('SEAO', 'South-Eastern Administrative Okrug'),
-        ('SAO', 'Southern Administrative Okrug'),
-        ('zel', 'Zelenogradsky Administrative Okrug'),
-        ('troi', 'Troitsky Administrative Okrug'),
-        ('novo', 'Novomoskovsky Administrative Okrug'),
-        ('city', 'Territorial units with special status'),
-        ('non', 'None'),
-        ('other', 'Other')
+        ('CAO', _('Central Administrative Okrug')),
+        ('EAO', _('Eastern Administrative Okrug')),
+        ('WAO', _('Western Administrative Okrug')),
+        ('NAO', _('Northern Administrative Okrug')),
+        ('NEAO', _('North-Eastern Administrative Okrug')),
+        ('NWAO', _('North-Western Administrative Okrug')),
+        ('SWAO', _('South-Western Administrative Okrug')),
+        ('SEAO', _('South-Eastern Administrative Okrug')),
+        ('SAO', _('Southern Administrative Okrug')),
+        ('zel', _('Zelenogradsky Administrative Okrug')),
+        ('troi', _('Troitsky Administrative Okrug')),
+        ('novo', _('Novomoskovsky Administrative Okrug')),
+        ('city', _('Territorial units with special status')),
+        ('non', _('None')),
+        ('other', _('Other'))
     )
     work_location = models.CharField(blank=False, null=True, max_length=6, db_index=False, choices=WORK_LOCATION_CHOICES)
     WORK_OCCUPATION_CHOICES = (
