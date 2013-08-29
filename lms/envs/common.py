@@ -238,6 +238,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
+
+# ...
+    "announcements.context_processors.site_wide_announcements",
+# ..
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -727,6 +731,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'djcelery',
     'south',
+
+    'announcements',
+    
 
     # Monitor the status of services
     'service_status',
