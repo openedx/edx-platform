@@ -171,3 +171,147 @@
 .t-icon-solo {
   @include line-height(0);
 }
+
+// ====================
+
+// typography weights
+.t-weight1 {
+  font-weight: 300;
+}
+
+.t-weight2 {
+  font-weight: 400;
+}
+
+.t-weight3 {
+  font-weight: 500;
+}
+
+.t-weight4 {
+  font-weight: 600;
+}
+
+.t-weight5 {
+  font-weight: 700;
+}
+
+// ====================
+
+// application: canned headings
+.hd-lv1 {
+  @extend .t-title1;
+  @extend .t-weight1;
+  color: $m-gray-d4;
+  margin: 0 0 ($baseline*2) 0;
+}
+
+.hd-lv1-alt {
+  @extend .t-title2;
+  @extend .t-weight1;
+  color: $m-gray-d4;
+  margin: 0 0 ($baseline*2) 0;
+}
+
+.hd-lv2 {
+  @extend .t-title4;
+  @extend .t-weight1;
+  margin: 0 0 ($baseline*0.75) 0;
+  border-bottom: 1px solid $m-gray-l3;
+  padding-bottom: ($baseline/2);
+  color: $m-gray-d4;
+}
+
+.hd-lv2-alt {
+  @extend .t-title4;
+  @extend .t-weight1;
+  margin: 0 0 ($baseline*0.75) 0;
+  border-bottom: 1px solid $m-gray-t1;
+  padding-bottom: ($baseline/2);
+  color: $m-blue-d1;
+  text-transform: uppercase;
+}
+
+.hd-lv3 {
+  @extend .t-title6;
+  @extend .t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+.hd-lv3-alt {
+  @extend .t-title6;
+  @extend .t-weight3;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+.hd-lv4 {
+  @extend .t-title6;
+  @extend .t-weight2;
+  margin: 0 0 $baseline 0;
+  color: $m-gray-d4;
+}
+
+.hd-lv4-alt {
+  @extend .t-title6;
+  @extend .t-weight4;
+  margin: 0 0 ($baseline) 0;
+  color: $m-gray-d4;
+  text-transform: uppercase;
+}
+
+.hd-lv5 {
+  @extend .t-title7;
+  @extend .t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+// application: canned copy
+.copy-base {
+  @extend .t-copy-base;
+  color: $m-gray-d2;
+}
+
+.copy-lead1 {
+  @extend .t-copy-lead2;
+  color: $m-gray;
+}
+
+.copy-detail {
+  @extend .t-copy-sub1;
+  @extend .t-weight3;
+  color: $m-gray-d1;
+}
+
+.copy-metadata {
+  @extend .t-copy-sub2;
+  color: $m-gray-d1;
+
+
+  .copy-metadata-value {
+    @extend .t-weight2;
+  }
+
+  .copy-metadata-value {
+    @extend .t-weight4;
+  }
+}
+
+// application: canned links
+.copy-link {
+  border-bottom: 1px dotted transparent;
+
+  &:hover, &:active {
+    border-color: $m-blue-d2;
+  }
+}
+
+.copy-badge {
+  @extend .t-title8;
+  @extend .t-weight5;
+  border-radius: ($baseline/5);
+  padding: ($baseline/2) $baseline;
+  text-transform: uppercase;
+}
+

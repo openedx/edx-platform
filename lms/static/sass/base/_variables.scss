@@ -15,7 +15,7 @@ $fg-min-width: 810px;
 // ====================
 
 // FONTS
-$sans-serif: 'Open Sans', $verdana;
+$sans-serif: 'Open Sans', $verdana, sans-serif;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
@@ -35,7 +35,17 @@ $very-light-text: #fff;
 
 // COLORS: misc.
 $white: rgb(255,255,255);
+$white-t0: rgba($white, 0.125);
+$white-t1: rgba($white, 0.25);
+$white-t2: rgba($white, 0.5);
+$white-t3: rgba($white, 0.75);
+
 $black: rgb(0,0,0);
+$black-t0: rgba($black, 0.125);
+$black-t1: rgba($black, 0.25);
+$black-t2: rgba($black, 0.5);
+$black-t3: rgba($black, 0.75);
+
 $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
@@ -47,6 +57,7 @@ $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
+
 $green: rgb(37, 184, 90);
 
 // COLORS: old variables
@@ -63,11 +74,17 @@ $m-gray-d1: #7D7F83;
 $m-gray-d2: #707276;
 $m-gray-d3: #646668;
 $m-gray-d4: #050505;
+$m-gray-t0: rgba($m-gray,0.125);
+$m-gray-t1: rgba($m-gray,0.25);
+$m-gray-t2: rgba($m-gray,0.50);
+$m-gray-t3: rgba($m-gray,0.75);
 
 $m-blue: #1AA1DE;
 $m-blue-l1: #2BACE6;
 $m-blue-l2: #42B5E9;
 $m-blue-l3: #59BEEC;
+$m-blue-l4: tint($m-blue,90%);
+$m-blue-l5: tint($m-blue,95%);
 $m-blue-d1: #1790C7;
 $m-blue-d2: #1580B0;
 $m-blue-d3: #126F9A;
@@ -80,6 +97,30 @@ $m-pink-l3: #D7548E;
 $m-pink-d1: #A0255B;
 $m-pink-d2: #8C204F;
 $m-pink-d3: #771C44;
+
+$m-green: rgb(0, 136, 1);
+$m-green-s1: rgb(96, 188, 97);
+$m-green-l1: tint($m-green,20%);
+$m-green-l2: tint($m-green,40%);
+$m-green-l3: tint($m-green,60%);
+$m-green-l4: tint($m-green,90%);
+$m-green-l5: tint($m-green,95%);
+$m-green-d1: shade($m-green,20%);
+$m-green-d2: shade($m-green,40%);
+$m-green-d3: shade($m-green,60%);
+$m-green-d4: shade($m-green,90%);
+$m-green-t0: rgba($m-green,0.125);
+$m-green-t1: rgba($m-green,0.25);
+$m-green-t2: rgba($m-green,0.50);
+$m-green-t3: rgba($m-green,0.75);
+
+// ====================
+
+// shadows
+$shadow: rgba(0,0,0,0.2);
+$shadow-l1: rgba(0,0,0,0.1);
+$shadow-l2: rgba(0,0,0,0.05);
+$shadow-d1: rgba(0,0,0,0.4);
 
 // ====================
 
