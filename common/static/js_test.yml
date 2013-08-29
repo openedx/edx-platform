@@ -52,10 +52,12 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
+    - js/src
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - coffee/spec
+    - js/spec
 
 # Regular expressions used to exclude *.js files from
 # appearing in the test runner page.
