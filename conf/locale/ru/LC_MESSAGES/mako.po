@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-08-26 18:18+0400\n"
-"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
+"PO-Revision-Date: 2013-08-29 11:37+0400\n"
+"Last-Translator: Павел <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -22,8 +22,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Virtaal 0.7.1\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "Generated-By: Babel 0.9.6\n"
+"X-POOTLE-MTIME: 1377761849.541389\n"
 
 #: cms/djangoapps/contentstore/utils.py:18
 msgid "Open Ended Panel"
@@ -39,6 +40,9 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"Невозможно создать курс '{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py:126
 msgid ""
@@ -46,6 +50,8 @@ msgid ""
 "and course run. Please change either organization or course number to be "
 "unique."
 msgstr ""
+"Уже существует курс, созданный той же самой организацией, с тем же номером и "
+"годом проведения. Измените что-нибудь, чтобы достичь уникальности."
 
 #: cms/djangoapps/contentstore/views/course.py:130
 #: cms/djangoapps/contentstore/views/course.py:132
@@ -54,79 +60,84 @@ msgstr ""
 msgid ""
 "Please change either the organization or course number so that it is unique."
 msgstr ""
+"Пожалуйста, измените либо организацию, либо номер курса, чтобы они были "
+"уникальны"
 
 #: cms/djangoapps/contentstore/views/course.py:142
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
 msgstr ""
+"Уже существует курс, созданный той же самой организацией, с тем же номером. "
+"Измените что-нибудь, чтобы достичь уникальности."
 
 #: cms/djangoapps/contentstore/views/user.py:123
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Недостаточно полномочий"
 
 #: cms/djangoapps/contentstore/views/user.py:131
 msgid "Could not find user by email address '{email}'."
-msgstr ""
+msgstr "Не могу найти пользователя с адресом '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py:157
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"Пользователь {email} был зарегистрирован, но еще не активировал свою учетную "
+"запись."
 
 #: cms/djangoapps/contentstore/views/user.py:175
 #: cms/djangoapps/contentstore/views/user.py:218
 msgid "You may not remove the last instructor from a course"
-msgstr ""
+msgstr "Вы не можете удалить последнего инструктора из курса"
 
 #: cms/djangoapps/contentstore/views/user.py:191
 msgid "malformed JSON"
-msgstr ""
+msgstr "Некорректный JSON"
 
 #: cms/djangoapps/contentstore/views/user.py:195
 #: cms/djangoapps/contentstore/views/user.py:198
 msgid "`role` is required"
-msgstr ""
+msgstr "требуется `role`"
 
 #: cms/djangoapps/contentstore/views/user.py:204
 msgid "Only instructors may create other instructors"
-msgstr ""
+msgstr "Только инструкторы могут создавать других инструкторов"
 
 #: cms/djangoapps/course_creators/models.py:33
 msgid "unrequested"
-msgstr ""
+msgstr "незапрошенный"
 
 #: cms/djangoapps/course_creators/models.py:34
-#, fuzzy
 msgid "pending"
-msgstr "Заголовок 1"
+msgstr "ожидание"
 
 #: cms/djangoapps/course_creators/models.py:35
 msgid "granted"
-msgstr ""
+msgstr "разрешено"
 
 #: cms/djangoapps/course_creators/models.py:36
 msgid "denied"
-msgstr ""
+msgstr "отказано"
 
 #: cms/djangoapps/course_creators/models.py:39
-#, fuzzy
 msgid "Studio user"
-msgstr "Помощь Студии"
+msgstr "Пользователь Студии"
 
 #: cms/djangoapps/course_creators/models.py:41
 msgid "The date when state was last updated"
-msgstr ""
+msgstr "Дата, когда состояние было последний раз обновлено"
 
 #: cms/djangoapps/course_creators/models.py:43
-#, fuzzy
 msgid "Current course creator state"
-msgstr "Текущий курс:"
+msgstr ""
 
 #: cms/djangoapps/course_creators/models.py:44
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
 msgstr ""
+"Дополнительные заметки о пользователе (к примеру, почему создание курсов "
+"было запрещено)"
 
 #: cms/static/coffee/src/main.js:38
 msgid ""
@@ -141,7 +152,7 @@ msgstr ""
 #: cms/static/coffee/src/views/module_edit.js:67
 #, python-format
 msgid "<em>Editing:</em> %s"
-msgstr ""
+msgstr "<em>Редактирование:</em> %s"
 
 #: cms/static/coffee/src/views/module_edit.js:121
 #: cms/static/coffee/src/views/unit.js:68 cms/static/js/base.js:843
@@ -151,34 +162,30 @@ msgstr ""
 #: cms/static/js/views/grader-select-view.js:85
 #: cms/static/js/views/overview.js:229 cms/static/js/views/textbook.js:125
 msgid "Saving"
-msgstr ""
+msgstr "Сохранение"
 
 #: cms/static/coffee/src/views/module_edit.js:130
-#, fuzzy
 msgid "There was an error saving your changes. Please try again."
 msgstr ""
-"Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
+"Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
 
 #: cms/static/coffee/src/views/unit.js:159
-#, fuzzy
 msgid "Delete this component?"
-msgstr "Удалить этот раздел"
+msgstr "Удалить этот компонент?"
 
 #: cms/static/coffee/src/views/unit.js:160
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "Действие по удалению этого компонента не может быть отменено."
 
 #: cms/static/coffee/src/views/unit.js:163
-#, fuzzy
 msgid "Yes, delete this component"
-msgstr "Удалить этот раздел"
+msgstr "Да, удалить этот компонент"
 
 #: cms/static/coffee/src/views/unit.js:168 cms/static/js/base.js:398
 #: cms/static/js/views/course_info_edit.js:170
 #: cms/static/js/views/textbook.js:38
-#, fuzzy
 msgid "Deleting"
-msgstr "Удалить"
+msgstr "Удаление"
 
 #: cms/static/coffee/src/views/unit.js:191 cms/static/js/base.js:414
 #: cms/static/js/views/assets.js:43
@@ -199,66 +206,59 @@ msgstr "Отмена"
 
 #: cms/static/js/base.js:83
 msgid "This link will open in a new browser window/tab"
-msgstr ""
+msgstr "Эта ссылка откроется в новом окне или новой вкладке браузера"
 
 #: cms/static/js/base.js:86
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "Эта ссылка откроется в модальном окне"
 
 #: cms/static/js/base.js:204 cms/templates/overview.html:135
 msgid "Collapse All Sections"
 msgstr "Свернуть все разделы"
 
 #: cms/static/js/base.js:206
-#, fuzzy
 msgid "Expand All Sections"
-msgstr "Свернуть все разделы"
+msgstr "Развернуть все разделы"
 
 #: cms/static/js/base.js:245
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr ""
+"Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением "
+"<code>tar.gz</code>."
 
 #: cms/static/js/base.js:310
 msgid "start"
-msgstr ""
+msgstr "начать"
 
 #: cms/static/js/base.js:335
-#, fuzzy
 msgid "There has been an error while saving your changes."
-msgstr ""
-"Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
+msgstr "Произошла ошибка сохранения ваших изменений."
 
 #: cms/static/js/base.js:382
-#, fuzzy
 msgid "Delete this ?"
-msgstr "Удалить элемент"
+msgstr "Удалить?"
 
 #: cms/static/js/base.js:383
 msgid "Deleting this  is permanent and cannot be undone."
 msgstr ""
 
 #: cms/static/js/base.js:386
-#, fuzzy
 msgid "Yes, delete this "
-msgstr "Удалить элемент"
+msgstr ""
 
 #: cms/static/js/base.js:462
-#, fuzzy
 msgid "Hide Studio Help"
-msgstr "Помощь Студии edX"
+msgstr "Спрятать Помощь Студии"
 
 #: cms/static/js/base.js:464 cms/templates/widgets/sock.html:6
 msgid "Looking for Help with Studio?"
 msgstr "Нужна помощь со студией?"
 
 #: cms/static/js/base.js:626
-#, fuzzy
 msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
-"Заметка: Пробелы и специальные символы запрещены. Данное поле не может быть "
-"изменено."
+msgstr "Не используйте пробелы и специальные символы в данном поле."
 
 #: cms/static/js/base.js:641
 msgid ""
@@ -275,7 +275,7 @@ msgstr "Будет начат:"
 
 #: cms/static/js/base.js:869
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
+msgstr "{day}/{month}/{year} в {hour}:{minute} UTC"
 
 #: cms/static/js/base.js:872 cms/templates/component.html:36
 #: cms/templates/overview.html:174
@@ -286,37 +286,39 @@ msgstr "Редактировать"
 
 #: cms/static/js/models/course.js:7 cms/static/js/models/section.js:7
 msgid "You must specify a name"
-msgstr ""
+msgstr "Необходимо указать имя"
 
 #: cms/static/js/models/uploads.js:16
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in <"
 "%= fileExtensions %> to upload."
 msgstr ""
+"Только файлы типа <%= fileTypes %> могуть быть загружены. Пожалуйста, "
+"выберите файл, оканчивающийся <%= fileExtensions %> для загрузки."
 
 #: cms/static/js/models/uploads.js:41
 msgid "or"
-msgstr ""
+msgstr "или"
 
 #: cms/static/js/models/settings/course_details.js:43
 msgid "The course must have an assigned start date."
-msgstr ""
+msgstr "Курс должен иметь назначенную дату начала."
 
 #: cms/static/js/models/settings/course_details.js:46
 msgid "The course end date cannot be before the course start date."
-msgstr ""
+msgstr "Дата окончания курса не может быть ранее даты начала курса."
 
 #: cms/static/js/models/settings/course_details.js:49
 msgid "The course start date cannot be before the enrollment start date."
-msgstr ""
+msgstr "Дата начала курса не может быть ранее даты начала набора."
 
 #: cms/static/js/models/settings/course_details.js:52
 msgid "The enrollment start date cannot be after the enrollment end date."
-msgstr ""
+msgstr "Дата начала набора не может быть позже даты окончания набора."
 
 #: cms/static/js/models/settings/course_details.js:55
 msgid "The enrollment end date cannot be after the course end date."
-msgstr ""
+msgstr "Дата окончания набора не может быть позже даты окончания курса."
 
 #: cms/static/js/models/settings/course_details.js:59
 msgid "Key should only contain letters, numbers, _, or -"
@@ -332,21 +334,20 @@ msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js:114
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "Введите целое число между 0 и 100."
 
 #: cms/static/js/models/settings/course_grading_policy.js:128
 #: cms/static/js/models/settings/course_grading_policy.js:134
 msgid "Please enter an integer."
-msgstr ""
+msgstr "Введите целое число."
 
 #: cms/static/js/models/settings/course_grading_policy.js:140
 msgid "Cannot drop more <% attrs.types %> than will assigned."
 msgstr ""
 
 #: cms/static/js/views/assets.js:13
-#, fuzzy
 msgid "Delete File Confirmation"
-msgstr "Удалить этот раздел"
+msgstr "Подтверждение удаления файла"
 
 #: cms/static/js/views/assets.js:14
 msgid ""
@@ -355,47 +356,48 @@ msgid ""
 "Also any content that links/refers to this item will no longer work (e.g. "
 "broken images and/or links)"
 msgstr ""
+"Вы уверены, что хотите удалить этот элемент. Операция не может быть "
+"отменена!\n"
+"\n"
+"Кроме того, все наполнение, ссылающееся на этот элемент, перестанет работать "
+"(\"битые\" изображения или ссылки)"
 
 #: cms/static/js/views/assets.js:17
 #: cms/static/js/views/course_info_edit.js:162
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: cms/static/js/views/assets.js:27 cms/templates/asset_index.html:148
 msgid "Your file has been deleted."
 msgstr "Файл был удален."
 
 #: cms/static/js/views/assets.js:70
-#, fuzzy
 msgid "Uploading"
-msgstr "Оценивание"
+msgstr "Загрузка"
 
 #: cms/static/js/views/assets.js:103
-#, fuzzy
 msgid "Load Another File"
-msgstr "Загрузить новый файл"
+msgstr "Загрузить другой файл"
 
 #: cms/static/js/views/course_info_edit.js:158
 msgid "Are you sure you want to delete this update?"
-msgstr ""
+msgstr "Вы действительно хотите удалить это обновление?"
 
 #: cms/static/js/views/course_info_edit.js:159
-#, fuzzy
 msgid "This action cannot be undone."
-msgstr "Этот раздел еще не реализован."
+msgstr "Это действие не может быть отменено."
 
 #: cms/static/js/views/section.js:71
-#, fuzzy
 msgid "Your change could not be saved"
-msgstr "Ваши политические изменения были сохранены."
+msgstr "Ваши изменения не могут быть сохранены"
 
 #: cms/static/js/views/section.js:75
 msgid "Return and resolve this issue"
-msgstr ""
+msgstr "Вернуться и решить эту проблему"
 
 #: cms/static/js/views/textbook.js:29
 msgid "Delete <%= name %>?"
-msgstr ""
+msgstr "Удалить <%= name %>?"
 
 #: cms/static/js/views/textbook.js:31
 msgid ""
@@ -411,7 +413,7 @@ msgstr "Удалить"
 
 #: cms/static/js/views/textbook.js:244
 msgid "Upload a new PDF to <%= name %>"
-msgstr ""
+msgstr "Загрузить новый PDF в <%= name %>"
 
 #: cms/static/js/views/uploads.js:102
 msgid "We're sorry, there was an error"
@@ -435,20 +437,21 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/validating_view.js:103
-#, fuzzy
 msgid "Save Changes"
-msgstr "Текущие изменения"
+msgstr "Сохранить изменения"
 
 #: cms/static/js/views/validating_view.js:131
-#, fuzzy
 msgid "Your changes have been saved."
-msgstr "Ваши политические изменения были сохранены."
+msgstr "Ваши изменения были сохранены."
 
 #: cms/static/js/views/settings/advanced_view.js:55
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
 msgstr ""
+"Ваши изменения не вступят в силу, пока вы не выполните сохранение. Обратите "
+"внимание на форматирование ключа и значения, так как валидация не "
+"поддерживается."
 
 #: cms/static/js/views/settings/advanced_view.js:104
 #: cms/templates/settings_advanced.html:62
@@ -461,15 +464,16 @@ msgid ""
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
 msgstr ""
+"Учтите, что валидация ключей и значений политик еще не реализована. В случае "
+"трудностей проверьте пары ключ-значение."
 
 #: cms/static/js/views/settings/main_settings_view.js:248
-#, fuzzy
 msgid "Upload your course image."
-msgstr "Последний день вашего курса активен"
+msgstr "Загрузить образ вашего курса."
 
 #: cms/static/js/views/settings/main_settings_view.js:249
 msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgstr "Файлы должны иметь формат JPEG или PNG."
 
 #: cms/templates/404.html:3 cms/templates/error.html:7
 msgid "Page Not Found"
@@ -534,6 +538,8 @@ msgid ""
 "This account, set up using {0}, has already been activated. Please sign in "
 "to start working within edX Studio."
 msgstr ""
+"Эта учетная запись, созданная с использованием {0}, уже активирована. "
+"Пожалуйста, войдите чтобы начать работать в edX Studio."
 
 #: cms/templates/activation_active.html:26
 #: cms/templates/activation_complete.html:26
@@ -562,12 +568,16 @@ msgid ""
 "the URL you went to was correct &mdash; e-mail programs will sometimes split "
 "it into two lines."
 msgstr ""
+"Кажется, что-то пошло не так. Убедитесь, что URL, по которому Вы переходили, "
+"корректен &mdash; иногда почтовые программы разбивают его на две строки"
 
 #: cms/templates/activation_invalid.html:21
 msgid ""
 "If you still have issues, contact edX Support. In the meatime, you can also "
 "return to"
 msgstr ""
+"Если проблемы сохранились, обратитесь к службе поддержки edX. Еще Вы можете "
+"вернуться к "
 
 #: cms/templates/activation_invalid.html:27
 msgid "Contact edX Support"
@@ -757,9 +767,10 @@ msgid "UTC"
 msgstr "UTC"
 
 #: cms/templates/edit_subsection.html:52
+#, fuzzy
 msgid "The date above differs from the release date of {name}, which is unset."
 msgstr ""
-"Вышеуказанная дата отличается от даты конца  {name}, которая не сохраняется."
+"Вышеуказанная дата отличается от даты конца {name}, которая не сохраняется."
 
 #: cms/templates/edit_subsection.html:54
 msgid "The date above differs from the release date of {name} - {start_time}"
@@ -969,8 +980,8 @@ msgid ""
 "Build and release <strong>sections</strong> to your students incrementally. "
 "You don't have to have it all done at once."
 msgstr ""
-"Добавляйте разделы для студентов постепенно. Вы не должны создавать все и "
-"сразу."
+"Добавляйте <strong>разделы</strong> для студентов постепенно. Вы не должны "
+"создавать все и сразу."
 
 #: cms/templates/howitworks.html:64 cms/templates/howitworks.html:65
 #: cms/templates/howitworks.html:73
@@ -1173,9 +1184,7 @@ msgstr "замена"
 
 #: cms/templates/import.html:35
 msgid "Replace my course with the one above"
-msgstr ""
-"Заменить мой курс с одним выше \n"
-"????"
+msgstr "Заменить мой курс загруженным выше"
 
 #: cms/templates/import.html:81
 msgid "Your import has failed."
@@ -1276,7 +1285,7 @@ msgstr ""
 
 #: cms/templates/index.html:120
 msgid "e.g. 2013_Spring"
-msgstr "к "
+msgstr "к примеру 2013_Весна"
 
 #: cms/templates/index.html:121
 msgid "The term in which your course will run"
@@ -1284,7 +1293,7 @@ msgstr ""
 
 #: cms/templates/index.html:130
 msgid "Create"
-msgstr ""
+msgstr "Создать"
 
 #: cms/templates/index.html:147
 msgid "Organization:"
@@ -1300,7 +1309,7 @@ msgstr ""
 
 #: cms/templates/index.html:176
 msgid "Are you staff on an existing Studio course?"
-msgstr ""
+msgstr "Вы являетесь персоналом существующего курса Студии?"
 
 #: cms/templates/index.html:178
 msgid ""
@@ -1308,18 +1317,20 @@ msgid ""
 "Please get in touch with the course creator or administrator for the "
 "specific course you are helping to author."
 msgstr ""
+"Вы должны быть добавлены к курсу в Студии создателем курса. Пожалуйста, "
+"свяжитесь с создателем курса или администратором."
 
 #: cms/templates/index.html:186 cms/templates/index.html:194
 msgid "Create Your First Course"
-msgstr ""
+msgstr "Создать Ваш первый курс"
 
 #: cms/templates/index.html:188
 msgid "Your new course is just a click away!"
-msgstr ""
+msgstr "Ваш первый курс в клике от вас!"
 
 #: cms/templates/index.html:207
 msgid "Becoming a Course Creator in Studio"
-msgstr ""
+msgstr "Стать создателем курса в Студии"
 
 #: cms/templates/index.html:212
 msgid ""
@@ -1333,11 +1344,11 @@ msgstr ""
 #: cms/templates/index.html:216 cms/templates/index.html:240
 #: cms/templates/index.html:266
 msgid "Your Course Creator Request Status:"
-msgstr ""
+msgstr "Ваш статус запроса на создание курса:"
 
 #: cms/templates/index.html:221
 msgid "Request the Ability to Create Courses"
-msgstr ""
+msgstr "Запросить права на создание курсов"
 
 #: cms/templates/index.html:231 cms/templates/index.html:257
 msgid "Your Course Creator Request Status"
@@ -1357,7 +1368,7 @@ msgstr ""
 
 #: cms/templates/index.html:246
 msgid "Denied"
-msgstr ""
+msgstr "Отказ в доступе"
 
 #: cms/templates/index.html:247
 msgid ""
@@ -1374,13 +1385,15 @@ msgstr ""
 
 #: cms/templates/index.html:272
 msgid "Pending"
-msgstr ""
+msgstr "Ожидание"
 
 #: cms/templates/index.html:273
 msgid ""
 "Your request is currently being reviewed by edX staff and should be updated "
 "shortly."
 msgstr ""
+"Ваш запрос в настоящее время обрабатывается персоналом edX, статус запроса "
+"будет скоро обновлен."
 
 #: cms/templates/index.html:285 cms/templates/index.html:341
 msgid "Need help?"
@@ -1391,10 +1404,12 @@ msgid ""
 "If you are new to Studio and having trouble getting started, there are a few "
 "things that may be of help:"
 msgstr ""
+"Если Вы новичок в Студии и не знаете, как начать работать, вам может помочь "
+"следующее:"
 
 #: cms/templates/index.html:290
 msgid "Get started by reading Studio's Documentation"
-msgstr ""
+msgstr "Начните с чтения документации по Студии"
 
 #: cms/templates/index.html:293
 msgid "Request help with Studio"
@@ -1403,34 +1418,34 @@ msgstr "Нужна помощь со студией?"
 #: cms/templates/index.html:300 cms/templates/index.html:307
 #: cms/templates/index.html:313
 msgid "Can I create courses in Studio?"
-msgstr ""
+msgstr "Я могу создавать курсы в Студии?"
 
 #: cms/templates/index.html:301
 msgid "In order to create courses in Studio, you must"
-msgstr ""
+msgstr "Для создания курса Вы должны"
 
 #: cms/templates/index.html:301
 msgid "contact edX staff to help you create a course"
-msgstr ""
+msgstr "свяжитесь с персоналом edX для получения помощи в создании курса"
 
 #: cms/templates/index.html:308
 msgid ""
 "In order to create courses in Studio, you must have course creator "
 "privileges to create your own course."
-msgstr ""
+msgstr "Для создания курсов в Студии вам нужны соответствующие привилегии"
 
 #: cms/templates/index.html:314
 msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
+msgstr "Ваш запрос на право создания курсов в Студии был отклонен. Пожалуйста"
 
 #: cms/templates/index.html:314
 msgid "contact edX Staff with further questions"
-msgstr ""
+msgstr "свяжитесь с персоналом edX для дальнейших вопросов"
 
 #: cms/templates/index.html:326
 #, python-format
 msgid "Thanks for signing up, %(name)s!"
-msgstr ""
+msgstr "Спасибо за регистрацию, %(name)s!"
 
 #: cms/templates/index.html:331
 msgid "We need to verify your email address"
@@ -1533,41 +1548,45 @@ msgstr ""
 
 #: cms/templates/manage_users.html:46
 msgid "e.g. jane.doe@gmail.com"
-msgstr ""
+msgstr "например vasya.pupkin@mail.ru"
 
 #: cms/templates/manage_users.html:47
 msgid ""
 "Please provide the email address of the course staff member you'd like to add"
 msgstr ""
+"Пожалуйста, укажите адрес email для члена персонала курса, которого Вы "
+"хотите добавить"
 
 #: cms/templates/manage_users.html:54
 msgid "Add User"
-msgstr ""
+msgstr "Добавить пользователя"
 
 #: cms/templates/manage_users.html:76 cms/templates/manage_users.html:88
 msgid "Current Role:"
-msgstr ""
+msgstr "Текущая роль:"
 
 #: cms/templates/manage_users.html:78
 #: lms/templates/courseware/instructor_dashboard.html:116
 msgid "Admin"
-msgstr ""
+msgstr "Администратор"
 
 #: cms/templates/manage_users.html:80 cms/templates/manage_users.html:92
 msgid "You!"
-msgstr ""
+msgstr "Вы!"
 
 #: cms/templates/manage_users.html:90
 msgid "Staff"
-msgstr ""
+msgstr "Персонал"
 
 #: cms/templates/manage_users.html:103
 msgid "send an email message to {email}"
-msgstr ""
+msgstr "Отправить письмо по адресу {email}"
 
 #: cms/templates/manage_users.html:112
 msgid "Promote another member to Admin to remove your admin rights"
 msgstr ""
+"Дать права администратора другому пользователю чтобы убрать Ваши права "
+"администратора"
 
 #: cms/templates/manage_users.html:114
 msgid "Remove Admin Access"
@@ -1616,6 +1635,9 @@ msgid ""
 "ownership of the course, add Admin access to another user and request they "
 "remove you from the Course Team list."
 msgstr ""
+"У каждого курса должен быть администратор. Для передачи курса предоставьте "
+"права администратора другому пользователю и попросите, чтобы он удалил Вас "
+"из команды курса."
 
 #: cms/templates/overview.html:8 cms/templates/overview.html:128
 msgid "Course Outline"
@@ -1678,7 +1700,7 @@ msgid ""
 "On the date set above, this section - {name} - will be released to students. "
 "Any units marked private will only be visible to admins."
 msgstr ""
-"Этот раздел  - {name} - будет выпущен для студентов; дата указана выше. "
+"Этот раздел - {name} - будет выпущен для студентов в дату указанную выше. "
 "Любые блоки, отмеченные для приватного просмотра, будут видимы только "
 "администраторам."
 
@@ -1839,35 +1861,36 @@ msgstr ""
 
 #: cms/templates/settings.html:218 cms/templates/settings.html:222
 #: cms/templates/settings.html:230
-#, fuzzy
 msgid "Course Image"
-msgstr "Имя курса"
+msgstr "Образ курса"
 
 #: cms/templates/settings.html:226
 msgid "You can manage this image along with all of your other"
-msgstr ""
+msgstr "Вы можете управлять этим образом наряду со всеми другими"
 
 #: cms/templates/settings.html:226
-#, fuzzy
 msgid "files &amp; uploads"
-msgstr "Файлы &amp; Загрузки"
+msgstr "файлы &amp; загрузки"
 
 #: cms/templates/settings.html:232
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG "
 "format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
+"Ваш курс пока не имеет изображения. Пожалуйста, загрузите его (формат JPEG "
+"или PNG, минимальный размер 375x200 пикселей)"
 
 #: cms/templates/settings.html:239
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
 msgstr ""
+"Пожалуйста, укажите корректный путь к изображению Вашего курса "
+"(поддерживаются только форматы JPEG или PNG)"
 
 #: cms/templates/settings.html:241
-#, fuzzy
 msgid "Upload Course Image"
-msgstr "Имя курса"
+msgstr "Загрузить изображение курса"
 
 #: cms/templates/settings.html:246
 msgid "Course Introduction Video"
@@ -1964,9 +1987,9 @@ msgid ""
 "over specific course settings that edX Studio will use when displaying and "
 "running your course."
 msgstr ""
-"Ручная политика JSON-пар ключей и значений   дает вам контроль над "
-"конкретными настройками курса, которые Студия edX будет использовать, когда "
-"ваш курс будет запущен."
+"Ручные настройки - набор JSON-пар ключей и значений который дает вам "
+"контроль над конкретными настройками курса, которые Студия edX будет "
+"использовать, когда ваш курс будет запущен."
 
 #: cms/templates/settings_advanced.html:89
 msgid ""
@@ -1998,7 +2021,7 @@ msgstr "Члены профессорско-преподавательского
 
 #: cms/templates/settings_discussions_faculty.html:40
 msgid "Individuals instructing and helping with this course"
-msgstr ""
+msgstr "В этом курсе инструкторами и помощниками являются"
 
 #: cms/templates/settings_discussions_faculty.html:48
 #: cms/templates/settings_discussions_faculty.html:85
@@ -2141,11 +2164,11 @@ msgstr "Имя Тип Значение"
 
 #: cms/templates/settings_discussions_faculty.html:272
 msgid "Number of Attempts <br /> Allowed on Problems: "
-msgstr "Количество попыток,  <br />разрешенных на задание:"
+msgstr "Количество попыток,<br />разрешенных на задание:"
 
 #: cms/templates/settings_discussions_faculty.html:276
 msgid "0 or higher"
-msgstr "0 или выше"
+msgstr "Количество попыток,<br />разрешенных на задание:"
 
 #: cms/templates/settings_discussions_faculty.html:285
 msgid "Discussions"
@@ -2318,7 +2341,7 @@ msgid ""
 "your first edX course today."
 msgstr ""
 "Готовы начать создание онлайн-курсов? Зарегистрируйтесь ниже и начните "
-"создание своего первого курса в edX  сегодня."
+"создание своего первого курса в edX сегодня."
 
 #: cms/templates/signup.html:26
 msgid "Required Information to Sign Up for edX Studio"
@@ -2431,9 +2454,9 @@ msgid ""
 "global edX platform. Our users are often faculty members, teaching "
 "assistants and course staff, and members of instructional technology groups."
 msgstr ""
-"Студия для каждого, кто хочет создавать онлайн-курсы на глобальной "
-"платформе  edX. Зачастую наши пользователи - преподаватели, ассистенты, "
-"персонал курса и члены учебных технологических групп."
+"Студия для каждого, кто хочет создавать онлайн-курсы на глобальной платформе "
+"edX. Зачастую наши пользователи - преподаватели, ассистенты, персонал курса "
+"и члены учебных технологических групп."
 
 #: cms/templates/signup.html:190
 msgid "How technically savvy do I need to be to create courses in Studio?"
@@ -2524,6 +2547,8 @@ msgid ""
 "text as a single chapter and enter a name of your choice in the Chapter Name "
 "field."
 msgstr ""
+"Если Вы не разбили Ваш текст на главы, можно загрузить текст как одну главу "
+"и указать выбранное имя в поле Имя главы"
 
 #: cms/templates/unit.html:5
 msgid "Individual Unit"
@@ -2878,7 +2903,7 @@ msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html:8
 msgid "name"
-msgstr ""
+msgstr "имя"
 
 #: common/djangoapps/course_modes/models.py:35
 msgid "Honor Code Certificate"
@@ -2933,7 +2958,6 @@ msgid "Lyceum"
 msgstr "Лицей"
 
 #: common/djangoapps/student/models.py:120
-#, fuzzy
 msgid "Education Center"
 msgstr "Центр образования"
 
@@ -2942,7 +2966,6 @@ msgid "Gymnasium"
 msgstr "Гимназия"
 
 #: common/djangoapps/student/models.py:122
-#, fuzzy
 msgid "Educational complex"
 msgstr "УВК"
 
@@ -3090,28 +3113,25 @@ msgstr "Вторая"
 
 #: common/djangoapps/student/views.py:359
 msgid "Course id not specified"
-msgstr ""
+msgstr "Id курса не задан"
 
 #: common/djangoapps/student/views.py:369
 msgid "Course id is invalid"
-msgstr ""
+msgstr "Id курса некорректен"
 
 #: common/djangoapps/student/views.py:372
-#, fuzzy
 msgid "Enrollment is closed"
-msgstr "Дата окончания регистрации"
+msgstr "Запись на курс закрыта"
 
 #: common/djangoapps/student/views.py:396
 msgid "You are not enrolled in this course"
-msgstr ""
+msgstr "Вы не записаны на этот курс"
 
 #: common/djangoapps/student/views.py:398
-#, fuzzy
 msgid "Enrollment action is invalid"
-msgstr "Недействительная активация для вашей учетной записи"
+msgstr "Недействительная запись на курс"
 
 #: common/djangoapps/student/views.py:410
-#, fuzzy
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
@@ -3122,7 +3142,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py:436 lms/templates/provider_login.html:42
 msgid "Email or password is incorrect."
-msgstr "E-mail  или пароль введены неверно."
+msgstr "E-mail или пароль введены неверно."
 
 #: common/djangoapps/student/views.py:483
 msgid ""
@@ -3131,9 +3151,8 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views.py:542
-#, fuzzy
 msgid "An account with the Email '{email}' already exists."
-msgstr "Учетная запись с таким адресом электронной почты уже существует."
+msgstr "Учетная запись с адресом '{email}' уже существует."
 
 #: common/djangoapps/student/views.py:623
 msgid "Error (401 {field}). E-mail us."
@@ -3144,13 +3163,12 @@ msgid "To enroll, you must follow the honor code."
 msgstr ""
 
 #: common/djangoapps/student/views.py:639
-#, fuzzy
 msgid "You must accept the terms of service."
 msgstr "Я согласен с условиями предоставления услуг"
 
 #: common/djangoapps/student/views.py:689
 msgid "Valid e-mail is required."
-msgstr ""
+msgstr "Введите действительный адрес эл. почты!"
 
 #: common/djangoapps/student/views.py:728
 msgid "Could not send activation e-mail."
@@ -3158,11 +3176,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py:1037
 msgid "Unknown error. Please e-mail us to let us know how it happened."
-msgstr ""
+msgstr "Кажется, что-то пошло не так. Напишите нам, как это получилось"
 
 #: common/djangoapps/student/views.py:1056
 msgid "Invalid e-mail or user"
-msgstr ""
+msgstr "Неверный адрес e-mail или пользователь"
 
 #: common/djangoapps/student/views.py:1088
 msgid "No inactive user with this e-mail exists"
@@ -3174,20 +3192,19 @@ msgstr ""
 
 #: common/djangoapps/student/views.py:1118
 msgid "Invalid password"
-msgstr ""
+msgstr "Неверный пароль"
 
 #: common/djangoapps/student/views.py:1125
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "Введите действительный адрес эл. почты!"
 
 #: common/djangoapps/student/views.py:1130
-#, fuzzy
 msgid "An account with this e-mail already exists."
 msgstr "Учетная запись с таким адресом электронной почты уже существует."
 
 #: common/djangoapps/student/views.py:1146
 msgid "Old email is the same as the new email."
-msgstr ""
+msgstr "Старый адрес электронной почты совпадает с новым."
 
 #: common/djangoapps/student/views.py:1235
 msgid "Name required"
@@ -3222,11 +3239,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py:61
 msgid "Task is already running."
-msgstr ""
+msgstr "Задание уже выполняется."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:102
 msgid "Membership"
-msgstr ""
+msgstr "Членство"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:118
 msgid "Student Admin"
@@ -3239,7 +3256,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:144
 #: lms/templates/courseware/instructor_dashboard.html:122
 msgid "Analytics"
-msgstr ""
+msgstr "Аналитика"
 
 #: lms/djangoapps/shoppingcart/models.py:162
 msgid "Trying to add a different currency into the cart"
@@ -3261,14 +3278,12 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py:28
 #: lms/djangoapps/shoppingcart/tests/test_views.py:80
-#, fuzzy
 msgid "The course you requested does not exist."
-msgstr "Запрашиваемая вами страница не может быть найдена"
+msgstr "Запрашиваемый вами курс не существует."
 
 #: lms/djangoapps/shoppingcart/views.py:31
-#, fuzzy
 msgid "Course added to cart."
-msgstr "Импорт курса:"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:142
 msgid "The payment processor did not return a required parameter: {0}"
@@ -3375,9 +3390,8 @@ msgid "The request ID is invalid."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:385
-#, fuzzy
 msgid "The transaction has already been settled or reversed."
-msgstr "Эта учетная запись уже была активирована."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:393
 msgid "You requested a credit for a capture that was previously voided"
@@ -3405,23 +3419,21 @@ msgid "Filter"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js:61
-#, fuzzy
 msgid "Choose all"
-msgstr "Выберите файл"
+msgstr "Выбрать всё"
 
 #: lms/static/admin/js/SelectFilter2.js:61
 #, python-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Щелкните чтобы выбрать все %s."
 
 #: lms/static/admin/js/SelectFilter2.js:67
-#, fuzzy
 msgid "Choose"
-msgstr "Выберите файл"
+msgstr "Выбрать"
 
 #: lms/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
-msgstr ""
+msgstr "Удалить"
 
 #: lms/static/admin/js/SelectFilter2.js:75
 #, python-format
@@ -3436,9 +3448,8 @@ msgid ""
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js:80
-#, fuzzy
 msgid "Remove all"
-msgstr "Удалить срок"
+msgstr "Удалить все"
 
 #: lms/static/admin/js/SelectFilter2.js:80
 #, python-format
@@ -3507,9 +3518,8 @@ msgid "Clock"
 msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:81
-#, fuzzy
 msgid "Choose a time"
-msgstr "Выберите файл"
+msgstr "Выберите время"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
@@ -3609,28 +3619,24 @@ msgid "administratorMessageSubject"
 msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
-#, fuzzy
 msgid "labelUsername"
-msgstr "Публичное имя пользователя"
+msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
-#, fuzzy
 msgid "labelPassword"
-msgstr "Пароль"
+msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
 msgid "loginSubmit"
 msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
-#, fuzzy
 msgid "loginInvalid"
-msgstr "Недействительная активация"
+msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
-#, fuzzy
 msgid "enterRoomPassword"
-msgstr "Пароль"
+msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
 msgid "enterRoomPasswordSubmit"
@@ -3677,9 +3683,8 @@ msgid "messageSubmit"
 msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
-#, fuzzy
 msgid "userOnline"
-msgstr "Содержание курса"
+msgstr ""
 
 #: lms/static/js/vendor/candy.min.js:1
 msgid "roomSubject"
@@ -3847,13 +3852,15 @@ msgstr ""
 
 #: lms/templates/dashboard.html:13
 msgid "Dashboard"
-msgstr ""
+msgstr "Личный кабинет"
 
 #: lms/templates/dashboard.html:57
 msgid ""
 "You'll receive a confirmation in your in-box. Please click the link in the "
 "email to confirm the email change."
 msgstr ""
+"Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
+"ссылке указанной в письме для смены почтового адреса."
 
 #: lms/templates/dashboard.html:101 lms/templates/register.html:154
 msgid "Full Name"
@@ -3861,20 +3868,20 @@ msgstr "Полное имя"
 
 #: lms/templates/dashboard.html:101 lms/templates/dashboard.html:106
 msgid "edit"
-msgstr ""
+msgstr "изменить"
 
 #: lms/templates/dashboard.html:104
 #: lms/templates/university_profile/edge.html:15
 msgid "Email"
-msgstr ""
+msgstr "Эл. почта"
 
 #: lms/templates/dashboard.html:113 lms/templates/dashboard.html:116
 msgid "Reset Password"
-msgstr ""
+msgstr "Восстановить пароль"
 
 #: lms/templates/dashboard.html:128
 msgid "Current Courses"
-msgstr ""
+msgstr "Текущие курсы"
 
 #: lms/templates/dashboard.html:143 lms/templates/dashboard.html:147
 msgid "{course_number} {course_name} Cover Image"
@@ -3882,19 +3889,19 @@ msgstr ""
 
 #: lms/templates/dashboard.html:155
 msgid "Course Completed - {end_date}"
-msgstr ""
+msgstr "Курс выполнен - {end_date}"
 
 #: lms/templates/dashboard.html:157
 msgid "Course Started - {start_date}"
-msgstr ""
+msgstr "Курс начат - {start_date}"
 
 #: lms/templates/dashboard.html:159
 msgid "Course Starts - {start_date}"
-msgstr ""
+msgstr "Курс начинается - {start_date}"
 
 #: lms/templates/dashboard.html:181
 msgid "Register for Pearson exam"
-msgstr ""
+msgstr "Зарегистрироваться на личный экзамен"
 
 #: lms/templates/dashboard.html:182
 msgid ""
@@ -3973,35 +3980,35 @@ msgstr ""
 
 #: lms/templates/dashboard.html:277
 msgid "View Archived Course"
-msgstr ""
+msgstr "Просмотр архивных курсов"
 
 #: lms/templates/dashboard.html:279
 msgid "View Course"
-msgstr ""
+msgstr "Просмотр курса"
 
 #: lms/templates/dashboard.html:282
 msgid "Unregister"
-msgstr ""
+msgstr "Удалить регистрацию"
 
 #: lms/templates/dashboard.html:291
 msgid "Looks like you haven't registered for any courses yet."
-msgstr ""
+msgstr "Вы не зарегистрированы ни на один курс"
 
 #: lms/templates/dashboard.html:293
 msgid "Find courses now!"
-msgstr ""
+msgstr "Найти курсы!"
 
 #: lms/templates/dashboard.html:300
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Ошибка при загрузке курсов"
 
 #: lms/templates/dashboard.html:319
 msgid "Are you sure you want to unregister from {course_number}?"
-msgstr ""
+msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
 
 #: lms/templates/dashboard.html:344
 msgid "Password Reset Email Sent"
-msgstr ""
+msgstr "Письмо восстановлением пароля выслано"
 
 #: lms/templates/dashboard.html:350
 msgid ""
@@ -4011,15 +4018,15 @@ msgstr ""
 
 #: lms/templates/dashboard.html:365 lms/templates/dashboard.html:382
 msgid "Change Email"
-msgstr ""
+msgstr "Изменить Email"
 
 #: lms/templates/dashboard.html:373
 msgid "Please enter your new email address:"
-msgstr ""
+msgstr "Введите новый адрес электронной почты:"
 
 #: lms/templates/dashboard.html:375
 msgid "Please confirm your password:"
-msgstr ""
+msgstr "Подтвердите ваш пароль:"
 
 #: lms/templates/dashboard.html:379
 msgid ""
@@ -4029,7 +4036,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html:398
 msgid "Change your name"
-msgstr ""
+msgstr "Измениние отображаемого имени"
 
 #: lms/templates/dashboard.html:404
 msgid ""
@@ -4045,11 +4052,11 @@ msgstr ""
 
 #: lms/templates/dashboard.html:410
 msgid "Reason for name change:"
-msgstr ""
+msgstr "Причина изменения имени:"
 
 #: lms/templates/dashboard.html:414
 msgid "Change My Name"
-msgstr ""
+msgstr "Изменить имя"
 
 #: lms/templates/email_change_failed.html:8 lms/templates/email_exists.html:8
 msgid "E-mail change failed"
@@ -4210,7 +4217,7 @@ msgstr ""
 #: lms/templates/forgot_password_modal.html:17 lms/templates/login.html:111
 #: lms/templates/register.html:112
 msgid "Required Information"
-msgstr ""
+msgstr "Требуемая информация"
 
 #: lms/templates/forgot_password_modal.html:21
 msgid "Your E-mail Address"
@@ -4360,11 +4367,11 @@ msgstr ""
 
 #: lms/templates/login.html:100
 msgid "The following errors occured while logging you in:"
-msgstr ""
+msgstr "При входе произошли следующие ошибки:"
 
 #: lms/templates/login.html:102
 msgid "Your email or password is incorrect"
-msgstr ""
+msgstr "Ваш адрес элекронной почты или пароль неверны"
 
 #: lms/templates/login.html:107
 msgid ""
@@ -4389,7 +4396,7 @@ msgstr ""
 
 #: lms/templates/login.html:152
 msgid "Helpful Information"
-msgstr ""
+msgstr "Справочная информация"
 
 #: lms/templates/login.html:157 lms/templates/login.html:159
 msgid "Login via OpenID"
@@ -4420,7 +4427,7 @@ msgstr ""
 #: lms/templates/login_modal.html:9 lms/templates/provider_login.html:37
 #: lms/templates/university_profile/edge.html:23
 msgid "Log In"
-msgstr ""
+msgstr "Войти"
 
 #: lms/templates/login_modal.html:32
 msgid "Not enrolled?"
@@ -4496,7 +4503,7 @@ msgstr ""
 
 #: lms/templates/navigation.html:61
 msgid "Find Courses"
-msgstr ""
+msgstr "Найти курсы"
 
 #: lms/templates/navigation.html:69
 msgid "Dashboard for:"
@@ -4531,7 +4538,7 @@ msgstr "Зарегистрируйтесь сейчас"
 #: lms/templates/registration/login.html:8
 #: lms/templates/registration/login.html:21
 msgid "Log in"
-msgstr ""
+msgstr "Вход в систему"
 
 #: lms/templates/navigation.html:126
 msgid ""
@@ -4587,7 +4594,7 @@ msgstr "Регистрация в {platform_name}"
 
 #: lms/templates/register.html:73
 msgid "Create my {platform_name} Account"
-msgstr ""
+msgstr "Создать мой аккаунт в {platform_name}"
 
 #: lms/templates/register.html:87
 msgid "Welcome! Register below to create your {platform_name} account"
@@ -4670,7 +4677,7 @@ msgstr "Регистрация"
 
 #: lms/templates/register.html:338 lms/templates/signup_modal.html:120
 msgid "Create My Account"
-msgstr ""
+msgstr "Создать учетную запись"
 
 #: lms/templates/register.html:345
 msgid "Registration Help"
@@ -6894,10 +6901,8 @@ msgid "Payment Error"
 msgstr ""
 
 #: lms/templates/shoppingcart/error.html:10
-#, fuzzy
 msgid "There was an error processing your order!"
 msgstr ""
-"Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
 
 #: lms/templates/shoppingcart/error.html:13
 msgid "Return to cart to retry payment"
@@ -10140,11 +10145,11 @@ msgstr ""
 
 #: lms/templates/university_profile/edge.html:12
 msgid "Log in to your courses"
-msgstr ""
+msgstr "Войти в ваши курсы"
 
 #: lms/templates/university_profile/edge.html:29
 msgid "Register for classes"
-msgstr "Регистрация на занятия"
+msgstr "Регистрация на курсы"
 
 #: lms/templates/university_profile/edge.html:30
 msgid "Take free online courses from today's leading universities."
