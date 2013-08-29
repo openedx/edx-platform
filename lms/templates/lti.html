@@ -1,4 +1,4 @@
-<div align="center" id="${element_id}" class="${element_class}">
+<div id="${element_id}" class="${element_class}">
 
     ## This form will be hidden. Once available on the client, the LTI
     ## module JavaScript will trigget a "submit" on the form, and the
@@ -6,31 +6,29 @@
     <form
         action="${lti_url}"
         name="ltiLaunchForm"
-        id="ltiLaunchForm"
+        class="ltiLaunchForm"
         method="post"
         target="ltiLaunchFrame"
         encType="application/x-www-form-urlencoded"
     >
+        <input name="launch_presentation_return_url" value="" />
+        <input name="lis_outcome_service_url" value="" />
+        <input name="lis_result_sourcedid" value="" />
+        <input name="lti_message_type" value="basic-lti-launch-request" />
+        <input name="lti_version" value="LTI-1p0" />
+        <input name="oauth_callback" value="about:blank" />
+        <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
+        <input name="oauth_nonce" value="${oauth_nonce}" />
+        <input name="oauth_signature_method" value="HMAC-SHA1" />
+        <input name="oauth_timestamp" value="${oauth_timestamp}" />
+        <input name="oauth_version" value="1.0" />
+        <input name="user_id" value="default_user_id" />
+        <input name="oauth_signature" value="${oauth_signature}" />
 
-    <input type="hidden" name="launch_presentation_return_url" value="">
-    <input type="hidden" name="lis_outcome_service_url" value="">
-    <input type="hidden" name="lis_result_sourcedid" value="">
-    <input type="hidden" name="lti_message_type" value="basic-lti-launch-request">
-    <input type="hidden" name="lti_version" value="LTI-1p0">
-    <input type="hidden" name="oauth_callback" value="about:blank">
-    <input type="hidden" name="oauth_consumer_key" value="${oauth_consumer_key}"/>
-    <input type="hidden" name="oauth_nonce" value="${oauth_nonce}"/>
-    <input type="hidden" name="oauth_signature_method" value="HMAC-SHA1"/>
-    <input type="hidden" name="oauth_timestamp" value="${oauth_timestamp}"/>
-    <input type="hidden" name="oauth_version" value="1.0"/>
-    <input type="hidden" name="user_id" value="default_user_id">
-
-    <input type="hidden" name="oauth_signature" value="${oauth_signature}"/>
-    <input type="submit" value="Press to Launch" style="display: none"/>
-
+        <input type="submit" value="Press to Launch" />
     </form>
 
-    <h3 class="error_message hidden">
+    <h3 class="error_message">
         Please provide LTI url. Click "Edit", and fill in the
         required fields.
     </h3>
@@ -38,11 +36,8 @@
     ## The result of the form submit will be rendered here.
     <iframe
         name="ltiLaunchFrame"
-        id="ltiLaunchFrame"
-        width="0"
-        height="0"
+        class="ltiLaunchFrame"
         src=""
-        style="border: 0px; overflow-x: hidden;"
     ></iframe>
 
 </div>
