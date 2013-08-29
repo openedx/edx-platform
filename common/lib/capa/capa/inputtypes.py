@@ -49,7 +49,7 @@ import pyparsing
 
 from .registry import TagRegistry
 from chem import chemcalc
-from preview import latex_preview
+from calc.preview import latex_preview
 import xqueue_interface
 from datetime import datetime
 
