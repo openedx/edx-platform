@@ -34,7 +34,7 @@ from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
 
-__all__ = ['import_course', 'generate_export_course', 'export_course']
+__all__ = ['import_course', 'import_status', 'generate_export_course', 'export_course']
 
 log = logging.getLogger(__name__)
 
@@ -143,21 +143,21 @@ def import_course(request, org, course, name):
 
         else:   # This was the last chunk.
 
-            # 'Lock' with status info.
-            status_file = data_root / (course + filename + ".lock")
+            # Use sessions to keep info about import progress
+            session_status = request.session.setdefault("import_status", {})
+            key = course + filename
+            session_status[key] = 1
+            request.session.modified = True
 
-            # Do everything from now on in a with-context, to be sure we've
-            # properly cleaned up.
-            with wfile(status_file, course_dir):
-
-                with open(status_file, 'w+') as sf:
-                    sf.write("Extracting")
+            # Do everything from now on in a try-finally block to make sure
+            # everything is properly cleaned up.
+            try:
 
                 tar_file = tarfile.open(temp_filepath)
                 tar_file.extractall(course_dir + '/')
 
-                with open(status_file, 'w+') as sf:
-                    sf.write("Verifying")
+                session_status[key] = 2
+                request.session.modified = True
 
                 # find the 'course.xml' file
                 dirpath = None
@@ -210,11 +210,14 @@ def import_course(request, org, course, name):
 
                 logging.debug('new course at {0}'.format(course_items[0].location))
 
-                with open(status_file, 'w') as sf:
-                    sf.write("Updating course")
+                session_status[key] = 3
+                request.session.modified = True
 
                 create_all_course_groups(request.user, course_items[0].location)
                 logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
+            finally:
+                shutil.rmtree(course_dir)
 
             return JsonResponse({'Status': 'OK'})
     else:
@@ -231,31 +234,24 @@ def import_course(request, org, course, name):
 
 @ensure_csrf_cookie
 @login_required
-def get_import_status(request, course, filename):
+def import_status(request, org, course, ename):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
-        0 : No status file found (import done or upload still in progress)
+        0 : No status info found (import done or upload still in progress)
         1 : Extracting file
         2 : Validating.
         3 : Importing to mongo
 
-        4 : Error reading file (e.g., converting contents to int)
-
     """
-    data_root = path(settings.GITHUB_REPO_ROOT)
-    status_file = data_root / (course + filename + ".lock")
-    if not os.path.isfile(status_file):
-        return JsonResponse({"ImportStatus": 0 })
 
-    with open(status_file, "r") as f:
-        try:
-            status = int(f.read())
-        except ValueError:
-            status = 4
-        return JsonResponse({"ImportStatus": status})
+    try:
+        session_status = request.session["import_status"]
+        status = session_status[course + name]
+    except KeyError:
+        status = 0
 
-
+    return JsonResponse({"ImportStatus": status })
 
 
 @ensure_csrf_cookie

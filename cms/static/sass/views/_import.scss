@@ -121,6 +121,10 @@ body.course.import {
   }
 }
 
+div.status-info-block {
+    display: none;
+}
+
 .not-started {
   opacity: 0.4;
 }

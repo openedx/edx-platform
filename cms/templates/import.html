@@ -34,8 +34,8 @@
         <input type="file" name="course-data" class="file-input" >
         <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <div id="status-infos" class="status-infos">
-            <p class="status-info in-progress">
+        <div id="status-info-block" class="status-info-block">
+            <p class="status-info not-started">
             Unpacking
             <span class="loading-dots">.</span>
             <span class="loading-dots">.</span>
@@ -99,7 +99,7 @@ $('#fileupload').fileupload({
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
                     if (result.status != 200) {
-                        alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
+                        alert('${_("Your import has failed.")}\n\n' + result.responseText["ErrMsg"]);
                         submitBtn.show();
                         bar.hide();
                     } else {
@@ -116,10 +116,17 @@ $('#fileupload').fileupload({
     },
 
     progressall: function(e, data){
-        var percentVal = parseInt(data.loaded / data.total * 100, 10) + "%";
+        var percentInt = data.loaded / data.total * 100
+        var percentVal = parseInt(percentInt, 10) + "%";
+        if (percentInt >= 99) {
+            bar.hide();
+            console.log(JSON.stringify(data));
+            startServerFeedback();
+        } else {
         bar.show();
         fill.width(percentVal);
         percent.html(percentVal);
+        }
     },
     done: function(e, data){
         bar.hide();
