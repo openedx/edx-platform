@@ -83,6 +83,7 @@ class LTIModule(LTIFields, XModule):
         # with 'Content-Type': 'application/x-www-form-urlencoded'
         # so '='' becomes '%3D', but server waits for unencoded signature.
         # Decode signature back:
+        # may be it may be encoded by browser again... check
         params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
         return params
 
