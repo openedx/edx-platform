@@ -823,6 +823,16 @@ class CombinedOpenEndedV1Module():
         """
         return (self.state == self.DONE or self.ready_to_reset) and self.is_scored
 
+    def get_weight(self):
+        """
+        Return the weight of the problem.  The old default weight was None, so set to 1 in that case.
+        Output - int weight
+        """
+        weight = self.weight
+        if weight is None:
+            weight = 1
+        return weight
+
     def get_score(self):
         """
         Score the student received on the problem, or None if there is no
@@ -837,9 +847,7 @@ class CombinedOpenEndedV1Module():
         score = None
 
         #The old default was None, so set to 1 if it is the old default weight
-        weight = self.weight
-        if weight is None:
-            weight = 1
+        weight = self.get_weight()
         if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
@@ -879,27 +887,41 @@ class CombinedOpenEndedV1Module():
         return score_dict
 
     def max_score(self):
-        ''' Maximum score. Two notes:
-
-            * This is generic; in abstract, a problem could be 3/5 points on one
-              randomization, and 5/7 on another
-        '''
+        """
+        Maximum score possible in this module.  Returns the max score if finished, None if not.
+        """
         max_score = None
         if self.check_if_done_and_scored():
             max_score = self._max_score
         return max_score
 
     def get_progress(self):
-        ''' Return a progress.Progress object that represents how far the
+        """
+        Generate a progress object. Progress objects represent how far the
         student has gone in this module.  Must be implemented to get correct
-        progress tracking behavior in nesting modules like sequence and
-        vertical.
+        progress tracking behavior in nested modules like sequence and
+        vertical.  This behavior is consistent with capa.
 
-        If this module has no notion of progress, return None.
-        '''
-        progress_object = Progress(self.current_task_number, len(self.task_xml))
+        If the module is unscored, return None (consistent with capa).
+        """
 
-        return progress_object
+        d = self.get_score()
+        score = d['score']
+        total = d['total']
+
+        if total > 0 and self.is_scored:
+            if self.weight is not None:
+                # scale score and total by weight/total:
+                score = score * self.get_weight() / total
+                total = self.get_weight()
+
+            try:
+                return Progress(score, total)
+            except (TypeError, ValueError):
+                log.exception("Got bad progress")
+                return None
+
+        return None
 
     def out_of_sync_error(self, data, msg=''):
         """

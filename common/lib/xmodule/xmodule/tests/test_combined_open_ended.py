@@ -22,6 +22,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
+from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
     TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE)
@@ -479,6 +480,29 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         #The progress view requires that this function be exposed
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
+
+    def test_container_get_progress(self):
+        """
+        See if we can get the progress from the actual xmodule
+        """
+        progress = self.combinedoe_container.max_score()
+        self.assertEqual(progress, None)
+
+    def test_get_progress(self):
+        """
+        Test if we can get the correct progress from the combined open ended class
+        """
+        self.combinedoe.update_task_states()
+        self.combinedoe.state = "done"
+        self.combinedoe.is_scored = True
+        progress = self.combinedoe.get_progress()
+        self.assertIsInstance(progress, Progress)
+
+        #progress._a is the score of the xmodule, which is 0 right now
+        self.assertEqual(progress._a, 0)
+
+        #progress._b is the max_score (which is 1), divided by the weight (which is 1)
+        self.assertEqual(progress._b, 1)
 
     def test_container_weight(self):
         """
