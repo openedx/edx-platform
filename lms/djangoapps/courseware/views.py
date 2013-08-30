@@ -22,7 +22,7 @@ from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
@@ -78,7 +78,7 @@ def courses(request):
     return render_to_response("courseware/courses.html", {'courses': courses})
 
 
-def render_accordion(request, course, chapter, section, model_data_cache):
+def render_accordion(request, course, chapter, section, field_data_cache):
     """
     Draws navigation bar. Takes current position in accordion as
     parameter.
@@ -93,7 +93,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
-    toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
+    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -187,7 +187,7 @@ def check_for_active_timelimit_module(request, course_id, course):
             # get the corresponding section_descriptor for the given StudentModel entry:
             module_state_key = timelimit_student_module.module_state_key
             timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
-            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course.id, request.user,
+            timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course.id, request.user,
                                                                                      timelimit_descriptor, depth=None)
             timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                          timelimit_module_cache, course.id, position=None)
@@ -208,7 +208,7 @@ def check_for_active_timelimit_module(request, course_id, course):
     return context
 
 
-def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
+def update_timelimit_module(user, course_id, field_data_cache, timelimit_descriptor, timelimit_module):
     """
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
@@ -308,10 +308,10 @@ def index(request, course_id, chapter=None, section=None,
     masq = setup_masquerade(request, staff_access)
 
     try:
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -322,7 +322,7 @@ def index(request, course_id, chapter=None, section=None,
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section, model_data_cache),
+            'accordion': render_accordion(request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
@@ -373,11 +373,11 @@ def index(request, course_id, chapter=None, section=None,
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
-            section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_id, user, section_descriptor, depth=None)
             section_module = get_module(request.user, request,
                                 section_descriptor.location,
-                                section_model_data_cache, course_id, position, depth=None)
+                                section_field_data_cache, course_id, position, depth=None)
 
             if section_module is None:
                 # User may be trying to be clever and access something
@@ -694,12 +694,12 @@ def progress(request, course_id, student_id=None):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id, student, course, depth=None)
 
     courseware_summary = grades.progress_summary(student, request, course,
-                                                 model_data_cache)
-    grade_summary = grades.grade(student, request, course, model_data_cache)
+                                                 field_data_cache)
+    grade_summary = grades.grade(student, request, course, field_data_cache)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)

@@ -44,7 +44,7 @@ from ratelimitbackend.exceptions import RateLimitException
 import student.views as student_views
 # Required for Pearson
 from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
@@ -915,7 +915,7 @@ def test_center_login(request):
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
-    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+    timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
                                                                              timelimit_descriptor, depth=None)
     timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)

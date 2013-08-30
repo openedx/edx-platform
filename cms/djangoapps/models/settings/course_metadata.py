@@ -1,8 +1,9 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
-from xblock.core import Scope
+from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
+from cms.xmodule_namespace import CmsBlockMixin
 
 
 class CourseMetadata(object):
@@ -34,12 +35,17 @@ class CourseMetadata(object):
 
         descriptor = get_modulestore(course_location).get_item(course_location)
 
-        for field in descriptor.fields + descriptor.lms.fields:
+        for field in descriptor.fields.values():
+            if field.name in CmsBlockMixin.fields:
+                continue
+
             if field.scope != Scope.settings:
                 continue
 
-            if field.name not in cls.FILTERED_LIST:
-                course[field.name] = field.read_json(descriptor)
+            if field.name in cls.FILTERED_LIST:
+                continue
+
+            course[field.name] = field.read_json(descriptor)
 
         return course
 
@@ -67,12 +73,8 @@ class CourseMetadata(object):
 
             if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                 dirty = True
-                value = getattr(CourseDescriptor, key).from_json(val)
+                value = descriptor.fields[key].from_json(val)
                 setattr(descriptor, key, value)
-            elif hasattr(descriptor.lms, key) and getattr(descriptor.lms, key) != key:
-                dirty = True
-                value = getattr(CourseDescriptor.lms, key).from_json(val)
-                setattr(descriptor.lms, key, value)
 
         if dirty:
             # Save the data that we've just changed to the underlying
@@ -96,8 +98,6 @@ class CourseMetadata(object):
         for key in payload['deleteKeys']:
             if hasattr(descriptor, key):
                 delattr(descriptor, key)
-            elif hasattr(descriptor.lms, key):
-                delattr(descriptor.lms, key)
 
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.

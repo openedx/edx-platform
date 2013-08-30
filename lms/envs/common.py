@@ -30,6 +30,9 @@ from path import path
 
 from .discussionsettings import *
 
+from lms.xblock.mixin import LmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
@@ -319,6 +322,12 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
 
 #################### Python sandbox ############################################
 

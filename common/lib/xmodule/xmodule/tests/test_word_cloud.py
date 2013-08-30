@@ -8,7 +8,7 @@ from . import PostData, LogicTest
 class WordCloudModuleTest(LogicTest):
     """Logic tests for Word Cloud Xmodule."""
     descriptor_class = WordCloudDescriptor
-    raw_model_data = {
+    raw_field_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
         'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
         'submitted': False

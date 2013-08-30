@@ -23,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 from track.views import task_track
 
 from courseware.models import StudentModule
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor_task.models import InstructorTask, PROGRESS
 
@@ -251,7 +251,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     the need for a Request object when instantiating an xmodule instance.
     """
     # reconstitute the problem's corresponding XModule:
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
@@ -271,7 +271,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
         if xmodule_instance_args is not None else ''
 
-    return get_module_for_descriptor_internal(student, module_descriptor, model_data_cache, course_id,
+    return get_module_for_descriptor_internal(student, module_descriptor, field_data_cache, course_id,
                                               make_track_function(), xqueue_callback_url_prefix,
                                               grade_bucket_type=grade_bucket_type)
 

@@ -6,8 +6,6 @@ from pytz import UTC
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import editable_modulestore
-from xmodule.course_module import CourseDescriptor
-from xblock.core import Scope
 from xmodule.x_module import XModuleDescriptor
 
 
@@ -35,7 +33,7 @@ class XModuleCourseFactory(Factory):
         if display_name is not None:
             new_course.display_name = display_name
 
-        new_course.lms.start = datetime.datetime.now(UTC).replace(microsecond=0)
+        new_course.start = datetime.datetime.now(UTC).replace(microsecond=0)
 
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():

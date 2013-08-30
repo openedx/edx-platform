@@ -60,12 +60,6 @@ location = ${location | h}
   %endfor
 </table>
 <table>
-  <tr><th>${_('{platform_name} Fields').format(platform_name=settings.PLATFORM_NAME)}</th></tr>
-  %for name, field in lms_fields:
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
-  %endfor
-</table>
-<table>
   <tr><th>${_('XML attributes')}</th></tr>
   %for name, field in xml_attributes.items():
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>

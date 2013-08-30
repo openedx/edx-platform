@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 
 from xmodule.modulestore.django import modulestore, editable_modulestore
 
@@ -234,14 +234,14 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
                                         kwargs={'course_id': self.course.id}))
 
         return grades.grade(self.student_user, fake_request,
-                            self.course, model_data_cache)
+                            self.course, field_data_cache)
 
     def get_progress_summary(self):
         """
@@ -255,7 +255,7 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
@@ -264,7 +264,7 @@ class TestCourseGrader(TestSubmittingProblems):
         progress_summary = grades.progress_summary(self.student_user,
                                                    fake_request,
                                                    self.course,
-                                                   model_data_cache)
+                                                   field_data_cache)
         return progress_summary
 
     def check_grade_percent(self, percent):

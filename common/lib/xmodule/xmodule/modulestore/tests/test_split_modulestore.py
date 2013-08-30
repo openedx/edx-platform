@@ -9,10 +9,11 @@ import unittest
 import uuid
 from importlib import import_module
 
-from xblock.core import Scope
+from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
+from xmodule.modulestore.inheritance import InheritanceMixin
 from pytz import UTC
 from path import path
 import re
@@ -31,6 +32,7 @@ class SplitModuleTest(unittest.TestCase):
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
         'fs_root': '',
+        'xblock_mixins': (InheritanceMixin,)
     }
 
     MODULESTORE = {
@@ -187,7 +189,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.category, 'course')
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
-        self.assertEqual(course.lms.graceperiod, datetime.timedelta(hours=2))
+        self.assertEqual(course.graceperiod, datetime.timedelta(hours=2))
         self.assertIsNone(course.advertised_start)
         self.assertEqual(len(course.children), 0)
         self.assertEqual(course.definition_locator.definition_id, "head12345_11")
@@ -893,7 +895,7 @@ class TestCourseCreation(SplitModuleTest):
         original = modulestore().get_course(original_locator)
         original_index = modulestore().get_course_index_info(original_locator)
         fields = {}
-        for field in original.fields:
+        for field in original.fields.values():
             if field.scope == Scope.content and field.name != 'location':
                 fields[field.name] = getattr(original, field.name)
             elif field.scope == Scope.settings:

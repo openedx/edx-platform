@@ -10,7 +10,8 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
-from xblock.core import XBlock, Scope, String, Integer, Float, List, ModelType
+from xblock.core import XBlock
+from xblock.fields import Scope, String, Integer, Float, List
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.modulestore.locator import BlockUsageLocator
@@ -20,29 +21,6 @@ log = logging.getLogger(__name__)
 
 def dummy_track(_event_type, _event):
     pass
-
-
-class LocationField(ModelType):
-    """
-    XBlock field for storing Location values
-    """
-    def from_json(self, value):
-        """
-        Parse the json value as a Location
-        """
-        try:
-            return Location(value)
-        except InvalidLocationError:
-            if isinstance(value, BlockUsageLocator):
-                return value
-            else:
-                return BlockUsageLocator(value)
-
-    def to_json(self, value):
-        """
-        Store the Location as a url string in json
-        """
-        return value.url()
 
 
 class HTMLSnippet(object):
@@ -115,24 +93,6 @@ class XModuleFields(object):
         default=None
     )
 
-    # Please note that in order to be compatible with XBlocks more generally,
-    # the LMS and CMS shouldn't be using this field. It's only for internal
-    # consumption by the XModules themselves
-    location = LocationField(
-        display_name="Location",
-        help="This is the location id for the XModule.",
-        scope=Scope.content,
-        default=Location(None),
-    )
-    # Please note that in order to be compatible with XBlocks more generally,
-    # the LMS and CMS shouldn't be using this field. It's only for internal
-    # consumption by the XModules themselves
-    category = String(
-        display_name="xmodule category",
-        help="This is the category id for the XModule. It's for internal use only",
-        scope=Scope.content,
-    )
-
 
 class XModule(XModuleFields, HTMLSnippet, XBlock):
     ''' Implements a generic learning module.
@@ -152,7 +112,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
     icon_class = 'other'
 
 
-    def __init__(self, runtime, descriptor, model_data):
+    def __init__(self, descriptor, *args, **kwargs):
         '''
         Construct a new xmodule
 
@@ -160,32 +120,43 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
 
         descriptor: the XModuleDescriptor that this module is an instance of.
 
-        model_data: A dictionary-like object that maps field names to values
+        field_data: A dictionary-like object that maps field names to values
             for those fields.
         '''
-        super(XModule, self).__init__(runtime, model_data)
-        self._model_data = model_data
-        self.system = runtime
+        super(XModule, self).__init__(*args, **kwargs)
+        self.system = self.runtime
         self.descriptor = descriptor
-        # LMS tests don't require descriptor but really it's required
-        if descriptor:
-            self.url_name = descriptor.url_name
-            # don't need to set category as it will automatically get from descriptor
-        elif isinstance(self.location, Location):
-            self.url_name = self.location.name
-            if getattr(self, 'category', None) is None:
-                self.category = self.location.category
-        elif isinstance(self.location, BlockUsageLocator):
-            self.url_name = self.location.usage_id
-            if getattr(self, 'category', None) is None:
-                raise InsufficientSpecificationError()
-        else:
-            raise InsufficientSpecificationError()
         self._loaded_children = None
 
     @property
     def id(self):
         return self.location.url()
+
+    @property
+    def category(self):
+        return self.scope_ids.block_type
+
+    @property
+    def location(self):
+        try:
+            return Location(self.scope_ids.usage_id)
+        except InvalidLocationError:
+            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
+                return self.scope_ids.usage_id
+            else:
+                return BlockUsageLocator(self.scope_ids.usage_id)
+
+    @property
+    def url_name(self):
+        if self.descriptor:
+            return self.descriptor.url_name
+        elif isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.usage_id
+        else:
+            raise InsufficientSpecificationError()
+
 
     @property
     def display_name_with_default(self):
@@ -424,10 +395,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # (like a practice problem).
     has_score = False
 
-    # A list of descriptor attributes that must be equal for the descriptors to
-    # be equal
-    equality_attributes = ('_model_data', 'location')
-
     # Class level variable
 
     # True if this descriptor always requires recalculation of grades, for
@@ -458,23 +425,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         runtime: A DescriptorSystem for interacting with external resources
 
-        model_data: A dictionary-like object that maps field names to values
+        field_data: A dictionary-like object that maps field names to values
             for those fields.
 
         XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
         self.system = self.runtime
-        if isinstance(self.location, Location):
-            self.url_name = self.location.name
-            if getattr(self, 'category', None) is None:
-                self.category = self.location.category
-        elif isinstance(self.location, BlockUsageLocator):
-            self.url_name = self.location.usage_id
-            if getattr(self, 'category', None) is None:
-                raise InsufficientSpecificationError()
-        else:
-            raise InsufficientSpecificationError()
         # update_version is the version which last updated this xblock v prev being the penultimate updater
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
@@ -485,6 +442,30 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     @property
     def id(self):
         return self.location.url()
+
+    @property
+    def category(self):
+        return self.scope_ids.block_type
+
+    @property
+    def location(self):
+        try:
+            return Location(self.scope_ids.usage_id)
+        except InvalidLocationError:
+            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
+                return self.scope_ids.usage_id
+            else:
+                return BlockUsageLocator(self.scope_ids.usage_id)
+
+    @property
+    def url_name(self):
+        if isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.usage_id
+        else:
+            raise InsufficientSpecificationError()
+
 
     @property
     def display_name_with_default(self):
@@ -539,10 +520,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         system: Module system
         """
         # save any field changes
-        module = self.module_class(
-            system,
-            self,
-            system.xblock_model_data(self),
+        module = system.construct_xblock_from_class(
+            self.module_class,
+            descriptor=self,
+            field_data=system.xblock_field_data(self),
+            scope_ids=self.scope_ids,
         )
         module.save()
         return module
@@ -638,35 +620,23 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         # if caller wants kvs, caller's assuming it's up to date; so, decache it
         self.save()
-        return self._model_data._kvs
+        return self._field_data._kvs
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        return (self.__class__ == other.__class__ and
-                all(getattr(self, attr, None) == getattr(other, attr, None)
-                    for attr in self.equality_attributes))
+        return (self.scope_ids == other.scope_ids and
+                self.fields.keys() == other.fields.keys() and
+                all(getattr(self, field.name) == getattr(other, field.name)
+                    for field in self.fields.values()))
 
     def __repr__(self):
         return (
-            "{class_}({system!r}, location={location!r},"
-            " model_data={model_data!r})".format(
-                class_=self.__class__.__name__,
-                system=self.system,
-                location=self.location,
-                model_data=self._model_data,
-            )
+            "{0.__class__.__name__}("
+            "{0.runtime!r}, "
+            "{0._field_data!r}, "
+            "{0.scope_ids!r}"
+            ")".format(self)
         )
-
-    def iterfields(self):
-        """
-        A generator for iterate over the fields of this xblock (including the ones in namespaces).
-        Example usage: [field.name for field in module.iterfields()]
-        """
-        for field in self.fields:
-            yield field
-        for namespace in self.namespaces:
-            for field in getattr(self, namespace).fields:
-                yield field
 
     @property
     def non_editable_metadata_fields(self):
@@ -686,17 +656,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if scope == Scope.settings and hasattr(self, '_inherited_metadata'):
             inherited_metadata = getattr(self, '_inherited_metadata')
             result = {}
-            for field in self.iterfields():
+            for field in self.fields.values():
                 if (field.scope == scope and
-                        field.name in self._model_data and
+                        self._field_data.has(self, field.name) and
                         field.name not in inherited_metadata):
-                    result[field.name] = self._model_data[field.name]
+                    result[field.name] = self._field_data.get(self, field.name)
             return result
         else:
             result = {}
-            for field in self.iterfields():
-                if (field.scope == scope and field.name in self._model_data):
-                    result[field.name] = self._model_data[field.name]
+            for field in self.fields.values():
+                if (field.scope == scope and self._field_data.has(self, field.name)):
+                    result[field.name] = self._field_data.get(self, field.name)
             return result
 
     @property
@@ -709,7 +679,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         inherited_metadata = getattr(self, '_inherited_metadata', {})
         inheritable_metadata = getattr(self, '_inheritable_metadata', {})
         metadata_fields = {}
-        for field in self.fields:
+
+        # Only use the fields from this class, not mixins
+        fields = getattr(self, 'unmixed_class', self.__class__).fields
+
+        for field in fields.values():
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
                 continue
@@ -717,7 +691,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             inheritable = False
             value = getattr(self, field.name)
             default_value = field.default
-            explicitly_set = field.name in self._model_data
+            explicitly_set = self._field_data.has(self, field.name)
             if field.name in inheritable_metadata:
                 inheritable = True
                 default_value = field.from_json(inheritable_metadata.get(field.name))
@@ -813,6 +787,8 @@ class DescriptorSystem(Runtime):
                that you're about to re-raise---let the caller track them.
         """
 
+        super(DescriptorSystem, self).__init__(**kwargs)
+
         self.load_item = load_item
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
@@ -823,7 +799,7 @@ class DescriptorSystem(Runtime):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
+    def __init__(self, process_xml, policy, **kwargs):
         """
         load_item, resources_fs, error_tracker: see DescriptorSystem
 
@@ -832,8 +808,8 @@ class XMLParsingSystem(DescriptorSystem):
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
-                                  **kwargs)
+
+        super(XMLParsingSystem, self).__init__(**kwargs)
         self.process_xml = process_xml
         self.policy = policy
 
@@ -852,12 +828,12 @@ class ModuleSystem(Runtime):
     '''
     def __init__(
             self, ajax_url, track_function, get_module, render_template,
-            replace_urls, xblock_model_data, user=None, filestore=None,
+            replace_urls, xblock_field_data, user=None, filestore=None,
             debug=False, xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None):
+            replace_jump_to_id_urls=None, **kwargs):
         '''
         Create a closure around the system environment.
 
@@ -897,7 +873,7 @@ class ModuleSystem(Runtime):
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        xblock_model_data - A function that constructs a model_data for an xblock from its
+        xblock_field_data - A function that constructs a field_data for an xblock from its
             corresponding descriptor
 
         cache - A cache object with two methods:
@@ -908,6 +884,8 @@ class ModuleSystem(Runtime):
             not to allow the execution of unsafe, unsandboxed code.
 
         '''
+        super(ModuleSystem, self).__init__(**kwargs)
+
         self.ajax_url = ajax_url
         self.xqueue = xqueue
         self.track_function = track_function
@@ -921,7 +899,7 @@ class ModuleSystem(Runtime):
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
-        self.xblock_model_data = xblock_model_data
+        self.xblock_field_data = xblock_field_data
 
         if publish is None:
             publish = lambda e: None
