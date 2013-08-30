@@ -282,6 +282,7 @@ class @CombinedOpenEnded
     if @allow_reset=="True"
       @show_combined_rubric_current()
       @reset_button.show()
+      VideoClipper.cleanUp()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -324,6 +325,7 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
+      VideoClipper.cleanUp()
       @submit_button.hide()
       if @child_type=="openended"
         @skip_button.hide()
@@ -454,6 +456,8 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   reset: (event) =>
+    VideoClipper.cleanUp()
+    onVideoClipperReady()
     event.preventDefault()
     if @child_state == 'done' or @allow_reset=="True"
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
