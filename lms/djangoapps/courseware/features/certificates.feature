@@ -21,15 +21,19 @@ Feature: Verified certificates
         And I select a contribution amount
         And I confirm that the details match
         And I go to step "4"
-        Then The course is added to my cart
-        And I view the payment page
+        Then I am at the payment page
 
     Scenario: I can pay for a verified certificate
         Given I have submitted photos to verify my identity
         When I submit valid payment information
         Then I see that my payment was successful
-        And I receive an email confirmation
-        And I see that I am registered for a verified certificate course on my dashboard
+
+    Scenario: Verified courses display correctly on dashboard
+        Given I have submitted photos to verify my identity
+        When I submit valid payment information
+        And I navigate to my dashboard
+        Then I see the course on my dashboard
+        And I see that I am on the verified track
 
     Scenario: I can re-take photos
         Given I have submitted my "<PhotoType>" photo

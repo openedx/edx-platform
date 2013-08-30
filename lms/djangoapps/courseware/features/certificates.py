@@ -5,6 +5,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from course_modes.models import CourseMode
 from selenium.common.exceptions import WebDriverException
+from nose.tools import assert_equal
 
 def create_cert_course():
     world.clear_courses()
@@ -105,7 +106,7 @@ def capture_my_photo(step, name):
         "ctx.fillStyle = 'rgb(200,0,0)';",
         "ctx.fillRect(0, 0, 640, 480);",
         "var image = $('#{}_image');".format(name),
-        "image[0].src = canvas[0].toDataURL('image/png');"
+        "image[0].src = canvas[0].toDataURL('image/png').replace('image/png', 'image/octet-stream');"
         )
 
     # Mirror the javascript of the photo_verification.html page
@@ -113,7 +114,7 @@ def capture_my_photo(step, name):
     world.browser.execute_script("$('#{}_capture_button').hide();".format(name))
     world.browser.execute_script("$('#{}_reset_button').show();".format(name))
     world.browser.execute_script("$('#{}_approve_button').show();".format(name))
-    assert world.css_visible('#{}_approve_button'.format(name))
+    assert world.css_find('#{}_approve_button'.format(name))
 
 
 @step(u'I approve my "([^"]*)" photo$')
@@ -129,7 +130,7 @@ def approve_my_photo(step, name):
 
     # Make sure that the carousel is in the right place
     assert world.css_has_class(wrapper_css[name], 'carousel-active')
-    assert world.css_visible(button_css[name])
+    assert world.css_find(button_css[name])
 
     # HACK: for now don't bother clicking the approve button for
     # id_photo, because it is sending you back to Step 1.
@@ -158,29 +159,59 @@ def confirm_details_match(step):
     assert world.css_find(cb_css).checked
 
 
-@step(u'The course is added to my cart')
-def see_course_is_added_to_my_cart(step):
-    assert False, 'This step must be implemented'
-@step(u'I view the payment page')
-def view_the_payment_page(step):
-    assert False, 'This step must be implemented'
+@step(u'I am at the payment page')
+def at_the_payment_page(step):
+    world.css_find('input')
+    assert_equal(world.browser.title, u'Payment Form')
+
+
+@step(u'I submit valid payment information$')
+def submit_payment(step):
+    button_css = 'input[value=Submit]'
+    world.css_click(button_css)
+
+
 @step(u'I have submitted photos to verify my identity')
 def submitted_photos_to_verify_my_identity(step):
-    assert False, 'This step must be implemented'
-@step(u'I submit valid payment information')
-def submit_valid_payment_information(step):
-    assert False, 'This step must be implemented'
+    step.given('I am logged in')
+    step.given('I select the verified track')
+    step.given('I go to step "1"')
+    step.given('I capture my "face" photo')
+    step.given('I approve my "face" photo')
+    step.given('I go to step "2"')
+    step.given('I capture my "photo_id" photo')
+    step.given('I approve my "photo_id" photo')
+    step.given('I go to step "3"')
+    step.given('I select a contribution amount')
+    step.given('I confirm that the details match')
+    step.given('I go to step "4"')
+
+
 @step(u'I see that my payment was successful')
-def sesee_that_my_payment_was_successful(step):
-    assert False, 'This step must be implemented'
-@step(u'I receive an email confirmation')
-def receive_an_email_confirmation(step):
-    assert False, 'This step must be implemented'
-@step(u'I see that I am registered for a verified certificate course on my dashboard')
-def see_that_i_am_registered_for_a_verified_certificate_course_on_my_dashboard(step):
-    assert False, 'This step must be implemented'
+def see_that_my_payment_was_successful(step):
+    world.css_find('div')
+    assert_equal(world.browser.title, u'Receipt for Order 1')
+
+
+@step(u'I navigate to my dashboard')
+def navigate_to_my_dashboard(step):
+    world.css_click('span.avatar')
+    assert world.css_find('section.my-courses')
+
+
+@step(u'I see the course on my dashboard')
+def see_the_course_on_my_dashboard(step):
+    course_link_css = 'section.my-courses a[href*="edx/999/Certificates"]'
+    assert world.is_css_present(course_link_css)
+
+
+@step(u'I see that I am on the verified track')
+def see_that_i_am_on_the_verified_track(step):
+    assert False, 'Implement this step after the design is done'
+
+
 @step(u'I have submitted my "([^"]*)" photo')
-def submitted_my_group1_photo(step, group1):
+def submitted_my_foo_photo(step, name):
     assert False, 'This step must be implemented'
 @step(u'I retake my "([^"]*)" photo')
 def retake_my_group1_photo(step, group1):
