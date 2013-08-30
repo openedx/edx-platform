@@ -58,31 +58,40 @@
     </div>
 </section>
 <script type='text/javascript'>
-    var onVideoClipperReadyTried = VideoClipper;
-    var onVideoClipperReady = function(){
-      coeVideoId = $('#combined-open-ended').data('videoId');
+    // var onVideoClipperReadyTried = VideoClipper;
+    // var onVideoClipperReady = function(){
+    //   coeVideoId = $('#combined-open-ended').data('videoId');
 
-      if ((coeVideoId != null) && coeVideoId !== "") {
-        textarea = $('#combined-open-ended').find('textarea');
-        textarea.attr('id', 'video-clipper');
-        new VideoClipper({
-          textareaId: "video-clipper",
-          videoType: "YT",
-          videoId: coeVideoId
-        });
-      }
-    };
-    if(onVideoClipperReadyTried !== undefined){
-        onVideoClipperReady();
-    };
+    //   // snippetButton = $('#combined-open-ended').find('input[name=reset]').after('<input />').next();
 
-    var onOmniPlayerReadyTried = OmniPlayer;
-    var onOmniPlayerReady = function(){
-        OmniPlayer.loaded.YT = true;
-    };
-    if(onOmniPlayerReadyTried !== undefined){
-        onOmniPlayerReady();
-    };
+    //   // $(snippetButton).attr({
+    //   //   value: 'Snippet',
+    //   //   type: 'button',
+    //   //   id: 'coe-snippet-button'
+    //   // });
+
+    //   if ((coeVideoId != null) && coeVideoId !== "") {
+    //     textarea = $('#combined-open-ended').find('textarea');
+    //     textarea.attr('id', 'video-clipper');
+    //     new VideoClipper({
+    //       textareaId: "video-clipper",
+    //       // buttonId: 'coe-snippet-button',
+    //       videoType: "YT",
+    //       videoId: coeVideoId
+    //     });
+    //   }
+    // };
+    // if(onVideoClipperReadyTried !== undefined){
+    //     onVideoClipperReady();
+    // };
+
+    // var onOmniPlayerReadyTried = OmniPlayer;
+    // var onOmniPlayerReady = function(){
+    //     OmniPlayer.loaded.YT = true;
+    // };
+    // if(onOmniPlayerReadyTried !== undefined){
+    //     onOmniPlayerReady();
+    // };
 </script>
 <style>
     /* start bookMarklet Styles */

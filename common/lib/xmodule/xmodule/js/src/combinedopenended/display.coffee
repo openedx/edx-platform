@@ -274,15 +274,18 @@ class @CombinedOpenEnded
     @hint_area.attr('disabled', false)
 
     if @task_number==1 and @child_state=='assessing'
+      @video_response_on()
       @prompt_hide()
     if @child_state == 'done'
+      @video_response_on()
       @rubric_wrapper.hide()
     if @child_type=="openended"
+      @video_response_on()
       @skip_button.hide()
     if @allow_reset=="True"
       @show_combined_rubric_current()
       @reset_button.show()
-      VideoClipper.cleanUp()
+      @video_response_off()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -290,11 +293,13 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @gentle_alert "Your score did not meet the criteria to move to the next step."
     else if @child_state == 'initial'
+      @video_response_on()
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
       @setup_file_upload()
     else if @child_state == 'assessing'
+      @video_response_off()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hide_file_upload()
@@ -320,12 +325,13 @@ class @CombinedOpenEnded
       else
         @submit_button.click @message_post
     else if @child_state == 'done'
+      @video_response_off()
       @show_combined_rubric_current()
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
-      VideoClipper.cleanUp()
+      @video_response_off()
       @submit_button.hide()
       if @child_type=="openended"
         @skip_button.hide()
@@ -456,8 +462,7 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   reset: (event) =>
-    VideoClipper.cleanUp()
-    onVideoClipperReady()
+    @video_response_reset()
     event.preventDefault()
     if @child_state == 'done' or @allow_reset=="True"
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
@@ -655,3 +660,35 @@ class @CombinedOpenEnded
     if @rub.check_complete()
       @submit_button.attr("disabled",false)
       @submit_button.show()
+
+  video_response_on: () =>
+    onVideoClipperReadyTried = VideoClipper
+    window.onVideoClipperReady = ->
+      coeVideoId = @coe.data('videoId')
+      if coeVideoId != null && coeVideoId != ""
+        textarea = @coe.find('textarea')
+        textarea.attr('id', 'coe-video-clipper')
+        new VideoClipper
+          textareaId: 'coe-video-clipper'
+          videoType: "YT"
+          videoId: coeVideoId
+
+      if onVideoClipperReadyTried != undefined
+        window.onVideoClipperReady()
+
+      onOmniPlayerReadyTried = OmniPlayer
+      window.onOmniPlayerReady = ->
+        OmniPlayer.loaded.YT = true
+
+      if onOmniPlayerReadyTried != undefined
+        window.onOmniPlayerReady()
+
+
+  video_response_off: () =>
+    VideoClipper.cleanUp()
+
+  video_response_reset: () =>
+    @video_response_off()
+    @video_response_on()
+
+
