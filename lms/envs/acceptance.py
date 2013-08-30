@@ -82,6 +82,11 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
+
+# Set up Video information so that the lms will send
+# requests to a mock Youtube server running locally
+VIDEO_PORT = XQUEUE_PORT + 2
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True

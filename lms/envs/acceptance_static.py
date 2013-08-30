@@ -70,6 +70,10 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
+# Set up Video information so that the lms will send
+# requests to a mock Youtube server running locally
+VIDEO_PORT = XQUEUE_PORT + 2
+
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
