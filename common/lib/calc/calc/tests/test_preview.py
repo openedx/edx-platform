@@ -4,7 +4,7 @@ Unit tests for preview.py
 """
 
 import unittest
-import preview
+from calc import preview
 import pyparsing
 
 
