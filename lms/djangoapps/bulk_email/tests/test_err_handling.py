@@ -18,8 +18,6 @@ from bulk_email.tasks import delegate_email_batches
 from mock import patch, Mock
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
-TEST_SMTP_PORT = 1025
-
 
 class EmailTestException(Exception):
     pass
@@ -38,14 +36,9 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-
-        #self.smtp_server_thread = FakeSMTPServerThread('localhost', TEST_SMTP_PORT)
-        #self.smtp_server_thread.start()
-
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
 
     def tearDown(self):
-        #self.smtp_server_thread.stop()
         patch.stopall()
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
@@ -124,8 +117,6 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Test that celery handles SMTPConnectError by retrying.
         """
-        # SMTP reply is already specified in fake SMTP Channel created
-        #self.smtp_server_thread.server.set_errtype("CONN")
         get_conn.return_value.open.side_effect = SMTPConnectError(424, "Bad Connection")
 
         test_email = {
