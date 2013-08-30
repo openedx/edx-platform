@@ -8,7 +8,6 @@ from contentstore.utils import get_modulestore
 
 ############### ACTIONS ####################
 
-
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
     world.create_component_instance(
@@ -17,6 +16,26 @@ def i_created_a_video_component(step):
         '.xmodule_VideoModule',
         has_multiple_templates=False
     )
+
+
+@step('I have created a Video component with subtitles$')
+def i_created_a_video_component(step):
+    step.given('I have created a Video component')
+
+    # Store the current URL so we can return here
+    video_url = world.browser.url
+
+    # Upload subtitles for the video using the upload interface
+    step.given('I have uploaded subtitles')
+
+    # Return to the video
+    world.visit(video_url)
+
+
+@step('I have uploaded subtitles')
+def i_have_uploaded_subtitles(step):
+    step.given('I go to the files and uploads page')
+    step.given('I upload the file "subs_OEoXaMPEzfM.srt.sjson"')
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
