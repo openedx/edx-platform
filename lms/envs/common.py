@@ -601,7 +601,7 @@ PIPELINE_JS = {
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
-            'js/utility.js',
+            'js/src/utility.js',
         ],
         'output_filename': 'js/lms-application.js',
 

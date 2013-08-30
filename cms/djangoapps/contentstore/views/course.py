@@ -18,6 +18,7 @@ from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.contentstore.content import StaticContent
 
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
@@ -206,7 +207,8 @@ def course_info(request, org, course, name, provided_id=None):
         'context_course': course_module,
         'url_base': "/" + org + "/" + course + "/",
         'course_updates': json.dumps(get_course_updates(location)),
-        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url() })
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url(),
+        'base_asset_url': StaticContent.get_base_url_path_for_course_assets(location) + '/'})
 
 
 @expect_json
