@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic.base import View
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
@@ -30,6 +31,7 @@ log = logging.getLogger(__name__)
 
 class VerifyView(View):
 
+    @method_decorator(login_required)
     def get(self, request, course_id):
         """
         """
@@ -73,6 +75,7 @@ class VerifiedView(View):
     View that gets shown once the user has already gone through the
     verification flow
     """
+    @method_decorator(login_required)
     def get(self, request, course_id):
         """
         Handle the case where we have a get request
@@ -93,6 +96,7 @@ class VerifiedView(View):
         return render_to_response('verify_student/verified.html', context)
 
 
+@login_required
 def create_order(request):
     """
     Submit PhotoVerification and create a new Order for this verified cert

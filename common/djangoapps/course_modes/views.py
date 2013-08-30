@@ -36,7 +36,7 @@ class ChooseModeView(View):
 
         return render_to_response("course_modes/choose.html", context)
 
-
+    @method_decorator(login_required)
     def post(self, request, course_id):
         user = request.user
 
