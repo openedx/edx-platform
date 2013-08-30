@@ -15,6 +15,7 @@ from django.http import Http404
 from celery import task, current_task
 from celery.utils.log import get_task_logger
 from django.core.urlresolvers import reverse
+from statsd import statsd
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -181,6 +182,9 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
 
             try:
                 connection.send_messages([email_msg])
+
+                statsd.increment('course_email.sent', tags=[_statsd_tag(course_title)])
+
                 log.info('Email with id %s sent to %s', email_id, email)
                 num_sent += 1
             except SMTPDataError as exc:
@@ -191,6 +195,9 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
                 else:
                     # This will fall through and not retry the message, since it will be popped
                     log.warning('Email with id %s not delivered to %s due to error %s', email_id, email, exc.smtp_error)
+
+                    statsd.increment('course_email.error', tags=[_statsd_tag(course_title)])
+
                     num_error += 1
 
             to_list.pop()
@@ -226,3 +233,11 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
 def course_email_result(num_sent, num_error, num_optout):
     """Return the formatted result of course_email sending."""
     return "Sent {0}, Fail {1}, Optout {2}".format(num_sent, num_error, num_optout)
+
+
+def _statsd_tag(course_title):
+    """
+    Calculate the tag we will use for DataDog.
+    """
+    tag = "course_email:{0}".format(course_title)
+    return tag[:200]
