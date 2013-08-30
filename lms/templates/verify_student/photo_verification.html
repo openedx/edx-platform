@@ -7,20 +7,22 @@
 <%block name="title"><title>${("Register for [Course Name] | Verification")}</title></%block>
 
 <%block name="js_extra">
-  <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
-  <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
-
-<!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
+<script src="${static.url('js/vendor/jpegcam/webcam.min.js')}"></script>
 <script type="text/javascript">
 
   var onVideoFail = function(e) {
     console.log('Failed to get camera access!', e);
   };
 
+  // Returns true if we are capable of video capture (regardless of whether the
+  // user has given permission).
   function initVideoCapture() {
     window.URL = window.URL || window.webkitURL;
     navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    return !(navigator.getUserMedia == undefined);
   }
 
   var submitToPaymentProcessing = function() {
@@ -149,8 +151,19 @@
     //
     // $("#pay_button_frame").addClass('disabled');
 
-    initVideoCapture();
-    initSnapshotHandler(["photo_id", "face"]);
+    var hasHtml5CameraSupport = initVideoCapture();
+
+    // If HTML5 WebRTC capture is not supported, we initialize jpegcam
+    if (!hasHtml5CameraSupport) {
+      webcam.set_shutter_sound(false);
+      webcam.set_quality(90); // JPEG quality
+      webcam.set_swf_url("${static.url('js/vendor/jpegcam/webcam.swf')}");
+      embedHtml = webcam.get_html(500, 375);
+      $("#face_capture_div").html(embedHtml);
+    }
+    else {
+      initSnapshotHandler(["photo_id", "face"]);
+    }
 
   });
 </script>
@@ -230,7 +243,7 @@
 
               <div class="wrapper-task">
                 <div id="facecam" class="task cam">
-                  <div class="placeholder-cam">
+                  <div class="placeholder-cam" id="face_capture_div">
                     <video id="face_video" width="500" height="375" autoplay></video><br/>
                     <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
                   </div>
