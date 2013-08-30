@@ -62,12 +62,10 @@ class MongoKeyValueStore(KeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, children, metadata, location, category):
+    def __init__(self, data, children, metadata):
         self._data = data
         self._children = children
         self._metadata = metadata
-        self._location = location
-        self._category = category
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -77,11 +75,7 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                return self._location
-            elif key.field_name == 'category':
-                return self._category
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return self._data
             else:
                 return self._data[key.field_name]
@@ -94,11 +88,7 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = value
-            elif key.field_name == 'category':
-                self._category = value
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = value
             else:
                 self._data[key.field_name] = value
@@ -112,11 +102,7 @@ class MongoKeyValueStore(KeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = Location(None)
-            elif key.field_name == 'category':
-                self._category = None
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = None
             else:
                 del self._data[key.field_name]
@@ -129,12 +115,7 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                # WHY TRUE? if it's been deleted should it be False?
-                return True
-            elif key.field_name == 'category':
-                return self._category is not None
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return True
             else:
                 return key.field_name in self._data
@@ -210,15 +191,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 kvs = MongoKeyValueStore(
                     definition.get('data', {}),
                     definition.get('children', []),
-                    metadata,
-                    location,
-                    category
+                    metadata
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                model_data['category'] = category
-                model_data['location'] = location
                 module = class_(self, model_data)
+                module.category = category
+                module.location = location
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
@@ -632,6 +611,8 @@ class MongoModuleStore(ModuleStoreBase):
                 definition_data = {}
         dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xmodule = xblock_class(system, dbmodel)
+        xmodule.category = location.category
+        xmodule.location = location
         # decache any pending field settings from init
         xmodule.save()
         return xmodule
@@ -855,9 +836,7 @@ class MongoModuleStore(ModuleStoreBase):
         kvs = MongoKeyValueStore(
             definition_data,
             [],
-            metadata,
-            location,
-            category
+            metadata
         )
 
         class_ = XModuleDescriptor.load_class(
@@ -865,6 +844,4 @@ class MongoModuleStore(ModuleStoreBase):
             self.default_class
         )
         model_data = DbModel(kvs, class_, None, MongoUsage(None, location))
-        model_data['category'] = category
-        model_data['location'] = location
         return model_data

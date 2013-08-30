@@ -228,8 +228,9 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, location))
         model_data = VideoDescriptor._parse_video_xml(xml_data)
-        model_data['location'] = location
         video = cls(system, model_data)
+        video.location = location
+        video.category = 'video'
         return video
 
     def definition_to_xml(self, resource_fs):

@@ -362,13 +362,14 @@ class XmlDescriptor(XModuleDescriptor):
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
-        model_data['location'] = location
-        model_data['category'] = xml_object.tag
-
-        return cls(
+        new_object = cls(
             system,
             model_data,
         )
+        new_object.location = location
+        new_object.category = xml_object.tag
+
+        return new_object
 
     @classmethod
     def _format_filepath(cls, category, name):

@@ -528,7 +528,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         :param user_id: request.user object
         """
-        new_def_data = self._filter_special_fields(new_def_data)
         document = {
             "category" : category,
             "fields": new_def_data,
@@ -552,7 +551,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         :param user_id: request.user
         """
-        new_def_data = self._filter_special_fields(new_def_data)
         def needs_saved():
             for key, value in new_def_data.iteritems():
                 if key not in old_definition['fields'] or value != old_definition['fields'][key]:
@@ -743,7 +741,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         block_fields = partitioned_fields.setdefault(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
-        definition_fields = self._filter_special_fields(partitioned_fields.get(Scope.content, {}))
+        definition_fields = partitioned_fields.get(Scope.content, {})
 
         # build from inside out: definition, structure, index entry
         # if building a wholly new structure
@@ -934,7 +932,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
     def _persist_subdag(self, xblock, user_id, structure_blocks):
         # persist the definition if persisted != passed
-        new_def_data = self._filter_special_fields(xblock.get_explicitly_set_fields_by_scope(Scope.content))
+        new_def_data = xblock.get_explicitly_set_fields_by_scope(Scope.content)
         if (xblock.definition_locator is None or xblock.definition_locator.definition_id is None):
             xblock.definition_locator = self.create_definition_from_data(
                 new_def_data, xblock.category, user_id)
@@ -1315,14 +1313,3 @@ class SplitMongoModuleStore(ModuleStoreBase):
             result[field.scope][field_name] = value
         return result
 
-    def _filter_special_fields(self, fields):
-        """
-        Remove any fields which split or its kvs computes or adds but does not want persisted.
-
-        :param fields: a dict of fields
-        """
-        if 'location' in fields:
-            del fields['location']
-        if 'category' in fields:
-            del fields['category']
-        return fields

@@ -22,29 +22,6 @@ def dummy_track(_event_type, _event):
     pass
 
 
-class LocationField(ModelType):
-    """
-    XBlock field for storing Location values
-    """
-    def from_json(self, value):
-        """
-        Parse the json value as a Location
-        """
-        try:
-            return Location(value)
-        except InvalidLocationError:
-            if isinstance(value, BlockUsageLocator):
-                return value
-            else:
-                return BlockUsageLocator(value)
-
-    def to_json(self, value):
-        """
-        Store the Location as a url string in json
-        """
-        return value.url()
-
-
 class HTMLSnippet(object):
     """
     A base class defining an interface for an object that is able to present an
@@ -115,24 +92,6 @@ class XModuleFields(object):
         default=None
     )
 
-    # Please note that in order to be compatible with XBlocks more generally,
-    # the LMS and CMS shouldn't be using this field. It's only for internal
-    # consumption by the XModules themselves
-    location = LocationField(
-        display_name="Location",
-        help="This is the location id for the XModule.",
-        scope=Scope.content,
-        default=Location(None),
-    )
-    # Please note that in order to be compatible with XBlocks more generally,
-    # the LMS and CMS shouldn't be using this field. It's only for internal
-    # consumption by the XModules themselves
-    category = String(
-        display_name="xmodule category",
-        help="This is the category id for the XModule. It's for internal use only",
-        scope=Scope.content,
-    )
-
 
 class XModule(XModuleFields, HTMLSnippet, XBlock):
     ''' Implements a generic learning module.
@@ -167,21 +126,9 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         self._model_data = model_data
         self.system = runtime
         self.descriptor = descriptor
-        # LMS tests don't require descriptor but really it's required
-        if descriptor:
-            self.url_name = descriptor.url_name
-            # don't need to set category as it will automatically get from descriptor
-        elif isinstance(self.location, Location):
-            self.url_name = self.location.name
-            if getattr(self, 'category', None) is None:
-                self.category = self.location.category
-        elif isinstance(self.location, BlockUsageLocator):
-            self.url_name = self.location.usage_id
-            if getattr(self, 'category', None) is None:
-                raise InsufficientSpecificationError()
-        else:
-            raise InsufficientSpecificationError()
         self._loaded_children = None
+        self._location = None
+        self._category = None
 
     @property
     def id(self):
@@ -197,6 +144,55 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
+
+    @property
+    def url_name(self):
+        # LMS tests don't require descriptor but really it's required
+        if self.descriptor:
+            return self.descriptor.url_name
+            # don't need to set category as it will automatically get from descriptor
+        elif isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.usage_id
+        else:
+            raise InsufficientSpecificationError()
+
+    @property
+    def location(self):
+        if self._location is not None:
+            return self._location
+        elif self.descriptor is not None:
+            return self.descriptor.location
+        else:
+            raise InsufficientSpecificationError()
+
+    @location.setter
+    def location(self, location):
+        self._location = location
+
+    @property
+    def category(self):
+        """
+        The category
+        """
+        if self._category is not None:
+            return self._category
+        elif self.descriptor is not None:
+            return self.descriptor.category
+        elif isinstance(self.location, Location):
+            self._category = self.location.category
+            return self._category
+        else:
+            raise InsufficientSpecificationError()
+
+    @category.setter
+    def category(self, value):
+        """
+        Should be set at time of instantiation and never changed after that, but this is the
+        symbol decoding the type
+        """
+        self._category = value
 
     def get_children(self):
         '''
@@ -465,22 +461,15 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
         self.system = self.runtime
-        if isinstance(self.location, Location):
-            self.url_name = self.location.name
-            if getattr(self, 'category', None) is None:
-                self.category = self.location.category
-        elif isinstance(self.location, BlockUsageLocator):
-            self.url_name = self.location.usage_id
-            if getattr(self, 'category', None) is None:
-                raise InsufficientSpecificationError()
-        else:
-            raise InsufficientSpecificationError()
+
         # update_version is the version which last updated this xblock v prev being the penultimate updater
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
         # definition_locator is only used by mongostores which separate definitions from blocks
         self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
         self._child_instances = None
+        self.location = kwargs.get('location')
+        self._category = kwargs.get('category')
 
     @property
     def id(self):
@@ -496,6 +485,39 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
+
+    @property
+    def url_name(self):
+        """
+        The url ified name
+        """
+        if isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.usage_id
+        else:
+            raise InsufficientSpecificationError()
+
+    @property
+    def category(self):
+        """
+        The category
+        """
+        if self._category is not None:
+            return self._category
+        elif isinstance(self.location, Location):
+            self._category = self.location.category
+            return self._category
+        else:
+            raise InsufficientSpecificationError()
+
+    @category.setter
+    def category(self, value):
+        """
+        Should be set at time of instantiation and never changed after that, but this is the
+        symbol decoding the type
+        """
+        self._category = value
 
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
