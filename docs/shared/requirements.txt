@@ -58,7 +58,7 @@ xmltodict==0.4.1
 # Metrics gathering and monitoring
 dogapi==1.2.1
 dogstatsd-python==0.2.1
-newrelic==1.8.0.13
+newrelic==1.13.1.31
 
 # Used for Internationalization and localization
 Babel==1.3
