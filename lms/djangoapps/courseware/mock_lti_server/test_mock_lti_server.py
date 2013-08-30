@@ -1,10 +1,10 @@
-import mock
+"""
+Test for Mock_LTI_Server
+"""
 import unittest
 import threading
-import json
 import urllib
-import time
-from mock_lti_server import MockLTIServer, MockLTIRequestHandler
+from mock_lti_server import MockLTIServer
 
 from nose.plugins.skip import SkipTest
 
@@ -26,9 +26,15 @@ class MockLTIServerTest(unittest.TestCase):
 
         # Create the server
         server_port = 8034
-        self.server_url = 'http://127.0.0.1:%d' % server_port
-        self.server = MockLTIServer(server_port, {'client_key': '', 'client_secret': ''})
-
+        server_host = '127.0.0.1'
+        address = (server_host, server_port)
+        self.server = MockLTIServer(address)
+        self.server.oauth_settings = {
+            'client_key': 'test_client_key',
+            'client_secret': 'test_client_secret',
+            'lti_base':  'http://{}:{}/'.format(server_host, server_port),
+            'lti_endpoint': 'correct_lti_endpoint'
+        }
         # Start the server in a separate daemon thread
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True
@@ -39,34 +45,30 @@ class MockLTIServerTest(unittest.TestCase):
         # Stop the server, freeing up the port
         self.server.shutdown()
 
-    def test_oauth_request(self):
-
-        # Send a grade request
-        header = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            u'Authorization': u'OAuth oauth_nonce="151177408427657509491377691584", \
-oauth_timestamp="1377691584", oauth_version="1.0", \
-oauth_signature_method="HMAC-SHA1", oauth_consumer_key="", \
-oauth_signature="wc1unKXxsX5e4HXJu%2FuiQ1KbrVo%3D"',
-            'launch_presentation_return_url': '',
-            'user_id': 'default_user_id',
-            'lis_result_sourcedid': '',
-            'lti_version': 'LTI-1p0',
-            'lis_outcome_service_url': '',
-            'lti_message_type': 'basic-lti-launch-request',
-            'oauth_callback': 'about:blank'
-        }
-        body = {}
+    def test_request(self):
+        """
+        Tests that LTI server processes request with right program
+        path,  and responses with incorrect signature.
+        """
         request = {
-            'header': json.dumps(header),
-            'body': json.dumps(body)}
+            'user_id': 'default_user_id',
+            'oauth_nonce': '',
+            'oauth_timestamp': '',
+            'oauth_consumer_key': 'client_key',
+            'lti_version': 'LTI-1p0',
+            'oauth_signature_method': 'HMAC-SHA1',
+            'oauth_version': '1.0',
+            'oauth_signature': '',
+            'lti_message_type': 'basic-lti-launch-request',
+            'oauth_callback': 'about:blank',
+            'launch_presentation_return_url': '',
+            'lis_outcome_service_url': '',
+            'lis_result_sourcedid': ''
+        }
+
         response_handle = urllib.urlopen(
-            self.server_url + '/correct_lti_endpoint',
+            self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint'],
             urllib.urlencode(request)
         )
-
-        response_dict = json.loads(response_handle.read())
-        # Expect that the response is success
-        self.assertEqual(response_dict['return_code'], 0)
-        # self.assertEqual(response_dict['return_code'], 0)
-
+        response = response_handle.read()
+        self.assertTrue('Wrong LTI signature' in response)

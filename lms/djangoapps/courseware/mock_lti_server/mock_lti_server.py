@@ -52,7 +52,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             else:
                 params = {k: v for k, v in post_dict.items() if k != 'oauth_signature'}
                 if self.server.check_oauth_signature(params, post_dict['oauth_signature']):
-                    status_message = "This is LTI tool."
+                    status_message = "This is LTI tool. Success."
                 else:
                     status_message = "Wrong LTI signature"
         else:
