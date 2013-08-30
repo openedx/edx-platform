@@ -132,7 +132,7 @@ def show_requirements(request, course_id):
     """
     Show the requirements necessary for
     """
-    context = { "course_id": course_id }
+    context = { "course_id": course_id, "is_not_active": not request.user.is_active}
     return render_to_response("verify_student/show_requirements.html", context)
 
 def face_upload(request):
