@@ -179,6 +179,9 @@ MITX_FEATURES = {
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Toggle search availability
+    'COURSE_SEARCH': False,
 }
 
 # Used for A/B testing

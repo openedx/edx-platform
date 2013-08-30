@@ -6,6 +6,7 @@ This is the testing suite for the models within the search module
 
 import json
 import re
+import collections
 from django.test import TestCase
 from django.test.utils import override_settings
 from pyfuzz.generator import random_regex
@@ -29,21 +30,33 @@ TEST_GREEK = u"""Σο οι δεύτερον απόσταση απαγωγής ο
              Χωρική θέσεις δε χτένας ίμερας έρευνα έμμεση αρ. Προκύψει επίλογοι ιππασίας σαν."""
 
 
-def dummy_entry(score, searchable_text=None):
+def document_update(original, update):
+    """
+    This is used to selectively update certain parts of a nested dictionary.
+
+    Specifically this is used to update a single field of the source of a mock es object
+    without being forced to copy over the current state of the source
+    """
+
+    for key, value in update.iteritems():
+        if isinstance(value, collections.Mapping):
+            replacement = document_update(original.get(key, {}), value)
+            original[key] = replacement
+        else:
+            original[key] = update[key]
+    return original
+
+
+def dummy_entry(**kwargs):
     """
     This creates a fully-fledged fake response entry for a given score
     """
 
     id_ = dummy_document("id", ["tag", "org", "course", "category", "name"], "regex", regex="[a-zA-Z0-9]", length=25)
-    if searchable_text is None:
-        source = dummy_document("_source", ["thumbnail", "searchable_text"], "regex", regex="[a-zA-Z0-9]", length=50)
-    else:
-        source = dummy_document("_source", ["thumbnail"], "regex", regex="[a-zA-Z0-9]", length=50)
-        source["_source"].update({"searchable_text": searchable_text})
+    source = dummy_document("_source", ["thumbnail", "searchable_text"], "regex", regex="[a-zA-Z0-9]", length=50)
     string_id = json.dumps(id_["id"])
     source["_source"].update({"id": string_id, "course_id": random_regex(regex="[a-zA-Z0-9/]", length=50)})
-    document = {"_score": score}
-    source.update(document)
+    document_update(source, kwargs)
     return source
 
 
@@ -64,14 +77,14 @@ class ModelTest(TestCase):
     """
 
     def test_search_result_init(self):
-        check = SearchResult(dummy_entry(1.0), ["fake-query"])
+        check = SearchResult(dummy_entry(_score = 1.0), ["fake-query"])
         self.assertTrue(bool(re.match(r"^[a-zA-Z0-9]+$", check.snippets)))
         self.assertTrue(check.url.startswith("/courses"))
         self.assertTrue("/jump_to/" in check.url)
         self.assertEqual(check.category, json.loads(check.data["id"])["category"])
 
     def test_snippet_generation(self):
-        document = dummy_entry(1.0, TEST_TEXT)
+        document = dummy_entry(_score=1.0, _source={"searchable_text": TEST_TEXT})
         result = SearchResult(document, [u"quis nostrud"])
         self.assertTrue(result.snippets.startswith("Ut enim ad minim"))
         self.assertTrue(result.snippets.strip().endswith("anim id est laborum."))
@@ -81,13 +94,13 @@ class ModelTest(TestCase):
     @override_settings(SENTENCE_TOKENIZER="DETECT")
     @override_settings(STEMMER="DETECT")
     def test_language_detection(self):
-        document = dummy_entry(1.0, TEST_GREEK)
+        document = dummy_entry(_score=1.0, _source={"searchable_text": TEST_GREEK})
         result = SearchResult(document, [u"νου στην όπου"])
         self.assertTrue(result.snippets.startswith(u"Είχε γιου"))
 
     def test_search_results(self):
         scores = [1.0, 5.2, 2.0, 123.2]
-        hits = [dummy_entry(score) for score in scores]
+        hits = [dummy_entry(_score=score) for score in scores]
         full_return = FakeResponse({"hits": {"hits": hits}})
         results = SearchResults(full_return, s=["fake query"], sort="relevance")
         self.assertTrue(all([isinstance(result, SearchResult) for result in results.entries]))
@@ -96,7 +109,7 @@ class ModelTest(TestCase):
         self.assertEqual([123.2, 5.2, 2.0, 1.0], scores)
 
     def test_get_content_url(self):
-        document = dummy_entry(1.0)
+        document = dummy_entry(_score=1.0)
         id_ = json.dumps({
             "org": "test-org",
             "course": "test-course",

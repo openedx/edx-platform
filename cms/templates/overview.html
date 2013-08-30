@@ -21,7 +21,6 @@
   <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/index_courses.js')}"></script>
-
   <script type="text/template" id="section-name-edit-tpl">
     <%static:include path="js/section-name-edit.underscore" />
   </script>
@@ -122,6 +121,7 @@
 </%block>
 
 <%block name="content">
+  <input type="hidden" id="course_id" name="course_id" value="${ course_id }" readonly>
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
@@ -141,9 +141,11 @@
           <li class="nav-item">
             <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
           </li>
-          <li class="nav-item">
-            <a href="#" class="button new-button index-courses" id="index-courses" data-course="${course_title}">${_("Index Courseware for Search")}</a>
-          </li>
+          % if search_boolean:
+            <li class="nav-item">
+                <a href="#" class="button new-button index-courses" id="index-courses" data-course="${course_title}">${_("Index Courseware for Search")}</a>
+            </li>
+          % endif
         </ul>
       </nav>
     </header>

@@ -33,6 +33,7 @@ class PersonalServer(StubServer):
 
 
 @override_settings(ES_DATABASE="http://127.0.0.1:9203")
+@override_settings(MITX_FEATURES={"COURSE_SEARCH": True})
 @override_settings(ES_SETTINGS=open("common/djangoapps/search/tests/test_settings.json").read())
 class EsTest(TestCase):
     """

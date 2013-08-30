@@ -82,16 +82,15 @@ class ElasticDatabase(object):
         This includes a url, which should point to the location of the elasticsearch server.
         The only other input here is the Elastic Search settings file, which is a JSON file
         that should be specified in the application settings file.
+
+        This will also only actually create something if the search feature flag is true.
         """
 
-        try:
+        if settings.MITX_FEATURES.get("COURSE_SEARCH", False):
             self.url = settings.ES_DATABASE
-        except AttributeError:
-            self.url = "http://localhost:9200"
-        try:
             self.index_settings = settings.ES_SETTINGS
-        except AttributeError:
-            self.index_settings = '{}'
+        else:
+            log.debug("Search is currently turned off")
 
     def index_data(self, index, data, type_, id_):
         """

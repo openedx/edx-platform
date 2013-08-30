@@ -9,7 +9,7 @@ import math
 
 import requests
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse, Http404
 from mitxmako.shortcuts import render_to_response
 from django_future.csrf import ensure_csrf_cookie
 
@@ -58,10 +58,13 @@ def index_course(request):
     Is called via AJAX from Studio, and doesn't render any templates.
     """
 
+    course = get_course_with_access(request.user, request.POST["course_id"], 'staff')
     indexer = MongoIndexer()
     if "course" in request.POST:
         indexer.index_course(request.POST["course"])
-        return HttpResponse(status=204)
+        response = HttpResponse(status=204)
+        response['course'] = request.POST["course"]
+        return response
     else:
         return HttpResponseBadRequest()
 
@@ -74,19 +77,18 @@ def _find(request, course_id):
     try:
         database = settings.ES_DATABASE
     except AttributeError:  # If settings has no ES_DATABASE
-        database = "http://localhost:9200"
+        raise Http404
     query = request.GET.get("s", "*.*")
-    full_query_data = \
-        {
-            "query": {
-                "query_string": {
-                    "default_field": "searchable_text",
-                    "query": query,
-                    "analyzer": "standard"
-                },
+    full_query_data = {
+        "query": {
+            "query_string": {
+                "default_field": "searchable_text",
+                "query": query,
+                "analyzer": "standard"
             },
-            "size": "1000"
-        }
+        },
+        "size": "1000"
+    }
     index = ",".join([content + "-index" for content in CONTENT_TYPES])
 
     course_hash = hashlib.sha1(course_id).hexdigest()
