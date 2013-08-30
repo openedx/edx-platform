@@ -150,63 +150,21 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     for section_format, sections in grading_context['graded_sections'].iteritems():
         format_scores = []
         for section in sections:
-            section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.display_name_with_default
 
-            should_grade_section = False
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
-            for moduledescriptor in section['xmoduledescriptors']:
-                # some problems have state that is updated independently of interaction
-                # with the LMS, so they need to always be scored. (E.g. foldit.)
-                if moduledescriptor.always_recalculate_grades:
-                    should_grade_section = True
-                    break
+            section_descriptor = section.get('section_descriptor')
+            xmoduledescriptors = section.get('xmoduledescriptors')
 
-                # Create a fake key to pull out a StudentModule object from the ModelDataCache
+            graded_total, add_raw_scores = compute_graded_total(
+                section_descriptor,
+                xmoduledescriptors,
+                student,
+                course.id,
+                model_data_cache,
+                request
+            )
 
-                key = LmsKeyValueStore.Key(
-                    Scope.user_state,
-                    student.id,
-                    moduledescriptor.location,
-                    None
-                )
-                if model_data_cache.find(key):
-                    should_grade_section = True
-                    break
-
-            if should_grade_section:
-                scores = []
-
-                def create_module(descriptor):
-                    '''creates an XModule instance given a descriptor'''
-                    # TODO: We need the request to pass into here. If we could forego that, our arguments
-                    # would be simpler
-                    return get_module_for_descriptor(student, request, descriptor, model_data_cache, course.id)
-
-                for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
-
-                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, model_data_cache)
-                    if correct is None and total is None:
-                        continue
-
-                    if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
-                        if total > 1:
-                            correct = random.randrange(max(total - 2, 1), total + 1)
-                        else:
-                            correct = total
-
-                    graded = module_descriptor.lms.graded
-                    if not total > 0:
-                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
-                        graded = False
-
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
-
-                _, graded_total = graders.aggregate_scores(scores, section_name)
-                if keep_raw_scores:
-                    raw_scores += scores
-            else:
-                graded_total = Score(0.0, 1.0, True, section_name)
+            if keep_raw_scores:
+                raw_scores += add_raw_scores
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
@@ -230,6 +188,121 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
     return grade_summary
+
+
+def compute_graded_total(section_descriptor, xmoduledescriptors, student, course_id, model_data_cache, request):
+    """
+    Computes a total grade for a section.
+
+    - section_descriptor: descriptor to pass into yield_dynamic_descriptor_descendents
+    - xmoduledescriptors: an iterable containing moduledescriptors
+    - student: a User, as passed into grade()
+    - course_id: is just course.id, where course is the relevant CourseDescriptor
+    - model_data_cache: is an output of ModelDataCache(...)
+    - request: the original HTTP request; needed to pass into get_module_for_descriptor
+
+    @return a tuple: (graded_total, raw_scores)
+        - graded_total: a Score -- either the output of graders.aggregate_scores, or 0/1 if not should_grade_section
+        - raw_scores: a list of Score objects to be added to raw_scores within grade()
+    """
+
+    section_name = section_descriptor.display_name_with_default
+
+    raw_scores = []
+
+    if should_grade_section(xmoduledescriptors, model_data_cache, student.id):
+        scores = []
+
+        def create_module(descriptor):
+            '''creates an XModule instance given a descriptor'''
+            # TODO: We need the request to pass into here. If we could forego that, our arguments
+            # would be simpler
+            return get_module_for_descriptor(student, request, descriptor, model_data_cache, course_id)
+
+        for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
+
+            (correct, total) = get_score(course_id, student, module_descriptor, create_module, model_data_cache)
+
+            if correct is None and total is None:
+                continue
+
+            graded = module_descriptor.lms.graded
+            if not total > 0:
+                #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                graded = False
+
+            if settings.GENERATE_PROFILE_SCORES:    # for debugging!
+                if total > 1:
+                    correct = random.randrange(max(total - 2, 1), total + 1)
+                else:
+                    correct = total
+
+            scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+
+        _, graded_total = graders.aggregate_scores(scores, section_name)
+
+        raw_scores += scores
+    else:
+        graded_total = Score(0.0, 1.0, True, section_name)
+
+    return graded_total, raw_scores
+
+
+def should_grade_section(xmoduledescriptors, model_data_cache, student_id):
+    """
+    Determines whether a section should be graded or not.
+
+    If the moduledescriptor is found in the model data cache, it should be graded.
+    Also, if any moduledescriptor in a section should be graded, the entire section should be.
+
+    - xmoduledescriptors: a list of moduledescriptors in this section.
+    - model_data_cache: is an output of ModelDataCache(...)
+    - student_id: student.id, where student is a User
+
+    @return True or False
+    """
+
+    # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
+    for moduledescriptor in xmoduledescriptors:
+
+        # some problems have state that is updated independently of interaction
+        # with the LMS, so they need to always be scored. (E.g. foldit.)
+        if moduledescriptor.always_recalculate_grades:
+            return True
+
+        # Create a fake key to pull out a StudentModule object from the ModelDataCache
+
+        key = LmsKeyValueStore.Key(
+            Scope.user_state,
+            student_id,
+            moduledescriptor.location,
+            None
+        )
+        if model_data_cache.find(key):
+            return True
+
+    return False
+
+
+def find_attempted(module_descriptor, model_data_cache, student_id):
+    """
+    Determines whether a section has been attempted yet.
+
+    If the section is in the model data cache, AND if the grade is not null (an attempted problem
+        will have a grade of 0.0 or more), then it has been attempted.
+    This is for purposes of calculating the projected grade.
+
+    @return True or False
+    """
+
+    key = LmsKeyValueStore.Key(
+        Scope.user_state,
+        student_id,
+        module_descriptor.location,
+        None
+    )
+    found = model_data_cache.find(key)
+    return found and found.grade is not None
 
 
 def grade_for_percentage(grade_cutoffs, percentage):
@@ -278,7 +351,6 @@ def progress_summary(student, request, course, model_data_cache):
     will return None.
 
     """
-
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
     course_module = get_module(student, request, course.location, model_data_cache, course.id, depth=None)
@@ -329,11 +401,12 @@ def progress_summary(student, request, course, model_data_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name_with_default,
-                         'display_name': chapter_module.display_name_with_default,
-                         'url_name': chapter_module.url_name,
-                         'sections': sections})
-
+        chapters.append({
+            'course': course.display_name_with_default,
+            'display_name': chapter_module.display_name_with_default,
+            'url_name': chapter_module.url_name,
+            'sections': sections
+        })
     return chapters
 
 

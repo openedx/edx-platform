@@ -1,0 +1,17 @@
+<problemset display_name="Problem Set 2">
+  <sequential>
+    <problem display_name="2-1" url_name="2_1" weight="10">
+      <numericalresponse answer="23.5">
+        <responseparam type="tolerance" default="0.00001"/> 
+        <textline size="20" inline="true"/>
+      </numericalresponse>
+    </problem>
+
+    <problem display_name="2-2" url_name="2_2" weight="10">
+      <numericalresponse answer="3.14">
+        <responseparam type="tolerance" default="0.00001"/> 
+        <textline size="20" inline="true"/>
+      </numericalresponse>
+    </problem>
+  </sequential>
+</problemset>
