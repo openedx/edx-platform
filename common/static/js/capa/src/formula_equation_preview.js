@@ -52,12 +52,14 @@ formulaEquationPreview.enable = function () {
             // Show the loading icon.
             inputData.$img.css('visibility', 'visible');
 
+            // Say we are waiting for request.
             inputData.isWaitingForRequest = true;
+            // First thing in `sendRequest`, say we aren't anymore.
             throttledRequest(inputData, this.value);
         };
 
         $this.on("input", initializeRequest);
-        // send an initial
+        // Ask for initial preview.
         initializeRequest.call(this);
     }
 
@@ -85,7 +87,7 @@ formulaEquationPreview.enable = function () {
             //     // This is run when ajax call fails.
             //     // Have an error message and other stuff here?
             //     inputData.$img.css('visibility', 'hidden');
-            // }); */
+            // });
         }
         else {
             inputData.requestCallback({
@@ -140,7 +142,7 @@ formulaEquationPreview.enable = function () {
                 );
             }
             else if (latex) {
-                console.error("Oops no mathjax for ", latex);
+                console.warn("[FormulaEquationInput] Oops no mathjax for ", latex);
                 // Fall back to modifying the actual element.
                 var textNode = previewElement.childNodes[0];
                 textNode.data = "\\[" + latex + "\\]";
