@@ -291,45 +291,77 @@
 
   // ====================
 
-  // UI: error
-  .wrapper-msg-error {
-    position: relative;
-    top: -($baseline*0.75);
+  // UI : message
+  .wrapper-msg {
     width: flex-grid(12,12);
-    margin-bottom: $baseline;
-    border-top: ($baseline/4) solid $red;
-    padding: ($baseline*0.75) $baseline;
-    background: tint($red, 95%);
+    margin: 0 auto ($baseline*1.5) auto;
+    border-bottom: ($baseline/4) solid $m-blue;
+    padding: $baseline ($baseline*1.5);
+    background: tint($m-blue, 95%);
 
-    .msg-error, .icon {
+    .msg-content, .msg-icon {
       display: inline-block;
       vertical-align: middle;
     }
 
-    .msg-error {
-      @include clearfix();
+    .msg-content {
       width: flex-grid(11,12);
 
       .title {
-        @extend .t-title5;
+        @extend .t-title6;
         @extend .t-weight4;
-        color: $red;
       }
 
       .copy {
-        @extend .t-copy-base;
-        color: $red;
+        @extend .t-copy-sub1;
       }
     }
 
-    .icon {
+    .msg-icon {
       width: flex-grid(1,12);
       @extend .t-icon2;
-      color: $red;
       text-align: center;
+      color: $m-blue;
     }
   }
 
+  // UI: error
+  .wrapper-msg-error {
+    border-bottom-color: $red;
+    background: tint($red, 95%);
+
+    .msg-icon {
+      color: $red;
+    }
+
+    .msg-content {
+
+      .title {
+        color: $red;
+      }
+    }
+  }
+
+  // UI: error
+  .wrapper-msg-activate {
+    border-bottom-color: $m-pink;
+    background: tint($m-pink, 95%);
+
+    .msg-icon {
+      color: $m-pink;
+    }
+
+    .msg-content {
+
+      .title {
+        color: $m-pink;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: inline messages
   .msg-inline {
 
     &.msg-error {
@@ -1247,6 +1279,7 @@
         min-height: ($baseline*15);
         float: left;
         margin-right: flex-gutter();
+        border-color: $m-green-l3;
         text-align: center;
 
         &:last-child {
@@ -1257,7 +1290,7 @@
           @extend .t-title5;
           @extend .t-weight4;
           padding: $baseline;
-          border-bottom: 1px solid $m-green-l2;
+          border-bottom: 1px solid $m-green-l3;
           background: $m-green-l4;
 
         }
@@ -1314,6 +1347,42 @@
 
         .actions {
           padding: ($baseline/2) $baseline;
+        }
+      }
+
+      // specific requirements
+      .req-activate {
+        float: left;
+        text-align: center;
+        border-color: $m-pink-l4;
+
+        .title {
+          @extend .t-title4;
+          @extend .t-weight4;
+          border-bottom-color: $m-pink-l4;
+          background: $m-pink-l5;
+        }
+
+        .placeholder-art {
+          background: $m-pink-l4;
+        }
+
+        .copy-super {
+          @extend .t-copy-lead1;
+          color: $m-pink;
+        }
+
+        .copy-sub {
+          @extend .t-copy-base;
+        }
+      }
+
+      // CASE: account not activated
+      &.account-not-activated {
+
+        .req {
+          width: flex-grid(3,12);
+          min-height: ($baseline*18);
         }
       }
     }

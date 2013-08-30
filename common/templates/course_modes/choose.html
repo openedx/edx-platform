@@ -19,6 +19,21 @@ $(document).ready(function() {
 </%block>
 
 <%block name="content">
+
+%if error:
+<div class="wrapper-msg wrapper-msg-error">
+  <div class=" msg msg-error">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">Sorry, there was an error when trying to register you</h3>
+      <div class="copy">
+        <p>${error}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
 <div class="container">
   <section class="wrapper">
 
@@ -30,19 +45,6 @@ $(document).ready(function() {
         </span>
       </h2>
     </header>
-
-    %if error:
-    <div class="wrapper-msg wrapper-msg-error">
-      <i class="icon icon-warning-sign expandable-icon"></i>
-
-      <div class=" msg msg-error">
-        <h3 class="title">Sorry, there was an error when trying to register you</h3>
-        <div class="copy">
-          <p>${error}</p>
-        </div>
-      </div>
-    </div>
-    %endif
 
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
@@ -87,7 +89,7 @@ $(document).ready(function() {
               %if error:
               <div class="msg msg-error msg-inline">
                 <div class="copy">
-                  <p>${error}</p>
+                  <p><i class="msg-icon icon-warning-sign"></i> ${error}</p>
                 </div>
               </div>
               %endif
