@@ -13,11 +13,15 @@ logger = getLogger(__name__)
 @before.all
 def setup_mock_lti_server():
 
+    server_host = '127.0.0.1'
+
     # Add +1 to XQUEUE random port number
     server_port = settings.XQUEUE_PORT + 1
 
+    address = (server_host, server_port)
+
     # Create the mock server instance
-    server = MockLTIServer(server_port)
+    server = MockLTIServer(address)
     logger.debug("LTI server started at {} port".format(str(server_port)))
     # Start the server running in a separate daemon thread
     # Because the thread is a daemon, it will terminate
@@ -26,11 +30,17 @@ def setup_mock_lti_server():
     server_thread.daemon = True
     server_thread.start()
 
+    server.oauth_settings = {
+        'client_key': 'test_client_key',
+        'client_secret': 'test_client_secret',
+        'lti_base':  'http://{}:{}/'.format(server_host, server_port),
+        'lti_endpoint': 'correct_lti_endpoint'
+    }
+
     # Store the server instance in lettuce's world
     # so that other steps can access it
     # (and we can shut it down later)
     world.lti_server = server
-    world.lti_server_port = server_port
 
 
 @after.all
