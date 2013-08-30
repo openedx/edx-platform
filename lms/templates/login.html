@@ -53,6 +53,9 @@
           }  else {
             location.href="${reverse('dashboard')}";
           }
+        } else if(json.hasOwnProperty('redirect')){
+            var u=decodeURI(window.location.search);
+            location.href=json.redirect+u;
         } else {
           toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();

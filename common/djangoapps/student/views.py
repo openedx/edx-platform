@@ -24,7 +24,8 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+                         HttpResponseNotAllowed, Http404, HttpResponseRedirect)
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
@@ -57,6 +58,7 @@ from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
 from external_auth.models import ExternalAuthMap
+import external_auth.views
 
 from bulk_email.models import Optout
 
@@ -69,6 +71,8 @@ log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
+
+SHIB_DOMAIN_PREFIX = 'shib'
 
 
 def csrf_token(context):
@@ -95,7 +99,7 @@ def index(request, extra_context={}, user=None):
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
-    if domain == False:
+    if domain is False:
         domain = request.META.get('HTTP_HOST')
 
     courses = get_courses(None, domain=domain)
@@ -255,6 +259,8 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
+    if context.get("extauth_domain", '').startswith(SHIB_DOMAIN_PREFIX):
+        return render_to_response('register-shib.html', context)
     return render_to_response('register.html', context)
 
 
@@ -407,11 +413,35 @@ def change_enrollment(request):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
+
+def parse_course_id_from_string(input_str):
+    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    if m_obj:
+        return m_obj.group('course_id')
+    return None
+
+
+def get_course_enrollment_domain(course_id):
+    try:
+        course = course_from_id(course_id)
+        return course.enrollment_domain
+    except ItemNotFoundError:
+        return None
+
+
 @ensure_csrf_cookie
-def accounts_login(request, error=""):
+def accounts_login(request):
     if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
-    return render_to_response('login.html', {'error': error})
+    # see if the "next" parameter has been set, whether it has a course context, and if so, whether
+    # there is a course-specific place to redirect
+    next = request.GET.get('next')
+    if next:
+        course_id = parse_course_id_from_string(next)
+        if course_id and get_course_enrollment_domain(course_id):
+            return external_auth.views.course_specific_login(request, course_id)
+    return render_to_response('login.html')
+
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -428,6 +458,17 @@ def login_user(request, error=""):
     except User.DoesNotExist:
         AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
         user = None
+
+    # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
+    # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
+    # address into the Gmail login.
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and user:
+        try:
+            eamap = ExternalAuthMap.objects.get(user=user)
+            if eamap.external_domain.startswith(SHIB_DOMAIN_PREFIX):
+                return HttpResponse(json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+        except (ExternalAuthMap.DoesNotExist, ExternalAuthMap.MultipleObjectsReturned):
+            pass
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
@@ -630,9 +671,9 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_not_required = settings.MITX_FEATURES.get("AUTH_USE_SHIB") \
-                       and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') \
-                       and DoExternalAuth and ("shib" in eamap.external_domain)
+    tos_not_required = (settings.MITX_FEATURES.get("AUTH_USE_SHIB") and
+                        settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and
+                        DoExternalAuth and eamap.external_domain.startswith(SHIB_DOMAIN_PREFIX))
 
     if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':

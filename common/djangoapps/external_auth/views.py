@@ -11,7 +11,7 @@ from external_auth.models import ExternalAuthMap
 from external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
+from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -44,7 +44,7 @@ from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
 from ratelimitbackend.exceptions import RateLimitException
 
-import student.views as student_views
+import student.views
 # Required for Pearson
 from courseware.views import get_module_for_descriptor, jump_to
 from courseware.model_data import FieldDataCache
@@ -136,6 +136,7 @@ def _external_login_or_signup(request,
                               fullname,
                               retfun=None):
     """Generic external auth login or signup"""
+    logout(request)
 
     # see if we have a map from this external_id to an edX username
     try:
@@ -160,13 +161,13 @@ def _external_login_or_signup(request,
         if uses_shibboleth:
             # if we are using shib, try to link accounts using email
             try:
-                link_user = User.objects.get(email=eamap.external_email)
+                link_user = User.objects.get(email=eamap.external_id)
                 if not ExternalAuthMap.objects.filter(user=link_user).exists():
                     # if there's no pre-existing linked eamap, we link the user
                     eamap.user = link_user
                     eamap.save()
                     internal_user = link_user
-                    log.info('SHIB: Linking existing account for %s', eamap.external_email)
+                    log.info('SHIB: Linking existing account for %s', eamap.external_id)
                     # now pass through to log in
                 else:
                     # otherwise, there must have been an error, b/c we've already linked a user with these external
@@ -215,9 +216,9 @@ def _external_login_or_signup(request,
     # testing request.method for extra paranoia
     if uses_shibboleth and request.method == 'GET':
         enroll_request = _make_shib_enrollment_request(request)
-        student_views.try_change_enrollment(enroll_request)
+        student.views.try_change_enrollment(enroll_request)
     else:
-        student_views.try_change_enrollment(request)
+        student.views.try_change_enrollment(request)
     AUDIT_LOG.info("Login success - %s (%s)", user.username, user.email)
     if retfun is None:
         return redirect('/')
@@ -239,11 +240,13 @@ def _signup(request, eamap):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    # default conjoin name, no spaces
+    # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
+    # but this only affects username, not fullname
     username = eamap.external_name.replace(' ', '')
 
     context = {'has_extauth_info': True,
                'show_signup_immediately': True,
+               'extauth_domain': eamap.external_domain,
                'extauth_id': eamap.external_id,
                'extauth_email': eamap.external_email,
                'extauth_username': username,
@@ -270,7 +273,7 @@ def _signup(request, eamap):
 
     log.info('EXTAUTH: Doing signup for %s', eamap.external_id)
 
-    return student_views.register_user(request, extra_context=context)
+    return student.views.register_user(request, extra_context=context)
 
 
 # -----------------------------------------------------------------------------
@@ -368,11 +371,11 @@ def ssl_login(request):
 
     if not cert:
         # no certificate information - go onward to main index
-        return student_views.index(request)
+        return student.views.index(request)
 
     (_user, email, fullname) = _ssl_dn_extract_info(cert)
 
-    retfun = functools.partial(student_views.index, request)
+    retfun = functools.partial(student.views.index, request)
     return _external_login_or_signup(
         request,
         external_id=email,
@@ -435,16 +438,23 @@ def shib_login(request):
     else:
         # If we get here, the user has authenticated properly
         shib = {attr: request.META.get(attr, '')
-                for attr in ['REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider']}
+                for attr in ['REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider', 'displayName']}
 
         # Clean up first name, last name, and email address
         # TODO: Make this less hardcoded re: format, but split will work
         # even if ";" is not present, since we are accessing 1st element
-        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize().decode('utf-8')
-        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize().decode('utf-8')
+        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize()
+        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize()
 
     # TODO: should we be logging creds here, at info level?
     log.info("SHIB creds returned: %r", shib)
+
+    fullname = shib['displayName'] if shib['displayName'] else u'%s %s' % (shib['givenName'], shib['sn'])
+
+    next = request.REQUEST.get('next')
+    retfun = None
+    if next:
+        retfun = functools.partial(redirect, next)
 
     return _external_login_or_signup(
         request,
@@ -452,7 +462,8 @@ def shib_login(request):
         external_domain=SHIBBOLETH_DOMAIN_PREFIX + shib['Shib-Identity-Provider'],
         credentials=shib,
         email=shib['mail'],
-        fullname=u'%s %s' % (shib['givenName'], shib['sn']),
+        fullname=fullname,
+        retfun=retfun
     )
 
 
@@ -486,20 +497,18 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    query_string = request.META.get("QUERY_STRING", '')
-
     try:
         course = course_from_id(course_id)
     except ItemNotFoundError:
         # couldn't find the course, will just return vanilla signin page
-        return redirect_with_querystring('signin_user', query_string)
+        return redirect_with_querystring('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
-        return redirect_with_querystring('shib-login', query_string)
+        return redirect_with_querystring('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
-    return redirect_with_querystring('signin_user', query_string)
+    return redirect_with_querystring('signin_user', request.GET)
 
 
 def course_specific_register(request, course_id):
@@ -507,29 +516,27 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    query_string = request.META.get("QUERY_STRING", '')
-
     try:
         course = course_from_id(course_id)
     except ItemNotFoundError:
         # couldn't find the course, will just return vanilla registration page
-        return redirect_with_querystring('register_user', query_string)
+        return redirect_with_querystring('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
         # shib-login takes care of both registration and login flows
-        return redirect_with_querystring('shib-login', query_string)
+        return redirect_with_querystring('shib-login', request.GET)
 
     # Default fallthrough to normal registration page
-    return redirect_with_querystring('register_user', query_string)
+    return redirect_with_querystring('register_user', request.GET)
 
 
-def redirect_with_querystring(view_name, query_string):
+def redirect_with_querystring(view_name, querydict_get):
     """
-        Helper function to add query string to redirect views
+        Helper function to carry over get parameters across redirects
     """
-    if query_string:
-        return redirect("%s?%s" % (reverse(view_name), query_string))
+    if querydict_get:
+        return redirect("%s?%s" % (reverse(view_name), querydict_get.urlencode(safe='/')))
     return redirect(view_name)
 
 
