@@ -17,14 +17,13 @@ log = logging.getLogger(__name__)
 class LTIFields(object):
     """provider_url and tool_id together is unique location of LTI in the web.
 
-    Scope settings should be scope content:
-
-    Cale: There is no difference in presentation to the user yet because
+    Scope settings should be scope content. Expanation by Cale:
+    "There is no difference in presentation to the user yet because
     there is no sharing between courses.  However, when we get to the point of being
     able to have multiple courses using the same content,
     then the distinction between Scope.settings (local to the current course),
     and Scope.content (shared across all uses of this content in any course)
-    becomes much more clear/necessary.
+    becomes much more clear/necessary."
     """
     client_key = String(help="Client key", default='', scope=Scope.settings)
     client_secret = String(help="Client secret", default='', scope=Scope.settings)
