@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
+from mitxmako.middleware import MakoMiddleware
 
 from xmodule.modulestore.django import modulestore
 
@@ -135,6 +136,10 @@ class ViewsTestCase(TestCase):
     def verify_end_date(self, course_id, expected_end_text=None):
         request = self.request_factory.get("foo")
         request.user = self.user
+
+        # TODO: Remove the dependency on MakoMiddleware (by making the views explicitly supply a RequestContext)
+        MakoMiddleware().process_request(request)
+
         result = views.course_about(request, course_id)
         if expected_end_text is not None:
             self.assertContains(result, "Classes End")

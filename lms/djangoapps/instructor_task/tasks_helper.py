@@ -20,7 +20,6 @@ from dogapi import dog_stats_api
 
 from xmodule.modulestore.django import modulestore
 
-import mitxmako.middleware as middleware
 from track.views import task_track
 
 from courseware.models import StudentModule
@@ -33,26 +32,6 @@ TASK_LOG = get_task_logger(__name__)
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
-
-
-def initialize_mako(sender=None, conf=None, **kwargs):
-    """
-    Get mako templates to work on celery worker server's worker thread.
-
-    The initialization of Mako templating is usually done when Django is
-    initializing middleware packages as part of processing a server request.
-    When this is run on a celery worker server, no such initialization is
-    called.
-
-    To make sure that we don't load this twice (just in case), we look for the
-    result: the defining of the lookup paths for templates.
-    """
-    if 'main' not in middleware.lookup:
-        TASK_LOG.info("Initializing Mako middleware explicitly")
-        middleware.MakoMiddleware()
-
-# Actually make the call to define the hook:
-worker_process_init.connect(initialize_mako)
 
 
 class UpdateProblemModuleStateError(Exception):
