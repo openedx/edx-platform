@@ -375,10 +375,7 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                "{}?{}".format(
-                    reverse("course_modes_choose"),
-                    urlencode(dict(course_id=course_id))
-                )
+                reverse("course_modes_choose", kwargs={'course_id': course_id})
             )
 
         org, course_num, run = course_id.split("/")

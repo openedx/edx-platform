@@ -10,11 +10,12 @@ from mitxmako.shortcuts import render_to_response
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
+from django.contrib.auth.decorators import login_required
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -29,19 +30,15 @@ log = logging.getLogger(__name__)
 
 class VerifyView(View):
 
-    def get(self, request):
+    def get(self, request, course_id):
         """
         """
-        course_id = request.GET['course_id']
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
             return redirect(
-                "{}?{}".format(
-                    reverse('verify_student_verified'),
-                    urlencode(dict(course_id=course_id))
-                )
-            )
+                reverse('verify_student_verified',
+                        kwargs={'course_id': course_id}))
         else:
             # If they haven't completed a verification attempt, we have to
             # restart with a new one. We can't reuse an older one because we
@@ -76,11 +73,10 @@ class VerifiedView(View):
     View that gets shown once the user has already gone through the
     verification flow
     """
-    def get(self, request):
+    def get(self, request, course_id):
         """
         Handle the case where we have a get request
         """
-        course_id = request.GET['course_id']
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
@@ -131,10 +127,12 @@ def create_order(request):
 
     return HttpResponse(json.dumps(params), content_type="text/json")
 
-
-def show_requirements(request):
-    """This might just be a plain template without a view."""
-    context = { "course_id": request.GET.get("course_id") }
+@login_required
+def show_requirements(request, course_id):
+    """
+    Show the requirements necessary for
+    """
+    context = { "course_id": course_id }
     return render_to_response("verify_student/show_requirements.html", context)
 
 def face_upload(request):
@@ -175,7 +173,7 @@ def enroll(user, course_id, mode_slug):
         # to a page that lets them choose which mode they want.
         if len(available_modes) > 1:
             return HttpResponseRedirect(
-                reverse('choose_enroll_mode', course_id=course_id)
+                reverse('choose_enroll_mode', kwargs={'course_id': course_id})
             )
         # Otherwise, we use the only mode that's supported...
         else:
@@ -188,11 +186,11 @@ def enroll(user, course_id, mode_slug):
         return HttpResponseRedirect(reverse('dashboard'))
 
     if mode_slug == "verify":
-        if SoftwareSecureVerification.has_submitted_recent_request(user):
+        if SoftwareSecurePhotoVerification.has_submitted_recent_request(user):
             # Capture payment info
             # Create an order
             # Create a VerifiedCertificate order item
-            return HttpResponse.Redirect(reverse('payment'))
+            return HttpResponse.Redirect(reverse('verified'))
 
 
     # There's always at least one mode available (default is "honor"). If they

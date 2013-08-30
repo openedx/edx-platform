@@ -518,7 +518,7 @@
           <li class="help-item">
             <h3 class="title">Change your mind?</h3>
             <div class="copy">
-              <p>You can always <a href="${reverse('course_modes_choose') + '?course_id=' + course_id }">Audit the course for free</a> without verifying.</p>
+                <p>You can always <a href="${reverse('course_modes_choose', kwargs={'course_id': course_id})}">Audit the course for free</a> without verifying.</p>
             </div>
           </li>
         </ul>

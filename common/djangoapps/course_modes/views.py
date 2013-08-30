@@ -21,8 +21,7 @@ from verify_student.models import SoftwareSecurePhotoVerification
 class ChooseModeView(View):
 
     @method_decorator(login_required)
-    def get(self, request, error=None):
-        course_id = request.GET.get("course_id")
+    def get(self, request, course_id, error=None):
         modes = CourseMode.modes_for_course_dict(course_id)
         context = {
             "course_id": course_id,
@@ -38,8 +37,7 @@ class ChooseModeView(View):
         return render_to_response("course_modes/choose.html", context)
 
 
-    def post(self, request):
-        course_id = request.GET.get("course_id")
+    def post(self, request, course_id):
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollement,
@@ -47,7 +45,7 @@ class ChooseModeView(View):
         course = course_from_id(course_id)
         if not has_access(user, course, 'enroll'):
             error_msg = _("Enrollment is closed")
-            return self.get(request, error=error_msg)
+            return self.get(request, course_id, error=error_msg)
 
         requested_mode = self.get_requested_mode(request.POST.get("mode"))
         if requested_mode == "verified" and request.POST.get("honor-code"):
@@ -72,29 +70,25 @@ class ChooseModeView(View):
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
-                return self.get(request, error=error_msg)
+                return self.get(request, course_id, error=error_msg)
 
             # Check for minimum pricing
             if amount_value < mode_info.min_price:
                 error_msg = _("No selected price or selected price is too low.")
-                return self.get(request, error=error_msg)
+                return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_id] = amount_value
             request.session["donation_for_course"] = donation_for_course
             if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
                 return redirect(
-                    "{}?{}".format(
-                        reverse('verify_student_verified'),
-                        urlencode(dict(course_id=course_id))
-                    )
+                    reverse('verify_student_verified',
+                            kwargs={'course_id': course_id})
                 )
 
             return redirect(
-                "{}?{}".format(
-                    reverse('verify_student_show_requirements'),
-                    urlencode(dict(course_id=course_id))
-                )
+                reverse('verify_student_show_requirements',
+                        kwargs={'course_id': course_id}),
             )
 
     def get_requested_mode(self, user_choice):

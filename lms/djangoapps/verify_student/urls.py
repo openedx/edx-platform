@@ -24,19 +24,19 @@ urlpatterns = patterns(
     # The above are what we did for the design mockups, but what we're really
     # looking at now is:
     url(
-        r'^show_requirements',
+        r'^show_requirements/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.show_requirements,
         name="verify_student_show_requirements"
     ),
 
     url(
-        r'^verify',
+        r'^verify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.VerifyView.as_view(),
         name="verify_student_verify"
     ),
 
     url(
-        r'^verified',
+        r'^verified/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.VerifiedView.as_view(),
         name="verify_student_verified"
     ),
@@ -48,7 +48,7 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^show_verification_page',
+        r'^show_verification_page/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.show_verification_page,
         name="verify_student/show_verification_page"
     ),

@@ -21,7 +21,7 @@ from student.tests.factories import UserFactory
 class StartView(TestCase):
 
     def start_url(course_id=""):
-        return "/verify_student/start?course_id={0}".format(urllib.quote(course_id))
+        return "/verify_student/{0}".format(urllib.quote(course_id))
 
     def test_start_new_verification(self):
         """
