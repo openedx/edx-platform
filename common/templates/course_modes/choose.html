@@ -28,18 +28,18 @@ $(document).ready(function() {
           <span class="sts">You are registering for</span>
           <span class="sts-course">${course_id} </span>
         </span>
-        <span class="sts-track">
-          <span class="sts-track-label">Registering as: </span>
-          <span class="sts-track-value">ID Verified</span>
-        </span>
       </h2>
     </header>
 
     %if error:
     <div class="wrapper-msg wrapper-msg-error">
+      <i class="icon icon-warning-sign expandable-icon"></i>
+
       <div class=" msg msg-error">
-      <h3 class="title">Sorry, there was an error with your registration</h3>
-      <div class="copy">${error}</div>
+        <h3 class="title">Sorry, there was an error when trying to register you</h3>
+        <div class="copy">
+          <p>${error}</p>
+        </div>
       </div>
     </div>
     %endif
@@ -75,19 +75,27 @@ $(document).ready(function() {
           <div class="register-choice register-choice-certificate">
             <div class="wrapper-copy">
               <span class="deco-ribbon"></span>
-              <h4 class="title">Certificate of Achievement</h4>
+              <h4 class="title">Certificate of Achievement &mdash; ID Verified</h4>
               <div class="copy">
-                <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
+                <p>Sign up and work toward a verified Certificate of Achievement.</p>
               </div>
             </div>
 
             <div class="field field-certificate-contribution">
               <h5 class="label">Select your contribution for this course:</h5>
 
+              %if error:
+              <div class="msg msg-error msg-inline">
+                <div class="copy">
+                  <p>${error}</p>
+                </div>
+              </div>
+              %endif
+
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand">Why do I have to pay? What if I don't meet all the requirements? <i class="icon-caret-down expandable-icon"></i></h5>
+                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> Why do I have to pay? What if I don't meet all the requirements?</h5>
 
                 <div class="copy expandable-area">
                   <dl class="list-faq">

@@ -121,7 +121,7 @@
     @include transition(all 0.25s ease-in-out 0s);
     display: inline-block;
     vertical-align: middle;
-    margin-left: ($baseline/4);
+    margin-right: ($baseline/4);
   }
 
   .expandable-area {
@@ -131,14 +131,16 @@
   // STATE: active
   &.is-ready {
 
+    .expandable-icon {
+      @include transform(rotate(-90deg));
+    }
+
     .title-expand {
       @extend .ui-fake-link;
       color: $m-blue-d2;
-      border-bottom: 1px dotted transparent;
 
       &:hover {
-        color: $m-blue-d2;
-        border-bottom: 1px dotted $m-blue-d2;
+        color: $m-blue;
       }
     }
 
@@ -152,7 +154,7 @@
   &.is-expanded {
 
     .expandable-icon {
-      @include transform(rotate(-180deg));
+      @include transform(rotate(0));
       @include transform-origin(50% 50%);
     }
 
@@ -291,28 +293,49 @@
 
   // UI: error
   .wrapper-msg-error {
+    position: relative;
+    top: -($baseline*0.75);
     width: flex-grid(12,12);
-    border-radius: ($baseline/5);
     margin-bottom: $baseline;
-    padding: $baseline ($baseline*1.25);
-    box-shadow: 0 2px 1px 0 tint($red,90%);
-    background: $red;
+    border-top: ($baseline/4) solid $red;
+    padding: ($baseline*0.75) $baseline;
+    background: tint($red, 95%);
+
+    .msg-error, .icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
 
     .msg-error {
       @include clearfix();
+      width: flex-grid(11,12);
 
       .title {
         @extend .t-title5;
         @extend .t-weight4;
-        margin-bottom: ($baseline/2);
-        border-bottom: ($baseline/10) solid tint($red,35%);
-        padding-bottom: ($baseline/2);
-        color: tint($red,90%);
+        color: $red;
       }
 
       .copy {
         @extend .t-copy-base;
-        color: tint($red,65%);
+        color: $red;
+      }
+    }
+
+    .icon {
+      width: flex-grid(1,12);
+      @extend .t-icon2;
+      color: $red;
+      text-align: center;
+    }
+  }
+
+  .msg-inline {
+
+    &.msg-error {
+
+      .copy, .copy p {
+        color: $red;
       }
     }
   }
@@ -322,7 +345,7 @@
   // UI: page header
   .page-header {
     width: flex-grid(12,12);
-    margin: 0 0 $baseline 0;
+    margin: 0 0 ($baseline/2) 0;
     border-bottom: ($baseline/4) solid $m-gray-l4;
 
     .title {
@@ -342,14 +365,16 @@
         width: flex-grid(3,12);
         text-align: right;
 
-        .sts-track-label {
-          @extend .text-sr;
-        }
-
         .sts-track-value {
           @extend .copy-badge;
           color: $white;
           background: $m-green-l2;
+
+          .context {
+            margin-right: ($baseline/4);
+            opacity: 0.80;
+            color: $white;
+          }
         }
       }
 
@@ -496,7 +521,7 @@
 
     // indiv slides
     .wrapper-view {
-      padding: 0 $baseline !important;
+
     }
 
     .view {
@@ -516,12 +541,12 @@
     .wrapper-task {
       @include clearfix();
       width: flex-grid(12,12);
-      margin: ($baseline*2) 0 $baseline 0;
+      margin: $baseline 0;
 
       .wrapper-help {
         float: right;
         width: flex-grid(6,12);
-        padding: ($baseline*0.75) $baseline;
+        padding: 0 $baseline;
 
         .help {
           margin-bottom: ($baseline*1.5);
@@ -858,7 +883,6 @@
     @extend .ui-well;
     @include clearfix;
     width: flex-grid(12,12);
-    margin: $baseline 0;
     border-radius: ($baseline/10);
     background: $m-gray-l4;
 
@@ -1056,6 +1080,7 @@
 
       .action-select input {
         @extend .t-weight4;
+        padding: ($baseline/2) ($baseline*0.75);
       }
     }
 
@@ -1090,7 +1115,7 @@
       }
 
       .list-actions {
-        margin-top: $baseline;
+        margin: ($baseline/2) 0;
         border-top: ($baseline/10) solid $m-gray-t1;
         padding-top: $baseline;
       }
