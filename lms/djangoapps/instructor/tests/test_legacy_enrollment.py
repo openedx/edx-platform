@@ -217,7 +217,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         self.assertEqual(mail.outbox[1].subject, 'You have been invited to register for MITx/999/Robot_Super_Course')
         self.assertEqual(mail.outbox[1].body, "Dear student,\n\nYou have been invited to join MITx/999/Robot_Super_Course at edx.org by a member of the course staff.\n\n" +
-                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form.\n" +
+                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form making sure to use student3_1@test.com in the E-mail field.\n" +
                                               "Once you have registered and activated your account, you will see MITx/999/Robot_Super_Course listed on your dashboard.\n\n" +
                                               "----\nThis email was automatically sent from edx.org to student3_1@test.com")
 
