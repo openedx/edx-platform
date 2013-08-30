@@ -89,7 +89,7 @@
           <p>There are a few things you will need to register as an ID verified student:</p>
         </div>
 
-        <ul class="list-reqs account-not-activated ${"account-not-activated" if is_not_active else ""}">
+        <ul class="list-reqs ${"account-not-activated" if is_not_active else ""}">
           %if is_not_active:
           <li class="req req-0 req-activate">
             <h4 class="title">Activate Your Account</h4>
