@@ -1,7 +1,7 @@
 """
 Unit tests for handling email sending errors
 """
-
+from itertools import cycle
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
@@ -14,7 +14,6 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 
 from bulk_email.models import CourseEmail
 from bulk_email.tasks import delegate_email_batches
-from bulk_email.tests.smtp_server_thread import FakeSMTPServerThread
 
 from mock import patch, Mock
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
@@ -26,12 +25,7 @@ class EmailTestException(Exception):
     pass
 
 
-@override_settings(
-    MODULESTORE=TEST_DATA_MONGO_MODULESTORE,
-    EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
-    EMAIL_HOST='localhost',
-    EMAIL_PORT=TEST_SMTP_PORT
-)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
@@ -45,25 +39,22 @@ class TestEmailErrors(ModuleStoreTestCase):
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.smtp_server_thread = FakeSMTPServerThread('localhost', TEST_SMTP_PORT)
-        self.smtp_server_thread.start()
+        #self.smtp_server_thread = FakeSMTPServerThread('localhost', TEST_SMTP_PORT)
+        #self.smtp_server_thread.start()
 
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
 
     def tearDown(self):
-        self.smtp_server_thread.stop()
+        #self.smtp_server_thread.stop()
         patch.stopall()
 
+    @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email.retry')
-    def test_data_err_retry(self, retry):
+    def test_data_err_retry(self, retry, get_conn):
         """
         Test that celery handles transient SMTPDataErrors by retrying.
         """
-        self.smtp_server_thread.server.set_errtype(
-            "DATA",
-            "454 Throttling failure: Daily message quota exceeded."
-        )
-
+        get_conn.return_value.send_messages.side_effect = SMTPDataError(455, "Throttling: Sending rate exceeded")
         test_email = {
             'action': 'Send email',
             'to_option': 'myself',
@@ -78,17 +69,15 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPDataError)
 
+    @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email_result')
     @patch('bulk_email.tasks.course_email.retry')
-    def test_data_err_fail(self, retry, result):
+    def test_data_err_fail(self, retry, result, get_conn):
         """
         Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         """
-        self.smtp_server_thread.server.set_errtype(
-            "DATA",
-            "554 Message rejected: Email address is not verified."
-        )
-
+        get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
+                                                                 None])
         students = [UserFactory() for _ in xrange(settings.EMAILS_PER_TASK)]
         for student in students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -106,18 +95,16 @@ class TestEmailErrors(ModuleStoreTestCase):
         # Test that after the rejected email, the rest still successfully send
         ((sent, fail, optouts), _) = result.call_args
         self.assertEquals(optouts, 0)
-        self.assertEquals(fail, 1)
-        self.assertEquals(sent, settings.EMAILS_PER_TASK - 1)
+        self.assertEquals(fail, settings.EMAILS_PER_TASK / 2)
+        self.assertEquals(sent, settings.EMAILS_PER_TASK / 2)
 
+    @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email.retry')
-    def test_disconn_err_retry(self, retry):
+    def test_disconn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPServerDisconnected by retrying.
         """
-        self.smtp_server_thread.server.set_errtype(
-            "DISCONN",
-            "Server disconnected, please try again later."
-        )
+        get_conn.return_value.open.side_effect = SMTPServerDisconnected(425, "Disconnecting")
         test_email = {
             'action': 'Send email',
             'to_option': 'myself',
@@ -131,13 +118,15 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPServerDisconnected)
 
+    @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email.retry')
-    def test_conn_err_retry(self, retry):
+    def test_conn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPConnectError by retrying.
         """
         # SMTP reply is already specified in fake SMTP Channel created
-        self.smtp_server_thread.server.set_errtype("CONN")
+        #self.smtp_server_thread.server.set_errtype("CONN")
+        get_conn.return_value.open.side_effect = SMTPConnectError(424, "Bad Connection")
 
         test_email = {
             'action': 'Send email',
