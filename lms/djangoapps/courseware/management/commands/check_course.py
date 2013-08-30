@@ -10,8 +10,6 @@ from django.contrib.auth.models import User
 
 import xmodule
 
-import mitxmako.middleware as middleware
-middleware.MakoMiddleware()
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import ModelDataCache
 from courseware.module_render import get_module

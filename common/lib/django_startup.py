@@ -7,7 +7,7 @@ def autostartup():
     """
     for app in settings.INSTALLED_APPS:
         try:
-            mod = import_module('{}.startup')
+            mod = import_module(app + '.startup')
             if hasattr(mod, 'run'):
                 mod.run()
         except ImportError:
