@@ -77,6 +77,19 @@ def csrf_token(context):
             ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
+def superuser_login_as(request, username):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied')
+    try:
+        u1 = User.objects.get(username=username)
+        u1.backend = 'django.contrib.auth.backends.ModelBackend'
+    except User.DoesNotExist:
+        return HttpResponse('User not found')
+    logout(request)
+    login(request, u1)
+    return HttpResponse('You are now logged in as ' + username)
+
+
 # NOTE: This view is not linked to directly--it is called from
 # branding/views.py:index(), which is cached for anonymous users.
 # This means that it should always return the same thing for anon

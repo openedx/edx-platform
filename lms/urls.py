@@ -420,6 +420,10 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+if settings.MITX_FEATURES.get('ENABLE_SUPERUSER_LOGIN_AS'):
+    urlpatterns += (
+        url(r'^su_login_as/(?P<username>[\w.@+-]+)/?$', 'student.views.superuser_login_as', name='impersonate'),
+    )
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
