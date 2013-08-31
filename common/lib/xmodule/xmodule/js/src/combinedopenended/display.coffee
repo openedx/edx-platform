@@ -206,6 +206,15 @@ class @CombinedOpenEnded
   get_html_callback: (response) =>
     @coe.replaceWith(response.html)
 
+    onVideoClipperReadyTried = VideoClipper
+    window.onVideoClipperReady = =>
+      console.log 'ran generate'
+      VideoClipper.generate()
+
+    if onVideoClipperReadyTried != undefined
+      window.onVideoClipperReady()
+
+
   get_html: () =>
     url = "#{@ajax_url}/get_html"
     $.ajaxWithPrefix({
@@ -265,6 +274,7 @@ class @CombinedOpenEnded
 
 
   rebind: () =>
+    console.log 'ran rebind'
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
@@ -274,13 +284,13 @@ class @CombinedOpenEnded
     @hint_area.attr('disabled', false)
 
     if @task_number==1 and @child_state=='assessing'
-      @video_response_on()
+      @video_response_off()
       @prompt_hide()
     if @child_state == 'done'
-      @video_response_on()
+      @video_response_off()
       @rubric_wrapper.hide()
     if @child_type=="openended"
-      @video_response_on()
+      @video_response_off()
       @skip_button.hide()
     if @allow_reset=="True"
       @show_combined_rubric_current()
@@ -319,6 +329,7 @@ class @CombinedOpenEnded
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
+      @video_response_on()
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
@@ -662,32 +673,55 @@ class @CombinedOpenEnded
       @submit_button.show()
 
   video_response_on: () =>
+    console.log('ran video_response_on')
     onVideoClipperReadyTried = VideoClipper
-    window.onVideoClipperReady = ->
+    window.onVideoClipperReady = =>
       coeVideoId = @coe.data('videoId')
       if coeVideoId != null && coeVideoId != ""
         textarea = @coe.find('textarea')
+        @video_button = @submit_button.after('<input type="button"/>').next()
+        @video_button.attr
+          value: 'Snippet'
+          id: 'coe-video-button'
+
         textarea.attr('id', 'coe-video-clipper')
         new VideoClipper
           textareaId: 'coe-video-clipper'
           videoType: "YT"
           videoId: coeVideoId
+          buttonId: 'coe-video-button'
 
-      if onVideoClipperReadyTried != undefined
-        window.onVideoClipperReady()
+    if onVideoClipperReadyTried != undefined
+      window.onVideoClipperReady()
 
-      onOmniPlayerReadyTried = OmniPlayer
-      window.onOmniPlayerReady = ->
-        OmniPlayer.loaded.YT = true
+    onOmniPlayerReadyTried = OmniPlayer
+    window.onOmniPlayerReady = ->
+      OmniPlayer.loaded.YT = true
 
-      if onOmniPlayerReadyTried != undefined
-        window.onOmniPlayerReady()
+    if onOmniPlayerReadyTried != undefined
+      window.onOmniPlayerReady()
 
 
   video_response_off: () =>
-    VideoClipper.cleanUp()
+    console.log('ran video_response_off')
+
+    onVideoClipperReadyTried = VideoClipper
+    window.onVideoClipperReady = =>
+      VideoClipper.cleanUp()
+      VideoClipper.generate()
+
+    if onVideoClipperReadyTried != undefined
+      window.onVideoClipperReady()
+
+    onOmniPlayerReadyTried = OmniPlayer
+    window.onOmniPlayerReady = ->
+      OmniPlayer.loaded.YT = true
+
+    if onOmniPlayerReadyTried != undefined
+      window.onOmniPlayerReady()
 
   video_response_reset: () =>
+    console.log('ran video_response_reset')
     @video_response_off()
     @video_response_on()
 

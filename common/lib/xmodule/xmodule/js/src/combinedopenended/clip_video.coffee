@@ -206,8 +206,8 @@ class @VideoClipper
       $('[rel*=blModal]').each (index, element) ->
         data = VideoClipper.getBLData $(element)
 
-        startTime = VideoClipper.secondsToTime(data.start)
-        endTime = VideoClipper.secondsToTime(data.end)
+        startTime = VideoClipper.secondsToTime(data.startSeconds)
+        endTime = VideoClipper.secondsToTime(data.endSeconds)
 
         $(element).click ->
           that.modal.open this
@@ -526,18 +526,6 @@ class @VideoClipper
     val = @secondsToTime val
     $("input[name='bl-start']").val val
     return val
-
-# TODO: Add Tests
-# coeVideoId = $('#combined-open-ended').data('videoId')
-
-# if coeVideoId? && coeVideoId != ""
-#   textarea = $('#combined-open-ended').find('textarea')
-#   textarea.attr('id','video-clipper')
-
-#   new VideoClipper
-#     textareaId: "video-clipper"
-#     videoType: "YT"
-#     videoId: coeVideoId
 
 VideoClipper.generate()
 if window.onVideoClipperReady?
