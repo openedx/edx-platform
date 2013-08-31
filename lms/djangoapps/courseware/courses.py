@@ -2,10 +2,11 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
 import inspect
+import re
 
 from path import path
 from django.http import Http404
-
+from django.conf import settings
 from .module_render import get_module
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
@@ -294,3 +295,18 @@ def sort_by_announcement(courses):
     courses = sorted(courses, key=key)
 
     return courses
+
+def get_cms_course_link_by_id(course_id):
+    """
+    Returns a proto-relative link to course_index for editing the course in cms, assuming that the course is actually
+    cms-backed. If course_id is improperly formatted, just return the root of the cms
+    """
+    format_str = r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<name>[^/]+)$'
+    host = "//{}/".format(settings.CMS_BASE) # protocol-relative
+    m = re.match(format_str, course_id)
+    if m:
+        return "{host}{org}/{course}/course/{name}".format(host=host,
+                                                            org=m.group('org'),
+                                                            course=m.group('course'),
+                                                            name=m.group('name'))
+    return host
