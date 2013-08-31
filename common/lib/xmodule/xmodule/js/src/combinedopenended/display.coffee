@@ -205,15 +205,7 @@ class @CombinedOpenEnded
 
   get_html_callback: (response) =>
     @coe.replaceWith(response.html)
-
-    onVideoClipperReadyTried = VideoClipper
-    window.onVideoClipperReady = =>
-      console.log 'ran generate'
-      VideoClipper.generate()
-
-    if onVideoClipperReadyTried != undefined
-      window.onVideoClipperReady()
-
+    console.log @$('[rel*=blModal]').length
 
   get_html: () =>
     url = "#{@ajax_url}/get_html"
@@ -284,13 +276,10 @@ class @CombinedOpenEnded
     @hint_area.attr('disabled', false)
 
     if @task_number==1 and @child_state=='assessing'
-      @video_response_off()
       @prompt_hide()
     if @child_state == 'done'
-      @video_response_off()
       @rubric_wrapper.hide()
     if @child_type=="openended"
-      @video_response_off()
       @skip_button.hide()
     if @allow_reset=="True"
       @show_combined_rubric_current()
@@ -709,6 +698,7 @@ class @CombinedOpenEnded
     window.onVideoClipperReady = =>
       VideoClipper.cleanUp()
       VideoClipper.generate()
+      console.log @$('[rel*=blModal]').length
 
     if onVideoClipperReadyTried != undefined
       window.onVideoClipperReady()
