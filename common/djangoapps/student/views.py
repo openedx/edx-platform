@@ -700,6 +700,19 @@ def change_setting(request):
                                     'location': up.location, }))
 
 
+def _validate_statgradlogin(login):
+    """
+    Raises ValidationError
+    """
+    p = re.compile('sch\d+\Z')
+
+    try:
+        if p.match(login) is None:
+            raise ValidationError
+    except:
+        raise ValidationError
+
+
 def _do_create_account(post_vars):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
@@ -731,6 +744,7 @@ def _do_create_account(post_vars):
     registration.register(user)
 
     profile = UserProfile(user=user)
+    profile.name = "%s %s %s" % (post_vars.get('lastname'), post_vars.get('firstname'), post_vars.get('middlename'))
     profile.lastname = post_vars.get('lastname')
     profile.firstname = post_vars.get('firstname')
     profile.middlename = post_vars.get('middlename')
@@ -839,30 +853,30 @@ def create_account(request, post_override=None):
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
     for a in required_post_vars:
-        if len(post_vars[a]) < 1:
-            error_str = {'username': 'Username must be minimum of two characters long.',
-                         'email': 'A properly formatted e-mail is required.',
-                         'name': 'Your legal name must be a minimum of two characters long.',
-                         'password': 'A valid password is required.',
-                         'terms_of_service': 'Accepting Terms of Service is required.',
-                         'honor_code': 'Agreeing to the Honor Code is required.',
-                         'lastname': 'Aht',
-                         'firstname': '',
-                         'middlename': '',
-                         'year_of_birth': '',
-                         'level_of_education': '',
-                         'education_place': '',
-                         'education_year': '',
-                         'work_type': '',
-                         'work_number': '',
-                         'work_name': '',
-                         'work_login': '',
-                         'work_location': '',
-                         'work_occupation': '',
-                         'work_teaching_experience': '',
-                         'work_qualification_category': '',
-                         'work_qualification_category_year': '',
-                         'contact_phone': ''}
+        if len(post_vars[a]) < 2:
+            error_str = {'username': _('Username must be minimum of two characters long.'),
+                         'email': _('A properly formatted e-mail is required.'),
+                         'name': _('Your legal name must be a minimum of two characters long.'),
+                         'password': _('A valid password is required.'),
+                         'terms_of_service': _('Accepting Terms of Service is required.'),
+                         'honor_code': _('Agreeing to the Honor Code is required.'),
+                         'lastname': _('Lastname must be a minimum of two characters long.'),
+                         'firstname': _('Firstname must be a minimum of two characters long.'),
+                         'middlename': _('Middlename must be a minimum of two characters long.'),
+                         'year_of_birth': _('Year of birth is required'),
+                         'level_of_education': _('Education level is required'),
+                         'education_place': _('Education place is required'),
+                         'education_year': _('Education year is required'),
+                         'work_type': _('Work type is required'),
+                         'work_number': _('Work number is required'),
+                         'work_name': _('Work name is required'),
+                         'work_login': _('Work StatGrad login is required'),
+                         'work_location': _('Work location is required'),
+                         'work_occupation': _('Work occupation is required'),
+                         'work_teaching_experience': _('Work teaching experience is required'),
+                         'work_qualification_category': _('Work qualification category is required'),
+                         'work_qualification_category_year': _('Work qualification year is required'),
+                         'contact_phone': _('Contact phone is required')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
@@ -872,6 +886,13 @@ def create_account(request, post_override=None):
     except ValidationError:
         js['value'] = _("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
+        return HttpResponse(json.dumps(js))
+
+    try:
+        _validate_statgradlogin(post_vars['work_login'])
+    except ValidationError:
+        js['value'] = _("Valid StatGrad login is required.").format(field=a)
+        js['field'] = 'work_login'
         return HttpResponse(json.dumps(js))
 
     # try:

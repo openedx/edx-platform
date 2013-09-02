@@ -83,13 +83,10 @@ class UserProfile(models.Model):
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
-    
+
     lastname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
     firstname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
     middlename = models.CharField(blank=False, null=True, max_length=30, db_index=True)
-    
-    
-
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
@@ -103,7 +100,7 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    
+
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
@@ -210,11 +207,11 @@ class UserProfile(models.Model):
         ('first', _("First")),
         ('second', _("Second"))
     )
-    work_qualification_category = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES) 
+    work_qualification_category = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES)
     work_qualification_category_year = models.IntegerField(blank=False, null=True, db_index=True)
-    
+
     contact_phone = models.CharField(blank=False, null=True, max_length=10, db_index=False)
-    
+
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
