@@ -11,7 +11,7 @@ import urllib
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 from pkg_resources import resource_string
-from xblock.core import String, Scope
+from xblock.core import String, Scope, List
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ class LTIFields(object):
     """
     client_key = String(help="Client key", default='', scope=Scope.settings)
     client_secret = String(help="Client secret", default='', scope=Scope.settings)
-    lti_url = String(help="URL of the tool", default='', scope=Scope.settings)
+    launch_url = String(help="URL of the tool", default='', scope=Scope.settings)
+    custom_parameters = List(help="Custom parameters", scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
@@ -44,14 +45,29 @@ class LTIModule(LTIFields, XModule):
 
         # these params do not participate in oauth signing
         params = {
-            'lti_url': self.lti_url,
+            'launch_url': self.launch_url,
             'element_id': self.location.html_id(),
             'element_class': self.location.category,
         }
-        params.update(self.oauth_params())
+
+        parsed_custom_parameters = {}
+        for custom_parameter in self.custom_parameters:
+            try:
+                param_name, param_value = custom_parameter.split('=')
+            except ValueError:
+                raise Exception('Could not parse custom parameter: {0}. \
+                    Should be "x=y" string.'.format(custom_parameter))
+
+            # LTI specs:  'custom_' should be prepended before each custom parameter
+            parsed_custom_parameters.update(
+                {u'custom_' + unicode(param_name): unicode(param_value)}
+            )
+
+        params.update({'custom_parameters': parsed_custom_parameters})
+        params.update(self.oauth_params(parsed_custom_parameters))
         return self.system.render_template('lti.html', params)
 
-    def oauth_params(self):
+    def oauth_params(self, custom_parameters):
         """Obtains LTI html from provider"""
         client = requests.auth.Client(
             client_key=unicode(self.client_key),
@@ -73,11 +89,15 @@ class LTIModule(LTIFields, XModule):
             'lti_version': 'LTI-1p0',
             'role': 'student'
         }
+
+        # appending custom parameter for signing
+        body.update(custom_parameters)
+
         # This is needed for body encoding:
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         _, headers, _ = client.sign(
-            unicode(self.lti_url),
+            unicode(self.launch_url),
             http_method=u'POST',
             body=body,
             headers=headers)
@@ -101,5 +121,5 @@ class LTIModule(LTIFields, XModule):
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor):
-    """LTI Descriptor. No export/import to html."""
+    """LTI Descriptor. No export/import to xml."""
     module_class = LTIModule
