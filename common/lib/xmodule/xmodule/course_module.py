@@ -153,6 +153,7 @@ class TextbookList(List):
 
 
 class CourseFields(object):
+    LTIs = List(help="LTI tools passports as id:client_key:client_secret", scope=Scope.settings)
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
