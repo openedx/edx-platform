@@ -257,7 +257,7 @@ class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True):
+    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True, **kwargs):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -269,7 +269,7 @@ class XMLModuleStore(ModuleStoreBase):
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
-        super(XMLModuleStore, self).__init__()
+        super(XMLModuleStore, self).__init__(**kwargs)
 
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)

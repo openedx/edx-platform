@@ -5,6 +5,8 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from certificates.models import CertificateStatuses
+  from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+  from xmodule.modulestore.django import modulestore
 %>
 <%inherit file="main.html" />
 
@@ -14,6 +16,14 @@
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
+
+    $(".email-settings").click(function(event) {
+      $("#email_settings_course_id").val( $(event.target).data("course-id") );
+      $("#email_settings_course_number").text( $(event.target).data("course-number") );
+      if($(event.target).data("optout") == "False") {
+        $("#receive_emails").prop('checked', true);
+      }
+    });
 
     $(".unenroll").click(function(event) {
       $("#unenroll_course_id").val( $(event.target).data("course-id") );
@@ -78,6 +88,24 @@
        return false;
     });
 
+    $("#email_settings_form").submit(function(){
+      $.ajax({
+        type: "POST",
+        url: '${reverse("change_email_settings")}',
+        data: $(this).serializeArray(),
+        success: function(data) {
+          if(data.success) {
+            location.href = "${reverse('dashboard')}";
+          }
+        },
+        error: function(xhr, textStatus, error) {
+          if (xhr.status == 403) {
+            location.href = "${reverse('signin_user')}";          
+          }
+        }
+      });
+      return false;
+    });
   })(this)
   </script>
 </%block>
@@ -309,6 +337,10 @@ padding-left: 20px;
               % endif
             % endif
             <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
+	    % if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE:
+	      <!-- Only show the Email Settings link/modal if this course has bulk email feature enabled -->
+              <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
+	    % endif
           </section>
         </article>
 
@@ -340,6 +372,29 @@ padding-left: 20px;
       % endfor
     % endif
   </section>
+</section>
+
+<section id="email-settings-modal" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}</h2>
+      <hr/>
+    </header>
+
+    <form id="email_settings_form" method="post">
+      <input name="course_id" id="email_settings_course_id" type="hidden" />
+      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <div class="submit">
+        <input type="submit" id="submit" value="Save Settings" />
+      </div>
+    </form>
+
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="unenroll-modal" class="modal unenroll-modal">

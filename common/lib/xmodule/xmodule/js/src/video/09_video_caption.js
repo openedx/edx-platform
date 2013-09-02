@@ -6,13 +6,26 @@ define(
 [],
 function () {
 
-    // VideoCaption() function - what this module "exports".
+    /**
+     * @desc VideoCaption module exports a function.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @param {object} state - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {undefined}
+     */
     return function (state) {
         state.videoCaption = {};
 
         _makeFunctionsPublic(state);
+
         state.videoCaption.renderElements();
-        state.videoCaption.bindHandlers();
     };
 
     // ***************************************************************
@@ -57,28 +70,34 @@ function () {
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
-    // function renderElements()
-    //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+    /**
+     * @desc Create any necessary DOM elements, attach them, and set their
+     *     initial configuration. Also make the created DOM elements available
+     *     via the 'state' object. Much easier to work this way - you don't
+     *     have to do repeated jQuery element selects.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @this {object} - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @returns {boolean}
+     *     true: The function fethched captions successfully, and compltely
+     *         rendered everything related to captions.
+     *     false: The captions were not fetched. Nothing will be rendered,
+     *         and the CC button will be hidden.
+     */
     function renderElements() {
         this.videoCaption.loaded = false;
 
         this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
-        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
-
-        this.videoCaption.fetchCaption();
-        this.videoCaption.setSubtitlesHeight();
-
-        if (this.videoType === 'html5') {
-            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
-
-            this.videoCaption.subtitlesEl.addClass('html5');
-            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+        if (!this.videoCaption.fetchCaption()) {
+            this.videoCaption.hideCaptions(true);
+            this.videoCaption.hideSubtitlesEl.hide();
         }
     }
 
@@ -118,32 +137,69 @@ function () {
         }
     }
 
+    /**
+     * @desc Fetch the caption file specified by the user. Upn successful
+     *     receival of the file, the captions will be rendered.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @this {object} - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @returns {boolean}
+     *     true: The user specified a caption file. NOTE: if an error happens
+     *         while the specified file is being retrieved (for example the
+     *         file is missing on the server), this function will still return
+     *         true.
+     *     false: No caption file was specified, or an empty string was
+     *         specified.
+     */
     function fetchCaption() {
         var _this = this;
 
-        this.videoCaption.hideCaptions(this.hide_captions);
-
+        // Check whether the captions file was specified. This is the point
+        // where we either stop with the caption panel (so that a white empty
+        // panel to the right of the video will not be shown), or carry on
+        // further.
         if (!this.youtubeId('1.0')) {
-            return;
+            return false;
         }
 
+        // Fetch the captions file. If no file was specified, or if an error
+        // occurred, then we hide the captions panel, and the "CC" button
         $.ajaxWithPrefix({
             url: _this.videoCaption.captionURL(),
             notifyOnError: false,
-            success: function(captions) {
+            success: function (captions) {
                 _this.videoCaption.captions = captions.text;
                 _this.videoCaption.start = captions.start;
                 _this.videoCaption.loaded = true;
 
                 if (onTouchBasedDevice()) {
                     _this.videoCaption.subtitlesEl.find('li').html(
-                        gettext('Caption will be displayed when you start playing the video.')
+                        gettext(
+                            'Caption will be displayed when ' +
+                            'you start playing the video.'
+                        )
                     );
                 } else {
                     _this.videoCaption.renderCaption();
                 }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('ERROR while fetching captions.');
+                console.log(
+                    'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
+                );
+
+                _this.videoCaption.hideCaptions(true);
+                _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
+
+        return true;
     }
 
     function captionURL() {
@@ -227,9 +283,24 @@ function () {
     }
 
     function renderCaption() {
-        var container,
+        var container = $('<ol>'),
             _this = this;
-        container = $('<ol>');
+
+        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
+        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
+
+        this.videoCaption.setSubtitlesHeight();
+
+        if (this.videoType === 'html5') {
+            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
+
+            this.videoCaption.subtitlesEl.addClass('html5');
+            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+        }
+
+        this.videoCaption.hideCaptions(this.hide_captions);
+
+        this.videoCaption.bindHandlers();
 
         $.each(this.videoCaption.captions, function(index, text) {
             var liEl = $('<li>');

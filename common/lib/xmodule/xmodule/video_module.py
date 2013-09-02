@@ -24,9 +24,6 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
 from xblock.core import Scope, String, Boolean, Float, List, Integer
 
 import datetime
@@ -104,14 +101,14 @@ class VideoFields(object):
         default=[]
     )
     track = String(
-        help="The external URL to download the subtitle track. This appears as a link beneath the video.",
+        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
         display_name="Download Track",
         scope=Scope.settings,
         default=""
     )
     sub = String(
-        help="The name of the subtitle track (for non-Youtube videos).",
-        display_name="HTML5 Subtitles",
+        help="The name of the timed transcript track (for non-Youtube videos).",
+        display_name="HTML5 Timed Transcript",
         scope=Scope.settings,
         default=""
     )

@@ -15,7 +15,7 @@ from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
 from lettuce.django import django_url
-from nose.tools import assert_equals
+from nose.tools import assert_equals  # pylint: disable=E0611
 
 from logging import getLogger
 logger = getLogger(__name__)

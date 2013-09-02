@@ -110,6 +110,41 @@ def xml_store_config(data_dir):
     return store
 
 
+def studio_store_config(data_dir):
+    """
+    Defines modulestore structure used by Studio tests.
+    """
+    options = {
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'host': 'localhost',
+        'db': 'test_xmodule',
+        'collection': 'modulestore_%s' % uuid4().hex,
+        'fs_root': data_dir,
+        'render_template': 'mitxmako.shortcuts.render_to_string',
+    }
+
+    store = {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+            'OPTIONS': options
+        },
+        'direct': {
+            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+            'OPTIONS': options
+        },
+        'draft': {
+            'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+            'OPTIONS': options
+        },
+        'split': {
+            'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+            'OPTIONS': options
+        }
+    }
+
+    return store
+
+
 class ModuleStoreTestCase(TestCase):
     """
     Subclass for any test case that uses a ModuleStore.

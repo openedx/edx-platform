@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 DATA_LOCATION = 'i4x://edx/templates'
 

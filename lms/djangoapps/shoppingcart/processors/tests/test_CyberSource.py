@@ -116,14 +116,10 @@ class CyberSourceTests(TestCase):
         order2 = Order.get_cart_for_user(student2)
         record_purchase(params_cc, order1)
         record_purchase(params_nocc, order2)
-        self.assertEqual(order1.bill_to_ccnum, '1234')
-        self.assertEqual(order1.bill_to_cardtype, 'Visa')
         self.assertEqual(order1.bill_to_first, student1.first_name)
         self.assertEqual(order1.status, 'purchased')
 
         order2 = Order.objects.get(user=student2)
-        self.assertEqual(order2.bill_to_ccnum, '####')
-        self.assertEqual(order2.bill_to_cardtype, 'MasterCard')
         self.assertEqual(order2.bill_to_first, student2.first_name)
         self.assertEqual(order2.status, 'purchased')
 

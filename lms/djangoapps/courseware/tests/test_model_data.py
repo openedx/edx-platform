@@ -318,8 +318,6 @@ class StorageTestBase(object):
         self.assertEquals(exception.saved_field_names[0], 'existing_field')
 
 
-
-
 class TestSettingsStorage(StorageTestBase, TestCase):
     factory = SettingsFactory
     scope = Scope.settings
