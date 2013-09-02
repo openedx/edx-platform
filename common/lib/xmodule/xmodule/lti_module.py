@@ -31,8 +31,9 @@ class LTIFields(object):
     and Scope.content (shared across all uses of this content in any course)
     becomes much more clear/necessary."
     """
-    client_key = String(help="Client key", default='', scope=Scope.settings)
-    client_secret = String(help="Client secret", default='', scope=Scope.settings)
+    # client_key = String(help="Client key", default='', scope=Scope.settings)
+    # client_secret = String(help="Client secret", default='', scope=Scope.settings)
+    lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
     launch_url = String(help="URL of the tool", default='', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters", scope=Scope.settings)
 
@@ -46,7 +47,23 @@ class LTIModule(LTIFields, XModule):
 
     def get_html(self):
         """ Renders parameters to template. """
-        import ipdb; ipdb.set_trace()
+
+        # get client_key and client_secret parameters from current course:
+        # course location example: u'i4x://blades/1/course/2013_Spring'
+        course = self.descriptor.system.load_item(
+            self.location.tag + '://' + self.location.org + '/' +
+            self.location.course + '/course' + '/2013_Spring')
+        client_key, client_secret = '', ''
+        for lti_passport in course.LTIs:
+            try:
+                lti_id, key, secret = lti_passport.split(':')
+            except ValueError:
+                raise Exception('Could not parse LTI passport: {0}. \
+                    Should be "id:key:secret" string.'.format(lti_passport))
+            if lti_id == self.lti_id:
+                client_key, client_secret = key, secret
+                break
+
         # these params do not participate in oauth signing
         params = {
             'launch_url': self.launch_url,
@@ -68,14 +85,18 @@ class LTIModule(LTIFields, XModule):
             )
 
         params.update({'custom_parameters': parsed_custom_parameters})
-        params.update(self.oauth_params(parsed_custom_parameters))
+        params.update(self.oauth_params(
+            parsed_custom_parameters,
+            client_key,
+            client_secret
+        ))
         return self.system.render_template('lti.html', params)
 
-    def oauth_params(self, custom_parameters):
+    def oauth_params(self, custom_parameters, client_key, client_secret):
         """Obtains LTI html from provider"""
         client = requests.auth.Client(
-            client_key=unicode(self.client_key),
-            client_secret=unicode(self.client_secret)
+            client_key=unicode(client_key),
+            client_secret=unicode(client_secret)
         )
 
         # @ned - why  self.runtime.anonymous_student_id is None in dev env?
