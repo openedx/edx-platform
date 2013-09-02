@@ -52,6 +52,7 @@ class MockLTIServerTest(unittest.TestCase):
         """
         request = {
             'user_id': 'default_user_id',
+            'role': 'student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
             'oauth_consumer_key': 'client_key',

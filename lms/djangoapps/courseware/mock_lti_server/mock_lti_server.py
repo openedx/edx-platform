@@ -33,6 +33,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         if self._is_correct_lti_request():
             correct_keys = [
                 'user_id',
+                'role',
                 'oauth_nonce',
                 'oauth_timestamp',
                 'oauth_consumer_key',
