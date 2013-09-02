@@ -4,7 +4,7 @@
     ## module JavaScript will trigget a "submit" on the form, and the
     ## result will be rendered to the below iFrame.
     <form
-        action="${lti_url}"
+        action="${launch_url}"
         name="ltiLaunchForm"
         class="ltiLaunchForm"
         method="post"
@@ -25,6 +25,10 @@
         <input name="user_id" value="${user_id}" />
         <input name="role" value="student" />
         <input name="oauth_signature" value="${oauth_signature}" />
+
+        % for param_name, param_value in custom_parameters.items():
+            <input name="${param_name}" value="${param_value}" />
+        %endfor
 
         <input type="submit" value="Press to Launch" />
     </form>
