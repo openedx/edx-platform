@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-08-29 14:13+0400\n"
+"PO-Revision-Date: 2013-09-02 11:25+0400\n"
 "Last-Translator: Павел <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -24,7 +24,7 @@ msgstr ""
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Generated-By: Babel 0.9.6\n"
-"X-POOTLE-MTIME: 1377771214.175800\n"
+"X-POOTLE-MTIME: 1378106741.719030\n"
 
 #: cms/djangoapps/contentstore/utils.py:18
 msgid "Open Ended Panel"
@@ -144,21 +144,21 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
-"Это может случиться из-за ошибки на нашем сервере или Вашего "
-"интернет-соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
+"Это может случиться из-за ошибки на нашем сервере или Вашего интернет-"
+"соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
 "подключены к интернету."
 
 #: cms/static/coffee/src/main.js:41
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:67
+#: cms/static/coffee/src/views/module_edit.js:77
 #, python-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:121
-#: cms/static/coffee/src/views/unit.js:68 cms/static/js/base.js:843
+#: cms/static/coffee/src/views/module_edit.js:131
+#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:843
 #: cms/static/js/models/section.js:26
 #: cms/static/js/views/course_info_edit.js:101
 #: cms/static/js/views/course_info_edit.js:315
@@ -167,30 +167,36 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving"
 msgstr "Сохранение"
 
-#: cms/static/coffee/src/views/module_edit.js:130
+#: cms/static/coffee/src/views/module_edit.js:140
 msgid "There was an error saving your changes. Please try again."
 msgstr ""
 "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
 
-#: cms/static/coffee/src/views/unit.js:159
-msgid "Delete this component?"
-msgstr "Удалить этот компонент?"
+#: cms/static/coffee/src/views/tabs.js:96
+#, fuzzy
+msgid "Delete Component Confirmation"
+msgstr "Подтверждение удаления файла"
 
-#: cms/static/coffee/src/views/unit.js:160
-msgid "Deleting this component is permanent and cannot be undone."
-msgstr "Действие по удалению этого компонента не может быть отменено."
+#: cms/static/coffee/src/views/tabs.js:97
+#, fuzzy
+msgid ""
+"Are you sure you want to delete this component? This action cannot be undone."
+msgstr "Вы действительно хотите удалить это обновление?"
 
-#: cms/static/coffee/src/views/unit.js:163
-msgid "Yes, delete this component"
-msgstr "Да, удалить этот компонент"
+#: cms/static/coffee/src/views/tabs.js:100 cms/static/js/views/assets.js:17
+#: cms/static/js/views/course_info_edit.js:162
+msgid "OK"
+msgstr "OK"
 
-#: cms/static/coffee/src/views/unit.js:168 cms/static/js/base.js:398
+#: cms/static/coffee/src/views/tabs.js:111
+#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:398
 #: cms/static/js/views/course_info_edit.js:170
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting"
 msgstr "Удаление"
 
-#: cms/static/coffee/src/views/unit.js:191 cms/static/js/base.js:414
+#: cms/static/coffee/src/views/tabs.js:124
+#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:414
 #: cms/static/js/views/assets.js:43
 #: cms/static/js/views/course_info_edit.js:188
 #: cms/static/js/views/textbook.js:48
@@ -206,6 +212,18 @@ msgstr "Удаление"
 #: lms/templates/discussion/_underscore_templates.html:147
 msgid "Cancel"
 msgstr "Отмена"
+
+#: cms/static/coffee/src/views/unit.js:177
+msgid "Delete this component?"
+msgstr "Удалить этот компонент?"
+
+#: cms/static/coffee/src/views/unit.js:178
+msgid "Deleting this component is permanent and cannot be undone."
+msgstr "Действие по удалению этого компонента не может быть отменено."
+
+#: cms/static/coffee/src/views/unit.js:181
+msgid "Yes, delete this component"
+msgstr "Да, удалить этот компонент"
 
 #: cms/static/js/base.js:83
 msgid "This link will open in a new browser window/tab"
@@ -364,11 +382,6 @@ msgstr ""
 "\n"
 "Кроме того, все наполнение, ссылающееся на этот элемент, перестанет работать "
 "(\"битые\" изображения или ссылки)"
-
-#: cms/static/js/views/assets.js:17
-#: cms/static/js/views/course_info_edit.js:162
-msgid "OK"
-msgstr "OK"
 
 #: cms/static/js/views/assets.js:27 cms/templates/asset_index.html:148
 msgid "Your file has been deleted."
@@ -1472,8 +1485,8 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
-"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих\". "
-"Если письма нет и там, запросите помощь по ссылке"
+"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих"
+"\". Если письма нет и там, запросите помощь по ссылке"
 
 #: cms/templates/login.html:4 cms/templates/widgets/header.html:156
 msgid "Sign In"
@@ -1504,7 +1517,7 @@ msgstr "Забыли пароль?"
 #: cms/templates/login.html:30 cms/templates/signup.html:35
 #: lms/templates/login.html:119 lms/templates/login_modal.html:17
 #: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
-#: lms/templates/register.html:122
+#: lms/templates/register.html:122 lms/templates/signup_modal.html:28
 #: lms/templates/university_profile/edge.html:19
 msgid "Password"
 msgstr "Пароль"
@@ -2357,87 +2370,108 @@ msgid "Required Information to Sign Up for edX Studio"
 msgstr "Необходимая информация для регистрации в Студии edX"
 
 #: cms/templates/signup.html:40 lms/templates/register.html:171
+#: lms/templates/signup_modal.html:35
 msgid "Lastname"
 msgstr "Фамилия"
 
 #: cms/templates/signup.html:44 lms/templates/register.html:175
+#: lms/templates/signup_modal.html:39
 msgid "Firstname"
 msgstr "Имя"
 
 #: cms/templates/signup.html:48 lms/templates/register.html:179
+#: lms/templates/signup_modal.html:43
 msgid "Middlename"
 msgstr "Отчество"
 
 #: cms/templates/signup.html:52 lms/templates/register.html:183
+#: lms/templates/signup_modal.html:47
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr "Год рождения"
 
 #: cms/templates/signup.html:61 lms/templates/register.html:192
+#: lms/templates/signup_modal.html:56
 msgid "Highest Level of Education Completed"
 msgstr "Образование"
 
 #: cms/templates/signup.html:70 lms/templates/register.html:201
+#: lms/templates/signup_modal.html:65
 msgid "Place where Education Completed"
 msgstr "Какое учебное заведение окончил(а)"
 
 #: cms/templates/signup.html:74 lms/templates/register.html:205
+#: lms/templates/signup_modal.html:69
 msgid "Year when education was Completed"
 msgstr "Год окончания учебного заведения"
 
 #: cms/templates/signup.html:84 lms/templates/register.html:215
+#: lms/templates/signup_modal.html:79
 msgid "Diploma qualification"
 msgstr "Квалификация по диплому"
 
 #: cms/templates/signup.html:88 lms/templates/register.html:219
+#: lms/templates/signup_modal.html:83
 msgid "Diploma specialty"
 msgstr "Специальность по диплому"
 
 #: cms/templates/signup.html:92 lms/templates/register.html:223
+#: lms/templates/signup_modal.html:87
 msgid "Type of educational institution"
 msgstr "Тип образовательного учреждения"
 
 #: cms/templates/signup.html:101 lms/templates/register.html:232
+#: lms/templates/signup_modal.html:96
 msgid "Number of educational institution"
 msgstr "Номер образовательного учреждения"
 
 #: cms/templates/signup.html:105 lms/templates/register.html:236
+#: lms/templates/signup_modal.html:100
 msgid "Name of educational institution"
 msgstr "Название образовательного учреждения"
 
 #: cms/templates/signup.html:109 lms/templates/register.html:240
+#: lms/templates/signup_modal.html:104
 msgid "StatGrad login of educational institution"
 msgstr "Логин образовательного учреждения в системе Статград"
 
 #: cms/templates/signup.html:113 lms/templates/register.html:244
+#: lms/templates/signup_modal.html:108
 msgid "Okrug of educational institution"
 msgstr "Округ образовательного учреждения"
 
 #: cms/templates/signup.html:122 lms/templates/register.html:253
+#: lms/templates/signup_modal.html:117
 msgid "Occupation at educational institution"
 msgstr "Должность по месту работы"
 
 #: cms/templates/signup.html:131 lms/templates/register.html:262
+#: lms/templates/signup_modal.html:126
 msgid "Another occupation at educational institution"
 msgstr "Вторая должность по месту работы"
 
 #: cms/templates/signup.html:140 lms/templates/register.html:271
+#: lms/templates/signup_modal.html:135
 msgid "Educational experience at educational institution"
 msgstr "Стаж педагогический (полных лет)"
 
 #: cms/templates/signup.html:144 lms/templates/register.html:275
+#: lms/templates/signup_modal.html:139
 msgid "Managing experience at educational institution"
 msgstr "Стаж руководящей работы (полных лет)"
 
 #: cms/templates/signup.html:148 lms/templates/register.html:279
+#: lms/templates/signup_modal.html:143
 msgid "Qualification category"
 msgstr "Квалификационная категория"
 
 #: cms/templates/signup.html:157 lms/templates/register.html:288
+#: lms/templates/signup_modal.html:152
 msgid "Qualification category year"
 msgstr "Год присвоения категории"
 
 #: cms/templates/signup.html:161 lms/templates/register.html:292
+#: lms/templates/signup_modal.html:156
 msgid "Contact phone"
 msgstr "Контактный телефон"
 
@@ -2955,176 +2989,229 @@ msgid "Elementary/primary school"
 msgstr "Неполное среднее"
 
 #: common/djangoapps/student/models.py:103
-#: common/djangoapps/student/models.py:126
-#: common/djangoapps/student/models.py:188
+#: common/djangoapps/student/models.py:125
+#: common/djangoapps/student/models.py:146
+#: common/djangoapps/student/models.py:187
 msgid "None"
 msgstr "Нет"
 
 #: common/djangoapps/student/models.py:104
-#: common/djangoapps/student/models.py:127
-#: common/djangoapps/student/models.py:181
+#: common/djangoapps/student/models.py:126
+#: common/djangoapps/student/models.py:147
+#: common/djangoapps/student/models.py:180
 msgid "Other"
 msgstr "Другое"
 
-#: common/djangoapps/student/models.py:118
+#: common/djangoapps/student/models.py:117
 msgid "School"
 msgstr "Школа"
 
-#: common/djangoapps/student/models.py:119
+#: common/djangoapps/student/models.py:118
 msgid "Lyceum"
 msgstr "Лицей"
 
-#: common/djangoapps/student/models.py:120
+#: common/djangoapps/student/models.py:119
 msgid "Education Center"
 msgstr "Центр образования"
 
-#: common/djangoapps/student/models.py:121
+#: common/djangoapps/student/models.py:120
 msgid "Gymnasium"
 msgstr "Гимназия"
 
-#: common/djangoapps/student/models.py:122
+#: common/djangoapps/student/models.py:121
 msgid "Educational complex"
 msgstr "УВК"
 
-#: common/djangoapps/student/models.py:123
+#: common/djangoapps/student/models.py:122
 msgid "Kindergarten"
 msgstr "Детский сад"
 
-#: common/djangoapps/student/models.py:124
+#: common/djangoapps/student/models.py:123
 msgid "Non-profit educational institution"
 msgstr "НОУ"
 
-#: common/djangoapps/student/models.py:125
+#: common/djangoapps/student/models.py:124
 msgid "College"
 msgstr "Колледж"
 
-#: common/djangoapps/student/models.py:152
+#: common/djangoapps/student/models.py:133
+msgid "Central Administrative Okrug"
+msgstr "Центральный административный округ"
+
+#: common/djangoapps/student/models.py:134
+msgid "Eastern Administrative Okrug"
+msgstr "Восточный административный округ"
+
+#: common/djangoapps/student/models.py:135
+msgid "Western Administrative Okrug"
+msgstr "Западный административный округ"
+
+#: common/djangoapps/student/models.py:136
+msgid "Northern Administrative Okrug"
+msgstr "Северный административный округ"
+
+#: common/djangoapps/student/models.py:137
+msgid "North-Eastern Administrative Okrug"
+msgstr "Северо-Восточный административный округ"
+
+#: common/djangoapps/student/models.py:138
+msgid "North-Western Administrative Okrug"
+msgstr "Северо-Западный административный округ"
+
+#: common/djangoapps/student/models.py:139
+msgid "South-Western Administrative Okrug"
+msgstr "Юго-Западный административный округ"
+
+#: common/djangoapps/student/models.py:140
+msgid "South-Eastern Administrative Okrug"
+msgstr "Юго-Восточный административный округ"
+
+#: common/djangoapps/student/models.py:141
+msgid "Southern Administrative Okrug"
+msgstr "Южный административный округ"
+
+#: common/djangoapps/student/models.py:142
+msgid "Zelenogradsky Administrative Okrug"
+msgstr "Зеленоградский административный округ"
+
+#: common/djangoapps/student/models.py:143
+msgid "Troitsky Administrative Okrug"
+msgstr "Троицкий административный округ"
+
+#: common/djangoapps/student/models.py:144
+msgid "Novomoskovsky Administrative Okrug"
+msgstr "Новомосковский административный округ"
+
+#: common/djangoapps/student/models.py:145
+msgid "Territorial units with special status"
+msgstr "Городского подчинения"
+
+#: common/djangoapps/student/models.py:151
 msgid "Teacher"
 msgstr "Учитель"
 
-#: common/djangoapps/student/models.py:153
+#: common/djangoapps/student/models.py:152
 msgid "Teacher and organizer"
 msgstr "Педагог-организатор"
 
-#: common/djangoapps/student/models.py:154
+#: common/djangoapps/student/models.py:153
 msgid "Social teacher"
 msgstr "Социальный педагог"
 
-#: common/djangoapps/student/models.py:155
+#: common/djangoapps/student/models.py:154
 msgid "Educational Psychologist"
 msgstr "Педагог-писхолог"
 
-#: common/djangoapps/student/models.py:156
+#: common/djangoapps/student/models.py:155
 msgid "Caregiver (including older)"
 msgstr "Воспитатель (включая старшего)"
 
-#: common/djangoapps/student/models.py:157
+#: common/djangoapps/student/models.py:156
 msgid "Manager (Director, Head of) the educational institution"
 msgstr "Руководитель (директор, заведующий) образовательного учреждения"
 
-#: common/djangoapps/student/models.py:158
+#: common/djangoapps/student/models.py:157
 msgid "Vice manager (director, head of) the educational institution"
 msgstr ""
-"Заместитель руководителя (директора, заведующего) образовательного "
-"учреждения"
+"Заместитель руководителя (директора, заведующего) образовательного учреждения"
 
-#: common/djangoapps/student/models.py:159
+#: common/djangoapps/student/models.py:158
 msgid "Senior master"
 msgstr "Старший мастер"
 
-#: common/djangoapps/student/models.py:160
+#: common/djangoapps/student/models.py:159
 msgid "Instructor"
 msgstr "Преподаватель"
 
-#: common/djangoapps/student/models.py:161
+#: common/djangoapps/student/models.py:160
 msgid "Teacher-pathologists, speech therapists (speech therapist)"
 msgstr "Учитель-дефектолог, учитель-логопед(логопед)"
 
-#: common/djangoapps/student/models.py:162
+#: common/djangoapps/student/models.py:161
 msgid "Tutor"
 msgstr "Тьютор"
 
-#: common/djangoapps/student/models.py:163
+#: common/djangoapps/student/models.py:162
 msgid "Teacher-librarian"
 msgstr "Педагог-библиотекарь"
 
-#: common/djangoapps/student/models.py:164
+#: common/djangoapps/student/models.py:163
 msgid "Senior leader"
 msgstr "Старший вожатый"
 
-#: common/djangoapps/student/models.py:165
+#: common/djangoapps/student/models.py:164
 msgid "Teacher of additional education (including older)"
 msgstr "Педагог дополнительного образования (включая старшего)"
 
-#: common/djangoapps/student/models.py:166
+#: common/djangoapps/student/models.py:165
 msgid "Musical head"
 msgstr "Музыкальный руководитель"
 
-#: common/djangoapps/student/models.py:167
+#: common/djangoapps/student/models.py:166
 msgid "Concertmaster"
 msgstr "Концертмейстер"
 
-#: common/djangoapps/student/models.py:168
+#: common/djangoapps/student/models.py:167
 msgid "Master of Physical Education"
 msgstr "Руководитель физического воспитания"
 
-#: common/djangoapps/student/models.py:169
+#: common/djangoapps/student/models.py:168
 msgid "Instructor of Physical Education"
 msgstr "Инструктор по физической культуре"
 
-#: common/djangoapps/student/models.py:170
+#: common/djangoapps/student/models.py:169
 msgid "The Methodist (including older)"
 msgstr "Методист (включая старшего)"
 
-#: common/djangoapps/student/models.py:171
+#: common/djangoapps/student/models.py:170
 msgid "Instructor for Labour"
 msgstr "Инструктор по труду"
 
-#: common/djangoapps/student/models.py:172
+#: common/djangoapps/student/models.py:171
 msgid "Instructor-organizer life safety"
 msgstr "Преподаватель-организатор ОБЖ"
 
-#: common/djangoapps/student/models.py:173
+#: common/djangoapps/student/models.py:172
 msgid "Coach and teacher (including older)"
 msgstr "Тренер-преподаватель (включая старшего)"
 
-#: common/djangoapps/student/models.py:174
+#: common/djangoapps/student/models.py:173
 msgid "Master of of industrial training"
 msgstr "Мастер производственного обучения"
 
-#: common/djangoapps/student/models.py:175
+#: common/djangoapps/student/models.py:174
 msgid "The duty on the regime (including older)"
 msgstr "Дежурный по режиму (включая старшего)"
 
-#: common/djangoapps/student/models.py:176
+#: common/djangoapps/student/models.py:175
 msgid "Leader"
 msgstr "Вожатый"
 
-#: common/djangoapps/student/models.py:177
+#: common/djangoapps/student/models.py:176
 msgid "Assistant caregiver"
 msgstr "Помощник воспитателя"
 
-#: common/djangoapps/student/models.py:178
+#: common/djangoapps/student/models.py:177
 msgid "Junior caregiver"
 msgstr "Младший воспитатель"
 
-#: common/djangoapps/student/models.py:179
+#: common/djangoapps/student/models.py:178
 msgid "Secretary of teaching department"
 msgstr "Секретарь учебной части"
 
-#: common/djangoapps/student/models.py:180
+#: common/djangoapps/student/models.py:179
 msgid "Dispatcher of the educational institution"
 msgstr "Диспетчер образовательного учреждения"
 
-#: common/djangoapps/student/models.py:189
+#: common/djangoapps/student/models.py:188
 msgid "High"
 msgstr "Высшая"
 
-#: common/djangoapps/student/models.py:190
+#: common/djangoapps/student/models.py:189
 msgid "First"
 msgstr "Первая"
 
-#: common/djangoapps/student/models.py:191
+#: common/djangoapps/student/models.py:190
 msgid "Second"
 msgstr "Вторая"
 
@@ -3575,178 +3662,6 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipEmoticons"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipSound"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipAutoscroll"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipStatusmessage"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipAdministration"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipUsercount"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "timeFormat"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "dateFormat"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "statusConnecting"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "statusConnected"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "statusDisconnecting"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "statusDisconnected"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "statusAuthfail"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "status"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "reasonWas"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "passwordEnteredInvalid"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "administratorMessageSubject"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "labelUsername"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "labelPassword"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "loginSubmit"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "loginInvalid"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "enterRoomPassword"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "enterRoomPasswordSubmit"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "nicknameConflict"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "privateActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "ignoreActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "unignoreActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "kickActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "reason"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "banActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "setSubjectActionLabel"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "subject"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "messageSubmit"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "userOnline"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "roomSubject"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "presenceUnknownWarningSubject"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "presenceUnknownWarning"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipRole"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "tooltipIgnored"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "userJoinedRoom"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "userLeftRoom"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "userHasBeenKickedFromRoom"
-msgstr ""
-
-#: lms/static/js/vendor/candy.min.js:1
-msgid "userHasBeenBannedFromRoom"
-msgstr ""
-
 #: lms/templates/admin_dashboard.html:11
 msgid "{platform_name}-wide Summary"
 msgstr ""
@@ -3879,7 +3794,7 @@ msgstr ""
 msgid "Dashboard"
 msgstr "Личный кабинет"
 
-#: lms/templates/dashboard.html:57
+#: lms/templates/dashboard.html:56
 msgid ""
 "You'll receive a confirmation in your in-box. Please click the link in the "
 "email to confirm the email change."
@@ -3887,102 +3802,102 @@ msgstr ""
 "Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
 "ссылке указанной в письме для смены почтового адреса."
 
-#: lms/templates/dashboard.html:101 lms/templates/register.html:154
+#: lms/templates/dashboard.html:130 lms/templates/register.html:154
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/templates/dashboard.html:101 lms/templates/dashboard.html:106
+#: lms/templates/dashboard.html:130 lms/templates/dashboard.html:135
 msgid "edit"
 msgstr "изменить"
 
-#: lms/templates/dashboard.html:104
+#: lms/templates/dashboard.html:133
 #: lms/templates/university_profile/edge.html:15
 msgid "Email"
 msgstr "Эл. почта"
 
-#: lms/templates/dashboard.html:113 lms/templates/dashboard.html:116
+#: lms/templates/dashboard.html:142 lms/templates/dashboard.html:145
 msgid "Reset Password"
 msgstr "Восстановить пароль"
 
-#: lms/templates/dashboard.html:128
+#: lms/templates/dashboard.html:157
 msgid "Current Courses"
 msgstr "Текущие курсы"
 
-#: lms/templates/dashboard.html:143 lms/templates/dashboard.html:147
+#: lms/templates/dashboard.html:172 lms/templates/dashboard.html:176
 msgid "{course_number} {course_name} Cover Image"
 msgstr ""
 
-#: lms/templates/dashboard.html:155
+#: lms/templates/dashboard.html:184
 msgid "Course Completed - {end_date}"
 msgstr "Курс выполнен - {end_date}"
 
-#: lms/templates/dashboard.html:157
+#: lms/templates/dashboard.html:186
 msgid "Course Started - {start_date}"
 msgstr "Курс начат - {start_date}"
 
-#: lms/templates/dashboard.html:159
+#: lms/templates/dashboard.html:188
 msgid "Course Starts - {start_date}"
 msgstr "Курс начинается - {start_date}"
 
-#: lms/templates/dashboard.html:181
+#: lms/templates/dashboard.html:210
 msgid "Register for Pearson exam"
 msgstr "Зарегистрироваться на личный экзамен"
 
-#: lms/templates/dashboard.html:182
+#: lms/templates/dashboard.html:211
 msgid ""
 "Registration for the Pearson exam is now open and will close on {end_date}"
 msgstr ""
 
-#: lms/templates/dashboard.html:189
+#: lms/templates/dashboard.html:218
 #: lms/templates/test_center_register.html:120
 msgid "Schedule Pearson exam"
 msgstr ""
 
-#: lms/templates/dashboard.html:190
+#: lms/templates/dashboard.html:219
 msgid "{link_start}Registration{link_end} number: {number}"
 msgstr ""
 
-#: lms/templates/dashboard.html:195
+#: lms/templates/dashboard.html:224
 msgid "Write this down! You'll need it to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:201
+#: lms/templates/dashboard.html:230
 msgid ""
 "Your registration for the Pearson exam has been rejected. Please {link_start}"
 "see your registration status details{link_end}."
 msgstr ""
 
-#: lms/templates/dashboard.html:204
+#: lms/templates/dashboard.html:233
 msgid ""
 "Otherwise {link_start}contact edX at {email}{link_end} for further help."
 msgstr ""
 
-#: lms/templates/dashboard.html:213
+#: lms/templates/dashboard.html:242
 msgid ""
 "Your {link_start}registration for the Pearson exam{link_end} is pending."
 msgstr ""
 
-#: lms/templates/dashboard.html:214
+#: lms/templates/dashboard.html:243
 msgid ""
 "Within a few days, you should see a confirmation number here, which can be "
 "used to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:238
+#: lms/templates/dashboard.html:267
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
 
-#: lms/templates/dashboard.html:240
+#: lms/templates/dashboard.html:269
 msgid "Your final grade:"
 msgstr ""
 
-#: lms/templates/dashboard.html:243
+#: lms/templates/dashboard.html:272
 msgid "Grade required for a certificate:"
 msgstr ""
 
-#: lms/templates/dashboard.html:247
+#: lms/templates/dashboard.html:276
 msgid ""
 "Your certificate is being held pending confirmation that the issuance of "
 "your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
@@ -3991,95 +3906,95 @@ msgid ""
 "contacting {email}."
 msgstr ""
 
-#: lms/templates/dashboard.html:257
+#: lms/templates/dashboard.html:286
 msgid "Your Certificate is Generating"
 msgstr ""
 
-#: lms/templates/dashboard.html:261
+#: lms/templates/dashboard.html:290
 msgid "This link will open/download a PDF document"
 msgstr ""
 
-#: lms/templates/dashboard.html:267
+#: lms/templates/dashboard.html:296
 msgid "Complete our course feedback survey"
 msgstr ""
 
-#: lms/templates/dashboard.html:277
+#: lms/templates/dashboard.html:306
 msgid "View Archived Course"
 msgstr "Просмотр архивных курсов"
 
-#: lms/templates/dashboard.html:279
+#: lms/templates/dashboard.html:308
 msgid "View Course"
 msgstr "Просмотр курса"
 
-#: lms/templates/dashboard.html:282
+#: lms/templates/dashboard.html:311
 msgid "Unregister"
 msgstr "Удалить регистрацию"
 
-#: lms/templates/dashboard.html:291
+#: lms/templates/dashboard.html:320
 msgid "Looks like you haven't registered for any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:293
+#: lms/templates/dashboard.html:322
 msgid "Find courses now!"
 msgstr "Найти курсы!"
 
-#: lms/templates/dashboard.html:300
+#: lms/templates/dashboard.html:329
 msgid "Course-loading errors"
 msgstr "Ошибка при загрузке курсов"
 
-#: lms/templates/dashboard.html:319
+#: lms/templates/dashboard.html:348
 msgid "Are you sure you want to unregister from {course_number}?"
 msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
 
-#: lms/templates/dashboard.html:344
+#: lms/templates/dashboard.html:373
 msgid "Password Reset Email Sent"
 msgstr "Письмо восстановлением пароля выслано"
 
-#: lms/templates/dashboard.html:350
+#: lms/templates/dashboard.html:379
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
 msgstr ""
 
-#: lms/templates/dashboard.html:365 lms/templates/dashboard.html:382
+#: lms/templates/dashboard.html:394 lms/templates/dashboard.html:411
 msgid "Change Email"
 msgstr "Изменить Email"
 
-#: lms/templates/dashboard.html:373
+#: lms/templates/dashboard.html:402
 msgid "Please enter your new email address:"
 msgstr "Введите новый адрес электронной почты:"
 
-#: lms/templates/dashboard.html:375
+#: lms/templates/dashboard.html:404
 msgid "Please confirm your password:"
 msgstr "Подтвердите ваш пароль:"
 
-#: lms/templates/dashboard.html:379
+#: lms/templates/dashboard.html:408
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr ""
 
-#: lms/templates/dashboard.html:398
+#: lms/templates/dashboard.html:427
 msgid "Change your name"
 msgstr "Измениние отображаемого имени"
 
-#: lms/templates/dashboard.html:404
+#: lms/templates/dashboard.html:433
 msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
 "be logged and recorded."
 msgstr ""
 
-#: lms/templates/dashboard.html:408
+#: lms/templates/dashboard.html:437
 msgid ""
 "Enter your desired full name, as it will appear on the {platform} "
 "certificates:"
 msgstr ""
 
-#: lms/templates/dashboard.html:410
+#: lms/templates/dashboard.html:439
 msgid "Reason for name change:"
 msgstr "Причина изменения имени:"
 
-#: lms/templates/dashboard.html:414
+#: lms/templates/dashboard.html:443
 msgid "Change My Name"
 msgstr "Изменить имя"
 
@@ -4273,8 +4188,8 @@ msgid ""
 "{link_end}."
 msgstr ""
 "<strong>Вопросы по лекциям, домашним заданиям, инструментам или материалам "
-"данного курса</strong>, задавайте на {link_start}форуме обсуждения "
-"курса{link_end}."
+"данного курса</strong>, задавайте на {link_start}форуме обсуждения курса"
+"{link_end}."
 
 #: lms/templates/help_modal.html:34
 msgid ""
@@ -4414,6 +4329,7 @@ msgstr ""
 #: lms/templates/login.html:115 lms/templates/login_modal.html:14
 #: lms/templates/provider_login.html:44 lms/templates/provider_login.html:45
 #: lms/templates/register.html:118 lms/templates/register.html:139
+#: lms/templates/signup_modal.html:25
 msgid "E-mail"
 msgstr ""
 
@@ -4438,8 +4354,8 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a "
-"rel=\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
+"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a rel="
+"\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
 
 #: lms/templates/login.html:164
 msgid "Not Enrolled?"
@@ -4653,8 +4569,8 @@ msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
-"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены "
-"(*)</strong>."
+"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены (*)"
+"</strong>."
 
 #: lms/templates/register.html:119 lms/templates/register.html:140
 msgid "example: username@domain.com"
@@ -4664,7 +4580,7 @@ msgstr ""
 msgid "Welcome {username}"
 msgstr ""
 
-#: lms/templates/register.html:131 lms/templates/signup_modal.html:38
+#: lms/templates/register.html:131
 msgid "Enter a public username:"
 msgstr ""
 
@@ -4708,7 +4624,7 @@ msgstr "Я согласен с {link_start}кодексом чести{link_end}
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/register.html:338 lms/templates/signup_modal.html:120
+#: lms/templates/register.html:338 lms/templates/signup_modal.html:179
 msgid "Create My Account"
 msgstr "Создать учетную запись"
 
@@ -4785,75 +4701,27 @@ msgstr "Следующий"
 msgid "Sign Up for {span_start}{platform_name}{span_end}"
 msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
-#: lms/templates/signup_modal.html:25 lms/templates/signup_modal.html:44
-msgid "E-mail *"
-msgstr "Адрес e-mail *"
-
-#: lms/templates/signup_modal.html:26 lms/templates/signup_modal.html:45
+#: lms/templates/signup_modal.html:26
 msgid "e.g. yourname@domain.com"
 msgstr "например yourname@domain.com"
 
-#: lms/templates/signup_modal.html:28
-msgid "Password *"
-msgstr "Пароль *"
-
-#: lms/templates/signup_modal.html:31 lms/templates/signup_modal.html:40
-msgid "Public Username *"
-msgstr "Публичное имя *"
-
-#: lms/templates/signup_modal.html:32 lms/templates/signup_modal.html:41
-msgid "e.g. yourname (shown on forums)"
-msgstr "оно показывается на форумах"
-
-#: lms/templates/signup_modal.html:34 lms/templates/signup_modal.html:50
-msgid "Full Name *"
-msgstr "Полное имя *"
-
-#: lms/templates/signup_modal.html:35 lms/templates/signup_modal.html:51
-msgid "e.g. Your Name (for certificates)"
-msgstr "для сертификатов"
-
-#: lms/templates/signup_modal.html:37
-msgid "<i>Welcome</i> {name}"
-msgstr ""
-
-#: lms/templates/signup_modal.html:59
-msgid "Ed. Completed"
-msgstr ""
-
-#: lms/templates/signup_modal.html:71
-msgid "Gender"
-msgstr ""
-
-#: lms/templates/signup_modal.html:83
-msgid "Year of birth"
-msgstr ""
-
-#: lms/templates/signup_modal.html:95
-msgid "Mailing address"
-msgstr ""
-
-#: lms/templates/signup_modal.html:98
-msgid "Goals in signing up for {platform_name}"
-msgstr ""
-
-#: lms/templates/signup_modal.html:106
+#: lms/templates/signup_modal.html:165
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
 msgstr ""
 
-#: lms/templates/signup_modal.html:113
+#: lms/templates/signup_modal.html:172
 msgid "I agree to the {link_start}Honor Code{link_end}*"
 msgstr "Я согласен с {link_start}Кодексом чести{link_end}*"
 
-#: lms/templates/signup_modal.html:127
+#: lms/templates/signup_modal.html:186
 msgid "Already have an account?"
 msgstr "Уже имеете учетную запись?"
 
-#: lms/templates/signup_modal.html:127
+#: lms/templates/signup_modal.html:186
 msgid "Login."
 msgstr "Учетная запись."
 
-#: lms/templates/signup_modal.html:134
+#: lms/templates/signup_modal.html:193
 msgid "Close Modal"
 msgstr "Закрыть"
 
@@ -6071,7 +5939,8 @@ msgstr "Анонимный"
 #: lms/templates/courseware/notifications.html:63
 msgid ""
 "{user} posted a {comment} to the thread {thread} in discussion {discussion}"
-msgstr "{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
+msgstr ""
+"{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
 
 #: lms/templates/courseware/notifications.html:70
 msgid "{user} posted a new thread {thread} in discussion {discussion}"
@@ -6442,8 +6311,7 @@ msgid ""
 "registered for edX will not be enrolled, but will be allowed to enroll."
 msgstr ""
 "Если автоматическая запись <em>выключена</em>, то обучающиеся, которые не "
-"зарегистрированы в {platform_name}, не будут записаны, но смогут это "
-"сделать."
+"зарегистрированы в {platform_name}, не будут записаны, но смогут это сделать."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:49
 msgid "Administration List Management"
@@ -10207,6 +10075,24 @@ msgstr "Регистрация на курсы"
 #: lms/templates/university_profile/edge.html:30
 msgid "Take free online courses from today's leading universities."
 msgstr ""
+
+#~ msgid "E-mail *"
+#~ msgstr "Адрес e-mail *"
+
+#~ msgid "Password *"
+#~ msgstr "Пароль *"
+
+#~ msgid "Public Username *"
+#~ msgstr "Публичное имя *"
+
+#~ msgid "e.g. yourname (shown on forums)"
+#~ msgstr "оно показывается на форумах"
+
+#~ msgid "Full Name *"
+#~ msgstr "Полное имя *"
+
+#~ msgid "e.g. Your Name (for certificates)"
+#~ msgstr "для сертификатов"
 
 #~ msgid ""
 #~ "This will be used in public discussions with your courses and in our "
