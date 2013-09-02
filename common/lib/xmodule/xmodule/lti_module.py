@@ -1,7 +1,11 @@
 """
 Module that allows to insert LTI tools to page.
+
 Module uses current 0.14.2 version of requests (oauth part).
 Please update code when upgrading requests.
+
+Protocol is oauth1, LTI version is 1.1.1:
+http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 """
 
 import logging
@@ -42,7 +46,7 @@ class LTIModule(LTIFields, XModule):
 
     def get_html(self):
         """ Renders parameters to template. """
-
+        import ipdb; ipdb.set_trace()
         # these params do not participate in oauth signing
         params = {
             'launch_url': self.launch_url,
