@@ -1,5 +1,7 @@
 """
 Module that allows to insert LTI tools to page.
+Module uses current 0.14.2 version of requests (oauth part).
+Please update code when upgrading requests.
 """
 
 import logging
@@ -80,9 +82,9 @@ class LTIModule(LTIFields, XModule):
 
         # 0.14.2 (current) version of requests oauth library encodes signature,
         # with 'Content-Type': 'application/x-www-form-urlencoded'
-        # so '='' becomes '%3D', but server waits for unencoded signature.
-        # Decode signature back:
-        # may be it may be encoded by browser again... check
+        # so '='' becomes '%3D'.
+        # We send form via browser, so browser will encode it again,
+        # So we need to decode signature back:
         params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
         return params
 
