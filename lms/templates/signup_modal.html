@@ -25,8 +25,9 @@
           <label data-field="email" for="signup_email">${_('E-mail')}</label>
 	       <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
           </span>
+          <span class="field required text" id="field-password">
           <label data-field="password" for="signup_password">${_('Password')}</label>
-	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
+	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required aria-required="true" />
           </span>
         </div>
 
@@ -77,11 +78,11 @@
           
           <span class="field text" id="field-education-qualification">
             <label for="education-qualification">${_('Diploma qualification')}</label>
-            <input id="education-qualification" type="text" name="education_qualification" value="" required aria-required="true" />
+            <input id="education-qualification" type="text" name="education_qualification" value="" />
           </span>
           <span class="field text" id="field-education-specialty">
             <label for="education-specialty">${_('Diploma specialty')}</label>
-            <input id="education-specialty" type="text" name="education_specialty" value="" required aria-required="true" />
+            <input id="education-specialty" type="text" name="education_specialty" value="" />
           </span>
           <span class="field required select" id="field-work-type">
             <label for="work-type">${_("Type of educational institution")}</label>
@@ -137,7 +138,7 @@
           </span>
           <span class="field text" id="field-work-managing-experience">
             <label for="work-managing-experience">${_('Managing experience at educational institution')}</label>
-            <input id="work-managing-experience" type="text" name="work-managing-experience" value="" required aria-required="true" />
+            <input id="work-managing-experience" type="text" name="work-managing-experience" value=""/>
           </span>
           <span class="field select" id="field-work-qualification-category">
         <label for="work-qualification-category">${_("Qualification category")}</label>
@@ -152,7 +153,7 @@
             <label for="work-qualification-category-year">${_('Qualification category year')}</label>
             <input id="work-qualification-category-year" type="text" name="work_qualification_category_year" value="" required aria-required="true" />
           </span>
-          <span class="field text" id="field-contact-phone">
+          <span class="field required text" id="field-contact-phone">
             <label for="contact-phone">${_('Contact phone')}</label>
             <input id="contact-phone" type="text" name="contact_phone" value="" required aria-required="true" />
           </span>
