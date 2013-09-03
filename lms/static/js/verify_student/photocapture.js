@@ -32,7 +32,9 @@ var submitToPaymentProcessing = function() {
     "/verify_student/create_order",
     {
       "course_id" : course_id,
-      "contribution": contribution
+      "contribution": contribution,
+      "face_image" : $("#face_image")[0].src,
+      "photo_id_image" : $("#photo_id_image")[0].src
     },
     function(data) {
       for (prop in data) {
