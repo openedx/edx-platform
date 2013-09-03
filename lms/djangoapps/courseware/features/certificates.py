@@ -208,14 +208,18 @@ def see_that_i_am_on_the_verified_track(step):
     assert False, 'Implement this step after the design is done'
 
 
-@step(u'I have submitted my "([^"]*)" photo')
-def submitted_my_foo_photo(step, name):
-    assert False, 'This step must be implemented'
-@step(u'I retake my "([^"]*)" photo')
-def retake_my_group1_photo(step, group1):
-    assert False, 'This step must be implemented'
-@step(u'I see the new photo on the confirmation page.')
-def sesee_the_new_photo_on_the_confirmation_page(step):
+@step(u'I leave the flow and return$')
+def leave_the_flow_and_return(step):
+    world.browser.back()
+
+
+@step(u'I am at the verified page$')
+def see_the_payment_page(step):
+    assert world.css_find('button#pay_button')
+
+
+@step(u'I press the payment button')
+def press_payment_button(step):
     assert False, 'This step must be implemented'
 @step(u'I have submitted face and ID photos')
 def submitted_face_and_id_photos(step):
@@ -228,12 +232,6 @@ def sesee_the_new_name_on_the_confirmation_page(step):
     assert False, 'This step must be implemented'
 @step(u'I have submitted photos')
 def submitted_photos(step):
-    assert False, 'This step must be implemented'
-@step(u'I leave the flow and return')
-def leave_the_flow_and_return(step):
-    assert False, 'This step must be implemented'
-@step(u'I see the payment page')
-def see_the_payment_page(step):
     assert False, 'This step must be implemented'
 @step(u'I am registered for the course')
 def seam_registered_for_the_course(step):
