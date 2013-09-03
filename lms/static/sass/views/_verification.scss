@@ -162,7 +162,7 @@
 
     .expandable-area {
       visibility: visible;
-      height: ($baseline*10.5);
+      height: ($baseline*12);
       opacity: 1.0;
     }
   }
@@ -957,6 +957,10 @@
 
     &.is-not-ready {
       background: $m-gray-l4;
+
+      .action-primary {
+        @extend .btn-primary-disabled;
+      }
     }
   }
 

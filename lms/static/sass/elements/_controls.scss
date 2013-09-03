@@ -168,6 +168,16 @@
   }
 }
 
+// disabled primary button - used for more manual approaches
+.btn-primary-disabled {
+  background: $m-gray-l2;
+  color: $white-t3;
+  pointer-events: none;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+}
+
 // ====================
 
   // application: canned actions
