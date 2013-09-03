@@ -167,6 +167,12 @@ class VideoModule(VideoFields, XModule):
         sources = {get_ext(src): src for src in self.html5_sources}
         sources['main'] = self.source
 
+        # for testing Youtube timeout in acceptance tests
+        if getattr(settings, 'VIDEO_PORT', None):
+            yt_test_url = "http://127.0.0.1:" + str(settings.VIDEO_PORT) + '/test_youtube/'
+        else:
+            yt_test_url = 'https://gdata.youtube.com/feeds/api/videos/'
+
         return self.system.render_template('video.html', {
             'youtube_streams': _create_youtube_string(self),
             'id': self.location.html_id(),
@@ -181,7 +187,11 @@ class VideoModule(VideoFields, XModule):
             'show_captions': json.dumps(self.show_captions),
             'start': self.start_time,
             'end': self.end_time,
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
+            # TODO: Later on the value 1500 should be taken from some global
+            # configuration setting field.
+            'yt_test_timeout': 1500,
+            'yt_test_url': yt_test_url
         })
 
 
