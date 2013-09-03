@@ -472,6 +472,7 @@
       @extend .ui-depth2;
       position: relative;
       width: flex-grid(2,12);
+      height: ($baseline*6);
       float: left;
       padding: $baseline $baseline ($baseline*1.5) $baseline;
       text-align: center;
