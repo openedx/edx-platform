@@ -125,6 +125,9 @@ function () {
                 // We store the fact that previous element that lost focus was
                 // the volume clontrol.
                 state.volumeBlur = true;
+                // The following field is used in video_speed_control to track 
+                // the element that had the focus.
+                state.previousFocus = 'volume';
             });
     }
 
