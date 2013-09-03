@@ -32,6 +32,8 @@ MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
 MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 

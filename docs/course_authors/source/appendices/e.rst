@@ -473,12 +473,39 @@ Answers with scripts
 
   .. image:: ../Images/numericalresponse.png
 
-<numericalresponse>
+
+``<numericalresponse>``
+
++------------+----------------------------------------------+-------------------------------+
+| Attribute  |                 Description                  |              Notes            |
++============+==============================================+===============================+
+| ``answer`` | A value to which student input must be       | Note that any numeric         |
+|            | equivalent. Note that this expression can be | expression provided by the    |
+|            | expressed in terms of a variable that is     | student will be automatically |
+|            | computed in a script provided in the problem | simplified on the grader's    |
+|            | by preceding the appropriate variable name   | backend.                      |
+|            | with a dollar sign.                          |                               |
+|            |                                              |                               |
+|            | This answer will be evaluated similar to a   |                               |
+|            | student's input. Thus '1/3' and 'sin(pi/5)'  |                               |
+|            | are valid, as well as simpler expressions,   |                               |
+|            | such as '0.3' and '42'                       |                               |
++------------+----------------------------------------------+-------------------------------+
 
 
-  .. image:: ../Images/numericalresponse2.png
++------------------------+--------------------------------------------+--------------------------------------+
+|       Children         |                 Description                |                 Notes                |
++========================+============================================+======================================+
+| ``responseparam``      | used to specify a tolerance on the accepted|                                      |
+|                        | values of a number. See description below. |                                      |
++------------------------+--------------------------------------------+--------------------------------------+
+|``formulaequationinput``| An input specifically for taking math      |                                      |
+|                        | input from students. See below.            |                                      |
++------------------------+--------------------------------------------+--------------------------------------+
+| ``textline``           | A format to take input from students, see  | Deprecated for NumericalResponse.    |
+|                        | description below.                         | Use ``formulaequationinput`` instead.|
++------------------------+--------------------------------------------+--------------------------------------+
 
-Children may include ``<formulaequationinput/>``.
 
 <responseparam>
 
@@ -494,7 +521,9 @@ size      (optional) defines the size (i.e. the width)
           typing their math expression.
 ========= ============================================= =====
 
-<textline> (While <textline /> is supported, its use is extremely discouraged. We urge usage of <formulaequationinput />. See the opening paragraphs of the Numerical Response section for more information.)
+<textline> (While <textline /> is supported, its use is extremely discouraged.
+We urge usage of <formulaequationinput />. See the opening paragraphs of the
+`Numerical Response`_ section for more information.)
 
   .. image:: ../Images/numericalresponse5.png
 
@@ -563,7 +592,8 @@ by ``||``. For example, an input of ``1 || 2`` would represent the resistance
 of a pair of parallel resistors (of resistance 1 and 2 ohms), evaluating to 2/3
 (ohms).
 
-At the time of writing, factorials written in the form '3!' are invalid, but there is a workaround. Students can specify ``fact(3)`` or ``factorial(3)`` to
+At the time of writing, factorials written in the form '3!' are invalid, but
+there is a workaround. Students can specify ``fact(3)`` or ``factorial(3)`` to
 access the factorial function.
 
 The default included functions are the following:
@@ -573,7 +603,8 @@ The default included functions are the following:
 - Other common functions: sqrt, log10, log2, ln, exp, abs
 - Factorial: ``fact(3)`` or ``factorial(3)`` are valid. However, you must take
   care to only input integers. For example, ``fact(1.5)`` would fail.
-- Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch, coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
+- Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch,
+  coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
 
 .. raw:: latex
   

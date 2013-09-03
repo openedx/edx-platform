@@ -10,6 +10,7 @@ import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
+
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
@@ -106,8 +107,8 @@ def get_index(file_name):
 def get_file(file_name):
     index = get_index(file_name)
     assert index != -1
-
     url_css = 'a.filename'
+
     def get_url():
         return world.css_find(url_css)[index]._element.get_attribute('href')
     url = world.retry_on_exception(get_url)

@@ -23,7 +23,7 @@ class TextbookIndexTestCase(CourseTestCase):
     def test_view_index(self):
         "Basic check that the textbook index page responds correctly"
         resp = self.client.get(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         # we don't have resp.context right now,
         # due to bugs in our testing harness :(
         if resp.context:
@@ -36,7 +36,7 @@ class TextbookIndexTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
         self.assertEqual(self.course.pdf_textbooks, obj)
 
@@ -73,7 +73,7 @@ class TextbookIndexTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
         self.assertEqual(content, obj)
 
@@ -90,7 +90,7 @@ class TextbookIndexTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # reload course
         store = get_modulestore(self.course.location)
@@ -111,7 +111,7 @@ class TextbookIndexTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         obj = json.loads(resp.content)
         self.assertIn("error", obj)
 
@@ -184,7 +184,7 @@ class TextbookCreateTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         self.assertNotIn("Location", resp)
 
 
@@ -238,14 +238,14 @@ class TextbookByIdTestCase(CourseTestCase):
     def test_get_1(self):
         "Get the first textbook"
         resp = self.client.get(self.url1)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         compare = json.loads(resp.content)
         self.assertEqual(compare, self.textbook1)
 
     def test_get_2(self):
         "Get the second textbook"
         resp = self.client.get(self.url2)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         compare = json.loads(resp.content)
         self.assertEqual(compare, self.textbook2)
 
@@ -257,7 +257,7 @@ class TextbookByIdTestCase(CourseTestCase):
     def test_delete(self):
         "Delete a textbook by ID"
         resp = self.client.delete(self.url1)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         course = self.store.get_item(self.course.location)
         self.assertEqual(course.pdf_textbooks, [self.textbook2])
 
@@ -288,7 +288,7 @@ class TextbookByIdTestCase(CourseTestCase):
         )
         self.assertEqual(resp.status_code, 201)
         resp2 = self.client.get(url)
-        self.assert2XX(resp2.status_code)
+        self.assertEqual(resp2.status_code, 200)
         compare = json.loads(resp2.content)
         self.assertEqual(compare, textbook)
         course = self.store.get_item(self.course.location)
@@ -311,7 +311,7 @@ class TextbookByIdTestCase(CourseTestCase):
         )
         self.assertEqual(resp.status_code, 201)
         resp2 = self.client.get(self.url2)
-        self.assert2XX(resp2.status_code)
+        self.assertEqual(resp2.status_code, 200)
         compare = json.loads(resp2.content)
         self.assertEqual(compare, replacement)
         course = self.store.get_item(self.course.location)

@@ -244,8 +244,10 @@ PIPELINE_JS = {
              'js/models/course.js',
              'js/models/section.js', 'js/views/section.js',
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
+             'js/models/uploads.js', 'js/views/uploads.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/utility.js'],
+             'js/views/assets.js', 'js/utility.js',
+             'js/models/settings/course_grading_policy.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -355,7 +357,10 @@ INSTALLED_APPS = (
     'django_comment_common',
 
     # for course creator table
-    'django.contrib.admin'
+    'django.contrib.admin',
+
+    # for managing course modes
+    'course_modes'
 )
 
 ################# EDX MARKETING SITE ##################################

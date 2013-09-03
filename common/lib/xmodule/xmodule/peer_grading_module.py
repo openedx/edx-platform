@@ -46,7 +46,6 @@ class PeerGradingFields(object):
     )
     due = Date(
         help="Due date that should be displayed.",
-        default=None,
         scope=Scope.settings)
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
@@ -230,7 +229,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             count_graded = self.student_data_for_location['count_graded']
             count_required = self.student_data_for_location['count_required']
         except:
-            success, response = self.query_data_for_location()
+            success, response = self.query_data_for_location(self.location)
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
@@ -313,17 +312,26 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged', 'answer_unknown'])
-        success, message = self._check_required(data, required)
+        required = ['location', 'submission_id', 'submission_key', 'score', 'feedback', 'submission_flagged', 'answer_unknown']
+        if data.get("submission_flagged", False) in ["false", False, "False", "FALSE"]:
+            required.append("rubric_scores[]")
+        success, message = self._check_required(data, set(required))
         if not success:
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        if 'rubric_scores[]' in required:
+            data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
             response = self.peer_gs.save_grade(**data_dict)
+            success, location_data = self.query_data_for_location(data_dict['location'])
+            #Don't check for success above because the response = statement will raise the same Exception as the one
+            #that will cause success to be false.
+            response.update({'required_done' : False})
+            if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded'])>=int(location_data['count_required']):
+                response['required_done'] = True
             return response
         except GradingServiceError:
             # This is a dev_facing_error
@@ -503,7 +511,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             log.error(error_text)
             success = False
-        except:
+        except Exception:
             log.exception("Could not contact peer grading service.")
             success = False
 
@@ -514,20 +522,24 @@ class PeerGradingModule(PeerGradingFields, XModule):
             '''
             try:
                 return modulestore().get_instance(self.system.course_id, location)
-            except:
+            except Exception:
                 # the linked problem doesn't exist
                 log.error("Problem {0} does not exist in this course".format(location))
                 raise
 
+        good_problem_list = []
         for problem in problem_list:
             problem_location = problem['location']
-            descriptor = _find_corresponding_module_for_location(problem_location)
+            try:
+                descriptor = _find_corresponding_module_for_location(problem_location)
+            except Exception:
+                continue
             if descriptor:
                 problem['due'] = descriptor.lms.due
                 grace_period = descriptor.lms.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
-                except:
+                except Exception:
                     log.error("Malformed due date or grace period string for location {0}".format(problem_location))
                     raise
                 if self._closed(problem_timeinfo):
@@ -538,13 +550,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # if we can't find the due date, assume that it doesn't have one
                 problem['due'] = None
                 problem['closed'] = False
+            good_problem_list.append(problem)
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
-            'problem_list': problem_list,
+            'problem_list': good_problem_list,
             'error_text': error_text,
             # Checked above
             'staff_access': False,

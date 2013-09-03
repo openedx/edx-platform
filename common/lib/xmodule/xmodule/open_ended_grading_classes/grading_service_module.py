@@ -11,6 +11,9 @@ log = logging.getLogger(__name__)
 
 
 class GradingServiceError(Exception):
+    """
+    Exception for grading service.  Shown when Open Response Assessment servers cannot be reached.
+    """
     pass
 
 
@@ -62,7 +65,6 @@ class GradingService(object):
         """
         Make a get request to the grading controller
         """
-        log.debug(params)
         op = lambda: self.session.get(url,
                                       allow_redirects=allow_redirects,
                                       params=params)

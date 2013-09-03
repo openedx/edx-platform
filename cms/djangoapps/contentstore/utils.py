@@ -4,6 +4,7 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.contentstore.content import StaticContent
 from django.core.urlresolvers import reverse
 import copy
 import logging
@@ -151,6 +152,13 @@ def get_lms_link_for_about_page(location):
         lms_link = None
 
     return lms_link
+
+
+def course_image_url(course):
+    """Returns the image url for the course."""
+    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    path = StaticContent.get_url_path_from_location(loc)
+    return path
 
 
 class UnitState(object):

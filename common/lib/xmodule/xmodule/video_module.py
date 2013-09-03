@@ -104,14 +104,14 @@ class VideoFields(object):
         default=[]
     )
     track = String(
-        help="The external URL to download the subtitle track. This appears as a link beneath the video.",
+        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
         display_name="Download Track",
         scope=Scope.settings,
         default=""
     )
     sub = String(
-        help="The name of the subtitle track (for non-Youtube videos).",
-        display_name="HTML5 Subtitles",
+        help="The name of the timed transcript track (for non-Youtube videos).",
+        display_name="HTML5 Timed Transcript",
         scope=Scope.settings,
         default=""
     )

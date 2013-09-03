@@ -31,7 +31,13 @@ discussion_link = get_discussion_link(course) if course else None
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>', platform_name=settings.PLATFORM_NAME)}</p>
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+        link_start='<a href="{url}" target="_blank">'.format(
+          url=marketing_link('FAQ')
+        ),
+        link_end='</a>',
+        platform_name=settings.PLATFORM_NAME)}
+      </p>
 
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
     <hr>

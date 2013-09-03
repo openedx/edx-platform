@@ -387,6 +387,11 @@ if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
 
     )
 
+# Shopping cart
+urlpatterns += (
+    url(r'^shoppingcart/', include('shoppingcart.urls')),
+)
+
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (

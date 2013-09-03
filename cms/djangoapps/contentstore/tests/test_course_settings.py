@@ -30,6 +30,7 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course.location)
         self.assertEqual(details.course_location, self.course.location, "Location not copied into")
+        self.assertEqual(details.course_image_name, self.course.course_image)
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
@@ -43,6 +44,7 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertTupleEqual(Location(jsondetails['course_location']), self.course.location, "Location !=")
+        self.assertEqual(jsondetails['course_image_name'], self.course.course_image)
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
@@ -96,6 +98,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(jsondetails.__dict__).start_date,
             jsondetails.start_date
+        )
+        jsondetails.course_image_name = "an_image.jpg"
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).course_image_name,
+            jsondetails.course_image_name
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -188,6 +195,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
+        self.alter_field(url, details, 'course_image_name', "course_image_name")
 
     def compare_details_with_encoding(self, encoded, details, context):
         self.compare_date_fields(details, encoded, context, 'start_date')
@@ -197,6 +205,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
+        self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
 
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
@@ -430,12 +439,12 @@ class CourseGraderUpdatesTest(CourseTestCase):
 
     def test_get(self):
         resp = self.client.get(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
 
     def test_delete(self):
         resp = self.client.delete(self.url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
     def test_post(self):
         grader = {
@@ -446,5 +455,5 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "weight": 17.3,
         }
         resp = self.client.post(self.url, grader)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)

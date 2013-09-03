@@ -12,6 +12,9 @@ from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 
 class TestLocationMapper(unittest.TestCase):
+    """
+    Test the location to locator mapper
+    """
 
     def setUp(self):
         modulestore_options = {
@@ -23,11 +26,10 @@ class TestLocationMapper(unittest.TestCase):
         # pylint: disable=W0142
         TestLocationMapper.loc_store = LocMapperStore(**modulestore_options)
 
-
     def tearDown(self):
-        db = TestLocationMapper.loc_store.db
-        db.drop_collection(TestLocationMapper.loc_store.location_map)
-        db.connection.close()
+        dbref = TestLocationMapper.loc_store.db
+        dbref.drop_collection(TestLocationMapper.loc_store.location_map)
+        dbref.connection.close()
         TestLocationMapper.loc_store = None
 
     def test_create_map(self):
@@ -438,7 +440,6 @@ class TestLocationMapper(unittest.TestCase):
         )
         self.assertEqual(trans_loc.name, '1')
 
-
     def test_delete_block(self):
         """
         test delete_block_location_translator(location, old_course_id=None)
@@ -490,10 +491,17 @@ class TestLocationMapper(unittest.TestCase):
         )
         self.assertEqual(locator.usage_id, 'problem3')
 
+
 #==================================
 # functions to mock existing services
 def loc_mapper():
+    """
+    Mocks the global location mapper.
+    """
     return TestLocationMapper.loc_store
 
+
 def render_to_template_mock(*_args):
-    pass
+    """
+    Mocks the mako render_to_template w/ a noop
+    """

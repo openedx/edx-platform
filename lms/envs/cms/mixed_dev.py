@@ -6,7 +6,7 @@ This configuration is to run the MixedModuleStore on a localdev environment
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0614
 
-from .dev import *, DATA_DIR
+from .dev import *
 
 MODULESTORE = {
     'default': {

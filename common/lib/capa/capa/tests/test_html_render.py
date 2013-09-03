@@ -226,6 +226,26 @@ class CapaHtmlRenderTest(unittest.TestCase):
         span_element = rendered_html.find('span')
         self.assertEqual(span_element.get('attr'), "TEST")
 
+    def test_xml_comments_and_other_odd_things(self):
+        # Comments and processing instructions should be skipped.
+        xml_str = textwrap.dedent("""\
+            <?xml version="1.0" encoding="utf-8"?>
+            <!DOCTYPE html [
+                <!ENTITY % wacky "lxml.etree is wacky!">
+            ]>
+            <problem>
+            <!-- A commment. -->
+            <?ignore this processing instruction. ?>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = new_loncapa_problem(xml_str)
+
+        # Render the HTML
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>\s+</div>")
+
     def _create_test_file(self, path, content_str):
         test_fp = self.system.filestore.open(path, "w")
         test_fp.write(content_str)
