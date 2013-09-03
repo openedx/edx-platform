@@ -19,12 +19,12 @@
     <header class="page-header">
       <h2 class="title">
         <span class="wrapper-sts">
-          <span class="sts">You are registering for</span>
-          <span class="sts-course">${course_id} </span>
+          <span class="sts">${_("You are registering for")}</span>
+          <span class="sts-course">${course_id}</span>
         </span>
         <span class="sts-track">
           <span class="sts-track-value">
-            <span class="context">Registering as:</span> ID Verified
+            <span class="context">${_("Registering as:")}</span>
           </span>
         </span>
       </h2>
@@ -32,39 +32,40 @@
 
     <div class="wrapper-progress">
       <section class="progress">
-        <h3 class="sr title">Your Progress</h3>
+        <h3 class="sr title">${_("Your Progress")}</h3>
 
+        <!-- FIXME: Move the "Current Step: " text to the right DOM element -->
         <ol class="progress-steps">
           <li class="progress-step is-completed" id="progress-step0">
             <span class="wrapper-step-number"><span class="step-number">0</span></span>
-            <span class="step-name">Intro</span>
+            <span class="step-name">${_("Intro")}</span>
           </li>
 
           <li class="progress-step is-current" id="progress-step1">
             <span class="wrapper-step-number"><span class="step-number">1</span></span>
-            <span class="step-name"><span class="sr">Current Step: </span>Take Photo</span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Take Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step2">
             <span class="wrapper-step-number"><span class="step-number">2</span></span>
-            <span class="step-name">Take ID Photo</span>
+            <span class="step-name">${_("Take ID Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step3">
             <span class="wrapper-step-number"><span class="step-number">3</span></span>
-            <span class="step-name">Review</span>
+            <span class="step-name">${_("Review")}</span>
           </li>
 
           <li class="progress-step" id="progress-step4">
             <span class="wrapper-step-number"><span class="step-number">4</span></span>
-            <span class="step-name">Make Payment</span>
+            <span class="step-name">${_("Make Payment")}</span>
           </li>
 
           <li class="progress-step" id="progress-step5">
             <span class="wrapper-step-number"><span class="step-number">
               <i class="icon-ok"></i>
             </span></span>
-            <span class="step-name">Confirmation</span>
+            <span class="step-name">${_("Confirmation")}</span>
           </li>
         </ol>
 
@@ -80,9 +81,9 @@
         <section class="wrapper carousel"  data-transition="slide">
           <div id="wrapper-facephoto" class="wrapper-view block-photo">
             <div class="facephoto view">
-              <h3 class="title">Take Your Photo</h3>
+              <h3 class="title">${_("Take Your Photo")}</h3>
               <div class="instruction">
-                <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+                <p>${_("Use your webcam to take a picture of your face so we can match it with the picture on your ID.")}</p>
               </div>
 
               <div class="wrapper-task">
@@ -102,19 +103,19 @@
                     <ul class="list-controls">
                       <li class="control control-redo" id="face_reset_button">
                         <a class="action action-redo" href="">
-                          <i class="icon-undo"></i> <span class="sr">Retake</span>
+                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
                         </a>
                       </li>
 
                       <li class="control control-do" id="face_capture_button">
                         <a class="action action-do" href="">
-                          <i class="icon-camera"></i><span class="sr">Take photo</span>
+                          <i class="icon-camera"></i><span class="sr">${_("Take photo")}</span>
                         </a>
                       </li>
 
                       <li class="control control-approve" id="face_approve_button">
                         <a class="action action-approve" href="">
-                          <i class="icon-ok"></i> <span class="sr">Looks good</span>
+                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
                         </a>
                       </li>
                     </ul>
@@ -123,28 +124,28 @@
 
                 <div class="wrapper-help">
                   <div class="help help-task photo-tips facetips">
-                    <h4 class="title">Tips on taking a successful photo</h4>
+                    <h4 class="title">${_("Tips on taking a successful photo")}</h4>
 
                     <div class="copy">
                       <ul class="list-help">
-                        <li class="help-item">Make sure your face is well-lit</li>
-                        <li class="help-item">Be sure your entire face is inside the frame</li>
-                        <li class="help-item">Can we match the photo you took with the one on your ID?</li>
-                        <li class="help-item">Click the checkmark once you are happy with the photo</li>
+                        <li class="help-item">${_("Make sure your face is well-lit")}</li>
+                        <li class="help-item">${_("Be sure your entire face is inside the frame")}</li>
+                        <li class="help-item">${_("Can we match the photo you took with the one on your ID?")}</li>
+                        <li class="help-item">${_("Click the checkmark once you are happy with the photo")}</li>
                       </ul>
                     </div>
                   </div>
 
                   <div class="help help-faq facefaq">
-                    <h4 class="sr title">Common Questions</h4>
+                    <h4 class="sr title">${_("Common Questions")}</h4>
 
                     <div class="copy">
                       <dl class="list-faq">
-                        <dt class="faq-question">Why do you need my photo?</dt>
-                        <dd class="faq-answer">We need your photo to confirm that you are you.</dd>
+                        <dt class="faq-question">${_("Why do you need my photo?")}</dt>
+                        <dd class="faq-answer">${_("We need your photo to confirm that you are you.")}</dd>
 
-                        <dt class="faq-question">What do you do with this picture?</dt>
-                        <dd class="faq-answer">We only use it to verify your identity.  It is not displayed anywhere.</dd>
+                        <dt class="faq-question">${_("What do you do with this picture?")}</dt>
+                        <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
                       </dl>
                     </div>
                   </div>
@@ -152,11 +153,11 @@
               </div>
 
               <nav class="nav-wizard"> <!-- FIXME: Additional class is-ready, is-not-ready -->
-                <span class="help help-inline">Once you verify your photo looks good, you can move on to step 2.</span>
+                <span class="help help-inline">${_("Once you verify your photo looks good, you can move on to step 2.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
+                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
                   </li>
                 </ol>
               </nav>
@@ -166,9 +167,9 @@
 
           <div id="wrapper-idphoto" class="wrapper-view block-photo">
             <div class="idphoto view">
-              <h3 class="title">Show Us Your ID</h3>
+              <h3 class="title">${_("Show Us Your ID")}</h3>
               <div class="instruction">
-                <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
+                <p>${_("Use your webcam to take a picture of your face so we can match it with the picture on your ID.")}</p>
               </div>
 
               <div class="wrapper-task">
@@ -188,19 +189,19 @@
                     <ul class="list-controls">
                       <li class="control control-redo" id="photo_id_reset_button">
                         <a class="action action-redo" href="">
-                          <i class="icon-undo"></i> <span class="sr">Retake</span>
+                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
                         </a>
                       </li>
 
                       <li class="control control-do" id="photo_id_capture_button">
                         <a class="action action-do" href="">
-                          <i class="icon-camera"></i> <span class="sr">Take photo</span>
+                          <i class="icon-camera"></i> <span class="sr">${_("Take photo")}</span>
                         </a>
                       </li>
 
                       <li class="control control-approve" id="photo_id_approve_button">
                         <a class="action action-approve" href="">
-                          <i class="icon-ok"></i> <span class="sr">Looks good</span>
+                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
                         </a>
                       </li>
                     </ul>
@@ -209,28 +210,28 @@
 
                 <div class="wrapper-help">
                   <div class="help help-task photo-tips facetips">
-                    <h4 class="title">Tips on taking a successful photo</h4>
+                    <h4 class="title">${_("Tips on taking a successful photo")}</h4>
 
                     <div class="copy">
                       <ul>
-                        <li>Make sure your ID is well-lit</li>
-                        <li>Check that there isn't any glare</li>
-                        <li>Ensure that you can see your photo and read your name</li>
-                        <li>Try to keep your fingers at the edge to avoid covering important information</li>
+                        <li>${_("Make sure your ID is well-lit")}</li>
+                        <li>${_("Check that there isn't any glare")}</li>
+                        <li>${_("Ensure that you can see your photo and read your name")}</li>
+                        <li>${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
                       </ul>
                     </div>
                   </div>
 
                   <div class="help help-faq facefaq">
-                    <h4 class="sr title">Common Questions</h4>
+                    <h4 class="sr title">${_("Common Questions")}</h4>
 
                     <div class="copy">
                       <dl class="list-faq">
-                        <dt class="faq-question">Why do you need a photo of my ID?</dt>
-                        <dd class="faq-answer">We need to match your ID with your photo and name to confirm that you are you.</dd>
+                        <dt class="faq-question">${_("Why do you need a photo of my ID?")}</dt>
+                        <dd class="faq-answer">${_("We need to match your ID with your photo and name to confirm that you are you.")}</dd>
 
-                        <dt class="faq-question">What do you do with this picture?</dt>
-                        <dd class="faq-answer">We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.</dd>
+                        <dt class="faq-question">${_("What do you do with this picture?")}</dt>
+                        <dd class="faq-answer">${_("We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.")}</dd>
                       </dl>
                     </div>
                   </div>
@@ -238,11 +239,11 @@
               </div>
 
               <nav class="nav-wizard">
-                <span class="help help-inline">Once you verify your ID photo looks good, you can move on to step 3.</span>
+                <span class="help help-inline">${_("Once you verify your ID photo looks good, you can move on to step 3.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
+                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
                   </li>
                 </ol>
               </nav>
@@ -251,32 +252,34 @@
 
           <div id="wrapper-review" class="wrapper-view">
             <div class="review view">
-              <h3 class="title">Verify Your Submission</h3>
+              <h3 class="title">${_("Verify Your Submission")}</h3>
               <div class="instruction">
-                <p>Make sure we can verify your identity with the photos and information below.</p>
+                <p>${_("Make sure we can verify your identity with the photos and information below.")}</p>
               </div>
 
               <div class="wrapper-task">
                 <ol class="review-tasks">
                   <li class="review-task review-task-name">
-                    <h4 class="title">Check Your Name</h4>
+                    <h4 class="title">${_("Check Your Name")}</h4>
 
                     <div class="copy">
-                      <p>Make sure your full name on your edX account, ${user_full_name}, matches your ID. We will also use this as the name on your certificate.</p>
+                      <!-- FIXME: not sure how to handle variables w/in translation context -->
+                      ${_("Contact {platform_name}").format(platform_name=settings.PLATFORM_NAME)}
+                      <p>${_("Make sure your full name on your edX account, {}, matches your ID. We will also use this as the name on your certificate.").format(user_full_name)}</p>
                     </div>
 
                     <ul class="list-actions">
                       <li class="action action-editname">
-                        <a rel="modal" class="edit-name" href="#">Edit my name</a>
+                        <a rel="modal" class="edit-name" href="#">${_("Edit my name")}</a>
                       </li>
                     </ul>
                   </li>
 
                   <li class="review-task review-task-photos">
-                    <h4 class="title">Review the Photos You've Taken</h4>
+                    <h4 class="title">${_("Review the Photos You've Taken")}</h4>
 
                     <div class="copy">
-                      <p>Make sure your full name on your edX account, <strong>${user_full_name}</strong>, matches your ID. We will also use this as the name on your certificate.</p>
+                      <p>${_("Curabitur blandit tempus porttitor. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.")}</p>
                     </div>
 
                     <ol class="wrapper-photos">
@@ -286,11 +289,11 @@
                         </div>
 
                         <div class="help-tips">
-                          <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                          <h5 class="title">${_("The photo above needs to meet the following requirements:")}</h5>
                           <ul class="list-help list-tips copy">
-                            <li class="tip">Be well lit</li>
-                            <li class="tip">Show your whole face</li>
-                            <li class="tip">Match your ID</li>
+                            <li class="tip">${_("Be well lit")}</li>
+                            <li class="tip">${_("Show your whole face")}</li>
+                            <li class="tip">${_("Match your ID")}</li>
                           </ul>
                         </div>
                       </li>
@@ -301,11 +304,11 @@
                        </div>
 
                        <div class="help-tips">
-                         <h5 class="title">The photo above needs to meet the following requirements:</h5>
+                         <h5 class="title">${_("The photo above needs to meet the following requirements:")}</h5>
                          <ul class="list-help list-tips copy">
-                           <li class="tip">Be readable (not too far away, no glare)</li>
-                           <li class="tip">Show your name</li>
-                           <li class="tip">Match the photo of your face and your name above</li>
+                           <li class="tip">${_("Be readable (not too far away, no glare)")}</li>
+                           <li class="tip">${_("Show your name")}</li>
+                           <li class="tip">${_("Match the photo of your face and your name above")}</li>
                          </ul>
                        </div>
                       </li>
@@ -313,22 +316,22 @@
 
                     <div class="msg msg-retake msg-followup">
                       <div class="copy">
-                        <p>Photos don't meet the requirements?</p>
+                        <p>${_("Photos don't meet the requirements?")}</p>
                       </div>
 
                       <ul class="list-actions">
                         <li class="action action-retakephotos">
-                          <a class="retake-photos" href="#">Retake Your Photos</a>
+                          <a class="retake-photos" href="#">${_("Retake Your Photos")}</a>
                         </li>
                       </ul>
                     </div>
                   </li>
 
                   <li class="review-task  review-task-contribution">
-                    <h4 class="title">Check Your Contribution Level</h4>
+                    <h4 class="title">${_("Check Your Contribution Level")}</h4>
 
                     <div class="copy">
-                      <p>Please confirm your contribution for this course:</p>
+                      <p>${_("Please confirm your contribution for this course:")}</p>
                     </div>
 
                     <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price"/>
@@ -338,18 +341,17 @@
               </div>
 
               <nav class="nav-wizard">
-                <span class="help help-inline">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</span>
+                <span class="help help-inline">${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step step-match">
                     <input type="checkbox" name="match" id="confirm_pics_good" />
-                    <label for="confirm_pics_good">Yes! My details all match.</label>
+                    <label for="confirm_pics_good">${_("Yes! My details all match.")}</label>
                   </li>
                   <li class="wizard-step step-proceed">
                     <form id="pay_form" method="post" action="${purchase_endpoint}">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id | h}" />
-                      <!-- <button class="action-primary" type="submit" id="pay_button">Go to Step 4: Secure Payment</button> -->
                       <input class="action-primary" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
                     </form>
                   </li>
@@ -365,16 +367,16 @@
       <aside class="content-supplementary">
         <ul class="list-help">
           <li class="help-item">
-            <h3 class="title">Have questions?</h3>
+            <h3 class="title">${_("Have questions?")}</h3>
             <div class="copy">
-              <p>Please read <a rel="external" href="">our FAQs to view common questions about our certificates</a>.</p>
+              <p>${_("Please read {a_start} our FAQs to view common questions about our certificates {a_end}.").format(a_start='<a rel="external" href="">', a_end="</a>")}</p>
             </div>
           </li>
 
           <li class="help-item">
-            <h3 class="title">Change your mind?</h3>
+            <h3 class="title">${_("Change your mind?")}</h3>
             <div class="copy">
-                <p>You can always <a href="${reverse('course_modes_choose', kwargs={'course_id': course_id})}">Audit the course for free</a> without verifying.</p>
+              <p>${_("You can always {a_start} Audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="">', a_end="</a>")}</p>
             </div>
           </li>
         </ul>
