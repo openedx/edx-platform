@@ -40,6 +40,12 @@ div.video {
       padding-bottom: 56.25%;
       position: relative;
 
+      div {
+        &.hidden {
+          display: none;
+        }
+      }
+
       object, iframe {
         border: none;
         height: 100%;
@@ -47,6 +53,15 @@ div.video {
         position: absolute;
         top: 0;
         width: 100%;
+      }
+
+      h3 {
+        text-align: center;
+        color: white;
+
+        &.hidden {
+          display: none;
+        }
       }
     }
 
@@ -516,6 +531,12 @@ div.video {
         height: 0px;
     }
 
+    article.video-wrapper section.video-player {
+      h3 {
+        color: black;
+      }
+    }
+
     ol.subtitles {
         width: 0;
         height: 0;
@@ -561,6 +582,12 @@ div.video {
 
     article.video-wrapper {
         position: static;
+    }
+
+    article.video-wrapper section.video-player {
+      h3 {
+        color: white;
+      }
     }
 
     div.tc-wrapper {
