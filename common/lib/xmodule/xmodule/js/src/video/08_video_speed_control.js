@@ -10,20 +10,30 @@ function () {
     return function (state) {
         state.videoSpeedControl = {};
 
+        if (state.videoType === 'html5') {
+            _initialize(state);
+        } else if (state.videoType === 'youtube' && state.youtubeXhr) {
+            state.youtubeXhr.done(function () {
+                _initialize(state);
+            });
+        }
+
         if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
             _hideSpeedControl(state);
 
             return;
         }
-
-        _makeFunctionsPublic(state);
-        _renderElements(state);
-        _bindHandlers(state);
     };
 
     // ***************************************************************
     // Private functions start here.
     // ***************************************************************
+
+    function _initialize(state) {
+        _makeFunctionsPublic(state);
+        _renderElements(state);
+        _bindHandlers(state);
+    }
 
     // function _makeFunctionsPublic(state)
     //
