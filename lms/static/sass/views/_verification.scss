@@ -222,9 +222,9 @@
   }
 
   // HACK: nasty override due to our bad input/button styling
-  button, input[type="submit"], input[type="button"] {
+  button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
-    @extend .t-weight3;
+    @extend .t-weight4;
     text-transform: none;
     text-shadow: none;
     letter-spacing: 0;
