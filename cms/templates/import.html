@@ -36,22 +36,16 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
         <div id="status-info-block" class="status-info-block">
             <p class="status-info not-started">
+            <i class="icon-check-empty"></i> 
             Unpacking
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
             </p>
             <p class="status-info not-started">
+            <i class="icon-check-empty"></i> 
             Verifying
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
             </p>
             <p class="status-info not-started">
+            <i class="icon-check-empty"></i> 
             Importing
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
-            <span class="loading-dots">.</span>
             </p>
         </div>
         <div class="progress-bar">
@@ -71,6 +65,7 @@
 <script>
 (function() {
 
+var file;
 var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
@@ -79,6 +74,8 @@ var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
 
 var allStats = $('#status-infos');
+
+var feedbackUrl = "${reverse('import_status', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name='fillerName'))}"
 
 
 $('#fileupload').fileupload({
@@ -116,16 +113,24 @@ $('#fileupload').fileupload({
     },
 
     progressall: function(e, data){
+        var doneAt;
         var percentInt = data.loaded / data.total * 100
         var percentVal = parseInt(percentInt, 10) + "%";
-        if (percentInt >= 99) {
-            bar.hide();
-            console.log(JSON.stringify(data));
-            startServerFeedback();
+        // Firefox makes ProgressEvent.loaded equal ProgressEvent.total only
+        // after receiving a response from the server (see Mozilla bug 637002),
+        // so for Firefox we jump the gun a little.
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            doneAt = 95;
         } else {
-        bar.show();
-        fill.width(percentVal);
-        percent.html(percentVal);
+            doneAt = 99;
+        }
+        if (percentInt >= doneAt) {
+            bar.hide();
+            startServerFeedback(feedbackUrl.replace("fillerName", file.name);
+        } else {
+            bar.show();
+            fill.width(percentVal);
+            percent.html(percentVal);
         }
     },
     done: function(e, data){

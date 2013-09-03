@@ -18,7 +18,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 
 from mitxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
@@ -145,7 +145,7 @@ def import_course(request, org, course, name):
 
             # Use sessions to keep info about import progress
             session_status = request.session.setdefault("import_status", {})
-            key = course + filename
+            key = org + course + filename
             session_status[key] = 1
             request.session.modified = True
 
@@ -232,9 +232,10 @@ def import_course(request, org, course, name):
             })
         })
 
+@require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status(request, org, course, ename):
+def import_status(request, org, course, name):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -247,7 +248,7 @@ def import_status(request, org, course, ename):
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[course + name]
+        status = session_status[org + course + name]
     except KeyError:
         status = 0
 
