@@ -23,6 +23,8 @@
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
     data-autoplay="${autoplay}"
+    data-yt-test-timeout="${yt_test_timeout}"
+    data-yt-test-url="${yt_test_url}"
 >
     <div class="tc-wrapper">
         <article class="video-wrapper">
@@ -30,6 +32,7 @@
 
             <section class="video-player">
                 <div id="${id}"></div>
+                <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
             </section>
 
             <div class="video-player-post"></div>
