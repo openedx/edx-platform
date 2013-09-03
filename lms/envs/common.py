@@ -290,12 +290,14 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                        'title': 'Circuits and Electronics',
-                                        'xmlpath': '6002x/',
-                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                        }
-                   }
+COURSE_SETTINGS = {
+    '6.002x_Fall_2012': {
+        'number': '6.002x',
+        'title': 'Circuits and Electronics',
+        'xmlpath': '6002x/',
+        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+    }
+}
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
