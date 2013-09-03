@@ -170,16 +170,13 @@ function objectTagForFlashCamera(name) {
 $(document).ready(function() {
   $(".carousel-nav").addClass('sr');
   $("#pay_button").click(submitToPaymentProcessing);
-  // $("#confirm_pics_good").click(function() {
-  //   if (this.checked) {
-  //     $("#pay_button_frame").removeClass('disabled');
-  //   }
-  //   else {
-  //     $("#pay_button_frame").addClass('disabled');
-  //   }
-  // });
-  //
-  // $("#pay_button_frame").addClass('disabled');
+  // prevent browsers from keeping this button checked
+  $("#confirm_pics_good").prop("checked", false)
+  $("#confirm_pics_good").change(function() {
+      $("#pay_button").toggleClass('disabled');
+  });
+  
+  $("#pay_button_frame").addClass('disabled');
 
   var hasHtml5CameraSupport = initVideoCapture();
 
