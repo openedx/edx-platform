@@ -23,9 +23,11 @@ from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
-from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+from xmodule.tests.test_util_open_ended import (
+    MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
-    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE)
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE
+)
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -69,7 +71,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+        }
     }
     definition = Mock()
     descriptor = Mock()
@@ -192,7 +194,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+        }
     }
 
     oeparam = etree.XML('''
@@ -553,7 +555,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA})
+                                                   instance_state={'task_states': TEST_STATE_SA})
 
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                    self.location,
@@ -561,7 +563,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA_IN})
+                                                   instance_state={'task_states': TEST_STATE_SA_IN})
 
 
     def test_get_score_realistic(self):
@@ -605,7 +607,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         descriptor = Mock(data=definition)
         instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
-            instance_state.update({'current_task_number' : task_number})
+            instance_state.update({'current_task_number': task_number})
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
                                                definition,
@@ -711,7 +713,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
-        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files" : False, "student_file" : None})
+        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files": False, "student_file": None})
         html = module.handle_ajax("get_html", {})
 
         #Mock a student submitting an assessment
