@@ -10,9 +10,9 @@
   <div class=" msg msg-activate">
     <i class="msg-icon icon-warning-sign"></i>
     <div class="msg-content">
-      <h3 class="title">You need to activate your account before proceeding</h3>
+      <h3 class="title">${_("You need to activate your account before proceeding")}</h3>
       <div class="copy">
-        <p>Please check your email for further instructions on verifying your new account.</p>
+        <p>${_("Please check your email for further instructions on verifying your new account.")}</p>
       </div>
     </div>
   </div>
@@ -25,12 +25,12 @@
     <header class="page-header">
       <h2 class="title">
         <span class="wrapper-sts">
-          <span class="sts">You are registering for</span>
+          <span class="sts">${_("You are registering for")}</span>
           <span class="sts-course">${course_id}</span>
         </span>
         <span class="sts-track">
           <span class="sts-track-value">
-            <span class="context">Registering as:</span> ID Verified
+            <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
           </span>
         </span>
       </h2>
@@ -38,39 +38,39 @@
 
     <div class="wrapper-progress">
       <section class="progress">
-        <h3 class="sr title">Your Progress</h3>
+        <h3 class="sr title">${_("Your Progress")}</h3>
 
         <ol class="progress-steps">
           <li class="progress-step is-current" id="progress-step0">
             <span class="wrapper-step-number"><span class="step-number">0</span></span>
-            <span class="step-name">Intro</span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Intro")}</span>
           </li>
 
           <li class="progress-step" id="progress-step1">
             <span class="wrapper-step-number"><span class="step-number">1</span></span>
-            <span class="step-name"><span class="sr">Current Step: </span>Take Photo</span>
+            <span class="step-name">${_("Take Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step2">
             <span class="wrapper-step-number"><span class="step-number">2</span></span>
-            <span class="step-name">Take ID Photo</span>
+            <span class="step-name">${_("Take ID Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step3">
             <span class="wrapper-step-number"><span class="step-number">3</span></span>
-            <span class="step-name">Review</span>
+            <span class="step-name">${_("Review")}</span>
           </li>
 
           <li class="progress-step" id="progress-step4">
             <span class="wrapper-step-number"><span class="step-number">4</span></span>
-            <span class="step-name">Make Payment</span>
+            <span class="step-name">${_("Make Payment")}</span>
           </li>
 
           <li class="progress-step" id="progress-step5">
             <span class="wrapper-step-number"><span class="step-number">
               <i class="icon-ok"></i>
             </span></span>
-            <span class="step-name">Confirmation</span>
+            <span class="step-name">${_("Confirmation")}</span>
           </li>
         </ol>
 
@@ -83,31 +83,31 @@
 
     <div class="wrapper-content-main">
       <article class="content-main">
-        <h3 class="title">What You Will Need to Register</h3>
+        <h3 class="title">${_("What You Will Need to Register")}</h3>
 
         <div class="instruction">
-          <p>There are a few things you will need to register as an ID verified student:</p>
+          <p>${_("There are a few things you will need to register as an ID verified student:")}</p>
         </div>
 
         <ul class="list-reqs ${"account-not-activated" if is_not_active else ""}">
           %if is_not_active:
           <li class="req req-0 req-activate">
-            <h4 class="title">Activate Your Account</h4>
+            <h4 class="title">${_("Activate Your Account")}</h4>
             <div class="placeholder-art">
               <i class="icon-envelope-alt"></i>
             </div>
 
             <div class="copy">
               <p>
-                <span class="copy-super">Check Your Email</span>
-                <span class="copy-sub">Nulla vitae elit libero, a pharetra augue. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</span>
+                <span class="copy-super">${_("Check Your Email")}</span>
+                <span class="copy-sub">${_("Nulla vitae elit libero, a pharetra augue. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum")}.</span>
               </p>
             </div>
           </li>
           %endif
 
           <li class="req req-1 req-id">
-            <h4 class="title">Identification</h4>
+            <h4 class="title">${_("Identification")}</h4>
             <div class="placeholder-art">
               <i class="icon-list-alt icon-under"></i>
               <i class="icon-user icon-over"></i>
@@ -115,47 +115,47 @@
 
             <div class="copy">
               <p>
-                <span class="copy-super">A photo identification document</span>
-                <span class="copy-sub">a drivers license, passport, student ID, or other ID with your name and picture on it</span>
+                <span class="copy-super">${_("A photo identification document")}</span>
+                <span class="copy-sub">${_("a drivers license, passport, student ID, or other ID with your name and picture on it")}</span>
               </p>
             </div>
           </li>
 
           <li class="req req-2 req-webcam">
-            <h4 class="title">Webcam</h4>
+            <h4 class="title">${_("Webcam")}</h4>
             <div class="placeholder-art">
               <i class="icon-facetime-video"></i>
             </div>
 
             <div class="copy">
               <p>
-                <span class="copy-super">A webcam and a modern browser</span>
-                <span class="copy-sub">Firefox, Chrome, or Opera</span>
+                <span class="copy-super">${_("A webcam and a modern browser")}</span>
+                <span class="copy-sub">${_("Firefox, Chrome, or Opera")}</span>
               </p>
             </div>
           </li>
 
           <li class="req req-3 req-payment">
-            <h4 class="title">Credit or Debit Card</h4>
+            <h4 class="title">${_("Credit or Debit Card")}</h4>
             <div class="placeholder-art">
               <i class="icon-credit-card"></i>
             </div>
 
             <div class="copy">
               <p>
-                <span class="copy-super">A major credit or debit card</span>
-                <span class="copy-sub">Visa, Master Card, Maestro, Amex, Discover, JCB with Discover logo, Diners Club</span>
+                <span class="copy-super">${_("A major credit or debit card")}</span>
+                <span class="copy-sub">${_("Visa, Master Card, Maestro, Amex, Discover, JCB with Discover logo, Diners Club")}</span>
               </p>
             </div>
           </li>
         </ul>
 
         <nav class="nav-wizard ${"is-not-ready" if is_not_active else "is-ready"}">
-          <span class="help help-inline">Missing something? You can always <a href="">audit this course instead</a></span>
+          <span class="help help-inline">${_("Missing something? You can always {a_start} audit this course instead {a_end}").format(a_start='<a href="">', a_end="</a>")}</span>
 
           <ol class="wizard-steps">
             <li class="wizard-step">
-            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}">Go to Step 1: Take my Photo</a>
+            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}">${_("Go to Step 1: Take my Photo")}</a>
             </li>
           </ol>
         </nav>
@@ -166,16 +166,16 @@
       <aside class="content-supplementary">
         <ul class="list-help">
           <li class="help-item">
-            <h3 class="title">Have questions?</h3>
+            <h3 class="title">${_("Have questions?")}</h3>
             <div class="copy">
-              <p>Please read <a rel="external" href="">our FAQs to view common questions about our certificates</a>.</p>
+              <p>${_("Please read {a_start} our FAQs to view common questions about our certificates {a_end}.").format(a_start='<a rel="external" href="">', a_end="</a>")}</p>
             </div>
           </li>
 
           <li class="help-item">
-            <h3 class="title">Change your mind?</h3>
+            <h3 class="title">${_("Change your mind?")}</h3>
             <div class="copy">
-              <p>You can always <a href="">Audit the course for free</a> without verifying.</p>
+              <p>${_("You can always {a_start} Audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="">', a_end="</a>")}</p>
             </div>
           </li>
         </ul>
