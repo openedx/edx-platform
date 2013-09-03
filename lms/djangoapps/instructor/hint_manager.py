@@ -8,10 +8,11 @@ These views will only be visible if MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW
 """
 
 import json
-import re
+import copy
 
 from django.http import HttpResponse, Http404
 from django_future.csrf import ensure_csrf_cookie
+from django.utils.translation import ugettext as _
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 
@@ -31,7 +32,7 @@ def hint_manager(request, course_id):
     try:
         get_course_with_access(request.user, course_id, 'staff', depth=None)
     except Http404:
-        out = 'Sorry, but students are not allowed to access the hint manager!'
+        out = _('Sorry, but students are not allowed to access the hint manager!')
         return HttpResponse(out)
     if request.method == 'GET':
         out = get_hints(request, course_id, 'mod_queue')
@@ -40,7 +41,7 @@ def hint_manager(request, course_id):
     field = request.POST['field']
     if not (field == 'mod_queue' or field == 'hints'):
         # Invalid field.  (Don't let users continue - they may overwrite other db's)
-        out = 'Error in hint manager - an invalid field was accessed.'
+        out = _('Error in hint manager - an invalid field was accessed.')
         return HttpResponse(out)
 
     switch_dict = {
@@ -77,21 +78,17 @@ def get_hints(request, course_id, field):
         - 'all_hints': A list of [answer, pk dict] pairs, representing all hints.
           Sorted by answer.
         - 'id_to_name': A dictionary mapping problem id to problem name.
+
+    Someone may want to separate this by problem in the future.
     """
     if field == 'mod_queue':
         other_field = 'hints'
-        field_label = 'Hints Awaiting Moderation'
-        other_field_label = 'Approved Hints'
+        field_label = _('Hints Awaiting Moderation')
+        other_field_label = _('Approved Hints')
     elif field == 'hints':
         other_field = 'mod_queue'
-        field_label = 'Approved Hints'
-        other_field_label = 'Hints Awaiting Moderation'
-    # The course_id is of the form school/number/classname.
-    # We want to use the course_id to find all matching definition_id's.
-    # To do this, just take the school/number part - leave off the classname.
-    chopped_id = '/'.join(course_id.split('/')[:-1])
-    chopped_id = re.escape(chopped_id)
-    all_hints = XModuleContentField.objects.filter(field_name=field, definition_id__regex=chopped_id)
+        field_label = _('Approved Hints')
+        other_field_label = _('Hints Awaiting Moderation')
     # big_out_dict[problem id] = [[answer, {pk: [hint, votes]}], sorted by answer]
     # big_out_dict maps a problem id to a list of [answer, hints] pairs, sorted in order of answer.
     big_out_dict = {}
@@ -99,28 +96,42 @@ def get_hints(request, course_id, field):
     # id_to_name[problem id] = Display name of problem
     id_to_name = {}
 
-    for hints_by_problem in all_hints:
-        loc = Location(hints_by_problem.definition_id)
-        name = location_to_problem_name(course_id, loc)
-        if name is None:
-            continue
-        id_to_name[hints_by_problem.definition_id] = name
+    # Get all of the hinters in this course.
+    org, course_number, course_name = course_id.split('/')
+    hinter_filter = Location('i4x', org, course_number, 'crowdsource_hinter', None)
+    hinters = modulestore().get_items(hinter_filter, course_id=course_id)
+    model_data_cache = model_data.ModelDataCache(hinters, course_id, request.user)
 
-        def answer_sorter(thing):
-            """
-            `thing` is a tuple, where `thing[0]` contains an answer, and `thing[1]` contains
-            a dict of hints.  This function returns an index based on `thing[0]`, which
-            is used as a key to sort the list of things.
-            """
-            try:
-                return float(thing[0])
-            except ValueError:
-                # Put all non-numerical answers first.
-                return float('-inf')
+    def answer_sorter(thing):
+        """
+        `thing` is a tuple, where `thing[0]` contains an answer, and `thing[1]` contains
+        a dict of hints.  This function returns an index based on `thing[0]`, which
+        is used as a key to sort the list of things.
+        """
+        try:
+            return float(thing[0])
+        except ValueError:
+            # Put all non-numerical answers first.
+            return float('-inf')
 
-        # Answer list contains [answer, dict_of_hints] pairs.
-        answer_list = sorted(json.loads(hints_by_problem.value).items(), key=answer_sorter)
-        big_out_dict[hints_by_problem.definition_id] = answer_list
+    # For each hinter, get and process a list of all hints.
+    for hinter_descriptor in hinters:
+        hinter_module = module_render.get_module(
+            request.user,
+            request,
+            hinter_descriptor.location,
+            model_data_cache,
+            course_id
+        )
+        loc_string = str(hinter_descriptor.location)
+        # To code reviewers: Do you think this is OK?  I make sure that field
+        # can only be 'hints' or 'mod_queue' earlier.
+        hints = getattr(hinter_module, field)
+        big_out_dict[loc_string] = sorted(hints.items(), key=answer_sorter)
+
+        # Also generate the name of the problem to which this hinter is pointed.
+        problem_descriptor = modulestore().get_items(hinter_module.target_problem, course_id=course_id)[0]
+        id_to_name[loc_string] = problem_descriptor.display_name_with_default
 
     render_dict = {'field': field,
                    'other_field': other_field,
@@ -131,18 +142,21 @@ def get_hints(request, course_id, field):
     return render_dict
 
 
-def location_to_problem_name(course_id, loc):
+def _location_to_module(location, request, course_id):
     """
-    Given the location of a crowdsource_hinter module, try to return the name of the
-    problem it wraps around.  Return None if the hinter no longer exists.
+    Converts a location string to a module.  Requires the request and course_id
+    objects.
     """
-    try:
-        descriptor = modulestore().get_items(loc, course_id=course_id)[0]
-        return descriptor.get_children()[0].display_name
-    except IndexError:
-        # Sometimes, the problem is no longer in the course.  Just
-        # don't include said problem.
-        return None
+    loc = Location(location)
+    descriptor = modulestore().get_items(loc, course_id=course_id)[0]
+    model_data_cache = model_data.ModelDataCache([descriptor], course_id, request.user)
+    return module_render.get_module(
+        request.user,
+        request,
+        loc,
+        model_data_cache,
+        course_id
+    )
 
 
 def delete_hints(request, course_id, field):
@@ -158,18 +172,19 @@ def delete_hints(request, course_id, field):
       1: ['problem_whatever', '42.0', '3'],
       2: ['problem_whatever', '32.5', '12']}
     """
-
     for key in request.POST:
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
-        this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
-        problem_dict = json.loads(this_problem.value)
-        del problem_dict[answer][pk]
-        this_problem.value = json.dumps(problem_dict)
-        this_problem.save()
+        hinter_module = _location_to_module(problem_id, request, course_id)
+        try:
+            del getattr(hinter_module, field)[answer][pk]
+        except KeyError:
+            return 'No hint found to delete!'
+        # Remember to save after modifying an xmodule!
+        hinter_module.save()
 
 
 def change_votes(request, course_id, field):
@@ -190,12 +205,16 @@ def change_votes(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk, new_votes = request.POST.getlist(key)
-        this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
-        problem_dict = json.loads(this_problem.value)
-        # problem_dict[answer][pk] points to a [hint_text, #votes] pair.
-        problem_dict[answer][pk][1] = int(new_votes)
-        this_problem.value = json.dumps(problem_dict)
-        this_problem.save()
+        hinter_module = _location_to_module(problem_id, request, course_id)
+        try:
+            getattr(hinter_module, field)[answer][pk][1] = int(new_votes)
+        except KeyError:
+            return 'Invalid hint.'
+        except ValueError:
+            return '{inp} is not a valid vote count.  Please submit an integer.'.format(
+                inp=str(new_votes)
+            )
+        hinter_module.save()
 
 
 def add_hint(request, course_id, field):
@@ -211,31 +230,14 @@ def add_hint(request, course_id, field):
     problem_id = request.POST['problem']
     answer = request.POST['answer']
     hint_text = request.POST['hint']
-
-    # Validate the answer.  This requires initializing the xmodules, which
-    # is annoying.
-    loc = Location(problem_id)
-    descriptors = modulestore().get_items(loc, course_id=course_id)
-    m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
-    hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
+    hinter_module = _location_to_module(problem_id, request, course_id)
     if not hinter_module.validate_answer(answer):
-        # Invalid answer.  Don't add it to the database, or else the
-        # hinter will crash when we encounter it.
-        return 'Error - the answer you specified is not properly formatted: ' + str(answer)
-
-    this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
-
-    hint_pk_entry = XModuleContentField.objects.get(field_name='hint_pk', definition_id=problem_id)
-    this_pk = int(hint_pk_entry.value)
-    hint_pk_entry.value = this_pk + 1
-    hint_pk_entry.save()
-
-    problem_dict = json.loads(this_problem.value)
-    if answer not in problem_dict:
-        problem_dict[answer] = {}
-    problem_dict[answer][this_pk] = [hint_text, 1]
-    this_problem.value = json.dumps(problem_dict)
-    this_problem.save()
+        return 'Invalid answer for this problem: {ans}'.format(ans=answer)
+    hint_dict = getattr(hinter_module, field)
+    if answer not in hint_dict:
+        hint_dict[answer] = {}
+    hint_dict[answer][hinter_module.hint_pk] = [hint_text, 1]
+    hinter_module.save()
 
 
 def approve(request, course_id, field):
@@ -252,19 +254,13 @@ def approve(request, course_id, field):
         if key == 'op' or key == 'field':
             continue
         problem_id, answer, pk = request.POST.getlist(key)
-        # Can be optimized - sort the delete list by problem_id, and load each problem
-        # from the database only once.
-        problem_in_mod = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
-        problem_dict = json.loads(problem_in_mod.value)
-        hint_to_move = problem_dict[answer][pk]
-        del problem_dict[answer][pk]
-        problem_in_mod.value = json.dumps(problem_dict)
-        problem_in_mod.save()
-
-        problem_in_hints = XModuleContentField.objects.get(field_name='hints', definition_id=problem_id)
-        problem_dict = json.loads(problem_in_hints.value)
-        if answer not in problem_dict:
-            problem_dict[answer] = {}
-        problem_dict[answer][pk] = hint_to_move
-        problem_in_hints.value = json.dumps(problem_dict)
-        problem_in_hints.save()
+        hinter_module = _location_to_module(problem_id, request, course_id)
+        try:
+            transfer_hint = copy.copy(hinter_module.mod_queue[answer][pk])
+        except KeyError:
+            return 'Unable to find hint.'
+        del hinter_module.mod_queue[answer][pk]
+        if answer not in hinter_module.hints:
+            hinter_module.hints[answer] = {}
+        hinter_module.hints[answer][pk] = transfer_hint
+        hinter_module.save()

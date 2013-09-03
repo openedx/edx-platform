@@ -1,7 +1,5 @@
 """
 Adds crowdsourced hinting functionality to lon-capa numerical response problems.
-
-Currently experimental - not for instructor use, yet.
 """
 
 import logging
@@ -14,24 +12,44 @@ from pkg_resources import resource_string
 from lxml import etree
 
 from xmodule.x_module import XModule
+from xmodule.capa_module import CapaModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidLocationError
 
 from capa.responsetypes import FormulaResponse
 
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.conf import settings
 
 log = logging.getLogger(__name__)
+
+# A global variable that tracks what problems can have hinting.
+problem_choices = []
+
+
+def get_problem_choices():
+    """
+    Used by studio to get all the problems on the same page as the hinter.
+    """
+    global problem_choices
+    return problem_choices
 
 
 class CrowdsourceHinterFields(object):
     """Defines fields for the crowdsource hinter module."""
     has_children = True
 
-    moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.content,
-                      default='False')
-    debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.content,
-                   default='False')
+    display_name = String(scope=Scope.settings, default='Crowdsourced Hinter')
+    target_problem = String(help='The id of the problem we are hinting for.', scope=Scope.settings,
+                            default='', values=get_problem_choices, display_name='Target problem')
+    moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.settings,
+                      default='False', display_name='Moderate')
+    debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.settings,
+                   default='False', display_name='Debug mode')
     # Usage: hints[answer] = {str(pk): [hint_text, #votes]}
     # hints is a dictionary that takes answer keys.
     # Each value is itself a dictionary, accepting hint_pk strings as keys,
@@ -56,13 +74,13 @@ class CrowdsourceHinterFields(object):
 class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     """
     An Xmodule that makes crowdsourced hints.
-    Currently, only works on capa problems with exactly one numerical response,
-    and no other parts.
+    Currently, only works on capa problems with exactly one numerical or formula response.
 
     Example usage:
-    <crowdsource_hinter>
-        <problem blah blah />
-    </crowdsource_hinter>
+    <crowdsource_hinter target_problem="i4x://my/problem/location" />
+
+    The target_problem should be on the same page as the hinter.  (Otherwise, the hinter would
+    be kind of useless!)
 
     XML attributes:
     -moderate="True" will not display hints until staff approve them in the hint manager.
@@ -75,14 +93,48 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
     def __init__(self, *args, **kwargs):
+        """
+        Sets up the hinting module.  Saves any errors into self.init_error, so that the errors
+        can be displayed in html.  (Instructors will want to see the errors as they are making
+        their courses.)
+        """
         XModule.__init__(self, *args, **kwargs)
-        # We need to know whether we are working with a FormulaResponse problem.
+        self.init_error = None
+
+        # Determine whether we are in Studio.  In Studio, accessing self.hints raises
+        # an exception.
+        self.in_studio = False
         try:
-            responder = self.get_display_items()[0].lcp.responders.values()[0]
-        except (IndexError, AttributeError):
-            log.exception('Unable to find a capa problem child.')
+            self.hints
+        except TypeError:
+            self.in_studio = True
+            self.setup_studio()
+
+        # Get the problem we are hinting for.
+        try:
+            problem_loc = Location(self.target_problem)
+        except InvalidLocationError:
+            # This means the location wasn't chosen at all.
+            self.init_error = _('''Choose a target problem under Edit -> Settings.  Hinting will
+                be enabled on the first response blank of the problem you choose.  Right now,
+                hinting only works on numerical and formula response blanks.''')
+            return
+        course_id = '/'.join(str(problem_loc).split('/')[1:3])
+        problem_descriptors = modulestore().get_items(problem_loc, course_id=course_id)
+        try:
+            self.problem_module = self.system.get_module(problem_descriptors[0])
+        except IndexError:
+            self.init_error = _('The problem you specified could not be found!')
             return
 
+        # Find the responder for this problem,
+        try:
+            responder = self.problem_module.lcp.responders.values()[0]
+        except IndexError:
+            self.init_error = _('The problem you specified does not have any response blanks!')
+            return
+
+        # We need to know whether we are working with a FormulaResponse problem.
         self.is_formula = isinstance(self, FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str
@@ -95,36 +147,91 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             self.validate_answer = responder.validate_answer
         else:
             # This response type is not supported!
-            log.exception('Response type not supported for hinting: ' + str(responder))
+            self.init_error = _('Response type not supported for hinting.')
+            log.exception(self.init_error)
 
     def get_html(self):
         """
-        Puts a wrapper around the problem html.  This wrapper includes ajax urls of the
-        hinter and of the problem.
-        - Dependent on lon-capa problem.
+        In student views - loads a little stub of HTML where hints will go.
+
+        In studio - shows any errors in the configuration of this hinting module, or
+        a little blurb if there are no errors.
         """
-        if self.debug == 'True':
-            # Reset the user vote, for debugging only!
-            self.user_voted = False
-        if self.hints == {}:
-            # Force self.hints to be written into the database.  (When an xmodule is initialized,
-            # fields are not added to the db until explicitly changed at least once.)
-            self.hints = {}
+        # Display any errors generated in __init__.  This is mostly for instructors to
+        # see in Studio.
+        if self.init_error is not None:
+            return unicode(self.init_error)
 
-        try:
-            child = self.get_display_items()[0]
-            out = child.get_html()
-            # The event listener uses the ajax url to find the child.
-            child_url = child.system.ajax_url
-        except IndexError:
-            out = 'Error in loading crowdsourced hinter - can\'t find child problem.'
-            child_url = ''
+        if self.in_studio:
+            # We're in studio mode.
 
-        # Wrap the module in a <section>.  This lets us pass data attributes to the javascript.
-        out += '<section class="crowdsource-wrapper" data-url="' + self.system.ajax_url +\
-            '" data-child-url = "' + child_url + '"> </section>'
+            # Take the entire url
+            # - minus the last two segments
+            # - minus the i4x
+            # - append /hint_manager
+            # - prepend LMS_BASE/courses/
+            # Ex: i4x://Me/19.001/crowdsource_hinter/ec4d140d58114daeabb6f1819547decf@draft
+            # -> localhost:8000/courses/Me/19.001/hint_manager
+            manager_url = settings.LMS_BASE + '/courses' +\
+                '/'.join(self.location.url().split('/')[1:-2]) + '/hint_manager'
+            return _('''This is a crowdsourced hinting module for {name}.  This message is only
+                visible in Studio - your students will see the actual hinting module.
+                <br /><br />
+                To add or moderate hints, visit <a href="{manager_url}">{manager_url}</a>''').format(
+                    name=self.problem_module.display_name_with_default,
+                    manager_url=manager_url,
+                )
+        else:
+            if self.debug == 'True':
+                # Reset the user vote, for debugging only!
+                self.user_voted = False
+            if self.hints == {}:
+                # Force self.hints to be written into the database.  (When an xmodule is initialized,
+                # fields are not added to the db until explicitly changed at least once.)
+                self.hints = {}
 
+        # The event listener uses the ajax url to find the child.
+        child_url = self.problem_module.system.ajax_url
+
+        # Return a little section for displaying hints.
+        out = '<section class="crowdsource-wrapper" data-url="{url}" data-child-url="{child_url}"> </section>'.format(
+            url=self.system.ajax_url, child_url=child_url)
         return out
+
+    def setup_studio(self):
+        global problem_choices
+        """
+        Create a list of problems within this section, to offer as choices for the
+        target problem.
+        Updates a global variable; does not return anything.
+        """
+        # problem_choies contains dictionaries of {'display_name': readable name,
+        # 'value': system name}, each representing a choice.
+        # The choices should be all problems in the same section as this hinter
+        # module.
+        problem_choices = [{'display_name': _('None selected'),
+                            'value': ''}]
+        # Find the parent of this module.
+        # This is sort of clunky - we have to loop through all modules.
+        all_modules = modulestore().get_items(Location(course=self.location.course, revision='draft'))
+        def get_parent(child_module, modules):
+            """Find, through brute force, which of modules is the parent of child_module."""
+            for candidate_parent in modules:
+                for child in candidate_parent.get_children():
+                    if child_module.descriptor.location == child.location:
+                        return candidate_parent
+
+        parent = get_parent(self, all_modules)
+        if parent is None:
+            # Weird... not supposed to happen.  Just get out.
+            log.exception('Unable to find parent of hinter module!')
+            return
+
+        # Add all problems that are children of our parent.
+        for descriptor in parent.get_children():
+            if descriptor.module_class == CapaModule:
+                problem_choices.append({'display_name': descriptor.display_name_with_default,
+                                        'value': str(descriptor.location)})
 
     def numerical_answer_to_str(self, answer):
         """
@@ -297,7 +404,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
-            return {'error': 'Sorry, but you have already voted!'}
+            return {'error': _('Sorry, but you have already voted!')}
         ans = data['answer']
         if not self.validate_answer(ans):
             # Uh oh.  Invalid answer.
@@ -351,10 +458,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if not self.validate_answer(answer):
             log.exception('Failure in hinter submit_hint: Unable to parse answer: {ans}'.format(
                           ans=answer))
-            return {'error': 'Could not submit answer'}
+            return {'error': _('Could not submit answer')}
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:
-            return {'message': 'Sorry, but you have already voted!'}
+            return {'message': _('Sorry, but you have already voted!')}
         # Add the new hint to self.hints or self.mod_queue.  (Awkward because a direct write
         # is necessary.)
         if self.moderate == 'True':
@@ -374,7 +481,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.user_voted = True
         self.previous_answers = []
         self.user_submissions = []
-        return {'message': 'Thank you for your hint!'}
+        return {'message': _('Thank you for your hint!')}
 
 
 class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, RawDescriptor):
