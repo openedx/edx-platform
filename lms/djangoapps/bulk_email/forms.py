@@ -1,3 +1,6 @@
+"""
+Defines a form for providing validation of CourseEmail templates.
+"""
 import logging
 
 from django import forms
@@ -11,7 +14,7 @@ log = logging.getLogger(__name__)
 class CourseEmailTemplateForm(forms.ModelForm):
     """Form providing validation of CourseEmail templates."""
 
-    class Meta:
+    class Meta:  # pylint: disable=C0111
         model = CourseEmailTemplate
 
     def _validate_template(self, template):
