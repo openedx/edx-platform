@@ -125,7 +125,7 @@
   }
 
   .expandable-area {
-    @include transition(opacity 0.25s ease-in-out 0s);
+    @include transition(opacity 0.25s ease-in-out 0s, height 0.25s ease-in-out 0s);
   }
 
   // STATE: active
@@ -145,8 +145,10 @@
     }
 
     .expandable-area {
-      display: none;
+      visibility: none;
+      height: 0;
       opacity: 0.0;
+      overflow: scroll;
     }
   }
 
@@ -159,7 +161,8 @@
     }
 
     .expandable-area {
-      display: block;
+      visibility: visible;
+      height: ($baseline*10.5);
       opacity: 1.0;
     }
   }
@@ -875,9 +878,21 @@
   .cam {
 
     .placeholder-cam {
-      @include size(500px 375px);
-      margin: $baseline auto;
-      background: $m-blue-d1;
+      width: 95%;
+      height: 375px;
+      margin: ($baseline/2) auto;
+      background: $m-blue-l5;
+
+      // placeholders
+      .placeholder-art {
+        opacity: 0.5;
+      }
+
+      // previously defined in HTML
+      video, canvas {
+        display: block;
+        @include size(100% 100%);
+      }
     }
 
     .controls {
@@ -1264,6 +1279,24 @@
   // VIEW: requirements
   &.step-requirements {
 
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step0 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
     // progress indicator
     .progress-sts-value {
       width: 0%;
@@ -1396,6 +1429,37 @@
   // VIEW: take cam photo
   &.step-photos-cam {
 
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0 {
+        border-bottom: ($baseline/5) solid $m-green-l2;
+
+        .wrapper-step-number {
+          border-color: $m-green-l2;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
     // progress indicator
     .progress-sts-value {
       width: 20%;
@@ -1404,6 +1468,37 @@
 
   // VIEW: take id photo
   &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-green-l2;
+
+        .wrapper-step-number {
+          border-color: $m-green-l2;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
 
     // progress indicator
     .progress-sts-value {
@@ -1449,6 +1544,37 @@
       }
     }
 
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1, &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-green-l2;
+
+        .wrapper-step-number {
+          border-color: $m-green-l2;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
     // progress indicator
     .progress-sts-value {
       width: 60%;
@@ -1457,6 +1583,37 @@
 
   // VIEW: take and review photos
   &.step-confirmation {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1, &#progress-step2, &#progress-step3, &#progress-step4 {
+        border-bottom: ($baseline/5) solid $m-green-l2;
+
+        .wrapper-step-number {
+          border-color: $m-green-l2;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step5 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
 
     // progress indicator
     .progress-sts-value {
