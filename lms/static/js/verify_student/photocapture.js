@@ -22,10 +22,11 @@ var submitToPaymentProcessing = function() {
   {
       contribution = contribution_input.val();
   }
+  var course_id = $("input[name='course_id']").val();
   var xhr = $.post(
-    "create_order",
+    "/verify_student/create_order",
     {
-      "course_id" : "${course_id}",
+      "course_id" : course_id,
       "contribution": contribution
     },
     function(data) {
