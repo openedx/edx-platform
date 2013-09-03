@@ -29,11 +29,13 @@ from xmodule.contentstore.django import _CONTENTSTORE
 # to use staticfiles.
 try:
     import staticfiles
+    import staticfiles.handlers
 except ImportError:
     pass
 else:
     import sys
     sys.modules['django.contrib.staticfiles'] = staticfiles
+    sys.modules['django.contrib.staticfiles.handlers'] = staticfiles.handlers
 
 LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
