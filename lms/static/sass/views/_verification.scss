@@ -1080,6 +1080,10 @@
   // VIEW: select a track
   &.step-select-track {
 
+    .sts-track {
+      @extend .text-sr;
+    }
+
     .form-register-choose {
       @include clearfix();
       width: flex-grid(12,12);
@@ -1214,6 +1218,7 @@
       .title {
         @extend .hd-lv4;
         @extend .t-weight4;
+        margin-top: $baseline;
         margin-bottom: ($baseline/2);
       }
 

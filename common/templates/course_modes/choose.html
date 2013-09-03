@@ -37,14 +37,7 @@ $(document).ready(function() {
 <div class="container">
   <section class="wrapper">
 
-    <header class="page-header">
-      <h2 class="title">
-        <span class="wrapper-sts">
-          <span class="sts">${_("You are registering for")}</span>
-          <span class="sts-course">${course_id} </span>
-        </span>
-      </h2>
-    </header>
+    <%include file="/verify_student/_verification_header.html" />
 
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
@@ -153,9 +146,13 @@ $(document).ready(function() {
 
           <div class="help help-register">
             <h3 class="title">${_("Verified Registration Requirements")}</h3>
-
             <div class="copy">
               <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")} <a href="">${_("View requirements")}</a></p>
+            </div>
+
+            <h3 class="title">${_("What is an ID Verified Certificate?")}</h3>
+            <div class="copy">
+              <p>${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.")}</p>
             </div>
           </div>
           % endif
@@ -165,32 +162,7 @@ $(document).ready(function() {
       </article>
     </div> <!-- /wrapper-content-main -->
 
-    <div class="wrapper-content-supplementary">
-      <aside class="content-supplementary">
-        <ul class="list-help">
-          <li class="help-item">
-            <h3 class="title">${_("What is an ID Verified Certificate?")}</h3>
-            <div class="copy">
-              <p>${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.")}</p>
-            </div>
-          </li>
-
-          <li class="help-item">
-            <h3 class="title">${_("Have questions?")}</h3>
-            <div class="copy">
-              <p>${_("Please read ")}<a rel="external" href="">${_("our FAQs to view common questions about our certificates")}</a>${_(".")}</p>
-            </div>
-          </li>
-
-          <li class="help-item">
-            <h3 class="title">${_("Not the course you wanted?")}</h3>
-            <div class="copy">
-                <p><a href="${marketing_link('COURSES')}">${_("Return to our course listings to find another course")}</a></p>
-            </div>
-          </li>
-        </ul>
-      </aside>
-    </div> <!-- /wrapper-content-supplementary -->
+    <%include file="/verify_student/_verification_support.html" />
   </section>
 </div>
 </%block>
