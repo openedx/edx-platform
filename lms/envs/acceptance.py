@@ -19,6 +19,7 @@ import logging
 logging.disable(logging.ERROR)
 import os
 from random import choice, randint
+import string
 
 
 def seed():
@@ -82,6 +83,23 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# Enable fake payment processing page
+MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
+# Configure the payment processor to use the fake processing page
+# Since both the fake payment page and the shoppingcart app are using
+# the same settings, we can generate this randomly and guarantee
+# that they are using the same secret.
+RANDOM_SHARED_SECRET = ''.join(
+    choice(string.letters + string.digits + string.punctuation)
+    for x in range(250)
+)
+
+CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
+CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
