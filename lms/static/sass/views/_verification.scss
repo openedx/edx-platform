@@ -878,9 +878,21 @@
   .cam {
 
     .placeholder-cam {
-      @include size(500px 375px);
-      margin: $baseline auto;
-      background: $m-blue-d1;
+      width: 95%;
+      height: 375px;
+      margin: ($baseline/2) auto;
+      background: $m-blue-l5;
+
+      // placeholders
+      .placeholder-art {
+        opacity: 0.5;
+      }
+
+      // previously defined in HTML
+      video, canvas {
+        display: block;
+        @include size(100% 100%);
+      }
     }
 
     .controls {
