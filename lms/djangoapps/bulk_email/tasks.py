@@ -130,7 +130,7 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
     optouts = set(optouts)
     num_optout = len(optouts)
 
-    to_list = filter(lambda x: x['email'] not in optouts, to_list)
+    to_list = [recipient for recipient in to_list if recipient['email'] not in optouts]
 
     subject = "[" + course_title + "] " + msg.subject
 
@@ -226,6 +226,8 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
         log.exception('Email with id %d caused course_email task to fail with uncaught exception. To list: %s',
                       email_id,
                       [i['email'] for i in to_list])
+        # Close the connection before we exit
+        connection.close()
         raise
 
 
