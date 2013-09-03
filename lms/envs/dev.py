@@ -263,6 +263,9 @@ if SEGMENT_IO_LMS_KEY:
 ########################## USER API ########################
 EDX_API_KEY = None
 
+########################## QUERYABLE TABLES ########################
+INSTALLED_APPS += ('queryable',)
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
