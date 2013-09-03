@@ -4,7 +4,6 @@
 from lettuce import world, step
 from lettuce.django import django_url
 from course_modes.models import CourseMode
-from selenium.common.exceptions import WebDriverException
 from nose.tools import assert_equal
 
 def create_cert_course():
@@ -161,8 +160,7 @@ def confirm_details_match(step):
 
 @step(u'I am at the payment page')
 def at_the_payment_page(step):
-    world.css_find('input')
-    assert_equal(world.browser.title, u'Payment Form')
+    assert world.css_find('input[name=transactionSignature]')
 
 
 @step(u'I submit valid payment information$')
