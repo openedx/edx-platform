@@ -118,7 +118,7 @@
   <div class="upload-modal modal">
     <a href="#" class="close-button"><span class="close-icon"></span></a>
       <div class="modal-body">
-        <h1>S{_("Upload New File")}</h1>
+        <h1>${_("Upload New File")}</h1>
         <p class="file-name"></a>
         <div class="progress-bar">
           <div class="progress-fill"></div>
@@ -129,7 +129,7 @@
       </div>
         <form class="file-chooser" action="${upload_asset_callback_url}"
                                 method="post" enctype="multipart/form-data">
-          <a href="#" class="choose-file-button">Choose File</a>
+          <a href="#" class="choose-file-button">${_("Choose File")}</a>
           <input type="file" class="file-input" name="files[]" multiple>
         </form>
       </div>

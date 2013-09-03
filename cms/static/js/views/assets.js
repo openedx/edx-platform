@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.uploads .upload-button').bind('click', showUploadModal);
-    $('.upload-modal .close-button').bind('click', resetUploadModal);
+    $('.upload-modal .close-button').bind('click', hideModal);
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $('.remove-asset-button').bind('click', removeAsset);
 });
@@ -52,6 +52,7 @@ function removeAsset(e){
 
 function showUploadModal(e) {
     e.preventDefault();
+    resetUploadModal();
     resetUploadBar();
     $modal = $('.upload-modal').show();
     $('.upload-modal .file-chooser').fileupload({
@@ -108,7 +109,6 @@ function resetUploadModal() {
     $('.upload-modal .choose-file-button').html(gettext('Choose File'));
     $('.upload-modal .embeddable-xml-input').val('');
     $('.upload-modal .embeddable').hide();
-    hideModal();
 }
 
 function showUploadFeedback(event, percentComplete) {
