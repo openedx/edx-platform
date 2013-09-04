@@ -715,7 +715,9 @@
           text-align: right;
 
           .action-retakephotos a {
-            @extend .btn-primary-gray;
+            @extend .btn-primary-blue;
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
           }
         }
       }
@@ -839,7 +841,9 @@
           text-align: right;
 
           .action-editname a {
-            @extend .btn-primary-gray;
+            @extend .btn-primary-blue;
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
           }
         }
       }

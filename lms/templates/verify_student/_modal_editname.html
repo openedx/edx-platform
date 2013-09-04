@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <section id="edit-name" class="modal">
-<header>
+  <header>
   <h4>${_("Edit Your Full Name")}</h4>
 </header>
   <form id="course-checklists" class="course-checklists" method="post" action="">
@@ -22,6 +22,6 @@
   </form>
   <a href="#" data-dismiss="modal" rel="view" class="action action-close action-editname-close">
     <i class="icon-remove-sign"></i>
-    <span class="label">close</span>
+    <span class="label">${_("close")}</span>
   </a>
 </section>
