@@ -126,7 +126,7 @@ function () {
                 // the volume clontrol.
                 state.volumeBlur = true;
                 // The following field is used in video_speed_control to track 
-                // the element that had the focus.
+                // the element that had the focus before it.
                 state.previousFocus = 'volume';
             });
     }
