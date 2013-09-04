@@ -197,9 +197,15 @@ def high_level_source_in_editor(step):
 
 
 def verify_high_level_source_links(step, visible):
-    assert_equal(visible, world.is_css_present('.launch-latex-compiler'))
+    if visible:
+        assert world.is_css_present('.launch-latex-compiler')
+    else:
+        assert world.is_css_not_present('.launch-latex-compiler')
     world.cancel_component(step)
-    assert_equal(visible, world.is_css_present('.upload-button'))
+    if visible:
+        assert world.is_css_present('.upload-button')
+    else:
+        assert world.is_css_not_present('.upload-button')
 
 
 def verify_modified_weight():

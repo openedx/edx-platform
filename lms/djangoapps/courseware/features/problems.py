@@ -101,6 +101,9 @@ def input_problem_answer(_, problem_type, correctness):
 
 @step(u'I check a problem')
 def check_problem(step):
+    # first scroll down so the loading mathjax button does not
+    # cover up the Check button
+    world.browser.execute_script("window.scrollTo(0,1024)")
     world.css_click("input.check")
 
 

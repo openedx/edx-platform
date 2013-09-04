@@ -5,7 +5,7 @@ from lettuce import world, step
 from common import create_studio_user
 from django.contrib.auth.models import Group
 from auth.authz import get_course_groupname_for_role, get_user_by_email
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -112,12 +112,12 @@ def other_user_login(_step, name):
 @step(u's?he does( not)? see the course on (his|her) page')
 def see_course(_step, inverted, gender='self'):
     class_css = 'h3.course-title'
-    all_courses = world.css_find(class_css, wait_time=1)
-    all_names = [item.html for item in all_courses]
     if inverted:
-        assert not world.scenario_dict['COURSE'].display_name in all_names
+        assert world.is_css_not_present(class_css)
     else:
-        assert world.scenario_dict['COURSE'].display_name in all_names
+        all_courses = world.css_find(class_css)
+        all_names = [item.html for item in all_courses]
+        assert_in(world.scenario_dict['COURSE'].display_name, all_names)
 
 
 @step(u'"([^"]*)" should( not)? be marked as an admin')

@@ -93,7 +93,9 @@ def assert_policy_entries(expected_keys, expected_values):
     for key, value in zip(expected_keys, expected_values):
         index = get_index_of(key)
         assert_false(index == -1, "Could not find key: {key}".format(key=key))
-        assert_equal(value, world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+        found_value = world.css_find(VALUE_CSS)[index].value
+        assert_equal(value, found_value,
+            "{} is not equal to {}".format(value, found_value))
 
 
 def get_index_of(expected_key):

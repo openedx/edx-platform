@@ -12,7 +12,7 @@ def i_fill_in_the_registration_form(step):
         register_form.find_by_name('password').fill('test')
         register_form.find_by_name('username').fill('robot-studio')
         register_form.find_by_name('name').fill('Robot Studio')
-        register_form.find_by_name('terms_of_service').check()
+        register_form.find_by_name('terms_of_service').click()
     world.retry_on_exception(fill_in_reg_form)
 
 
