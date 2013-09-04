@@ -196,8 +196,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         ((template, context), _) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item.orderitem_ptr, context['order_items'])
-        self.assertIn(cert_item.orderitem_ptr, context['order_items'])
+        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(cert_item, context['order_items'])
         self.assertFalse(context['any_refunds'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
