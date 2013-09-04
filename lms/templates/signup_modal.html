@@ -181,6 +181,10 @@
         </div>
         </div>
 
+            <input id="signup_tos" name="terms_of_service" type="hidden" value="true">
+            <input id="signup_honor" name="honor_code" type="hidden" value="true">
+        
+<!--
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
@@ -195,7 +199,7 @@
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
               link_end='</a>')}
           </label>
-        </div>
+        </div>-->
 
         <div class="submit">
           <input name="submit" type="submit" value="${_('Create My Account')}">
