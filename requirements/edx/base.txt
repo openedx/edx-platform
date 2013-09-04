@@ -28,6 +28,7 @@ fs==0.4.0
 GitPython==0.3.2.RC1
 glob2==0.3
 lxml==3.0.1
+mailsnake==1.6.2
 mako==0.7.3
 Markdown==2.2.1
 networkx==1.7
