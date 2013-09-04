@@ -175,8 +175,17 @@ $(document).ready(function() {
   $("#confirm_pics_good").change(function() {
       $("#pay_button").toggleClass('disabled');
   });
+
   
-  $("#pay_button_frame").addClass('disabled');
+  // add in handlers to add/remove the correct classes to the body
+  // when moving between steps
+  $('#face_next_button').click(function(){ 
+      $('body').addClass('step-photos-id').removeClass('step-photos-cam')
+  })
+
+  $('#photo_id_next_button').click(function(){ 
+      $('body').addClass('step-review').removeClass('step-photos-id')
+  })
 
   var hasHtml5CameraSupport = initVideoCapture();
 
