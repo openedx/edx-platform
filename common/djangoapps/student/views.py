@@ -162,7 +162,7 @@ def cert_info(user, course):
     'survey_url': url, only if show_survey_button is True
     'grade': if status is not 'processing'
     """
-    if not course.has_ended():
+    if hasattr(course, 'has_ended') and not course.has_ended():
         return {}
 
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
@@ -761,8 +761,11 @@ def exam_registration_info(user, course):
     exam of the course.  Returns None if the user is not registered, or if there is no
     current exam for the course.
     """
-    exam_info = course.current_test_center_exam
-    if exam_info is None:
+    if hasattr(course, 'current_test_center_exam'):
+        exam_info =  course.current_test_center_exam
+        if exam_info is None:
+            return None
+    else:
         return None
 
     exam_code = exam_info.exam_series_code
