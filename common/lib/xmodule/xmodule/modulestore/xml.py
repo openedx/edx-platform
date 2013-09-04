@@ -173,7 +173,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                msg = "Error loading from xml. " + str(err)[:200]
+                msg = "Error loading from xml. " + unicode(err)[:200]
                 log.warning(msg)
                 # Normally, we don't want lots of exception traces in our logs from common
                 # content problems.  But if you're debugging the xml loading code itself,
@@ -317,7 +317,8 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir.encode("utf-8"),
+                    unicode(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
@@ -493,8 +494,9 @@ class XMLModuleStore(ModuleStoreBase):
                     module.save()
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
-                    system.error_tracker("ERROR: " + str(e))
+                    logging.exception("Failed to load %s. Skipping... \
+                            Exception: %s", filepath, unicode(e))
+                    system.error_tracker("ERROR: " + unicode(e))
 
     def get_instance(self, course_id, location, depth=0):
         """
