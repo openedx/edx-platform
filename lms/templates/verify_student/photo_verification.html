@@ -251,8 +251,6 @@
                     <h4 class="title">${_("Check Your Name")}</h4>
 
                     <div class="copy">
-                      <!-- FIXME: not sure how to handle variables w/in translation context -->
-                      ${_("Contact {platform_name}").format(platform_name=settings.PLATFORM_NAME)}
                       <p>${_("Make sure your full name on your edX account ({}) matches your ID. We will also use this as the name on your certificate.").format(user_full_name)}</p>
                     </div>
 
