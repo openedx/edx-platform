@@ -392,7 +392,7 @@ def cas_login(request, next_page=None, required=False):
         Uses django_cas for authentication.
         CAS is a common authentcation method pioneered by Yale.
         See http://en.wikipedia.org/wiki/Central_Authentication_Service
-        
+
         Does normal CAS login then generates user_profile if nonexistent,
         and if login was successful.  We assume that user details are
         maintained by the central service, and thus an empty user profile
@@ -400,12 +400,12 @@ def cas_login(request, next_page=None, required=False):
     """
 
     ret = django_cas_login(request, next_page, required)
-    
+
     if request.user.is_authenticated():
         user = request.user
         if not UserProfile.objects.filter(user=user):
-            up = UserProfile(name=user.username, user=user)
-            up.save()
+            user_profile = UserProfile(name=user.username, user=user)
+            user_profile.save()
 
     return ret
 

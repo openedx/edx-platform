@@ -862,7 +862,6 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
-        )
+    )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
-    
