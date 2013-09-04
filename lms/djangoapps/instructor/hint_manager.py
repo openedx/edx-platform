@@ -1,8 +1,10 @@
 """
 Views for hint management.
 
-Along with the crowdsource_hinter xmodule, this code is still
-experimental, and should not be used in new courses, yet.
+Get to these views through courseurl/hint_manager.
+For example: https://courses.edx.org/courses/MITx/2.01x/2013_Spring/hint_manager
+
+These views will only be visible if MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 """
 
 import json
@@ -15,12 +17,17 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from courseware.courses import get_course_with_access
 from courseware.models import XModuleContentField
+import courseware.module_render as module_render
+import courseware.model_data as model_data
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 
 
 @ensure_csrf_cookie
 def hint_manager(request, course_id):
+    """
+    The URL landing function for all calls to the hint manager, both POST and GET.
+    """
     try:
         get_course_with_access(request.user, course_id, 'staff', depth=None)
     except Http404:
@@ -28,24 +35,29 @@ def hint_manager(request, course_id):
         return HttpResponse(out)
     if request.method == 'GET':
         out = get_hints(request, course_id, 'mod_queue')
-        return render_to_response('courseware/hint_manager.html', out)
+        out.update({'error': ''})
+        return render_to_response('instructor/hint_manager.html', out)
     field = request.POST['field']
     if not (field == 'mod_queue' or field == 'hints'):
         # Invalid field.  (Don't let users continue - they may overwrite other db's)
         out = 'Error in hint manager - an invalid field was accessed.'
         return HttpResponse(out)
 
-    if request.POST['op'] == 'delete hints':
-        delete_hints(request, course_id, field)
-    if request.POST['op'] == 'switch fields':
-        pass
-    if request.POST['op'] == 'change votes':
-        change_votes(request, course_id, field)
-    if request.POST['op'] == 'add hint':
-        add_hint(request, course_id, field)
-    if request.POST['op'] == 'approve':
-        approve(request, course_id, field)
-    rendered_html = render_to_string('courseware/hint_manager_inner.html', get_hints(request, course_id, field))
+    switch_dict = {
+        'delete hints': delete_hints,
+        'switch fields': lambda *args: None,    # Takes any number of arguments, returns None.
+        'change votes': change_votes,
+        'add hint': add_hint,
+        'approve': approve,
+    }
+
+    # Do the operation requested, and collect any error messages.
+    error_text = switch_dict[request.POST['op']](request, course_id, field)
+    if error_text is None:
+        error_text = ''
+    render_dict = get_hints(request, course_id, field)
+    render_dict.update({'error': error_text})
+    rendered_html = render_to_string('instructor/hint_manager_inner.html', render_dict)
     return HttpResponse(json.dumps({'success': True, 'contents': rendered_html}))
 
 
@@ -165,7 +177,13 @@ def change_votes(request, course_id, field):
     Updates the number of votes.
 
     The numbered fields of `request.POST` contain [problem_id, answer, pk, new_votes] tuples.
-    - Very similar to `delete_hints`.  Is there a way to merge them?  Nah, too complicated.
+    See `delete_hints`.
+
+    Example `request.POST`:
+    {'op': 'delete_hints',
+     'field': 'mod_queue',
+      1: ['problem_whatever', '42.0', '3', 42],
+      2: ['problem_whatever', '32.5', '12', 9001]}
     """
 
     for key in request.POST:
@@ -193,6 +211,18 @@ def add_hint(request, course_id, field):
     problem_id = request.POST['problem']
     answer = request.POST['answer']
     hint_text = request.POST['hint']
+
+    # Validate the answer.  This requires initializing the xmodules, which
+    # is annoying.
+    loc = Location(problem_id)
+    descriptors = modulestore().get_items(loc, course_id=course_id)
+    m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
+    hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
+    if not hinter_module.validate_answer(answer):
+        # Invalid answer.  Don't add it to the database, or else the
+        # hinter will crash when we encounter it.
+        return 'Error - the answer you specified is not properly formatted: ' + str(answer)
+
     this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
 
     hint_pk_entry = XModuleContentField.objects.get(field_name='hint_pk', definition_id=problem_id)
@@ -214,6 +244,8 @@ def approve(request, course_id, field):
     hint list.  POST:
     op, field
     (some number) -> [problem, answer, pk]
+
+    The numbered fields are analogous to those in `delete_hints` and `change_votes`.
     """
 
     for key in request.POST:

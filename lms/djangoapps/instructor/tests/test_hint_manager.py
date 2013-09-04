@@ -2,17 +2,18 @@ import json
 
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from mock import patch, MagicMock
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -137,15 +138,44 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         Check that instructors can add new hints.
         """
+        # Because add_hint accesses the xmodule, this test requires a bunch
+        # of monkey patching.
+        hinter = MagicMock()
+        hinter.validate_answer = lambda string: True
+
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'add hint',
                                        'problem': self.problem_id,
                                        'answer': '3.14',
                                        'hint': 'This is a new hint.'})
-        view.add_hint(post, self.course_id, 'mod_queue')
+        post.user = 'fake user'
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.ModelDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
         problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
         self.assertTrue('3.14' in json.loads(problem_hints))
+
+    def test_addbadhint(self):
+        """
+        Check that instructors cannot add hints with unparsable answers.
+        """
+        # Patching.
+        hinter = MagicMock()
+        hinter.validate_answer = lambda string: False
+
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue',
+                                       'op': 'add hint',
+                                       'problem': self.problem_id,
+                                       'answer': 'fish',
+                                       'hint': 'This is a new hint.'})
+        post.user = 'fake user'
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.ModelDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        self.assertTrue('fish' not in json.loads(problem_hints))
 
     def test_approve(self):
         """

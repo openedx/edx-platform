@@ -12,24 +12,26 @@ import copy
 from django.contrib.auth.models import User
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import _CONTENTSTORE
 
 from xmodule.course_module import CourseDescriptor
 
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
-
+from pymongo import MongoClient
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
@@ -57,6 +59,10 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
+    def tearDown(self):
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def load_test_import_course(self):
         '''
@@ -121,3 +127,9 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
+
+    def test_tab_name_imports_correctly(self):
+        module_store, content_store, course, course_location = self.load_test_import_course()
+        print "course tabs = {0}".format(course.tabs)
+        self.assertEqual(course.tabs[2]['name'],'Syllabus')
+        

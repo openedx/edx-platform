@@ -270,15 +270,18 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, **kwargs):
+                 user=None, password=None, mongo_options=None, **kwargs):
 
-        super(MongoModuleStore, self).__init__()
+        super(MongoModuleStore, self).__init__(**kwargs)
+
+        if mongo_options is None:
+            mongo_options = {}
 
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port,
             tz_aware=True,
-            **kwargs
+            **mongo_options
         )[db][collection]
 
         if user is not None and password is not None:
@@ -312,7 +315,7 @@ class MongoModuleStore(ModuleStoreBase):
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
         query = {'_id.org': location.org,
                  '_id.course': location.course,
-                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical', 'videosequence',
                                           'wrapper', 'problemset', 'conditional', 'randomize']}
                  }
         # we just want the Location, children, and inheritable metadata
@@ -791,7 +794,7 @@ class MongoModuleStore(ModuleStoreBase):
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
-                    tab['name'] = metadata.get('display_name')
+                    tab['name'] = tab.get('name', metadata.get('display_name'))
                     break
             course.tabs = existing_tabs
             # Save the updates to the course to the MongoKeyValueStore

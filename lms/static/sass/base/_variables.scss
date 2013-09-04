@@ -64,7 +64,20 @@ $green: rgb(37, 184, 90);
 $light-gray: #ddd;
 $dark-gray: #333;
 
+<<<<<<< HEAD
 // COLORS: edx.org marketing site variables
+=======
+// used by descriptor css
+$lightGrey: #edf1f5;
+$darkGrey: #8891a1;
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d4: shade($blue,80%);
+$shadow: rgba($black, 0.2);
+$shadow-l1: rgba($black, 0.1);
+
+// edx.org marketing site variables
+>>>>>>> master
 $m-gray: #8A8C8F;
 $m-gray-l1: #97999B;
 $m-gray-l2: #A4A6A8;
@@ -266,4 +279,3 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 $f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
-

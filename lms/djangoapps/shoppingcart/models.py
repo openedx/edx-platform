@@ -1,22 +1,27 @@
+from datetime import datetime
 import pytz
 import logging
-from datetime import datetime
+import smtplib
+
 from django.db import models
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
 from model_utils.managers import InheritanceManager
-from courseware.courses import get_course_about_section
-
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
 
 from course_modes.models import CourseMode
+from courseware.courses import get_course_about_section
+from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment
 from statsd import statsd
-from .exceptions import *
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
+
+from .exceptions import InvalidCartItem, PaymentException, PurchasedCallbackException
 
 log = logging.getLogger("shoppingcart")
 
@@ -102,15 +107,17 @@ class Order(models.Model):
         self.purchase_time = datetime.now(pytz.utc)
         self.bill_to_first = first
         self.bill_to_last = last
-        self.bill_to_street1 = street1
-        self.bill_to_street2 = street2
         self.bill_to_city = city
         self.bill_to_state = state
-        self.bill_to_postalcode = postalcode
         self.bill_to_country = country
-        self.bill_to_ccnum = ccnum
-        self.bill_to_cardtype = cardtype
-        self.processor_reply_dump = processor_reply_dump
+        self.bill_to_postalcode = postalcode
+        if settings.MITX_FEATURES['STORE_BILLING_INFO']:
+            self.bill_to_street1 = street1
+            self.bill_to_street2 = street2
+            self.bill_to_ccnum = ccnum
+            self.bill_to_cardtype = cardtype
+            self.processor_reply_dump = processor_reply_dump
+
         # save these changes on the order, then we can tell when we are in an
         # inconsistent state
         self.save()
@@ -119,6 +126,18 @@ class Order(models.Model):
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
         for item in orderitems:
             item.purchase_item()
+
+        # send confirmation e-mail
+        subject = _("Order Payment Confirmation")
+        message = render_to_string('emails/order_confirmation_email.txt', {
+            'order': self,
+            'order_items': orderitems
+        })
+        try:
+            send_mail(subject, message,
+                      settings.DEFAULT_FROM_EMAIL, [self.user.email])
+        except smtplib.SMTPException:
+            log.error('Failed sending confirmation e-mail for order %d', self.id)
 
 
 class OrderItem(models.Model):
@@ -186,6 +205,7 @@ class OrderItem(models.Model):
         only one item in the order
         """
         return'shoppingcart/receipt.html'
+
 
 class PaidCourseRegistration(OrderItem):
     """
@@ -312,8 +332,8 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = "{mode} certificate for course {course_id}".format(mode=item.mode,
-                                                                            course_id=course_id)
+        item.line_desc = _("{mode} certificate for course {course_id}").format(mode=item.mode,
+                                                                               course_id=course_id)
         item.currency = currency
         order.currency = currency
         order.save()

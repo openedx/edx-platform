@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
-from nose.tools import assert_true, assert_false, assert_equal
+from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=E0611
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -168,15 +168,18 @@ def i_see_new_course_image(_step):
     img = images[0]
     expected_src = '/c4x/MITx/999/asset/image.jpg'
     # Don't worry about the domain in the URL
-    assert img['src'].endswith(expected_src)
+    try:
+        assert img['src'].endswith(expected_src)
+    except AssertionError as e:
+        e.args += ('Was looking for {}'.format(expected_src), 'Found {}'.format(img['src']))
+        raise
 
 
 @step('the image URL should be present in the field')
 def image_url_present(_step):
     field_css = '#course-image-url'
-    field = world.css_find(field_css).first
     expected_value = '/c4x/MITx/999/asset/image.jpg'
-    assert field.value == expected_value
+    assert world.css_value(field_css) == expected_value
 
 
 ############### HELPER METHODS ####################

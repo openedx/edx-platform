@@ -16,11 +16,6 @@ from requests import put
 from base64 import encodestring
 from json import dumps
 
-# Let the LMS and CMS do their one-time setup
-# For example, setting up mongo caches
-# These names aren't used, but do important work on import.
-from lms import one_time_startup        # pylint: disable=W0611
-from cms import one_time_startup        # pylint: disable=W0611
 from pymongo import MongoClient
 import xmodule.modulestore.django
 from xmodule.contentstore.django import _CONTENTSTORE
@@ -161,9 +156,10 @@ def reset_databases(scenario):
     mongo = MongoClient()
     mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
     _CONTENTSTORE.clear()
-    modulestore = xmodule.modulestore.django.modulestore()
+
+    modulestore = xmodule.modulestore.django.editable_modulestore()
     modulestore.collection.drop()
-    xmodule.modulestore.django._MODULESTORES.clear()
+    xmodule.modulestore.django.clear_existing_modulestores()
 
 
 # Uncomment below to trigger a screenshot on error

@@ -10,3 +10,4 @@ graphviz
 mysql
 geos
 mongodb
+lynx

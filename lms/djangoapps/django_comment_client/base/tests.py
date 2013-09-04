@@ -10,14 +10,14 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from util.testing import UrlResetMixin
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from nose.tools import assert_true, assert_equal
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from mock import patch
 
 log = logging.getLogger(__name__)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 

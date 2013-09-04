@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
 from django.conf import settings
@@ -265,9 +265,8 @@ def type_in_codemirror(index, text):
 
 
 def upload_file(filename):
-    file_css = '.upload-dialog input[type=file]'
-    upload = world.css_find(file_css).first
     path = os.path.join(TEST_ROOT, filename)
-    upload._element.send_keys(os.path.abspath(path))
+    world.browser.execute_script("$('input.file-input').css('display', 'block')")
+    world.browser.attach_file('file', os.path.abspath(path))
     button_css = '.upload-dialog .action-upload'
     world.css_click(button_css)

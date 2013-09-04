@@ -915,7 +915,26 @@ class NumericalResponse(LoncapaResponse):
         else:
             return CorrectMap(self.answer_id, 'incorrect')
 
-    # TODO: add check_hint_condition(self, hxml_set, student_answers)
+    def compare_answer(self, ans1, ans2):
+        """
+        Outside-facing function that lets us compare two numerical answers,
+        with this problem's tolerance.
+        """
+        return compare_with_tolerance(
+            evaluator({}, {}, ans1),
+            evaluator({}, {}, ans2),
+            self.tolerance
+        )
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        try:
+            evaluator(dict(), dict(), answer)
+            return True
+        except (StudentInputError, UndefinedVariable):
+            return False
 
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
@@ -1778,46 +1797,24 @@ class FormulaResponse(LoncapaResponse):
             self.correct_answer, given, self.samples)
         return CorrectMap(self.answer_id, correctness)
 
-    def check_formula(self, expected, given, samples):
-        variables = samples.split('@')[0].split(',')
-        numsamples = int(samples.split('@')[1].split('#')[1])
-        sranges = zip(*map(lambda x: map(float, x.split(",")),
-                           samples.split('@')[1].split('#')[0].split(':')))
-
-        ranges = dict(zip(variables, sranges))
-        for _ in range(numsamples):
-            instructor_variables = self.strip_dict(dict(self.context))
-            student_variables = {}
-            # ranges give numerical ranges for testing
-            for var in ranges:
-                # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
-                value = random.uniform(*ranges[var])
-                instructor_variables[str(var)] = value
-                student_variables[str(var)] = value
-            # log.debug('formula: instructor_vars=%s, expected=%s' %
-            # (instructor_variables,expected))
-
-            # Call `evaluator` on the instructor's answer and get a number
-            instructor_result = evaluator(
-                instructor_variables, {},
-                expected, case_sensitive=self.case_sensitive
-            )
+    def tupleize_answers(self, answer, var_dict_list):
+        """
+        Takes in an answer and a list of dictionaries mapping variables to values.
+        Each dictionary represents a test case for the answer.
+        Returns a tuple of formula evaluation results.
+        """
+        out = []
+        for var_dict in var_dict_list:
             try:
-                # log.debug('formula: student_vars=%s, given=%s' %
-                # (student_variables,given))
-
-                # Call `evaluator` on the student's answer; look for exceptions
-                student_result = evaluator(
-                    student_variables,
-                    {},
-                    given,
-                    case_sensitive=self.case_sensitive
-                )
+                out.append(evaluator(
+                    var_dict,
+                    dict(),
+                    answer,
+                    case_sensitive=self.case_sensitive,
+                ))
             except UndefinedVariable as uv:
                 log.debug(
-                    'formularesponse: undefined variable in given=%s',
-                    given
-                )
+                    'formularesponse: undefined variable in formula=%s' % answer)
                 raise StudentInputError(
                     "Invalid input: " + uv.message + " not permitted in answer"
                 )
@@ -1840,17 +1837,70 @@ class FormulaResponse(LoncapaResponse):
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error {0} in formula'.format(ve))
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(given))
+                                        cgi.escape(answer))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(given))
+                                        cgi.escape(answer))
+        return out
 
-            # No errors in student's response--actually test for correctness
-            if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
-                return "incorrect"
-        return "correct"
+    def randomize_variables(self, samples):
+        """
+        Returns a list of dictionaries mapping variables to random values in range,
+        as expected by tupleize_answers.
+        """
+        variables = samples.split('@')[0].split(',')
+        numsamples = int(samples.split('@')[1].split('#')[1])
+        sranges = zip(*map(lambda x: map(float, x.split(",")),
+                           samples.split('@')[1].split('#')[0].split(':')))
+        ranges = dict(zip(variables, sranges))
+
+        out = []
+        for i in range(numsamples):
+            var_dict = {}
+            # ranges give numerical ranges for testing
+            for var in ranges:
+                # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
+                value = random.uniform(*ranges[var])
+                var_dict[str(var)] = value
+            out.append(var_dict)
+        return out
+
+    def check_formula(self, expected, given, samples):
+        """
+        Given an expected answer string, a given (student-produced) answer
+        string, and a samples string, return whether the given answer is
+        "correct" or "incorrect".
+        """
+        var_dict_list = self.randomize_variables(samples)
+        student_result = self.tupleize_answers(given, var_dict_list)
+        instructor_result = self.tupleize_answers(expected, var_dict_list)
+
+        correct = all(compare_with_tolerance(student, instructor, self.tolerance)
+                      for student, instructor in zip(student_result, instructor_result))
+        if correct:
+            return "correct"
+        else:
+            return "incorrect"
+
+    def compare_answer(self, ans1, ans2):
+        """
+        An external interface for comparing whether a and b are equal.
+        """
+        internal_result = self.check_formula(ans1, ans2, self.samples)
+        return internal_result == "correct"
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        var_dict_list = self.randomize_variables(self.samples)
+        try:
+            self.tupleize_answers(answer, var_dict_list)
+            return True
+        except StudentInputError:
+            return False
 
     def strip_dict(self, d):
         ''' Takes a dict. Returns an identical dict, with all non-word

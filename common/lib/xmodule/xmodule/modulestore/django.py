@@ -8,7 +8,16 @@ from __future__ import absolute_import
 from importlib import import_module
 
 from django.conf import settings
+from django.core.cache import get_cache, InvalidCacheBackendError
+from django.dispatch import Signal
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
+
+# We may not always have the request_cache module available
+try:
+    from request_cache.middleware import RequestCache
+    HAS_REQUEST_CACHE = True
+except ImportError:
+    HAS_REQUEST_CACHE = False
 
 _MODULESTORES = {}
 
@@ -39,7 +48,20 @@ def create_modulestore_instance(engine, options):
         if key in _options and isinstance(_options[key], basestring):
             _options[key] = load_function(_options[key])
 
+    if HAS_REQUEST_CACHE:
+        request_cache = RequestCache.get_request_cache()
+    else:
+        request_cache = None
+
+    try:
+        metadata_inheritance_cache = get_cache('mongo_metadata_inheritance')
+    except InvalidCacheBackendError:
+        metadata_inheritance_cache = get_cache('default')
+
     return class_(
+        metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
+        request_cache=request_cache,
+        modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         **_options
     )
 
@@ -55,6 +77,7 @@ def modulestore(name='default'):
 
     return _MODULESTORES[name]
 
+
 _loc_singleton = None
 def loc_mapper():
     """
@@ -69,3 +92,42 @@ def loc_mapper():
         _loc_singleton = LocMapperStore(settings.modulestore_options)
     return _loc_singleton
 
+
+def clear_existing_modulestores():
+    """
+    Clear the existing modulestore instances, causing
+    them to be re-created when accessed again.
+
+    This is useful for flushing state between unit tests.
+    """
+    _MODULESTORES.clear()
+
+
+def editable_modulestore(name='default'):
+    """
+    Retrieve a modulestore that we can modify.
+    This is useful for tests that need to insert test
+    data into the modulestore.
+
+    Currently, only Mongo-backed modulestores can be modified.
+    Returns `None` if no editable modulestore is available.
+    """
+
+    # Try to retrieve the ModuleStore
+    # Depending on the settings, this may or may not
+    # be editable.
+    store = modulestore(name)
+
+    # If this is a `MixedModuleStore`, then we will need
+    # to retrieve the actual Mongo instance.
+    # We assume that the default is Mongo.
+    if hasattr(store, 'modulestores'):
+        store = store.modulestores['default']
+
+    # At this point, we either have the ability to create
+    # items in the store, or we do not.
+    if hasattr(store, 'create_xmodule'):
+        return store
+
+    else:
+        return None

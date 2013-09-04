@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -18,7 +18,7 @@ from django.core import mail
 USER_COUNT = 4
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check Enrollment/Unenrollment with/without auto-enrollment on activation and with/without email notification
@@ -217,7 +217,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         self.assertEqual(mail.outbox[1].subject, 'You have been invited to register for MITx/999/Robot_Super_Course')
         self.assertEqual(mail.outbox[1].body, "Dear student,\n\nYou have been invited to join MITx/999/Robot_Super_Course at edx.org by a member of the course staff.\n\n" +
-                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form.\n" +
+                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form making sure to use student3_1@test.com in the E-mail field.\n" +
                                               "Once you have registered and activated your account, you will see MITx/999/Robot_Super_Course listed on your dashboard.\n\n" +
                                               "----\nThis email was automatically sent from edx.org to student3_1@test.com")
 

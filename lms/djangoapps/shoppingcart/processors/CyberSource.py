@@ -97,7 +97,6 @@ def verify_signatures(params, signed_fields_key='signedFields', full_sig_key='si
     if processor_hash(data) != returned_sig:
         raise CCProcessorSignatureException()
 
-
 def render_purchase_form_html(cart):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
@@ -124,7 +123,6 @@ def get_purchase_params(cart):
 
 def get_purchase_endpoint():
     return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
-
 
 def payment_accepted(params):
     """
