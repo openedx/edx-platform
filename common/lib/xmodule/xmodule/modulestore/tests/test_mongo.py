@@ -4,6 +4,7 @@ from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false
 # pylint: enable=E0611
 import pymongo
+import logging
 from uuid import uuid4
 
 from xblock.fields import Scope
@@ -19,6 +20,7 @@ from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
+log = logging.getLogger(__name__)
 
 HOST = 'localhost'
 PORT = 27017
@@ -59,7 +61,7 @@ class TestMongoModuleStore(object):
         #
         draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple', 'simple_with_draft']
+        courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
         import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
 
         # also test a course with no importing of static content
@@ -100,12 +102,14 @@ class TestMongoModuleStore(object):
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
-        assert_equals(len(courses), 4)
+        assert_equals(len(courses), 5)
         courses.sort(key=lambda c: c.id)
         assert_equals(courses[0].id, 'edX/simple/2012_Fall')
         assert_equals(courses[1].id, 'edX/simple_with_draft/2012_Fall')
         assert_equals(courses[2].id, 'edX/test_import_course/2012_Fall')
-        assert_equals(courses[3].id, 'edX/toy/2012_Fall')
+        assert_equals(courses[3].id, 'edX/test_unicode/2012_Fall')
+        assert_equals(courses[4].id, 'edX/toy/2012_Fall')
+        log.debug(str(courses))
 
     def test_loads(self):
         assert_not_equals(
@@ -119,6 +123,22 @@ class TestMongoModuleStore(object):
         assert_not_equals(
             self.store.get_item("i4x://edX/toy/video/Welcome"),
             None)
+
+    def test_unicode_loads(self):
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/course/2012_Fall"),
+            None)
+        # All items with ascii-only filenames should load properly.
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/video/Welcome"),
+            None)
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/video/Welcome"),
+            None)
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/chapter/Overview"),
+            None)
+
 
     def test_find_one(self):
         assert_not_equals(
@@ -159,9 +179,9 @@ class TestMongoModuleStore(object):
             """
             Helper function for pulling out the name of a given static tab.
 
-            Assumes the information is desired for courses[1] ('toy' course).
+            Assumes the information is desired for courses[4] ('toy' course).
             """
-            return courses[2].tabs[index]['name']
+            return courses[4].tabs[index]['name']
 
         # There was a bug where model.save was not getting called after the static tab name
         # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
