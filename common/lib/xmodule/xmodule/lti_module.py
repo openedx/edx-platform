@@ -1,7 +1,7 @@
 """
 Module that allows to insert LTI tools to page.
 
-Module uses current 0.14.2 version of requests (oauth part).
+Module uses current edx-platform 0.14.2 version of requests (oauth part).
 Please update code when upgrading requests.
 
 Protocol is oauth1, LTI version is 1.1.1:
@@ -21,25 +21,105 @@ log = logging.getLogger(__name__)
 
 
 class LTIFields(object):
-    """provider_url and tool_id together is unique location of LTI in the web.
-
-    Scope settings should be scope content. Expanation by Cale:
-    "There is no difference in presentation to the user yet because
-    there is no sharing between courses.  However, when we get to the point of being
-    able to have multiple courses using the same content,
-    then the distinction between Scope.settings (local to the current course),
-    and Scope.content (shared across all uses of this content in any course)
-    becomes much more clear/necessary."
     """
-    # client_key = String(help="Client key", default='', scope=Scope.settings)
-    # client_secret = String(help="Client secret", default='', scope=Scope.settings)
+    Fields to define and obtain LTI tool from provider are set here,
+    except credentials, which should be set in course settings::
+
+    `lti_id` is id to connect tool with credentials in course settings.
+    `launch_url` is launch url of tool.
+    `custom_parameters` are additional parameters to navigate to proper book and book page.
+
+    For example, for Vitalsource provider, `launch_url` should be
+    *https://bc-staging.vitalsource.com/books/book*,
+    and to get to proper book and book page, you should set custom parameters as::
+
+        vbid=put_book_id_here
+        book_location=page/put_page_number_here
+
+    """
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
     launch_url = String(help="URL of the tool", default='', scope=Scope.settings)
-    custom_parameters = List(help="Custom parameters", scope=Scope.settings)
+    custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
-    '''LTI Module'''
+    '''Module provides LTI integration to course.
+
+    Except usual xmodule structure it proceeds with oauth signing.
+    How it works::
+
+    1. Get credentials from course settings.
+
+    2.  There is minimal set of parameters need to be signed (presented for Vitalsource)::
+
+            user_id
+            oauth_callback
+            lis_outcome_service_url
+            lis_result_sourcedid
+            launch_presentation_return_url
+            lti_message_type
+            lti_version
+            role
+            *+ all custom parameters*
+
+        These parameters should be encoded and signed by *oauth1* together with
+        `launch_url` and *POST* request type. Signing proceeds with client key/secret
+        pair obtained from course settings. That pair should be obtained from LTI provider
+        and set into course settings by course author.
+        After that signature and other oauth data are generated.
+
+        Additional oauth data which is generated after signing is usual::
+
+            oauth_callback
+            oauth_nonce
+            oauth_consumer_key
+            oauth_signature_method
+            oauth_timestamp
+            oauth_version
+
+
+        All that data is passed to form and sent to LTI provider server by browser via
+        autosubmit via javascript.
+
+        Form example::
+
+            <form
+                    action="${launch_url}"
+                    name="ltiLaunchForm"
+                    class="ltiLaunchForm"
+                    method="post"
+                    target="ltiLaunchFrame"
+                    encType="application/x-www-form-urlencoded"
+                >
+                    <input name="launch_presentation_return_url" value="" />
+                    <input name="lis_outcome_service_url" value="" />
+                    <input name="lis_result_sourcedid" value="" />
+                    <input name="lti_message_type" value="basic-lti-launch-request" />
+                    <input name="lti_version" value="LTI-1p0" />
+                    <input name="oauth_callback" value="about:blank" />
+                    <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
+                    <input name="oauth_nonce" value="${oauth_nonce}" />
+                    <input name="oauth_signature_method" value="HMAC-SHA1" />
+                    <input name="oauth_timestamp" value="${oauth_timestamp}" />
+                    <input name="oauth_version" value="1.0" />
+                    <input name="user_id" value="${user_id}" />
+                    <input name="role" value="student" />
+                    <input name="oauth_signature" value="${oauth_signature}" />
+
+                    % for param_name, param_value in custom_parameters.items():
+                        <input name="${param_name}" value="${param_value}" />
+                    %endfor
+
+                    <input type="submit" value="Press to Launch" />
+                </form>
+
+        LTI provider has same secret key and it signs data string via *oauth1* and compares signatures.
+
+        If signatures are correct, LTI provider redirects iframe source to LTI tool web page,
+        and LTI tool is rendered to iframe inside course.
+
+        Otherwise error message from LTI provider is generated.
+    '''
 
     js = {'js': [resource_string(__name__, 'js/src/lti/lti.js')]}
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
@@ -48,11 +128,14 @@ class LTIModule(LTIFields, XModule):
     def get_html(self):
         """ Renders parameters to template. """
 
-        # get client_key and client_secret parameters from current course:
+        # Obtains client_key and client_secret credentials from current course:
         # course location example: u'i4x://blades/1/course/2013_Spring'
         course = self.descriptor.system.load_item(
-            self.location.tag + '://' + self.location.org + '/' +
-            self.location.course + '/course' + '/2013_Spring')
+            self.location.tag + '://' +
+            self.location.org + '/' +
+            self.location.course +
+            '/course' +
+            '/2013_Spring')
         client_key, client_secret = '', ''
         for lti_passport in course.LTIs:
             try:
@@ -71,6 +154,7 @@ class LTIModule(LTIFields, XModule):
             'element_class': self.location.category,
         }
 
+        # parsing custom parameters to dict
         parsed_custom_parameters = {}
         for custom_parameter in self.custom_parameters:
             try:
@@ -93,7 +177,15 @@ class LTIModule(LTIFields, XModule):
         return self.system.render_template('lti.html', params)
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
-        """Obtains LTI html from provider"""
+        """Signs request and returns signature and oauth parameters.
+
+        `custom_paramters` is dict of parsed `custom_parameter` field
+
+        `client_key` and `client_secret` are LTI tool credentials.
+
+        Also *anonymous student id* is passed to template and therefore to LTI provider.
+        """
+
         client = requests.auth.Client(
             client_key=unicode(client_key),
             client_secret=unicode(client_secret)
