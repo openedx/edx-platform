@@ -368,6 +368,45 @@ class ImportTestCase(BaseCourseTestCase):
         html = modulestore.get_instance(course_id, loc)
         self.assertEquals(html.display_name, "Toy lab")
 
+    def test_unicode(self):
+        """Check that courses with unicode characters in filenames and in
+        org/course/name import properly. Currently, this means: (a) Having
+        files with unicode names does not prevent import; (b) if files are not
+        loaded because of unicode filenames, there are appropriate
+        exceptions/errors to that effect."""
+
+        print("Starting import")
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['test_unicode'])
+        courses = modulestore.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+        course_id = course.id
+
+        print("course errors:")
+
+        # Expect to find an error/exception about characters in "®esources"
+        found = False
+        expect = "Invalid characters in '®esources'"
+        for (msg, err) in modulestore.get_item_errors(course.location):
+            msg_u = msg.encode("utf-8")
+            err_u = err.encode("utf-8")
+            print(msg_u)
+            print(err_u)
+            if max(msg_u.find(expect), err_u.find(expect)) >= 1:
+                found = True
+
+        self.assertTrue(found)
+        chapters = course.get_children()
+        self.assertEquals(len(chapters), 5)
+
+        ch2 = chapters[1]
+        self.assertEquals(ch2.url_name, "secret:magic")
+
+        print("Ch2 location: ", ch2.location)
+
+        also_ch2 = modulestore.get_instance(course_id, ch2.location)
+        self.assertEquals(ch2, also_ch2)
+
     def test_url_name_mangling(self):
         """
         Make sure that url_names are only mangled once.
