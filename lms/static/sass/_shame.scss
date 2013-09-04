@@ -170,6 +170,10 @@
       &:hover .track {
         opacity: 1.0;
       }
+
+      &.has-option-verified {
+        padding-top: 12px !important;
+      }
     }
 
     // already registered but course not started or registration is closed
