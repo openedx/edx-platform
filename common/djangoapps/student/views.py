@@ -467,8 +467,9 @@ def login_user(request, error=""):
             eamap = ExternalAuthMap.objects.get(user=user)
             if eamap.external_domain.startswith(SHIB_DOMAIN_PREFIX):
                 return HttpResponse(json.dumps({'success': False, 'redirect': reverse('shib-login')}))
-        except (ExternalAuthMap.DoesNotExist, ExternalAuthMap.MultipleObjectsReturned):
-            pass
+        except ExternalAuthMap.DoesNotExist:
+            # This is actually the common case, logging in user without external linked login
+            log.info("User %s w/o external auth attempting login", user)
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
