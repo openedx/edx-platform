@@ -845,12 +845,17 @@ def create_account(request, post_override=None):
     # TODO: Check password is sane
 
     required_post_vars = ["email", "password", "lastname", "firstname", "middlename", "year_of_birth",
-        "level_of_education", "education_place", "education_year",
+        "education_place", "education_year",
         "work_type", "work_number", "work_name", "work_login", "work_location",
         "work_occupation", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
         "contact_phone", "terms_of_service", "honor_code"]
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
+
+    if len(post_vars["level_of_education"] < 1):
+        js['value'] = _('Education level is required')
+        js['field'] = "level_of_education"
+        return HttpResponse(json.dumps(js))
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
