@@ -3,7 +3,6 @@ from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
-import copy
 
 
 class CourseMetadata(object):
@@ -55,9 +54,9 @@ class CourseMetadata(object):
 
         dirty = False
 
-        #Copy the filtered list to avoid permanently changing the class attribute
-        filtered_list = copy.copy(cls.FILTERED_LIST)
-        #Don't filter on the tab attribute if filter_tabs is False
+        # Copy the filtered list to avoid permanently changing the class attribute.
+        filtered_list = list(cls.FILTERED_LIST)
+        # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
             filtered_list.remove("tabs")
 
