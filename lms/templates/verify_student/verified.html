@@ -11,7 +11,7 @@
 var submitToPaymentProcessing = function(event) {
     event.preventDefault();
     var xhr = $.post(
-      "create_order",
+      "/verify_student/create_order",
       {
         "course_id" : "${course_id}",
       },

@@ -139,7 +139,7 @@
         </ul>
 
         <nav class="nav-wizard ${"is-not-ready" if is_not_active else "is-ready"}">
-        <span class="help help-inline">${_("Missing something? You can always {a_start} audit this course instead {a_end}").format(a_start='<a href="/course_modes/choose/${course_id}">', a_end="</a>")}</span>
+        <span class="help help-inline">${_("Missing something? You can always {a_start} audit this course instead {a_end}").format(a_start='<a href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</span>
 
           <ol class="wizard-steps">
             <li class="wizard-step">
