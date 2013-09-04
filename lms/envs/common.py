@@ -355,6 +355,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 
+# CMS base
+CMS_BASE = 'localhost:8001'
+
 # Site info
 SITE_ID = 1
 SITE_NAME = "edx.org"

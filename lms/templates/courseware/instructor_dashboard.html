@@ -109,8 +109,13 @@ function goto( mode)
 <div class="instructor-dashboard-wrapper">
 
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
-    <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }"> Try New Beta Dashboard </a></div>
+    <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a></div>
   %endif
+  %if studio_url:
+    ## not checking access because if user can see this, they are at least course staff (with studio edit access)
+    <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
+  %endif
+
 
   <section class="instructor-dashboard-content">
     <h1>${_("Instructor Dashboard")}</h1>
@@ -125,7 +130,7 @@ function goto( mode)
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">${_("Manage Groups")}</a>
           %if show_email_tab:
-             | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">Email</a>
+             | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">${_("Email")}</a>
           %endif
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
