@@ -21,6 +21,8 @@ below::
 import inspect
 from importlib import import_module
 
+from dogapi import dog_stats_api
+
 from django.conf import settings
 
 from track.backends import BaseBackend
@@ -81,14 +83,17 @@ def _instantiate_backend_from_name(name, options):
     return backend
 
 
+@dog_stats_api.timed('track.send')
 def send(event):
     """
     Send an event object to all the initialized backends.
 
     """
-    for backend in backends.itervalues():
-        backend.send(event)
+    dog_stats_api.increment('track.send.count')
 
+    for name, backend in backends.iteritems():
+        with dog_stats_api.timer('track.send.backend.{0}'.format(name)):
+            backend.send(event)
 
 
 _initialize_backends_from_django_settings()
