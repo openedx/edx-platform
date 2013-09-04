@@ -21,7 +21,7 @@ from statsd import statsd
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-from .exceptions import InvalidCartItem, PaymentException, PurchasedCallbackException
+from .exceptions import InvalidCartItem, PurchasedCallbackException
 
 log = logging.getLogger("shoppingcart")
 
@@ -201,10 +201,18 @@ class OrderItem(models.Model):
     @property
     def single_item_receipt_template(self):
         """
-        the template that should be used when there's
-        only one item in the order
+        The template that should be used when there's only one item in the order
         """
         return'shoppingcart/receipt.html'
+
+    @property
+    def additional_instruction_text(self):
+        """
+        Individual instructions for this order item.
+
+        Currently, only used for e-mails.
+        """
+        return ''
 
 
 class PaidCourseRegistration(OrderItem):
@@ -322,6 +330,13 @@ class CertificateItem(OrderItem):
             course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
         except ObjectDoesNotExist:
             course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+
+        # do some validation on the enrollment mode
+        valid_modes = CourseMode.modes_for_course_dict(course_id)
+        if mode in valid_modes:
+            mode_info = valid_modes[mode]
+        else:
+            raise InvalidCartItem(_("Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id))
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
@@ -332,8 +347,8 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = _("{mode} certificate for course {course_id}").format(mode=item.mode,
-                                                                               course_id=course_id)
+        item.line_desc = _("Certificate of Achievement, {mode_name} for course {course_id}").format(mode_name=mode_info.name,
+                                                                                                    course_id=course_id)
         item.currency = currency
         order.currency = currency
         order.save()
@@ -354,3 +369,9 @@ class CertificateItem(OrderItem):
             return 'shoppingcart/verified_cert_receipt.html'
         else:
             return super(CertificateItem, self).single_item_receipt_template
+
+    @property
+    def additional_instruction_text(self):
+        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option \
+                  and receive a full refund. To receive your refund, contact {billing_email}.").format(
+                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)

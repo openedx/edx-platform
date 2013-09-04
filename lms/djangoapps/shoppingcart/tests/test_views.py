@@ -91,7 +91,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_show_cart(self):
         self.login_user()
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
@@ -110,7 +110,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_clear_cart(self):
         self.login_user()
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
         resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
@@ -120,7 +120,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_remove_item(self, exception_log):
         self.login_user()
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
                                 {'id': reg_item.id})
@@ -166,7 +166,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def test_show_receipt_404s(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         self.cart.purchase()
 
         user2 = UserFactory.create()
@@ -184,7 +184,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success(self):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
         self.login_user()
@@ -203,7 +203,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_refund(self):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'verified')
+        cert_item = CertificateItem.add_to_order(self.cart, 'test/course1', self.cost, 'honor')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         cert_item.status = "refunded"
         cert_item.save()
@@ -222,7 +222,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_custom_receipt_page(self):
-        cert_item = CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
+        cert_item = CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'honor')
         self.cart.purchase()
         self.login_user()
         receipt_url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
