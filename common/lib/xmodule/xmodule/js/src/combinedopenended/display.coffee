@@ -205,7 +205,6 @@ class @CombinedOpenEnded
 
   get_html_callback: (response) =>
     @coe.replaceWith(response.html)
-    console.log @$('[rel*=blModal]').length
 
   get_html: () =>
     url = "#{@ajax_url}/get_html"
@@ -261,12 +260,9 @@ class @CombinedOpenEnded
         @$('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
 
-
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 
-
   rebind: () =>
-    console.log 'ran rebind'
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
@@ -284,11 +280,11 @@ class @CombinedOpenEnded
     if @allow_reset=="True"
       @show_combined_rubric_current()
       @reset_button.show()
-      @video_response_off()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
+      @video_response_off()
       if @task_number<@task_count
         @gentle_alert "Your score did not meet the criteria to move to the next step."
     else if @child_state == 'initial'
@@ -298,13 +294,13 @@ class @CombinedOpenEnded
       @submit_button.click @save_answer
       @setup_file_upload()
     else if @child_state == 'assessing'
-      @video_response_off()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
       @submit_button.attr("disabled",true)
+      @video_response_off()
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
@@ -325,21 +321,19 @@ class @CombinedOpenEnded
       else
         @submit_button.click @message_post
     else if @child_state == 'done'
-      @video_response_off()
       @show_combined_rubric_current()
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
-      @video_response_off()
       @submit_button.hide()
+      @video_response_off()
       if @child_type=="openended"
         @skip_button.hide()
       if @task_number<@task_count
         @next_problem_button.show()
       else
         @reset_button.show()
-
 
   find_assessment_elements: ->
     @assessment = @$('input[name="grade-selection"]')
@@ -462,7 +456,6 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   reset: (event) =>
-    @video_response_reset()
     event.preventDefault()
     if @child_state == 'done' or @allow_reset=="True"
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
@@ -478,6 +471,7 @@ class @CombinedOpenEnded
           @has_been_reset = true
           @rebind()
           @reset_button.hide()
+          @video_response_reset()
         else
           @errors_area.html(response.error)
     else
@@ -662,7 +656,6 @@ class @CombinedOpenEnded
       @submit_button.show()
 
   video_response_on: () =>
-    console.log('ran video_response_on')
     onVideoClipperReadyTried = VideoClipper
     window.onVideoClipperReady = =>
       coeVideoId = @coe.data('videoId')
@@ -692,13 +685,10 @@ class @CombinedOpenEnded
 
 
   video_response_off: () =>
-    console.log('ran video_response_off')
-
     onVideoClipperReadyTried = VideoClipper
     window.onVideoClipperReady = =>
       VideoClipper.cleanUp()
       VideoClipper.generate()
-      console.log @$('[rel*=blModal]').length
 
     if onVideoClipperReadyTried != undefined
       window.onVideoClipperReady()
@@ -711,7 +701,6 @@ class @CombinedOpenEnded
       window.onOmniPlayerReady()
 
   video_response_reset: () =>
-    console.log('ran video_response_reset')
     @video_response_off()
     @video_response_on()
 

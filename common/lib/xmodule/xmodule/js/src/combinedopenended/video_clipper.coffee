@@ -108,7 +108,6 @@ class @VideoClipper
     VideoClipper.generate(this)
 
   update: (newTag) =>
-    $(".bl-URL").text newTag
     currContent = @questionBox.contents()
     newContent = []
     beginPos = 0
