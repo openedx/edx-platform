@@ -75,7 +75,8 @@ def make_desired_capabilities():
     desired_capabilities['build'] = settings.SAUCE.get('BUILD')
     desired_capabilities['video-upload-on-pass'] = False
     desired_capabilities['sauce-advisor'] = False
-    desired_capabilities['record-screenshots'] = False
+    desired_capabilities['capture-html'] = True
+    desired_capabilities['record-screenshots'] = True
     desired_capabilities['selenium-version'] = "2.34.0"
     desired_capabilities['max-duration'] = 3600
     desired_capabilities['public'] = 'public restricted'
@@ -87,6 +88,7 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
+    # from nose.tools import set_trace; set_trace()
     world.absorb(settings.SAUCE.get('SAUCE_ENABLED'), 'SAUCE_ENABLED')
 
     if not world.SAUCE_ENABLED:
