@@ -792,17 +792,17 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
-    # HTML editor for email
-    if idash_mode == 'Email':
-        html_module = HtmlDescriptor(course.system, {'data': html_message})
-        email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
-    else:
-        email_editor = None
-
     # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
     # 2) enable course email
-    studio_url = None
     is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    email_editor = None
+    # HTML editor for email
+    if idash_mode == 'Email' and is_studio_course:
+        html_module = HtmlDescriptor(course.system, {'data': html_message})
+        email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+
+    studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link_by_id(course_id)
 
