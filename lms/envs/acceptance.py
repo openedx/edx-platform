@@ -107,3 +107,10 @@ INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
 LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *      # pylint: disable=F0401
+except ImportError:
+    pass
