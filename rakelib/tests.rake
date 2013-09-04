@@ -111,7 +111,7 @@ TEST_TASK_DIRS = []
     desc "Run acceptance tests"
     task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance"] do |t, args|
         setup_acceptance_db(system)
-        Rake::Task["fasttest_acceptance_#{system}"].invoke(*args)
+        Rake::Task["fasttest_acceptance_#{system}"].invoke(args.harvest_args)
     end
 
     desc "Run acceptance tests without collectstatic or database migrations"
