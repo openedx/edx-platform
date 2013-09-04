@@ -148,7 +148,7 @@
       visibility: none;
       height: 0;
       opacity: 0.0;
-      overflow: scroll;
+      overflow-y: scroll;
     }
   }
 
@@ -162,7 +162,7 @@
 
     .expandable-area {
       visibility: visible;
-      height: ($baseline*12);
+      height: ($baseline*16);
       opacity: 1.0;
     }
   }
@@ -228,6 +228,14 @@
     text-transform: none;
     text-shadow: none;
     letter-spacing: 0;
+  }
+
+  .checkbox label {
+    display: inline-block;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
   }
 
   //  reset: lists
@@ -601,6 +609,7 @@
 
           // help - general list
           .list-help {
+            margin-top: ($baseline/2);
 
             .help-item {
               margin-bottom: ($baseline/4);
@@ -879,6 +888,7 @@
   .cam {
 
     .placeholder-cam {
+      position: relative;
       width: 95%;
       height: 375px;
       margin: ($baseline/2) auto;
@@ -886,13 +896,23 @@
 
       // placeholders
       .placeholder-art {
-        opacity: 0.5;
+        opacity: 0.7;
+        z-index: 100;
+
+        .copy {
+          position: absolute;
+          top: 40%;
+          margin: 0 40px;
+          text-align: center;
+        }
       }
 
       // previously defined in HTML
       video, canvas {
+        position: relative;
         display: block;
         @include size(100% 100%);
+        z-index: 500;
       }
     }
 
@@ -1397,17 +1417,18 @@
       .req-activate {
         float: left;
         text-align: center;
-        border-color: $m-pink-l4;
+        border-color: $m-pink-l3;
 
         .title {
           @extend .t-title4;
           @extend .t-weight4;
-          border-bottom-color: $m-pink-l4;
-          background: $m-pink-l5;
+          border-bottom-color: $m-pink-l3;
+          background: tint($m-pink, 95%);
+          color: $m-pink;
         }
 
         .placeholder-art {
-          background: $m-pink-l4;
+          background: $m-pink-l1;
         }
 
         .copy-super {

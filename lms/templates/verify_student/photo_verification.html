@@ -79,6 +79,7 @@
                   <div class="placeholder-cam" id="face_capture_div">
 
                     <div class="placeholder-art">
+                      <p class="copy">Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission</p>
                     </div>
 
                     <video id="face_video" autoplay></video><br/>
@@ -128,7 +129,7 @@
                     <div class="copy">
                       <dl class="list-faq">
                         <dt class="faq-question">${_("Why do you need my photo?")}</dt>
-                        <dd class="faq-answer">${_("We need your photo to confirm that you are you.")}</dd>
+                        <dd class="faq-answer">${_("As part of the verification process, we need your photo to confirm that you are you.")}</dd>
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
@@ -155,7 +156,7 @@
             <div class="idphoto view">
               <h3 class="title">${_("Show Us Your ID")}</h3>
               <div class="instruction">
-                <p>${_("Use your webcam to take a picture of your face so we can match it with the picture on your ID.")}</p>
+                <p>${_("Use your webcam to take a picture of your ID so we can match it with your photo and the name on your account.")}</p>
               </div>
 
               <div class="wrapper-task">
@@ -163,6 +164,7 @@
                   <div class="placeholder-cam" id="photo_id_capture_div">
 
                     <div class="placeholder-art">
+                      <p class="copy">Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission</p>
                     </div>
 
                     <video id="photo_id_video" autoplay></video><br/>
@@ -193,15 +195,16 @@
                 </div>
 
                 <div class="wrapper-help">
-                  <div class="help help-task photo-tips facetips">
+                  <div class="help help-task photo-tips idtips">
                     <h4 class="title">${_("Tips on taking a successful photo")}</h4>
 
                     <div class="copy">
-                      <ul>
-                        <li>${_("Make sure your ID is well-lit")}</li>
-                        <li>${_("Check that there isn't any glare")}</li>
-                        <li>${_("Ensure that you can see your photo and read your name")}</li>
-                        <li>${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
+                      <ul class="list-help">
+                        <li class="help-item">${_("Make sure your ID is well-lit")}</li>
+                        <li class="help-item">${_("Check that there isn't any glare")}</li>
+                        <li class="help-item">${_("Ensure that you can see your photo and read your name")}</li>
+                        <li class="help-item">${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
+                        <li class="help-item">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                       </ul>
                     </div>
                   </div>
@@ -249,7 +252,7 @@
                     <div class="copy">
                       <!-- FIXME: not sure how to handle variables w/in translation context -->
                       ${_("Contact {platform_name}").format(platform_name=settings.PLATFORM_NAME)}
-                      <p>${_("Make sure your full name on your edX account, {}, matches your ID. We will also use this as the name on your certificate.").format(user_full_name)}</p>
+                      <p>${_("Make sure your full name on your edX account ({}) matches your ID. We will also use this as the name on your certificate.").format(user_full_name)}</p>
                     </div>
 
                     <ul class="list-actions">
@@ -263,7 +266,7 @@
                     <h4 class="title">${_("Review the Photos You've Taken")}</h4>
 
                     <div class="copy">
-                      <p>${_("Curabitur blandit tempus porttitor. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.")}</p>
+                      <p>${_("Please review the photos below and verify that they meet the requirements listed below.")}</p>
                     </div>
 
                     <ol class="wrapper-photos">
@@ -291,8 +294,9 @@
                          <h5 class="title">${_("The photo above needs to meet the following requirements:")}</h5>
                          <ul class="list-help list-tips copy">
                            <li class="tip">${_("Be readable (not too far away, no glare)")}</li>
-                           <li class="tip">${_("Show your name")}</li>
-                           <li class="tip">${_("Match the photo of your face and your name above")}</li>
+                           <li class="tip">${_("Show your full name")}</li>
+                           <li class="tip">${_("The photo on your ID matches the photo of your face")}</li>
+                           <li class="tip">${_("The name on your ID matches the name on your account above")}</li>
                          </ul>
                        </div>
                       </li>

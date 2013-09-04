@@ -96,7 +96,7 @@ $(document).ready(function() {
                   <dl class="list-faq">
                     <dt class="faq-question">${_("Why do I have to pay?")}</dt>
                     <dd class="faq-answer">
-                      <p>${_("Your payment helps cover the costs of verification. As a non-profit, edX  keeps these costs as low as possible, Your payment will also help edX with our mission to provide quality education to anyone.")}</p>
+                      <p>${_("As a not-for-profit, edX uses your contribution to support our mission to provide quality education to everyone around the world. While we have established a minimum fee, we ask that you contribute as much as you can.")}</p>
                     </dd>
 
                     <dt class="faq-question">${_("I'd like to pay more than the minimum.  Is my contribution tax deductible?")}</dt>
@@ -105,29 +105,19 @@ $(document).ready(function() {
                     </dd>
 
                     % if "honor" in modes:
-                    <dt class="faq-question">${_("What if I can't afford it?")}</dt>
+                    <dt class="faq-question">${_("What if I can't afford it or don't have the necessary equipment?")}</dt>
                     <dd class="faq-answer">
-                      <p>${_("If you cannot afford the minimum payment, you can always work towards a free  Honor Code Certificate of Achievement for this course.")}</p>
+                      <p>${_("If you can't afford the minimum fee, don't have a webcam, credit card, debit card or acceptable ID, you can audit the course for free. You may also elect to pursue an Honor Code certificate, but you will need to tell us why you would like the fee waived below. Then click the 'Select Certificate' button to complete your registration.")}</p>
 
-                      <p>${_("Enter $0 above and explain why you would like the fee waived below. Then click Select Certificate button to move on to the next step.")}</p>
-
-                      <ul class="fields">
-                        <li class="field field-explain">
-                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Tell us why you need help paying for this course in 180 characters or more.")}</label>
-                          <textarea name="explain"></textarea>
-                        </li>
-                      </ul>
-                    </dd>
-
-                    <dt class="faq-question">${_("What if I don't meet all of the requirements for financial assistance but I still want to work toward a certificate?")}</dt>
-
-                    <dd class="faq-answer">
-                      <p>${_("If you don't have a webcam, credit or debit card or acceptable ID, you can  opt to simply audit this course, or select to work towards a free Honor Code Certificate of Achievement for this course by checking the box below. Then  click the Select Certificate button to complete registration. We won't ask you to verify your identity.")}</p>
-
-                      <ul class="fields">
-                        <li class="field field-explain">
+                      <ul class="list-fields">
+                        <li class="field field-honor-code checkbox">
                           <input type="checkbox" name="honor-code" id="honor-code">
                           <label for="honor-code">${_("Select Honor Code Certificate")}</label>
+                        </li>
+
+                        <li class="field field-explain">
+                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Tell us why you would like the fee waived for this course in at least 180 characters.")}</label>
+                          <textarea name="explain"></textarea>
                         </li>
                       </ul>
                     </dd>
