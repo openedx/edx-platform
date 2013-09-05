@@ -16,8 +16,27 @@ define(
 ['video/03_video_player.js'],
 function (VideoPlayer) {
 
-    if (typeof(window.gettext) == "undefined") {
-        window.gettext = function(s){return s;};
+    // In case if console.log() is unavailable for some reason.
+    //
+    // console.log() will be used to put case critical messages to the browser
+    // JavaScript console to allow for better and quicker debugging.
+    //
+    // This is placed here because '01_initialize.js' gets loaded first.
+    if (typeof window.console === 'undefined') {
+        window.console = {};
+    }
+    if ($.isFunction(window.console.log) === false) {
+        window.console.log = function () {};
+    }
+
+    // The function gettext() is defined by a vendor library. If, however, it
+    // is undefined, it is a simple wrapper. It is used to return a different
+    // version of the string passed (translated string, etc.). In the basic
+    // case, the original string is returned.
+    if (typeof(window.gettext) == 'undefined') {
+        window.gettext = function (s) {
+            return s;
+        };
     }
 
     /**
@@ -228,6 +247,8 @@ function (VideoPlayer) {
         this.el = $(element).find('.video');
         this.id = this.el.attr('id').replace(/video_/, '');
 
+        console.log('[Video info]: Initializing video with id "' + this.id + '".');
+
         // We store all settings passed to us by the server in one place. These are "read only", so don't
         // modify them. All variable content lives in 'state' object.
         this.config = {
@@ -261,9 +282,14 @@ function (VideoPlayer) {
         }
         this.config.ytTestTimeout = tempYtTestTimeout;
 
+        console.log('[Video info]: Try parsing YouTube IDs.');
         if (!(_parseYouTubeIDs(this))) {
+            console.log('[Video info]: Could not parse YouTube IDs. Try parsing non-YouTube video sources.');
+
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
             if (!_prepareHTML5Video(this, true)) {
+                console.log('[Video info]: No video sources available at all.');
+
                 // Non-YouTube sources were not found either.
                 return;
             }
@@ -271,19 +297,29 @@ function (VideoPlayer) {
             _setConfigurations(this);
             _renderElements(this);
         } else {
+            console.log('[Video info]: Valid YouTube IDs found.');
             if (!this.youtubeXhr) {
+                console.log('[Video info]: Making request to see if YouTube responds.');
                 this.youtubeXhr = this.getVideoMetadata();
             }
+
+            console.log('[Video info]: Waiting for YouTube to respond.');
 
             this.youtubeXhr
                 .always(function(json, status) {
                     var err = $.isPlainObject(json.error) ||
                                 (status !== 'success' && status !== 'notmodified');
                     if (err) {
+                        console.log('[Video info]: An error happened while waiting for YouTube to respond.');
+                        console.log('[Video info]: Checking if alternate non-YouTube video sources are available.');
+
                         // When the youtube link doesn't work for any reason
                         // (for example, the great firewall in china) any
                         // alternate sources should automatically play.
                         if (!_prepareHTML5Video(_this)) {
+                            console.log('[Video info]: No alternative non-YouTube video sources available.');
+                            console.log('[Video info]: Will try to continue loading YouTube video. Maybe the response timeout is longer than was specified.');
+
                             // Non-YouTube sources were not found either.
 
                             _this.el.find('.video-player div').removeClass('hidden');
@@ -294,11 +330,15 @@ function (VideoPlayer) {
                             _this.fetchMetadata();
                             _this.parseSpeed();
                         } else {
+                            console.log('[Video info]: Alternative non-YouTube video sources were found and will be loaded.');
+
                             // In-browser HTML5 player does not support quality
                             // control.
                             _this.el.find('a.quality_control').hide();
                         }
                     } else {
+                        console.log('[Video info]: YouTube responded with OK. Loading YouTube video.');
+
                         _this.fetchMetadata();
                         _this.parseSpeed();
                     }
