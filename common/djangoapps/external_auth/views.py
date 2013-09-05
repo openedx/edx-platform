@@ -177,7 +177,7 @@ def _external_login_or_signup(request,
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info('SHIB: No user for %s yet, doing signup', eamap.external_email)
-                return _signup(request, eamap)
+                return _signup(request, eamap, retfun)
         else:
             log.info('No user for %s yet. doing signup', eamap.external_email)
             return _signup(request, eamap, retfun)
