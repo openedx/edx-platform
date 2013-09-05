@@ -118,7 +118,8 @@ class CourseDetailsTestCase(CourseTestCase):
 
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(settings_details_url)
-            self.assertContains(response, "Course Summary Page")
+            self.assertNotContains(response, "Course Summary Page")
+            self.assertNotContains(response, "Send a note to students via email")
             self.assertContains(response, "course summary page will not be viewable")
 
             self.assertContains(response, "Course Start Date")
@@ -143,6 +144,7 @@ class CourseDetailsTestCase(CourseTestCase):
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get(settings_details_url)
             self.assertContains(response, "Course Summary Page")
+            self.assertContains(response, "Send a note to students via email")
             self.assertNotContains(response, "course summary page will not be viewable")
 
             self.assertContains(response, "Course Start Date")
