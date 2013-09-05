@@ -1129,11 +1129,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         return {}
 
-    def inherit_settings(self, block_map, block, inheriting_settings=None):
+    def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """
-        Updates block with any inheritable setting set by an ancestor and recurses to children.
+        Updates block_json with any inheritable setting set by an ancestor and recurses to children.
         """
-        if block is None:
+        if block_json is None:
             return
 
         if inheriting_settings is None:
@@ -1143,11 +1143,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # NOTE: this should show the values which all fields would have if inherited: i.e.,
         # not set to the locally defined value but to value set by nearest ancestor who sets it
         # ALSO NOTE: no xblock should ever define a _inherited_settings field as it will collide w/ this logic.
-        block.setdefault('_inherited_settings', {}).update(inheriting_settings)
+        block_json.setdefault('_inherited_settings', {}).update(inheriting_settings)
 
         # update the inheriting w/ what should pass to children
-        inheriting_settings = block['_inherited_settings'].copy()
-        block_fields = block['fields']
+        inheriting_settings = block_json['_inherited_settings'].copy()
+        block_fields = block_json['fields']
         for field_name in inheritance.InheritanceMixin.fields:
             if field_name in block_fields:
                 inheriting_settings[field_name] = block_fields[field_name]
