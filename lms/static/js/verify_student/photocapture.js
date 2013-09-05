@@ -47,7 +47,7 @@ var submitToPaymentProcessing = function() {
   });
 }
 
-function doResetButton(resetButton, captureButton, approveButton) {
+function doResetButton(resetButton, captureButton, approveButton, nextButton) {
   approveButton.removeClass('approved');
   nextButton.addClass('disabled');
 
@@ -117,7 +117,7 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       flashCapture[0].reset();
     }
 
-    doResetButton(resetButton, captureButton, approveButton);
+    doResetButton(resetButton, captureButton, approveButton, nextButton);
     return false;
   }
 
@@ -176,14 +176,14 @@ $(document).ready(function() {
       $("#pay_button").toggleClass('disabled');
   });
 
-  
+
   // add in handlers to add/remove the correct classes to the body
   // when moving between steps
-  $('#face_next_button').click(function(){ 
+  $('#face_next_button').click(function(){
       $('body').addClass('step-photos-id').removeClass('step-photos-cam')
   })
 
-  $('#photo_id_next_button').click(function(){ 
+  $('#photo_id_next_button').click(function(){
       $('body').addClass('step-review').removeClass('step-photos-id')
   })
 
