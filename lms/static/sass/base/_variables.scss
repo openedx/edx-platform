@@ -157,6 +157,15 @@ $courseware-footer-margin: 0px;
 
 // ====================
 
+// STATE: verified
+$verified-color-lvl1: $m-green;
+$verified-color-lvl2: $m-green-l1;
+$verified-color-lvl3: $m-green-l2;
+$verified-color-lvl4: $m-green-l3;
+$verified-color-lvl5: $m-green-l4;
+
+// ====================
+
 // ACTIONS: general
 $button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;

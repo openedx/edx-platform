@@ -76,7 +76,7 @@
   border-bottom: 1px dotted transparent;
 
   &:hover, &:active {
-    border-color: $m-blue-d2;
+    border-color: $link-color-d1;
   }
 }
 
@@ -86,6 +86,12 @@
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
   text-transform: uppercase;
+}
+
+// ====================
+
+.btn-verify-primary {
+  @extend .btn-primary-green;
 }
 
 // ====================
@@ -277,7 +283,7 @@
   }
 
   .action-confirm {
-    @extend .btn-primary-green;
+    @extend .btn-verify-primary;
     border: none;
   }
 
@@ -411,7 +417,7 @@
         .sts-track-value {
           @extend .copy-badge;
           color: $white;
-          background: $m-green-l2;
+          background: $verified-color-lvl3;
 
           .context {
             margin-right: ($baseline/4);
@@ -461,7 +467,7 @@
       width: 0%;
       height: 100%;
       display: block;
-      background: $m-green-l3;
+      background: $verified-color-lvl4;
     }
   }
 
@@ -522,10 +528,10 @@
 
       // STATE: is completed
       &.is-completed {
-        border-bottom: ($baseline/5) solid $m-green-l2;
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
-          border-color: $m-green-l2;
+          border-color: $verified-color-lvl3;
         }
 
         .step-number, .step-name {
@@ -675,7 +681,7 @@
           &.approved {
 
             .action {
-              @extend .btn-primary-green;
+              @extend .btn-verify-primary;
             }
           }
         }
@@ -1182,7 +1188,7 @@
     }
 
     .register-choice-certificate {
-      border-color: $m-green-l1;
+      border-color: $verified-color-lvl3;
       position: relative;
 
       .deco-ribbon {
@@ -1217,7 +1223,7 @@
       }
 
       .action-select input {
-        @extend .btn-primary-green;
+        @extend .btn-verify-primary;
       }
 
       .action-intro {
@@ -1347,7 +1353,7 @@
         min-height: ($baseline*15);
         float: left;
         margin-right: flex-gutter();
-        border-color: $m-green-l3;
+        border-color: $verified-color-lvl4;
         text-align: center;
 
         &:last-child {
@@ -1358,8 +1364,8 @@
           @extend .t-title5;
           @extend .t-weight4;
           padding: $baseline;
-          border-bottom: 1px solid $m-green-l3;
-          background: $m-green-l4;
+          border-bottom: 1px solid $verified-color-lvl4;
+          background: $verified-color-lvl5;
 
         }
 
@@ -1368,7 +1374,7 @@
           display: inline-block;
           margin: $baseline 0 ($baseline/2) 0;
           padding: $baseline;
-          background: $m-green-l2;
+          background: $verified-color-lvl3;
           border-radius: ($baseline*10);
 
           *[class^="icon"] {
@@ -1390,7 +1396,7 @@
             position: absolute;
             left: 24px;
             top: 34px;
-            background: $m-green-l2;
+            background: $verified-color-lvl3;
             padding: 3px 5px;
           }
         }
@@ -1406,7 +1412,7 @@
         .copy-super {
           @extend .t-copy-base;
           margin-bottom: ($baseline/2);
-          color: $m-green;
+          color: $verified-color-lvl1;
         }
 
         .copy-sub {
@@ -1470,10 +1476,10 @@
 
       // STATE: is completed
        &#progress-step0 {
-        border-bottom: ($baseline/5) solid $m-green-l2;
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
-          border-color: $m-green-l2;
+          border-color: $verified-color-lvl3;
         }
 
         .step-number, .step-name {
@@ -1510,10 +1516,10 @@
 
       // STATE: is completed
        &#progress-step0, &#progress-step1 {
-        border-bottom: ($baseline/5) solid $m-green-l2;
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
-          border-color: $m-green-l2;
+          border-color: $verified-color-lvl3;
         }
 
         .step-number, .step-name {
@@ -1585,10 +1591,10 @@
 
       // STATE: is completed
        &#progress-step0, &#progress-step1, &#progress-step2 {
-        border-bottom: ($baseline/5) solid $m-green-l2;
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
-          border-color: $m-green-l2;
+          border-color: $verified-color-lvl3;
         }
 
         .step-number, .step-name {
@@ -1625,10 +1631,10 @@
 
       // STATE: is completed
        &#progress-step0, &#progress-step1, &#progress-step2, &#progress-step3, &#progress-step4 {
-        border-bottom: ($baseline/5) solid $m-green-l2;
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
-          border-color: $m-green-l2;
+          border-color: $verified-color-lvl3;
         }
 
         .step-number, .step-name {
@@ -1742,10 +1748,10 @@
 
     // STATE: is completed
      &#progress-step1 {
-      border-bottom: ($baseline/5) solid $m-green-l2;
+      border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
       .wrapper-step-number {
-        border-color: $m-green-l2;
+        border-color: $verified-color-lvl3;
       }
 
       .step-number, .step-name {
