@@ -1,9 +1,17 @@
 #pylint: disable=C0111
 
+from django.contrib.auth.models import User
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course, section_location
+from common import section_location, course_id
 
+from django.contrib.auth.models import User
+from student.models import CourseEnrollment
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
+from courseware.courses import get_course_by_id
+from xmodule import seq_module, vertical_module
 
 @step('I view the LTI and it is not rendered')
 def lti_is_not_rendered(_step):
@@ -67,8 +75,13 @@ def incorrect_lti_is_rendered(_step):
 @step('the course has a LTI component filled with correct data')
 def view_lti_with_data(_step):
     coursenum = 'test_course'
-    i_am_registered_for_the_course(_step, coursenum)
-
+    metadata =  {
+        'LTIs': ["test_lti_id:{}:{}".format(
+            world.lti_server.oauth_settings['client_key'],
+            world.lti_server.oauth_settings['client_secret']
+        )]
+    }
+    i_am_registered_for_the_course(_step, coursenum, metadata)
     add_correct_lti_to_course(coursenum)
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
@@ -85,8 +98,8 @@ def view_lti_with_data(_step):
 @step('the course has a LTI component with empty fields')
 def view_default_lti(_step):
     coursenum = 'test_course'
-    i_am_registered_for_the_course(_step, coursenum)
-
+    metadata = {}
+    i_am_registered_for_the_course(_step, coursenum, {})
     add_default_lti_to_course(coursenum)
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
@@ -104,8 +117,13 @@ def view_default_lti(_step):
 and client_key, but incorrect client_secret')
 def view_wrong_data_lti(_step):
     coursenum = 'test_course'
-    i_am_registered_for_the_course(_step, coursenum)
-
+    metadata =  {
+        'LTIs': ["test_lti_id:{}:{}".format(
+            world.lti_server.oauth_settings['client_key'],
+            world.lti_server.oauth_settings['client_secret']
+        )]
+    }
+    i_am_registered_for_the_course(_step, coursenum, metadata)
     wrong_data_lti_to_course(coursenum)
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
@@ -126,9 +144,8 @@ def add_correct_lti_to_course(course):
         category=category,
         display_name='LTI',
         metadata={
-            'client_key': world.lti_server.oauth_settings['client_key'],
-            'client_secret': world.lti_server.oauth_settings['client_secret'],
-            'lti_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
+            'lti_id': 'test_lti_id',
+            'launch_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
         }
     )
 
@@ -149,8 +166,49 @@ def wrong_data_lti_to_course(course):
         category=category,
         display_name='LTI',
         metadata={
-            'client_key': world.lti_server.oauth_settings['client_key'],
-            'client_secret': "wrong_secret",
+            'lti_id': 'test_lti_id',
             'lti_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
         }
     )
+
+
+@step(u'The course "([^"]*)" exists$')
+def create_course(_step, course, metadata):
+
+    # First clear the modulestore so we don't try to recreate
+    # the same course twice
+    # This also ensures that the necessary templates are loaded
+    world.clear_courses()
+
+    # Create the course
+    # We always use the same org and display name,
+    # but vary the course identifier (e.g. 600x or 191x)
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='edx',
+                                        number=course,
+                                        display_name='Test Course',
+                                        metadata=metadata)
+
+    # Add a section to the course to contain problems
+    world.scenario_dict['SECTION'] = world.ItemFactory.create(parent_location=world.scenario_dict['COURSE'].location,
+                                       display_name='Test Section')
+
+    world.ItemFactory.create(
+        parent_location=world.scenario_dict['SECTION'].location,
+        category='sequential',
+        display_name='Test Section')
+
+
+@step(u'I am registered for the course "([^"]*)"$')
+def i_am_registered_for_the_course(step, course, metadata):
+    # Create the course
+    create_course(step, course, metadata)
+
+    # Create the user
+    world.create_user('robot', 'test')
+    u = User.objects.get(username='robot')
+
+    # If the user is not already enrolled, enroll the user.
+    # TODO: change to factory
+    CourseEnrollment.enroll(u, course_id(course))
+
+    world.log_in(username='robot', password='test')
