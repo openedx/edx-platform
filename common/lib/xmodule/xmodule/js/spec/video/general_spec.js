@@ -188,15 +188,20 @@
 
         describe('multiple YT on page', function () {
             beforeEach(function () {
-                $.ajax.calls.length = 0;
-                $.ajaxWithPrefix.calls = 0;
-
                 loadFixtures('video_yt_multiple.html');
-
-                state1 = new Video('#example1');
 
                 spyOn($, 'ajaxWithPrefix');
 
+                $.ajax.calls.length = 0;
+                $.ajaxWithPrefix.calls.length = 0;
+
+                // Because several other tests have run, the variable
+                // that stores the value of the first ajax request must be
+                // cleared so that we test a pristine state of the video
+                // module.
+                Video.clearYoutubeXhr();
+
+                state1 = new Video('#example1');
                 state2 = new Video('#example2');
                 state3 = new Video('#example3');
             });
