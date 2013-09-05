@@ -1691,7 +1691,7 @@
             }
 
             td {
-              border-top: 1px solid #ccc;
+              border-ts: 1px solid #ccc;
               vertical-align: middle;
               padding: ($baseline/2) ($baseline/2) ($baseline/2) 0;
               text-transform: capitalize;
@@ -1710,6 +1710,11 @@
 
           .action a {
             @extend .btn-primary-blue;
+          }
+
+          .action-course a {
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
           }
 
 
