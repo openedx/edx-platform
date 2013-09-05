@@ -153,22 +153,20 @@ function () {
                     state.videoSpeedControl.el.removeClass('open');
                 });
 
-
             // ******************************
             // The tabbing will cycle through the elements in the following
             // order:
-            // 1. Play button
-            // 2. Speed button
+            // 1. Play control
+            // 2. Speed control
             // 3. Fastest speed called firstSpeed
             // 4. Intermediary speed called otherSpeed 
             // 5. Slowest speed called lastSpeed
-            // 6. Sound button
+            // 6. Volume control
             // This field will keep track of where the focus is coming from.
             state.previousFocus = '';
 
-
             // ******************************
-            // Attach 'focus', and 'blur' events to the speed button which
+            // Attach 'focus', and 'blur' events to the speed control which
             // either brings up the speed dialog with individual speed entries,
             // or closes it.
             state.videoSpeedControl.el.children('a')
@@ -185,9 +183,9 @@ function () {
                     // When the focus leaves this element, the speed entries
                     // dialog will be shown.
                     
-                    // If we are tabbing forward (previous focus is empty ie 
-                    // play button), we open the dialog and set focus on the 
-                    // first speed entry.
+                    // If we are tabbing forward (previous focus is play
+                    // control), we open the dialog and set focus on the first
+                    // speed entry.
                     if (state.previousFocus === 'playPause') {
                         state.videoSpeedControl.el.addClass('open');
                         state.videoSpeedControl.videoSpeedsEl
@@ -196,7 +194,7 @@ function () {
                     }
 
                     // If we are tabbing backwards (previous focus is volume 
-                    // button), we open the dialog and set focus on the 
+                    // control), we open the dialog and set focus on the 
                     // last speed entry.
                     if (state.previousFocus === 'volume') {
                         state.videoSpeedControl.el.addClass('open');
@@ -207,17 +205,16 @@ function () {
                     
                 });
 
-
             // ******************************
-            // Attach 'blur' event to elements which represent individual
-            // speed entries and use it to track the origin of the focus
+            // Attach 'blur' event to elements which represent individual speed
+            // entries and use it to track the origin of the focus.
             speedLinks = state.videoSpeedControl.videoSpeedsEl
                 .find('a.speed_link');
 
             speedLinks.first().on('blur', function () {
-                // The previous focus is a speed entry (we are tabbing 
+                // The previous focus is a speed entry (we are tabbing
                 // backwards), the dialog will close, set focus on the speed
-                // button and track the focus on first speed.
+                // control and track the focus on first speed.
                 if (state.previousFocus === 'otherSpeed') {
                     state.previousFocus = 'firstSpeed';
                     state.videoSpeedControl.el.children('a').focus();
@@ -234,9 +231,9 @@ function () {
                 });
 
             speedLinks.last().on('blur', function () {
-                // The previous focus is a speed entry (we are tabbing 
-                // forward), the dialog will close, set focus on the speed
-                // button and track the focus on last speed.
+                // The previous focus is a speed entry (we are tabbing forward),
+                // the dialog will close, set focus on the speed control and
+                // track the focus on last speed.
                 if (state.previousFocus === 'otherSpeed') {
                     state.previousFocus = 'lastSpeed';
                     state.videoSpeedControl.el.children('a').focus();
