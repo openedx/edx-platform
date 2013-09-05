@@ -91,6 +91,7 @@ from contentstore import utils
             </li>
           </ol>
 
+          % if about_page_editable:
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
@@ -103,6 +104,7 @@ from contentstore import utils
               </li>
             </ul>
           </div>
+          % endif
 
           % if not about_page_editable:
           <div class="notice notice-incontext notice-workflow">
