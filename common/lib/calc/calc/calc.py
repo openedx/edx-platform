@@ -9,7 +9,7 @@ import operator
 import numbers
 import numpy
 import scipy.constants
-import calcfunctions
+import functions
 
 from pyparsing import (
     Word, Literal, CaselessLiteral, ZeroOrMore, MatchFirst, Optional, Forward,
@@ -20,9 +20,9 @@ DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,
     'cos': numpy.cos,
     'tan': numpy.tan,
-    'sec': calcfunctions.sec,
-    'csc': calcfunctions.csc,
-    'cot': calcfunctions.cot,
+    'sec': functions.sec,
+    'csc': functions.csc,
+    'cot': functions.cot,
     'sqrt': numpy.sqrt,
     'log10': numpy.log10,
     'log2': numpy.log2,
@@ -31,24 +31,24 @@ DEFAULT_FUNCTIONS = {
     'arccos': numpy.arccos,
     'arcsin': numpy.arcsin,
     'arctan': numpy.arctan,
-    'arcsec': calcfunctions.arcsec,
-    'arccsc': calcfunctions.arccsc,
-    'arccot': calcfunctions.arccot,
+    'arcsec': functions.arcsec,
+    'arccsc': functions.arccsc,
+    'arccot': functions.arccot,
     'abs': numpy.abs,
     'fact': math.factorial,
     'factorial': math.factorial,
     'sinh': numpy.sinh,
     'cosh': numpy.cosh,
     'tanh': numpy.tanh,
-    'sech': calcfunctions.sech,
-    'csch': calcfunctions.csch,
-    'coth': calcfunctions.coth,
+    'sech': functions.sech,
+    'csch': functions.csch,
+    'coth': functions.coth,
     'arcsinh': numpy.arcsinh,
     'arccosh': numpy.arccosh,
     'arctanh': numpy.arctanh,
-    'arcsech': calcfunctions.arcsech,
-    'arccsch': calcfunctions.arccsch,
-    'arccoth': calcfunctions.arccoth
+    'arcsech': functions.arcsech,
+    'arccsch': functions.arccsch,
+    'arccoth': functions.arccoth
 }
 DEFAULT_VARIABLES = {
     'i': numpy.complex(0, 1),

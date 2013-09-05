@@ -65,8 +65,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_edx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
     }
 }
 
@@ -81,6 +81,11 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
+
+
+# Set up Video information so that the lms will send
+# requests to a mock Youtube server running locally
+VIDEO_PORT = XQUEUE_PORT + 2
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests

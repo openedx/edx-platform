@@ -147,8 +147,6 @@ function (VideoPlayer) {
         if (state.parseYoutubeStreams(state.config.youtubeStreams)) {
             state.videoType = 'youtube';
 
-            state.fetchMetadata();
-            state.parseSpeed();
             return true;
         }
         return false;
@@ -157,9 +155,7 @@ function (VideoPlayer) {
     // function _prepareHTML5Video(state)
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
-    function _prepareHTML5Video(state) {
-        state.videoType = 'html5';
-
+    function _prepareHTML5Video(state, html5Mode) {
         state.parseVideoSources(
             {
                 mp4: state.config.mp4Source,
@@ -168,20 +164,39 @@ function (VideoPlayer) {
             }
         );
 
+        if (html5Mode) {
+            state.speeds = ['0.75', '1.0', '1.25', '1.50'];
+            state.videos = {
+                '0.75': state.config.sub,
+                '1.0':  state.config.sub,
+                '1.25': state.config.sub,
+                '1.5':  state.config.sub
+            };
+        }
+
+        // We must have at least one non-YouTube video source available.
+        // Otherwise, return a negative.
+        if (
+            state.html5Sources.webm === null &&
+            state.html5Sources.mp4 === null &&
+            state.html5Sources.ogg === null
+        ) {
+            state.el.find('.video-player div').addClass('hidden');
+            state.el.find('.video-player h3').removeClass('hidden');
+
+            return false;
+        }
+
+        state.videoType = 'html5';
+
         if (!state.config.sub || !state.config.sub.length) {
             state.config.sub = '';
             state.config.show_captions = false;
         }
 
-        state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-        state.videos = {
-            '0.75': state.config.sub,
-            '1.0':  state.config.sub,
-            '1.25': state.config.sub,
-            '1.5':  state.config.sub
-        };
-
         state.setSpeed($.cookie('video_speed'));
+
+        return true;
     }
 
     function _setConfigurations(state) {
@@ -205,7 +220,7 @@ function (VideoPlayer) {
     // The function set initial configuration and preparation.
 
     function initialize(element) {
-        var _this = this;
+        var _this = this, tempYtTestTimeout;
         // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
         this.isFullScreen = false;
 
@@ -231,28 +246,61 @@ function (VideoPlayer) {
             webmSource:         this.el.data('webm-source'),
             oggSource:          this.el.data('ogg-source'),
 
+            ytTestUrl:   this.el.data('yt-test-url'),
+
             fadeOutTimeout:     1400,
 
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
+        // Check if the YT test timeout has been set. If not, or it is in
+        // improper format, then set to default value.
+        tempYtTestTimeout = parseInt(this.el.data('yt-test-timeout'), 10);
+        if (!isFinite(tempYtTestTimeout)) {
+            tempYtTestTimeout = 1500;
+        }
+        this.config.ytTestTimeout = tempYtTestTimeout;
+
         if (!(_parseYouTubeIDs(this))) {
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
-            _prepareHTML5Video(this);
+            if (!_prepareHTML5Video(this, true)) {
+                // Non-YouTube sources were not found either.
+                return;
+            }
+
             _setConfigurations(this);
             _renderElements(this);
         } else {
-            this.getVideoMetadata()
+            if (!this.youtubeXhr) {
+                this.youtubeXhr = this.getVideoMetadata();
+            }
+
+            this.youtubeXhr
                 .always(function(json, status) {
                     var err = $.isPlainObject(json.error) ||
-                                (status !== "success" && status !== "notmodified");
-
-                    if (err){
+                                (status !== 'success' && status !== 'notmodified');
+                    if (err) {
                         // When the youtube link doesn't work for any reason
                         // (for example, the great firewall in china) any
                         // alternate sources should automatically play.
-                        _prepareHTML5Video(_this);
-                        _this.el.find('a.quality_control').hide();
+                        if (!_prepareHTML5Video(_this)) {
+                            // Non-YouTube sources were not found either.
+
+                            _this.el.find('.video-player div').removeClass('hidden');
+                            _this.el.find('.video-player h3').addClass('hidden');
+
+                            // If in reality the timeout was to short, try to
+                            // continue loading the YouTube video anyways.
+                            _this.fetchMetadata();
+                            _this.parseSpeed();
+                        } else {
+                            // In-browser HTML5 player does not support quality
+                            // control.
+                            _this.el.find('a.quality_control').hide();
+                        }
+                    } else {
+                        _this.fetchMetadata();
+                        _this.parseSpeed();
                     }
 
                     _setConfigurations(_this);
@@ -298,7 +346,13 @@ function (VideoPlayer) {
     //     Take the HTML5 sources (URLs of videos), and make them available explictly for each type
     //     of video format (mp4, webm, ogg).
     function parseVideoSources(sources) {
-        var _this = this;
+        var _this = this,
+            v = document.createElement('video'),
+            sourceCodecs = {
+                mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+                webm: 'video/webm; codecs="vp8, vorbis"',
+                ogg: 'video/ogg; codecs="theora"'
+            };
 
         this.html5Sources = {
             mp4: null,
@@ -308,7 +362,14 @@ function (VideoPlayer) {
 
         $.each(sources, function (name, source) {
             if (source && source.length) {
-                _this.html5Sources[name] = source;
+                if (
+                    Boolean(
+                        v.canPlayType &&
+                        v.canPlayType(sourceCodecs[name]).replace(/no/, '')
+                    )
+                ) {
+                    _this.html5Sources[name] = source;
+                }
             }
         });
     }
@@ -325,7 +386,9 @@ function (VideoPlayer) {
 
         $.each(this.videos, function (speed, url) {
             _this.getVideoMetadata(url, function(data) {
-                _this.metadata[data.data.id] = data.data;
+                if (data.data) {
+                    _this.metadata[data.data.id] = data.data;
+                }
             });
         });
     }
@@ -362,12 +425,11 @@ function (VideoPlayer) {
         if (typeof url !== 'string') {
             url = this.videos['1.0'] || '';
         }
-
         successHandler = ($.isFunction(callback)) ? callback : null;
         xhr = $.ajax({
-            url: 'https://gdata.youtube.com/feeds/api/videos/' + url + '?v=2&alt=jsonc',
-            timeout: 500,
+            url: this.config.ytTestUrl + url + '?v=2&alt=jsonc',
             dataType: 'jsonp',
+            timeout: this.config.ytTestTimeout,
             success: successHandler
         });
 

@@ -18,6 +18,7 @@ class OptoutAdmin(admin.ModelAdmin):
 
 
 class CourseEmailTemplateAdmin(admin.ModelAdmin):
+    """Admin for course email templates."""
     form = CourseEmailTemplateForm
     fieldsets = (
         (None, {

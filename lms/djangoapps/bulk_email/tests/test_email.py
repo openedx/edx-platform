@@ -288,12 +288,6 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
     """
     Test that exceptions are handled correctly.
     """
-
-    def test_get_course_exc(self):
-        # Make sure delegate_email_batches handles Http404 exception from get_course_by_id.
-        with self.assertRaises(Exception):
-            delegate_email_batches("_", "_", "blah/blah/blah", "_", "_")
-
     def test_no_course_email_obj(self):
         # Make sure course_email handles CourseEmail.DoesNotExist exception.
         with self.assertRaises(CourseEmail.DoesNotExist):

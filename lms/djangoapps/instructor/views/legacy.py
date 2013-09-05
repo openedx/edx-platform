@@ -33,7 +33,7 @@ from xmodule.html_module import HtmlDescriptor
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_cms_course_link_by_id
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -792,23 +792,30 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
+    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
+    # 2) enable course email
+    is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    email_editor = None
     # HTML editor for email
-    if idash_mode == 'Email':
+    if idash_mode == 'Email' and is_studio_course:
         html_module = HtmlDescriptor(course.system, {'data': html_message})
         email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
-    else:
-        email_editor = None
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
 
     # Flag for whether or not we display the email tab (depending upon
     # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
         course_stats = get_course_stats_table()
+
     #----------------------------------------
     # context for rendering
 
@@ -821,6 +828,7 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
+               'studio_url': studio_url,
 
                'to_option': email_to_option,      # email
                'subject': email_subject,          # email
@@ -842,7 +850,6 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
-
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
