@@ -186,6 +186,39 @@
             });
         });
 
+        describe('multiple YT on page', function () {
+            beforeEach(function () {
+                $.ajax.calls.length = 0;
+                $.ajaxWithPrefix.calls = 0;
+
+                loadFixtures('video_yt_multiple.html');
+
+                state1 = new Video('#example1');
+
+                spyOn($, 'ajaxWithPrefix');
+
+                state2 = new Video('#example2');
+                state3 = new Video('#example3');
+            });
+
+            it('check for YT availability is performed only once', function () {
+                var numAjaxCalls = 0;
+
+                // Total ajax calls made.
+                numAjaxCalls = $.ajax.calls.length;
+
+                // Subtract ajax calls to get captions.
+                numAjaxCalls -= $.ajaxWithPrefix.calls.length;
+
+                // Subtract ajax calls to get metadata for each video.
+                numAjaxCalls -= 3;
+
+                // This should leave just one call. It was made to check
+                // for YT availability.
+                expect(numAjaxCalls).toBe(1);
+            });
+        });
+
         describe('setSpeed', function () {
             describe('YT', function () {
                 beforeEach(function () {
