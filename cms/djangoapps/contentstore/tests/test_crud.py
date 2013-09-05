@@ -218,7 +218,7 @@ class TemplateTests(unittest.TestCase):
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:
-            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.get_inherited_settings().copy()
+            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.inherited_settings.copy()
             json_fields = json_data.get('fields', {})
             for field_name in inheritance.InheritanceMixin.fields:
                 if field_name in json_fields:

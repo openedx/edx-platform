@@ -9,10 +9,9 @@ from lxml import etree
 from xblock.fields import Dict, Scope, ScopeIds
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml_exporter import EdxJSONEncoder
-
-from xblock.field_data import DictFieldData
+from xblock.runtime import DbModel
 
 log = logging.getLogger(__name__)
 
@@ -365,10 +364,12 @@ class XmlDescriptor(XModuleDescriptor):
                 field_data['xml_attributes'][key] = value
         field_data['location'] = location
         field_data['category'] = xml_object.tag
+        kvs = InheritanceKeyValueStore(initial_values=field_data)
+        field_data = DbModel(kvs)
 
         return system.construct_xblock_from_class(
             cls,
-            DictFieldData(field_data),
+            field_data,
 
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,

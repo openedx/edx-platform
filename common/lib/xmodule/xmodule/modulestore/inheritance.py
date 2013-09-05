@@ -3,6 +3,7 @@ from pytz import UTC
 
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin
 from xmodule.fields import Date, Timedelta
+from xblock.runtime import KeyValueStore
 
 
 class InheritanceMixin(XBlockMixin):
@@ -51,16 +52,18 @@ def compute_inherited_metadata(descriptor):
 
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
-    for child in descriptor.get_children():
-        inherit_metadata(
-            child,
-            {
-                name: field.read_from(descriptor)
-                for name, field in InheritanceMixin.fields.items()
-                if field.is_set_on(descriptor)
-            }
-        )
-        compute_inherited_metadata(child)
+    if descriptor.has_children:
+        parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
+        # add any of descriptor's explicitly set fields to the inheriting list
+        for field in InheritanceMixin.fields.values():
+            # pylint: disable = W0212
+            if descriptor._field_data.has(descriptor, field.name):
+                # inherited_settings values are json repr
+                parent_metadata[field.name] = field.read_json(descriptor)
+
+        for child in descriptor.get_children():
+            inherit_metadata(child, parent_metadata)
+            compute_inherited_metadata(child)
 
 
 def inherit_metadata(descriptor, inherited_data):
@@ -72,53 +75,46 @@ def inherit_metadata(descriptor, inherited_data):
     `inherited_data`: A dictionary mapping field names to the values that
         they should inherit
     """
-    # The inherited values that are actually being used.
-    if not hasattr(descriptor, '_inherited_metadata'):
-        setattr(descriptor, '_inherited_metadata', {})
-
-    # All inheritable metadata values (for which a value exists in field_data).
-    if not hasattr(descriptor, '_inheritable_metadata'):
-        setattr(descriptor, '_inheritable_metadata', {})
-
-    # Set all inheritable metadata from kwargs that are
-    # in self.inheritable_metadata and aren't already set in metadata
-    for name, field in InheritanceMixin.fields.items():
-        if name not in inherited_data:
-            continue
-        inherited_value = inherited_data[name]
-
-        descriptor._inheritable_metadata[name] = inherited_value
-        if not field.is_set_on(descriptor):
-            descriptor._inherited_metadata[name] = inherited_value
-            field.write_to(descriptor, inherited_value)
-            # We've updated the fields on the descriptor, so we need to save it
-            descriptor.save()
+    try:
+        descriptor.xblock_kvs.inherited_settings = inherited_data
+    except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error module
+        pass
 
 
 def own_metadata(module):
-    # IN SPLIT MONGO this is just ['metadata'] as it keeps ['_inherited_metadata'] separate!
-    # FIXME move into kvs? will that work for xml mongo?
     """
     Return a dictionary that contains only non-inherited field keys,
     mapped to their serialized values
     """
-    inherited_metadata = getattr(module, '_inherited_metadata', {})
-    metadata = {}
-    for name, field in module.fields.items():
-        # Only save metadata that wasn't inherited
-        if field.scope != Scope.settings:
-            continue
+    return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
-        if not field.is_set_on(module):
-            continue
+class InheritanceKeyValueStore(KeyValueStore):
+    """
+    Common superclass for kvs's which know about inheritance of settings. Offers simple
+    dict-based storage of fields and lookup of inherited values.
 
-        if name in inherited_metadata and field.read_from(module) == inherited_metadata.get(name):
-            continue
+    Note: inherited_settings is a dict of key to json values (internal xblock field repr)
+    """
+    def __init__(self, initial_values=None, inherited_settings=None):
+        super(InheritanceKeyValueStore, self).__init__()
+        self.inherited_settings = inherited_settings or {}
+        self._fields = initial_values or {}
 
-        try:
-            metadata[name] = field.read_json(module)
-        except KeyError:
-            # Ignore any missing keys in _field_data
-            pass
+    def get(self, key):
+        return self._fields[key.field_name]
 
-    return metadata
+    def set(self, key, value):
+        # xml backed courses are read-only, but they do have some computed fields
+        self._fields[key.field_name] = value
+
+    def delete(self, key):
+        del self._fields[key.field_name]
+
+    def has(self, key):
+        return key.field_name in self._fields
+
+    def default(self, key):
+        """
+        Check to see if the default should be from inheritance rather than from the field's global default
+        """
+        return self.inherited_settings[key.field_name]

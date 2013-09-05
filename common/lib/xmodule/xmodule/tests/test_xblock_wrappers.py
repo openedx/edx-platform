@@ -29,6 +29,7 @@ from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
+from xmodule.tests import get_test_descriptor_system
 
 LEAF_XMODULES = (
     AnnotatableDescriptor,
@@ -80,20 +81,12 @@ class TestXBlockWrapper(object):
         )
         return runtime
 
-    @property
-    def leaf_descriptor_runtime(self):
-        runtime = MakoDescriptorSystem(
-            load_item=Mock(),
-            resources_fs=Mock(),
-            error_tracker=Mock(),
-            render_template=(lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)),
-        )
-        return runtime
-
     def leaf_descriptor(self, descriptor_cls):
         location = 'i4x://org/course/category/name'
-        return descriptor_cls(
-            self.leaf_descriptor_runtime,
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
             DictFieldData({}),
             ScopeIds(None, descriptor_cls.__name__, location, location)
         )
@@ -110,16 +103,12 @@ class TestXBlockWrapper(object):
         runtime.position = 2
         return runtime
 
-    @property
-    def container_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        return runtime
-
     def container_descriptor(self, descriptor_cls):
         location = 'i4x://org/course/category/name'
-        return descriptor_cls(
-            self.container_descriptor_runtime,
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
             DictFieldData({
                 'children': range(3)
             }),

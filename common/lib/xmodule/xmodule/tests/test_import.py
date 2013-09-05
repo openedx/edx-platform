@@ -158,11 +158,10 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
         self.assertEqual(child.due, ImportTestCase.date.from_json(v))
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(1, len(child._inherited_metadata))
+        # need to convert v to canonical json b4 comparing
         self.assertEqual(
-            datetime.datetime(2013, 3, 20, 17, 0, tzinfo=UTC()),
-            child._inherited_metadata['due']
+            ImportTestCase.date.to_json(ImportTestCase.date.from_json(v)),
+            child.xblock_kvs.inherited_settings['due']
         )
 
         # Now export and check things
@@ -218,8 +217,6 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.due, None)
-        # pylint: disable=W0212
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertLessEqual(
             child.start,
             datetime.datetime.now(UTC())
@@ -249,10 +246,9 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(descriptor.due, ImportTestCase.date.from_json(course_due))
         self.assertEqual(child.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
-        self.assertEqual(1, len(child._inheritable_metadata))
         self.assertEqual(
-            datetime.datetime(2013, 3, 20, 17, 0, tzinfo=UTC()),
-            child._inheritable_metadata['due']
+            ImportTestCase.date.to_json(ImportTestCase.date.from_json(course_due)),
+            child.xblock_kvs.inherited_settings['due']
         )
 
     def test_is_pointer_tag(self):
@@ -288,14 +284,14 @@ class ImportTestCase(BaseCourseTestCase):
         print("Starting import")
         course = self.get_course('toy')
 
-        def check_for_key(key, node):
+        def check_for_key(key, node, value):
             "recursive check for presence of key"
             print("Checking {0}".format(node.location.url()))
-            self.assertTrue(node._field_data.has(node, key))
+            self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
-                check_for_key(key, c)
+                check_for_key(key, c, value)
 
-        check_for_key('graceperiod', course)
+        check_for_key('graceperiod', course, course.graceperiod)
 
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same

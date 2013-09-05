@@ -15,6 +15,8 @@ import logging
 
 from lxml import etree
 from pkg_resources import resource_string
+import datetime
+import time
 
 from django.http import Http404
 from django.conf import settings
@@ -28,8 +30,8 @@ from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
 from xblock.field_data import DictFieldData
 
-import datetime
-import time
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore
+from xblock.runtime import DbModel
 
 log = logging.getLogger(__name__)
 
@@ -240,9 +242,11 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, location))
         field_data = VideoDescriptor._parse_video_xml(xml_data)
         field_data['location'] = location
+        kvs = InheritanceKeyValueStore(initial_values=field_data)
+        field_data = DbModel(kvs)
         video = system.construct_xblock_from_class(
             cls,
-            DictFieldData(field_data),
+            field_data,
 
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
@@ -259,25 +263,22 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         youtube_string = _create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
-        if youtube_string == '1.00:OEoXaMPEzfM':
-            youtube_string = ''
+        if youtube_string and youtube_string != '1.00:OEoXaMPEzfM':
+            xml.set('youtube', unicode(youtube_string))
+        xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
             'show_captions': json.dumps(self.show_captions),
-            'youtube': youtube_string,
             'start_time': datetime.timedelta(seconds=self.start_time),
             'end_time': datetime.timedelta(seconds=self.end_time),
             'sub': self.sub,
-            'url_name': self.url_name
         }
-        fields = {field.name: field for field in self.fields.values()}
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
-            # is set to its default value, we don't need to write it out.
-            if key in fields and fields[key].default == getattr(self, key):
-                continue
+            # is set to its default value, we don't write it out.
             if value:
-                xml.set(key, unicode(value))
+                if key in self.fields and self.fields[key].is_set_on(self):
+                    xml.set(key, unicode(value))
 
         for source in self.html5_sources:
             ele = etree.Element('source')

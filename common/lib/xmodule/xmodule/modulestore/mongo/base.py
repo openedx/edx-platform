@@ -17,25 +17,23 @@ import sys
 import logging
 import copy
 
-from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
 from operator import attrgetter
-from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import DbModel, KeyValueStore
+from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata
+from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
 log = logging.getLogger(__name__)
 
@@ -58,12 +56,13 @@ class InvalidWriteError(Exception):
     """
 
 
-class MongoKeyValueStore(KeyValueStore):
+class MongoKeyValueStore(InheritanceKeyValueStore):
     """
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
     def __init__(self, data, children, metadata):
+        super(MongoKeyValueStore, self).__init__()
         self._data = data
         self._children = children
         self._metadata = metadata
@@ -201,10 +200,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                     # Convert the serialized fields values in self.cached_metadata
                     # to python values
-                    metadata_to_inherit = {
-                        key: module.fields[key].from_json(value)
-                        for key, value in self.cached_metadata.get(non_draft_loc.url(), {}).items()
-                    }
+                    metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 # decache any computed pending field settings
                 module.save()

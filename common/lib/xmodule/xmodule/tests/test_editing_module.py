@@ -9,7 +9,7 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from .import get_test_system
+from xmodule.tests import get_test_descriptor_system
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
 
     def setUp(self):
         super(TabsEditingDescriptorTestCase, self).setUp()
-        system = get_test_system()
+        system = get_test_descriptor_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         self.tabs = [
             {
@@ -44,8 +44,8 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         ]
 
         TabsEditingDescriptor.tabs = self.tabs
-        self.descriptor = TabsEditingDescriptor(
-            runtime=system,
+        self.descriptor = system.construct_xblock_from_class(
+            TabsEditingDescriptor,
             field_data=DictFieldData({}),
             scope_ids=ScopeIds(None, None, None, None),
         )

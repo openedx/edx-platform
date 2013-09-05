@@ -19,7 +19,9 @@ from path import path
 
 import calc
 from xblock.field_data import DictFieldData
-from xmodule.x_module import ModuleSystem, XModuleDescriptor
+from xmodule.x_module import ModuleSystem, XModuleDescriptor, DescriptorSystem
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.mako_module import MakoDescriptorSystem
 
 
 # Location of common test DATA directory
@@ -64,7 +66,20 @@ def get_test_system():
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         xblock_field_data=lambda descriptor: descriptor._field_data,
         anonymous_student_id='student',
-        open_ended_grading_interface= open_ended_grading_interface
+        open_ended_grading_interface=open_ended_grading_interface
+    )
+
+
+def get_test_descriptor_system():
+    """
+    Construct a test DescriptorSystem instance.
+    """
+    return MakoDescriptorSystem(
+        load_item=Mock(),
+        resources_fs=Mock(),
+        error_tracker=Mock(),
+        render_template=lambda template, context: repr(context),
+        mixins=(InheritanceMixin,),
     )
 
 
