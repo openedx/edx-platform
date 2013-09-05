@@ -130,6 +130,10 @@
 // ====================
 
 // edx.org marketing site - registration iframe band-aid (poor form enough to isolate out)
+.view-iframe, .view-iframe-content {
+  overflow: hidden;
+}
+
 .view-partial-mktgregister {
   background: transparent !important;
 
