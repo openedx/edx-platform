@@ -237,7 +237,7 @@ def _signup(request, eamap, retfun=None):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP',''):
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', False):
         # do signin immediately, by calling create_account, instead of asking
         # student to fill in form.  MIT students already have information filed.
         username = eamap.external_email.split('@',1)[0]
