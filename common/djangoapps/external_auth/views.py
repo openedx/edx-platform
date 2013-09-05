@@ -866,6 +866,8 @@ def test_center_login(request):
         - vueExamSeriesCode - a code that indicates the exam that we're using
     '''
     # Required for Pearson
+    # this import must be here because the test center code imports this file (can't have import loops)
+    # also, the test center code really needs refactoring - it is a huge kludge
     from courseware.views import get_module_for_descriptor, jump_to
 
     # errors are returned by navigating to the error_url, adding a query parameter named "code"
