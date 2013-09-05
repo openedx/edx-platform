@@ -44,7 +44,8 @@ class LTIFields(object):
 
 
 class LTIModule(LTIFields, XModule):
-    '''Module provides LTI integration to course.
+    '''
+    Module provides LTI integration to course.
 
     Except usual xmodule structure it proceeds with oauth signing.
     How it works::
@@ -127,7 +128,9 @@ class LTIModule(LTIFields, XModule):
     js_module_name = "LTI"
 
     def get_html(self):
-        """ Renders parameters to template. """
+        """
+        Renders parameters to template.
+        """
 
         # Obtains client_key and client_secret credentials from current course:
         course_id = self.runtime.course_id
@@ -176,7 +179,8 @@ class LTIModule(LTIFields, XModule):
         return self.system.render_template('lti.html', context)
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
-        """Signs request and returns signature and oauth parameters.
+        """
+        Signs request and returns signature and oauth parameters.
 
         `custom_paramters` is dict of parsed `custom_parameter` field
 
@@ -236,5 +240,7 @@ class LTIModule(LTIFields, XModule):
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor):
-    """LTI Descriptor. No export/import to xml."""
+    """
+    LTIModuleDescriptor provides no export/import to xml.
+    """
     module_class = LTIModule
