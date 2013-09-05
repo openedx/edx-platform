@@ -852,7 +852,7 @@ def create_account(request, post_override=None):
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
-    if len(post_vars["level_of_education"] < 1):
+    if len(post_vars["level_of_education"]) < 1:
         js['value'] = _('Education level is required')
         js['field'] = "level_of_education"
         return HttpResponse(json.dumps(js))
