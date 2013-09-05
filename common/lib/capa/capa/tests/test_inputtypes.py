@@ -55,7 +55,7 @@ class OptionInputTest(unittest.TestCase):
                     'options': [('Up', 'Up'), ('Down', 'Down')],
                     'status': 'answered',
                     'msg': '',
-                    'inline': '',
+                    'inline': False,
                     'id': 'sky_input'}
 
         self.assertEqual(context, expected)
