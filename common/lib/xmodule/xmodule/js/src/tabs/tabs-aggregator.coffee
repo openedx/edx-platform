@@ -9,7 +9,7 @@ class @TabsEditingDescriptor
     ###
 
     # hide editor/settings bar
-    $('.component-edit-header').hide()
+    @element.closest('.component-editor').find('.component-edit-header').hide()
 
     @$tabs = $(".tab", @element)
     @$content = $(".component-tab", @element)
