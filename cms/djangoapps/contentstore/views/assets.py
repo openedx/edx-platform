@@ -35,6 +35,7 @@ from xmodule.exceptions import NotFoundError, SerializationError
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
+from django.utils.translation import ugettext as _
 
 __all__ = ['asset_index', 'upload_asset']
 

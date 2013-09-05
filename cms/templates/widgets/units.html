@@ -1,5 +1,6 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from contentstore.utils import compute_unit_state %>
+<%! from django.utils.translation import ugettext as _ %>
 
 <!--
 This def will enumerate through a passed in subsection and list all of the units
@@ -26,8 +27,8 @@ This def will enumerate through a passed in subsection and list all of the units
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
-	<a href="#" data-tooltip="Drag to sort" class="drag-handle"></a>
+	<a href="#" data-tooltip='${_("Delete this unit")}' class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
+	<a href="#" data-tooltip='${_("Drag to sort")}' class="drag-handle"></a>
       </div>
       % endif
     </div>
@@ -35,7 +36,7 @@ This def will enumerate through a passed in subsection and list all of the units
   % endfor
   <li>
     <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection.location}">
-      <span class="new-unit-icon"></span>New Unit
+      <span class="new-unit-icon"></span>${_("New Unit")}
     </a>
   </li>
 </ol>

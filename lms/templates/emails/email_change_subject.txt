@@ -1,1 +1,2 @@
-Request to change ${settings.PLATFORM_NAME} account e-mail
+<%! from django.utils.translation import ugettext as _ %>
+${_('Request to change {0} account e-mail').format(settings.PLATFORM_NAME)}

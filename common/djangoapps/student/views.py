@@ -646,12 +646,12 @@ def create_account(request, post_override=None):
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
-            error_str = {'username': 'Username must be minimum of two characters long.',
-                         'email': 'A properly formatted e-mail is required.',
-                         'name': 'Your legal name must be a minimum of two characters long.',
-                         'password': 'A valid password is required.',
-                         'terms_of_service': 'Accepting Terms of Service is required.',
-                         'honor_code': 'Agreeing to the Honor Code is required.'}
+            error_str = {'username': _('Username must be minimum of two characters long.'),
+                         'email': _('A properly formatted e-mail is required.'),
+                         'name': _('Your legal name must be a minimum of two characters long.'),
+                         'password': _('A valid password is required.'),
+                         'terms_of_service': _('Accepting Terms of Service is required.'),
+                         'honor_code': _('Agreeing to the Honor Code is required.')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
