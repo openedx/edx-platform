@@ -24,9 +24,6 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
 from xblock.core import Scope, String, Boolean, Float, List, Integer
 
 import datetime

@@ -191,7 +191,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('FirstNameTesting123', resp.content)
-        self.assertIn('StreetTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
         ((template, context), _) = render_mock.call_args

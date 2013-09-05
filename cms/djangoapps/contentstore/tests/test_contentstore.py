@@ -25,6 +25,7 @@ from contentstore.tests.utils import parse_json
 from auth.authz import add_user_to_creator_group
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location, mongo
@@ -68,7 +69,7 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy courses.
@@ -1139,12 +1140,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
+        print module_store.metadata_inheritance_cache_subsystem
+        print module_store.request_cache
         course = module_store.get_item(location, depth=2)
 
         # make sure we haven't done too many round trips to DB
-        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
-        # 4) because of the RT due to calculating the inherited metadata
-        self.assertEqual(wrapper.counter, 4)
+        # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
+        # Because we're querying from the top of the tree, we cache information needed for inheritance,
+        # so we don't need to make an extra query to compute it.
+        self.assertEqual(wrapper.counter, 3)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
         self.assertTrue(Location(['i4x', 'edX', 'toy', 'sequential',
@@ -1180,7 +1184,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -1707,6 +1711,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         content_store.find(location)
 
 
+@override_settings(MODULESTORE=TEST_MODULESTORE)
 class MetadataSaveTestCase(ModuleStoreTestCase):
     """Test that metadata is correctly cached and decached."""
 

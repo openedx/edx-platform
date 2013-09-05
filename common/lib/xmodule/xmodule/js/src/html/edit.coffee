@@ -101,32 +101,25 @@ class @HTMLEditingDescriptor
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
     if visualEditor.isDirty()
-      content = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+      content = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
       @advanced_editor.setValue(content)
       @advanced_editor.setCursor(0)
     @advanced_editor.refresh()
     @advanced_editor.focus()
     @showingVisualEditor = false
 
-  rewriteStaticLinks: (content, from, to) ->
-    if from == null || to == null
-      return content
-
-    regex = new RegExp(from, 'g')
-    return content.replace(regex, to)    
-
   # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
   showVisualEditor: (visualEditor) ->
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
-    content = @rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
+    content = rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
     visualEditor.setContent(content)
     visualEditor.startContent = content
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
   initInstanceCallback: (visualEditor) =>
-    visualEditor.setContent(@rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url))
+    visualEditor.setContent(rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url))
     @focusVisualEditor(visualEditor)
 
   focusVisualEditor: (visualEditor) =>
@@ -150,5 +143,5 @@ class @HTMLEditingDescriptor
     text = @advanced_editor.getValue()
     visualEditor = @getVisualEditor()
     if @showingVisualEditor and visualEditor.isDirty()
-      text = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+      text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
     data: text

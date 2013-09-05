@@ -9,7 +9,6 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import i_am_registered_for_the_course
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-from nose.tools import assert_equal
 
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
@@ -83,13 +82,21 @@ def answer_problem_step(step, problem_type, correctness):
     *problem_type* is a string representing the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect']
     """
-
-    assert(correctness in ['correct', 'incorrect'])
-    assert(problem_type in PROBLEM_DICT)
-    answer_problem(problem_type, correctness)
+    # Change the answer on the page
+    input_problem_answer(step, problem_type, correctness)
 
     # Submit the problem
     check_problem(step)
+
+
+@step(u'I input an answer on a "([^"]*)" problem "([^"]*)ly"')
+def input_problem_answer(_, problem_type, correctness):
+    """
+    Have the browser input an answer (either correct or incorrect)
+    """
+    assert(correctness in ['correct', 'incorrect'])
+    assert(problem_type in PROBLEM_DICT)
+    answer_problem(problem_type, correctness)
 
 
 @step(u'I check a problem')
@@ -147,8 +154,8 @@ def see_score(_step, score):
     assert world.browser.is_text_present(score)
 
 
-@step(u'My "([^"]*)" answer is marked "([^"]*)"')
-def assert_answer_mark(step, problem_type, correctness):
+@step(u'[Mm]y "([^"]*)" answer is( NOT)? marked "([^"]*)"')
+def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     """
     Assert that the expected answer mark is visible
     for a given problem type.
@@ -163,7 +170,10 @@ def assert_answer_mark(step, problem_type, correctness):
 
     # At least one of the correct selectors should be present
     for sel in PROBLEM_DICT[problem_type][correctness]:
-        has_expected = world.is_css_present(sel)
+        if isnt_marked:
+            has_expected = world.is_css_not_present(sel)
+        else:
+            has_expected = world.is_css_present(sel)
 
         # As soon as we find the selector, break out of the loop
         if has_expected:

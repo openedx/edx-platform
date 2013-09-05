@@ -45,3 +45,25 @@ Feature: Course updates
         When I modify the handout to "<ol>Test</ol>"
         Then I see the handout "Test"
         And I see a "saving" notification
+
+    Scenario: Static links are rewritten when previewing a course update
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I add a new update with the text "<img src='/static/my_img.jpg'/>"
+        # Can only do partial text matches because of the quotes with in quotes (and regexp step matching).
+        Then I should see the update "/c4x/MITx/999/asset/my_img.jpg"
+        And I change the update from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
+        Then I should see the update "/c4x/MITx/999/asset/modified.jpg"
+        And when I reload the page
+        Then I should see the update "/c4x/MITx/999/asset/modified.jpg"
+
+    Scenario: Static links are rewritten when previewing handouts
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I modify the handout to "<ol><img src='/static/my_img.jpg'/></ol>"
+        # Can only do partial text matches because of the quotes with in quotes (and regexp step matching).
+        Then I see the handout "/c4x/MITx/999/asset/my_img.jpg"
+        And I change the handout from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
+        Then I see the handout "/c4x/MITx/999/asset/modified.jpg"
+        And when I reload the page
+        Then I see the handout "/c4x/MITx/999/asset/modified.jpg"

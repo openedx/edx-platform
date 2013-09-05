@@ -22,9 +22,12 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
-from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+from xmodule.progress import Progress
+from xmodule.tests.test_util_open_ended import (
+    MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
-    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE)
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE
+)
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -68,7 +71,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+        }
     }
     definition = Mock()
     descriptor = Mock()
@@ -191,7 +194,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+        }
     }
 
     oeparam = etree.XML('''
@@ -480,6 +483,29 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
 
+    def test_container_get_progress(self):
+        """
+        See if we can get the progress from the actual xmodule
+        """
+        progress = self.combinedoe_container.max_score()
+        self.assertEqual(progress, None)
+
+    def test_get_progress(self):
+        """
+        Test if we can get the correct progress from the combined open ended class
+        """
+        self.combinedoe.update_task_states()
+        self.combinedoe.state = "done"
+        self.combinedoe.is_scored = True
+        progress = self.combinedoe.get_progress()
+        self.assertIsInstance(progress, Progress)
+
+        # progress._a is the score of the xmodule, which is 0 right now.
+        self.assertEqual(progress._a, 0)
+
+        # progress._b is the max_score (which is 1), divided by the weight (which is 1).
+        self.assertEqual(progress._b, 1)
+
     def test_container_weight(self):
         """
         Check the problem weight in the container
@@ -529,7 +555,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA})
+                                                   instance_state={'task_states': TEST_STATE_SA})
 
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                    self.location,
@@ -537,7 +563,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA_IN})
+                                                   instance_state={'task_states': TEST_STATE_SA_IN})
 
 
     def test_get_score_realistic(self):
@@ -581,7 +607,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         descriptor = Mock(data=definition)
         instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
-            instance_state.update({'current_task_number' : task_number})
+            instance_state.update({'current_task_number': task_number})
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
                                                definition,
@@ -687,7 +713,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
-        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files" : False, "student_file" : None})
+        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files": False, "student_file": None})
         html = module.handle_ajax("get_html", {})
 
         #Mock a student submitting an assessment
@@ -729,7 +755,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
-        #from nose.tools import set_trace; set_trace()
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)

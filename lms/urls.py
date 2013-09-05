@@ -3,9 +3,6 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-# Not used, the work is done in the imported module.
-from . import one_time_startup      # pylint: disable=W0611
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -193,6 +190,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
@@ -348,9 +346,6 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
             include('instructor.views.api_urls'))
     )
-
-if settings.ENABLE_JASMINE:
-    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin

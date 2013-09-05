@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 
 from lettuce import world, step
-from nose.tools import assert_equals, assert_in
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location

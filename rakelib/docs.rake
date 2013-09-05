@@ -18,7 +18,7 @@ task :builddocs, [:type, :quiet] do |t, args|
         if args.quiet == 'verbose'
             sh('make html quiet=false')
         else
-            sh('make html')
+            sh('make html quiet=true')
         end
     end
 end

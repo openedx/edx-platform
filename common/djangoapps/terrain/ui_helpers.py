@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from lettuce.django import django_url
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 
 @world.absorb

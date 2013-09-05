@@ -25,7 +25,9 @@ function (VideoPlayer) {
      *
      * Initialize module exports this function.
      *
-     * @param {Object} state A place for all properties, and methods of Video.
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
      * @param {DOM element} element Container of the entire Video DOM element.
      */
     return function (state, element) {
@@ -40,10 +42,12 @@ function (VideoPlayer) {
     /**
      * @function _makeFunctionsPublic
      *
-     * Functions which will be accessible via 'state' object. When called, these functions will get the 'state'
+     * Functions which will be accessible via 'state' object. When called,
+     * these functions will get the 'state'
      * object as a context.
      *
-     * @param {Object} state A place for all properties, and methods of Video.
+     * @param {object} state The object containg the state (properties,
+     *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
         state.setSpeed    = _.bind(setSpeed, state);

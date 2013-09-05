@@ -7,7 +7,7 @@ from xmodule.fields import Date, Timedelta
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
 from .import get_test_system
-from nose.tools import assert_equals
+from nose.tools import assert_equals  # pylint: disable=E0611
 from mock import Mock
 
 
