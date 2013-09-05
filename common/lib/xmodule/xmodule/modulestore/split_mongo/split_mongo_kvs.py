@@ -18,7 +18,7 @@ class SplitMongoKVS(KeyValueStore):
     known to the MongoModuleStore (data, children, and metadata)
     """
 
-    def __init__(self, definition, fields, _inherited_settings, location, category):
+    def __init__(self, definition, fields, _inherited_settings):
         """
 
         :param definition: either a lazyloader or definition id for the definition
@@ -34,8 +34,6 @@ class SplitMongoKVS(KeyValueStore):
         # if the db id, then the definition is presumed to be loaded into _fields
         self._fields = copy.copy(fields)
         self._inherited_settings = _inherited_settings
-        self._location = location
-        self._category = category
 
     def get(self, key):
         # simplest case, field is directly set
@@ -57,11 +55,7 @@ class SplitMongoKVS(KeyValueStore):
                 # or get default
                 raise KeyError()
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                return self._location
-            elif key.field_name == 'category':
-                return self._category
-            elif isinstance(self._definition, DefinitionLazyLoader):
+            if isinstance(self._definition, DefinitionLazyLoader):
                 self._load_definition()
                 if key.field_name in self._fields:
                     return self._fields[key.field_name]
@@ -75,14 +69,7 @@ class SplitMongoKVS(KeyValueStore):
         if key.scope not in [Scope.children, Scope.settings, Scope.content]:
             raise InvalidScopeError(key.scope)
         if key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = value  # is changing this legal?
-                return
-            elif key.field_name == 'category':
-                # TODO should this raise an exception? category is not changeable.
-                return
-            else:
-                self._load_definition()
+            self._load_definition()
 
         # set the field
         self._fields[key.field_name] = value
@@ -99,13 +86,7 @@ class SplitMongoKVS(KeyValueStore):
         if key.scope not in [Scope.children, Scope.settings, Scope.content]:
             raise InvalidScopeError(key.scope)
         if key.scope == Scope.content:
-            if key.field_name == 'location':
-                return  # noop
-            elif key.field_name == 'category':
-                # TODO should this raise an exception? category is not deleteable.
-                return  # noop
-            else:
-                self._load_definition()
+            self._load_definition()
 
         # delete the field value
         if key.field_name in self._fields:
@@ -123,12 +104,7 @@ class SplitMongoKVS(KeyValueStore):
         """
         # handle any special cases
         if key.scope == Scope.content:
-            if key.field_name == 'location':
-                return True
-            elif key.field_name == 'category':
-                return self._category is not None
-            else:
-                self._load_definition()
+            self._load_definition()
         elif key.scope == Scope.parent:
             return True
 
@@ -144,16 +120,11 @@ class SplitMongoKVS(KeyValueStore):
         """
         # handle any special cases
         if key_scope == Scope.content:
-            if key_name == 'location':
-                return PROVENANCE_LOCAL
-            elif key_name == 'category':
+            self._load_definition()
+            if key_name in self._fields:
                 return PROVENANCE_LOCAL
             else:
-                self._load_definition()
-                if key_name in self._fields:
-                    return PROVENANCE_LOCAL
-                else:
-                    return PROVENANCE_DEFAULT
+                return PROVENANCE_DEFAULT
         elif key_scope == Scope.parent:
             return PROVENANCE_DEFAULT
         # catch the locally set state

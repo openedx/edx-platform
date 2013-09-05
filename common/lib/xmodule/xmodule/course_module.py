@@ -377,12 +377,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
-        if self.wiki_slug is None:
-            if isinstance(self.location, Location):
-                self.wiki_slug = self.location.course
-            elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.location.course_id or self.display_name
-
         msg = None
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
@@ -397,8 +391,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
-        if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info
@@ -441,6 +433,34 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 tabs.append({'type': 'progress', 'name': 'Progress'})
 
             self.tabs = tabs
+
+    @property
+    def discussion_topics(self):
+        if not self._model_data.get('discussion_topics'):
+            # in next xblock rev:
+            # self._model_data.set('discussion_topics', {'General': {'id': self.location.html_id()}})
+            self._model_data['discussion_topics'] = {'General': {'id': self.location.html_id()}}
+        return self._model_data.get('discussion_topics')
+
+    @discussion_topics.setter
+    def discussion_topics(self, topics):
+        # in next xblock rev:
+        # self._model_data.set('discussion_topics', topics)
+        self._model_data['discussion_topics'] = topics
+
+    @property
+    def wiki_slug(self):
+        if not self._model_data.get('wiki_slug'):
+            if isinstance(self.location, Location):
+                return self.location.course
+            elif isinstance(self.location, CourseLocator):
+                return self.location.course_id or self.display_name
+
+    @wiki_slug.setter
+    def wiki_slug(self, slug):
+        # in next xblock rev:
+        # self._model_data.set('wiki_slug', slug)
+        self._model_data['wiki_slug'] = slug
 
     def set_grading_policy(self, course_policy):
         """

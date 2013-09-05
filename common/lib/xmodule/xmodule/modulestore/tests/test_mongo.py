@@ -178,10 +178,9 @@ class TestMongoKeyValueStore(object):
 
     def setUp(self):
         self.data = {'foo': 'foo_value'}
-        self.location = Location('i4x://org/course/category/name@version')
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
-        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location, 'category')
+        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)
 
     def _check_read(self, key, expected_value):
         """
@@ -192,7 +191,6 @@ class TestMongoKeyValueStore(object):
 
     def test_read(self):
         assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
-        assert_equals(self.location, self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'location')))
         assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
         assert_equals(self.metadata['meta'], self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')))
         assert_equals(None, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
@@ -214,7 +212,6 @@ class TestMongoKeyValueStore(object):
 
     def test_write(self):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
-        yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'location'), Location('i4x://org/course/category/name@new_version'))
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
 
@@ -240,7 +237,6 @@ class TestMongoKeyValueStore(object):
 
     def test_delete(self):
         yield (self._check_delete_key_error, KeyValueStore.Key(Scope.content, None, None, 'foo'))
-        yield (self._check_delete_default, KeyValueStore.Key(Scope.content, None, None, 'location'), Location(None))
         yield (self._check_delete_default, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
         yield (self._check_delete_key_error, KeyValueStore.Key(Scope.settings, None, None, 'meta'))
 

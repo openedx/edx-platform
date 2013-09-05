@@ -86,9 +86,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         kvs = SplitMongoKVS(
             definition,
             json_data.get('fields', {}),
-            json_data.get('_inherited_settings'),
-            block_locator,
-            json_data.get('category'))
+            json_data.get('_inherited_settings')
+        )
         model_data = DbModel(kvs, class_, None,
             SplitMongoKVSid(
                 # DbModel req's that these support .url()
@@ -109,6 +108,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 error_msg=exc_info_to_str(sys.exc_info())
             )
 
+        module.location = block_locator
+        module.category = json_data.get('category')
         edit_info = json_data.get('edit_info', {})
         module.edited_by = edit_info.get('edited_by')
         module.edited_on = edit_info.get('edited_on')

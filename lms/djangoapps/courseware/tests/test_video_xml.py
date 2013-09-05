@@ -52,13 +52,14 @@ class VideoFactory(object):
         """Method return Video Xmodule instance."""
         location = Location(["i4x", "edX", "video", "default",
                              "SampleProblem1"])
-        model_data = {'data': VideoFactory.sample_problem_xml_youtube,
-                      'location': location}
+        model_data = {'data': VideoFactory.sample_problem_xml_youtube}
 
         system = get_test_system()
         system.render_template = lambda template, context: context
 
         descriptor = VideoDescriptor(system, model_data)
+        descriptor.location = location
+        descriptor.category = 'video'
 
         module = descriptor.xmodule(system)
 
