@@ -14,6 +14,7 @@ import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
+from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
 
@@ -106,9 +107,9 @@ class LTIModule(LTIFields, XModule):
                     <input name="role" value="student" />
                     <input name="oauth_signature" value="${oauth_signature}" />
 
-                    % for param_name, param_value in custom_parameters.items():
-                        <input name="${param_name}" value="${param_value}" />
-                    %endfor
+                    <input name="custom_1" value="${custom_param_1_value}" />
+                    <input name="custom_2" value="${custom_param_2_value}" />
+                    <input name="custom_..." value="${custom_param_..._value}" />
 
                     <input type="submit" value="Press to Launch" />
                 </form>
@@ -129,13 +130,9 @@ class LTIModule(LTIFields, XModule):
         """ Renders parameters to template. """
 
         # Obtains client_key and client_secret credentials from current course:
-        # course location example: u'i4x://blades/1/course/2013_Spring'
-        course = self.descriptor.system.load_item(
-            self.location.tag + '://' +
-            self.location.org + '/' +
-            self.location.course +
-            '/course' +
-            '/2013_Spring')
+        course_id = self.runtime.course_id
+        course_location = CourseDescriptor.id_to_location(course_id)
+        course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key, client_secret = '', ''
         for lti_passport in course.LTIs:
             try:
@@ -147,15 +144,8 @@ class LTIModule(LTIFields, XModule):
                 client_key, client_secret = key, secret
                 break
 
-        # these params do not participate in oauth signing
-        params = {
-            'launch_url': self.launch_url,
-            'element_id': self.location.html_id(),
-            'element_class': self.location.category,
-        }
-
         # parsing custom parameters to dict
-        parsed_custom_parameters = {}
+        custom_parameters = {}
         for custom_parameter in self.custom_parameters:
             try:
                 param_name, param_value = custom_parameter.split('=')
@@ -164,17 +154,26 @@ class LTIModule(LTIFields, XModule):
                     Should be "x=y" string.'.format(custom_parameter))
 
             # LTI specs:  'custom_' should be prepended before each custom parameter
-            parsed_custom_parameters.update(
+            custom_parameters.update(
                 {u'custom_' + unicode(param_name): unicode(param_value)}
             )
 
-        params.update({'custom_parameters': parsed_custom_parameters})
-        params.update(self.oauth_params(
-            parsed_custom_parameters,
+        input_fields = (self.oauth_params(
+            custom_parameters,
             client_key,
             client_secret
         ))
-        return self.system.render_template('lti.html', params)
+
+        context = {
+            'input_fields': input_fields,
+
+            # these params do not participate in oauth signing
+            'launch_url': self.launch_url,
+            'element_id': self.location.html_id(),
+            'element_class': self.location.category,
+        }
+
+        return self.system.render_template('lti.html', context)
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """Signs request and returns signature and oauth parameters.
@@ -191,20 +190,19 @@ class LTIModule(LTIFields, XModule):
             client_secret=unicode(client_secret)
         )
 
-        # @ned - why  self.runtime.anonymous_student_id is None in dev env?
         user_id = self.runtime.anonymous_student_id
-        user_id = user_id if user_id else 'default_user_id'
+        assert user_id is not None
 
         # must have parameters for correct signing from LTI:
         body = {
-            'user_id': user_id,
-            'oauth_callback': 'about:blank',
-            'lis_outcome_service_url': '',
-            'lis_result_sourcedid': '',
-            'launch_presentation_return_url': '',
-            'lti_message_type': 'basic-lti-launch-request',
-            'lti_version': 'LTI-1p0',
-            'role': 'student'
+            u'user_id': user_id,
+            u'oauth_callback': u'about:blank',
+            u'lis_outcome_service_url': '',
+            u'lis_result_sourcedid': '',
+            u'launch_presentation_return_url': '',
+            u'lti_message_type': u'basic-lti-launch-request',
+            u'lti_version': 'LTI-1p0',
+            u'role': u'student'
         }
 
         # appending custom parameter for signing
@@ -220,12 +218,10 @@ class LTIModule(LTIFields, XModule):
             headers=headers)
         params = headers['Authorization']
         # parse headers to pass to template as part of context:
-        params = dict([param.strip().replace('"', '').split('=') for param in params.split('",')])
+        params = dict([param.strip().replace('"', '').split('=') for param in params.split(',')])
 
         params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
         del params[u'OAuth oauth_nonce']
-
-        params['user_id'] = body['user_id']
 
         # 0.14.2 (current) version of requests oauth library encodes signature,
         # with 'Content-Type': 'application/x-www-form-urlencoded'
@@ -234,6 +230,8 @@ class LTIModule(LTIFields, XModule):
         # So we need to decode signature back:
         params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
 
+        # add lti parameters to oauth parameters for sending in form
+        params.update(body)
         return params
 
 
