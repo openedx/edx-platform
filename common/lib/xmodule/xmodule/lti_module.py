@@ -69,7 +69,7 @@ class LTIModule(LTIFields, XModule):
         and set into course settings by course author.
         After that signature and other oauth data are generated.
 
-        Additional oauth data which is generated after signing is usual::
+         Oauth data which is generated after signing is usual::
 
             oauth_callback
             oauth_nonce
