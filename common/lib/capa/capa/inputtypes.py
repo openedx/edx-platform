@@ -325,7 +325,7 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('inline', '')]
+                Attribute('inline', False)]
 
 registry.register(OptionInput)
 
