@@ -11,22 +11,8 @@
         target="ltiLaunchFrame"
         encType="application/x-www-form-urlencoded"
     >
-        <input name="launch_presentation_return_url" value="" />
-        <input name="lis_outcome_service_url" value="" />
-        <input name="lis_result_sourcedid" value="" />
-        <input name="lti_message_type" value="basic-lti-launch-request" />
-        <input name="lti_version" value="LTI-1p0" />
-        <input name="oauth_callback" value="about:blank" />
-        <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
-        <input name="oauth_nonce" value="${oauth_nonce}" />
-        <input name="oauth_signature_method" value="HMAC-SHA1" />
-        <input name="oauth_timestamp" value="${oauth_timestamp}" />
-        <input name="oauth_version" value="1.0" />
-        <input name="user_id" value="${user_id}" />
-        <input name="role" value="student" />
-        <input name="oauth_signature" value="${oauth_signature}" />
 
-        % for param_name, param_value in custom_parameters.items():
+        % for param_name, param_value in input_fields.items():
             <input name="${param_name}" value="${param_value}" />
         %endfor
 
