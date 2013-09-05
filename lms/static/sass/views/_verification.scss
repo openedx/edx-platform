@@ -239,7 +239,7 @@
   }
 
   //  reset: lists
-  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group {
+  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
     @extend .ui-no-list;
   }
 
@@ -451,9 +451,9 @@
     @extend .ui-depth1;
     position: absolute;
     top: 43px;
-    left: 70px;
+    left: 7%;
     display: block;
-    width: 77%;
+    width: 83%;
     margin: 0 auto;
     background: $m-gray-l4;
 
@@ -474,14 +474,15 @@
       @include clearfix();
       position: relative;
       top: ($baseline/4);
+      display: table;
+      width: 100%;
     }
 
     .progress-step {
       @extend .ui-depth2;
       position: relative;
-      width: flex-grid(2,12);
+      display: table-cell;
       height: ($baseline*6);
-      float: left;
       padding: $baseline $baseline ($baseline*1.5) $baseline;
       text-align: center;
 
@@ -1497,7 +1498,7 @@
 
     // progress indicator
     .progress-sts-value {
-      width: 20%;
+      width: 14%;
     }
   }
 
@@ -1537,7 +1538,7 @@
 
     // progress indicator
     .progress-sts-value {
-      width: 40%;
+      width: 36%;
     }
   }
 
@@ -1612,7 +1613,7 @@
 
     // progress indicator
     .progress-sts-value {
-      width: 60%;
+      width: 55%;
     }
   }
 
@@ -1654,6 +1655,70 @@
     .progress-sts-value {
       width: 100%;
     }
+
+    .info-item {
+      margin-bottom: ($baseline*1.5);
+      padding: ($baseline*0.75) $baseline;
+      border-radius: ($baseline/10);
+      background: $m-gray-l4;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      > .title {
+        @extend .hd-lv3;
+      }
+
+      .copy {
+        @extend .copy-base;
+
+        strong {
+          @extend .t-weight5;
+          color: $m-gray-d4;
+        }
+
+        table {
+          width: 100%;
+          margin-bottom: $baseline;
+
+            tr {
+            }
+
+            th {
+              padding: ($baseline/2) ($baseline/2) ($baseline/2) 0;
+              text-align: left;
+            }
+
+            td {
+              border-top: 1px solid #ccc;
+              vertical-align: middle;
+              padding: ($baseline/2) ($baseline/2) ($baseline/2) 0;
+              text-transform: capitalize;
+            }
+
+            tfoot td {
+              font-weight: 600;
+
+              &.total {
+                text-align: right;
+              }
+            }
+        }
+
+
+
+          .action a {
+            @extend .btn-primary-blue;
+          }
+
+
+      }
+    }
+
+
+
+
   }
 }
 
@@ -1700,7 +1765,8 @@
 
   // progress indicator
   .progress-sts {
-    width: 47%;
+    width: 75%;
+    left: 13%;
   }
 
   .progress-sts-value {
