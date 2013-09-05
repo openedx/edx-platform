@@ -99,7 +99,7 @@ class TestXBlockWrapper(object):
         if depth == 0:
             runtime.get_module.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
         else:
-            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth-1)
+            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth - 1)
         runtime.position = 2
         return runtime
 
@@ -188,9 +188,9 @@ class TestStudioView(TestXBlockWrapper):
 
     # Test that for all of the Descriptors listed in CONTAINER_XMODULES
     # render the same thing using studio_view as they do using get_html, under the following conditions:
-    # a) All of its descendents are xmodules
-    # b) Some of its descendents are xmodules and some are xblocks
-    # c) All of its descendents are xblocks
+    # a) All of its descendants are xmodules
+    # b) Some of its descendants are xmodules and some are xblocks
+    # c) All of its descendants are xblocks
     def test_studio_view_container_node(self):
         for descriptor_cls in CONTAINER_XMODULES:
             yield self.check_studio_view_container_node_xmodules_only, descriptor_cls

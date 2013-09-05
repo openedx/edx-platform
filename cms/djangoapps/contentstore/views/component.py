@@ -2,15 +2,15 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import ( HttpResponse, HttpResponseBadRequest,
-        HttpResponseForbidden )
+from django.http import (HttpResponse, HttpResponseBadRequest,
+        HttpResponseForbidden)
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from xmodule.modulestore.exceptions import ( ItemNotFoundError,
-        InvalidLocationError )
+from xmodule.modulestore.exceptions import (ItemNotFoundError,
+        InvalidLocationError)
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
@@ -21,8 +21,8 @@ from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import ( get_modulestore, get_lms_link_for_item,
-    compute_unit_state, UnitState, get_course_for_item )
+from contentstore.utils import (get_modulestore, get_lms_link_for_item,
+    compute_unit_state, UnitState, get_course_for_item)
 
 from models.settings.course_grading import CourseGradingModel
 

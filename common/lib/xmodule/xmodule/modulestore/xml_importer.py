@@ -25,7 +25,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 
     verbose = True
 
-    for dirname, dirnames, filenames in os.walk(static_dir):
+    for dirname, _, filenames in os.walk(static_dir):
         for filename in filenames:
 
             try:
