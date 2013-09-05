@@ -8,6 +8,9 @@ from collections import OrderedDict
 class TestLTI(BaseTestXmodule):
     """
     Integration test for lti xmodule.
+
+    It checks overall code, by assuring that context that goes to template is correct.
+    As part of that, checks oauth signature generation by mocking signing function of `requests` library.
     """
     CATEGORY = "lti"
 
@@ -42,7 +45,9 @@ class TestLTI(BaseTestXmodule):
         saved_sign = requests.auth.Client.sign
 
         def mocked_sign(self, *args, **kwargs):
-            """Mocked oauth1 sign function"""
+            """
+            Mocked oauth1 sign function.
+            """
             # self is <oauthlib.oauth1.rfc5849.Client object> here:
             _, headers, _ = saved_sign(self, *args, **kwargs)
             # we should replace noonce, timestamp and signed_signature in headers:
@@ -57,7 +62,9 @@ class TestLTI(BaseTestXmodule):
         requests.auth.Client.sign = mocked_sign
 
     def test_lti_constructor(self):
-        """Make sure that all parameters extracted """
+        """
+        Makes sure that all parameters extracted.
+        """
         self.runtime.render_template = lambda template, context: context
         generated_context = self.item_module.get_html()
         expected_context = {
