@@ -387,7 +387,7 @@ class CombinedOpenEndedV1Module():
             'location': self.location,
             'legend_list': LEGEND_LIST,
             'human_state': HUMAN_STATES.get(self.state, "Not started."),
-            'is_staff': self.system.user_is_staff
+            'is_staff': self.system.user_is_staff,
         }
 
         return context
