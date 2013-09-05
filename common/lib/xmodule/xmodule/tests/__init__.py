@@ -37,7 +37,7 @@ open_ended_grading_interface = {
     }
 
 
-def get_test_system():
+def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
 
@@ -63,7 +63,8 @@ def get_test_system():
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
-        open_ended_grading_interface= open_ended_grading_interface
+        open_ended_grading_interface= open_ended_grading_interface,
+        course_id=course_id
     )
 
 

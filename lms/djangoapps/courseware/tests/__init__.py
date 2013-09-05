@@ -77,7 +77,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        self.runtime = get_test_system()
+        self.runtime = get_test_system(course_id='MITx/999/Robot_Super_Course')
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))

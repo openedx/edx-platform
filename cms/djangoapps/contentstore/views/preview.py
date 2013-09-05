@@ -80,7 +80,6 @@ def preview_component(request, location):
         component,
         'xmodule_edit.html'
     )
-
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
         'editor': component.runtime.render(component, None, 'studio_view').content,
@@ -107,7 +106,6 @@ def preview_module_system(request, preview_id, descriptor):
         )
 
     course_id = get_course_for_item(descriptor.location).location.course_id
-
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -120,6 +118,8 @@ def preview_module_system(request, preview_id, descriptor):
         user=request.user,
         xblock_model_data=preview_model_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        course_id=course_id,
+        anonymous_student_id= 'student'
     )
 
 
