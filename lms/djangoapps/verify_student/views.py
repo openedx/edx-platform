@@ -142,20 +142,9 @@ def show_requirements(request, course_id):
     """
     Show the requirements necessary for
     """
-    context = { "course_id": course_id, "is_not_active": not request.user.is_active}
+    context = {"course_id": course_id, "is_not_active": not request.user.is_active}
     return render_to_response("verify_student/show_requirements.html", context)
 
-def face_upload(request):
-    context = { "course_id": "edX/Certs101/2013_Test" }
-    return render_to_response("verify_student/face_upload.html", context)
-
-def photo_id_upload(request):
-    context = { "course_id": "edX/Certs101/2013_Test" }
-    return render_to_response("verify_student/photo_id_upload.html", context)
-
-def final_verification(request):
-    context = { "course_id": "edX/Certs101/2013_Test" }
-    return render_to_response("verify_student/final_verification.html", context)
 
 def show_verification_page(request):
     pass

@@ -251,12 +251,12 @@
                     <h4 class="title">${_("Check Your Name")}</h4>
 
                     <div class="copy">
-                      <p>${_("Make sure your full name on your edX account ({}) matches your ID. We will also use this as the name on your certificate.").format(user_full_name)}</p>
+                        <p>${_("Make sure your full name on your edX account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
                     </div>
 
                     <ul class="list-actions">
                       <li class="action action-editname">
-                        <a rel="modal" class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
+                        <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
                       </li>
                     </ul>
                   </li>

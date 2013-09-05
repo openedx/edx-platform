@@ -67,6 +67,26 @@ function doSnapshotButton(captureButton, resetButton, approveButton) {
   approveButton.show();
 }
 
+
+function submitNameChange(event) {
+  event.preventDefault();
+  var full_name = $('input[name="name"]').val();
+  var xhr = $.post(
+    "/change_name",
+    {
+      "new_name" : full_name,
+      "rationale": "Want to match ID for ID Verified Certificates."
+    },
+    function(data) {
+        $('#full-name').html(full_name);
+    }
+  )
+  .fail(function(jqXhr,text_status, error_thrown) {
+    $('.message-copy').html(jqXhr.responseText);
+  });
+  
+}
+
 function initSnapshotHandler(names, hasHtml5CameraSupport) {
   var name = names.pop();
   if (name == undefined) {
@@ -186,6 +206,10 @@ $(document).ready(function() {
   $('#photo_id_next_button').click(function(){
       $('body').addClass('step-review').removeClass('step-photos-id')
   })
+
+  // set up edit information dialog
+  $('#edit-name div[role="alert"]').hide();
+  $('#edit-name .action-save').click(submitNameChange);
 
   var hasHtml5CameraSupport = initVideoCapture();
 

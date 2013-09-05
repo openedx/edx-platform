@@ -12,15 +12,14 @@
     </div>
     <p>
       <label for="name">${_('Full Name')}</label>
-      <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" />
+      <input id="name" type="text" name="name" value="" placeholder="${user_full_name}" required aria-required="true" />
     </p>
 
     <div class="actions">
-      <button class="action action-primary" type="submit">${_("Save")}</button>
-      <button class="action action-secondary action-cancel">${_("Cancel")}</button>
+      <button class="action action-primary action-save">${_("Save")}</button>
     </div>
   </form>
-  <a href="#" data-dismiss="modal" rel="view" class="action action-close action-editname-close">
+  <a href="#" data-dismiss="leanModal" rel="view" class="action action-close action-editname-close">
     <i class="icon-remove-sign"></i>
     <span class="label">${_("close")}</span>
   </a>

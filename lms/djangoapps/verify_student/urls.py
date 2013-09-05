@@ -6,24 +6,6 @@ from verify_student import views
 urlpatterns = patterns(
     '',
     url(
-        r'^face_upload',
-        views.face_upload,
-        name="verify_student/face_upload"
-    ),
-    url(
-        r'^photo_id_upload',
-        views.photo_id_upload,
-        name="verify_student/photo_id_upload"
-    ),
-    url(
-        r'^final_verification',
-        views.final_verification,
-        name="verify_student/final_verification"
-    ),
-
-    # The above are what we did for the design mockups, but what we're really
-    # looking at now is:
-    url(
         r'^show_requirements/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.show_requirements,
         name="verify_student_show_requirements"
