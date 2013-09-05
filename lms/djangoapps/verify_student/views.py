@@ -101,9 +101,10 @@ def create_order(request):
     """
     Submit PhotoVerification and create a new Order for this verified cert
     """
-    attempt = SoftwareSecurePhotoVerification(user=request.user)
-    attempt.status = "ready"
-    attempt.save()
+    if not SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
+        attempt = SoftwareSecurePhotoVerification(user=request.user)
+        attempt.status = "ready"
+        attempt.save()
 
     course_id = request.POST['course_id']
     donation_for_course = request.session.get('donation_for_course', {})
