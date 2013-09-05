@@ -123,8 +123,8 @@ class CourseDetailsTestCase(CourseTestCase):
 
             self.assertContains(response, "Course Start Date")
             self.assertContains(response, "Course End Date")
-            self.assertNotContains(response, "Enrollment Start Date")
-            self.assertNotContains(response, "Enrollment End Date")
+            self.assertContains(response, "Enrollment Start Date")
+            self.assertContains(response, "Enrollment End Date")
             self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertNotContains(response, "Introducing Your Course")
