@@ -266,6 +266,7 @@ class @StaffGrading
 
     @render_view()
     @scroll_to_top()
+    VideoClipper.generate()
        
   get_next_submission: (location) ->
     @location = location
