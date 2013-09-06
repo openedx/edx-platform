@@ -2,6 +2,7 @@ import logging
 import sys
 from functools import partial
 
+from django.conf import settings
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -11,11 +12,11 @@ from xmodule_modifiers import replace_static_urls, wrap_xmodule, save_module  # 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mongo import MongoUsage
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
+
+from lms.xblock.field_data import lms_field_data
 
 from util.sandboxing import can_execute_unsafe_code
 
@@ -97,14 +98,10 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
 
-    def preview_model_data(descriptor):
+    def preview_field_data(descriptor):
         "Helper method to create a DbModel from a descriptor"
-        return DbModel(
-            SessionKeyValueStore(request, descriptor._model_data),
-            descriptor.module_class,
-            preview_id,
-            MongoUsage(preview_id, descriptor.location.url()),
-        )
+        student_data = DbModel(SessionKeyValueStore(request))
+        return lms_field_data(descriptor._field_data, student_data)
 
     course_id = get_course_for_item(descriptor.location).location.course_id
 
@@ -118,8 +115,9 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xblock_model_data=preview_model_data,
+        xblock_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        mixins=settings.XBLOCK_MIXINS,
     )
 
 

@@ -37,21 +37,21 @@
           <div class="field field-start-date">
             <label for="start_date">${_("Release Day")}</label>
             <input type="text" id="start_date" name="start_date"
-                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}"
+                value="${subsection.start.strftime('%m/%d/%Y') if subsection.start else ''}"
                 placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
             <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">${_("UTC")}</abbr>)</label>
             <input type="text" id="start_time" name="start_time"
-                value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}"
+                value="${subsection.start.strftime('%H:%M') if subsection.start else ''}"
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
-        % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
-            % if parent_item.lms.start is None:
+        % if subsection.start and not almost_same_datetime(subsection.start, parent_item.start):
+            % if parent_item.start is None:
             <p class="notice">${_("The date above differs from the release date of {name}, which is unset.").format(name=parent_item.display_name_with_default)}
             % else:
-      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
+      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.start))}.
             % endif
       <a href="#" class="sync-date no-spinner">${_("Sync to {name}.").format(name=parent_item.display_name_with_default)}</a></p>
         % endif
@@ -60,7 +60,7 @@
     <div class="row gradable">
       <label>${_("Graded as:")}</label>
 
-    <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else _('Not Graded')}">
+    <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
     </div>
 
     <div class="due-date-input row">
@@ -69,13 +69,13 @@
         <div class="field field-start-date">
         <label for="due_date">${_("Due Day")}</label>
           <input type="text" id="due_date" name="due_date"
-          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}"
+          value="${subsection.due.strftime('%m/%d/%Y') if subsection.due else ''}"
           placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
         <label for="due_time">${_("Due Time")} (<abbr title="${_('Coordinated Universal Time')}">UTC</abbr>)</label>
           <input type="text" id="due_time" name="due_time"
-            value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}"
+            value="${subsection.due.strftime('%H:%M') if subsection.due else ''}"
             placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
         <a href="#" class="remove-date">${_("Remove due date")}</a>

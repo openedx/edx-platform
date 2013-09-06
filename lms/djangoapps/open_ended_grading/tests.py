@@ -15,8 +15,8 @@ from mitxmako.shortcuts import render_to_string
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
 from xmodule.x_module import ModuleSystem
+from xblock.fields import ScopeIds
 
 from open_ended_grading import staff_grading_service, views
 from courseware.access import _course_staff_group_name
@@ -28,6 +28,7 @@ from django.test.utils import override_settings
 
 from xmodule.tests import test_util_open_ended
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xblock.field_data import DictFieldData
 
 from courseware.tests import factories
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -158,7 +159,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location, 'category':'peergrading'}
+        field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
@@ -166,13 +167,13 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data={},
+            xblock_field_data=lambda d: d._field_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
-            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            mixins=settings.XBLOCK_MIXINS,
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, model_data)
-        model_data = {'location': location}
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, self.descriptor, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
+        self.peer_module = self.descriptor.xmodule(self.system)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
