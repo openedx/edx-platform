@@ -158,9 +158,7 @@ class LTIModule(LTIFields, XModule):
                     Should be "x=y" string.'.format(custom_parameter))
 
             # LTI specs:  'custom_' should be prepended before each custom parameter
-            custom_parameters.update(
-                {u'custom_' + unicode(param_name): unicode(param_value)}
-            )
+            custom_parameters[u'custom_' + unicode(param_name)] = unicode(param_value)
 
         input_fields = (self.oauth_params(
             custom_parameters,
