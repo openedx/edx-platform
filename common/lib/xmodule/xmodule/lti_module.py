@@ -142,7 +142,7 @@ class LTIModule(LTIFields, XModule):
             try:
                 lti_id, key, secret = lti_passport.split(':')
             except ValueError:
-                raise Exception('Could not parse LTI passport: {0}. \
+                raise Exception('Could not parse LTI passport: {0!r}. \
                     Should be "id:key:secret" string.'.format(lti_passport))
             if lti_id == self.lti_id:
                 client_key, client_secret = key, secret
@@ -154,7 +154,7 @@ class LTIModule(LTIFields, XModule):
             try:
                 param_name, param_value = custom_parameter.split('=', 1)
             except ValueError:
-                raise Exception('Could not parse custom parameter: {0}. \
+                raise Exception('Could not parse custom parameter: {0!r}. \
                     Should be "x=y" string.'.format(custom_parameter))
 
             # LTI specs:  'custom_' should be prepended before each custom parameter
