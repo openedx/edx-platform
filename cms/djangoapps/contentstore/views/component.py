@@ -30,6 +30,7 @@ from .requests import _xmodule_recurse
 from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError
+from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -137,6 +138,15 @@ def edit_subsection(request, location):
     )
 
 
+def load_mixed_class(category):
+    """
+    Load an XBlock by category name, and apply all defined mixins
+    """
+    component_class = XModuleDescriptor.load_class(category)
+    mixologist = Mixologist(settings.XBLOCK_MIXINS)
+    return mixologist.mix(component_class)
+
+
 @login_required
 def edit_unit(request, location):
     """
@@ -165,7 +175,7 @@ def edit_unit(request, location):
 
     component_templates = defaultdict(list)
     for category in COMPONENT_TYPES:
-        component_class = XModuleDescriptor.load_class(category)
+        component_class = load_mixed_class(category)
         # add the default template
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
@@ -203,7 +213,7 @@ def edit_unit(request, location):
                 # class? i.e., can an advanced have more than one entry in the
                 # menu? one for default and others for prefilled boilerplates?
                 try:
-                    component_class = XModuleDescriptor.load_class(category)
+                    component_class = load_mixed_class(category)
 
                     component_templates['advanced'].append((
                         component_class.display_name.default or category,

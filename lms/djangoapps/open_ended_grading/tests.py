@@ -169,7 +169,8 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             replace_urls=None,
             xblock_field_data=lambda d: d._field_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
-            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            mixins=settings.XBLOCK_MIXINS,
         )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
         self.peer_module = self.descriptor.xmodule(self.system)
