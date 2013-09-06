@@ -23,7 +23,7 @@ CMS.Models.Section = Backbone.Model.extend({
     showNotification: function() {
         if(!this.msg) {
             this.msg = new CMS.Views.Notification.Mini({
-                title: gettext("Saving") + "&hellip;"
+                title: gettext("Saving&hellip;")
             });
         }
         this.msg.show();

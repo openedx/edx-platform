@@ -54,7 +54,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
             e.preventDefault();
             cachethis.$el.removeClass('is-active');
             $(document).off('click', cachethis.removeMenu);
-        }
+        };
         this.hideSymbol = this.options['hideSymbol'];
         this.render();
     },
@@ -82,7 +82,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
           this.removeMenu(e);
 
               var saving = new CMS.Views.Notification.Mini({
-                  title: gettext('Saving') + '&hellip;'
+                  title: gettext('Saving&hellip;')
               });
               saving.show();
 
@@ -96,4 +96,4 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 
           this.render();
     }
-})
+});

@@ -395,7 +395,7 @@ function _deleteItem($el, type) {
                     });
 
                     var deleting = new CMS.Views.Notification.Mini({
-                        title: gettext('Deleting') + '&hellip;'
+                        title: gettext('Deleting&hellip;')
                     });
                     deleting.show();
 
@@ -840,7 +840,7 @@ function saveSetSectionScheduleDate(e) {
     });
 
     var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;"
+        title: gettext("Saving&hellip;")
     });
     saving.show();
     // call into server to commit the new order
