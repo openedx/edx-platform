@@ -41,6 +41,8 @@ class VerifyView(View):
             return redirect(
                 reverse('verify_student_verified',
                         kwargs={'course_id': course_id}))
+        elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+            return redirect(reverse('dashboard'))
         else:
             # If they haven't completed a verification attempt, we have to
             # restart with a new one. We can't reuse an older one because we
@@ -65,7 +67,7 @@ class VerifyView(View):
             ],
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
-            "min_price" : verify_mode.min_price,
+            "min_price": verify_mode.min_price,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -81,6 +83,8 @@ class VerifiedView(View):
         """
         Handle the case where we have a get request
         """
+        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+            return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
@@ -138,15 +142,18 @@ def create_order(request):
 
     return HttpResponse(json.dumps(params), content_type="text/json")
 
+
 @login_required
 def show_requirements(request, course_id):
     """
     Show the requirements necessary for
     """
+    if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+        return redirect(reverse('dashboard'))
     context = {
         "course_id": course_id,
         "is_not_active": not request.user.is_active,
-        "course_name" : course_from_id(course_id).display_name,
+        "course_name": course_from_id(course_id).display_name,
     }
     return render_to_response("verify_student/show_requirements.html", context)
 

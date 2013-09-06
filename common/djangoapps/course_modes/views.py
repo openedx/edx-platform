@@ -22,6 +22,8 @@ class ChooseModeView(View):
 
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
+        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+            return redirect(reverse('dashboard'))
         modes = CourseMode.modes_for_course_dict(course_id)
         context = {
             "course_id": course_id,
