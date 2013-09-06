@@ -157,6 +157,9 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Course Image")
+            self.assertContains(response,"Course Overview")
+            self.assertContains(response,"Course Introduction Video")
             self.assertContains(response, "Requirements")
 
 
