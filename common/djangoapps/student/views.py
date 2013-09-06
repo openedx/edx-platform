@@ -890,9 +890,16 @@ def create_account(request, post_override=None):
 
     for a in numeric_post_vars:
         if len(post_vars[a]) > 0 and not post_vars[a].isdigit():
-            js['value'] = _("Field must be numeric")
+            error_str = {
+             'education_year': _('Education year must be numeric'),
+             'work_teaching_experience': _('Work teaching experience must be numeric'),
+             'work_managing_experience': _('Work managing experience must be numeric'),
+             'work_qualification_category_year': _('Work qualification year must be numeric'),
+             'contact_phone': _('Contact phone must be numeric')}
+            js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
+
 
     try:
         validate_email(post_vars['email'])
