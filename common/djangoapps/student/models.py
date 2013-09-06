@@ -90,10 +90,10 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', _("Doctorate")),
         ('m', _("Master's or professional degree")),
         ('b', _("Bachelor's degree")),
         ('a', _("Associate's degree")),
+        ('s', _("Specialist's degree")),
         ('hs', _("Secondary/high school")),
         ('jhs', _("Junior secondary/junior high/middle school")),
         ('el', _("Elementary/primary school")),
