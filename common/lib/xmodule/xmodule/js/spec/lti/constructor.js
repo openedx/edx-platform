@@ -1,3 +1,21 @@
+/**
+ * File: constructor.js
+ *
+ * Purpose: Jasmine tests for LTI module (front-end part).
+ *
+ *
+ * The front-end part of the LTI module is really simple. If an action
+ * is set for the hidden LTI form, then it is submited, and the results are
+ * redirected to an iframe.
+ *
+ * We will test that the form is only submited when the action is set (i.e.
+ * not empty).
+ *
+ * Other aspects of LTI module will be covered by Python unit tests and
+ * acceptance tests.
+ *
+ */
+
 /*
  * "Hence that general is skilful in attack whose opponent does not know what
  * to defend; and he is skilful in defense whose opponent does not know what
