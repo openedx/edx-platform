@@ -160,11 +160,11 @@ class LTIModule(LTIFields, XModule):
             # LTI specs:  'custom_' should be prepended before each custom parameter
             custom_parameters[u'custom_' + unicode(param_name)] = unicode(param_value)
 
-        input_fields = (self.oauth_params(
+        input_fields = self.oauth_params(
             custom_parameters,
             client_key,
             client_secret
-        ))
+        )
 
         context = {
             'input_fields': input_fields,
