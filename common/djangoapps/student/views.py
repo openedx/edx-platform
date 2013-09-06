@@ -886,6 +886,14 @@ def create_account(request, post_override=None):
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
+    numeric_post_vars = ["education_year","work_managing_experience","work_teaching_experience", "work_qualification_category_year", "contact_phone"]
+
+    for a in numeric_post_vars:
+        if len(post_vars[a]) > 0 and not post_vars[a].isdigit():
+            js['value'] = _("Field must be numeric")
+            js['field'] = a
+            return HttpResponse(json.dumps(js))
+
     try:
         validate_email(post_vars['email'])
     except ValidationError:
