@@ -13,7 +13,7 @@ from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
@@ -82,8 +82,8 @@ def get_opt_course_with_access(user, course_id, action):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.lms.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
-        return '/static/' + (course.lms.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
+    if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
+        return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
         loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
@@ -149,16 +149,16 @@ def get_course_about_section(course, section_key):
             loc = course.location._replace(category='about', name=section_key)
 
             # Use an empty cache
-            model_data_cache = ModelDataCache([], course.id, request.user)
+            field_data_cache = FieldDataCache([], course.id, request.user)
             about_module = get_module(
                 request.user,
                 request,
                 loc,
-                model_data_cache,
+                field_data_cache,
                 course.id,
                 not_found_ok=True,
                 wrap_xmodule_display=False,
-                static_asset_path=course.lms.static_asset_path
+                static_asset_path=course.static_asset_path
             )
 
             html = ''
@@ -199,15 +199,15 @@ def get_course_info_section(request, course, section_key):
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
 
     # Use an empty cache
-    model_data_cache = ModelDataCache([], course.id, request.user)
+    field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
         loc,
-        model_data_cache,
+        field_data_cache,
         course.id,
         wrap_xmodule_display=False,
-        static_asset_path=course.lms.static_asset_path
+        static_asset_path=course.static_asset_path
     )
 
     html = ''
@@ -246,7 +246,7 @@ def get_course_syllabus_section(course, section_key):
                     htmlFile.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
                     course_id=course.location.course_id,
-                    static_asset_path=course.lms.static_asset_path,
+                    static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(

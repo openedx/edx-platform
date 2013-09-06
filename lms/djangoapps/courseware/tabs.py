@@ -21,7 +21,7 @@ from .module_render import get_module
 from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 
 from open_ended_grading import open_ended_notifications
 
@@ -378,10 +378,10 @@ def get_static_tab_by_slug(course, tab_slug):
 def get_static_tab_contents(request, course, tab):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course.id,
         request.user, modulestore().get_instance(course.id, loc), depth=0)
-    tab_module = get_module(request.user, request, loc, model_data_cache, course.id,
-                            static_asset_path=course.lms.static_asset_path)
+    tab_module = get_module(request.user, request, loc, field_data_cache, course.id,
+                            static_asset_path=course.static_asset_path)
 
     logging.debug('course_module = {0}'.format(tab_module))
 

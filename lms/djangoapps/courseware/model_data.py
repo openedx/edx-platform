@@ -3,12 +3,11 @@ Classes to provide the LMS runtime data storage to XBlocks
 """
 
 import json
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from itertools import chain
 from .models import (
     StudentModule,
-    XModuleContentField,
-    XModuleSettingsField,
+    XModuleUserStateSummaryField,
     XModuleStudentPrefsField,
     XModuleStudentInfoField
 )
@@ -16,8 +15,9 @@ import logging
 
 from django.db import DatabaseError
 
-from xblock.runtime import KeyValueStore, InvalidScopeError
-from xblock.core import KeyValueMultiSaveError, Scope
+from xblock.runtime import KeyValueStore
+from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
+from xblock.fields import Scope
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def chunks(items, chunk_size):
     return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
 
 
-class ModelDataCache(object):
+class FieldDataCache(object):
     """
     A cache of django model objects needed to supply the data
     for a module and its decendants
@@ -106,7 +106,7 @@ class ModelDataCache(object):
 
         descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 
-        return ModelDataCache(descriptors, course_id, user, select_for_update)
+        return FieldDataCache(descriptors, course_id, user, select_for_update)
 
     def _query(self, model_class, **kwargs):
         """
@@ -137,9 +137,7 @@ class ModelDataCache(object):
         """
         Queries the database for all of the fields in the specified scope
         """
-        if scope in (Scope.children, Scope.parent):
-            return []
-        elif scope == Scope.user_state:
+        if scope == Scope.user_state:
             return self._chunked_query(
                 StudentModule,
                 'module_state_key__in',
@@ -147,21 +145,11 @@ class ModelDataCache(object):
                 course_id=self.course_id,
                 student=self.user.pk,
             )
-        elif scope == Scope.content:
+        elif scope == Scope.user_state_summary:
             return self._chunked_query(
-                XModuleContentField,
-                'definition_id__in',
-                (descriptor.location.url() for descriptor in self.descriptors),
-                field_name__in=set(field.name for field in fields),
-            )
-        elif scope == Scope.settings:
-            return self._chunked_query(
-                XModuleSettingsField,
+                XModuleUserStateSummaryField,
                 'usage_id__in',
-                (
-                    '%s-%s' % (self.course_id, descriptor.location.url())
-                    for descriptor in self.descriptors
-                ),
+                (descriptor.location.url() for descriptor in self.descriptors),
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.preferences:
@@ -179,7 +167,7 @@ class ModelDataCache(object):
                 field_name__in=set(field.name for field in fields),
             )
         else:
-            raise InvalidScopeError(scope)
+            return []
 
     def _fields_to_cache(self):
         """
@@ -187,20 +175,18 @@ class ModelDataCache(object):
         """
         scope_map = defaultdict(set)
         for descriptor in self.descriptors:
-            for field in (descriptor.module_class.fields + descriptor.module_class.lms.fields):
+            for field in descriptor.fields.values():
                 scope_map[field.scope].add(field)
         return scope_map
 
     def _cache_key_from_kvs_key(self, key):
         """
-        Return the key used in the ModelDataCache for the specified KeyValueStore key
+        Return the key used in the FieldDataCache for the specified KeyValueStore key
         """
         if key.scope == Scope.user_state:
             return (key.scope, key.block_scope_id.url())
-        elif key.scope == Scope.content:
+        elif key.scope == Scope.user_state_summary:
             return (key.scope, key.block_scope_id.url(), key.field_name)
-        elif key.scope == Scope.settings:
-            return (key.scope, '%s-%s' % (self.course_id, key.block_scope_id.url()), key.field_name)
         elif key.scope == Scope.preferences:
             return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.user_info:
@@ -208,14 +194,12 @@ class ModelDataCache(object):
 
     def _cache_key_from_field_object(self, scope, field_object):
         """
-        Return the key used in the ModelDataCache for the specified scope and
+        Return the key used in the FieldDataCache for the specified scope and
         field
         """
         if scope == Scope.user_state:
             return (scope, field_object.module_state_key)
-        elif scope == Scope.content:
-            return (scope, field_object.definition_id, field_object.field_name)
-        elif scope == Scope.settings:
+        elif scope == Scope.user_state_summary:
             return (scope, field_object.usage_id, field_object.field_name)
         elif scope == Scope.preferences:
             return (scope, field_object.module_type, field_object.field_name)
@@ -224,9 +208,9 @@ class ModelDataCache(object):
 
     def find(self, key):
         '''
-        Look for a model data object using an LmsKeyValueStore.Key object
+        Look for a model data object using an DjangoKeyValueStore.Key object
 
-        key: An `LmsKeyValueStore.Key` object selecting the object to find
+        key: An `DjangoKeyValueStore.Key` object selecting the object to find
 
         returns the found object, or None if the object doesn't exist
         '''
@@ -252,15 +236,10 @@ class ModelDataCache(object):
                     'module_type': key.block_scope_id.category,
                 },
             )
-        elif key.scope == Scope.content:
-            field_object, _ = XModuleContentField.objects.get_or_create(
+        elif key.scope == Scope.user_state_summary:
+            field_object, _ = XModuleUserStateSummaryField.objects.get_or_create(
                 field_name=key.field_name,
-                definition_id=key.block_scope_id.url()
-            )
-        elif key.scope == Scope.settings:
-            field_object, _ = XModuleSettingsField.objects.get_or_create(
-                field_name=key.field_name,
-                usage_id='%s-%s' % (self.course_id, key.block_scope_id.url()),
+                usage_id=key.block_scope_id.url()
             )
         elif key.scope == Scope.preferences:
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
@@ -279,19 +258,15 @@ class ModelDataCache(object):
         return field_object
 
 
-class LmsKeyValueStore(KeyValueStore):
+class DjangoKeyValueStore(KeyValueStore):
     """
-    This KeyValueStore will read data from descriptor_model_data if it exists,
-    but will not overwrite any keys set in descriptor_model_data. Attempts to do so will
-    raise an InvalidWriteError.
-
-    If the scope to write to is not one of the 5 named scopes:
-        Scope.content
-        Scope.settings
+    This KeyValueStore will read and write data in the following scopes to django models
+        Scope.user_state_summary
         Scope.user_state
         Scope.preferences
         Scope.user_info
-    then an InvalidScopeError will be raised.
+
+    Access to any other scopes will raise an InvalidScopeError
 
     Data for Scope.user_state is stored as StudentModule objects via the django orm.
 
@@ -302,29 +277,21 @@ class LmsKeyValueStore(KeyValueStore):
     """
 
     _allowed_scopes = (
-        Scope.content,
-        Scope.settings,
+        Scope.user_state_summary,
         Scope.user_state,
         Scope.preferences,
         Scope.user_info,
-        Scope.children,
     )
 
-    def __init__(self, descriptor_model_data, model_data_cache):
-        self._descriptor_model_data = descriptor_model_data
-        self._model_data_cache = model_data_cache
+
+    def __init__(self, field_data_cache):
+        self._field_data_cache = field_data_cache
 
     def get(self, key):
-        if key.field_name in self._descriptor_model_data:
-            return self._descriptor_model_data[key.field_name]
-
-        if key.scope == Scope.parent:
-            return None
-
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key.scope)
 
-        field_object = self._model_data_cache.find(key)
+        field_object = self._field_data_cache.find(key)
         if field_object is None:
             raise KeyError(key.field_name)
 
@@ -352,14 +319,11 @@ class LmsKeyValueStore(KeyValueStore):
         field_objects = dict()
         for field in kv_dict:
             # Check field for validity
-            if field.field_name in self._descriptor_model_data:
-                raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
-
             if field.scope not in self._allowed_scopes:
                 raise InvalidScopeError(field.scope)
 
             # If the field is valid and isn't already in the dictionary, add it.
-            field_object = self._model_data_cache.find_or_create(field)
+            field_object = self._field_data_cache.find_or_create(field)
             if field_object not in field_objects.keys():
                 field_objects[field_object] = []
             # Update the list of associated fields
@@ -387,13 +351,10 @@ class LmsKeyValueStore(KeyValueStore):
                 raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):
-        if key.field_name in self._descriptor_model_data:
-            raise InvalidWriteError("Not allowed to deleted descriptor model data", key.field_name)
-
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key.scope)
 
-        field_object = self._model_data_cache.find(key)
+        field_object = self._field_data_cache.find(key)
         if field_object is None:
             raise KeyError(key.field_name)
 
@@ -406,16 +367,10 @@ class LmsKeyValueStore(KeyValueStore):
             field_object.delete()
 
     def has(self, key):
-        if key.field_name in self._descriptor_model_data:
-            return key.field_name in self._descriptor_model_data
-
-        if key.scope == Scope.parent:
-            return True
-
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key.scope)
 
-        field_object = self._model_data_cache.find(key)
+        field_object = self._field_data_cache.find(key)
         if field_object is None:
             return False
 
@@ -423,6 +378,3 @@ class LmsKeyValueStore(KeyValueStore):
             return key.field_name in json.loads(field_object.state)
         else:
             return True
-
-
-LmsUsage = namedtuple('LmsUsage', 'id, def_id')

@@ -2,7 +2,7 @@
 
 from pkg_resources import resource_string
 from xmodule.mako_module import MakoModuleDescriptor
-from xblock.core import Scope, String
+from xblock.fields import Scope, String
 import logging
 
 log = logging.getLogger(__name__)

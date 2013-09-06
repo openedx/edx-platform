@@ -39,7 +39,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = MagicMock([XModuleDescriptor],
                                system=self.system,
                                location=self.location,
-                               _model_data=self.valid_xml)
+                               _field_data=self.valid_xml)
 
         error_descriptor = error_module.ErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
@@ -74,7 +74,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = MagicMock([XModuleDescriptor],
                                system=self.system,
                                location=self.location,
-                               _model_data=self.valid_xml)
+                               _field_data=self.valid_xml)
 
         error_descriptor = error_module.NonStaffErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
