@@ -724,7 +724,8 @@ def create_account(request, post_override=None):
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
-
+        if len(post_vars[a] < 1):
+            post_vars[a] = '0'
 
     try:
         validate_email(post_vars['email'])
