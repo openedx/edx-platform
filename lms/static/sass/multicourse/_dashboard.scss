@@ -434,7 +434,7 @@
           display: inline-block;
           position: absolute;
           top: -28px;
-          right: 0;
+          right: ($baseline/2);
           text-align: center;
 
           .label {
