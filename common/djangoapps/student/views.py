@@ -708,9 +708,9 @@ def _validate_statgradlogin(login):
 
     try:
         if p.match(login) is None:
-            raise ValidationError
+            raise ValidationError("Ahtung")
     except:
-        raise ValidationError
+        raise ValidationError("Ahtung")
 
 
 def _do_create_account(post_vars):
