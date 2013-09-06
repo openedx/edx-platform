@@ -9,9 +9,12 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+  $('.expandable-area').slideUp();
   $('.is-expandable').addClass('is-ready');
   $('.is-expandable .title-expand').click(function(e) {
       e.preventDefault();
+      //$(this).parent().toggleClass('is-expanded');
+      $(this).next('.expandable-area').slideToggle();
       $(this).parent().toggleClass('is-expanded');
   });
 });
@@ -45,27 +48,6 @@ $(document).ready(function() {
 
         <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
 
-          % if "audit" in modes:
-          <div class="register-choice register-choice-audit">
-            <div class="wrapper-copy">
-              <h4 class="title">${_("Audit This Course")}</h4>
-              <div class="copy">
-                <p>${_("Sign up to audit this course for free and track your own progress.")}</p>
-              </div>
-            </div>
-
-            <ul class="list-actions">
-              <li class="action action-select">
-                <input type="submit" name="mode" value="Select Audit" />
-              </li>
-            </ul>
-          </div>
-
-          <span class="deco-divider">
-            <span class="copy">${_("or")}</span>
-          </span>
-          % endif
-
           % if "verified" in modes:
           <div class="register-choice register-choice-certificate">
             <div class="wrapper-copy">
@@ -77,7 +59,7 @@ $(document).ready(function() {
             </div>
 
             <div class="field field-certificate-contribution">
-              <h5 class="label">${_("Select your contribution for this course:")}</h5>
+              <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span> ${_("):")}</h5>
 
               %if error:
               <div class="msg msg-error msg-inline">
@@ -144,6 +126,26 @@ $(document).ready(function() {
             <div class="copy">
               <p>${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.")}</p>
             </div>
+          </div>
+          % endif
+
+          % if "audit" in modes:
+          <span class="deco-divider">
+            <span class="copy">${_("or")}</span>
+          </span>
+          <div class="register-choice register-choice-audit">
+            <div class="wrapper-copy">
+              <h4 class="title">${_("Audit This Course")}</h4>
+              <div class="copy">
+                <p>${_("Sign up to audit this course for free and track your own progress.")}</p>
+              </div>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action action-select">
+                <input type="submit" name="mode" value="Select Audit" />
+              </li>
+            </ul>
           </div>
           % endif
 

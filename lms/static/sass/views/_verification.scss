@@ -131,7 +131,7 @@
   }
 
   .expandable-area {
-    @include transition(opacity 0.25s ease-in-out 0s, height 0.25s ease-in-out 0s);
+   // @include transition(opacity 0.25s ease-in-out 0s, height 0.25s ease-in-out 0s);
   }
 
   // STATE: active
@@ -150,12 +150,14 @@
       }
     }
 
+/* using jquery
     .expandable-area {
       visibility: none;
       height: 0;
       opacity: 0.0;
       overflow-y: scroll;
     }
+*/
   }
 
   // STATE: expanded
@@ -166,11 +168,13 @@
       @include transform-origin(50% 50%);
     }
 
+/*
     .expandable-area {
       visibility: visible;
       height: ($baseline*16);
       opacity: 1.0;
     }
+*/
   }
 }
 
@@ -879,6 +883,7 @@
               display: inline-block;
               vertical-align: middle;
               margin-right: ($baseline/4);
+              padding: 3px 0;
 
               &:last-child {
                 margin-right: 0;
@@ -1037,7 +1042,7 @@
 
       // specific fields
       #contribution-other-amt {
-        width: ($baseline*3);
+        width: ($baseline*4.5);
         padding: ($baseline/4) ($baseline/2);
       }
     }
@@ -1294,7 +1299,7 @@
       }
 
       #contribution-other-amt {
-        width: ($baseline*3);
+        width: ($baseline*4.5);
         padding: ($baseline/4) ($baseline/2);
       }
 
@@ -1304,6 +1309,7 @@
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
+          padding: 1px 0;
 
           &:last-child {
             margin-right: 0;
