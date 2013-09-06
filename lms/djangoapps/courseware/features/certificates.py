@@ -49,6 +49,8 @@ def select_the_audit_track(step):
     create_cert_course()
     register()
     btn_css = 'input[value="Select Audit"]'
+    world.wait(1)  # TODO remove this after troubleshooting JZ
+    world.css_find(btn_css)
     world.css_click(btn_css)
 
 
@@ -70,7 +72,7 @@ def select_the_verified_track(step):
 
 @step(u'I should see the course on my dashboard$')
 def should_see_the_course_on_my_dashboard(step):
-    course_css = 'article.my-course'
+    course_css = 'li.course-item'
     assert world.is_css_present(course_css)
 
 
@@ -154,7 +156,7 @@ def confirm_details_match(step):
     world.browser.execute_script("window.scrollTo(0,1024)")
 
     cb_css = 'input#confirm_pics_good'
-    world.css_check(cb_css)
+    world.css_click(cb_css)
     assert world.css_find(cb_css).checked
 
 
@@ -187,8 +189,8 @@ def submitted_photos_to_verify_my_identity(step):
 
 @step(u'I see that my payment was successful')
 def see_that_my_payment_was_successful(step):
-    world.css_find('div')
-    assert_equal(world.browser.title, u'Receipt for Order 1')
+    title = world.css_find('div.wrapper-content-main h3.title')
+    assert_equal(title.text, u'Congratulations! You are now verified on edX.')
 
 
 @step(u'I navigate to my dashboard')
