@@ -297,6 +297,65 @@
 
   // ====================
 
+  // UI: reports/tables
+  .wrapper-report {
+
+    .report {
+      @extend .ui-window;
+      width: flex-grid(12,12);
+      border-color: $m-gray-t3;
+      border-collapse:collapse;
+
+      tr {
+        text-align: left;
+      }
+
+      td {
+        @extend .t-weight3;
+        vertical-align: middle;
+        padding: ($baseline*0.75) $baseline;
+        color: $m-gray-d3;
+      }
+
+      th {
+        @extend .t-weight2;
+        padding: ($baseline/2) $baseline;
+      }
+
+      thead {
+
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+
+        th[scope="col"] {
+          @extend .t-title7;
+          @extend .t-weight2;
+          vertical-align: middle;
+          color: $m-gray-l1;
+          background: $m-gray-l4;
+        }
+      }
+
+      tbody {
+
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+      }
+
+      tfoot {
+        background: $m-blue-t0;
+
+        th[scope="row"] {
+
+        }
+      }
+    }
+  }
+
+  // ====================
+
   // UI: help
   .help-item {
 
@@ -443,7 +502,7 @@
         @include line-height(28);
         @extend .t-weight4;
         display: block;
-
+        text-transform: none;
       }
     }
   }
@@ -1668,74 +1727,69 @@
       width: 100%;
     }
 
-    .info-item {
-      margin-bottom: ($baseline*1.5);
-      padding: ($baseline*0.75) $baseline;
-      border-radius: ($baseline/10);
-      background: $m-gray-l4;
+    // information elements
+    .list-info {
 
-      &:last-child {
-        margin-bottom: 0;
-      }
+      .info-item {
+        margin-bottom: ($baseline*1.5);
+        border-bottom: ($baseline/4) solid $m-gray-l4;
+        padding-bottom: ($baseline*1.5);
 
-      > .title {
-        @extend .hd-lv3;
-      }
-
-      .copy {
-        @extend .copy-base;
-
-        strong {
-          @extend .t-weight5;
-          color: $m-gray-d4;
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: none;
         }
 
-        table {
-          width: 100%;
+        > .title {
+          @extend .hd-lv3;
           margin-bottom: $baseline;
-
-            tr {
-            }
-
-            th {
-              padding: ($baseline/2) ($baseline/2) ($baseline/2) 0;
-              text-align: left;
-            }
-
-            td {
-              border-ts: 1px solid #ccc;
-              vertical-align: middle;
-              padding: ($baseline/2) ($baseline/2) ($baseline/2) 0;
-              text-transform: capitalize;
-            }
-
-            tfoot td {
-              font-weight: 600;
-
-              &.total {
-                text-align: right;
-              }
-            }
         }
 
-
-
-          .action a {
-            @extend .btn-primary-blue;
-          }
-
-          .action-course a {
-            @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
-          }
-
-
+        .copy {
+          @extend .copy-base;
+          margin-bottom: $baseline;
+        }
       }
     }
 
+    // information - course
+    .course-info {
 
+      .options {
 
+        .action-course {
+          @extend .btn-primary-blue;
+          @include font-size(14);
+          padding: 5px 10px;
+        }
+      }
 
+      .course-actions {
+
+        .action-dashboard {
+          @extend .btn-primary-blue;
+        }
+      }
+    }
+
+    // information - verification
+    .verification-info {
+
+    }
+
+    // information - payment
+    .payment-info {
+
+    }
+
+    // UI: table/report
+    .wrapper-report {
+
+      .report {
+
+      }
+    }
   }
 }
 
