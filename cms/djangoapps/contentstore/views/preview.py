@@ -2,6 +2,7 @@ import logging
 import sys
 from functools import partial
 
+from django.conf import settings
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -116,6 +117,7 @@ def preview_module_system(request, preview_id, descriptor):
         user=request.user,
         xblock_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        mixins=settings.XBLOCK_MIXINS,
     )
 
 
