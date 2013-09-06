@@ -52,7 +52,7 @@ class VerifyView(View):
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
         else:
-            chosen_price = verify_mode.min_price.format("{:g}")
+            chosen_price = verify_mode.min_price
         context = {
             "progress_state": progress_state,
             "user_full_name": request.user.profile.name,
