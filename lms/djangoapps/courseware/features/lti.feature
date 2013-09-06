@@ -11,7 +11,7 @@ Feature: LTI component
   And the course has a LTI component filled with correct fields
   Then I view the LTI and it is rendered
 
-  Scenario: LTI component in LMS is rendered incorreclty
+  Scenario: LTI component in LMS is rendered incorrectly
   Given the course has a incorrect LTI credentials
   And the course has a LTI component filled with correct fields
   Then I view the LTI but incorrect_signature warning is rendered

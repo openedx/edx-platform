@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User
 from lettuce import world, step
 from lettuce.django import django_url
-from common import section_location, course_id
+from common import course_id
 
 from student.models import CourseEnrollment
 
