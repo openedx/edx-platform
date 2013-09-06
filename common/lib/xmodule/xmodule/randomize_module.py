@@ -6,7 +6,7 @@ from xmodule.seq_module import SequenceDescriptor
 
 from lxml import etree
 
-from xblock.core import Scope, Integer
+from xblock.fields import Scope, Integer
 
 log = logging.getLogger('mitx.' + __name__)
 

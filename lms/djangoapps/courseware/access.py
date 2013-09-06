@@ -143,12 +143,12 @@ def _has_access_course_desc(user, course, action):
         """
         First check if restriction of enrollment by login method is enabled, both
             globally and by the course.
-        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap 
+        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap
             was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
         Rest of requirements:
         Enrollment can only happen in the course enrollment period, if one exists.
             or
-        
+
         (CourseEnrollmentAllowed always overrides)
         (staff can always enroll)
         """
@@ -195,7 +195,7 @@ def _has_access_course_desc(user, course, action):
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
-            if course.lms.ispublic:
+            if course.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
             return _has_staff_access_to_descriptor(user, course)
@@ -272,7 +272,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if descriptor.lms.start is not None:
+        if descriptor.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
             if now > effective_start:
@@ -526,20 +526,20 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
     in envs/dev.py!
     """
-    if descriptor.lms.days_early_for_beta is None:
+    if descriptor.days_early_for_beta is None:
         # bail early if no beta testing is set up
-        return descriptor.lms.start
+        return descriptor.start
 
     user_groups = [g.name for g in user.groups.all()]
 
     beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
-        delta = timedelta(descriptor.lms.days_early_for_beta)
-        effective = descriptor.lms.start - delta
+        delta = timedelta(descriptor.days_early_for_beta)
+        effective = descriptor.start - delta
         return effective
 
-    return descriptor.lms.start
+    return descriptor.start
 
 
 def _has_instructor_access_to_location(user, location, course_context=None):

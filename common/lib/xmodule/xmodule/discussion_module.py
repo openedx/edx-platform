@@ -3,7 +3,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.core import String, Scope
+from xblock.fields import String, Scope
 from uuid import uuid4
 
 

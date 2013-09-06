@@ -28,6 +28,10 @@ import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
+from lms.xblock.mixin import LmsBlockMixin
+from cms.xmodule_namespace import CmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
@@ -159,6 +163,13 @@ MIDDLEWARE_CLASSES = (
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
 )
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin)
+
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions

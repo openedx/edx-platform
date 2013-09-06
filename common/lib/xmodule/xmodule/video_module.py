@@ -24,7 +24,9 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname
 from xmodule.modulestore import Location
-from xblock.core import Scope, String, Boolean, Float, List, Integer
+from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
+
+from xblock.field_data import DictFieldData
 
 import datetime
 import time
@@ -98,7 +100,6 @@ class VideoFields(object):
         help="A list of filenames to be used with HTML5 video. The first supported filetype will be displayed.",
         display_name="Video Sources",
         scope=Scope.settings,
-        default=[]
     )
     track = String(
         help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
@@ -213,8 +214,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         # For backwards compatibility -- if we've got XML data, parse
         # it out and set the metadata fields
         if self.data:
-            model_data = VideoDescriptor._parse_video_xml(self.data)
-            self._model_data.update(model_data)
+            field_data = VideoDescriptor._parse_video_xml(self.data)
+            self._field_data.set_many(self, field_data)
             del self.data
 
     @classmethod
@@ -237,9 +238,17 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         if is_pointer_tag(xml_object):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, location))
-        model_data = VideoDescriptor._parse_video_xml(xml_data)
-        model_data['location'] = location
-        video = cls(system, model_data)
+        field_data = VideoDescriptor._parse_video_xml(xml_data)
+        field_data['location'] = location
+        video = system.construct_xblock_from_class(
+            cls,
+            DictFieldData(field_data),
+
+            # We're loading a descriptor, so student_id is meaningless
+            # We also don't have separate notions of definition and usage ids yet,
+            # so we use the location for both
+            ScopeIds(None, location.category, location, location)
+        )
         return video
 
     def definition_to_xml(self, resource_fs):
@@ -261,7 +270,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             'sub': self.sub,
             'url_name': self.url_name
         }
-        fields = {field.name: field for field in self.fields}
+        fields = {field.name: field for field in self.fields.values()}
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't need to write it out.
@@ -312,7 +321,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         present in the XML.
         """
         xml = etree.fromstring(xml_data)
-        model_data = {}
+        field_data = {}
 
         conversions = {
             'start_time': VideoDescriptor._parse_time,
@@ -328,12 +337,12 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
         sources = xml.findall('source')
         if sources:
-            model_data['html5_sources'] = [ele.get('src') for ele in sources]
-            model_data['source'] = model_data['html5_sources'][0]
+            field_data['html5_sources'] = [ele.get('src') for ele in sources]
+            field_data['source'] = field_data['html5_sources'][0]
 
         track = xml.find('track')
         if track is not None:
-            model_data['track'] = track.get('src')
+            field_data['track'] = track.get('src')
 
         for attr, value in xml.items():
             if attr in compat_keys:
@@ -347,8 +356,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                     # cleanliness, but hindsight doesn't need glasses
                     normalized_speed = speed[:-1] if speed.endswith('0') else speed
                     # If the user has specified html5 sources, make sure we don't use the default video
-                    if youtube_id != '' or 'html5_sources' in model_data:
-                        model_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
+                    if youtube_id != '' or 'html5_sources' in field_data:
+                        field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
             else:
                 #  Convert XML attrs into Python values.
                 if attr in conversions:
@@ -357,9 +366,9 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
                     value = VideoDescriptor._deserialize(attr, value)
-                model_data[attr] = value
+                field_data[attr] = value
 
-        return model_data
+        return field_data
 
     @classmethod
     def _deserialize(cls, attr, value):

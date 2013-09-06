@@ -7,6 +7,11 @@ from nose.tools import assert_equal  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
+from xmodule.x_module import ModuleSystem
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -63,26 +68,34 @@ class TestXBlockWrapper(object):
 
     @property
     def leaf_module_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        runtime.anonymous_student_id = 'dummy_anonymous_student_id'
-        runtime.open_ended_grading_interface = {}
-        runtime.seed = 5
-        runtime.get = lambda x: getattr(runtime, x)
-        runtime.ajax_url = 'dummy_ajax_url'
-        runtime.xblock_model_data = lambda d: d._model_data
+        runtime = ModuleSystem(
+            render_template=lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs),
+            anonymous_student_id='dummy_anonymous_student_id',
+            open_ended_grading_interface={},
+            ajax_url='dummy_ajax_url',
+            xblock_field_data=lambda d: d._field_data,
+            get_module=Mock(),
+            replace_urls=Mock(),
+            track_function=Mock(),
+        )
         return runtime
 
     @property
     def leaf_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        runtime = MakoDescriptorSystem(
+            load_item=Mock(),
+            resources_fs=Mock(),
+            error_tracker=Mock(),
+            render_template=(lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)),
+        )
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
+        location = 'i4x://org/course/category/name'
         return descriptor_cls(
             self.leaf_descriptor_runtime,
-            {'location': 'i4x://org/course/category/name'}
+            DictFieldData({}),
+            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def leaf_module(self, descriptor_cls):
@@ -104,12 +117,13 @@ class TestXBlockWrapper(object):
         return runtime
 
     def container_descriptor(self, descriptor_cls):
+        location = 'i4x://org/course/category/name'
         return descriptor_cls(
             self.container_descriptor_runtime,
-            {
-                'location': 'i4x://org/course/category/name',
+            DictFieldData({
                 'children': range(3)
-            }
+            }),
+            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def container_module(self, descriptor_cls, depth):

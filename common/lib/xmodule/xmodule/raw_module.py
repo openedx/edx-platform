@@ -3,7 +3,7 @@ from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 import logging
 import sys
-from xblock.core import String, Scope
+from xblock.fields import String, Scope
 from exceptions import SerializationError
 
 log = logging.getLogger(__name__)

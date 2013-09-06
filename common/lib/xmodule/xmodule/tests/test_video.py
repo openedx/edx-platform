@@ -14,12 +14,16 @@ the course, section, subsection, unit, etc.
 """
 
 import unittest
+from mock import Mock
+
 from . import LogicTest
 from lxml import etree
 from .import get_test_system
 from xmodule.modulestore import Location
 from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from .test_import import DummySystem
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 from textwrap import dedent
 
@@ -28,7 +32,7 @@ class VideoModuleTest(LogicTest):
     """Logic tests for Video Xmodule."""
     descriptor_class = VideoDescriptor
 
-    raw_model_data = {
+    raw_field_data = {
         'data': '<video />'
     }
 
@@ -123,7 +127,9 @@ class VideoDescriptorTest(unittest.TestCase):
         system = get_test_system()
         self.descriptor = VideoDescriptor(
             runtime=system,
-            model_data={})
+            field_data=DictFieldData({}),
+            scope_ids=ScopeIds(None, None, None, None),
+        )
 
     def test_get_context(self):
         """"test get_context"""
@@ -144,8 +150,8 @@ class VideoDescriptorTest(unittest.TestCase):
         """
         system = DummySystem(load_error_modules=True)
         location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        model_data = {'location': location}
-        descriptor = VideoDescriptor(system, model_data)
+        field_data = DictFieldData({'location': location})
+        descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -160,8 +166,8 @@ class VideoDescriptorTest(unittest.TestCase):
         """
         system = DummySystem(load_error_modules=True)
         location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        model_data = {'location': location}
-        descriptor = VideoDescriptor(system, model_data)
+        field_data = DictFieldData({'location': location})
+        descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -196,10 +202,12 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         '''
         location = Location(["i4x", "edX", "video", "default",
                              "SampleProblem1"])
-        model_data = {'data': sample_xml,
-                      'location': location}
+        field_data = DictFieldData({
+            'data': sample_xml,
+            'location': location
+        })
         system = DummySystem(load_error_modules=True)
-        descriptor = VideoDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, field_data, Mock())
         self.assert_attributes_equal(descriptor, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -415,7 +423,7 @@ class VideoExportTestCase(unittest.TestCase):
         """Test that we write the correct XML on export."""
         module_system = DummySystem(load_error_modules=True)
         location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, {'location': location})
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
 
         desc.youtube_id_0_75 = 'izygArpw-Qo'
         desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
@@ -442,7 +450,7 @@ class VideoExportTestCase(unittest.TestCase):
         """Test XML export with defaults."""
         module_system = DummySystem(load_error_modules=True)
         location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, {'location': location})
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
 
         xml = desc.definition_to_xml(None)
         expected = '<video url_name="SampleProblem1"/>\n'

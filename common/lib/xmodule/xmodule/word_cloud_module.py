@@ -14,7 +14,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, Dict, Boolean, List, Integer, String
+from xblock.fields import Scope, Dict, Boolean, List, Integer, String
 
 log = logging.getLogger(__name__)
 
@@ -71,11 +71,11 @@ class WordCloudFields(object):
     )
     all_words = Dict(
         help="All possible words from all students.",
-        scope=Scope.content
+        scope=Scope.user_state_summary
     )
     top_words = Dict(
         help="Top num_top_words words for word cloud.",
-        scope=Scope.content
+        scope=Scope.user_state_summary
     )
 
 

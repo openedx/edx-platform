@@ -16,8 +16,8 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import courseware.module_render as render
 from courseware.tests.tests import LoginEnrollmentTestCase
-from courseware.model_data import ModelDataCache
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.model_data import FieldDataCache
 
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
 
@@ -62,14 +62,14 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         course = get_course_with_access(self.mock_user, self.course_id, 'load')
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course_id, self.mock_user, course, depth=2)
 
         module = render.get_module(
             self.mock_user,
             mock_request,
             ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
-            model_data_cache,
+            field_data_cache,
             self.course_id
         )
 
@@ -210,7 +210,7 @@ class TestTOC(TestCase):
         chapter_url = '%s/%s/%s' % ('/courses', self.course_name, chapter)
         factory = RequestFactory()
         request = factory.get(chapter_url)
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
@@ -228,7 +228,7 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
+        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, field_data_cache)
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
@@ -238,7 +238,7 @@ class TestTOC(TestCase):
         section = 'Welcome'
         factory = RequestFactory()
         request = factory.get(chapter_url)
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
@@ -256,7 +256,7 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
+        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, field_data_cache)
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
@@ -282,7 +282,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             data=self.content_string + self.rewrite_link + self.rewrite_bad_link + self.course_link
         )
         self.location = self.descriptor.location
-        self.model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id,
             self.user,
             self.descriptor
@@ -293,7 +293,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
             wrap_xmodule_display=True,
         )
@@ -306,7 +306,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
             wrap_xmodule_display=False,
         )
@@ -319,7 +319,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
         )
         result_fragment = module.runtime.render(module, None, 'student_view')
@@ -337,7 +337,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
         )
         result_fragment = module.runtime.render(module, None, 'student_view')
@@ -360,7 +360,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
             static_asset_path="toy_course_dir",
         )
@@ -371,13 +371,13 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         url = course_image_url(self.course)
         self.assertTrue(url.startswith('/c4x/'))
 
-        self.course.lms.static_asset_path = "toy_course_dir"
+        self.course.static_asset_path = "toy_course_dir"
         url = course_image_url(self.course)
         self.assertTrue(url.startswith('/static/toy_course_dir/'))
-        self.course.lms.static_asset_path = ""
+        self.course.static_asset_path = ""
 
     def test_get_course_info_section(self):
-        self.course.lms.static_asset_path = "toy_course_dir"
+        self.course.static_asset_path = "toy_course_dir"
         get_course_info_section(self.request, self.course, "handouts")
         # NOTE: check handouts output...right now test course seems to have no such content
         # at least this makes sure get_course_info_section returns without exception
@@ -387,7 +387,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
         )
         result_fragment = module.runtime.render(module, None, 'student_view')
@@ -405,7 +405,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.user,
             self.request,
             self.location,
-            self.model_data_cache,
+            self.field_data_cache,
             self.course.id,
         )
         result_fragment = module.runtime.render(module, None, 'student_view')

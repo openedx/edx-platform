@@ -33,7 +33,7 @@ system = ModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
-    xblock_model_data={}
+    xblock_field_data={}
 )
 
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
