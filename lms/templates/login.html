@@ -32,7 +32,7 @@
         $("label").parent().removeClass("is-focused");
       });
     });
-    
+
     (function() {
       toggleSubmitButton(true);
 
@@ -74,7 +74,7 @@
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html(gettext('Processing your account information &hellip;'));
+          html(gettext('Processing your account information') + '&hellip;');
       }
     }
   </script>
