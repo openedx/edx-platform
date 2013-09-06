@@ -35,7 +35,7 @@ def upload_file(_step, file_name):
 def upload_file(_step, files_string):
     # Turn files_string to a list of file names
     files = files_string.split(",")
-    files = map(lambda x: string.strip(x, ' "'), files)
+    files = map(lambda x: string.strip(x, ' "\''), files)
 
     upload_css = 'a.upload-button'
     world.css_click(upload_css)

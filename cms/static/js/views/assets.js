@@ -53,7 +53,6 @@ function removeAsset(e){
 function showUploadModal(e) {
     e.preventDefault();
     resetUploadModal();
-    resetUploadBar();
     $modal = $('.upload-modal').show();
     $('.upload-modal .file-chooser').fileupload({
         dataType: 'json',
@@ -61,10 +60,10 @@ function showUploadModal(e) {
         maxChunkSize: 100 * 1000 * 1000,      // 100 MB
         autoUpload: true,
         progressall: function(e, data) {
-            var percentComplete = parseInt(data.loaded / data.total * 100, 10);
+            var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
             showUploadFeedback(e, percentComplete);
         },
-        maxFileSize: 10 * 1000 * 1000,   // 100 MB
+        maxFileSize: 100 * 1000 * 1000,   // 100 MB
         maxNumberofFiles: 100,
         add: function(e, data) {
             data.process().done(function () {
@@ -103,6 +102,8 @@ function resetUploadBar() {
 }
 
 function resetUploadModal() {
+    // Reset modal so it no longer displays information about previously
+    // completed uploads.
     resetUploadBar();
     $('.upload-modal .file-name').html('');
     $('.upload-modal h1').html(gettext('Upload New File'));
