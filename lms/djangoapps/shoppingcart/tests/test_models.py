@@ -20,10 +20,14 @@ from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
 
 
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class OrderTest(TestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.course_id = "test/course"
+        self.course_id = "org/test/Test_Course"
+        CourseFactory.create(org='org', number='test', display_name='Test Course 1')
+        for i in xrange(1, 5):
+            CourseFactory.create(org='org', number='test', display_name='Test Course {0}'.format(i))
         self.cost = 40
 
     def test_get_cart_for_user(self):
@@ -38,7 +42,7 @@ class OrderTest(TestCase):
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
-        CertificateItem.add_to_order(cart, 'test/course1', self.cost, 'honor')
+        CertificateItem.add_to_order(cart, 'org/test/Test_Course_1', self.cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), 2)
         cart.clear()
         self.assertEquals(cart.orderitem_set.count(), 0)
@@ -58,10 +62,10 @@ class OrderTest(TestCase):
     def test_total_cost(self):
         cart = Order.get_cart_for_user(user=self.user)
         # add items to the order
-        course_costs = [('test/course1', 30),
-                        ('test/course2', 40),
-                        ('test/course3', 10),
-                        ('test/course4', 20)]
+        course_costs = [('org/test/Test_Course_1', 30),
+                        ('org/test/Test_Course_2', 40),
+                        ('org/test/Test_Course_3', 10),
+                        ('org/test/Test_Course_4', 20)]
         for course, cost in course_costs:
             CertificateItem.add_to_order(cart, course, cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), len(course_costs))
@@ -225,13 +229,14 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
 
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CertificateItemTest(TestCase):
     """
     Tests for verifying specific CertificateItem functionality
     """
     def setUp(self):
         self.user = UserFactory.create()
-        self.course_id = "test/course"
+        self.course_id = "org/test/Test_Course"
         self.cost = 40
         course_mode = CourseMode(course_id=self.course_id,
                                  mode_slug="honor",
@@ -243,6 +248,7 @@ class CertificateItemTest(TestCase):
                                  mode_display_name="verified cert",
                                  min_price=self.cost)
         course_mode.save()
+        CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
 
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_id)
