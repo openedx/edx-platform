@@ -188,6 +188,11 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             thisTarget = e.currentTarget;
         } else
         {
+            // e and forcedTarget can be null so don't deference it
+            // This is because in cases where we have a marketing site
+            // we don't display the codeMirrors for editing the marketing
+            // materials, except we do need to show the 'set course image'
+            // workflow. So in this case e = forcedTarget = null.
             return;
         }
 
