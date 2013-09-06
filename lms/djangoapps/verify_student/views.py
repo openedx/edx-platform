@@ -65,6 +65,7 @@ class VerifyView(View):
             ],
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
+            "min_price" : verify_mode.min_price,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
