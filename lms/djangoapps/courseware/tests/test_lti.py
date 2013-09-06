@@ -50,7 +50,7 @@ class TestLTI(BaseTestXmodule):
             """
             # self is <oauthlib.oauth1.rfc5849.Client object> here:
             __, headers, __ = saved_sign(self, *args, **kwargs)
-            # we should replace noonce, timestamp and signed_signature in headers:
+            # we should replace nonce, timestamp and signed_signature in headers:
             old = headers[u'Authorization']
             old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
             old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
