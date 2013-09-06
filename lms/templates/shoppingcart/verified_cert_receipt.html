@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.conf import settings %>
+<%! from student.views import course_from_id %>
 
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-confirmation</%block>
@@ -13,6 +13,8 @@
     ${notification}
 </section>
 % endif
+<% course_id = order_items[0].course_id %>
+<% course = course_from_id(course_id) %>
 
 <div class="container">
   <section class="wrapper cart-list">
@@ -21,7 +23,7 @@
   <h2 class="title">
     <span class="wrapper-sts">
       <span class="sts">${_("You are registering for")}</span>
-      <span class="sts-course">[Course Name]</span>
+      <span class="sts-course">${course.display_name}</span>
     </span>
     <span class="sts-track">
       <span class="sts-track-value">
@@ -103,9 +105,9 @@
                             % for item in order_items:
                                 <tr>
                                     <td>${item.line_desc}</td>
-                                    <td>Starts: [date]
+                                    <td>${_("Starts: {start_date}").format(start_date=course.start_date_text)}
                                     <ul class="list-actions">
-                                        <li class="action action-course"><a href="">Go to Course</a></li>
+                                        <li class="action action-course"><a href="${reverse('course_root', kwargs={'course_id': item.course_id})}">Go to Course</a></li>
                                     </ul>
                                     </td>
                                 </tr>
@@ -114,7 +116,7 @@
                         </table>
 
                         <ul class="list-actions">
-                            <li class="action action-dashboard"><a href="">Go to your Dashboard</a></li>
+                            <li class="action action-dashboard"><a href="${reverse('dashboard')}">Go to your Dashboard</a></li>
                         </ul>
                     </div>
 
@@ -178,7 +180,6 @@
                         % endif
                         </div>
 
-<%doc>
                         <h4 class="title">${_("Billing details:")}</h4>
                         <div class="copy">
                             <p>
@@ -189,7 +190,6 @@
                                 ${order.bill_to_country.upper()}
                             </p>
                         </div>
-</%doc>
 
                 </li>
             </ul>

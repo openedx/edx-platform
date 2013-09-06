@@ -2,6 +2,7 @@ from datetime import datetime
 import pytz
 import logging
 import smtplib
+import textwrap
 
 from django.db import models
 from django.conf import settings
@@ -347,8 +348,9 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = _("Certificate of Achievement, {mode_name} for course {course_id}").format(mode_name=mode_info.name,
-                                                                                                    course_id=course_id)
+        course_name = course_from_id(course_id).display_name
+        item.line_desc = _("Certificate of Achievement, {mode_name} for course {course}").format(mode_name=mode_info.name,
+                                                                                                 course=course_name)
         item.currency = currency
         order.currency = currency
         order.save()
@@ -372,6 +374,7 @@ class CertificateItem(OrderItem):
 
     @property
     def additional_instruction_text(self):
-        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option \
-                  and receive a full refund. To receive your refund, contact {billing_email}.").format(
-                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+        return textwrap.dedent(
+            _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option \
+               and receive a full refund. To receive your refund, contact {billing_email}.").format(
+            billing_email=settings.PAYMENT_SUPPORT_EMAIL))
