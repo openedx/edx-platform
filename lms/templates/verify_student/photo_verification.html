@@ -4,7 +4,7 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="bodyclass">register verification-process step-photos</%block>
-<%block name="title"><title>${("Register for [Course Name] | Verification")}</title></%block>
+<%block name="title"><title>${_("Register for {} | Verification").format(course_name)}</title></%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
@@ -16,7 +16,7 @@
 <div class="container">
   <section class="wrapper">
 
-    <%include file="_verification_header.html" />
+    <%include file="_verification_header.html" args="course_name=course_name" />
 
     <div class="wrapper-progress">
       <section class="progress">

@@ -142,7 +142,11 @@ def show_requirements(request, course_id):
     """
     Show the requirements necessary for
     """
-    context = {"course_id": course_id, "is_not_active": not request.user.is_active}
+    context = {
+        "course_id": course_id,
+        "is_not_active": not request.user.is_active,
+        "course_name" : course_from_id(course_id).display_name,
+    }
     return render_to_response("verify_student/show_requirements.html", context)
 
 

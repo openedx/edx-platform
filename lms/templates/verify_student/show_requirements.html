@@ -2,7 +2,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements</%block>
-<%block name="title"><title>${("Register for [Course Name]")}</title></%block>
+<%block name="title"><title>${_("Register for {}").format(course_name)}</title></%block>
 
 <%block name="content">
 %if is_not_active:
@@ -22,7 +22,7 @@
 <div class="container">
   <section class="wrapper">
 
-    <%include file="_verification_header.html" />
+    <%include file="_verification_header.html" args="course_name=course_name"/>
 
     <div class="wrapper-progress">
       <section class="progress">

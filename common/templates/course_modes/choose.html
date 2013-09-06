@@ -3,7 +3,7 @@
 <%inherit file="../main.html" />
 
 <%block name="bodyclass">register verification-process step-select-track</%block>
-<%block name="title"><title>${("Register for [Course Name] | Choose Your Track")}</title></%block>
+<%block name="title"><title>${_("Register for {} | Choose Your Track").format(course_name)}</title></%block>
 
 <%block name="js_extra">
 <script type="text/javascript">
@@ -37,7 +37,7 @@ $(document).ready(function() {
 <div class="container">
   <section class="wrapper">
 
-    <%include file="/verify_student/_verification_header.html" />
+    <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
 
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
