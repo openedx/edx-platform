@@ -17,7 +17,10 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from student.models import TestCenterUser, TestCenterRegistration
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    from django_cas.views import login as django_cas_login
+
+from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
 from django.utils.http import urlquote
@@ -44,7 +47,7 @@ from ratelimitbackend.exceptions import RateLimitException
 import student.views as student_views
 # Required for Pearson
 from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
@@ -379,6 +382,32 @@ def ssl_login(request):
         fullname=fullname,
         retfun=retfun
     )
+
+
+# -----------------------------------------------------------------------------
+# CAS (Central Authentication Service)
+# -----------------------------------------------------------------------------
+def cas_login(request, next_page=None, required=False):
+    """
+        Uses django_cas for authentication.
+        CAS is a common authentcation method pioneered by Yale.
+        See http://en.wikipedia.org/wiki/Central_Authentication_Service
+
+        Does normal CAS login then generates user_profile if nonexistent,
+        and if login was successful.  We assume that user details are
+        maintained by the central service, and thus an empty user profile
+        is appropriate.
+    """
+
+    ret = django_cas_login(request, next_page, required)
+
+    if request.user.is_authenticated():
+        user = request.user
+        if not UserProfile.objects.filter(user=user):
+            user_profile = UserProfile(name=user.username, user=user)
+            user_profile.save()
+
+    return ret
 
 
 # -----------------------------------------------------------------------------
@@ -915,7 +944,7 @@ def test_center_login(request):
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
-    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+    timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
                                                                              timelimit_descriptor, depth=None)
     timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)

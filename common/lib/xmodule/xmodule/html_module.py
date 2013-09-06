@@ -7,7 +7,7 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xblock.core import Scope, String
+from xblock.fields import Scope, String
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children

@@ -10,7 +10,7 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
-from xblock.core import Dict, String, Scope, Boolean, Float
+from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -108,9 +108,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.lms.due
+            due_date = self.linked_problem.due
             if due_date:
-                self.lms.due = due_date
+                self.due = due_date
 
         try:
             self.timeinfo = TimeInfo(self.due, self.graceperiod)
@@ -532,8 +532,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
             except Exception:
                 continue
             if descriptor:
-                problem['due'] = descriptor.lms.due
-                grace_period = descriptor.lms.graceperiod
+                problem['due'] = descriptor.due
+                grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
                 except Exception:

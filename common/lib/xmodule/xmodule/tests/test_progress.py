@@ -1,6 +1,9 @@
 """Module progress tests"""
 
 import unittest
+from mock import Mock
+
+from xblock.field_data import DictFieldData
 
 from xmodule.progress import Progress
 from xmodule import x_module
@@ -134,6 +137,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(get_test_system(), None, {'location': 'a://b/c/d/e'})
+        xm = x_module.XModule(None, get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
         p = xm.get_progress()
         self.assertEqual(p, None)

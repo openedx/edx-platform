@@ -30,6 +30,9 @@ from path import path
 
 from .discussionsettings import *
 
+from lms.xblock.mixin import LmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
@@ -92,6 +95,7 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
     'AUTH_USE_SHIB': False,
+    'AUTH_USE_CAS': False,
 
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
@@ -319,6 +323,12 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
 
 #################### Python sandbox ############################################
 
@@ -856,3 +866,14 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
+
+######################## CAS authentication ###########################
+
+if MITX_FEATURES.get('AUTH_USE_CAS'):
+    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas.backends.CASBackend',
+    )
+    INSTALLED_APPS += ('django_cas',)
+    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)

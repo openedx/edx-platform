@@ -388,7 +388,8 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': HUMAN_STATES.get(self.state, "Not started.")
+            'human_state': HUMAN_STATES.get(self.state, "Not started."),
+            'is_staff': self.system.user_is_staff,
         }
 
         return context

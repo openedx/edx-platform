@@ -29,12 +29,12 @@ class DummySystem(ImportSystem):
         parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
-            xmlstore,
-            course_id,
-            course_dir,
-            policy,
-            error_tracker,
-            parent_tracker,
+            xmlstore=xmlstore,
+            course_id=course_id,
+            course_dir=course_dir,
+            policy=policy,
+            error_tracker=error_tracker,
+            parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
         )
 

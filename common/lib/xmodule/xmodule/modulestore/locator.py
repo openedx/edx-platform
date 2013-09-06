@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import logging
 import inspect
 from abc import ABCMeta, abstractmethod
-from urllib import quote
 
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -17,6 +16,15 @@ from .parsers import parse_url, parse_course_id, parse_block_ref
 from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, URL_VERSION_PREFIX
 
 log = logging.getLogger(__name__)
+
+
+class LocalId(object):
+    """
+    Class for local ids for non-persisted xblocks
+
+    Should be hashable and distinguishable, but nothing else
+    """
+    pass
 
 
 class Locator(object):
@@ -386,9 +394,12 @@ class BlockUsageLocator(CourseLocator):
         self.set_property('usage_id', new)
 
     def init_block_ref(self, block_ref):
-        parse = parse_block_ref(block_ref)
-        assert parse, 'Could not parse "%s" as a block_ref' % block_ref
-        self.set_usage_id(parse['block'])
+        if isinstance(block_ref, LocalId):
+            self.set_usage_id(block_ref)
+        else:
+            parse = parse_block_ref(block_ref)
+            assert parse, 'Could not parse "%s" as a block_ref' % block_ref
+            self.set_usage_id(parse['block'])
 
     def init_block_ref_from_url(self, url):
         if isinstance(url, Locator):
@@ -409,12 +420,8 @@ class BlockUsageLocator(CourseLocator):
         """
         Return a string representing this location.
         """
-        rep = CourseLocator.__unicode__(self)
-        if self.usage_id is None:
-            # usage_id has not been initialized
-            return rep + BLOCK_PREFIX + 'NONE'
-        else:
-            return rep + BLOCK_PREFIX + self.usage_id
+        rep = super(BlockUsageLocator, self).__unicode__()
+        return rep + BLOCK_PREFIX + unicode(self.usage_id)
 
 
 class DescriptionLocator(Locator):
