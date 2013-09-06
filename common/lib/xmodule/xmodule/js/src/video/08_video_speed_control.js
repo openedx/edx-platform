@@ -19,6 +19,10 @@ function () {
         }
 
         if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
+            console.log(
+                '[Video info]: HTML5 mode - playbackRate is not supported.'
+            );
+
             _hideSpeedControl(state);
 
             return;
@@ -65,7 +69,7 @@ function () {
             state.videoSpeedControl.el
         );
 
-        $.each(state.videoSpeedControl.speeds, function(index, speed) {
+        $.each(state.videoSpeedControl.speeds, function (index, speed) {
             var link = '<a class="speed_link" href="#">' + speed + 'x</a>';
 
             state.videoSpeedControl.videoSpeedsEl
@@ -78,26 +82,27 @@ function () {
     }
 
     /**
-    * @desc Check if playbackRate supports by browser.
-    *
-    * @type {function}
-    * @access private
-    *
-    * @param {object} state The object containg the state of the video player.
-    *     All other modules, their parameters, public variables, etc. are
-    *     available via this object.
-    *
-    * @this {object} The global window object.
-    *
-    * @returns {Boolean}
-    *       true: Browser support playbackRate functionality.
-    *       false: Browser doesn't support playbackRate functionality.
-    */
+     * @desc Check if playbackRate supports by browser.
+     *
+     * @type {function}
+     * @access private
+     *
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {Boolean}
+     *       true: Browser support playbackRate functionality.
+     *       false: Browser doesn't support playbackRate functionality.
+     */
     function _checkPlaybackRates() {
         var video = document.createElement('video');
 
-        // If browser supports, 1.0 should be returned by playbackRate property.
-        // In this case, function return True. Otherwise, False will be returned.
+        // If browser supports, 1.0 should be returned by playbackRate
+        // property. In this case, function return True. Otherwise, False will
+        // be returned.
         return Boolean(video.playbackRate);
     }
 
@@ -128,7 +133,7 @@ function () {
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
         if (onTouchBasedDevice()) {
-            state.videoSpeedControl.el.on('click', function(event) {
+            state.videoSpeedControl.el.on('click', function (event) {
                 // So that you can't highlight this control via a drag
                 // operation, we disable the default browser actions on a
                 // click event.
@@ -287,7 +292,7 @@ function () {
         this.videoSpeedControl.videoSpeedsEl.find('li').removeClass('active');
         this.videoSpeedControl.speeds = params.newSpeeds;
 
-        $.each(this.videoSpeedControl.speeds, function(index, speed) {
+        $.each(this.videoSpeedControl.speeds, function (index, speed) {
             var link, listItem;
 
             link = '<a class="speed_link" href="#">' + speed + 'x</a>';
