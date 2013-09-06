@@ -39,8 +39,8 @@ describe "OmniPlayer", ->
     it "sets the endSeconds to the given value", ->
       expect(@player.endSeconds).toEqual @endSeconds
 
-    it 'should call #[type].createPlayer', ->
-      spyOn(OmniPlayer[@type], 'createPlayer')
+    it 'should call #[_type].createPlayer', ->
+      spyOn(OmniPlayer["_#{@type}"], 'createPlayer')
       @player2 = new OmniPlayer
         elementId: @elementId
         videoId: @videoId
@@ -49,7 +49,7 @@ describe "OmniPlayer", ->
         width: @width
         startSeconds: @startSeconds
         endSeconds: @endSeconds
-      expect(OmniPlayer[@type].createPlayer).toHaveBeenCalled()
+      expect(OmniPlayer["_#{@type}"].createPlayer).toHaveBeenCalled()
 
   describe "instance with a type of 'YT'", ->
     beforeEach ->
@@ -63,12 +63,12 @@ describe "OmniPlayer", ->
 
     xdescribe 'window.onYouTubeIframeAPIReady', ->
 
-    xdescribe '.YT.build', ->
+    xdescribe '._YT.build', ->
 
-    describe '.YT.setup', ->
+    describe '._YT.setup', ->
       beforeEach ->
         # prevent createPlayer from being called and calling #YT.setup
-        spyOn(OmniPlayer.YT, 'createPlayer')
+        spyOn(OmniPlayer._YT, 'createPlayer')
 
         @player = new OmniPlayer
           elementId: @elementId
@@ -81,21 +81,21 @@ describe "OmniPlayer", ->
 
       it 'creates a script element', ->
         spyOn(document, 'createElement').andCallThrough()
-        OmniPlayer.YT.setup()
+        OmniPlayer._YT.setup()
         expect(document.createElement).toHaveBeenCalledWith("script")
 
       it 'gets the first script Tag', ->
         spyOn(document, 'getElementsByTagName').andCallThrough()
-        OmniPlayer.YT.setup()
+        OmniPlayer._YT.setup()
         expect(document.getElementsByTagName).toHaveBeenCalledWith("script")
 
-    describe '#[type].createPlayer', ->
+    describe '#[_type].createPlayer', ->
       describe 'when OmniPlayer.loaded.YT is true', ->
         beforeEach ->
           OmniPlayer.loaded.YT = true
 
         it 'calls .YT.build', ->
-          spyOn(OmniPlayer.YT, 'build')
+          spyOn(OmniPlayer._YT, 'build')
 
           @player = new OmniPlayer
             elementId: @elementId
@@ -106,7 +106,7 @@ describe "OmniPlayer", ->
             startSeconds: @startSeconds
             endSeconds: @endSeconds
 
-          expect(OmniPlayer.YT.build).toHaveBeenCalled()
+          expect(OmniPlayer._YT.build).toHaveBeenCalled()
 
 
       describe 'when OmniPlayer.loaded.YT is false', -> 
@@ -126,7 +126,7 @@ describe "OmniPlayer", ->
           expect(window.onYouTubeIframeAPIReady).toBeDefined()     
 
         it 'calls .YT.setup', ->
-          spyOn(OmniPlayer.YT, 'setup')
+          spyOn(OmniPlayer._YT, 'setup')
 
           @player = new OmniPlayer
             elementId: @elementId
@@ -137,6 +137,6 @@ describe "OmniPlayer", ->
             startSeconds: @startSeconds
             endSeconds: @endSeconds
 
-          expect(OmniPlayer.YT.setup).toHaveBeenCalled()          
+          expect(OmniPlayer._YT.setup).toHaveBeenCalled()          
 
 
