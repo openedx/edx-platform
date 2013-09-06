@@ -25,7 +25,7 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseNotAllowed, Http404, HttpResponseRedirect)
+                         HttpResponseNotAllowed, Http404)
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
@@ -71,8 +71,6 @@ log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
-
-SHIB_DOMAIN_PREFIX = 'shib'
 
 
 def csrf_token(context):
@@ -259,7 +257,7 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(SHIB_DOMAIN_PREFIX):
+    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
         return render_to_response('register-shib.html', context)
     return render_to_response('register.html', context)
 
@@ -414,14 +412,24 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
-def parse_course_id_from_string(input_str):
+def _parse_course_id_from_string(input_str):
+    """
+    Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
+    @param input_str:
+    @return: the course_id if found, None if not
+    """
     m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
         return m_obj.group('course_id')
     return None
 
 
-def get_course_enrollment_domain(course_id):
+def _get_course_enrollment_domain(course_id):
+    """
+    Helper function to get the enrollment domain set for a course with id course_id
+    @param course_id:
+    @return:
+    """
     try:
         course = course_from_id(course_id)
         return course.enrollment_domain
@@ -435,10 +443,10 @@ def accounts_login(request):
         return redirect(reverse('cas-login'))
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
-    next = request.GET.get('next')
-    if next:
-        course_id = parse_course_id_from_string(next)
-        if course_id and get_course_enrollment_domain(course_id):
+    redirect_to = request.GET.get('next')
+    if redirect_to:
+        course_id = _parse_course_id_from_string(redirect_to)
+        if course_id and _get_course_enrollment_domain(course_id):
             return external_auth.views.course_specific_login(request, course_id)
     return render_to_response('login.html')
 
@@ -465,11 +473,11 @@ def login_user(request, error=""):
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(SHIB_DOMAIN_PREFIX):
+            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
                 return HttpResponse(json.dumps({'success': False, 'redirect': reverse('shib-login')}))
         except ExternalAuthMap.DoesNotExist:
             # This is actually the common case, logging in user without external linked login
-            log.info("User %s w/o external auth attempting login", user)
+            AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
@@ -674,7 +682,8 @@ def create_account(request, post_override=None):
     # Can't have terms of service for certain SHIB users, like at Stanford
     tos_not_required = (settings.MITX_FEATURES.get("AUTH_USE_SHIB") and
                         settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and
-                        DoExternalAuth and eamap.external_domain.startswith(SHIB_DOMAIN_PREFIX))
+                        DoExternalAuth and
+                        eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX))
 
     if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':

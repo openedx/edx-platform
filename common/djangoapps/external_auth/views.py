@@ -23,7 +23,7 @@ if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
 from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
-from django.utils.http import urlquote
+from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
@@ -159,7 +159,10 @@ def _external_login_or_signup(request,
     internal_user = eamap.user
     if internal_user is None:
         if uses_shibboleth:
-            # if we are using shib, try to link accounts using email
+            # If we are using shib, try to link accounts
+            # For Stanford shib, the email the idp returns is actually under the control of the user.
+            # Since the id the idps return is not user-editable, and is of the from "username@stanford.edu",
+            # use the id to link accounts instead.
             try:
                 link_user = User.objects.get(email=eamap.external_id)
                 if not ExternalAuthMap.objects.filter(user=link_user).exists():
@@ -451,10 +454,10 @@ def shib_login(request):
 
     fullname = shib['displayName'] if shib['displayName'] else u'%s %s' % (shib['givenName'], shib['sn'])
 
-    next = request.REQUEST.get('next')
+    redirect_to = request.REQUEST.get('next')
     retfun = None
-    if next:
-        retfun = functools.partial(redirect, next)
+    if redirect_to:
+        retfun = functools.partial(_safe_postlogin_redirect, redirect_to, request.get_host())
 
     return _external_login_or_signup(
         request,
@@ -465,6 +468,20 @@ def shib_login(request):
         fullname=fullname,
         retfun=retfun
     )
+
+
+def _safe_postlogin_redirect(redirect_to, safehost, default_redirect='/'):
+    """
+    If redirect_to param is safe (not off this host), then perform the redirect.
+    Otherwise just redirect to '/'.
+    Basically copied from django.contrib.auth.views.login
+    @param redirect_to: user-supplied redirect url
+    @param safehost: which host is safe to redirect to
+    @return: an HttpResponseRedirect
+    """
+    if is_safe_url(url=redirect_to, host=safehost):
+        return redirect(redirect_to)
+    return redirect(default_redirect)
 
 
 def _make_shib_enrollment_request(request):
@@ -501,14 +518,14 @@ def course_specific_login(request, course_id):
         course = course_from_id(course_id)
     except ItemNotFoundError:
         # couldn't find the course, will just return vanilla signin page
-        return redirect_with_querystring('signin_user', request.GET)
+        return _redirect_with_get_querydict('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
-        return redirect_with_querystring('shib-login', request.GET)
+        return _redirect_with_get_querydict('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
-    return redirect_with_querystring('signin_user', request.GET)
+    return _redirect_with_get_querydict('signin_user', request.GET)
 
 
 def course_specific_register(request, course_id):
@@ -520,23 +537,24 @@ def course_specific_register(request, course_id):
         course = course_from_id(course_id)
     except ItemNotFoundError:
         # couldn't find the course, will just return vanilla registration page
-        return redirect_with_querystring('register_user', request.GET)
+        return _redirect_with_get_querydict('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
         # shib-login takes care of both registration and login flows
-        return redirect_with_querystring('shib-login', request.GET)
+        return _redirect_with_get_querydict('shib-login', request.GET)
 
     # Default fallthrough to normal registration page
-    return redirect_with_querystring('register_user', request.GET)
+    return _redirect_with_get_querydict('register_user', request.GET)
 
 
-def redirect_with_querystring(view_name, querydict_get):
+def _redirect_with_get_querydict(view_name, get_querydict):
     """
         Helper function to carry over get parameters across redirects
+        Using urlencode(safe='/') because the @login_required decorator generates 'next' queryparams with '/' unencoded
     """
-    if querydict_get:
-        return redirect("%s?%s" % (reverse(view_name), querydict_get.urlencode(safe='/')))
+    if get_querydict:
+        return redirect("%s?%s" % (reverse(view_name), get_querydict.urlencode(safe='/')))
     return redirect(view_name)
 
 

@@ -1,4 +1,3 @@
-
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -227,17 +226,17 @@ class ShibSPTest(ModuleStoreTestCase):
             sn_empty = not identity.get('sn')
             given_name_empty = not identity.get('givenName')
             displayname_empty = not identity.get('displayName')
-            fullname_input_HTML = '<input id="name" type="text" name="name"'
+            fullname_input_html = '<input id="name" type="text" name="name"'
             if sn_empty and given_name_empty and displayname_empty:
-                self.assertContains(response, fullname_input_HTML)
+                self.assertContains(response, fullname_input_html)
             else:
-                self.assertNotContains(response, fullname_input_HTML)
+                self.assertNotContains(response, fullname_input_html)
 
             # clean up b/c we don't want existing ExternalAuthMap for the next run
             client.session['ExternalAuthMap'].delete()
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_registration_formSubmit(self):
+    def test_registration_form_submit(self):
         """
         Tests user creation after the registration form that pops is submitted.  If there is no shib
         ExternalAuthMap in the session, then the created user should take the username and email from the
@@ -319,7 +318,7 @@ class ShibSPTest(ModuleStoreTestCase):
             user.delete()
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_course_specificLoginAndReg(self):
+    def test_course_specific_login_and_reg(self):
         """
         Tests that the correct course specific login and registration urls work for shib
         """

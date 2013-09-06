@@ -94,6 +94,8 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
+    # in LMS
     'AUTH_USE_SHIB': False,
     'AUTH_USE_CAS': False,
 

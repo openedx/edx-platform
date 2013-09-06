@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
-from student.views import parse_course_id_from_string, get_course_enrollment_domain
+from student.views import _parse_course_id_from_string, _get_course_enrollment_domain
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
@@ -166,27 +166,34 @@ class LoginTest(TestCase):
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
         """
-        Check that the audit log has received the expected call.
+        Check that the audit log has received the expected call as its last call.
         """
         method_calls = mock_audit_log.method_calls
-        self.assertEquals(len(method_calls), 1)
-        name, args, _kwargs = method_calls[0]
+        name, args, _kwargs = method_calls[-1]
         self.assertEquals(name, level)
         self.assertEquals(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertIn(log_string, format_string)
 
+
 class UtilFnTest(TestCase):
-    def test_parse_course_id_from_string(self):
-        COURSE_ID = u'org/num/run'
-        COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)
-        NON_COURSE_URL = u'/blahblah'
-        self.assertEqual(parse_course_id_from_string(COURSE_URL), COURSE_ID)
-        self.assertIsNone(parse_course_id_from_string(NON_COURSE_URL))
+    """
+    Tests for utility functions in student.views
+    """
+    def test__parse_course_id_from_string(self):
+        """
+        Tests the _parse_course_id_from_string util function
+        """
+        COURSE_ID = u'org/num/run'                                # pylint: disable=C0103
+        COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=C0103
+        NON_COURSE_URL = u'/blahblah'                             # pylint: disable=C0103
+        self.assertEqual(_parse_course_id_from_string(COURSE_URL), COURSE_ID)
+        self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class ExternalAuthTest(ModuleStoreTestCase):
+class ExternalAuthShibTest(ModuleStoreTestCase):
     """
     Tests how login_user() interacts with ExternalAuth, in particular Shib
     """
@@ -215,18 +222,18 @@ class ExternalAuthTest(ModuleStoreTestCase):
         Tests that when a shib user types their email address into the login page, they get redirected
         to the shib login.
         """
-        response = self.client.post(reverse('login'), {'email':self.user_w_map.email, 'password':''})
+        response = self.client.post(reverse('login'), {'email': self.user_w_map.email, 'password': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, json.dumps({'success': False, 'redirect':reverse('shib-login')}))
+        self.assertEqual(response.content, json.dumps({'success': False, 'redirect': reverse('shib-login')}))
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test_get_course_enrollment_domain(self):
+    def test__get_course_enrollment_domain(self):
         """
-        Tests the get_course_enrollment_domain utility function
+        Tests the _get_course_enrollment_domain utility function
         """
-        self.assertIsNone(get_course_enrollment_domain("I/DONT/EXIST"))
-        self.assertIsNone(get_course_enrollment_domain(self.course.id))
-        self.assertEqual(self.shib_course.enrollment_domain, get_course_enrollment_domain(self.shib_course.id))
+        self.assertIsNone(_get_course_enrollment_domain("I/DONT/EXIST"))
+        self.assertIsNone(_get_course_enrollment_domain(self.course.id))
+        self.assertEqual(self.shib_course.enrollment_domain, _get_course_enrollment_domain(self.shib_course.id))
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_login_required_dashboard(self):
@@ -244,7 +251,7 @@ class ExternalAuthTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[self.course.id])
+        TARGET_URL = reverse('courseware', args=[self.course.id])            # pylint: disable=C0103
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
@@ -252,11 +259,11 @@ class ExternalAuthTest(ModuleStoreTestCase):
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id])
+        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id])  # pylint: disable=C0103
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
-                                           'REMOTE_USER':self.extauth.external_id,
-                                           'Shib-Identity-Provider':'https://idp.stanford.edu/'})
+                                           'REMOTE_USER': self.extauth.external_id,
+                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/'})
         # Test that the shib-login redirect page with ?next= and the desired page are part of the redirect chain
         # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
         # won't test its contents
