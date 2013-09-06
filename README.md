@@ -76,3 +76,6 @@ Reporting Security Issues
 -------------------------
 
 Please do not report security issues in public. Please email security@edx.org
+=======
+This is the Github-hosted branch of edx-platform that is behind
+http://docs.edx.org
