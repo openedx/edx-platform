@@ -152,7 +152,7 @@ class LTIModule(LTIFields, XModule):
         custom_parameters = {}
         for custom_parameter in self.custom_parameters:
             try:
-                param_name, param_value = custom_parameter.split('=')
+                param_name, param_value = custom_parameter.split('=', 1)
             except ValueError:
                 raise Exception('Could not parse custom parameter: {0}. \
                     Should be "x=y" string.'.format(custom_parameter))
