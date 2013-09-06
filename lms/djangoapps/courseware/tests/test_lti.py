@@ -19,7 +19,7 @@ class TestLTI(BaseTestXmodule):
         Mock oauth1 signing of requests library for testing.
         """
         super(TestLTI, self).setUp()
-        mocked_noonce = u'135685044251684026041377608307'
+        mocked_nonce = u'135685044251684026041377608307'
         mocked_timestamp = u'1234567890'
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
@@ -32,7 +32,7 @@ class TestLTI(BaseTestXmodule):
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
 
-            u'oauth_nonce': mocked_noonce,
+            u'oauth_nonce': mocked_nonce,
             u'oauth_timestamp': mocked_timestamp,
             u'oauth_consumer_key': u'',
             u'oauth_signature_method': u'HMAC-SHA1',
@@ -53,7 +53,7 @@ class TestLTI(BaseTestXmodule):
             # we should replace noonce, timestamp and signed_signature in headers:
             old = headers[u'Authorization']
             old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
-            old_parsed[u'OAuth oauth_nonce'] = mocked_noonce
+            old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
             old_parsed[u'oauth_timestamp'] = mocked_timestamp
             old_parsed[u'oauth_signature'] = mocked_signature_after_sign
             headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
