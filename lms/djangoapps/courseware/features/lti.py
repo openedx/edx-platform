@@ -91,7 +91,7 @@ def set_incorrect_lti_passport(_step):
     i_am_registered_for_the_course(coursenum, metadata)
 
 
-@step('the course has a LTI component filled with correct fields$')
+@step('the course has an LTI component filled with correct fields$')
 def add_correct_lti_to_course(_step):
     category = 'lti'
     world.ItemFactory.create(
@@ -116,7 +116,7 @@ def add_correct_lti_to_course(_step):
     world.browser.visit(url)
 
 
-@step('the course has a LTI component with incorrect fields$')
+@step('the course has an LTI component with incorrect fields$')
 def add_incorrect_lti_to_course(_step):
     category = 'lti'
     world.ItemFactory.create(
