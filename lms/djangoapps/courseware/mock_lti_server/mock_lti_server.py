@@ -82,13 +82,8 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             post_dict = urlparse.parse_qs(self.rfile.read(length), keep_blank_values=True)
             # The POST dict will contain a list of values for each key.
             # None of our parameters are lists, however, so we map [val] --> val.
-            #I f the list contains multiple entries, we pick the first one
-            post_dict = dict(
-                map(
-                    lambda (key, list_val): (key, list_val[0]),
-                    post_dict.items()
-                )
-            )
+            # If the list contains multiple entries, we pick the first one
+            post_dict = {key: val[0] for key, val in post_dict.items()}
         except:
             # We return an empty dict here, on the assumption
             # that when we later check that the request has
