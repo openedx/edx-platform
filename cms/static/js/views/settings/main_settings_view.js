@@ -184,8 +184,11 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         if (forcedTarget) {
             thisTarget = forcedTarget;
             thisTarget.id = $(thisTarget).attr('id');
-        } else {
+        } else if (e !== null) {
             thisTarget = e.currentTarget;
+        } else
+        {
+            return;
         }
 
         if (!this.codeMirrors[thisTarget.id]) {

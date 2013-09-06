@@ -194,14 +194,13 @@ from contentstore import utils
           % endif
         </section>
         <hr class="divide" />
-        % if about_page_editable:
             <section class="group-settings marketing">
               <header>
                 <h2 class="title-2">${_("Introducing Your Course")}</h2>
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
-
               <ol class="list-input">
+                % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
@@ -213,6 +212,7 @@ from contentstore import utils
                     %>${text}</%def>
                   <span class="tip tip-stacked">${overview_text()}</span>
                 </li>
+                % endif
 
                 <li class="field image" id="field-course-image">
                   <label>${_("Course Image")}</label>
@@ -242,6 +242,7 @@ from contentstore import utils
                   </div>
                 </li>
 
+                % if about_page_editable:
                 <li class="field video" id="field-course-introduction-video">
                   <label for="course-overview">${_("Course Introduction Video")}</label>
                   <div class="input input-existing">
@@ -258,9 +259,11 @@ from contentstore import utils
                     <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
+                % endif
               </ol>
             </section>
 
+          % if about_page_editable:
             <hr class="divide" />
 
             <section class="group-settings requirements">
@@ -277,7 +280,7 @@ from contentstore import utils
                 </li>
               </ol>
             </section>
-        % endif
+          % endif
       </form>
     </article>
     <aside class="content-supplementary" role="complimentary">
