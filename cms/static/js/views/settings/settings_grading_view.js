@@ -20,6 +20,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     initialize : function() {
         //  load template for grading view
         var self = this;
+        this.template = _.template($("#course_grade_policy-tpl").text());
         this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable="true">' +
                 '<%= descriptor %>' +
                 '</span><span class="range"></span>' +
@@ -27,27 +28,15 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         '</li>');
 
         this.setupCutoffs();
-
-        // instantiates an editor template for each update in the collection
-        // Because this calls render, put it after everything which render may depend upon to prevent race condition.
-        window.templateLoader.loadRemoteTemplate("course_grade_policy",
-                "/static/client_templates/course_grade_policy.html",
-                function (raw_template) {
-            self.template = _.template(raw_template);
-            self.render();
-        }
-        );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+        this.render();
     },
 
     render: function() {
-        // prevent bootstrap race condition by event dispatch
-        if (!this.template) return;
-
         this.clearValidationErrors();
 
         this.renderGracePeriod();
