@@ -17,7 +17,7 @@ def lti_is_not_rendered(_step):
     assert world.css_visible('.error_message')
 
     # iframe is not visible
-    assert (not world.css_visible('iframe'))
+    assert not world.css_visible('iframe')
 
     #inside iframe test content is not presented
     with world.browser.get_iframe('ltiLaunchFrame') as iframe:
@@ -31,7 +31,7 @@ def lti_is_rendered(_step):
     assert world.is_css_present('div.lti.rendered')
 
     # error is hidden
-    assert (not world.css_visible('.error_message'))
+    assert not world.css_visible('.error_message')
 
     # iframe is visible
     assert world.css_visible('iframe')
@@ -52,7 +52,7 @@ def incorrect_lti_is_rendered(_step):
     assert world.is_css_present('div.lti.rendered')
 
     # error is hidden
-    assert (not world.css_visible('.error_message'))
+    assert not world.css_visible('.error_message')
 
     # iframe is visible
     assert world.css_visible('iframe')
