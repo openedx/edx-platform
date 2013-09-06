@@ -179,8 +179,8 @@ class CombinedOpenEndedFields(object):
         scope=Scope.settings
     )
     video_id = String(
-        display_name = "Video ID",
-        help="This is used for video response",
+        display_name = "Video Response ID",
+        help="This enables embedded video clips of the specified video to be part of the response.",
         default="",
         scope=Scope.settings
     )
@@ -370,7 +370,6 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     js = {
             'coffee':
             [
-                resource_string(__name__, 'js/src/combinedopenended/omni_player.coffee'),
                 resource_string(__name__, 'js/src/combinedopenended/video_clipper.coffee'),
                 resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                 resource_string(__name__, 'js/src/collapsible.coffee'),

@@ -832,11 +832,6 @@ describe "VideoClipper", ->
       expect($("input[name='bl-end']").val()).toEqual ""
       expect($("input[name='bl-start']").val()).toEqual ""      
 
-    it "clears values for the textarea in the snippet box", ->
-      $(".bl-URL").text "Testing 1.. 2.. 3.."
-      VideoClipper.clearInputs()
-      expect($(".bl-URL").text()).toEqual "Generated URL goes here"
-
     it "removes the bl-incorrect class from the input boxes", ->
       $("input[name='bl-end']").addClass "bl-incorrect"
       $("input[name='bl-start']").addClass "bl-incorrect"

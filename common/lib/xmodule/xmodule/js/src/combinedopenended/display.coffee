@@ -273,10 +273,13 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
+      @video_response_off()
     if @child_state == 'done'
       @rubric_wrapper.hide()
+      @video_response_off()
     if @child_type=="openended"
       @skip_button.hide()
+      @video_response_off()
     if @allow_reset=="True"
       @show_combined_rubric_current()
       @reset_button.show()
@@ -658,6 +661,7 @@ class @CombinedOpenEnded
   video_response_on: () =>
     onVideoClipperReadyTried = VideoClipper
     window.onVideoClipperReady = =>
+      OmniPlayer.loaded.YT = true
       coeVideoId = @coe.data('videoId')
       if coeVideoId != null && coeVideoId != ""
         textarea = @coe.find('textarea')
@@ -676,29 +680,15 @@ class @CombinedOpenEnded
     if onVideoClipperReadyTried != undefined
       window.onVideoClipperReady()
 
-    onOmniPlayerReadyTried = OmniPlayer
-    window.onOmniPlayerReady = ->
-      OmniPlayer.loaded.YT = true
-
-    if onOmniPlayerReadyTried != undefined
-      window.onOmniPlayerReady()
-
-
   video_response_off: () =>
     onVideoClipperReadyTried = VideoClipper
     window.onVideoClipperReady = =>
+      OmniPlayer.loaded.YT = true
       VideoClipper.cleanUp()
       VideoClipper.generate()
 
     if onVideoClipperReadyTried != undefined
       window.onVideoClipperReady()
-
-    onOmniPlayerReadyTried = OmniPlayer
-    window.onOmniPlayerReady = ->
-      OmniPlayer.loaded.YT = true
-
-    if onOmniPlayerReadyTried != undefined
-      window.onOmniPlayerReady()
 
   video_response_reset: () =>
     @video_response_off()
