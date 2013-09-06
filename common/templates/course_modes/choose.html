@@ -13,10 +13,14 @@ $(document).ready(function() {
   $('.is-expandable').addClass('is-ready');
   $('.is-expandable .title-expand').click(function(e) {
       e.preventDefault();
-      //$(this).parent().toggleClass('is-expanded');
       $(this).next('.expandable-area').slideToggle();
       $(this).parent().toggleClass('is-expanded');
   });
+
+  $('#contribution-other-amt').focus(function() {
+    $('#contribution-other').attr('checked',true);
+  });
+
 });
 </script>
 </%block>
@@ -59,7 +63,7 @@ $(document).ready(function() {
             </div>
 
             <div class="field field-certificate-contribution">
-              <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span> ${_("):")}</h5>
+              <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span>${_("):")}</h5>
 
               %if error:
               <div class="msg msg-error msg-inline">
@@ -98,7 +102,7 @@ $(document).ready(function() {
                         </li>
 
                         <li class="field field-explain">
-                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Tell us why you would like the fee waived for this course in at least 180 characters.")}</label>
+                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Please write a few sentences about why you would like the fee waived for this course")}</label>
                           <textarea name="explain"></textarea>
                         </li>
                       </ul>
@@ -119,7 +123,7 @@ $(document).ready(function() {
           <div class="help help-register">
             <h3 class="title">${_("Verified Registration Requirements")}</h3>
             <div class="copy">
-              <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")} <a href="">${_("View requirements")}</a></p>
+              <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")}</p>
             </div>
 
             <h3 class="title">${_("What is an ID Verified Certificate?")}</h3>
