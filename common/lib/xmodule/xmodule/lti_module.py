@@ -214,7 +214,7 @@ class LTIModule(LTIFields, XModule):
         # This is needed for body encoding:
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-        _, headers, _ = client.sign(
+        __, headers, __ = client.sign(
             unicode(self.launch_url),
             http_method=u'POST',
             body=body,
