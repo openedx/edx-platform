@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
+from nose.tools import assert_true # pylint: disable=E0611
 
 
 @step(u'I go to the static pages page')
@@ -21,18 +22,21 @@ def add_page(_step):
 
 @step(u'I should( not)? see a "([^"]*)" static page$')
 def see_page(_step, doesnt, page):
-    index = get_index(page)
-    if doesnt:
-        assert index == -1
-    else:
-        assert index != -1
+
+    should_exist = not doesnt
+
+    # Need to retry here because the element
+    # will sometimes exist before the HTML content is loaded
+    exists_func = lambda(driver): page_exists(page) == should_exist
+    world.wait_for(exists_func)
+    assert_true(exists_func(None))
 
 
 @step(u'I "([^"]*)" the "([^"]*)" page$')
 def click_edit_delete(_step, edit_delete, page):
     button_css = 'a.%s-button' % edit_delete
     index = get_index(page)
-    assert index != -1
+    assert index is not None
     world.css_click(button_css, index=index)
 
 
@@ -54,4 +58,7 @@ def get_index(name):
     for i in range(len(all_pages)):
         if world.css_html(page_name_css, index=i) == '\n    {name}\n'.format(name=name):
             return i
-    return -1
+    return None
+
+def page_exists(page):
+    return get_index(page) is not None
