@@ -807,7 +807,11 @@ def _msk_from_problem_urlname(course_id, urlname):
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
-    urlname = "problem/" + urlname
+    # Combined open ended problems also have state that can be deleted.  However,
+    # appending "problem" will only allow capa problems to be reset.
+    # Get around this for combinedopenended problems.
+    if "combinedopenended" not in urlname:
+        urlname = "problem/" + urlname
 
     (org, course_name, __) = course_id.split("/")
     module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
