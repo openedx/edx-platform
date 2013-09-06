@@ -187,6 +187,8 @@
         });
 
         describe('multiple YT on page', function () {
+            var state1, state2, state3;
+
             beforeEach(function () {
                 loadFixtures('video_yt_multiple.html');
 
