@@ -794,7 +794,7 @@ class MongoModuleStore(ModuleStoreBase):
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
-                    tab['name'] = tab.get('name', metadata.get('display_name'))
+                    tab['name'] = metadata.get('display_name', tab.get('name'))
                     break
             course.tabs = existing_tabs
             # Save the updates to the course to the MongoKeyValueStore
