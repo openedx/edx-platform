@@ -5,7 +5,7 @@
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-confirmation</%block>
 
-<%block name="title"><title>${_("Register for [Course Name] | Receipt (Order")} ${order.id})</title></%block>
+<%block name="title"><title>${_("Receipt (Order")} ${order.id})</title></%block>
 
 <%block name="content">
 % if notification is not UNDEFINED:
@@ -22,12 +22,12 @@
     <header class="page-header">
   <h2 class="title">
     <span class="wrapper-sts">
-      <span class="sts">${_("You are registering for")}</span>
+      <span class="sts">${_("You are now registered for")}</span>
       <span class="sts-course">${course.display_name}</span>
     </span>
     <span class="sts-track">
       <span class="sts-track-value">
-        <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+        <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
       </span>
     </span>
   </h2>
@@ -82,7 +82,7 @@
         <article class="content-main">
 
 
-            <h3 class="title">Congratulations! You are now verified on ${_(settings.PLATFORM_NAME)}.</h3>
+            <h3 class="title">${_("Congratulations! You are now verified on ")} ${_(settings.PLATFORM_NAME)}.</h3>
 
             <div class="instruction">
               <p>${_("You are now registered as a verified student! Your registration details are below.")}</p>
@@ -90,15 +90,15 @@
 
             <ul class="list-info">
                 <li class="info-item course-info">
-                    <h4 class="title">You are registered for:</h4>
+                    <h4 class="title">${_("You are registered for:")}</h4>
 
                     <div class="copy">
                         <table>
-                            <caption class="sr">A list of courses you have just registered for as a verified student</caption>
+                            <caption class="sr">${_("A list of courses you have just registered for as a verified student")}</caption>
                             <thead>
                                 <tr>
-                                    <th>Course</th>
-                                    <th>Status</th>
+                                    <th>${_("Course")}</th>
+                                    <th>${_("Status")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,7 +107,7 @@
                                     <td>${item.line_desc}</td>
                                     <td>${_("Starts: {start_date}").format(start_date=course.start_date_text)}
                                     <ul class="list-actions">
-                                        <li class="action action-course"><a href="${reverse('course_root', kwargs={'course_id': item.course_id})}">Go to Course</a></li>
+                                        <li class="action action-course"><a href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a></li>
                                     </ul>
                                     </td>
                                 </tr>
@@ -116,19 +116,19 @@
                         </table>
 
                         <ul class="list-actions">
-                            <li class="action action-dashboard"><a href="${reverse('dashboard')}">Go to your Dashboard</a></li>
+                            <li class="action action-dashboard"><a href="${reverse('dashboard')}">${_("Go to your Dashboard")}</a></li>
                         </ul>
                     </div>
 
                 </li>
 
                 <li class="info-item verification-info">
-                    <h4 class="title">Verified Status</h4>
+                    <h4 class="title">${_("Verified Status")}</h4>
 
                     <div class="copy">
-                        <p>We have received your identification details to verify your identity. If there is a problem with any of the items, we will contact you to resubmit. You can now register for any of the verified certificate courses this semester without having to re-verify.</p>
+                        <p>${_("We have received your identification details to verify your identity. If there is a problem with any of the items, we will contact you to resubmit. You can now register for any of the verified certificate courses this semester without having to re-verify.")}</p>
 
-                        <p>The professor will ask you to periodically submit a new photo to verify your work during the course (usually at exam times).</p>
+                        <p>${_("The professor will ask you to periodically submit a new photo to verify your work during the course (usually at exam times).")}</p>
                     </div>
 
                 </li>
@@ -175,7 +175,7 @@
                             </table>
                         % if any_refunds:
                         <p>
-                            ${_("Note: items with strikethough like ")}<del>this</del>${_(" have been refunded.")}
+                            ${_("Note: items with strikethough like ")}<del>${_("this")}</del>${_(" have been refunded.")}
                         </p>
                         % endif
                         </div>
