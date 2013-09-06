@@ -79,7 +79,7 @@ def set_correct_lti_passport(_step):
     i_am_registered_for_the_course(coursenum, metadata)
 
 
-@step('the course has a incorrect LTI credentials$')
+@step('the course has incorrect LTI credentials$')
 def set_incorrect_lti_passport(_step):
     coursenum = 'test_course'
     metadata = {
