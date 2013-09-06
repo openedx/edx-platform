@@ -65,9 +65,10 @@ class LTIModule(LTIFields, XModule):
             *+ all custom parameters*
 
         These parameters should be encoded and signed by *oauth1* together with
-        `launch_url` and *POST* request type. Signing proceeds with client key/secret
-        pair obtained from course settings. That pair should be obtained from LTI provider
-        and set into course settings by course author.
+        `launch_url` and *POST* request type.
+
+    3. Signing proceeds with client key/secret pair obtained from course settings.
+        That pair should be obtained from LTI provider and set into course settings by course author.
         After that signature and other oauth data are generated.
 
          Oauth data which is generated after signing is usual::
@@ -80,7 +81,7 @@ class LTIModule(LTIFields, XModule):
             oauth_version
 
 
-        All that data is passed to form and sent to LTI provider server by browser via
+    4. All that data is passed to form and sent to LTI provider server by browser via
         autosubmit via javascript.
 
         Form example::
@@ -115,7 +116,7 @@ class LTIModule(LTIFields, XModule):
                     <input type="submit" value="Press to Launch" />
                 </form>
 
-        LTI provider has same secret key and it signs data string via *oauth1* and compares signatures.
+    5. LTI provider has same secret key and it signs data string via *oauth1* and compares signatures.
 
         If signatures are correct, LTI provider redirects iframe source to LTI tool web page,
         and LTI tool is rendered to iframe inside course.
