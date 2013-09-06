@@ -25,7 +25,7 @@ class GradingService(object):
     def __init__(self, config):
         self.username = config['username']
         self.password = config['password']
-        self.session = requests.session()
+        self.session = requests.Session()
         self.system = config['system']
 
     def _login(self):

@@ -9,7 +9,6 @@ Many of these GETs may become PUTs in the future.
 import re
 import logging
 import requests
-from requests.status_codes import codes
 from collections import OrderedDict
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
