@@ -49,7 +49,7 @@ class TestLTI(BaseTestXmodule):
             Mocked oauth1 sign function.
             """
             # self is <oauthlib.oauth1.rfc5849.Client object> here:
-            _, headers, _ = saved_sign(self, *args, **kwargs)
+            __, headers, __ = saved_sign(self, *args, **kwargs)
             # we should replace noonce, timestamp and signed_signature in headers:
             old = headers[u'Authorization']
             old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
