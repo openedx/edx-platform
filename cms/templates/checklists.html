@@ -5,9 +5,17 @@
 <%block name="bodyclass">is-signedin course uxdesign checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["checklist"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
 <%block name="jsextra">
 
-<script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
 <script type="text/javascript" src="${static.url('js/models/checklists.js')}"></script>
 
@@ -20,7 +28,7 @@
             el: $('.course-checklists'),
             collection: checklistCollection
         });
-
+        checklistCollection.fetch({reset: true});
     });
 
 </script>
