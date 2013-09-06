@@ -52,7 +52,7 @@ ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'word_cloud',
     'graphical_slider_tool',
-    'lti'
+    'lti',
 ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
