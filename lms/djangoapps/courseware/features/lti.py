@@ -71,7 +71,7 @@ def incorrect_lti_is_rendered(_step):
 def set_correct_lti_passport(_step):
     coursenum = 'test_course'
     metadata = {
-        'LTIs': ["correct_lti_id:{}:{}".format(
+        'lti_passports': ["correct_lti_id:{}:{}".format(
             world.lti_server.oauth_settings['client_key'],
             world.lti_server.oauth_settings['client_secret']
         )]
@@ -83,7 +83,7 @@ def set_correct_lti_passport(_step):
 def set_incorrect_lti_passport(_step):
     coursenum = 'test_course'
     metadata = {
-        'LTIs': ["test_lti_id:{}:{}".format(
+        'lti_passports': ["test_lti_id:{}:{}".format(
             world.lti_server.oauth_settings['client_key'],
             "incorrect_lti_secret_key"
         )]

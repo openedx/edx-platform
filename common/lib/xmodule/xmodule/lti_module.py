@@ -137,7 +137,7 @@ class LTIModule(LTIFields, XModule):
         course_location = CourseDescriptor.id_to_location(course_id)
         course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key, client_secret = '', ''
-        for lti_passport in course.LTIs:
+        for lti_passport in course.lti_passports:
             try:
                 lti_id, key, secret = lti_passport.split(':')
             except ValueError:
