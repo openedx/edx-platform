@@ -23,6 +23,19 @@
 <script>
 ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
+
+%if settings.MITX_FEATURES.get('ENABLE_STUDENT_BADGE_DISPLAY_COURSEWARE', False):
+  <script>
+    email = "${student.email}";
+    course_id = "${course.id}";
+    badge_service_url = "${settings.BADGE_SERVICE_URL}";
+  </script>
+
+  <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/mustache.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/progress_badgelets.js')}"></script>
+%endif
+
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
@@ -37,6 +50,24 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
       %if not course.disable_progress_graph:
         <div id="grade-detail-graph" aria-hidden="true"></div>
+      %endif
+
+      %if settings.MITX_FEATURES.get('ENABLE_STUDENT_BADGE_DISPLAY_COURSEWARE', False):
+        <div class="ui-badges" id="badges">
+          ## A call to progress_badgelets.js adds content to this div and unhides it. This Mustache template is used.
+          <div class="badges_scrollbar">
+            {{#badgeclasses}}
+              <a href="./badges">
+                {{#is_earned}}
+                  <img src="{{image}}" class="badgelet" title="{{name}}" />
+                {{/is_earned}}
+                {{^is_earned}}
+                  <img src="{{image}}" class="badgelet unlockable" />
+                {{/is_earned}}
+              </a>
+            {{/badgeclasses}}
+          </div>
+        </div>
       %endif
 
       <ol class="chapters">

@@ -338,6 +338,13 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+    # Page which displays to a student all badges for a particular course.
+    if settings.MITX_FEATURES.get('ENABLE_STUDENT_BADGE_DISPLAY_COURSEWARE', False):
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/badges$',
+                'courseware.views.badges', name="badges"),
+        )
+
 if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',

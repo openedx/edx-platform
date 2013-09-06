@@ -165,7 +165,10 @@ MITX_FEATURES = {
     'ENABLE_SHOPPING_CART': False,
 
     # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': False
+    'STORE_BILLING_INFO': False,
+
+    # Allow badges to be visible in courseware at /badges and beneath progress graph
+    'ENABLE_STUDENT_BADGE_DISPLAY_COURSEWARE': False,
 }
 
 # Used for A/B testing
@@ -491,6 +494,10 @@ MOCK_STAFF_GRADING = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+
+################################# Badge service ################################
+# Should update this with the URL of the badge service once deployed. Should not end with a /.
+BADGE_SERVICE_URL = 'http://dummy_url_to_replace_later.edx.org'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
