@@ -20,7 +20,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
@@ -112,10 +112,14 @@ def find_peer_grading_module(course):
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     #Get the first one
-    if len(items) > 0:
-        item_location = items[0].location
+    for item in items:
+        item_location = item.location
         #Generate a url for the first module and redirect the user to it
-        problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+        try:
+            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+        except NoPathToItem:
+            log.info("Invalid peer grading module location {0} in course {1}.".format(item_location, course.id))
+            continue
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
 
