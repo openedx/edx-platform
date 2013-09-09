@@ -161,11 +161,14 @@ MITX_FEATURES = {
     # basis in Studio)
     'ENABLE_CHAT': False,
 
+    # Allow users to enroll with methods other than just honor code certificates
+    'MULTIPLE_ENROLLMENT_ROLES' : False,
+
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
 
     # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': False
+    'STORE_BILLING_INFO': False,
 }
 
 # Used for A/B testing
@@ -822,7 +825,10 @@ INSTALLED_APPS = (
     'notification_prefs',
 
     # Different Course Modes
-    'course_modes'
+    'course_modes',
+
+    # Student Identity Verification
+    'verify_student',
 )
 
 ######################### MARKETING SITE ###############################
@@ -837,6 +843,9 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
 }
 
 
@@ -866,6 +875,11 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
+
+################# Student Verification #################
+VERIFY_STUDENT = {
+    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+}
 
 ######################## CAS authentication ###########################
 

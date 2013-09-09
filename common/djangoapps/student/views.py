@@ -2,7 +2,6 @@
 Student Views
 """
 import datetime
-import feedparser
 import json
 import logging
 import random
@@ -27,22 +26,20 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date
-from django.utils.http import base36_to_int
+from django.utils.http import cookie_date, base36_to_int, urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from ratelimitbackend.exceptions import RateLimitException
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from bs4 import BeautifulSoup
 
+from course_modes.models import CourseMode
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registration, CourseEnrollmentAllowed)
-
 from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -269,7 +266,7 @@ def dashboard(request):
     courses = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            courses.append(course_from_id(enrollment.course_id))
+            courses.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -288,12 +285,12 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course in courses
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
+    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
 
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
@@ -335,10 +332,13 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
+            if enrollment_response.content != '':
+                return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
 
+@require_POST
 def change_enrollment(request):
     """
     Modify the enrollment status for the logged-in user.
@@ -356,17 +356,15 @@ def change_enrollment(request):
     as a post-login/registration helper, so the error messages in the responses
     should never actually be user-visible.
     """
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
     user = request.user
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
 
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
     if course_id is None:
         return HttpResponseBadRequest(_("Course id not specified"))
+
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
 
     if action == "enroll":
         # Make sure the course exists
@@ -380,6 +378,14 @@ def change_enrollment(request):
 
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
+
+        # If this course is available in multiple modes, redirect them to a page
+        # where they can choose which mode they want.
+        available_modes = CourseMode.modes_for_course(course_id)
+        if len(available_modes) > 1:
+            return HttpResponse(
+                reverse("course_modes_choose", kwargs={'course_id': course_id})
+            )
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -463,10 +469,10 @@ def login_user(request, error=""):
             log.exception(e)
             raise
 
-        try_change_enrollment(request)
+        redirect_url = try_change_enrollment(request)
 
         statsd.increment("common.student.successful_login")
-        response = HttpResponse(json.dumps({'success': True}))
+        response = HttpResponse(json.dumps({'success': True, 'redirect_url': redirect_url}))
 
         # set the login cookie for the edx marketing site
         # we want this cookie to be accessed via javascript
@@ -732,14 +738,14 @@ def create_account(request, post_override=None):
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
-    try_change_enrollment(request)
+    redirect_url = try_change_enrollment(request)
 
     statsd.increment("common.student.account_created")
 
-    js = {'success': True}
-    HttpResponse(json.dumps(js), mimetype="application/json")
+    response_params = {'success': True,
+                       'redirect_url': redirect_url}
 
-    response = HttpResponse(json.dumps({'success': True}))
+    response = HttpResponse(json.dumps(response_params))
 
     # set the login cookie for the edx marketing site
     # we want this cookie to be accessed via javascript

@@ -1,0 +1,164 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+
+<%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="title"><title>${_("Register for {} | Choose Your Track").format(course_name)}</title></%block>
+
+<%block name="js_extra">
+<script type="text/javascript">
+
+$(document).ready(function() {
+  $('.expandable-area').slideUp();
+  $('.is-expandable').addClass('is-ready');
+  $('.is-expandable .title-expand').click(function(e) {
+      e.preventDefault();
+      $(this).next('.expandable-area').slideToggle();
+      $(this).parent().toggleClass('is-expanded');
+  });
+
+  $('#contribution-other-amt').focus(function() {
+    $('#contribution-other').attr('checked',true);
+  });
+
+});
+</script>
+</%block>
+
+<%block name="content">
+
+%if error:
+<div class="wrapper-msg wrapper-msg-error">
+  <div class=" msg msg-error">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("Sorry, there was an error when trying to register you")}</h3>
+      <div class="copy">
+        <p>${error}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
+<div class="container">
+  <section class="wrapper">
+
+    <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
+
+    <div class="wrapper-register-choose wrapper-content-main">
+      <article class="register-choose content-main">
+        <h3 class="title">${_("Select your track:")}</h3>
+
+        <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+
+          % if "verified" in modes:
+          <div class="register-choice register-choice-certificate">
+            <div class="wrapper-copy">
+              <span class="deco-ribbon"></span>
+              <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
+              <div class="copy">
+                <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
+              </div>
+            </div>
+
+            <div class="field field-certificate-contribution">
+              <h5 class="label">${_("Select your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span>${_("):")}</h5>
+
+              %if error:
+              <div class="msg msg-error msg-inline">
+                <div class="copy">
+                  <p><i class="msg-icon icon-warning-sign"></i> ${error}</p>
+                </div>
+              </div>
+              %endif
+
+              <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
+
+              <div class="help-tip is-expandable">
+                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I don't meet all the requirements?")}</h5>
+
+                <div class="copy expandable-area">
+                  <dl class="list-faq">
+                    <dt class="faq-question">${_("Why do I have to pay?")}</dt>
+                    <dd class="faq-answer">
+                      <p>${_("As a not-for-profit, edX uses your contribution to support our mission to provide quality education to everyone around the world. While we have established a minimum fee, we ask that you contribute as much as you can.")}</p>
+                    </dd>
+
+                    <dt class="faq-question">${_("I'd like to pay more than the minimum.  Is my contribution tax deductible?")}</dt>
+                    <dd class="faq-answer">
+                      <p>${_("Please check with your tax advisor to determine whether your contribution is tax deductible.")}</p>
+                    </dd>
+
+                    % if "honor" in modes:
+                    <dt class="faq-question">${_("What if I can't afford it or don't have the necessary equipment?")}</dt>
+                    <dd class="faq-answer">
+                      <p>${_("If you can't afford the minimum fee, don't have a webcam, credit card, debit card or acceptable ID, you can audit the course for free. You may also elect to pursue an Honor Code certificate, but you will need to tell us why you would like the fee waived below. Then click the 'Select Certificate' button to complete your registration.")}</p>
+
+                      <ul class="list-fields">
+                        <li class="field field-honor-code checkbox">
+                          <input type="checkbox" name="honor-code" id="honor-code">
+                          <label for="honor-code">${_("Select Honor Code Certificate")}</label>
+                        </li>
+
+                        <li class="field field-explain">
+                          <label for="explain"><span class="sr">${_("Explain your situation: ")}</span>${_("Please write a few sentences about why you would like the fee waived for this course")}</label>
+                          <textarea name="explain"></textarea>
+                        </li>
+                      </ul>
+                    </dd>
+                    % endif
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action action-select">
+                <input type="submit" name="mode" value="Select Certificate" />
+              </li>
+            </ul>
+          </div>
+
+          <div class="help help-register">
+            <h3 class="title">${_("Verified Registration Requirements")}</h3>
+            <div class="copy">
+              <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")}</p>
+            </div>
+
+            <h3 class="title">${_("What is an ID Verified Certificate?")}</h3>
+            <div class="copy">
+              <p>${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.")}</p>
+            </div>
+          </div>
+          % endif
+
+          % if "audit" in modes:
+          <span class="deco-divider">
+            <span class="copy">${_("or")}</span>
+          </span>
+          <div class="register-choice register-choice-audit">
+            <div class="wrapper-copy">
+              <h4 class="title">${_("Audit This Course")}</h4>
+              <div class="copy">
+                <p>${_("Sign up to audit this course for free and track your own progress.")}</p>
+              </div>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action action-select">
+                <input type="submit" name="mode" value="Select Audit" />
+              </li>
+            </ul>
+          </div>
+          % endif
+
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        </form>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="/verify_student/_verification_support.html" />
+  </section>
+</div>
+</%block>

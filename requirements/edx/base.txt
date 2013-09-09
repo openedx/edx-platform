@@ -18,6 +18,7 @@ django-followit==0.0.3
 django-keyedcache==1.4-6
 django-kombu==0.9.4
 django-mako==0.1.5pre
+django-model-utils==1.4.0
 django-masquerade==0.1.6
 django-mptt==0.5.5
 django-openid-auth==0.4
@@ -60,7 +61,6 @@ South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==0.6
-django-model-utils==1.4.0
 
 # Used for debugging
 ipython==0.13.1
