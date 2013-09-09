@@ -70,6 +70,8 @@ function doSnapshotButton(captureButton, resetButton, approveButton) {
 
 function submitNameChange(event) {
   event.preventDefault();
+  $("#lean_overlay").fadeOut(200);
+  $("#edit-name").css({ 'display' : 'none' });
   var full_name = $('input[name="name"]').val();
   var xhr = $.post(
     "/change_name",
@@ -84,7 +86,7 @@ function submitNameChange(event) {
   .fail(function(jqXhr,text_status, error_thrown) {
     $('.message-copy').html(jqXhr.responseText);
   });
-  
+
 }
 
 function initSnapshotHandler(names, hasHtml5CameraSupport) {
