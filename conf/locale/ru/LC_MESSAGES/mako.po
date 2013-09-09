@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-09-02 11:25+0400\n"
-"Last-Translator: Павел <pavelyushchenko@gmail.com>\n"
+"POT-Creation-Date: 2013-09-06 19:20+0400\n"
+"PO-Revision-Date: 2013-09-06 15:51+0400\n"
+"Last-Translator: yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -22,19 +22,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
+"X-Generator: Pootle 2.5.0\n"
 "Generated-By: Babel 0.9.6\n"
-"X-POOTLE-MTIME: 1378106741.719030\n"
+"X-POOTLE-MTIME: 1378468293.0\n"
 
+# edX translation file
+# This English source file is machine-generated. Do not check it into github
+# Copyright (C) 2013 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2013.
 #: cms/djangoapps/contentstore/utils.py:18
 msgid "Open Ended Panel"
-msgstr ""
+msgstr "Открытоконцовая панель"
 
 #: cms/djangoapps/contentstore/utils.py:19 lms/templates/notes.html:60
 msgid "My Notes"
 msgstr "Мои заметки"
 
-#: cms/djangoapps/contentstore/views/course.py:115
+#: cms/djangoapps/contentstore/views/course.py:116
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -44,7 +49,7 @@ msgstr ""
 "\n"
 "{err}"
 
-#: cms/djangoapps/contentstore/views/course.py:126
+#: cms/djangoapps/contentstore/views/course.py:127
 msgid ""
 "There is already a course defined with the same organization, course number, "
 "and course run. Please change either organization or course number to be "
@@ -53,23 +58,47 @@ msgstr ""
 "Уже существует курс, созданный той же самой организацией, с тем же номером и "
 "годом проведения. Измените что-нибудь, чтобы достичь уникальности."
 
-#: cms/djangoapps/contentstore/views/course.py:130
-#: cms/djangoapps/contentstore/views/course.py:132
-#: cms/djangoapps/contentstore/views/course.py:145
-#: cms/djangoapps/contentstore/views/course.py:147
+#: cms/djangoapps/contentstore/views/course.py:131
+#: cms/djangoapps/contentstore/views/course.py:133
+#: cms/djangoapps/contentstore/views/course.py:146
+#: cms/djangoapps/contentstore/views/course.py:148
 msgid ""
 "Please change either the organization or course number so that it is unique."
 msgstr ""
 "Пожалуйста, измените либо организацию, либо номер курса, чтобы они были "
 "уникальны"
 
-#: cms/djangoapps/contentstore/views/course.py:142
+#: cms/djangoapps/contentstore/views/course.py:143
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
 msgstr ""
 "Уже существует курс, созданный той же самой организацией, с тем же номером. "
 "Измените что-нибудь, чтобы достичь уникальности."
+
+#: cms/djangoapps/contentstore/views/tabs.py:36
+#: lms/templates/courseware/courseware-error.html:6
+msgid "Courseware"
+msgstr "Курс"
+
+#: cms/djangoapps/contentstore/views/tabs.py:37
+#: cms/templates/static-pages.html:18
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:76
+msgid "Course Info"
+msgstr "Информация о курсе"
+
+#: cms/djangoapps/contentstore/views/tabs.py:38
+msgid "Discussion"
+msgstr "Дискуссии"
+
+#: cms/djangoapps/contentstore/views/tabs.py:39
+msgid "Wiki"
+msgstr "Wiki"
+
+#: cms/djangoapps/contentstore/views/tabs.py:40
+#: lms/templates/peer_grading/peer_grading.html:23
+msgid "Progress"
+msgstr "Прогресс"
 
 #: cms/djangoapps/contentstore/views/user.py:123
 msgid "Insufficient permissions"
@@ -144,8 +173,8 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
-"Это может случиться из-за ошибки на нашем сервере или Вашего интернет-"
-"соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
+"Это может случиться из-за ошибки на нашем сервере или Вашего "
+"интернет-соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
 "подключены к интернету."
 
 #: cms/static/coffee/src/main.js:41
@@ -160,8 +189,8 @@ msgstr "<em>Редактирование:</em> %s"
 #: cms/static/coffee/src/views/module_edit.js:131
 #: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:843
 #: cms/static/js/models/section.js:26
-#: cms/static/js/views/course_info_edit.js:101
-#: cms/static/js/views/course_info_edit.js:315
+#: cms/static/js/views/course_info_edit.js:121
+#: cms/static/js/views/course_info_edit.js:330
 #: cms/static/js/views/grader-select-view.js:85
 #: cms/static/js/views/overview.js:229 cms/static/js/views/textbook.js:125
 msgid "Saving"
@@ -173,24 +202,24 @@ msgstr ""
 "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
 
 #: cms/static/coffee/src/views/tabs.js:96
-#, fuzzy
 msgid "Delete Component Confirmation"
-msgstr "Подтверждение удаления файла"
+msgstr "Подтверждение удаления компонента"
 
 #: cms/static/coffee/src/views/tabs.js:97
-#, fuzzy
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
-msgstr "Вы действительно хотите удалить это обновление?"
+msgstr ""
+"Вы действительно хотите удалить этот компонент? Это действие не можетбыть "
+"отменено."
 
 #: cms/static/coffee/src/views/tabs.js:100 cms/static/js/views/assets.js:17
-#: cms/static/js/views/course_info_edit.js:162
+#: cms/static/js/views/course_info_edit.js:178
 msgid "OK"
 msgstr "OK"
 
 #: cms/static/coffee/src/views/tabs.js:111
 #: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:398
-#: cms/static/js/views/course_info_edit.js:170
+#: cms/static/js/views/course_info_edit.js:186
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting"
 msgstr "Удаление"
@@ -198,7 +227,7 @@ msgstr "Удаление"
 #: cms/static/coffee/src/views/tabs.js:124
 #: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:414
 #: cms/static/js/views/assets.js:43
-#: cms/static/js/views/course_info_edit.js:188
+#: cms/static/js/views/course_info_edit.js:204
 #: cms/static/js/views/textbook.js:48
 #: cms/static/js/views/validating_view.js:112 cms/templates/component.html:30
 #: cms/templates/index.html:131 cms/templates/manage_users.html:55
@@ -395,11 +424,11 @@ msgstr "Загрузка"
 msgid "Load Another File"
 msgstr "Загрузить другой файл"
 
-#: cms/static/js/views/course_info_edit.js:158
+#: cms/static/js/views/course_info_edit.js:174
 msgid "Are you sure you want to delete this update?"
 msgstr "Вы действительно хотите удалить это обновление?"
 
-#: cms/static/js/views/course_info_edit.js:159
+#: cms/static/js/views/course_info_edit.js:175
 msgid "This action cannot be undone."
 msgstr "Это действие не может быть отменено."
 
@@ -678,27 +707,27 @@ msgstr "Сохранить"
 msgid "Drag to reorder"
 msgstr "Для изменения порядка - перетащите"
 
-#: cms/templates/course_info.html:6 cms/templates/course_info.html:55
+#: cms/templates/course_info.html:6 cms/templates/course_info.html:56
 msgid "Course Updates"
 msgstr "Обновления курса"
 
-#: cms/templates/course_info.html:54 cms/templates/edit-tabs.html:23
+#: cms/templates/course_info.html:55 cms/templates/edit-tabs.html:23
 #: cms/templates/overview.html:127 cms/templates/textbooks.html:52
 #: cms/templates/widgets/header.html:25
 msgid "Content"
 msgstr "Содержание"
 
-#: cms/templates/course_info.html:59 cms/templates/edit-tabs.html:28
+#: cms/templates/course_info.html:60 cms/templates/edit-tabs.html:28
 #: cms/templates/index.html:46 cms/templates/manage_users.html:19
 #: cms/templates/overview.html:132 cms/templates/textbooks.html:57
 msgid "Page Actions"
 msgstr "Actions-страница"
 
-#: cms/templates/course_info.html:62
+#: cms/templates/course_info.html:63
 msgid "New Update"
 msgstr "Новое обновление"
 
-#: cms/templates/course_info.html:72
+#: cms/templates/course_info.html:73
 msgid ""
 "Course updates are announcements or notifications you want to share with "
 "your class. Other course authors have used them for important exam/date "
@@ -963,9 +992,9 @@ msgid ""
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
-"Организована основа вашего курса. Студия предлагает <strong>структуру</"
-"strong> редактора, обеспечивающего простую иерархию и легкое перемещение "
-"студентов по курсу."
+"Организована основа вашего курса. Студия предлагает "
+"<strong>структуру</strong> редактора, обеспечивающего простую иерархию и "
+"легкое перемещение студентов по курсу."
 
 #: cms/templates/howitworks.html:44
 msgid "Simple Organization For Content"
@@ -1372,7 +1401,7 @@ msgstr "Запросить права на создание курсов"
 
 #: cms/templates/index.html:231 cms/templates/index.html:257
 msgid "Your Course Creator Request Status"
-msgstr ""
+msgstr "Статус вашего запроса на права создания курса"
 
 #: cms/templates/index.html:236
 msgid ""
@@ -1384,7 +1413,7 @@ msgstr ""
 
 #: cms/templates/index.html:243 cms/templates/index.html:269
 msgid "Your Course Creator request is:"
-msgstr ""
+msgstr "Ваш запрос на создание курсов:"
 
 #: cms/templates/index.html:246
 msgid "Denied"
@@ -1394,6 +1423,8 @@ msgstr "Отказ в доступе"
 msgid ""
 "Your request did not meet the criteria/guidelines specified by edX Staff."
 msgstr ""
+"Ваш запрос не соответствует критериям/руководствам, определенным персоналом "
+"edX."
 
 #: cms/templates/index.html:262
 msgid ""
@@ -1469,7 +1500,7 @@ msgstr "Спасибо за регистрацию, %(name)s!"
 
 #: cms/templates/index.html:331
 msgid "We need to verify your email address"
-msgstr ""
+msgstr "Необходимо проверить Ваш адрес электронной почты"
 
 #: cms/templates/index.html:333
 #, python-format
@@ -1485,8 +1516,8 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
-"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих"
-"\". Если письма нет и там, запросите помощь по ссылке"
+"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих\". "
+"Если письма нет и там, запросите помощь по ссылке"
 
 #: cms/templates/login.html:4 cms/templates/widgets/header.html:156
 msgid "Sign In"
@@ -1517,7 +1548,7 @@ msgstr "Забыли пароль?"
 #: cms/templates/login.html:30 cms/templates/signup.html:35
 #: lms/templates/login.html:119 lms/templates/login_modal.html:17
 #: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
-#: lms/templates/register.html:122 lms/templates/signup_modal.html:28
+#: lms/templates/register.html:122 lms/templates/signup_modal.html:29
 #: lms/templates/university_profile/edge.html:19
 msgid "Password"
 msgstr "Пароль"
@@ -1588,7 +1619,7 @@ msgid "Current Role:"
 msgstr "Текущая роль:"
 
 #: cms/templates/manage_users.html:78
-#: lms/templates/courseware/instructor_dashboard.html:116
+#: lms/templates/courseware/instructor_dashboard.html:122
 msgid "Admin"
 msgstr "Администратор"
 
@@ -1777,9 +1808,9 @@ msgid ""
 msgstr ""
 "Ваш курс на странице сводки не будет виден, пока он не объявлен. Чтобы "
 "обеспечить содержание страницы и просмотреть его, следуйте инструкциям, "
-"приведенным вами <abbr title=\"Program Manager\">PM</abbr> или Conrad Warre "
-"<a rel=\"email\" class=\"action action-email\" href=\"mailto:conrad@edx.org"
-"\">(conrad@edx.org)</a>."
+"приведенным вами <abbr title=\"Program Manager\">PM</abbr> или Conrad Warre <a "
+"rel=\"email\" class=\"action action-email\" "
+"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 
 #: cms/templates/settings.html:121
 msgid "Course Schedule"
@@ -2190,7 +2221,7 @@ msgstr "Количество попыток,<br />разрешенных на з
 
 #: cms/templates/settings_discussions_faculty.html:276
 msgid "0 or higher"
-msgstr "Количество попыток,<br />разрешенных на задание:"
+msgstr "0 или выше"
 
 #: cms/templates/settings_discussions_faculty.html:285
 msgid "Discussions"
@@ -2370,108 +2401,108 @@ msgid "Required Information to Sign Up for edX Studio"
 msgstr "Необходимая информация для регистрации в Студии edX"
 
 #: cms/templates/signup.html:40 lms/templates/register.html:171
-#: lms/templates/signup_modal.html:35
+#: lms/templates/signup_modal.html:36
 msgid "Lastname"
 msgstr "Фамилия"
 
 #: cms/templates/signup.html:44 lms/templates/register.html:175
-#: lms/templates/signup_modal.html:39
+#: lms/templates/signup_modal.html:40
 msgid "Firstname"
 msgstr "Имя"
 
 #: cms/templates/signup.html:48 lms/templates/register.html:179
-#: lms/templates/signup_modal.html:43
+#: lms/templates/signup_modal.html:44
 msgid "Middlename"
 msgstr "Отчество"
 
 #: cms/templates/signup.html:52 lms/templates/register.html:183
-#: lms/templates/signup_modal.html:47
+#: lms/templates/signup_modal.html:48
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr "Год рождения"
 
 #: cms/templates/signup.html:61 lms/templates/register.html:192
-#: lms/templates/signup_modal.html:56
+#: lms/templates/signup_modal.html:57
 msgid "Highest Level of Education Completed"
 msgstr "Образование"
 
 #: cms/templates/signup.html:70 lms/templates/register.html:201
-#: lms/templates/signup_modal.html:65
+#: lms/templates/signup_modal.html:66
 msgid "Place where Education Completed"
 msgstr "Какое учебное заведение окончил(а)"
 
 #: cms/templates/signup.html:74 lms/templates/register.html:205
-#: lms/templates/signup_modal.html:69
+#: lms/templates/signup_modal.html:70
 msgid "Year when education was Completed"
 msgstr "Год окончания учебного заведения"
 
 #: cms/templates/signup.html:84 lms/templates/register.html:215
-#: lms/templates/signup_modal.html:79
+#: lms/templates/signup_modal.html:80
 msgid "Diploma qualification"
 msgstr "Квалификация по диплому"
 
 #: cms/templates/signup.html:88 lms/templates/register.html:219
-#: lms/templates/signup_modal.html:83
+#: lms/templates/signup_modal.html:84
 msgid "Diploma specialty"
 msgstr "Специальность по диплому"
 
 #: cms/templates/signup.html:92 lms/templates/register.html:223
-#: lms/templates/signup_modal.html:87
+#: lms/templates/signup_modal.html:91
 msgid "Type of educational institution"
 msgstr "Тип образовательного учреждения"
 
 #: cms/templates/signup.html:101 lms/templates/register.html:232
-#: lms/templates/signup_modal.html:96
+#: lms/templates/signup_modal.html:100
 msgid "Number of educational institution"
 msgstr "Номер образовательного учреждения"
 
 #: cms/templates/signup.html:105 lms/templates/register.html:236
-#: lms/templates/signup_modal.html:100
+#: lms/templates/signup_modal.html:112
 msgid "Name of educational institution"
 msgstr "Название образовательного учреждения"
 
 #: cms/templates/signup.html:109 lms/templates/register.html:240
-#: lms/templates/signup_modal.html:104
+#: lms/templates/signup_modal.html:116
 msgid "StatGrad login of educational institution"
 msgstr "Логин образовательного учреждения в системе Статград"
 
 #: cms/templates/signup.html:113 lms/templates/register.html:244
-#: lms/templates/signup_modal.html:108
+#: lms/templates/signup_modal.html:128
 msgid "Okrug of educational institution"
 msgstr "Округ образовательного учреждения"
 
 #: cms/templates/signup.html:122 lms/templates/register.html:253
-#: lms/templates/signup_modal.html:117
+#: lms/templates/signup_modal.html:137
 msgid "Occupation at educational institution"
 msgstr "Должность по месту работы"
 
 #: cms/templates/signup.html:131 lms/templates/register.html:262
-#: lms/templates/signup_modal.html:126
+#: lms/templates/signup_modal.html:146
 msgid "Another occupation at educational institution"
 msgstr "Вторая должность по месту работы"
 
 #: cms/templates/signup.html:140 lms/templates/register.html:271
-#: lms/templates/signup_modal.html:135
+#: lms/templates/signup_modal.html:155
 msgid "Educational experience at educational institution"
 msgstr "Стаж педагогический (полных лет)"
 
 #: cms/templates/signup.html:144 lms/templates/register.html:275
-#: lms/templates/signup_modal.html:139
+#: lms/templates/signup_modal.html:159
 msgid "Managing experience at educational institution"
 msgstr "Стаж руководящей работы (полных лет)"
 
 #: cms/templates/signup.html:148 lms/templates/register.html:279
-#: lms/templates/signup_modal.html:143
+#: lms/templates/signup_modal.html:163
 msgid "Qualification category"
 msgstr "Квалификационная категория"
 
 #: cms/templates/signup.html:157 lms/templates/register.html:288
-#: lms/templates/signup_modal.html:152
+#: lms/templates/signup_modal.html:172
 msgid "Qualification category year"
 msgstr "Год присвоения категории"
 
 #: cms/templates/signup.html:161 lms/templates/register.html:292
-#: lms/templates/signup_modal.html:156
+#: lms/templates/signup_modal.html:178
 msgid "Contact phone"
 msgstr "Контактный телефон"
 
@@ -2534,17 +2565,13 @@ msgid ""
 "us a note."
 msgstr ""
 "Конечно. Мы создали онлайн курс edX101, в котором приведены некоторые "
-"рекомендации: от видеосъемки , создания упражнений, к основам ведения онлайн-"
-"курсов. Дополнительно, мы всегда здесь, чтобы помочь, просто напишите нам."
+"рекомендации: от видеосъемки , создания упражнений, к основам ведения "
+"онлайн-курсов. Дополнительно, мы всегда здесь, чтобы помочь, просто напишите "
+"нам."
 
 #: cms/templates/static-pages.html:15
 msgid "New Static Page"
 msgstr "Новая дополнительная страница"
-
-#: cms/templates/static-pages.html:18
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:76
-msgid "Course Info"
-msgstr "Информация о курсе"
 
 #: cms/templates/static-pages.html:25
 #: lms/templates/static_templates/copyright.html:17
@@ -2687,6 +2714,8 @@ msgid ""
 "Thank you for signing up for edX Studio! To activate your account, please "
 "copy and paste this address into your web browser's address bar:"
 msgstr ""
+"Спасибо за регистрацию в Студии edX. Чтобы активировать Вашу учетную запись, "
+"пожалуйста, скопируйте этот адрес в строку адреса браузера"
 
 #: cms/templates/emails/activation_email.txt:11
 msgid ""
@@ -2860,10 +2889,12 @@ msgid "Studio Help"
 msgstr "Помощь Студии"
 
 #: cms/templates/widgets/html-edit.html:6
+#: lms/templates/widgets/html-edit.html:5
 msgid "Visual"
 msgstr "Визуальный"
 
 #: cms/templates/widgets/html-edit.html:7
+#: lms/templates/widgets/html-edit.html:6
 msgid "HTML"
 msgstr "HTML"
 
@@ -2960,295 +2991,296 @@ msgstr "имя"
 msgid "Honor Code Certificate"
 msgstr ""
 
-#: common/djangoapps/student/models.py:96
-msgid "Doctorate"
-msgstr "Доктор"
-
-#: common/djangoapps/student/models.py:97
+#: common/djangoapps/student/models.py:93
 msgid "Master's or professional degree"
 msgstr "Магистр"
 
-#: common/djangoapps/student/models.py:98
+#: common/djangoapps/student/models.py:94
 msgid "Bachelor's degree"
 msgstr "Бакалавр"
 
-#: common/djangoapps/student/models.py:99
+#: common/djangoapps/student/models.py:95
 msgid "Associate's degree"
 msgstr "Среднее профессиональное"
 
-#: common/djangoapps/student/models.py:100
+#: common/djangoapps/student/models.py:96
+msgid "Specialist's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py:97
 msgid "Secondary/high school"
 msgstr "Начальное профессиональное"
 
-#: common/djangoapps/student/models.py:101
+#: common/djangoapps/student/models.py:98
 msgid "Junior secondary/junior high/middle school"
 msgstr "Среднее среднее"
 
-#: common/djangoapps/student/models.py:102
+#: common/djangoapps/student/models.py:99
 msgid "Elementary/primary school"
 msgstr "Неполное среднее"
 
-#: common/djangoapps/student/models.py:103
-#: common/djangoapps/student/models.py:125
-#: common/djangoapps/student/models.py:146
-#: common/djangoapps/student/models.py:187
+#: common/djangoapps/student/models.py:100
+#: common/djangoapps/student/models.py:122
+#: common/djangoapps/student/models.py:143
+#: common/djangoapps/student/models.py:184
 msgid "None"
 msgstr "Нет"
 
-#: common/djangoapps/student/models.py:104
-#: common/djangoapps/student/models.py:126
-#: common/djangoapps/student/models.py:147
-#: common/djangoapps/student/models.py:180
+#: common/djangoapps/student/models.py:101
+#: common/djangoapps/student/models.py:123
+#: common/djangoapps/student/models.py:144
+#: common/djangoapps/student/models.py:177
 msgid "Other"
 msgstr "Другое"
 
-#: common/djangoapps/student/models.py:117
+#: common/djangoapps/student/models.py:114
 msgid "School"
 msgstr "Школа"
 
-#: common/djangoapps/student/models.py:118
+#: common/djangoapps/student/models.py:115
 msgid "Lyceum"
 msgstr "Лицей"
 
-#: common/djangoapps/student/models.py:119
+#: common/djangoapps/student/models.py:116
 msgid "Education Center"
 msgstr "Центр образования"
 
-#: common/djangoapps/student/models.py:120
+#: common/djangoapps/student/models.py:117
 msgid "Gymnasium"
 msgstr "Гимназия"
 
-#: common/djangoapps/student/models.py:121
+#: common/djangoapps/student/models.py:118
 msgid "Educational complex"
 msgstr "УВК"
 
-#: common/djangoapps/student/models.py:122
+#: common/djangoapps/student/models.py:119
 msgid "Kindergarten"
 msgstr "Детский сад"
 
-#: common/djangoapps/student/models.py:123
+#: common/djangoapps/student/models.py:120
 msgid "Non-profit educational institution"
 msgstr "НОУ"
 
-#: common/djangoapps/student/models.py:124
+#: common/djangoapps/student/models.py:121
 msgid "College"
 msgstr "Колледж"
 
-#: common/djangoapps/student/models.py:133
+#: common/djangoapps/student/models.py:130
 msgid "Central Administrative Okrug"
 msgstr "Центральный административный округ"
 
-#: common/djangoapps/student/models.py:134
+#: common/djangoapps/student/models.py:131
 msgid "Eastern Administrative Okrug"
 msgstr "Восточный административный округ"
 
-#: common/djangoapps/student/models.py:135
+#: common/djangoapps/student/models.py:132
 msgid "Western Administrative Okrug"
 msgstr "Западный административный округ"
 
-#: common/djangoapps/student/models.py:136
+#: common/djangoapps/student/models.py:133
 msgid "Northern Administrative Okrug"
 msgstr "Северный административный округ"
 
-#: common/djangoapps/student/models.py:137
+#: common/djangoapps/student/models.py:134
 msgid "North-Eastern Administrative Okrug"
 msgstr "Северо-Восточный административный округ"
 
-#: common/djangoapps/student/models.py:138
+#: common/djangoapps/student/models.py:135
 msgid "North-Western Administrative Okrug"
 msgstr "Северо-Западный административный округ"
 
-#: common/djangoapps/student/models.py:139
+#: common/djangoapps/student/models.py:136
 msgid "South-Western Administrative Okrug"
 msgstr "Юго-Западный административный округ"
 
-#: common/djangoapps/student/models.py:140
+#: common/djangoapps/student/models.py:137
 msgid "South-Eastern Administrative Okrug"
 msgstr "Юго-Восточный административный округ"
 
-#: common/djangoapps/student/models.py:141
+#: common/djangoapps/student/models.py:138
 msgid "Southern Administrative Okrug"
 msgstr "Южный административный округ"
 
-#: common/djangoapps/student/models.py:142
+#: common/djangoapps/student/models.py:139
 msgid "Zelenogradsky Administrative Okrug"
 msgstr "Зеленоградский административный округ"
 
-#: common/djangoapps/student/models.py:143
+#: common/djangoapps/student/models.py:140
 msgid "Troitsky Administrative Okrug"
 msgstr "Троицкий административный округ"
 
-#: common/djangoapps/student/models.py:144
+#: common/djangoapps/student/models.py:141
 msgid "Novomoskovsky Administrative Okrug"
 msgstr "Новомосковский административный округ"
 
-#: common/djangoapps/student/models.py:145
+#: common/djangoapps/student/models.py:142
 msgid "Territorial units with special status"
 msgstr "Городского подчинения"
 
-#: common/djangoapps/student/models.py:151
+#: common/djangoapps/student/models.py:148
 msgid "Teacher"
 msgstr "Учитель"
 
-#: common/djangoapps/student/models.py:152
+#: common/djangoapps/student/models.py:149
 msgid "Teacher and organizer"
 msgstr "Педагог-организатор"
 
-#: common/djangoapps/student/models.py:153
+#: common/djangoapps/student/models.py:150
 msgid "Social teacher"
 msgstr "Социальный педагог"
 
-#: common/djangoapps/student/models.py:154
+#: common/djangoapps/student/models.py:151
 msgid "Educational Psychologist"
 msgstr "Педагог-писхолог"
 
-#: common/djangoapps/student/models.py:155
+#: common/djangoapps/student/models.py:152
 msgid "Caregiver (including older)"
 msgstr "Воспитатель (включая старшего)"
 
-#: common/djangoapps/student/models.py:156
+#: common/djangoapps/student/models.py:153
 msgid "Manager (Director, Head of) the educational institution"
 msgstr "Руководитель (директор, заведующий) образовательного учреждения"
 
-#: common/djangoapps/student/models.py:157
+#: common/djangoapps/student/models.py:154
 msgid "Vice manager (director, head of) the educational institution"
 msgstr ""
-"Заместитель руководителя (директора, заведующего) образовательного учреждения"
+"Заместитель руководителя (директора, заведующего) образовательного "
+"учреждения"
 
-#: common/djangoapps/student/models.py:158
+#: common/djangoapps/student/models.py:155
 msgid "Senior master"
 msgstr "Старший мастер"
 
-#: common/djangoapps/student/models.py:159
+#: common/djangoapps/student/models.py:156
 msgid "Instructor"
 msgstr "Преподаватель"
 
-#: common/djangoapps/student/models.py:160
+#: common/djangoapps/student/models.py:157
 msgid "Teacher-pathologists, speech therapists (speech therapist)"
 msgstr "Учитель-дефектолог, учитель-логопед(логопед)"
 
-#: common/djangoapps/student/models.py:161
+#: common/djangoapps/student/models.py:158
 msgid "Tutor"
 msgstr "Тьютор"
 
-#: common/djangoapps/student/models.py:162
+#: common/djangoapps/student/models.py:159
 msgid "Teacher-librarian"
 msgstr "Педагог-библиотекарь"
 
-#: common/djangoapps/student/models.py:163
+#: common/djangoapps/student/models.py:160
 msgid "Senior leader"
 msgstr "Старший вожатый"
 
-#: common/djangoapps/student/models.py:164
+#: common/djangoapps/student/models.py:161
 msgid "Teacher of additional education (including older)"
 msgstr "Педагог дополнительного образования (включая старшего)"
 
-#: common/djangoapps/student/models.py:165
+#: common/djangoapps/student/models.py:162
 msgid "Musical head"
 msgstr "Музыкальный руководитель"
 
-#: common/djangoapps/student/models.py:166
+#: common/djangoapps/student/models.py:163
 msgid "Concertmaster"
 msgstr "Концертмейстер"
 
-#: common/djangoapps/student/models.py:167
+#: common/djangoapps/student/models.py:164
 msgid "Master of Physical Education"
 msgstr "Руководитель физического воспитания"
 
-#: common/djangoapps/student/models.py:168
+#: common/djangoapps/student/models.py:165
 msgid "Instructor of Physical Education"
 msgstr "Инструктор по физической культуре"
 
-#: common/djangoapps/student/models.py:169
+#: common/djangoapps/student/models.py:166
 msgid "The Methodist (including older)"
 msgstr "Методист (включая старшего)"
 
-#: common/djangoapps/student/models.py:170
+#: common/djangoapps/student/models.py:167
 msgid "Instructor for Labour"
 msgstr "Инструктор по труду"
 
-#: common/djangoapps/student/models.py:171
+#: common/djangoapps/student/models.py:168
 msgid "Instructor-organizer life safety"
 msgstr "Преподаватель-организатор ОБЖ"
 
-#: common/djangoapps/student/models.py:172
+#: common/djangoapps/student/models.py:169
 msgid "Coach and teacher (including older)"
 msgstr "Тренер-преподаватель (включая старшего)"
 
-#: common/djangoapps/student/models.py:173
+#: common/djangoapps/student/models.py:170
 msgid "Master of of industrial training"
 msgstr "Мастер производственного обучения"
 
-#: common/djangoapps/student/models.py:174
+#: common/djangoapps/student/models.py:171
 msgid "The duty on the regime (including older)"
 msgstr "Дежурный по режиму (включая старшего)"
 
-#: common/djangoapps/student/models.py:175
+#: common/djangoapps/student/models.py:172
 msgid "Leader"
 msgstr "Вожатый"
 
-#: common/djangoapps/student/models.py:176
+#: common/djangoapps/student/models.py:173
 msgid "Assistant caregiver"
 msgstr "Помощник воспитателя"
 
-#: common/djangoapps/student/models.py:177
+#: common/djangoapps/student/models.py:174
 msgid "Junior caregiver"
 msgstr "Младший воспитатель"
 
-#: common/djangoapps/student/models.py:178
+#: common/djangoapps/student/models.py:175
 msgid "Secretary of teaching department"
 msgstr "Секретарь учебной части"
 
-#: common/djangoapps/student/models.py:179
+#: common/djangoapps/student/models.py:176
 msgid "Dispatcher of the educational institution"
 msgstr "Диспетчер образовательного учреждения"
 
-#: common/djangoapps/student/models.py:188
+#: common/djangoapps/student/models.py:185
 msgid "High"
 msgstr "Высшая"
 
-#: common/djangoapps/student/models.py:189
+#: common/djangoapps/student/models.py:186
 msgid "First"
 msgstr "Первая"
 
-#: common/djangoapps/student/models.py:190
+#: common/djangoapps/student/models.py:187
 msgid "Second"
 msgstr "Вторая"
 
-#: common/djangoapps/student/views.py:359
+#: common/djangoapps/student/views.py:369
 msgid "Course id not specified"
 msgstr "Id курса не задан"
 
-#: common/djangoapps/student/views.py:369
+#: common/djangoapps/student/views.py:379
 msgid "Course id is invalid"
 msgstr "Id курса некорректен"
 
-#: common/djangoapps/student/views.py:372
+#: common/djangoapps/student/views.py:382
 msgid "Enrollment is closed"
 msgstr "Запись на курс закрыта"
 
-#: common/djangoapps/student/views.py:396
+#: common/djangoapps/student/views.py:406
 msgid "You are not enrolled in this course"
 msgstr "Вы не записаны на этот курс"
 
-#: common/djangoapps/student/views.py:398
+#: common/djangoapps/student/views.py:408
 msgid "Enrollment action is invalid"
 msgstr "Недействительная запись на курс"
 
-#: common/djangoapps/student/views.py:410
+#: common/djangoapps/student/views.py:420
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
 
-#: common/djangoapps/student/views.py:429
+#: common/djangoapps/student/views.py:439
 msgid "Too many failed login attempts. Try again later."
 msgstr "Слишком много попыток неудачного входа. Попробуйте позднее."
 
-#: common/djangoapps/student/views.py:436 lms/templates/provider_login.html:42
+#: common/djangoapps/student/views.py:446 lms/templates/provider_login.html:42
 msgid "Email or password is incorrect."
 msgstr "E-mail или пароль введены неверно."
 
-#: common/djangoapps/student/views.py:483
+#: common/djangoapps/student/views.py:493
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
@@ -3257,68 +3289,189 @@ msgstr ""
 "письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
 "активации."
 
-#: common/djangoapps/student/views.py:542
+#: common/djangoapps/student/views.py:564
 msgid "An account with the Email '{email}' already exists."
 msgstr "Учетная запись с адресом '{email}' уже существует."
 
-#: common/djangoapps/student/views.py:623
+#: common/djangoapps/student/views.py:648
 msgid "Error (401 {field}). E-mail us."
 msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
 
-#: common/djangoapps/student/views.py:628
+#: common/djangoapps/student/views.py:653
 msgid "To enroll, you must follow the honor code."
 msgstr "Для записи вы должны следовать Кодексу поведения."
 
-#: common/djangoapps/student/views.py:639
+#: common/djangoapps/student/views.py:664
 msgid "You must accept the terms of service."
 msgstr "Я согласен с условиями предоставления услуг"
 
+#: common/djangoapps/student/views.py:683
+#: common/djangoapps/student/views.py:699
+msgid "Education level is required"
+msgstr "Требуется заполненое поле Образование"
+
 #: common/djangoapps/student/views.py:689
+msgid "Username must be minimum of two characters long."
+msgstr "Имя пользователя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:690
+msgid "A properly formatted e-mail is required."
+msgstr "Требуется правильный электронный адресс."
+
+#: common/djangoapps/student/views.py:691
+msgid "Your legal name must be a minimum of two characters long."
+msgstr "Ваше рельное имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:692
+msgid "A valid password is required."
+msgstr "Требуется корректный пароль."
+
+#: common/djangoapps/student/views.py:693
+msgid "Accepting Terms of Service is required."
+msgstr "Требуется принять правила использования сервиса."
+
+#: common/djangoapps/student/views.py:694
+msgid "Agreeing to the Honor Code is required."
+msgstr "Требуется принять Кодекс Чести."
+
+#: common/djangoapps/student/views.py:695
+msgid "Lastname must be a minimum of two characters long."
+msgstr "Фамилия должна быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:696
+msgid "Firstname must be a minimum of two characters long."
+msgstr "Имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:697
+msgid "Middlename must be a minimum of two characters long."
+msgstr "Отчество должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:698
+msgid "Year of birth is required"
+msgstr "Требуется год рождения"
+
+#: common/djangoapps/student/views.py:700
+msgid "Education place is required"
+msgstr "Требуется заполненое поле Название учебного учреждения"
+
+#: common/djangoapps/student/views.py:701
+msgid "Education year is required"
+msgstr "Требуется заполненое поле Год окончания учебного заведения"
+
+#: common/djangoapps/student/views.py:702
+msgid "Work type is required"
+msgstr "Требуется заполненое поле Тип образовательного учреждения"
+
+#: common/djangoapps/student/views.py:703
+msgid "Work number is required"
+msgstr "Требуется заполненое поле Номер образовательного учреждения"
+
+#: common/djangoapps/student/views.py:704
+msgid "Work name is required"
+msgstr "Требуется заполненое поле Название образовательного учреждения"
+
+#: common/djangoapps/student/views.py:705
+msgid "Work StatGrad login is required"
+msgstr ""
+"Требуется заполненое поле Логин образовательного учреждения в системе "
+"Статград"
+
+#: common/djangoapps/student/views.py:706
+msgid "Work location is required"
+msgstr "Должно быть указано местоположение рабочего места"
+
+#: common/djangoapps/student/views.py:707
+msgid "Work occupation is required"
+msgstr "Должен быть указан род занятий"
+
+#: common/djangoapps/student/views.py:708
+msgid "Work teaching experience is required"
+msgstr "Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:709
+msgid "Work qualification category is required"
+msgstr "Должна быть указана квалификация"
+
+#: common/djangoapps/student/views.py:710
+msgid "Work qualification year is required"
+msgstr "Должен быть указан стаж"
+
+#: common/djangoapps/student/views.py:711
+msgid "Contact phone is required"
+msgstr "Должен быть указан контактный телефон"
+
+#: common/djangoapps/student/views.py:721
+msgid "Education year must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:722
+#, fuzzy
+msgid "Work teaching experience must be numeric"
+msgstr "Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:723
+#, fuzzy
+msgid "Work managing experience must be numeric"
+msgstr "Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:724
+msgid "Work qualification year must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:725
+msgid "Contact phone must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:735
 msgid "Valid e-mail is required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:728
+#: common/djangoapps/student/views.py:742
+msgid "Valid StatGrad login is required."
+msgstr "Должен быть указан корректный логин СтатГрад"
+
+#: common/djangoapps/student/views.py:781
 msgid "Could not send activation e-mail."
 msgstr "Невозможно отправить письмо с информацией об активации."
 
-#: common/djangoapps/student/views.py:1037
+#: common/djangoapps/student/views.py:1089
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr "Кажется, что-то пошло не так. Напишите нам, как это получилось"
 
-#: common/djangoapps/student/views.py:1056
+#: common/djangoapps/student/views.py:1108
 msgid "Invalid e-mail or user"
 msgstr "Неверный адрес e-mail или пользователь"
 
-#: common/djangoapps/student/views.py:1088
+#: common/djangoapps/student/views.py:1140
 msgid "No inactive user with this e-mail exists"
 msgstr "С таким адресом не существует неактивных пользователей"
 
-#: common/djangoapps/student/views.py:1101
+#: common/djangoapps/student/views.py:1153
 msgid "Unable to send reactivation email"
 msgstr "Невозможно отправить письмо с повторной активацией"
 
-#: common/djangoapps/student/views.py:1118
+#: common/djangoapps/student/views.py:1170
 msgid "Invalid password"
 msgstr "Неверный пароль"
 
-#: common/djangoapps/student/views.py:1125
+#: common/djangoapps/student/views.py:1177
 msgid "Valid e-mail address required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1130
+#: common/djangoapps/student/views.py:1182
 msgid "An account with this e-mail already exists."
 msgstr "Учетная запись с таким адресом электронной почты уже существует."
 
-#: common/djangoapps/student/views.py:1146
+#: common/djangoapps/student/views.py:1198
 msgid "Old email is the same as the new email."
 msgstr "Старый адрес электронной почты совпадает с новым."
 
-#: common/djangoapps/student/views.py:1235
+#: common/djangoapps/student/views.py:1287
 msgid "Name required"
 msgstr "Требуется имя"
 
-#: common/djangoapps/student/views.py:1270
-#: common/djangoapps/student/views.py:1280
+#: common/djangoapps/student/views.py:1322
+#: common/djangoapps/student/views.py:1332
 msgid "Invalid ID"
 msgstr "Неверный ID"
 
@@ -3355,20 +3508,28 @@ msgstr "Членство"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:118
 msgid "Student Admin"
-msgstr ""
+msgstr "Администратор студентов"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:133
 msgid "Data Download"
 msgstr "Загрузка данных"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:144
-#: lms/templates/courseware/instructor_dashboard.html:122
+#: lms/templates/courseware/instructor_dashboard.html:131
 msgid "Analytics"
 msgstr "Аналитика"
 
-#: lms/djangoapps/shoppingcart/models.py:162
+#: lms/djangoapps/shoppingcart/models.py:128
+msgid "Order Payment Confirmation"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:178
 msgid "Trying to add a different currency into the cart"
 msgstr "Попытка добавить другую валюту в корзину"
+
+#: lms/djangoapps/shoppingcart/models.py:324
+msgid "{mode} certificate for course {course_id}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py:19
 msgid "You must be logged-in to add to a shopping cart"
@@ -3601,10 +3762,12 @@ msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
+"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
+"Декабрь"
 
 #: lms/static/admin/js/calendar.js:27
 msgid "S M T W T F S"
-msgstr ""
+msgstr "В П В С Ч П С"
 
 #: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js:19
 #: lms/static/admin/js/collapse.min.js:1
@@ -3699,7 +3862,7 @@ msgstr ""
 #: lms/templates/static_templates/faq.html:12
 #: lms/templates/static_templates/press.html:12
 msgid "Faq"
-msgstr ""
+msgstr "ЧаВо"
 
 #: lms/templates/contact.html:11 lms/templates/footer.html:23
 #: lms/templates/static_templates/about.html:13
@@ -3707,7 +3870,7 @@ msgstr ""
 #: lms/templates/static_templates/faq.html:13
 #: lms/templates/static_templates/press.html:13
 msgid "Press"
-msgstr ""
+msgstr "Пресса"
 
 #: lms/templates/contact.html:12 lms/templates/footer.html:33
 #: lms/templates/static_templates/about.html:14
@@ -3766,7 +3929,7 @@ msgstr ""
 #: lms/templates/contact.html:40
 #: lms/templates/static_templates/contact.html:42
 msgid "Media"
-msgstr ""
+msgstr "Медиа"
 
 #: lms/templates/contact.html:41
 #: lms/templates/static_templates/contact.html:43
@@ -3778,7 +3941,7 @@ msgstr ""
 #: lms/templates/contact.html:47
 #: lms/templates/static_templates/contact.html:49
 msgid "Universities"
-msgstr ""
+msgstr "Университеты"
 
 #: lms/templates/contact.html:48
 msgid ""
@@ -3788,13 +3951,13 @@ msgstr ""
 
 #: lms/templates/course.html:11
 msgid "New"
-msgstr ""
+msgstr "Новый"
 
-#: lms/templates/dashboard.html:13
+#: lms/templates/dashboard.html:15
 msgid "Dashboard"
 msgstr "Личный кабинет"
 
-#: lms/templates/dashboard.html:56
+#: lms/templates/dashboard.html:66
 msgid ""
 "You'll receive a confirmation in your in-box. Please click the link in the "
 "email to confirm the email change."
@@ -3802,102 +3965,102 @@ msgstr ""
 "Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
 "ссылке указанной в письме для смены почтового адреса."
 
-#: lms/templates/dashboard.html:130 lms/templates/register.html:154
+#: lms/templates/dashboard.html:158 lms/templates/register.html:154
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/templates/dashboard.html:130 lms/templates/dashboard.html:135
+#: lms/templates/dashboard.html:158 lms/templates/dashboard.html:163
 msgid "edit"
 msgstr "изменить"
 
-#: lms/templates/dashboard.html:133
+#: lms/templates/dashboard.html:161
 #: lms/templates/university_profile/edge.html:15
 msgid "Email"
 msgstr "Эл. почта"
 
-#: lms/templates/dashboard.html:142 lms/templates/dashboard.html:145
+#: lms/templates/dashboard.html:170 lms/templates/dashboard.html:173
 msgid "Reset Password"
 msgstr "Восстановить пароль"
 
-#: lms/templates/dashboard.html:157
+#: lms/templates/dashboard.html:185
 msgid "Current Courses"
 msgstr "Текущие курсы"
 
-#: lms/templates/dashboard.html:172 lms/templates/dashboard.html:176
+#: lms/templates/dashboard.html:200 lms/templates/dashboard.html:204
 msgid "{course_number} {course_name} Cover Image"
 msgstr ""
 
-#: lms/templates/dashboard.html:184
+#: lms/templates/dashboard.html:212
 msgid "Course Completed - {end_date}"
 msgstr "Курс выполнен - {end_date}"
 
-#: lms/templates/dashboard.html:186
+#: lms/templates/dashboard.html:214
 msgid "Course Started - {start_date}"
 msgstr "Курс начат - {start_date}"
 
-#: lms/templates/dashboard.html:188
+#: lms/templates/dashboard.html:216
 msgid "Course Starts - {start_date}"
 msgstr "Курс начинается - {start_date}"
 
-#: lms/templates/dashboard.html:210
+#: lms/templates/dashboard.html:238
 msgid "Register for Pearson exam"
 msgstr "Зарегистрироваться на личный экзамен"
 
-#: lms/templates/dashboard.html:211
+#: lms/templates/dashboard.html:239
 msgid ""
 "Registration for the Pearson exam is now open and will close on {end_date}"
 msgstr ""
 
-#: lms/templates/dashboard.html:218
+#: lms/templates/dashboard.html:246
 #: lms/templates/test_center_register.html:120
 msgid "Schedule Pearson exam"
 msgstr ""
 
-#: lms/templates/dashboard.html:219
+#: lms/templates/dashboard.html:247
 msgid "{link_start}Registration{link_end} number: {number}"
 msgstr ""
 
-#: lms/templates/dashboard.html:224
+#: lms/templates/dashboard.html:252
 msgid "Write this down! You'll need it to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:230
+#: lms/templates/dashboard.html:258
 msgid ""
 "Your registration for the Pearson exam has been rejected. Please {link_start}"
 "see your registration status details{link_end}."
 msgstr ""
 
-#: lms/templates/dashboard.html:233
+#: lms/templates/dashboard.html:261
 msgid ""
 "Otherwise {link_start}contact edX at {email}{link_end} for further help."
 msgstr ""
 
-#: lms/templates/dashboard.html:242
+#: lms/templates/dashboard.html:270
 msgid ""
 "Your {link_start}registration for the Pearson exam{link_end} is pending."
 msgstr ""
 
-#: lms/templates/dashboard.html:243
+#: lms/templates/dashboard.html:271
 msgid ""
 "Within a few days, you should see a confirmation number here, which can be "
 "used to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:267
+#: lms/templates/dashboard.html:295
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
 
-#: lms/templates/dashboard.html:269
+#: lms/templates/dashboard.html:297
 msgid "Your final grade:"
-msgstr ""
+msgstr "Ваша финальная оценка:"
 
-#: lms/templates/dashboard.html:272
+#: lms/templates/dashboard.html:300
 msgid "Grade required for a certificate:"
-msgstr ""
+msgstr "Оценка, требуемая для сертификата:"
 
-#: lms/templates/dashboard.html:276
+#: lms/templates/dashboard.html:304
 msgid ""
 "Your certificate is being held pending confirmation that the issuance of "
 "your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
@@ -3906,120 +4069,137 @@ msgid ""
 "contacting {email}."
 msgstr ""
 
-#: lms/templates/dashboard.html:286
+#: lms/templates/dashboard.html:314
 msgid "Your Certificate is Generating"
-msgstr ""
+msgstr "Ваш сертификат генерируется"
 
-#: lms/templates/dashboard.html:290
+#: lms/templates/dashboard.html:318
 msgid "This link will open/download a PDF document"
-msgstr ""
+msgstr "По этой ссылке доступен для открытия/загрузки документ PDF"
 
-#: lms/templates/dashboard.html:296
+#: lms/templates/dashboard.html:324
 msgid "Complete our course feedback survey"
-msgstr ""
+msgstr "Заполните нашу форму обратной связи по курсу"
 
-#: lms/templates/dashboard.html:306
+#: lms/templates/dashboard.html:334
 msgid "View Archived Course"
 msgstr "Просмотр архивных курсов"
 
-#: lms/templates/dashboard.html:308
+#: lms/templates/dashboard.html:336
 msgid "View Course"
 msgstr "Просмотр курса"
 
-#: lms/templates/dashboard.html:311
+#: lms/templates/dashboard.html:339
 msgid "Unregister"
 msgstr "Удалить регистрацию"
 
-#: lms/templates/dashboard.html:320
+#: lms/templates/dashboard.html:342
+msgid "Email Settings"
+msgstr "Настройки электронной почты"
+
+#: lms/templates/dashboard.html:352
 msgid "Looks like you haven't registered for any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:322
+#: lms/templates/dashboard.html:354
 msgid "Find courses now!"
 msgstr "Найти курсы!"
 
-#: lms/templates/dashboard.html:329
+#: lms/templates/dashboard.html:361
 msgid "Course-loading errors"
 msgstr "Ошибка при загрузке курсов"
 
-#: lms/templates/dashboard.html:348
+#: lms/templates/dashboard.html:380
+msgid "Email Settings for {course_number}"
+msgstr ""
+
+#: lms/templates/dashboard.html:386
+msgid "Receive course emails"
+msgstr ""
+
+#: lms/templates/dashboard.html:403
 msgid "Are you sure you want to unregister from {course_number}?"
 msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
 
-#: lms/templates/dashboard.html:373
+#: lms/templates/dashboard.html:428
 msgid "Password Reset Email Sent"
 msgstr "Письмо восстановлением пароля выслано"
 
-#: lms/templates/dashboard.html:379
+#: lms/templates/dashboard.html:434
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
 msgstr ""
+"Письмо было выслано по адресу {email}. Перейдите по ссылке в письме для "
+"изменения пароля."
 
-#: lms/templates/dashboard.html:394 lms/templates/dashboard.html:411
+#: lms/templates/dashboard.html:449 lms/templates/dashboard.html:466
 msgid "Change Email"
 msgstr "Изменить Email"
 
-#: lms/templates/dashboard.html:402
+#: lms/templates/dashboard.html:457
 msgid "Please enter your new email address:"
 msgstr "Введите новый адрес электронной почты:"
 
-#: lms/templates/dashboard.html:404
+#: lms/templates/dashboard.html:459
 msgid "Please confirm your password:"
 msgstr "Подтвердите ваш пароль:"
 
-#: lms/templates/dashboard.html:408
+#: lms/templates/dashboard.html:463
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
-msgstr ""
+msgstr "Мы вышлем подтверждения и на адрес {email}, и на новый адрес."
 
-#: lms/templates/dashboard.html:427
+#: lms/templates/dashboard.html:482
 msgid "Change your name"
 msgstr "Измениние отображаемого имени"
 
-#: lms/templates/dashboard.html:433
+#: lms/templates/dashboard.html:488
 msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
 "be logged and recorded."
 msgstr ""
 
-#: lms/templates/dashboard.html:437
+#: lms/templates/dashboard.html:492
 msgid ""
 "Enter your desired full name, as it will appear on the {platform} "
 "certificates:"
 msgstr ""
+"Введите Ваше полное имя, как оно будет напечатано на сертификате {platform}:"
 
-#: lms/templates/dashboard.html:439
+#: lms/templates/dashboard.html:494
 msgid "Reason for name change:"
 msgstr "Причина изменения имени:"
 
-#: lms/templates/dashboard.html:443
+#: lms/templates/dashboard.html:498
 msgid "Change My Name"
 msgstr "Изменить имя"
 
 #: lms/templates/email_change_failed.html:8 lms/templates/email_exists.html:8
 msgid "E-mail change failed"
-msgstr ""
+msgstr "Изменение e-mail не выполнено"
 
 #: lms/templates/email_change_failed.html:11
 msgid "We were unable to send a confirmation email to {email}"
-msgstr ""
+msgstr "Не удалось выслать письмо-подтверждение на адрес {email}"
 
 #: lms/templates/email_change_failed.html:13
 #: lms/templates/email_exists.html:13 lms/templates/invalid_email_key.html:16
 msgid "Go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Вернуться на {link_start}домашнюю страницу{link_end}."
 
 #: lms/templates/email_change_successful.html:9
 #: lms/templates/emails_change_successful.html:9
 msgid "E-mail change successful!"
-msgstr ""
+msgstr "e-mail успешно изменен!"
 
 #: lms/templates/email_change_successful.html:12
 #: lms/templates/emails_change_successful.html:12
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
+"Новый адрес email должен появиться на вашей {link_start}персональной "
+"странице{link_end}."
 
 #: lms/templates/email_exists.html:11
 msgid "An account with the new e-mail address already exists."
@@ -4030,8 +4210,9 @@ msgid "Student Enrollment Form"
 msgstr ""
 
 #: lms/templates/enroll_students.html:5
+#, fuzzy
 msgid "Course: "
-msgstr ""
+msgstr "Курс"
 
 #: lms/templates/enroll_students.html:9
 msgid "Add new students"
@@ -4094,7 +4275,7 @@ msgid "Level"
 msgstr "Уровень"
 
 #: lms/templates/folditbasic.html:23
-#: lms/templates/courseware/instructor_dashboard.html:650
+#: lms/templates/courseware/instructor_dashboard.html:719
 msgid "Submitted"
 msgstr "Отправлено"
 
@@ -4116,11 +4297,11 @@ msgstr ""
 
 #: lms/templates/footer.html:18 lms/templates/static_templates/jobs.html:5
 msgid "Jobs"
-msgstr ""
+msgstr "Задания"
 
 #: lms/templates/footer.html:28 lms/templates/static_templates/faq.html:7
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ, ЧаВо"
 
 #: lms/templates/footer.html:42
 msgid ""
@@ -4130,14 +4311,19 @@ msgid ""
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
 msgstr ""
+"{platform_name} &mdash; это некоммерческая организация, основанная {Harvard} "
+"и {MIT}, миссия которой &mdash; предложить лучшее высшее образование "
+"студентам всех возрастов везде, где есть доступ к сети Интернет. Бесплатные "
+"он-лайн курсы {platform_name} являются интерактивными, а предметы включают в "
+"себя информатику, здравоохранение и искусственный интеллект."
 
 #: lms/templates/footer.html:77
 msgid "&copy; 2013 {platform_name}, some rights reserved."
-msgstr ""
+msgstr "&copy; 2013 {platform_name}, часть прав сохранена."
 
 #: lms/templates/footer.html:82
 msgid "Terms of Service and Honor Code"
-msgstr ""
+msgstr "Условия предоставления услуг и кодекс чести"
 
 #: lms/templates/footer.html:85 lms/templates/static_templates/privacy.html:7
 #: lms/templates/static_templates/privacy.html:10
@@ -4179,7 +4365,7 @@ msgstr "Неверный e-mail."
 
 #: lms/templates/help_modal.html:18
 msgid "{span_start}{platform_name}{span_end} Help"
-msgstr ""
+msgstr "{span_start}{platform_name}{span_end} Помощь"
 
 #: lms/templates/help_modal.html:27
 msgid ""
@@ -4188,24 +4374,28 @@ msgid ""
 "{link_end}."
 msgstr ""
 "<strong>Вопросы по лекциям, домашним заданиям, инструментам или материалам "
-"данного курса</strong>, задавайте на {link_start}форуме обсуждения курса"
-"{link_end}."
+"данного курса</strong>, задавайте на {link_start}форуме обсуждения "
+"курса{link_end}."
 
 #: lms/templates/help_modal.html:34
 msgid ""
 "Have <strong>general questions about {platform_name}</strong>? You can find "
 "lots of helpful information in the {platform_name} {link_start}FAQ{link_end}."
 msgstr ""
+"Есть <strong>общий вопрос о {platform_name}</strong>? Вы можете найти много "
+"полезной информации по {platform_name} в {link_start}ЧаВо{link_end}."
 
 #: lms/templates/help_modal.html:42
 msgid ""
 "Have a <strong>question about something specific</strong>? You can contact "
 "the {platform_name} general support team directly:"
 msgstr ""
+"Есть <strong>конкретный вопрос</strong>? Свяжитесь напрямую с общей службой "
+"поддержки {platform_name}:"
 
 #: lms/templates/help_modal.html:46
 msgid "Report a problem"
-msgstr ""
+msgstr "Сообщить о проблеме"
 
 #: lms/templates/help_modal.html:47
 msgid "Make a suggestion"
@@ -4216,12 +4406,14 @@ msgid "Ask a question"
 msgstr ""
 
 #: lms/templates/help_modal.html:65
+#, fuzzy
 msgid "Name*"
-msgstr ""
+msgstr "имя"
 
 #: lms/templates/help_modal.html:67
+#, fuzzy
 msgid "E-mail*"
-msgstr ""
+msgstr "Адрес e-mail *"
 
 #: lms/templates/help_modal.html:70
 msgid "Briefly describe your issue*"
@@ -4275,21 +4467,24 @@ msgstr "Неправильный ключ адреса e-mail"
 
 #: lms/templates/invalid_email_key.html:10
 msgid "This e-mail key is not valid. Please check:"
-msgstr ""
+msgstr "Этот ключ email некорректен. Пожалуйста, проверьте:"
 
 #: lms/templates/invalid_email_key.html:12
 msgid ""
 "Was this key already used? Check whether the e-mail change has already "
 "happened."
 msgstr ""
+"Возможно, этот ключ уже был использован. Проверьте, была ли выполнена "
+"операция смены адреса email."
 
 #: lms/templates/invalid_email_key.html:13
 msgid "Did your e-mail client break the URL into two lines?"
-msgstr ""
+msgstr "Возможно, Ваш клиент email разбивает URL на несколько строк."
 
 #: lms/templates/invalid_email_key.html:14
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
+"Ключи действуют в течение ограниченного времени. Возможно, время истекло."
 
 #: lms/templates/login.html:10
 msgid "Log into your {platform_name} Account"
@@ -4301,7 +4496,7 @@ msgstr "Вход в вашу ученую запись {platform_name} "
 
 #: lms/templates/login.html:71 lms/templates/login_modal.html:26
 msgid "Access My Courses"
-msgstr ""
+msgstr "Мои курсы"
 
 #: lms/templates/login.html:85
 msgid "PLEASE LOG IN to access your account and courses"
@@ -4309,7 +4504,7 @@ msgstr "Пожалуйста, войдите, чтобы получить дос
 
 #: lms/templates/login.html:95
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
+msgstr "Извините, учетные записи {platform_name} в данный момент недоступны"
 
 #: lms/templates/login.html:100
 msgid "The following errors occured while logging you in:"
@@ -4325,13 +4520,16 @@ msgid ""
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
 "and an asterisk (*)</strong>."
 msgstr ""
+"Пожалуйста, предоставьте следующую информацию чтобы войти в {platform_name}. "
+"Обязательные поля отмечены <strong class=\"indicator\">полужирным шрифтом и "
+"звездочкой (*)</strong>."
 
 #: lms/templates/login.html:115 lms/templates/login_modal.html:14
 #: lms/templates/provider_login.html:44 lms/templates/provider_login.html:45
 #: lms/templates/register.html:118 lms/templates/register.html:139
 #: lms/templates/signup_modal.html:25
 msgid "E-mail"
-msgstr ""
+msgstr "Адрес e-mail"
 
 #: lms/templates/login.html:129
 msgid "Account Preferences"
@@ -4354,8 +4552,8 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a rel="
-"\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
+"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a "
+"rel=\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
 
 #: lms/templates/login.html:164
 msgid "Not Enrolled?"
@@ -4384,11 +4582,12 @@ msgstr "Не зарегистрированы?"
 
 #: lms/templates/login_modal.html:32
 msgid "Sign up."
-msgstr ""
+msgstr "Зарегистрироваться."
 
 #: lms/templates/login_modal.html:37
+#, fuzzy
 msgid "login via openid"
-msgstr ""
+msgstr "Войти с помощью OpenID"
 
 #: lms/templates/main.html:23
 msgid "Home"
@@ -4411,8 +4610,9 @@ msgid "Details"
 msgstr ""
 
 #: lms/templates/module-error.html:10
+#, fuzzy
 msgid "Error:"
-msgstr ""
+msgstr "Ошибка"
 
 #: lms/templates/module-error.html:16
 msgid "Raw data:"
@@ -4464,28 +4664,25 @@ msgstr ""
 
 #: lms/templates/navigation.html:78
 msgid "Log Out"
-msgstr ""
+msgstr "Завершить сеанс"
 
 #: lms/templates/navigation.html:88
 msgid "How it Works"
-msgstr ""
+msgstr "Механизм работы"
 
 #: lms/templates/navigation.html:91 lms/templates/courseware/courses.html:6
 msgid "Courses"
-msgstr ""
+msgstr "Курсы"
 
 #: lms/templates/navigation.html:94
 msgid "Schools"
-msgstr ""
+msgstr "Школы"
 
 #: lms/templates/navigation.html:101 lms/templates/navigation.html:105
 msgid "Register Now"
 msgstr "Зарегистрируйтесь сейчас"
 
 #: lms/templates/navigation.html:115 lms/templates/navigation.html:117
-#: lms/templates/registration/login.html:4
-#: lms/templates/registration/login.html:8
-#: lms/templates/registration/login.html:21
 msgid "Log in"
 msgstr "Вход в систему"
 
@@ -4495,22 +4692,25 @@ msgid ""
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}"
 "Firefox{ff_link_end}."
 msgstr ""
+"<strong>Предупреждение:</strong> Ваш браузер не поддерживается полностью. "
+"Рекомендуем использовать {chrome_link_start}Chrome{chrome_link_end} или "
+"{ff_link_start}Firefox{ff_link_end}."
 
 #: lms/templates/notes.html:67
 msgid "Tags: {tags}"
-msgstr ""
+msgstr "Теги: {tags}"
 
 #: lms/templates/notes.html:69
 msgid "Author: {username}"
-msgstr ""
+msgstr "Автор: {username}"
 
 #: lms/templates/notes.html:70
 msgid "Created: {datetime}"
-msgstr ""
+msgstr "Создан: {datetime}"
 
 #: lms/templates/notes.html:71
 msgid "Source: {link}"
-msgstr ""
+msgstr "Источник: {link}"
 
 #: lms/templates/notes.html:76
 msgid "You do not have any notes."
@@ -4569,8 +4769,8 @@ msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
-"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены (*)"
-"</strong>."
+"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены "
+"(*)</strong>."
 
 #: lms/templates/register.html:119 lms/templates/register.html:140
 msgid "example: username@domain.com"
@@ -4608,7 +4808,7 @@ msgstr "Информация о пользователе"
 
 #: lms/templates/register.html:299
 msgid "Account Acknowledgements"
-msgstr ""
+msgstr "Подтверждения"
 
 #: lms/templates/register.html:308
 msgid "I agree to the {link_start}Terms of Service{link_end}"
@@ -4619,12 +4819,11 @@ msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "Я согласен с {link_start}кодексом чести{link_end}"
 
 #: lms/templates/register.html:338
-#: lms/templates/registration/registration_form.html:44
 #: lms/templates/university_profile/edge.html:31
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/register.html:338 lms/templates/signup_modal.html:179
+#: lms/templates/register.html:338 lms/templates/signup_modal.html:205
 msgid "Create My Account"
 msgstr "Создать учетную запись"
 
@@ -4650,6 +4849,9 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
+"Регистрация на {platform_name} дает вам доступ ко всем текущим и будущим "
+"бесплатным курсам. Пока не готовы взять курс? Регистрация добавит Вас в "
+"список рассыки, и Вы получите оповещения о новых курсах."
 
 #: lms/templates/register.html:371
 msgid "Next Steps"
@@ -4677,21 +4879,23 @@ msgstr "Нужна помощь в регистрации в {platform_name}?"
 
 #: lms/templates/register.html:384
 msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
+msgstr "Посмотрите раздел ЧаВо для ответов на типичные вопросы."
 
 #: lms/templates/register.html:386
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
 msgstr ""
+"После регистрации ответ на большинство вопросов можно получить на форуме "
+"курса или с помощью ЧаВо."
 
 #: lms/templates/seq_module.html:4 lms/templates/seq_module.html:39
 msgid "Section Navigation"
-msgstr ""
+msgstr "Навигация по секциям"
 
 #: lms/templates/seq_module.html:6 lms/templates/seq_module.html:40
 msgid "Previous"
-msgstr ""
+msgstr "Предыдущий"
 
 #: lms/templates/seq_module.html:29 lms/templates/seq_module.html:41
 msgid "Next"
@@ -4705,23 +4909,39 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 msgid "e.g. yourname@domain.com"
 msgstr "например yourname@domain.com"
 
-#: lms/templates/signup_modal.html:165
-msgid "I agree to the {link_start}Terms of Service{link_end}*"
+#: lms/templates/signup_modal.html:101
+msgid "e.g. 9999"
 msgstr ""
 
-#: lms/templates/signup_modal.html:172
+#: lms/templates/signup_modal.html:113
+msgid "e.g. School of art"
+msgstr ""
+
+#: lms/templates/signup_modal.html:117
+msgid "e.g. sch9999"
+msgstr ""
+
+#: lms/templates/signup_modal.html:179
+msgid "e.g. 9091234567"
+msgstr ""
+
+#: lms/templates/signup_modal.html:191
+msgid "I agree to the {link_start}Terms of Service{link_end}*"
+msgstr "Я согласен с {link_start}условиями предоставления услуг{link_end}*"
+
+#: lms/templates/signup_modal.html:198
 msgid "I agree to the {link_start}Honor Code{link_end}*"
 msgstr "Я согласен с {link_start}Кодексом чести{link_end}*"
 
-#: lms/templates/signup_modal.html:186
+#: lms/templates/signup_modal.html:212
 msgid "Already have an account?"
 msgstr "Уже имеете учетную запись?"
 
-#: lms/templates/signup_modal.html:186
+#: lms/templates/signup_modal.html:212
 msgid "Login."
 msgstr "Учетная запись."
 
-#: lms/templates/signup_modal.html:193
+#: lms/templates/signup_modal.html:219
 msgid "Close Modal"
 msgstr "Закрыть"
 
@@ -4743,8 +4963,9 @@ msgstr "Комментарий"
 
 #: lms/templates/staff_problem_info.html:34
 #: lms/templates/courseware/notifications.html:52
+#, fuzzy
 msgid "comment"
-msgstr ""
+msgstr "комментарии"
 
 #: lms/templates/staff_problem_info.html:35
 msgid "Tag"
@@ -4776,11 +4997,11 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html:69
 msgid "XML attributes"
-msgstr ""
+msgstr "Атрибуты XML"
 
 #: lms/templates/staff_problem_info.html:85
 msgid "Submission History Viewer"
-msgstr ""
+msgstr "Просмотр истории посылок"
 
 #: lms/templates/staff_problem_info.html:88
 msgid "User:"
@@ -4822,15 +5043,15 @@ msgstr "Автоматический масштаб"
 
 #: lms/templates/static_pdfbook.html:76
 msgid "Actual Size"
-msgstr ""
+msgstr "Реальный размер"
 
 #: lms/templates/static_pdfbook.html:77
 msgid "Fit Page"
-msgstr ""
+msgstr "Страница целиком"
 
 #: lms/templates/static_pdfbook.html:78
 msgid "Full Width"
-msgstr ""
+msgstr "Полная ширина"
 
 #: lms/templates/static_pdfbook.html:120 lms/templates/staticbook.html:114
 msgid "Previous page"
@@ -4929,16 +5150,18 @@ msgid "e.g. Mr., Ms., Mrs., Dr."
 msgstr ""
 
 #: lms/templates/test_center_register.html:188
+#, fuzzy
 msgid "First Name"
-msgstr ""
+msgstr "Имя"
 
 #: lms/templates/test_center_register.html:189
 msgid "e.g. Albert"
 msgstr ""
 
 #: lms/templates/test_center_register.html:192
+#, fuzzy
 msgid "Middle Name"
-msgstr ""
+msgstr "Отчество"
 
 #: lms/templates/test_center_register.html:196
 msgid "Last Name"
@@ -5064,8 +5287,9 @@ msgid ""
 msgstr ""
 
 #: lms/templates/test_center_register.html:298
+#, fuzzy
 msgid "Optional Information"
-msgstr ""
+msgstr "Информация о пользователе"
 
 #: lms/templates/test_center_register.html:304
 #: lms/templates/test_center_register.html:310
@@ -5241,7 +5465,7 @@ msgstr ""
 
 #: lms/templates/tracking_log.html:4
 msgid "Tracking Log"
-msgstr ""
+msgstr "Журнал слежения"
 
 #: lms/templates/tracking_log.html:5
 msgid "datetime"
@@ -5341,16 +5565,16 @@ msgstr "Всего слов:"
 
 #: lms/templates/combinedopenended/combined_open_ended.html:14
 msgid "Open Response"
-msgstr ""
+msgstr "Открытый ответ"
 
 #: lms/templates/combinedopenended/combined_open_ended.html:19
 msgid "Assessments:"
-msgstr ""
+msgstr "Оценки:"
 
 #: lms/templates/combinedopenended/combined_open_ended.html:33
 #: lms/templates/peer_grading/peer_grading_problem.html:20
 msgid "Hide Prompt"
-msgstr ""
+msgstr "Скрыть приглашение"
 
 #: lms/templates/combinedopenended/combined_open_ended.html:42
 msgid "Try Again"
@@ -5443,11 +5667,11 @@ msgstr "Отправить"
 
 #: lms/templates/combinedopenended/openended/open_ended.html:35
 msgid "Skip Post-Assessment"
-msgstr ""
+msgstr "Пропустить пост-оценку"
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html:5
 msgid "There was an error with your submission.  Please contact course staff."
-msgstr ""
+msgstr "При отправке произошла ошибка. Обратитесь к персоналу курса."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html:7
 msgid "Rubric"
@@ -5489,7 +5713,7 @@ msgstr "{chapter}, текущая глава"
 
 #: lms/templates/courseware/course_about.html:68
 msgid "About {course.display_number_with_default}"
-msgstr ""
+msgstr "О {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html:90
 msgid "You are registered for this course {course.display_number_with_default}"
@@ -5529,9 +5753,9 @@ msgstr "Навыки"
 
 #: lms/templates/courseware/course_about.html:202
 msgid "Additional Resources"
-msgstr ""
+msgstr "Дополнительные ресурсы"
 
-#: lms/templates/courseware/course_navigation.html:36
+#: lms/templates/courseware/course_navigation.html:37
 msgid "Staff view"
 msgstr ""
 
@@ -5543,14 +5767,10 @@ msgstr "Исследовать бесплатные курсы {university_name}
 msgid "Explore free courses from leading universities."
 msgstr "Исследовать бесплатные курсы ведущих университетов."
 
-#: lms/templates/courseware/courseware-error.html:6
-msgid "Courseware"
-msgstr ""
-
 #: lms/templates/courseware/courseware-error.html:16
 msgid ""
 "There has been an error on the {span_start}{platform_name}{span_end} servers"
-msgstr ""
+msgstr "Возникла ошибка на серверах {span_start}{platform_name}{span_end}"
 
 #: lms/templates/courseware/courseware-error.html:17
 msgid ""
@@ -5573,16 +5793,17 @@ msgid "Course Navigation"
 msgstr "Навигация по курсу"
 
 #: lms/templates/courseware/courseware.html:176
+#, fuzzy
 msgid "close"
-msgstr ""
+msgstr "Закрыть"
 
 #: lms/templates/courseware/courseware.html:208
 msgid "Open Calculator"
-msgstr ""
+msgstr "Открытый калькулятор"
 
 #: lms/templates/courseware/courseware.html:208
 msgid "Calculator"
-msgstr ""
+msgstr "Калькулятор"
 
 #: lms/templates/courseware/courseware.html:216
 msgid "Hints"
@@ -5605,7 +5826,7 @@ msgid "Constants"
 msgstr "Константы"
 
 #: lms/templates/courseware/grade_summary.html:11
-#: lms/templates/courseware/instructor_dashboard.html:144
+#: lms/templates/courseware/instructor_dashboard.html:153
 msgid "Grade summary"
 msgstr "Итог по оценкам"
 
@@ -5614,7 +5835,7 @@ msgid "Not implemented yet"
 msgstr "Еще не реализовано"
 
 #: lms/templates/courseware/gradebook.html:40
-#: lms/templates/courseware/instructor_dashboard.html:140
+#: lms/templates/courseware/instructor_dashboard.html:149
 msgid "Gradebook"
 msgstr "Журнал оценок"
 
@@ -5635,66 +5856,67 @@ msgstr "Навигация по раздаточным материалам"
 msgid "Course Handouts"
 msgstr "Раздаточные материалы курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:110
+#: lms/templates/courseware/instructor_dashboard.html:116
 msgid "Instructor Dashboard"
-msgstr ""
+msgstr "Личная страница инструктора"
 
-#: lms/templates/courseware/instructor_dashboard.html:114
+#: lms/templates/courseware/instructor_dashboard.html:120
 msgid "Psychometrics"
-msgstr ""
+msgstr "Психометрика"
 
-#: lms/templates/courseware/instructor_dashboard.html:117
+#: lms/templates/courseware/instructor_dashboard.html:123
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:110
 msgid "Forum Admin"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:118
+#: lms/templates/courseware/instructor_dashboard.html:124
 msgid "Enrollment"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:119
+#: lms/templates/courseware/instructor_dashboard.html:125
 msgid "DataDump"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:120
+#: lms/templates/courseware/instructor_dashboard.html:126
 msgid "Manage Groups"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:136
+#: lms/templates/courseware/instructor_dashboard.html:145
 msgid "yes"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:173
+#: lms/templates/courseware/instructor_dashboard.html:182
 msgid "Export grades to remote gradebook"
 msgstr "Экспортировать оценки в удаленный журнал"
 
-#: lms/templates/courseware/instructor_dashboard.html:174
+#: lms/templates/courseware/instructor_dashboard.html:183
 msgid ""
 "The assignments defined for this course should match the ones stored in the "
 "gradebook, for this to work properly!"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:177
-#: lms/templates/courseware/instructor_dashboard.html:371
+#: lms/templates/courseware/instructor_dashboard.html:186
+#: lms/templates/courseware/instructor_dashboard.html:380
 msgid "Gradebook name:"
 msgstr "Название журнала оценок:"
 
-#: lms/templates/courseware/instructor_dashboard.html:189
+#: lms/templates/courseware/instructor_dashboard.html:198
 msgid "Assignment name:"
 msgstr "Название задания:"
 
-#: lms/templates/courseware/instructor_dashboard.html:201
+#: lms/templates/courseware/instructor_dashboard.html:210
+#, fuzzy
 msgid "Course-specific grade adjustment"
-msgstr ""
+msgstr "Поправка на оценку для студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:204
-#: lms/templates/courseware/instructor_dashboard.html:239
+#: lms/templates/courseware/instructor_dashboard.html:213
+#: lms/templates/courseware/instructor_dashboard.html:248
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:61
 msgid "Specify a particular problem in the course here by its url:"
-msgstr ""
+msgstr "Укажите URL задачи из курса:"
 
-#: lms/templates/courseware/instructor_dashboard.html:208
-#: lms/templates/courseware/instructor_dashboard.html:243
+#: lms/templates/courseware/instructor_dashboard.html:217
+#: lms/templates/courseware/instructor_dashboard.html:252
 msgid ""
 "You may use just the \"urlname\" if a problem, or \"modulename/urlname\" if "
 "not. (For example, if the location is <tt>i4x://university/course/problem/"
@@ -5703,37 +5925,41 @@ msgid ""
 "provide <tt>notaproblem/someothername</tt>.)"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:215
-#: lms/templates/courseware/instructor_dashboard.html:250
+#: lms/templates/courseware/instructor_dashboard.html:224
+#: lms/templates/courseware/instructor_dashboard.html:259
 msgid "Then select an action:"
-msgstr ""
+msgstr "Потом выберите действие:"
 
-#: lms/templates/courseware/instructor_dashboard.html:220
+#: lms/templates/courseware/instructor_dashboard.html:229
 msgid ""
 "These actions run in the background, and status for active tasks will appear "
 "in a table below. To see status for all tasks submitted for this problem, "
 "click on this button:"
 msgstr ""
+"Эти действия будут выполняться в фоновом режиме, статус активных задач будет "
+"отображаться в таблице ниже. Чтобы увидеть статус всех задач нажмите на "
+"кнопку:"
 
-#: lms/templates/courseware/instructor_dashboard.html:229
+#: lms/templates/courseware/instructor_dashboard.html:238
 msgid "Student-specific grade inspection and adjustment"
-msgstr ""
+msgstr "Специальная инспекция и поправка к оценке студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:231
+#: lms/templates/courseware/instructor_dashboard.html:240
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
+"Укажите адрес email или имя пользователя студента {platform_name} здесь:"
 
-#: lms/templates/courseware/instructor_dashboard.html:235
+#: lms/templates/courseware/instructor_dashboard.html:244
 msgid "Click this, and a link to student's progress page will appear below:"
-msgstr ""
+msgstr "Нажмите, и ниже появится ссылка на страницу с прогрессом ученика:"
 
-#: lms/templates/courseware/instructor_dashboard.html:259
+#: lms/templates/courseware/instructor_dashboard.html:268
 msgid ""
 "You may also delete the entire state of a student for the specified module:"
-msgstr ""
+msgstr "Вы также можете удалить все состояние студента в указанном модуле:"
 
-#: lms/templates/courseware/instructor_dashboard.html:264
+#: lms/templates/courseware/instructor_dashboard.html:273
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:45
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in "
@@ -5741,25 +5967,25 @@ msgid ""
 "student, click on this button:"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:277
+#: lms/templates/courseware/instructor_dashboard.html:286
 msgid "Select a problem and an action:"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:350
+#: lms/templates/courseware/instructor_dashboard.html:359
 msgid ""
 "User requires forum administrator privileges to perform administration "
 "tasks.  See instructor."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:369
+#: lms/templates/courseware/instructor_dashboard.html:378
 msgid "Pull enrollment from remote gradebook"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:372
+#: lms/templates/courseware/instructor_dashboard.html:381
 msgid "Section:"
 msgstr "Раздел:"
 
-#: lms/templates/courseware/instructor_dashboard.html:382
+#: lms/templates/courseware/instructor_dashboard.html:391
 msgid ""
 "Enroll or un-enroll one or many students: enter emails, separated by new "
 "lines or commas;"
@@ -5767,19 +5993,19 @@ msgstr ""
 "Зарегистрировать или отрегистрировать одного или нескольких студентов: "
 "введите адреса e-mail на отдельных строках или разделенные запятой"
 
-#: lms/templates/courseware/instructor_dashboard.html:385
+#: lms/templates/courseware/instructor_dashboard.html:394
 msgid "Notify students by email"
 msgstr "Оповестить студентов по электронной почте"
 
-#: lms/templates/courseware/instructor_dashboard.html:387
+#: lms/templates/courseware/instructor_dashboard.html:396
 msgid "Auto-enroll students when they activate"
 msgstr "Авто-регистрировать студентов при их активации"
 
-#: lms/templates/courseware/instructor_dashboard.html:401
+#: lms/templates/courseware/instructor_dashboard.html:410
 msgid "Problem urlname:"
 msgstr "Имя URL задачи:"
 
-#: lms/templates/courseware/instructor_dashboard.html:417
+#: lms/templates/courseware/instructor_dashboard.html:426
 msgid ""
 "Enter usernames or emails for students who should be beta-testers, one per "
 "line, or separated by commas.  They will get to see course materials early, "
@@ -5787,103 +6013,147 @@ msgid ""
 "policy."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:446
+#: lms/templates/courseware/instructor_dashboard.html:452
+msgid "Send to:"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html:454
+msgid "Myself"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html:456
+#: lms/templates/courseware/instructor_dashboard.html:458
+msgid "Staff and instructors"
+msgstr "Персонал и инструкторы"
+
+#: lms/templates/courseware/instructor_dashboard.html:461
+#: lms/templates/courseware/instructor_dashboard.html:463
+msgid "All (students, staff and instructors)"
+msgstr "Все (студенты, персонал и инструкторы)"
+
+#: lms/templates/courseware/instructor_dashboard.html:469
+msgid "Subject: "
+msgstr "Тема:"
+
+#: lms/templates/courseware/instructor_dashboard.html:487
+msgid ""
+"Please try not to email students more than once a day. Important things to "
+"consider before sending:"
+msgstr ""
+"Пожалуйста, не пишите студентам чаще одного раза в день. Перед посылкой "
+"обратите внимание на следующее:"
+
+#: lms/templates/courseware/instructor_dashboard.html:489
+msgid ""
+"Have you read over the email to make sure it says everything you want to say?"
+msgstr ""
+"Вы перечитали письмо, чтобы убедиться, что сказали все, что хотели сказать?"
+
+#: lms/templates/courseware/instructor_dashboard.html:490
+msgid ""
+"Have you sent the email to yourself first to make sure you're happy with how "
+"it's displayed?"
+msgstr ""
+"Вы отправили письмо себе чтобы убедиться, что удовлетворены тем, как оно "
+"отображается?"
+
+#: lms/templates/courseware/instructor_dashboard.html:515
 msgid "No Analytics are available at this time."
-msgstr ""
+msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:451
+#: lms/templates/courseware/instructor_dashboard.html:520
 msgid "Students enrolled:"
-msgstr ""
+msgstr "Участвующие студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:459
+#: lms/templates/courseware/instructor_dashboard.html:528
 msgid "Students active in the last week:"
-msgstr ""
+msgstr "Студенты, активные на прошлой неделе"
 
-#: lms/templates/courseware/instructor_dashboard.html:467
+#: lms/templates/courseware/instructor_dashboard.html:536
 msgid "Student activity day by day"
 msgstr "Активность студентов день за днем"
 
-#: lms/templates/courseware/instructor_dashboard.html:473
+#: lms/templates/courseware/instructor_dashboard.html:542
 msgid "Day"
 msgstr "День"
 
-#: lms/templates/courseware/instructor_dashboard.html:474
+#: lms/templates/courseware/instructor_dashboard.html:543
 #: lms/templates/static_templates/faq.html:73
 #: lms/templates/static_templates/faq.html:131
 msgid "Students"
 msgstr "Студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:489
+#: lms/templates/courseware/instructor_dashboard.html:558
 msgid "Answer distribution for problems"
 msgstr "Распределение ответов по задачам"
 
-#: lms/templates/courseware/instructor_dashboard.html:495
-#: lms/templates/courseware/instructor_dashboard.html:532
+#: lms/templates/courseware/instructor_dashboard.html:564
+#: lms/templates/courseware/instructor_dashboard.html:601
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:22
 msgid "Problem"
 msgstr "Задача"
 
-#: lms/templates/courseware/instructor_dashboard.html:496
+#: lms/templates/courseware/instructor_dashboard.html:565
 msgid "Max"
 msgstr "Максимальный"
 
-#: lms/templates/courseware/instructor_dashboard.html:497
+#: lms/templates/courseware/instructor_dashboard.html:566
 msgid "Points Earned (Num Students)"
 msgstr "Получено баллов (число студентов)"
 
-#: lms/templates/courseware/instructor_dashboard.html:526
+#: lms/templates/courseware/instructor_dashboard.html:595
 msgid "Students answering correctly"
 msgstr "Студенты, ответившие корректно"
 
-#: lms/templates/courseware/instructor_dashboard.html:533
+#: lms/templates/courseware/instructor_dashboard.html:602
 msgid "Number of students"
 msgstr "Число студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:546
+#: lms/templates/courseware/instructor_dashboard.html:615
 msgid ""
 "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
 "(shown here as an example):"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:642
+#: lms/templates/courseware/instructor_dashboard.html:711
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:90
 msgid "Pending Instructor Tasks"
-msgstr ""
+msgstr "Ожидающие задачи инструктора"
 
-#: lms/templates/courseware/instructor_dashboard.html:646
+#: lms/templates/courseware/instructor_dashboard.html:715
 msgid "Task Type"
 msgstr "Тип задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:647
+#: lms/templates/courseware/instructor_dashboard.html:716
 msgid "Task inputs"
-msgstr ""
+msgstr "Входные данные задач"
 
-#: lms/templates/courseware/instructor_dashboard.html:648
+#: lms/templates/courseware/instructor_dashboard.html:717
 msgid "Task Id"
-msgstr ""
+msgstr "ID задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:649
+#: lms/templates/courseware/instructor_dashboard.html:718
 msgid "Requester"
-msgstr ""
+msgstr "Запрашивающий"
 
-#: lms/templates/courseware/instructor_dashboard.html:651
+#: lms/templates/courseware/instructor_dashboard.html:720
 msgid "Task State"
 msgstr "Состояние задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:652
+#: lms/templates/courseware/instructor_dashboard.html:721
 msgid "Duration (sec)"
 msgstr "Длительность (в секундах)"
 
-#: lms/templates/courseware/instructor_dashboard.html:653
+#: lms/templates/courseware/instructor_dashboard.html:722
 msgid "Task Progress"
 msgstr "Ход выполнения задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:665
-#: lms/templates/courseware/instructor_dashboard.html:666
+#: lms/templates/courseware/instructor_dashboard.html:734
+#: lms/templates/courseware/instructor_dashboard.html:735
 msgid "unknown"
-msgstr ""
+msgstr "неизвестный"
 
-#: lms/templates/courseware/instructor_dashboard.html:730
+#: lms/templates/courseware/instructor_dashboard.html:799
 msgid "Course errors"
 msgstr "Ошибки курса"
 
@@ -5921,8 +6191,9 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html:73
 #: lms/templates/courseware/mktg_course_about.html:77
+#, fuzzy
 msgid "enroll"
-msgstr ""
+msgstr "Зарегистрировать"
 
 #: lms/templates/courseware/news.html:5
 msgid "News - MITx 6.002x"
@@ -5939,8 +6210,7 @@ msgstr "Анонимный"
 #: lms/templates/courseware/notifications.html:63
 msgid ""
 "{user} posted a {comment} to the thread {thread} in discussion {discussion}"
-msgstr ""
-"{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
+msgstr "{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
 
 #: lms/templates/courseware/notifications.html:70
 msgid "{user} posted a new thread {thread} in discussion {discussion}"
@@ -6098,16 +6368,16 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html:45
 msgid "&bull; This thread is closed."
-msgstr ""
+msgstr "&bull; Эта нить закрыта."
 
 #: lms/templates/discussion/_underscore_templates.html:52
 msgid "Report Misuse"
-msgstr ""
+msgstr "Уведомить о неправильном использовании"
 
 #: lms/templates/discussion/_underscore_templates.html:57
 #: lms/templates/discussion/_underscore_templates.html:62
 msgid "Pin Thread"
-msgstr ""
+msgstr "Прикрепить нить"
 
 #: lms/templates/discussion/_underscore_templates.html:76
 #: lms/templates/discussion/_underscore_templates.html:135
@@ -6153,6 +6423,7 @@ msgid ""
 "The forums are currently undergoing maintenance. We'll have them back up "
 "shortly!"
 msgstr ""
+"Форумы закрыты на техническое обслуживание. Вскоре они возобновят работу!"
 
 #: lms/templates/discussion/user_profile.html:23
 msgid "User Profile"
@@ -6187,7 +6458,7 @@ msgstr "Список задач"
 
 #: lms/templates/instructor/staff_grading.html:51
 msgid "Prompt"
-msgstr ""
+msgstr "Приглашение"
 
 #: lms/templates/instructor/staff_grading.html:51
 msgid "(Hide)"
@@ -6196,12 +6467,12 @@ msgstr "(скрыть)"
 #: lms/templates/instructor/staff_grading.html:64
 #: lms/templates/peer_grading/peer_grading_problem.html:32
 msgid "Student Response"
-msgstr ""
+msgstr "Ответ студента"
 
 #: lms/templates/instructor/staff_grading.html:73
 #: lms/templates/peer_grading/peer_grading_problem.html:44
 msgid "Written Feedback"
-msgstr ""
+msgstr "Записанная обратная связь"
 
 #: lms/templates/instructor/staff_grading.html:74
 msgid "Feedback for student (optional)"
@@ -6216,8 +6487,9 @@ msgid "Skip"
 msgstr "Пропустить"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:21
+#, fuzzy
 msgid "Grade Distribution"
-msgstr ""
+msgstr "Распределение по полу"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:23
 msgid "Loading problem list..."
@@ -6296,8 +6568,9 @@ msgid "Auto-Enroll"
 msgstr "Авторегистрировать"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:38
+#, fuzzy
 msgid "Auto Enroll"
-msgstr ""
+msgstr "Авторегистрировать"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:40
 msgid ""
@@ -6311,15 +6584,16 @@ msgid ""
 "registered for edX will not be enrolled, but will be allowed to enroll."
 msgstr ""
 "Если автоматическая запись <em>выключена</em>, то обучающиеся, которые не "
-"зарегистрированы в {platform_name}, не будут записаны, но смогут это сделать."
+"зарегистрированы в {platform_name}, не будут записаны, но смогут это "
+"сделать."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:49
 msgid "Administration List Management"
-msgstr ""
+msgstr "Управление списком администрирования"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:52
 msgid "Getting available lists..."
-msgstr ""
+msgstr "Получение доступных списков..."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:59
 msgid ""
@@ -6327,10 +6601,14 @@ msgid ""
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a forum admin for forum management."
 msgstr ""
+"Персонал не может изменять списки персонала или бета-тестеров. Для изменения "
+"этих списков обратитесь к инструктору и попросите его добавить Вас как "
+"инструктора для персонала или списков бета-тестеров, или как администратора "
+"форума для управления форумом."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:68
 msgid "Course Staff"
-msgstr ""
+msgstr "Персонал курса"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:70
 msgid ""
@@ -6342,21 +6620,23 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:76
 msgid "Add Staff"
-msgstr ""
+msgstr "Добавить персонал"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:81
 msgid "Instructors"
-msgstr ""
+msgstr "Инструктор"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:83
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
 "and remove course staff, as well as administer forum access."
 msgstr ""
+"Инструкторы составляют ядро администрации вашего курса. Инструкторы могут "
+"добавлять или удалять персонал курса и администрировать доступ к форумам."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:87
 msgid "Add Instructor"
-msgstr ""
+msgstr "Добавить инструктора"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:92
 msgid "Beta Testers"
@@ -6408,15 +6688,15 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:134
 msgid "Community TA"
-msgstr ""
+msgstr "Общественные ассистенты преподавателя"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:5
 msgid "Student-specific grade adjustment"
-msgstr ""
+msgstr "Поправка на оценку для студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:8
 msgid "Student Email"
-msgstr ""
+msgstr "Адрес email студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:12
 msgid "Student Progress Page"
@@ -6424,7 +6704,7 @@ msgstr "Страница прогресса студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:23
 msgid "Problem urlname"
-msgstr ""
+msgstr "Имя URL задачи"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:25
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:65
@@ -6436,23 +6716,24 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:32
 msgid "Reset Student Attempts"
-msgstr ""
+msgstr "Сбросить попытки студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:36
 msgid "Delete Student State for Module"
-msgstr ""
+msgstr "Удалить состояние студента для модуля"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:40
 msgid "Rescore Student Submission"
-msgstr ""
+msgstr "Перепроверить посылку студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:49
 msgid "Show Background Task History for Student"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:73
+#, fuzzy
 msgid "Then select an action"
-msgstr ""
+msgstr "Потом выберите действие:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:74
 msgid "Reset ALL students' attempts"
@@ -6479,41 +6760,43 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html:10
 msgid "{course_number} Combined Notifications"
-msgstr ""
+msgstr "{course_number} Комбинированные оповещения"
 
 #: lms/templates/open_ended_problems/combined_notifications.html:18
 msgid "Open Ended Console"
-msgstr ""
+msgstr "Открытоконцовая консоль"
 
 #: lms/templates/open_ended_problems/combined_notifications.html:20
 msgid "Here are items that could potentially need your attention."
-msgstr ""
+msgstr "Вот то, на что возможно вам стоит обратить внимание."
 
 #: lms/templates/open_ended_problems/combined_notifications.html:24
 msgid "No items require attention at the moment."
-msgstr ""
+msgstr "Отсутствуют пункты, требующие особого внимания."
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:10
 msgid "{course_number} Flagged Open Ended Problems"
-msgstr ""
+msgstr "{course_number} Отмеченные открытые задачи"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:21
 msgid "Flagged Open Ended Problems"
-msgstr ""
+msgstr "Отмеченные открытые задачи"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:23
 msgid ""
 "Here are a list of open ended problems for this course that have been "
 "flagged by students as potentially inappropriate."
 msgstr ""
+"Вот список открытых задач в курсе, которые были отмечены студентами как "
+"потенциально неподходящие."
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:27
 msgid "No flagged problems exist."
-msgstr ""
+msgstr "Нет отмеченных задач."
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:32
 msgid "Name"
-msgstr ""
+msgstr "Имя"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:46
 msgid "Unflag"
@@ -6524,8 +6807,9 @@ msgid "Ban"
 msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:10
+#, fuzzy
 msgid "{course_number} Open Ended Problems"
-msgstr ""
+msgstr "{course_number} Отмеченные открытые задачи"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:18
 msgid "Open Ended Problems"
@@ -6545,12 +6829,13 @@ msgid "Problem Name"
 msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:30
+#, fuzzy
 msgid "Status"
-msgstr ""
+msgstr "Статус:"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:31
 msgid "Grader Type"
-msgstr ""
+msgstr "Тип оценивания"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:32
 msgid "ETA"
@@ -6565,7 +6850,7 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading.html:8
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
-msgstr ""
+msgstr "Вот список задач, требующих перекрестной проверки для этого курса."
 
 #: lms/templates/peer_grading/peer_grading.html:12
 msgid ""
@@ -6577,23 +6862,19 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html:19
 msgid "Due date"
-msgstr ""
+msgstr "Дата сдачи"
 
 #: lms/templates/peer_grading/peer_grading.html:20
 msgid "Graded"
-msgstr ""
+msgstr "Оценено"
 
 #: lms/templates/peer_grading/peer_grading.html:21
 msgid "Available"
-msgstr ""
+msgstr "Доступно"
 
 #: lms/templates/peer_grading/peer_grading.html:22
 msgid "Required"
-msgstr ""
-
-#: lms/templates/peer_grading/peer_grading.html:23
-msgid "Progress"
-msgstr ""
+msgstr "Требуется"
 
 #: lms/templates/peer_grading/peer_grading.html:38
 msgid "No due date"
@@ -6610,8 +6891,9 @@ msgid "The due date has passed, and peer grading is closed at this time."
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html:9
+#, fuzzy
 msgid "Learning to Grade"
-msgstr ""
+msgstr "Обучение оцениванию"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:45
 msgid "Please include some written feedback as well."
@@ -6635,45 +6917,51 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html:70
 msgid "Ready to grade!"
-msgstr ""
+msgstr "Готов к оцениванию!"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:71
 msgid ""
 "You have finished learning to grade, which means that you are now ready to "
 "start grading."
 msgstr ""
+"Вы закончили обучение оцениванию, что означает, что вы можете начать "
+"оценивать."
 
 #: lms/templates/peer_grading/peer_grading_problem.html:72
 msgid "Start Grading!"
-msgstr ""
+msgstr "Начать оценивание!"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:77
 msgid "Learning to grade"
-msgstr ""
+msgstr "Обучение оцениванию"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:78
 msgid "You have not yet finished learning to grade this problem."
-msgstr ""
+msgstr "Вы еще не закончили обучение оцениванию этой задачи."
 
 #: lms/templates/peer_grading/peer_grading_problem.html:79
 msgid ""
 "You will now be shown a series of instructor-scored essays, and will be "
 "asked to score them yourself."
 msgstr ""
+"Теперь Вам будет предложено несколько эссе, уже оцененных инструктором, для "
+"самостоятельной оценки."
 
 #: lms/templates/peer_grading/peer_grading_problem.html:80
 msgid ""
 "Once you can score the essays similarly to an instructor, you will be ready "
 "to grade your peers."
 msgstr ""
+"Как только вы сможете оценить эссе так, как это сделал инструктор, вы будете "
+"готовы к перекрестному оцениванию."
 
 #: lms/templates/peer_grading/peer_grading_problem.html:81
 msgid "Start learning to grade"
-msgstr ""
+msgstr "Начать обучение оцениванию"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:86
 msgid "Are you sure that you want to flag this submission?"
-msgstr ""
+msgstr "Вы уверены, что хотите отметить эту посылку?"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:88
 msgid ""
@@ -6704,6 +6992,8 @@ msgid ""
 "Your account is not active yet. An activation link has been sent to {email}, "
 "along with instructions for activating your account."
 msgstr ""
+"Ваша учетная запись не активирована. Ссылка для активации была выслана на "
+"{email}, вместе с интрукцией для активации вашей учетной записи."
 
 #: lms/templates/registration/activation_complete.html:11
 msgid "Activation Complete!"
@@ -6714,8 +7004,9 @@ msgid "Account already active!"
 msgstr "Учетная запись активирована!"
 
 #: lms/templates/registration/activation_complete.html:27
+#, fuzzy
 msgid "You can now {link_start}log in{link_end}."
-msgstr ""
+msgstr "Вы можете сейчас {link_start}войти{link_end}."
 
 #: lms/templates/registration/activation_invalid.html:10
 msgid "Activation Invalid"
@@ -6735,87 +7026,17 @@ msgstr ""
 msgid "Or you can go back to the {link_start}home page{link_end}."
 msgstr "Или вы можете перейти {link_start}домашнюю страницу{link_end}."
 
-#: lms/templates/registration/login.html:11
-msgid "Please correct the errors below:"
-msgstr ""
-
-#: lms/templates/registration/login.html:17
-#: lms/templates/registration/registration_form.html:17
-msgid "Username:"
-msgstr ""
-
-#: lms/templates/registration/login.html:19
-#: lms/templates/registration/registration_form.html:31
-msgid "Password:"
-msgstr ""
-
-#: lms/templates/registration/login.html:27
-msgid ""
-"If you don't have an account, you can {link_start}sign up{link_end} for one."
-msgstr ""
-
-#: lms/templates/registration/logout.html:4
-msgid "Logged out"
-msgstr ""
-
-#: lms/templates/registration/logout.html:7
-msgid "You've been logged out."
-msgstr ""
-
-#: lms/templates/registration/logout.html:8
-msgid ""
-"Thanks for stopping by; when you come back, don't forget to {link_start}log "
-"in{link_end} again."
-msgstr ""
-
 #: lms/templates/registration/password_reset_done.html:3
 msgid "Password reset successful"
-msgstr ""
+msgstr "Пароль успешно сброшен"
 
 #: lms/templates/registration/password_reset_done.html:8
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-
-#: lms/templates/registration/registration_form.html:4
-msgid "Sign up"
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:9
-msgid "Please correct the errors below: {{ form.non_field_errors }}"
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:12
-msgid "Create an account"
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:24
-msgid "Email address:"
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:38
-msgid "Password (type again to catch typos):"
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:50
-msgid ""
-"Fill out the form to the left (all fields are required), and your account "
-"will be created; you'll be sent an email with instructions on how to finish "
-"your registration."
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:54
-msgid ""
-"We'll only use your email to send you signup instructions. We hate spam as "
-"much as you do."
-msgstr ""
-
-#: lms/templates/registration/registration_form.html:57
-msgid ""
-"This account will let you log into the ticket tracker, claim tickets, and be "
-"exempt from spam filtering"
-msgstr ""
+"Мы высылаем вам инструкции по установке пароля на введённый вами адрес "
+"электронной почты. Скоро вы их получите."
 
 #: lms/templates/shoppingcart/error.html:6
 msgid "Payment Error"
@@ -6823,7 +7044,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/error.html:10
 msgid "There was an error processing your order!"
-msgstr ""
+msgstr "При обработке запроса произошла ошибка!"
 
 #: lms/templates/shoppingcart/error.html:13
 msgid "Return to cart to retry payment"
@@ -6907,7 +7128,7 @@ msgstr ""
 
 #: lms/templates/static_templates/about.html:30
 msgid "About {span_start}{edX}{span_end}"
-msgstr ""
+msgstr "О {span_start}{edX}{span_end}"
 
 #: lms/templates/static_templates/about.html:31
 msgid ""
@@ -7017,7 +7238,7 @@ msgstr ""
 
 #: lms/templates/static_templates/contact.html:57
 msgid "Accessibility"
-msgstr ""
+msgstr "Специальные возможности"
 
 #: lms/templates/static_templates/contact.html:58
 msgid ""
@@ -7037,7 +7258,7 @@ msgstr ""
 
 #: lms/templates/static_templates/copyright.html:14
 msgid "Videos and Exercises"
-msgstr ""
+msgstr "Видео и упражнения"
 
 #: lms/templates/static_templates/copyright.html:15
 msgid ""
@@ -7057,7 +7278,7 @@ msgstr ""
 
 #: lms/templates/static_templates/copyright.html:20
 msgid "Student-generated content"
-msgstr ""
+msgstr "Контент, наполняемый студентами"
 
 #: lms/templates/static_templates/copyright.html:21
 msgid ""
@@ -7073,7 +7294,7 @@ msgstr ""
 
 #: lms/templates/static_templates/faq.html:23
 msgid "What is {edX}?"
-msgstr ""
+msgstr "Что такое {edX}?"
 
 #: lms/templates/static_templates/faq.html:24
 msgid ""
@@ -7269,35 +7490,40 @@ msgstr ""
 
 #: lms/templates/static_templates/help.html:7
 msgid "{edX} Help"
-msgstr ""
+msgstr "Помощь {edX}"
 
 #: lms/templates/static_templates/help.html:20
 #: lms/templates/static_templates/help.html:318
 msgid "{edX} Basics"
-msgstr ""
+msgstr "Основы {edX}"
 
 #: lms/templates/static_templates/help.html:22
 msgid "How do I sign up to take a class?"
-msgstr ""
+msgstr "Как я могу зарегистрироваться на курс?"
 
 #: lms/templates/static_templates/help.html:24
 msgid ""
 "Simply create an {edX} account (it's free) and then register for the course "
 "of your choice (also free). Follow the prompts on the {edX} website."
 msgstr ""
+"Просто создайте учетную запись в {edX} (это бесплатно), а затем "
+"регистрируйтесь на курсы по вашему выбору (также бесплатно). Следуйте "
+"указаниям на сайте {edX}."
 
 #: lms/templates/static_templates/help.html:28
 msgid "What does it cost to take a class? Is this really free?"
-msgstr ""
+msgstr "Сколько стоит курс? Он действительно бесплатный?"
 
 #: lms/templates/static_templates/help.html:30
 msgid ""
 "{EdX} courses are free for everyone. All you need is an Internet connection."
 msgstr ""
+"Курсы {EdX} бесплатны для всех. Вам требуется только подключение к сети "
+"Интернет."
 
 #: lms/templates/static_templates/help.html:34
 msgid "What happens after I sign up for a course?"
-msgstr ""
+msgstr "Что произойдет после моей регистрации на курс?"
 
 #: lms/templates/static_templates/help.html:36
 msgid ""
@@ -9583,8 +9809,9 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/jobs.html:576
+#, fuzzy
 msgid "Our Location"
-msgstr ""
+msgstr "Ваше местонахождение"
 
 #: lms/templates/static_templates/jobs.html:577
 msgid "11 Cambridge Center <br>Cambridge, MA 02142"
@@ -10075,6 +10302,9 @@ msgstr "Регистрация на курсы"
 #: lms/templates/university_profile/edge.html:30
 msgid "Take free online courses from today's leading universities."
 msgstr ""
+
+#~ msgid "Doctorate"
+#~ msgstr "Доктор"
 
 #~ msgid "E-mail *"
 #~ msgstr "Адрес e-mail *"
