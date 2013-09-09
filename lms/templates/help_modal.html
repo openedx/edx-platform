@@ -49,11 +49,7 @@ discussion_link = get_discussion_link(course) if course else None
     </div>
 
 ## TODO: find a way to refactor this
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+  <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
@@ -80,12 +76,8 @@ discussion_link = get_discussion_link(course) if course else None
         <input name="submit" type="submit" value="Submit">
       </div>
     </form>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+  
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="-1">
@@ -117,11 +109,7 @@ discussion_link = get_discussion_link(course) if course else None
     )}
     </p>
 
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>
 
