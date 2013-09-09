@@ -52,7 +52,29 @@ function removeAsset(e){
 
 function showUploadModal(e) {
     e.preventDefault();
+    resetUploadModal();
     $modal = $('.upload-modal').show();
+    $('.upload-modal .file-chooser').fileupload({
+        dataType: 'json',
+        type: 'POST',
+        maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+        autoUpload: true,
+        progressall: function(e, data) {
+            var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
+            showUploadFeedback(e, percentComplete);
+        },
+        maxFileSize: 100 * 1000 * 1000,   // 100 MB
+        maxNumberofFiles: 100,
+        add: function(e, data) {
+            data.process().done(function () {
+                data.submit();
+            });
+        },
+        done: function(e, data) {
+            displayFinishedUpload(data.result);
+        }
+
+    });
     $('.file-input').bind('change', startUpload);
     $modalCover.show();
 }
@@ -69,11 +91,6 @@ function startUpload(e) {
 
     $('.upload-modal h1').html(gettext('Uploading…'));
     $('.upload-modal .file-name').html(files[0].name);
-    $('.upload-modal .file-chooser').ajaxSubmit({
-        beforeSend: resetUploadBar,
-        uploadProgress: showUploadFeedback,
-        complete: displayFinishedUpload
-    });
     $('.upload-modal .choose-file-button').hide();
     $('.upload-modal .progress-bar').removeClass('loaded').show();
 }
@@ -84,18 +101,28 @@ function resetUploadBar() {
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
-function showUploadFeedback(event, position, total, percentComplete) {
+function resetUploadModal() {
+    // Reset modal so it no longer displays information about previously
+    // completed uploads.
+    resetUploadBar();
+    $('.upload-modal .file-name').html('');
+    $('.upload-modal h1').html(gettext('Upload New File'));
+    $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+    $('.upload-modal .embeddable-xml-input').val('');
+    $('.upload-modal .embeddable').hide();
+}
+
+function showUploadFeedback(event, percentComplete) {
     var percentVal = percentComplete + '%';
     $('.upload-modal .progress-fill').width(percentVal);
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
-function displayFinishedUpload(xhr) {
-    if (xhr.status == 200) {
+function displayFinishedUpload(resp) {
+    if (resp.status == 200) {
         markAsLoaded();
     }
 
-    var resp = JSON.parse(xhr.responseText);
     $('.upload-modal .embeddable-xml-input').val(resp.portable_url);
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
