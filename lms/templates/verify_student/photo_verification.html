@@ -79,7 +79,7 @@
                   <div class="placeholder-cam" id="face_capture_div">
 
                     <div class="placeholder-art">
-                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission. <br />Still not working? You can {a_start} audit the course  {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
                     </div>
 
                     <video id="face_video" autoplay></video><br/>
@@ -133,6 +133,8 @@
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
+                        <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
+                        <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
                       </dl>
                     </div>
                   </div>
@@ -164,7 +166,7 @@
                   <div class="placeholder-cam" id="photo_id_capture_div">
 
                     <div class="placeholder-art">
-                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission. Still not working? You can {a_start} audit the course  {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
                     </div>
 
                     <video id="photo_id_video" autoplay></video><br/>

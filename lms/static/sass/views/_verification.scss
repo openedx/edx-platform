@@ -680,6 +680,7 @@
           // help - general list
           .list-help {
             margin-top: ($baseline/2);
+            color: $black;
 
             .help-item {
               margin-bottom: ($baseline/4);
@@ -865,6 +866,7 @@
           }
 
           .help-tips {
+            margin-left: $baseline;
 
             .title {
               @extend .hd-lv5;
@@ -876,6 +878,7 @@
 
             // help - general list
             .list-tips {
+              color: $black;
 
               .tip {
                 margin-bottom: ($baseline/4);
@@ -1496,7 +1499,7 @@
         border-color: $m-pink-l3;
 
         .title {
-          @extend .t-title4;
+          @extend .t-title5;
           @extend .t-weight4;
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
@@ -1615,6 +1618,9 @@
 
   // VIEW: review photos
   &.step-review {
+    .modal.edit-name .submit input {
+      color: #fff;
+    }
 
     .nav-wizard {
 
