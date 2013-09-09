@@ -204,7 +204,15 @@ class OrderItem(models.Model):
         """
         The template that should be used when there's only one item in the order
         """
-        return'shoppingcart/receipt.html'
+        return 'shoppingcart/receipt.html'
+
+    @property
+    def single_item_receipt_context(self):
+        """
+        Extra variables needed to render the template specified in
+        `single_item_receipt_template`
+        """
+        return {}
 
     @property
     def additional_instruction_text(self):
@@ -371,6 +379,10 @@ class CertificateItem(OrderItem):
             return 'shoppingcart/verified_cert_receipt.html'
         else:
             return super(CertificateItem, self).single_item_receipt_template
+
+    @property
+    def single_item_receipt_context(self):
+        return {"course_name": course_from_id(self.course_id).display_name}
 
     @property
     def additional_instruction_text(self):

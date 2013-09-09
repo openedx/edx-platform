@@ -105,8 +105,14 @@ def show_receipt(request, ordernum):
     receipt_template = 'shoppingcart/receipt.html'
     # we want to have the ability to override the default receipt page when
     # there is only one item in the order
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'any_refunds': any_refunds
+    }
+
     if order_items.count() == 1:
         receipt_template = order_items[0].single_item_receipt_template
-    return render_to_response(receipt_template, {'order': order,
-                                                 'order_items': order_items,
-                                                 'any_refunds': any_refunds})
+        context.update(order_items[0].single_item_receipt_context)
+
+    return render_to_response(receipt_template, context)
