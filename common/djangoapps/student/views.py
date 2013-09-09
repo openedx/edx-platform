@@ -30,6 +30,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.views.decorators.http import require_POST
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -366,7 +367,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
     if course_id is None:
-        return HttpResponseBadRequest(_("Course id not specified"))
+        return HttpResponseBadRequest(ungettext_lazy("Course id not specified"))
 
     if action == "enroll":
         # Make sure the course exists
@@ -376,10 +377,10 @@ def change_enrollment(request):
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
-            return HttpResponseBadRequest(_("Course id is invalid"))
+            return HttpResponseBadRequest(ungettext_lazy("Course id is invalid"))
 
         if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest(_("Enrollment is closed"))
+            return HttpResponseBadRequest(ungettext_lazy("Enrollment is closed"))
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -403,9 +404,9 @@ def change_enrollment(request):
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
-            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+            return HttpResponseBadRequest(ungettext_lazy("You are not enrolled in this course"))
     else:
-        return HttpResponseBadRequest(_("Enrollment action is invalid"))
+        return HttpResponseBadRequest(ungettext_lazy("Enrollment action is invalid"))
 
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
@@ -417,7 +418,7 @@ def login_user(request, error=""):
     """AJAX request to log in the user."""
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'value': _('There was an error receiving your login information. Please email us.')}))  # TODO: User error message
+                                        'value': ungettext_lazy('There was an error receiving your login information. Please email us.')}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -436,14 +437,14 @@ def login_user(request, error=""):
     # this occurs when there are too many attempts from the same IP address
     except RateLimitException:
         return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Too many failed login attempts. Try again later.')}))
+                                        'value': ungettext_lazy('Too many failed login attempts. Try again later.')}))
     if user is None:
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Email or password is incorrect.')}))
+                                        'value': ungettext_lazy('Email or password is incorrect.')}))
 
     if user is not None and user.is_active:
         try:
@@ -561,7 +562,7 @@ def _do_create_account(post_vars):
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
+            js['value'] = ungettext_lazy("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
@@ -645,12 +646,12 @@ def create_account(request, post_override=None):
         "work_occupation", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
         "contact_phone"]:
         if a not in post_vars:
-            js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
+            js['value'] = ungettext_lazy("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
+        js['value'] = ungettext_lazy("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
@@ -661,7 +662,7 @@ def create_account(request, post_override=None):
 
     if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
-            js['value'] = _("You must accept the terms of service.").format(field=a)
+            js['value'] = ungettext_lazy("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
             return HttpResponse(json.dumps(js))
 
@@ -686,29 +687,29 @@ def create_account(request, post_override=None):
 
     for a in required_post_vars:
         if len(post_vars[a]) < 1:
-            error_str = {'username': _('Username must be minimum of two characters long.'),
-                         'email': _('A properly formatted e-mail is required.'),
-                         'name': _('Your legal name must be a minimum of two characters long.'),
-                         'password': _('A valid password is required.'),
-                         'terms_of_service': _('Accepting Terms of Service is required.'),
-                         'honor_code': _('Agreeing to the Honor Code is required.'),
-                         'lastname': _('Lastname must be a minimum of two characters long.'),
-                         'firstname': _('Firstname must be a minimum of two characters long.'),
-                         'middlename': _('Middlename must be a minimum of two characters long.'),
-                         'year_of_birth': _('Year of birth is required'),
-                         'level_of_education': _('Education level is required'),
-                         'education_place': _('Education place is required'),
-                         'education_year': _('Education year is required'),
-                         'work_type': _('Work type is required'),
-                         'work_number': _('Work number is required'),
-                         'work_name': _('Work name is required'),
-                         'work_login': _('Work StatGrad login is required'),
-                         'work_location': _('Work location is required'),
-                         'work_occupation': _('Work occupation is required'),
-                         'work_teaching_experience': _('Work teaching experience is required'),
-                         'work_qualification_category': _('Work qualification category is required'),
-                         'work_qualification_category_year': _('Work qualification year is required'),
-                         'contact_phone': _('Contact phone is required')}
+            error_str = {'username': ungettext_lazy('Username must be minimum of two characters long.'),
+                         'email': ungettext_lazy('A properly formatted e-mail is required.'),
+                         'name': ungettext_lazy('Your legal name must be a minimum of two characters long.'),
+                         'password': ungettext_lazy('A valid password is required.'),
+                         'terms_of_service': ungettext_lazy('Accepting Terms of Service is required.'),
+                         'honor_code': ungettext_lazy('Agreeing to the Honor Code is required.'),
+                         'lastname': ungettext_lazy('Lastname must be a minimum of two characters long.'),
+                         'firstname': ungettext_lazy('Firstname must be a minimum of two characters long.'),
+                         'middlename': ungettext_lazy('Middlename must be a minimum of two characters long.'),
+                         'year_of_birth': ungettext_lazy('Year of birth is required'),
+                         'level_of_education': ungettext_lazy('Education level is required'),
+                         'education_place': ungettext_lazy('Education place is required'),
+                         'education_year': ungettext_lazy('Education year is required'),
+                         'work_type': ungettext_lazy('Work type is required'),
+                         'work_number': ungettext_lazy('Work number is required'),
+                         'work_name': ungettext_lazy('Work name is required'),
+                         'work_login': ungettext_lazy('Work StatGrad login is required'),
+                         'work_location': ungettext_lazy('Work location is required'),
+                         'work_occupation': ungettext_lazy('Work occupation is required'),
+                         'work_teaching_experience': ungettext_lazy('Work teaching experience is required'),
+                         'work_qualification_category': ungettext_lazy('Work qualification category is required'),
+                         'work_qualification_category_year': ungettext_lazy('Work qualification year is required'),
+                         'contact_phone': ungettext_lazy('Contact phone is required')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
@@ -718,11 +719,11 @@ def create_account(request, post_override=None):
     for a in numeric_post_vars:
         if len(post_vars[a]) > 0 and not post_vars[a].isdigit():
             error_str = {
-             'education_year': _('Education year must be numeric'),
-             'work_teaching_experience': _('Work teaching experience must be numeric'),
-             'work_managing_experience': _('Work managing experience must be numeric'),
-             'work_qualification_category_year': _('Work qualification year must be numeric'),
-             'contact_phone': _('Contact phone must be numeric')}
+             'education_year': ungettext_lazy('Education year must be numeric'),
+             'work_teaching_experience': ungettext_lazy('Work teaching experience must be numeric'),
+             'work_managing_experience': ungettext_lazy('Work managing experience must be numeric'),
+             'work_qualification_category_year': ungettext_lazy('Work qualification year must be numeric'),
+             'contact_phone': ungettext_lazy('Contact phone must be numeric')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
@@ -732,14 +733,14 @@ def create_account(request, post_override=None):
     try:
         validate_email(post_vars['email'])
     except ValidationError:
-        js['value'] = _("Valid e-mail is required.").format(field=a)
+        js['value'] = ungettext_lazy("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
     try:
         _validate_statgradlogin(post_vars['work_login'])
     except ValidationError:
-        js['value'] = _("Valid StatGrad login is required.").format(field=a)
+        js['value'] = ungettext_lazy("Valid StatGrad login is required.").format(field=a)
         js['field'] = 'work_login'
         return HttpResponse(json.dumps(js))
 
