@@ -367,7 +367,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
     if course_id is None:
-        return HttpResponseBadRequest(ugettext_lazy("Course id not specified"))
+        return HttpResponseBadRequest(_("Course id not specified"))
 
     if action == "enroll":
         # Make sure the course exists
@@ -377,10 +377,10 @@ def change_enrollment(request):
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
-            return HttpResponseBadRequest(ugettext_lazy("Course id is invalid"))
+            return HttpResponseBadRequest(_("Course id is invalid"))
 
         if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest(ugettext_lazy("Enrollment is closed"))
+            return HttpResponseBadRequest(_("Enrollment is closed"))
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -404,9 +404,9 @@ def change_enrollment(request):
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
-            return HttpResponseBadRequest(ugettext_lazy("You are not enrolled in this course"))
+            return HttpResponseBadRequest(_("You are not enrolled in this course"))
     else:
-        return HttpResponseBadRequest(ugettext_lazy("Enrollment action is invalid"))
+        return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
@@ -418,7 +418,7 @@ def login_user(request, error=""):
     """AJAX request to log in the user."""
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'value': ugettext_lazy('There was an error receiving your login information. Please email us.')}))  # TODO: User error message
+                                        'value': ugettext_lazy('There was an error receiving your login information. Please email us.')}, cls=LazyEncoder))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -437,14 +437,14 @@ def login_user(request, error=""):
     # this occurs when there are too many attempts from the same IP address
     except RateLimitException:
         return HttpResponse(json.dumps({'success': False,
-                                        'value': ugettext_lazy('Too many failed login attempts. Try again later.')}))
+                                        'value': ugettext_lazy('Too many failed login attempts. Try again later.')}, cls=LazyEncoder))
     if user is None:
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'value': ugettext_lazy('Email or password is incorrect.')}))
+                                        'value': ugettext_lazy('Email or password is incorrect.')}, cls=LazyEncoder))
 
     if user is not None and user.is_active:
         try:
@@ -465,7 +465,7 @@ def login_user(request, error=""):
         try_change_enrollment(request)
 
         statsd.increment("common.student.successful_login")
-        response = HttpResponse(json.dumps({'success': True}))
+        response = HttpResponse(json.dumps({'success': True}, cls=LazyEncoder))
 
         # set the login cookie for the edx marketing site
         # we want this cookie to be accessed via javascript
@@ -491,9 +491,9 @@ def login_user(request, error=""):
     AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
+    not_activated_msg = ugettext_lazy("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
     return HttpResponse(json.dumps({'success': False,
-                                    'value': not_activated_msg}))
+                                    'value': not_activated_msg}, cls=LazyEncoder))
 
 
 @ensure_csrf_cookie
@@ -564,7 +564,7 @@ def _do_create_account(post_vars):
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = ugettext_lazy("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
         raise
 
@@ -648,12 +648,12 @@ def create_account(request, post_override=None):
         if a not in post_vars:
             js['value'] = ugettext_lazy("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     if post_vars.get('honor_code', 'false') != u'true':
         js['value'] = ugettext_lazy("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
-        return HttpResponse(json.dumps(js))
+        return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
     tos_not_required = settings.MITX_FEATURES.get("AUTH_USE_SHIB") \
@@ -664,7 +664,7 @@ def create_account(request, post_override=None):
         if post_vars.get('terms_of_service', 'false') != u'true':
             js['value'] = ugettext_lazy("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     # Confirm appropriate fields are there.
     # TODO: Check e-mail format is correct.
@@ -683,7 +683,7 @@ def create_account(request, post_override=None):
     if len(post_vars["level_of_education"]) < 1:
         js['value'] = _('Education level is required')
         js['field'] = "level_of_education"
-        return HttpResponse(json.dumps(js))
+        return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     for a in required_post_vars:
         if len(post_vars[a]) < 1:
@@ -712,7 +712,7 @@ def create_account(request, post_override=None):
                          'contact_phone': ugettext_lazy('Contact phone is required')}
             js['value'] = error_str[a]
             js['field'] = a
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     numeric_post_vars = ["education_year","work_managing_experience","work_teaching_experience"]
 
@@ -726,7 +726,7 @@ def create_account(request, post_override=None):
              'contact_phone': ugettext_lazy('Contact phone must be numeric')}
             js['value'] = error_str[a]
             js['field'] = a
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
         if len(post_vars[a]) < 1:
             post_vars[a] = '0'
 
@@ -735,14 +735,14 @@ def create_account(request, post_override=None):
     except ValidationError:
         js['value'] = ugettext_lazy("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
-        return HttpResponse(json.dumps(js))
+        return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     try:
         _validate_statgradlogin(post_vars['work_login'])
     except ValidationError:
         js['value'] = ugettext_lazy("Valid StatGrad login is required.").format(field=a)
         js['field'] = 'work_login'
-        return HttpResponse(json.dumps(js))
+        return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     # try:
     #     validate_slug(post_vars['username'])
@@ -1384,3 +1384,13 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return HttpResponse(json.dumps({'success': True}))
+
+class LazyEncoder(json.JSONEncoder):
+"""Encodes django's lazy i18n strings.
+Used to serialize translated strings to JSON, because
+simplejson chokes on it otherwise.
+"""
+    def default(self, obj):
+        if isinstance(obj, Promise):
+            return force_unicode(obj)
+        return obj
