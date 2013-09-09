@@ -36,7 +36,9 @@
 </%block>
 
 <%block name="js_extra">
+<script type="text/javascript" src="${static.url('js/jquery.masked.input.min.js')}"></script>
 <script type="text/javascript">
+
   (function() {
     $(document).ready(function() {
       if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
