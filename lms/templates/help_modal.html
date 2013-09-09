@@ -60,7 +60,7 @@ discussion_link = get_discussion_link(course) if course else None
     <header></header>
 
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
-      <div id="feedback_error" class="modal-form-error"></div>
+      <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
       <label data-field="name">${_('Name*')}</label>
       <input name="name" type="text">
@@ -88,7 +88,7 @@ discussion_link = get_discussion_link(course) if course else None
     </div>
   </div>
 
-  <div class="inner-wrapper" id="feedback_success_wrapper">
+  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="-1">
     <header>
       <h2>${_('Thank You!')}</h2>
       <hr>
@@ -182,16 +182,17 @@ discussion_link = get_discussion_link(course) if course else None
     $("#feedback_form").on("ajax:success", function(event, data, status, xhr) {
         $("#feedback_form_wrapper").css("display", "none");
         $("#feedback_success_wrapper").css("display", "block");
+        $("#feedback_success_wrapper").focus();
     });
     $("#feedback_form").on("ajax:error", function(event, xhr, status, error) {
-        $(".field-error").removeClass("field-error");
+        $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
         var responseData;
         try {
             responseData = jQuery.parseJSON(xhr.responseText);
         } catch(err) {
         }
         if (responseData) {
-            $("[data-field='"+responseData.field+"']").addClass("field-error");
+            $("[data-field='"+responseData.field+"']").addClass("field-error").attr("aria-invalid", "true");
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
@@ -217,6 +218,8 @@ discussion_link = get_discussion_link(course) if course else None
             });
 %endif
         }
+        // Make change explicit to assistive technology
+        $("#feedback_error").focus();
     });
 })(this)
 </script>
