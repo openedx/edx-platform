@@ -110,7 +110,7 @@ def add_correct_lti_to_course(_step):
     section_name = chapter_name
     path = "/courses/{org}/{num}/{name}/courseware/{chapter}/{section}".format(
         org=course.org,
-        num=course.num,
+        num=course.number,
         name=course.display_name.replace(' ', '_'),
         chapter=chapter_name,
         section=section_name)
@@ -137,7 +137,7 @@ def add_incorrect_lti_to_course(_step):
     section_name = chapter_name
     path = "/courses/{org}/{num}/{name}/courseware/{chapter}/{section}".format(
         org=course.org,
-        num=course.num,
+        num=course.number,
         name=course.display_name.replace(' ', '_'),
         chapter=chapter_name,
         section=section_name)
