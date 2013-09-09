@@ -74,7 +74,7 @@ jQuery(function($){
           </span>
           <span class="field required select" id="field-education-year">
               <label for="education-year">${_("Year when education was Completed")}</label>
-              <select id="education-year" name="education_year">
+              <select id="education-year" name="education_year" required aria-required="true">
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
                 <option value="${year}">${year}</option>
@@ -95,7 +95,7 @@ jQuery(function($){
           <div class="input-group">
           <span class="field required select" id="field-work-type">
             <label for="work-type">${_("Type of educational institution")}</label>
-        <select id="work-type" name="work_type">
+        <select id="work-type" name="work_type" required aria-required="true">
           <option value="">--</option>
           %for code, wo_type in UserProfile.WORK_TYPE_CHOICES:
           <option value="${code}">${_(wo_type)}</option>
@@ -141,7 +141,7 @@ jQuery(function($){
           </span>
           <span class="field required select" id="field-work-occupation">
         <label for="work-occupation">${_("Occupation at educational institution")}</label>
-        <select id="work-occupation" name="work_occupation">
+        <select id="work-occupation" name="work_occupation" required aria-required="true">
           <option value="">--</option>
           %for code, wo_occ in UserProfile.WORK_OCCUPATION_CHOICES:
           <option value="${code}">${_(wo_occ)}</option>
@@ -167,7 +167,7 @@ jQuery(function($){
           </span>
           <span class="field select" id="field-work-qualification-category">
         <label for="work-qualification-category">${_("Qualification category")}</label>
-        <select id="work-qualification-category" name="work_qualification_category">
+        <select id="work-qualification-category" name="work_qualification_category" required aria-required="true">
           <option value="">--</option>
           %for code, wo_qua in UserProfile.WORK_QUALIFICATION_CATEGORY_CHOICES:
           <option value="${code}">${_(wo_qua)}</option>
@@ -176,13 +176,31 @@ jQuery(function($){
           </span>
           <span class="field text" id="field-work-qualification-category-year">
             <label for="work-qualification-category-year">${_('Qualification category year')}</label>
-            <input id="work-qualification-category-year" type="text" name="work_qualification_category_year" value="" required aria-required="true" />
+            <select id="work-qualification-category-year" name="work_qualification_category_year" required aria-required="true">
+              <option value="">--</option>
+              <option value="2013">2013</option>
+              <option value="2012">2012</option>
+              <option value="2011">2011</option>
+              <option value="2010">2010</option>
+              <option value="2009">2009</option>
+              <option value="2008">2008</option>
+              <option value="2007">2007</option>
+              <option value="2006">2006</option>
+              <option value="2005">2005</option>
+              <option value="2004">2004</option>
+              <option value="2003">2003</option>
+              <option value="2002">2002</option>
+              <option value="2001">2001</option>
+              <option value="2000">2000</option>
+              <option value="0">раннее 2000</option>
+              <option value="-1">не присваивалась</option>
+            </select>
           </span>
         </div>
         <div class="input-group">
           <span class="field required text" id="field-contact-phone">
             <label for="contact-phone">${_('Contact phone')}</label>
-            <input id="contact-phone" type="text" name="contact_phone" value="" placeholder="${_('e.g. 9091234567')}" required aria-required="true" />
+            <input id="contact-phone" type="text" name="contact_phone" value="" placeholder="${_('e.g. (909) 123-4567')}" required aria-required="true" />
           </span>
         </div>
         </div>
