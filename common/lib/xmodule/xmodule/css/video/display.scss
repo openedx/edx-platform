@@ -15,6 +15,13 @@ div.video {
     @include clearfix;
   }
 
+  div.focus_grabber {
+    position: relative;
+    display: inline;
+    width: 0px;
+    height: 0px;
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
