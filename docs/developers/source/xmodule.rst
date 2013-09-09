@@ -95,14 +95,6 @@ Html
     :members:
     :show-inheritance:
 
-
-LTI
-===
-
-.. automodule:: xmodule.lti_module
-    :members:
-    :show-inheritance:
-
 Mako
 ====
 
