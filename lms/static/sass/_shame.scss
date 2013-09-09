@@ -130,7 +130,13 @@
 // ====================
 
 // edx.org marketing site - registration iframe band-aid (poor form enough to isolate out)
+.view-iframe, .view-iframe-content {
+  background: transparent !important;
+  overflow: hidden;
+}
+
 .view-partial-mktgregister {
+  background: transparent !important;
 
   // dimensions needed for course about page on marketing site
   .wrapper-view {
@@ -168,6 +174,10 @@
 
       &:hover .track {
         opacity: 1.0;
+      }
+
+      &.has-option-verified {
+        padding-top: 12px !important;
       }
     }
 

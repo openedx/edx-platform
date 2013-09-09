@@ -844,6 +844,23 @@ class CourseEnrollment(models.Model):
             return False
 
     @classmethod
+    def enrollment_mode_for_user(cls, user, course_id):
+        """
+        Returns the enrollment mode for the given user for the given course
+
+        `user` is a Django User object
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            if record.is_active:
+                return record.mode
+            else:
+                return None
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
 

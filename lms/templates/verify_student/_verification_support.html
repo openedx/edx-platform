@@ -1,0 +1,21 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="wrapper-content-supplementary">
+  <aside class="content-supplementary">
+    <ul class="list-help">
+      <li class="help-item">
+        <h3 class="title">${_("Have questions?")}</h3>
+        <div class="copy">
+            <p>${_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.").format(a_start='<a rel="external" href="'+ marketing_link('WHAT_IS_VERIFIED_CERT') + '">', a_end="</a>")}</p>
+        </div>
+      </li>
+
+      <li class="help-item">
+        <h3 class="title">${_("Change your mind?")}</h3>
+        <div class="copy">
+          <p>${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+        </div>
+      </li>
+    </ul>
+  </aside>
+</div> <!-- /wrapper-content-supplementary -->
