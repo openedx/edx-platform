@@ -104,15 +104,18 @@ def add_correct_lti_to_course(_step):
             'launch_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
         }
     )
+    course = world.scenario_dict["COURSE"]
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
     section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' % (
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
-        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-        chapter_name, section_name,)
-    )
+    path = "/courses/{org}/{num}/{name}/courseware/{chapter}/{section}".format(
+        org=course.org,
+        num=course.num,
+        name=course.display_name.replace(' ', '_'),
+        chapter=chapter_name,
+        section=section_name)
+    url = django_url(path)
+
     world.browser.visit(url)
 
 
@@ -128,15 +131,18 @@ def add_incorrect_lti_to_course(_step):
             'lti_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
         }
     )
+    course = world.scenario_dict["COURSE"]
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
     section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' % (
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
-        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-        chapter_name, section_name,)
-    )
+    path = "/courses/{org}/{num}/{name}/courseware/{chapter}/{section}".format(
+        org=course.org,
+        num=course.num,
+        name=course.display_name.replace(' ', '_'),
+        chapter=chapter_name,
+        section=section_name)
+    url = django_url(path)
+
     world.browser.visit(url)
 
 
