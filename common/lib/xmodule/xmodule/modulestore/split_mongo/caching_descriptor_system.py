@@ -1,7 +1,6 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -62,10 +61,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             if json_data is None:
                 raise ItemNotFoundError(block_id)
 
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category'),
-            self.default_class
-        )
+        class_ = self.load_block_type(json_data.get('category'))
         return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
 
     # xblock's runtime does not always pass enough contextual information to figure out

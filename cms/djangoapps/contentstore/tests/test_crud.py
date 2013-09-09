@@ -9,7 +9,8 @@ from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalI
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import inheritance
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import prefer_xmodules
+from xblock.core import XBlock
 
 
 class TemplateTests(unittest.TestCase):
@@ -248,9 +249,10 @@ class TemplateTests(unittest.TestCase):
         - 'definition':
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        class_ = XModuleDescriptor.load_class(
+        class_ = XBlock.load_class(
             json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class
+            default_class,
+            select=prefer_xmodules
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:

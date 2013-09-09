@@ -42,7 +42,7 @@ Representation:
         *** 'edited_by': user_id whose edit caused this version of the definition,
         *** 'edited_on': datetime of the change causing this version
         *** 'previous_version': the definition_id of the previous version of this definition
-        *** 'original_version': definition_id of the root of the previous version relation on this 
+        *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
 import threading
@@ -56,7 +56,7 @@ import copy
 from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import XModuleDescriptor, prefer_xmodules
 from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
 from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
@@ -68,6 +68,7 @@ from xblock.fields import Scope
 from xblock.runtime import Mixologist
 from bson.objectid import ObjectId
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -184,7 +185,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 error_tracker=self.error_tracker,
                 render_template=self.render_template,
                 resources_fs=None,
-                mixins=self.xblock_mixins
+                mixins=self.xblock_mixins,
+                select=self.xblock_select,
             )
             self._add_cache(course_entry['structure']['_id'], system)
             self.cache_items(system, block_ids, depth, lazy)
@@ -1471,7 +1473,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         if fields is None:
             return {}
-        cls = self.mixologist.mix(XModuleDescriptor.load_class(category))
+        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
         result = collections.defaultdict(dict)
         for field_name, value in fields.iteritems():
             field = getattr(cls, field_name)
@@ -1581,7 +1583,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 destination_block['edit_info']['edited_by'] = user_id
         else:
             destination_block = self._new_block(
-                user_id, new_block['category'], 
+                user_id, new_block['category'],
                 self._filter_blacklist(copy.copy(new_block['fields']), blacklist),
                 new_block['definition'],
                 new_block['edit_info']['update_version']
