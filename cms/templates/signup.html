@@ -6,17 +6,7 @@
 <%block name="title">${_("Sign Up")}</%block>
 <%block name="bodyclass">not-signedin view-signup</%block>
 
-<%block name="js_extra">
-  <script type="text/javascript" src="${static.url('js/jquery.masked.input.min.js')}"></script>
-</%block>
-
 <%block name="content">
-
-<script>
-jQuery(function($){
-   $("#contact-phone").mask("(999) 999-9999");
-});
-</script>
 
 <div class="wrapper-content wrapper">
   <section class="content">

@@ -7,6 +7,12 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
+<script>
+jQuery(function($){
+   $("#contact-phone").mask("(999) 999-9999");
+});
+</script>
+
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
