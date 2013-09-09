@@ -31,11 +31,3 @@ class SerializationError(Exception):
     def __init__(self, location, msg):
         super(SerializationError, self).__init__(msg)
         self.location = location
-
-
-class LTIError(Exception):
-    """
-    An error occured when parsing LTI paramaters from
-    course settings or LTI unit
-    """
-    pass
