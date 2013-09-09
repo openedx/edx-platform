@@ -21,6 +21,10 @@ from xblock.core import String, Scope, List
 log = logging.getLogger(__name__)
 
 
+class LTIError(Exception):
+    pass
+
+
 class LTIFields(object):
     """
     Fields to define and obtain LTI tool from provider are set here,
