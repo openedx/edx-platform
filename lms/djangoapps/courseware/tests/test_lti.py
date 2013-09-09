@@ -3,6 +3,7 @@
 import requests
 from . import BaseTestXmodule
 from collections import OrderedDict
+import mock
 
 
 class TestLTI(BaseTestXmodule):
@@ -59,7 +60,9 @@ class TestLTI(BaseTestXmodule):
             headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
             return None, headers, None
 
-        requests.auth.Client.sign = mocked_sign
+        patcher = mock.patch.object(requests.auth.Client, "sign", mocked_sign)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
         """
