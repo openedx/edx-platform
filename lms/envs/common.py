@@ -440,12 +440,12 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
+DEFAULT_FROM_EMAIL = 'noreply.edu@olimpiada.ru'
+DEFAULT_FEEDBACK_EMAIL = 'edu@olimpiada.ru'
+SERVER_EMAIL = 'edu@olimpiada.ru'
+TECH_SUPPORT_EMAIL = 'edu@olimpiada.ru'
+CONTACT_EMAIL = 'edu@olimpiada.ru'
+BUGS_EMAIL = 'edu@olimpiada.ru'
 ADMINS = ()
 MANAGERS = ADMINS
 

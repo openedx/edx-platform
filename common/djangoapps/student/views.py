@@ -810,6 +810,8 @@ def create_account(request, post_override=None):
         post_vars.update(dict(email=email, name=name, password=password))
         log.debug(u'In create_account with external_auth: user = %s, email=%s', name, email)
 
+    post_vars = dict(post_vars.items())
+    
     # Confirm we have a properly formed request
     for a in ['email', 'password', "lastname", "firstname", "middlename", "year_of_birth",
         "level_of_education", "education_place", "education_year",
@@ -899,7 +901,7 @@ def create_account(request, post_override=None):
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
-        if len(post_vars[a] < 1):
+        if len(post_vars[a]) < 1:
             post_vars[a] = '0'
 
     try:

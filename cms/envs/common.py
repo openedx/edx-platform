@@ -195,9 +195,9 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
+DEFAULT_FROM_EMAIL = 'noreply.edu@olimpiada.ru'
+DEFAULT_FEEDBACK_EMAIL = 'edu@olimpiada.ru'
+SERVER_EMAIL = 'edu@olimpiada.ru'
 ADMINS = ()
 MANAGERS = ADMINS
 
