@@ -9,16 +9,13 @@
 
 
 <style>
-.edx-edge-logo-large {
-  display: block;
+.olimpiada-logo-large {
+display: block;
 height: 72px;
-margin: 40px 60px 30px 250px;
-background: url("http://olimpiada.ru/images/logo.png") no-repeat;
-text-indent: -9999px;
-overflow: hidden;
+margin: 10px 60px 70px 250px;
 }
 .log-in-form {
-  width: 270px;
+  width: 270px !important;
   height: 300px;
 }
 .banners {
@@ -31,8 +28,12 @@ overflow: hidden;
 .banners-inner a {
   margin: 12px;
 }
+
+body {
+  height:100%;
+}
 .wrapper {
-  min-height:100%;
+  min-height: 100%;
   margin-bottom: -50px;
 }
 .wrapper:after {
@@ -45,17 +46,30 @@ overflow: hidden;
 </style>
 <div class="wrapper">
 
-<div class="edx-edge-logo-large">${_("edX edge")}</div>
+<div class="olimpiada-logo-large"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Coat_of_Arms_of_Moscow.svg/200px-Coat_of_Arms_of_Moscow.svg.png?uselang=ru" style="
+    float: left;
+    height: 180px;
+"><span style="
+    margin-top: 20px;
+    margin-left: 40px;
+    float: left;
+    font-size: larger;
+    font-weight: 800;
+">Департамент образования города Москвы<br>
+центр педагогического мастерства<br>
+курсы повышения квалификации учителей<span>
+ </span></span></div>
 
-<div class="banners" style=""><div class="banners-inner" style="
-    ">  <a href="http://www.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/edu130x59.gif" border="0" alt="Федеральный портал &quot;Российское образование&quot;" ></a>
+<div class="banners">
+  <div class="banners-inner">
+  <a href="http://www.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/edu130x59.gif" border="0" alt="Федеральный портал &quot;Российское образование&quot;" ></a>
   <a href="http://window.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/eo130x59.gif" border="0" alt="Единое окно доступа к образовательным ресурсам"></a>
   <a href="http://school-collection.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/sc130x59.gif" border="0" alt="Единая коллекция цифровых образовательных ресурсов"></a>
   <a href="http://fcior.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/fcior130x59.gif" border="0" alt="Федеральный центр информационно-образовательных ресурсов"></a>
+ </div>
+</div>
 
-  </div></div>
-
-<div class="main-wrapper">
+<div class="main-wrapper" style="width:1142px">
   <div class="content">
     <div class="log-in-form">
       <h2>Новости</h2>
