@@ -12,17 +12,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-09-09 14:42+0400\n"
-"PO-Revision-Date: 2013-09-09 11:53+0400\n"
-"Last-Translator: cher <blackav@gmail.com>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2013-09-09 16:25+0400\n"
+"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.0\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.5.7\n"
 "Generated-By: Babel 0.9.6\n"
 "X-POOTLE-MTIME: 1378713222.0\n"
 
@@ -179,8 +179,8 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
-"Это может случиться из-за ошибки на нашем сервере или Вашего "
-"интернет-соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
+"Это может случиться из-за ошибки на нашем сервере или Вашего интернет-"
+"соединения. Попробуйте перезагрузить страницу или убедиться, что Вы "
 "подключены к интернету."
 
 #: cms/static/coffee/src/main.js:41
@@ -998,9 +998,9 @@ msgid ""
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
-"Организована основа вашего курса. Студия предлагает "
-"<strong>структуру</strong> редактора, обеспечивающего простую иерархию и "
-"легкое перемещение студентов по курсу."
+"Организована основа вашего курса. Студия предлагает <strong>структуру</"
+"strong> редактора, обеспечивающего простую иерархию и легкое перемещение "
+"студентов по курсу."
 
 #: cms/templates/howitworks.html:44
 msgid "Simple Organization For Content"
@@ -1522,8 +1522,8 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
-"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих\". "
-"Если письма нет и там, запросите помощь по ссылке"
+"Пожалуйста, проверьте папку \"Спам\", если письмо отсутствует во \"Входящих"
+"\". Если письма нет и там, запросите помощь по ссылке"
 
 #: cms/templates/login.html:4 cms/templates/widgets/header.html:156
 msgid "Sign In"
@@ -1814,9 +1814,9 @@ msgid ""
 msgstr ""
 "Ваш курс на странице сводки не будет виден, пока он не объявлен. Чтобы "
 "обеспечить содержание страницы и просмотреть его, следуйте инструкциям, "
-"приведенным вами <abbr title=\"Program Manager\">PM</abbr> или Conrad Warre <a "
-"rel=\"email\" class=\"action action-email\" "
-"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
+"приведенным вами <abbr title=\"Program Manager\">PM</abbr> или Conrad Warre "
+"<a rel=\"email\" class=\"action action-email\" href=\"mailto:conrad@edx.org"
+"\">(conrad@edx.org)</a>."
 
 #: cms/templates/settings.html:121
 msgid "Course Schedule"
@@ -2571,9 +2571,8 @@ msgid ""
 "us a note."
 msgstr ""
 "Конечно. Мы создали онлайн курс edX101, в котором приведены некоторые "
-"рекомендации: от видеосъемки , создания упражнений, к основам ведения "
-"онлайн-курсов. Дополнительно, мы всегда здесь, чтобы помочь, просто напишите "
-"нам."
+"рекомендации: от видеосъемки , создания упражнений, к основам ведения онлайн-"
+"курсов. Дополнительно, мы всегда здесь, чтобы помочь, просто напишите нам."
 
 #: cms/templates/static-pages.html:15
 msgid "New Static Page"
@@ -3011,7 +3010,7 @@ msgstr "Среднее профессиональное"
 
 #: common/djangoapps/student/models.py:96
 msgid "Specialist's degree"
-msgstr ""
+msgstr "Специалист"
 
 #: common/djangoapps/student/models.py:97
 msgid "Secondary/high school"
@@ -3019,7 +3018,7 @@ msgstr "Начальное профессиональное"
 
 #: common/djangoapps/student/models.py:98
 msgid "Junior secondary/junior high/middle school"
-msgstr "Среднее среднее"
+msgstr "Среднее"
 
 #: common/djangoapps/student/models.py:99
 msgid "Elementary/primary school"
@@ -3150,8 +3149,7 @@ msgstr "Руководитель (директор, заведующий) обр
 #: common/djangoapps/student/models.py:154
 msgid "Vice manager (director, head of) the educational institution"
 msgstr ""
-"Заместитель руководителя (директора, заведующего) образовательного "
-"учреждения"
+"Заместитель руководителя (директора, заведующего) образовательного учреждения"
 
 #: common/djangoapps/student/models.py:155
 msgid "Senior master"
@@ -3408,7 +3406,7 @@ msgstr "Должен быть указан контактный телефон"
 
 #: common/djangoapps/student/views.py:721
 msgid "Education year must be numeric"
-msgstr ""
+msgstr "Год окончания должен быть числом"
 
 #: common/djangoapps/student/views.py:722
 #, fuzzy
@@ -3422,11 +3420,11 @@ msgstr "Должен быть указан опыт работы"
 
 #: common/djangoapps/student/views.py:724
 msgid "Work qualification year must be numeric"
-msgstr ""
+msgstr "Год получения квалификации должен быть числом"
 
 #: common/djangoapps/student/views.py:725
 msgid "Contact phone must be numeric"
-msgstr ""
+msgstr "Контактный телефон должен быть числом"
 
 #: common/djangoapps/student/views.py:735
 msgid "Valid e-mail is required."
@@ -4204,8 +4202,8 @@ msgstr "e-mail успешно изменен!"
 #: lms/templates/emails_change_successful.html:12
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
-"Новый адрес email должен появиться на вашей {link_start}персональной "
-"странице{link_end}."
+"Новый адрес email должен появиться на вашей {link_start}персональной странице"
+"{link_end}."
 
 #: lms/templates/email_exists.html:11
 msgid "An account with the new e-mail address already exists."
@@ -4380,8 +4378,8 @@ msgid ""
 "{link_end}."
 msgstr ""
 "<strong>Вопросы по лекциям, домашним заданиям, инструментам или материалам "
-"данного курса</strong>, задавайте на {link_start}форуме обсуждения "
-"курса{link_end}."
+"данного курса</strong>, задавайте на {link_start}форуме обсуждения курса"
+"{link_end}."
 
 #: lms/templates/help_modal.html:34
 msgid ""
@@ -4558,8 +4556,8 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a "
-"rel=\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
+"Вы можете начать обучение с помощью {platform_name} войдя с помощью <a rel="
+"\"external\" href=\"http://openid.net/\">учетной записи OpenID</a>."
 
 #: lms/templates/login.html:164
 msgid "Not Enrolled?"
@@ -4775,8 +4773,8 @@ msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
-"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены "
-"(*)</strong>."
+"Обязательные поля <strong class=\"indicator\">выделены жирным и отмечены (*)"
+"</strong>."
 
 #: lms/templates/register.html:119 lms/templates/register.html:140
 msgid "example: username@domain.com"
@@ -4917,19 +4915,19 @@ msgstr "например yourname@domain.com"
 
 #: lms/templates/signup_modal.html:101
 msgid "e.g. 9999"
-msgstr ""
+msgstr "например 9999"
 
 #: lms/templates/signup_modal.html:113
 msgid "e.g. School of art"
-msgstr ""
+msgstr "например Школа Искусств"
 
 #: lms/templates/signup_modal.html:117
 msgid "e.g. sch9999"
-msgstr ""
+msgstr "например sch9999"
 
 #: lms/templates/signup_modal.html:179
 msgid "e.g. 9091234567"
-msgstr ""
+msgstr "например (915) 136-1232"
 
 #: lms/templates/signup_modal.html:191
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
@@ -6216,7 +6214,8 @@ msgstr "Анонимный"
 #: lms/templates/courseware/notifications.html:63
 msgid ""
 "{user} posted a {comment} to the thread {thread} in discussion {discussion}"
-msgstr "{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
+msgstr ""
+"{user} опубликовал {comment} в  тему {thread} в обсуждении {discussion}"
 
 #: lms/templates/courseware/notifications.html:70
 msgid "{user} posted a new thread {thread} in discussion {discussion}"
@@ -6590,8 +6589,7 @@ msgid ""
 "registered for edX will not be enrolled, but will be allowed to enroll."
 msgstr ""
 "Если автоматическая запись <em>выключена</em>, то обучающиеся, которые не "
-"зарегистрированы в {platform_name}, не будут записаны, но смогут это "
-"сделать."
+"зарегистрированы в {platform_name}, не будут записаны, но смогут это сделать."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:49
 msgid "Administration List Management"
