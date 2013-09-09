@@ -23,6 +23,8 @@ from django.conf import settings
 from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, LogicTest
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 
 SOURCE_XML = """
@@ -52,13 +54,13 @@ class VideoFactory(object):
         """Method return Video Xmodule instance."""
         location = Location(["i4x", "edX", "video", "default",
                              "SampleProblem1"])
-        model_data = {'data': VideoFactory.sample_problem_xml_youtube,
+        field_data = {'data': VideoFactory.sample_problem_xml_youtube,
                       'location': location}
 
         system = get_test_system()
         system.render_template = lambda template, context: context
 
-        descriptor = VideoDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, DictFieldData(field_data), ScopeIds(None, None, None, None))
 
         module = descriptor.xmodule(system)
 
@@ -92,7 +94,9 @@ class VideoModuleUnitTest(unittest.TestCase):
             'sources': sources,
             'youtube_streams': _create_youtube_string(module),
             'track': '',
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
         self.assertEqual(module.get_html(), expected_context)
@@ -110,7 +114,7 @@ class VideoModuleLogicTest(LogicTest):
 
     descriptor_class = VideoDescriptor
 
-    raw_model_data = {
+    raw_field_data = {
         'data': '<video />'
     }
 

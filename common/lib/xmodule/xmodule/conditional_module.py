@@ -10,7 +10,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import Scope, List
+from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 

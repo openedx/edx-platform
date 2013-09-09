@@ -73,7 +73,7 @@ class StaffGradingService(GradingService):
             get_module = None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data= {}
+            xblock_field_data= {}
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']

@@ -30,6 +30,9 @@ from path import path
 
 from .discussionsettings import *
 
+from lms.xblock.mixin import LmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
@@ -92,6 +95,7 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
     'AUTH_USE_SHIB': False,
+    'AUTH_USE_CAS': False,
 
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
@@ -293,12 +297,14 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                        'title': 'Circuits and Electronics',
-                                        'xmlpath': '6002x/',
-                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                        }
-                   }
+COURSE_SETTINGS = {
+    '6.002x_Fall_2012': {
+        'number': '6.002x',
+        'title': 'Circuits and Electronics',
+        'xmlpath': '6002x/',
+        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+    }
+}
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
@@ -320,6 +326,12 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
 
 #################### Python sandbox ############################################
 
@@ -355,6 +367,9 @@ import monitoring.exceptions  # noqa
 DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
+
+# CMS base
+CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
@@ -865,3 +880,14 @@ def enable_theme(theme_name):
 VERIFY_STUDENT = {
     "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
 }
+
+######################## CAS authentication ###########################
+
+if MITX_FEATURES.get('AUTH_USE_CAS'):
+    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas.backends.CASBackend',
+    )
+    INSTALLED_APPS += ('django_cas',)
+    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)

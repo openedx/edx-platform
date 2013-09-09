@@ -58,13 +58,13 @@ def save_item(request):
         # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
         for metadata_key in request.POST.get('nullout', []):
-            _get_xblock_field(existing_item, metadata_key).write_to(existing_item, None)
+            setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
         for metadata_key, value in request.POST.get('metadata', {}).items():
-            field = _get_xblock_field(existing_item, metadata_key)
+            field = existing_item.fields[metadata_key]
 
             if value is None:
                 field.delete_from(existing_item)
@@ -79,16 +79,6 @@ def save_item(request):
 
     return JsonResponse()
 
-
-def _get_xblock_field(xblock, field_name):
-    """
-    A temporary function to get the xblock field either from the xblock or one of its namespaces by name.
-    :param xblock:
-    :param field_name:
-    """
-    for field in xblock.iterfields():
-        if field.name == field_name:
-            return field
 
 @login_required
 @expect_json

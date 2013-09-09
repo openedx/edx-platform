@@ -415,6 +415,8 @@ def change_enrollment(request):
 
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
+    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+        return redirect(reverse('cas-login'))
     return render_to_response('login.html', {'error': error})
 
 # Need different levels of logging
@@ -511,7 +513,11 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    response = redirect('/')
+    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+        target = reverse('cas-logout')
+    else:
+        target = '/'
+    response = redirect(target)
     response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
                            path='/',
                            domain=settings.SESSION_COOKIE_DOMAIN)

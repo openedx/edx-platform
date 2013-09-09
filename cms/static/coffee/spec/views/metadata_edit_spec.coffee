@@ -26,7 +26,6 @@ describe "Test Metadata Editor", ->
         explicitly_set: true,
         field_name: "display_name",
         help: "Specifies the name for this component.",
-        inheritable: false,
         options: [],
         type: CMS.Models.Metadata.GENERIC_TYPE,
         value: "Word cloud"
@@ -38,7 +37,6 @@ describe "Test Metadata Editor", ->
         explicitly_set: false,
         field_name: "show_answer",
         help: "When should you show the answer",
-        inheritable: true,
         options: [
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -54,7 +52,6 @@ describe "Test Metadata Editor", ->
         explicitly_set: false,
         field_name: "num_inputs",
         help: "Number of text boxes for student to input words/sentences.",
-        inheritable: false,
         options: {min: 1},
         type: CMS.Models.Metadata.INTEGER_TYPE,
         value: 5
@@ -66,7 +63,6 @@ describe "Test Metadata Editor", ->
         explicitly_set: true,
         field_name: "weight",
         help: "Weight for this problem",
-        inheritable: true,
         options: {min: 1.3, max:100.2, step:0.1},
         type: CMS.Models.Metadata.FLOAT_TYPE,
         value: 10.2
@@ -78,7 +74,6 @@ describe "Test Metadata Editor", ->
         explicitly_set: false,
         field_name: "list",
         help: "A list of things.",
-        inheritable: false,
         options: [],
         type: CMS.Models.Metadata.LIST_TYPE,
         value: ["the first display value", "the second"]
@@ -99,7 +94,6 @@ describe "Test Metadata Editor", ->
                         explicitly_set: true,
                         field_name: "unknown_type",
                         help: "Mystery property.",
-                        inheritable: false,
                         options: [
                             {"display_name": "Always", "value": "always"},
                             {"display_name": "Answered", "value": "answered"},
@@ -145,7 +139,6 @@ describe "Test Metadata Editor", ->
                     explicitly_set: false,
                     field_name: "display_name",
                     help: "",
-                    inheritable: false,
                     options: [],
                     type: CMS.Models.Metadata.GENERIC_TYPE,
                     value: null

@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, List, Float, Boolean
+from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, Timedelta

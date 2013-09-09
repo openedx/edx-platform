@@ -82,6 +82,38 @@
           $('.speeds').mouseenter().click();
           expect($('.speeds')).not.toHaveClass('open');
         });
+        // Tabbing depends on the following order:
+        // 1. Play anchor
+        // 2. Speed anchor
+        // 3. A number of speed entry anchors
+        // 4. Volume anchor
+        // If an other focusable element is inserted or if the order is changed, things will 
+        // malfunction as a flag, state.previousFocus, is set in the 1,3,4 elements and is
+        // used to determine the behavior of foucus() and blur() for the speed anchor.
+        it('checks for a certain order in focusable elements in video controls', function() {
+          var playIndex, speedIndex, firstSpeedEntry, lastSpeedEntry, volumeIndex, foundFirst = false;
+          $('.video-controls').find('a, :focusable').each(function(index) {
+            if ($(this).hasClass('video_control')) {
+              playIndex = index;
+            }
+            else if ($(this).parent().hasClass('speeds')) {
+              speedIndex = index;
+            }
+            else if ($(this).hasClass('speed_link')) {
+              if (!foundFirst) {
+                firstSpeedEntry = index;
+                foundFirst = true;
+              }
+              lastSpeedEntry = index;
+            }
+            else if ($(this).parent().hasClass('volume')) {
+              volumeIndex = index;
+            }
+          });
+          expect(playIndex+1).toEqual(speedIndex);
+          expect(speedIndex+1).toEqual(firstSpeedEntry);
+          expect(lastSpeedEntry+1).toEqual(volumeIndex);
+        });
       });
     });
 

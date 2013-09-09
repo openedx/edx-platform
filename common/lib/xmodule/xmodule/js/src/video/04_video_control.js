@@ -77,6 +77,11 @@ function () {
             state.el.on('mousemove', state.videoControl.showControls);
             state.el.on('keydown', state.videoControl.showControls);
         }
+        // The state.previousFocus is used in video_speed_control to track 
+        // the element that had the focus before it.
+        state.videoControl.playPauseEl.on('blur', function () {
+            state.previousFocus = 'playPause';
+        });
     }
 
     // ***************************************************************

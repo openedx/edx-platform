@@ -372,6 +372,12 @@ if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
         url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
     )
 
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
+    )
+
 if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
     urlpatterns += (
         url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',

@@ -1,3 +1,9 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @jtauber - to check licensing
+#   * One of @e0d, @jarv, or @feanil - to check system requirements
+
 -r repo.txt
 
 beautifulsoup4==4.1.3
@@ -42,6 +48,7 @@ pycrypto>=2.6
 pygments==1.5
 pygraphviz==1.1
 pymongo==2.4.1
+pyparsing==1.5.6
 python-memcached==1.48
 python-openid==2.2.5
 pytz==2012h
@@ -91,3 +98,6 @@ nose-ignore-docstring
 nose-exclude
 
 git+https://github.com/mfogel/django-settings-context-processor.git
+
+# django-cas version 2.0.3 with patch to be compatible with django 1.4
+git+https://github.com/mitocw/django-cas.git

@@ -16,6 +16,7 @@ from celery import task, current_task
 from celery.utils.log import get_task_logger
 from django.core.urlresolvers import reverse
 from statsd import statsd
+from dogapi import dog_stats_api
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -116,6 +117,13 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
     Sends to all addresses contained in to_list.  Emails are sent multi-part, in both plain
     text and html.
     """
+    with dog_stats_api.timer('course_email.single_task.time.overall', tags=[_statsd_tag(course_title)]):
+        _send_course_email(email_id, to_list, course_title, course_url, image_url, throttle)
+
+def _send_course_email(email_id, to_list, course_title, course_url, image_url, throttle):
+    """
+    Performs the email sending task.
+    """
     try:
         msg = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist:
@@ -130,7 +138,7 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
     optouts = set(optouts)
     num_optout = len(optouts)
 
-    to_list = filter(lambda x: x['email'] not in optouts, to_list)
+    to_list = [recipient for recipient in to_list if recipient['email'] not in optouts]
 
     subject = "[" + course_title + "] " + msg.subject
 
@@ -181,7 +189,8 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
                 time.sleep(0.2)
 
             try:
-                connection.send_messages([email_msg])
+                with dog_stats_api.timer('course_email.single_send.time.overall', tags=[_statsd_tag(course_title)]):
+                    connection.send_messages([email_msg])
 
                 statsd.increment('course_email.sent', tags=[_statsd_tag(course_title)])
 
@@ -226,6 +235,8 @@ def course_email(email_id, to_list, course_title, course_url, image_url, throttl
         log.exception('Email with id %d caused course_email task to fail with uncaught exception. To list: %s',
                       email_id,
                       [i['email'] for i in to_list])
+        # Close the connection before we exit
+        connection.close()
         raise
 
 

@@ -32,7 +32,7 @@ class TestXmoduleModfiers(ModuleStoreTestCase):
         late_problem = ItemFactory.create(
             parent_location=section.location, display_name='problem hist 2',
             category='problem')
-        late_problem.lms.start = datetime.datetime.now(UTC) + datetime.timedelta(days=32)
+        late_problem.start = datetime.datetime.now(UTC) + datetime.timedelta(days=32)
         late_problem.has_score = False
 
 

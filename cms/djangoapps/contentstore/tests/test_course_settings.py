@@ -118,16 +118,20 @@ class CourseDetailsTestCase(CourseTestCase):
 
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(settings_details_url)
-            self.assertContains(response, "Course Summary Page")
+            self.assertNotContains(response, "Course Summary Page")
+            self.assertNotContains(response, "Send a note to students via email")
             self.assertContains(response, "course summary page will not be viewable")
 
             self.assertContains(response, "Course Start Date")
             self.assertContains(response, "Course End Date")
-            self.assertNotContains(response, "Enrollment Start Date")
-            self.assertNotContains(response, "Enrollment End Date")
+            self.assertContains(response, "Enrollment Start Date")
+            self.assertContains(response, "Enrollment End Date")
             self.assertContains(response, "not the dates shown on your course summary page")
 
-            self.assertNotContains(response, "Introducing Your Course")
+            self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Course Image")
+            self.assertNotContains(response,"Course Overview")
+            self.assertNotContains(response,"Course Introduction Video")
             self.assertNotContains(response, "Requirements")
 
     def test_regular_site_fetch(self):
@@ -143,6 +147,7 @@ class CourseDetailsTestCase(CourseTestCase):
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get(settings_details_url)
             self.assertContains(response, "Course Summary Page")
+            self.assertContains(response, "Send a note to students via email")
             self.assertNotContains(response, "course summary page will not be viewable")
 
             self.assertContains(response, "Course Start Date")
@@ -152,6 +157,9 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Course Image")
+            self.assertContains(response,"Course Overview")
+            self.assertContains(response,"Course Introduction Video")
             self.assertContains(response, "Requirements")
 
 
@@ -341,8 +349,8 @@ class CourseGradingTest(CourseTestCase):
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Not Graded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.lms.format)
-        self.assertEqual(False, descriptor.lms.graded)
+        self.assertEqual(None, descriptor.format)
+        self.assertEqual(False, descriptor.graded)
 
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course.location, {'graderType': 'Homework'})
@@ -350,8 +358,8 @@ class CourseGradingTest(CourseTestCase):
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Homework', section_grader_type['graderType'])
-        self.assertEqual('Homework', descriptor.lms.format)
-        self.assertEqual(True, descriptor.lms.graded)
+        self.assertEqual('Homework', descriptor.format)
+        self.assertEqual(True, descriptor.graded)
 
         # Change the grader type back to Not Graded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course.location, {'graderType': 'Not Graded'})
@@ -359,8 +367,8 @@ class CourseGradingTest(CourseTestCase):
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Not Graded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.lms.format)
-        self.assertEqual(False, descriptor.lms.graded)
+        self.assertEqual(None, descriptor.format)
+        self.assertEqual(False, descriptor.graded)
 
 
 class CourseMetadataEditingTest(CourseTestCase):

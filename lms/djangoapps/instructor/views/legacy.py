@@ -33,7 +33,7 @@ from xmodule.html_module import HtmlDescriptor
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_cms_course_link_by_id
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -52,6 +52,8 @@ from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 
 from bulk_email.models import CourseEmail
@@ -109,17 +111,11 @@ def instructor_dashboard(request, course_id):
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
-            for field in course.fields:
+            for field in course.fields.values():
                 if getattr(field.scope, 'user', False):
                     continue
 
                 data.append([field.name, json.dumps(field.read_json(course))])
-            for namespace in course.namespaces:
-                for field in getattr(course, namespace).fields:
-                    if getattr(field.scope, 'user', False):
-                        continue
-
-                    data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
         datatable['data'] = data
         return datatable
 
@@ -792,23 +788,30 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
+    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
+    # 2) enable course email
+    is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    email_editor = None
     # HTML editor for email
-    if idash_mode == 'Email':
-        html_module = HtmlDescriptor(course.system, {'data': html_message})
+    if idash_mode == 'Email' and is_studio_course:
+        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
         email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
-    else:
-        email_editor = None
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
 
     # Flag for whether or not we display the email tab (depending upon
     # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
         course_stats = get_course_stats_table()
+
     #----------------------------------------
     # context for rendering
 
@@ -821,6 +824,7 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
+               'studio_url': studio_url,
 
                'to_option': email_to_option,      # email
                'subject': email_subject,          # email
@@ -842,7 +846,6 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
-
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -1472,7 +1475,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            grade_format = getattr(s.lms, 'grade_format', None)
+            grade_format = getattr(s, 'grade_format', None)
             aname = ''
             if grade_format in graders:
                 g = graders[grade_format]

@@ -15,7 +15,7 @@ from lxml import etree
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xblock.core import Scope, String, Integer, Boolean, Dict, List
+from xblock.fields import Scope, String, Integer, Boolean, Dict, List
 
 from capa.responsetypes import FormulaResponse
 

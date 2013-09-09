@@ -208,10 +208,10 @@ class InputTypeBase(object):
         # end up in a partially-initialized state.
         loaded = {}
         to_render = set()
-        for a in self.get_attributes():
-            loaded[a.name] = a.parse_from_xml(self.xml)
-            if a.render:
-                to_render.add(a.name)
+        for attribute in self.get_attributes():
+            loaded[attribute.name] = attribute.parse_from_xml(self.xml)
+            if attribute.render:
+                to_render.add(attribute.name)
 
         self.loaded_attributes = loaded
         self.to_render = to_render
@@ -325,7 +325,7 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('inline', '')]
+                Attribute('inline', False)]
 
 registry.register(OptionInput)
 
@@ -493,17 +493,17 @@ class JSInput(InputTypeBase):
         """
         Register the attributes.
         """
-        return [Attribute('params', None),       # extra iframe params
-                Attribute('html_file', None),
-                Attribute('gradefn', "gradefn"),
-                Attribute('get_statefn', None), # Function to call in iframe
-                                                 #   to get current state.
-                Attribute('set_statefn', None), # Function to call iframe to
-                                                 #   set state
-                Attribute('width', "400"),       # iframe width
-                Attribute('height', "300")]      # iframe height
-
-
+        return [
+            Attribute('params', None),       # extra iframe params
+            Attribute('html_file', None),
+            Attribute('gradefn', "gradefn"),
+            Attribute('get_statefn', None),  # Function to call in iframe
+                                             #   to get current state.
+            Attribute('set_statefn', None),  # Function to call iframe to
+                                             #   set state
+            Attribute('width', "400"),       # iframe width
+            Attribute('height', "300")       # iframe height
+        ]
 
     def _extra_context(self):
         context = {
@@ -512,7 +512,6 @@ class JSInput(InputTypeBase):
         }
 
         return context
-
 
 
 registry.register(JSInput)
@@ -1048,8 +1047,8 @@ class ChemicalEquationInput(InputTypeBase):
 
         try:
             result['preview'] = chemcalc.render_to_html(formula)
-        except pyparsing.ParseException as p:
-            result['error'] = u"Couldn't parse formula: {0}".format(p.msg)
+        except pyparsing.ParseException as err:
+            result['error'] = u"Couldn't parse formula: {0}".format(err.msg)
         except Exception:
             # this is unexpected, so log
             log.warning(
@@ -1189,15 +1188,19 @@ class DragAndDropInput(InputTypeBase):
                     'can_reuse': smth}.
             """
             tag_attrs = dict()
-            tag_attrs['draggable'] = {'id': Attribute._sentinel,
-                                      'label': "", 'icon': "",
-                                      'can_reuse': ""}
+            tag_attrs['draggable'] = {
+                'id': Attribute._sentinel,
+                'label': "", 'icon': "",
+                'can_reuse': ""
+            }
 
-            tag_attrs['target'] = {'id': Attribute._sentinel,
-                                   'x': Attribute._sentinel,
-                                   'y': Attribute._sentinel,
-                                   'w': Attribute._sentinel,
-                                   'h': Attribute._sentinel}
+            tag_attrs['target'] = {
+                'id': Attribute._sentinel,
+                'x': Attribute._sentinel,
+                'y': Attribute._sentinel,
+                'w': Attribute._sentinel,
+                'h': Attribute._sentinel
+            }
 
             dic = dict()
 

@@ -6,6 +6,8 @@ import unittest
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
@@ -87,8 +89,13 @@ class ConditionalFactory(object):
 
         # construct conditional module:
         cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
-        model_data = {'data': '<conditional/>', 'location': cond_location}
-        cond_module = ConditionalModule(system, cond_descriptor, model_data)
+        field_data = DictFieldData({'data': '<conditional/>', 'location': cond_location})
+        cond_module = ConditionalModule(
+            cond_descriptor,
+            system,
+            field_data,
+            ScopeIds(None, None, cond_location, cond_location)
+        )
 
         # return dict:
         return {'cond_module': cond_module,
