@@ -18,54 +18,6 @@
 <div class="container">
   <section class="wrapper cart-list">
 
-
-    <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
-
-    <div class="wrapper-progress">
-      <section class="progress">
-        <h3 class="sr title">${_("Your Progress")}</h3>
-
-        <ol class="progress-steps">
-          <li class="progress-step is-current" id="progress-step0">
-            <span class="wrapper-step-number"><span class="step-number">0</span></span>
-            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Intro")}</span>
-          </li>
-
-          <li class="progress-step" id="progress-step1">
-            <span class="wrapper-step-number"><span class="step-number">1</span></span>
-            <span class="step-name">${_("Take Photo")}</span>
-          </li>
-
-          <li class="progress-step" id="progress-step2">
-            <span class="wrapper-step-number"><span class="step-number">2</span></span>
-            <span class="step-name">${_("Take ID Photo")}</span>
-          </li>
-
-          <li class="progress-step" id="progress-step3">
-            <span class="wrapper-step-number"><span class="step-number">3</span></span>
-            <span class="step-name">${_("Review")}</span>
-          </li>
-
-          <li class="progress-step" id="progress-step4">
-            <span class="wrapper-step-number"><span class="step-number">4</span></span>
-            <span class="step-name">${_("Make Payment")}</span>
-          </li>
-
-          <li class="progress-step progress-step-icon" id="progress-step5">
-            <span class="wrapper-step-number"><span class="step-number">
-              <i class="icon-ok"></i>
-            </span></span>
-            <span class="step-name">${_("Confirmation")}</span>
-          </li>
-        </ol>
-
-        <span class="progress-sts">
-          <span class="progress-sts-value"></span>
-        </span>
-      </section>
-    </div>
-
-
     <div class="wrapper-content-main">
       <article class="content-main">
         <h3 class="title">${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h3>

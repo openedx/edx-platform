@@ -109,11 +109,9 @@ def show_receipt(request, ordernum):
         'order': order,
         'order_items': order_items,
         'any_refunds': any_refunds,
-        'course_name' : "",
     }
 
     if order_items.count() == 1:
         receipt_template = order_items[0].single_item_receipt_template
-        context.update(order_items[0].single_item_receipt_context)
 
     return render_to_response(receipt_template, context)
