@@ -148,7 +148,7 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [child.get_html() for child in self.get_display_items()]
+        html = [self.runtime.render_child(child, None, 'student_view').content for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 

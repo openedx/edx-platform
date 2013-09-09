@@ -1,37 +1,59 @@
 import datetime
 
-from factory import Factory, LazyAttributeSequence
+from factory import Factory, lazy_attribute_sequence, lazy_attribute
+from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 from pytz import UTC
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import editable_modulestore
 from xmodule.x_module import XModuleDescriptor
+from xmodule.course_module import CourseDescriptor
 
 
-class XModuleCourseFactory(Factory):
+class Dummy(object):
+    pass
+
+
+class XModuleFactory(Factory):
+    """
+    Factory for XModules
+    """
+
+    # We have to give a Factory a FACTORY_FOR.
+    # However, the class that we create is actually determined by the category
+    # specified in the factory
+    FACTORY_FOR = Dummy
+
+    @lazy_attribute
+    def modulestore(self):
+        # Delayed import so that we only depend on django if the caller
+        # hasn't provided their own modulestore
+        from xmodule.modulestore.django import editable_modulestore
+        return editable_modulestore('direct')
+
+
+class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-
-    ABSTRACT_FACTORY = True
+    org = 'MITx'
+    number = '999'
+    display_name = 'Robot Super Course'
 
     @classmethod
     def _create(cls, target_class, **kwargs):
 
+        # All class attributes (from this class and base classes) are
+        # passed in via **kwargs. However, some of those aren't actual field values,
+        # so pop those off for use separately
         org = kwargs.pop('org', None)
         number = kwargs.pop('number', kwargs.pop('course', None))
-        display_name = kwargs.pop('display_name', None)
-        location = Location('i4x', org, number, 'course', Location.clean(display_name))
+        store = kwargs.pop('modulestore')
 
-        store = editable_modulestore('direct')
+        location = Location('i4x', org, number, 'course', Location.clean(kwargs.get('display_name')))
 
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
-
-        # This metadata code was copied from cms/djangoapps/contentstore/views.py
-        if display_name is not None:
-            new_course.display_name = display_name
 
         new_course.start = datetime.datetime.now(UTC).replace(microsecond=0)
 
@@ -44,33 +66,41 @@ class XModuleCourseFactory(Factory):
         return new_course
 
 
-class Course:
-    pass
-
-
-class CourseFactory(XModuleCourseFactory):
-    FACTORY_FOR = Course
-
-    org = 'MITx'
-    number = '999'
-    display_name = 'Robot Super Course'
-
-
-class XModuleItemFactory(Factory):
+class ItemFactory(XModuleFactory):
     """
     Factory for XModule items.
     """
 
-    ABSTRACT_FACTORY = True
+    category = 'chapter'
+    parent = None
 
-    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
-    category = 'problem'
-    display_name = LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
+    @lazy_attribute_sequence
+    def display_name(self, n):
+        return "{} {}".format(self.category, n)
 
-    @staticmethod
-    def location(parent, category, display_name):
-        dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
-        return Location(parent).replace(category=category, name=dest_name)
+    @lazy_attribute
+    def location(self):
+        if self.display_name is None:
+            dest_name = uuid4().hex
+        else:
+            dest_name = self.display_name.replace(" ", "_")
+
+        return self.parent_location.replace(category=self.category, name=dest_name)
+
+    @lazy_attribute
+    def parent_location(self):
+        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
+        try:
+            parent = self.parent
+        # This error is raised if the caller hasn't provided either parent or parent_location
+        # In this case, we'll just return the default parent_location
+        except CyclicDefinitionError:
+            return default_location
+
+        if parent is None:
+            return default_location
+
+        return parent.location
 
     @classmethod
     def _create(cls, target_class, **kwargs):
@@ -97,13 +127,11 @@ class XModuleItemFactory(Factory):
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
         # catch any old style users before they get into trouble
         assert not 'template' in kwargs
-        parent_location = Location(kwargs.get('parent_location'))
         data = kwargs.get('data')
         category = kwargs.get('category')
         display_name = kwargs.get('display_name')
         metadata = kwargs.get('metadata', {})
-        location = kwargs.get('location', XModuleItemFactory.location(parent_location, category, display_name))
-        assert location != parent_location
+        location = kwargs.get('location')
         if kwargs.get('boilerplate') is not None:
             template_id = kwargs.get('boilerplate')
             clz = XModuleDescriptor.load_class(category)
@@ -113,10 +141,7 @@ class XModuleItemFactory(Factory):
             if not isinstance(data, basestring):
                 data.update(template.get('data'))
 
-        store = editable_modulestore('direct')
-
-        # This code was based off that in cms/djangoapps/contentstore/views.py
-        parent = store.get_item(parent_location)
+        store = kwargs.get('modulestore')
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
@@ -124,16 +149,14 @@ class XModuleItemFactory(Factory):
         store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
         if location.category not in DETACHED_CATEGORIES:
+
+            parent_location = Location(kwargs.get('parent_location'))
+            assert location != parent_location
+
+            # This code was based off that in cms/djangoapps/contentstore/views.py
+            parent = kwargs.get('parent') or store.get_item(parent_location)
+
             parent.children.append(location.url())
             store.update_children(parent_location, parent.children)
 
         return store.get_item(location)
-
-
-class Item:
-    pass
-
-
-class ItemFactory(XModuleItemFactory):
-    FACTORY_FOR = Item
-    category = 'chapter'

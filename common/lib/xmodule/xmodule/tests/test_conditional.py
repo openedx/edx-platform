@@ -8,6 +8,7 @@ from mock import Mock, patch
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.fragment import Fragment
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
@@ -76,13 +77,16 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock()
         cond_descriptor = Mock()
+        cond_descriptor.runtime = system
         cond_descriptor.get_required_module_descriptors = lambda: [source_descriptor, ]
         cond_descriptor.get_children = lambda: [child_descriptor, ]
         cond_descriptor.xml_attributes = {"attempted": "true"}
 
         # create child module:
         child_module = Mock()
-        child_module.get_html = lambda: '<p>This is a secret</p>'
+        child_module.runtime = system
+        child_module.get_html.return_value = u'<p>This is a secret</p>'
+        child_module.student_view.return_value = Fragment(child_module.get_html.return_value)
         child_module.displayable_items = lambda: [child_module]
         module_map = {source_descriptor: source_module, child_descriptor: child_module}
         system.get_module = lambda descriptor: module_map[descriptor]
