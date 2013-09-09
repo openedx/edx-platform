@@ -157,6 +157,13 @@ discussion_link = get_discussion_link(course) if course else None
     cycle_modal_tab("#feedback_link_question", "#help_wrapper .close-modal");
     cycle_modal_tab("#feedback_submit", "#feedback_form_wrapper .close-modal");
     cycle_modal_tab("#feedback_faq_link", "#feedback_success_wrapper .close-modal");
+    $("#help-modal").on("keydown", function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 27) {
+            e.preventDefault();
+            $("#help_wrapper .close-modal").click();
+        }
+    });
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
