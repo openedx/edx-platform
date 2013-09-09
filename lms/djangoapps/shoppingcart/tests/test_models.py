@@ -21,7 +21,7 @@ from shoppingcart.exceptions import PurchasedCallbackException
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class OrderTest(TestCase):
+class OrderTest(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.course_id = "org/test/Test_Course"
@@ -230,7 +230,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class CertificateItemTest(TestCase):
+class CertificateItemTest(ModuleStoreTestCase):
     """
     Tests for verifying specific CertificateItem functionality
     """
