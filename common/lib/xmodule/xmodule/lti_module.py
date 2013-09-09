@@ -14,7 +14,6 @@ import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
-from xmodule.exceptions import LTIError
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
