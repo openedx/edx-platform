@@ -382,7 +382,8 @@ class CertificateItem(OrderItem):
 
     @property
     def additional_instruction_text(self):
-        return textwrap.dedent(
-            _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option \
-               and receive a full refund. To receive your refund, contact {billing_email}.").format(
-            billing_email=settings.PAYMENT_SUPPORT_EMAIL))
+        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
+                 "and receive a full refund. To receive your refund, contact {billing_email}. "
+                 "Please include your order number in your e-mail. "
+                 "Please do NOT include your credit card information.").format(
+                     billing_email=settings.PAYMENT_SUPPORT_EMAIL)
