@@ -25,7 +25,7 @@ class OrderTest(TestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.course_id = "org/test/Test_Course"
-        CourseFactory.create(org='org', number='test', display_name='Test Course 1')
+        CourseFactory.create(org='org', number='test', display_name='Test Course')
         for i in xrange(1, 5):
             CourseFactory.create(org='org', number='test', display_name='Test Course {0}'.format(i))
         self.cost = 40
@@ -238,6 +238,7 @@ class CertificateItemTest(TestCase):
         self.user = UserFactory.create()
         self.course_id = "org/test/Test_Course"
         self.cost = 40
+        CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
         course_mode = CourseMode(course_id=self.course_id,
                                  mode_slug="honor",
                                  mode_display_name="honor cert",
@@ -248,7 +249,6 @@ class CertificateItemTest(TestCase):
                                  mode_display_name="verified cert",
                                  min_price=self.cost)
         course_mode.save()
-        CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
 
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_id)
