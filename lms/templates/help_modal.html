@@ -12,7 +12,7 @@
   <a href="#help-modal" rel="leanModal">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal">
+<section id="help-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" id="help_wrapper">
     <header>
       <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
@@ -127,6 +127,11 @@ discussion_link = get_discussion_link(course) if course else None
 
 <script type="text/javascript">
 (function() {
+    var onModalClose = function() {
+        $(".help-modal .close-modal").off("click");
+        $("#lean_overlay").off("click");
+        $("#help-modal").attr("aria-hidden", "true");
+    };
     $(".help-tab").click(function() {
         $(".field-error").removeClass("field-error");
         $("#feedback_form")[0].reset();
@@ -135,6 +140,9 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_error").css("display", "none");
         $("#feedback_success_wrapper").css("display", "none");
         $("#help_wrapper").css("display", "block");
+        $("#help-modal").attr("aria-hidden", "false");
+        $("#help-modal .close-modal").click(onModalClose);
+        $("#lean_overlay").click(onModalClose);
     });
     showFeedback = function(event, issue_type, title, subject_label, details_label) {
         $("#help_wrapper").css("display", "none");
