@@ -56,6 +56,7 @@ setup(
             "hidden = xmodule.hidden_module:HiddenDescriptor",
             "raw = xmodule.raw_module:RawDescriptor",
             "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
+            "lti = xmodule.lti_module:LTIModuleDescriptor"
         ],
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
