@@ -255,7 +255,7 @@ ANALYTICS_API_KEY = ""
 
 ##### segment-io  ######
 
-# If there's an environment variable set, grab it and turn on segment io
+# If there's an environment variable set, grab it and turn on Segment.io
 SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True

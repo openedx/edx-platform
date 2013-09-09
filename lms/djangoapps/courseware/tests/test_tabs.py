@@ -11,6 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
+FAKE_REQUEST = None
 
 class ProgressTestCase(TestCase):
 
@@ -29,20 +30,20 @@ class ProgressTestCase(TestCase):
     def test_progress(self):
 
         self.assertEqual(tabs._progress(self.tab, self.mockuser0, self.course,
-                                        self.active_page0), [])
+                                        self.active_page0, FAKE_REQUEST), [])
 
         self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].name, 'same')
+                                        self.active_page1, FAKE_REQUEST)[0].name, 'same')
 
         self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].link,
+                                        self.active_page1, FAKE_REQUEST)[0].link,
                          reverse('progress', args=[self.course.id]))
 
         self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page0)[0].is_active, False)
+                                        self.active_page0, FAKE_REQUEST)[0].is_active, False)
 
         self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].is_active, True)
+                                        self.active_page1, FAKE_REQUEST)[0].is_active, True)
 
 
 class WikiTestCase(TestCase):
@@ -60,26 +61,26 @@ class WikiTestCase(TestCase):
     def test_wiki_enabled(self):
 
         self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].name,
+                                    self.course, self.active_page1, FAKE_REQUEST)[0].name,
                          'same')
 
         self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].link,
+                                    self.course, self.active_page1, FAKE_REQUEST)[0].link,
                          reverse('course_wiki', args=[self.course.id]))
 
         self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].is_active,
+                                    self.course, self.active_page1, FAKE_REQUEST)[0].is_active,
                          True)
 
         self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page0)[0].is_active,
+                                    self.course, self.active_page0, FAKE_REQUEST)[0].is_active,
                          False)
 
     @override_settings(WIKI_ENABLED=False)
     def test_wiki_enabled_false(self):
 
         self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1), [])
+                                    self.course, self.active_page1, FAKE_REQUEST), [])
 
 
 class ExternalLinkTestCase(TestCase):
@@ -95,19 +96,19 @@ class ExternalLinkTestCase(TestCase):
     def test_external_link(self):
 
         self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].name,
+                                             self.course, self.active_page0, FAKE_REQUEST)[0].name,
                          'same')
 
         self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].link,
+                                             self.course, self.active_page0, FAKE_REQUEST)[0].link,
                          'blink')
 
         self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].is_active,
+                                             self.course, self.active_page0, FAKE_REQUEST)[0].is_active,
                          False)
 
         self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page00)[0].is_active,
+                                             self.course, self.active_page00, FAKE_REQUEST)[0].is_active,
                          False)
 
 
@@ -125,20 +126,20 @@ class StaticTabTestCase(TestCase):
     def test_static_tab(self):
 
         self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].name,
+                                          self.course, self.active_page1, FAKE_REQUEST)[0].name,
                          'same')
 
         self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].link,
+                                          self.course, self.active_page1, FAKE_REQUEST)[0].link,
                          reverse('static_tab', args=[self.course.id,
                                                      self.tabby['url_slug']]))
 
         self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].is_active,
+                                          self.course, self.active_page1, FAKE_REQUEST)[0].is_active,
                          True)
 
         self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page0)[0].is_active,
+                                          self.course, self.active_page0, FAKE_REQUEST)[0].is_active,
                          False)
 
 
@@ -166,45 +167,45 @@ class TextbooksTestCase(TestCase):
     def test_textbooks1(self):
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].name,
+                                         self.course, self.active_page0, FAKE_REQUEST)[0].name,
                          'Algebra')
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].link,
+                                         self.course, self.active_page0, FAKE_REQUEST)[0].link,
                          reverse('book', args=[self.course.id, 0]))
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].is_active,
+                                         self.course, self.active_page0, FAKE_REQUEST)[0].is_active,
                          True)
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX)[0].is_active,
+                                         self.course, self.active_pageX, FAKE_REQUEST)[0].is_active,
                          False)
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].name,
+                                         self.course, self.active_page1, FAKE_REQUEST)[1].name,
                          'Topology')
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].link,
+                                         self.course, self.active_page1, FAKE_REQUEST)[1].link,
                          reverse('book', args=[self.course.id, 1]))
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].is_active,
+                                         self.course, self.active_page1, FAKE_REQUEST)[1].is_active,
                          True)
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX)[1].is_active,
+                                         self.course, self.active_pageX, FAKE_REQUEST)[1].is_active,
                          False)
 
     @override_settings(MITX_FEATURES={'ENABLE_TEXTBOOK': False})
     def test_textbooks0(self):
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX), [])
+                                         self.course, self.active_pageX, FAKE_REQUEST), [])
 
         self.assertEqual(tabs._textbooks(self.tab, self.mockuser0,
-                                         self.course, self.active_pageX), [])
+                                         self.course, self.active_pageX, FAKE_REQUEST), [])
 
 
 class KeyCheckerTestCase(TestCase):
