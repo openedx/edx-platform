@@ -26,55 +26,57 @@
 
 (function () {
     describe('LTI', function () {
-        var element, errorMessage, frame,
-            editSettings = false;
-
-        // This function will be executed before each of the it() specs
-        // in this suite.
-        beforeEach(function () {
-            spyOn($.fn, 'submit').andCallThrough();
-
-            loadFixtures('lti.html');
-
-            element = $('#lti_id');
-            errorMessage = element.find('.error_message');
-            form = element.find('.ltiLaunchForm');
-            frame = element.find('.ltiLaunchFrame');
-
-            // First part of the tests will be running without the settings
-            // filled in. Once we reach the describe() spec
-            //
-            //     "After the settings were filled in"
-            //
-            // the variable `editSettings` will be changed to `true`.
-            if (editSettings) {
-                form.attr('action', 'http://www.example.com/');
-            }
-
-            LTI(element);
-        });
-
         describe('constructor', function () {
             describe('before settings were filled in', function () {
+                var element, errorMessage, frame;
+
+                // This function will be executed before each of the it() specs
+                // in this suite.
+                beforeEach(function () {
+                    loadFixtures('lti.html');
+
+                    element = $('#lti_id');
+                    errorMessage = element.find('.error_message');
+                    form = element.find('.ltiLaunchForm');
+                    frame = element.find('.ltiLaunchFrame');
+
+                    spyOnEvent(form, 'submit');
+
+                    LTI(element);
+                });
+
                 it(
                     'when URL setting is filled form is not submited',
                     function () {
 
-                    expect($.fn.submit).not.toHaveBeenCalled();
+                    expect('submit').not.toHaveBeenTriggeredOn(form);
                 });
             });
 
             describe('After the settings were filled in', function () {
-                it('editSettings is disabled', function () {
-                    expect(editSettings).toBe(false);
+                var element, errorMessage, frame;
 
-                    // Let us toggle edit settings switch. Next beforeEach()
-                    // will populate element's attributes with settings.
-                    editSettings = true;
+                // This function will be executed before each of the it() specs
+                // in this suite.
+                beforeEach(function () {
+                    loadFixtures('lti.html');
+
+                    element = $('#lti_id');
+                    errorMessage = element.find('.error_message');
+                    form = element.find('.ltiLaunchForm');
+                    frame = element.find('.ltiLaunchFrame');
+
+                    spyOnEvent(form, 'submit');
+
+                    // The user "fills in" the necessary settings, and the
+                    // form will get an action URL.
+                    form.attr('action', 'http://www.example.com/');
+
+                    LTI(element);
                 });
 
                 it('when URL setting is filled form is submited', function () {
-                    expect($.fn.submit).toHaveBeenCalled();
+                    expect('submit').toHaveBeenTriggeredOn(form);
                 });
             });
         });
