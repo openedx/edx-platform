@@ -108,7 +108,8 @@ def show_receipt(request, ordernum):
     context = {
         'order': order,
         'order_items': order_items,
-        'any_refunds': any_refunds
+        'any_refunds': any_refunds,
+        'course_name' : "",
     }
 
     if order_items.count() == 1:
