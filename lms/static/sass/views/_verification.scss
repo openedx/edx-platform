@@ -1622,6 +1622,23 @@
       color: #fff;
     }
 
+    .modal {
+
+      fieldset {
+        margin-top: $baseline;
+      }
+
+      .close-modal {
+        color: $m-blue-d3;
+
+        &:hover {
+          color: $m-blue-d1;
+          border: none;
+        }
+      }
+
+    }
+
     .nav-wizard {
 
       .help-inline {
