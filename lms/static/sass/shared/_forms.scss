@@ -14,7 +14,8 @@ textarea,
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="tel"] {
+input[type="tel"],
+select {
   background: $form-bg-color;
   border: 1px solid $border-color-2;
   border-radius: 3px;
