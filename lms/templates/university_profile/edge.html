@@ -6,9 +6,60 @@
 <%block name="bodyclass">no-header edge-landing</%block>
 
 <%block name="content">
+
+
+<style>
+.edx-edge-logo-large {
+  display: block;
+height: 72px;
+margin: 40px 60px 30px 250px;
+background: url("http://olimpiada.ru/images/logo.png") no-repeat;
+text-indent: -9999px;
+overflow: hidden;
+}
+.log-in-form {
+  width: 270px;
+  height: 300px;
+}
+.banners {
+    background: #F0EFEF;  border-top: 1px solid #8A8C8F;  border-bottom: 1px solid #8A8C8F;  width: 100%;  height: 83px;
+    margin-bottom: 40px;
+}
+.banners-inner {
+  overflow: hidden;  width: 930px;  height: 83px;  text-align: center;  margin-left: auto;  margin-right: auto;  background: #f0efef;  background: -moz-linear-gradient(left, #f0efef 0%, #ffffff 50%, #f0efef 100%);  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#f0efef), color-stop(50%,#ffffff), color-stop(100%,#f0efef));  background: -webkit-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -o-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -ms-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: linear-gradient(to right, #f0efef 0%,#ffffff 50%,#f0efef 100%);  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0efef', endColorstr='#f0efef',GradientType=1 );  border-bottom: 1px solid #8A8C8F;
+}
+.banners-inner a {
+  margin: 12px;
+}
+.wrapper {
+  min-height:100%;
+  margin-bottom: -50px;
+}
+.wrapper:after {
+  content: "";
+  display: block;
+}
+.footer-short, .wrapper:after {
+  height:50px;
+}
+</style>
+<div class="wrapper">
+
+<div class="edx-edge-logo-large">${_("edX edge")}</div>
+
+<div class="banners" style=""><div class="banners-inner" style="
+    ">  <a href="http://www.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/edu130x59.gif" border="0" alt="Федеральный портал &quot;Российское образование&quot;" ></a>
+  <a href="http://window.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/eo130x59.gif" border="0" alt="Единое окно доступа к образовательным ресурсам"></a>
+  <a href="http://school-collection.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/sc130x59.gif" border="0" alt="Единая коллекция цифровых образовательных ресурсов"></a>
+  <a href="http://fcior.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/fcior130x59.gif" border="0" alt="Федеральный центр информационно-образовательных ресурсов"></a>
+
+  </div></div>
+
 <div class="main-wrapper">
-  <div class="edx-edge-logo-large">${_("edX edge")}</div>
   <div class="content">
+    <div class="log-in-form">
+      <h2>Новости</h2>
+    </div>
     <div class="log-in-form">
       <h2>${_("Log in to your courses")}</h2>
       <form id="login_form" data-remote="true" method="post" action="/login_ajax">
@@ -33,6 +84,9 @@
     </div>
   </div>
 </div>
+</div>
+<footer class="footer-short">
+<footer>
 
 </%block>
 
