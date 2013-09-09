@@ -439,6 +439,10 @@ def _get_course_enrollment_domain(course_id):
 
 @ensure_csrf_cookie
 def accounts_login(request):
+    """
+    This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
+    the login path linked from the homepage uses it.
+    """
     if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -7,6 +8,7 @@ from mock import patch
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.test import TestCase
 from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -19,7 +21,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
 from external_auth.models import ExternalAuthMap
-from external_auth.views import shib_login, course_specific_login, course_specific_register
+from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, Registration, CourseEnrollment
@@ -504,3 +506,16 @@ class ShibSPTest(ModuleStoreTestCase):
         self.assertEqual(response['location'], 'http://testserver/testredirect')
         # now there is enrollment
         self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
+
+
+class ShibUtilFnTest(TestCase):
+    """
+    Tests util functions in shib module
+    """
+    def test__flatten_to_ascii(self):
+        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
+        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
+        self.assertEqual(_flatten_to_ascii(u'jas\xf6n'), u'jason')  # umlaut
+        self.assertEqual(_flatten_to_ascii(u'Jason\u5305'), u'Jason')  # mandarin, so it just gets dropped
+        self.assertEqual(_flatten_to_ascii(u'abc'), u'abc')  # pass through
+        self.assertEqual(_flatten_to_ascii(DIACRITIC), FLATTENED)

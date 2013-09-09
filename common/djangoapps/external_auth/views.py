@@ -5,6 +5,7 @@ import random
 import re
 import string       # pylint: disable=W0402
 import fnmatch
+import unicodedata
 
 from textwrap import dedent
 from external_auth.models import ExternalAuthMap
@@ -228,6 +229,15 @@ def _external_login_or_signup(request,
     return retfun()
 
 
+def _flatten_to_ascii(txt):
+    """
+    Flattens possibly unicode txt to ascii (django username limitation)
+    @param name:
+    @return:
+    """
+    return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def _signup(request, eamap):
@@ -245,7 +255,7 @@ def _signup(request, eamap):
 
     # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
     # but this only affects username, not fullname
-    username = eamap.external_name.replace(' ', '')
+    username = _flatten_to_ascii(eamap.external_name)
 
     context = {'has_extauth_info': True,
                'show_signup_immediately': True,
