@@ -59,7 +59,7 @@ from bulk_email.models import Optout
 
 import track.views
 
-from statsd import statsd
+from dogapi import dog_stats_api
 from pytz import UTC
 
 log = logging.getLogger("mitx.student")
@@ -388,10 +388,12 @@ def change_enrollment(request):
             )
 
         org, course_num, run = course_id.split("/")
-        statsd.increment("common.student.enrollment",
-                         tags=["org:{0}".format(org),
-                               "course:{0}".format(course_num),
-                               "run:{0}".format(run)])
+        dog_stats_api.increment(
+            "common.student.enrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
 
         CourseEnrollment.enroll(user, course.id)
 
@@ -402,10 +404,12 @@ def change_enrollment(request):
             CourseEnrollment.unenroll(user, course_id)
 
             org, course_num, run = course_id.split("/")
-            statsd.increment("common.student.unenrollment",
-                             tags=["org:{0}".format(org),
-                                   "course:{0}".format(course_num),
-                                   "run:{0}".format(run)])
+            dog_stats_api.increment(
+                "common.student.unenrollment",
+                tags=["org:{0}".format(org),
+                      "course:{0}".format(course_num),
+                      "run:{0}".format(run)]
+            )
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
@@ -471,7 +475,7 @@ def login_user(request, error=""):
 
         redirect_url = try_change_enrollment(request)
 
-        statsd.increment("common.student.successful_login")
+        dog_stats_api.increment("common.student.successful_login")
         response = HttpResponse(json.dumps({'success': True, 'redirect_url': redirect_url}))
 
         # set the login cookie for the edx marketing site
@@ -740,7 +744,7 @@ def create_account(request, post_override=None):
 
     redirect_url = try_change_enrollment(request)
 
-    statsd.increment("common.student.account_created")
+    dog_stats_api.increment("common.student.account_created")
 
     response_params = {'success': True,
                        'redirect_url': redirect_url}

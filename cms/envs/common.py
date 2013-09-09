@@ -358,6 +358,9 @@ INSTALLED_APPS = (
     # Tracking
     'track',
 
+    # Monitoring
+    'datadog',
+
     # For asset pipelining
     'mitxmako',
     'pipeline',

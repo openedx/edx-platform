@@ -790,7 +790,7 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    #For the wiki
+    # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',  # Our customizations
@@ -801,7 +801,7 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
-    # foldit integration
+    # Foldit integration
     'foldit',
 
     # For testing
@@ -814,11 +814,14 @@ INSTALLED_APPS = (
     'django_comment_common',
     'notes',
 
+    # Monitoring
+    'datadog',
+
     # User API
     'rest_framework',
     'user_api',
 
-    # shopping cart
+    # Shopping cart
     'shoppingcart',
 
     # Notification preferences setting
