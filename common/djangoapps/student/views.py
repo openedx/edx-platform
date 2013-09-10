@@ -648,7 +648,7 @@ def create_account(request, post_override=None):
     for a in ['email', 'password', "lastname", "firstname", "middlename", "year_of_birth",
         "level_of_education", "education_place", "education_year",
         "work_type", "work_number", "work_name", "work_login", "work_location",
-        "work_occupation", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
+        "work_occupation", "work_occupation_other", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
         "contact_phone"]:
         if a not in post_vars:
             js['value'] = ugettext_lazy("Error (401 {field}). E-mail us.").format(field=a)
@@ -689,6 +689,11 @@ def create_account(request, post_override=None):
         js['value'] = _('Education level is required')
         js['field'] = "level_of_education"
         return HttpResponse(json.dumps(js, cls=LazyEncoder))
+
+    if post_vars["work_occupation"] == 'other' and "work_occupation2" in post_vars:
+        post_vars.post_vars["work_occupation"] = post_vars["work_occupation2"]
+    if post_vars["work_occupation_other"] == 'other' and "work_occupation_other2" in post_vars:
+        post_vars.post_vars["work_occupation_other"] = post_vars["work_occupation_other2"]
 
     for a in required_post_vars:
         if len(post_vars[a]) < 1:
