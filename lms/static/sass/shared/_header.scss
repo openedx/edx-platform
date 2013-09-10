@@ -2,7 +2,7 @@ header.global {
   border-bottom: 1px solid $m-gray;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
   background: $header-bg;
-  height: 76px;
+  height: 96px;
   position: relative;
   width: 100%;
   z-index: 10;
@@ -23,6 +23,13 @@ header.global {
 
     a {
       display: block;
+      position: absolute;
+    }
+    span {
+      display: inline-block;
+      margin-left: 130px;
+      font-size: initial;
+      white-space: nowrap;
     }
   }
 

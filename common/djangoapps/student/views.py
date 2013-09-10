@@ -260,7 +260,7 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    return render_to_response('register.html', context)
+    return render_to_response('university_profile/edge.html', context)
 
 
 @login_required
@@ -414,7 +414,7 @@ def change_enrollment(request):
 
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
-    return render_to_response('login.html', {'error': error})
+    return render_to_response('university_profile/edge.html', {'error': error})
 
 # Need different levels of logging
 @ensure_csrf_cookie
