@@ -33,12 +33,11 @@ def get_university(domain=None):
     Return the university name specified for the domain, or None
     if no university was specified
     """
-#    if not settings.MITX_FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
-#        return None
+    if not settings.MITX_FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
+        return None
 
     subdomain = pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
-#    return settings.SUBDOMAIN_BRANDING.get(subdomain)
-    return 'edge'
+    return settings.SUBDOMAIN_BRANDING.get(subdomain)
 
 
 def get_logo_url(domain=None):
