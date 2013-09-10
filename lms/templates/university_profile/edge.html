@@ -2,7 +2,7 @@
 <%inherit file="../stripped-main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title"><title>${_("edX edge")}</title></%block>
+<%block name="title"><title>Департамент образования города Москвы - центр педагогического мастерства - курсы повышения квалификации учителей</title></%block>
 <%block name="bodyclass">no-header edge-landing</%block>
 
 <%block name="content">
@@ -35,21 +35,21 @@ html, body {
 }
 .wrapper {
   min-height: 100%;
-  margin-bottom: -50px;
+  margin-bottom: -100px;
 }
 .wrapper:after {
   content: "";
   display: block;
 }
 .footer-short, .wrapper:after {
-  height:50px;
+  height:100px;
 }
 .footer-short {
   border-top: 1px solid #c4c5c7;
 }
 
-footer a {
-  color: #333;
+footer .colophon .nav-colophon li a {
+color: #333;
 }
 
 footer a:link, footer a:visited, footer a:hover, footer a:active {
@@ -57,6 +57,11 @@ footer a:link, footer a:visited, footer a:hover, footer a:active {
   color: #1d9dd9;
   text-decoration: none !important;
   font-family: "Open Sans",Verdana,Geneva,sans-serif;
+}
+
+footer a:hover {
+  border-bottom: 1px dotted #1d9dd9;
+  color: #1d9dd9;
 }
 
 footer .references .copyright {
