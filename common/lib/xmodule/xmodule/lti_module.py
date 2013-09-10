@@ -6,7 +6,7 @@ http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 """
 
 import logging
-import oauthlib
+import oauthlib.oauth1
 import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
@@ -212,8 +212,11 @@ class LTIModule(LTIFields, XModule):
         # appending custom parameter for signing
         body.update(custom_parameters)
 
-        # This is needed for body encoding:
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {
+            'Host': self.system.HOSTNAME,
+            # This is needed for body encoding:
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
 
         __, headers, __ = client.sign(
             unicode(self.launch_url),

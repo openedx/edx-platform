@@ -347,6 +347,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         filestore=descriptor.system.resources_fs,
         get_module=inner_get_module,
         user=user,
+        debug=settings.DEBUG,
+        hostname=settings.SITE_NAME,
         # TODO (cpennington): This should be removed when all html from
         # a module is coming through get_html and is therefore covered
         # by the replace_static_urls code below
@@ -380,7 +382,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
