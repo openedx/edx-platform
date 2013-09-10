@@ -47,18 +47,20 @@ var submitToPaymentProcessing = function() {
   });
 }
 
-function doResetButton(resetButton, captureButton, approveButton, nextButton) {
+function doResetButton(resetButton, captureButton, approveButton, nextButtonNav, nextLink) {
   approveButton.removeClass('approved');
-  nextButton.addClass('disabled');
+  nextButtonNav.addClass('is-not-ready');
+  nextLink.attr('href', "#");
 
   captureButton.show();
   resetButton.hide();
   approveButton.hide();
 }
 
-function doApproveButton(approveButton, nextButton) {
+function doApproveButton(approveButton, nextButtonNav, nextLink) {
+  nextButtonNav.removeClass('is-not-ready');
   approveButton.addClass('approved');
-  nextButton.removeClass('disabled');
+  nextLink.attr('href', "#next");
 }
 
 function doSnapshotButton(captureButton, resetButton, approveButton) {
@@ -66,7 +68,6 @@ function doSnapshotButton(captureButton, resetButton, approveButton) {
   resetButton.show();
   approveButton.show();
 }
-
 
 function submitNameChange(event) {
   event.preventDefault();
@@ -101,7 +102,8 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   var captureButton = $("#" + name + "_capture_button");
   var resetButton = $("#" + name + "_reset_button");
   var approveButton = $("#" + name + "_approve_button");
-  var nextButton = $("#" + name + "_next_button");
+  var nextButtonNav = $("#" + name + "_next_button_nav");
+  var nextLink = $("#" + name + "_next_link");
   var flashCapture = $("#" + name + "_flash");
 
   var ctx = null;
@@ -139,12 +141,12 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       flashCapture[0].reset();
     }
 
-    doResetButton(resetButton, captureButton, approveButton, nextButton);
+    doResetButton(resetButton, captureButton, approveButton, nextButtonNav, nextLink);
     return false;
   }
 
   function approve() {
-    doApproveButton(approveButton, nextButton)
+    doApproveButton(approveButton, nextButtonNav, nextLink)
     return false;
   }
 
@@ -152,7 +154,8 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   captureButton.show();
   resetButton.hide();
   approveButton.hide();
-  nextButton.addClass('disabled');
+  nextButtonNav.addClass('is-not-ready');
+  nextLink.attr('href', "#");
 
   // Connect event handlers...
   video.click(snapshot);

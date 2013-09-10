@@ -141,12 +141,12 @@
                 </div>
               </div>
 
-              <nav class="nav-wizard"> <!-- FIXME: Additional class is-ready, is-not-ready -->
+              <nav class="nav-wizard" id="face_next_button_nav">
                 <span class="help help-inline">${_("Once you verify your photo looks good, you can move on to step 2.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
+                    <a id="face_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
                   </li>
                 </ol>
               </nav>
@@ -228,12 +228,12 @@
                 </div>
               </div>
 
-              <nav class="nav-wizard">
+              <nav class="nav-wizard" id="photo_id_next_button_nav">
                 <span class="help help-inline">${_("Once you verify your ID photo looks good, you can move on to step 3.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
+                    <a id="photo_id_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
                   </li>
                 </ol>
               </nav>
