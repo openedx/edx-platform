@@ -283,6 +283,9 @@ class @PeerGradingProblem
     @error_container.hide()
     @flag_submission_confirmation.hide()
 
+    if @tracking_changes()
+      @change_tracker = new TrackChanges(@el)
+
     @is_calibrated_check()
 
   # locally scoped jquery.
@@ -306,13 +309,18 @@ class @PeerGradingProblem
 
 
   construct_data: () ->
+    if @tracking_changes()
+      feedback_content = @feedback_area.html()
+    else
+      feedback_content = @feedback_area.val()
+    
     data =
       rubric_scores: @rub.get_score_list()
       score: @rub.get_total_score()
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
-      feedback: @feedback_area.val()
+      feedback: feedback_content
       submission_flagged: @flag_student_checkbox.is(':checked')
       answer_unknown: @answer_unknown_checkbox.is(':checked')
     return data
@@ -388,7 +396,7 @@ class @PeerGradingProblem
       @grading_message.fadeIn()
       message = "<p>Successfully saved your feedback. Fetching the next essay."
       if response.required_done
-        message = message + " You have completed the required number of gradings."
+        message = message + " You have done the required number of peer evals but may continue grading if you like."
       message = message + "</p>"
       @grading_message.html(message)
     else
@@ -464,6 +472,9 @@ class @PeerGradingProblem
     else
       @render_error("An error occurred while retrieving the next calibration essay")
 
+  tracking_changes: () =>
+    return @grading_wrapper.data('track-changes') == true
+
   # Renders a student submission to be graded
   render_submission: (response) =>
     if response.success
@@ -483,8 +494,12 @@ class @PeerGradingProblem
       @grading_panel.find(@grading_text_sel).show()
       @flag_student_container.show()
       @answer_unknown_container.show()
-      @feedback_area.val("")
-
+      if @tracking_changes()
+        @feedback_area.html(@make_paragraphs(response.student_response))
+        @change_tracker.rebindTracker()
+      else
+        @feedback_area.val("")
+      @answer_unknown_checkbox.removeAttr("checked")
       @flag_student_checkbox.removeAttr("checked")
       @submit_button.show()
       @submit_button.unbind('click')
@@ -495,7 +510,6 @@ class @PeerGradingProblem
       @render_error(response.error)
     else
       @render_error("An error occured when retrieving the next submission.")
-
 
   make_paragraphs: (text) ->
     paragraph_split = text.split(/\n\s*\n/)
@@ -527,13 +541,13 @@ class @PeerGradingProblem
     # display correct grade
     @calibration_feedback_panel.slideDown()
     calibration_wrapper = @$(@calibration_feedback_wrapper_sel)
-    calibration_wrapper.html("<p>The score you gave was: #{@grade}. The actual score is: #{response.actual_score}</p>")
+    calibration_wrapper.html("<p>The score you gave was: #{@grade}. The instructor score is: #{response.actual_score}</p>")
 
     score = parseInt(@grade)
     actual_score = parseInt(response.actual_score)
 
     if score == actual_score
-      calibration_wrapper.append("<p>Your score matches the actual score!</p>")
+      calibration_wrapper.append("<p>Your score matches the instructor score!</p>")
     else
       calibration_wrapper.append("<p>You may want to review the rubric again.</p>")
 
