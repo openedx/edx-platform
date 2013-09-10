@@ -17,6 +17,7 @@ from django.http import HttpResponse
 import logging
 
 import mitxmako
+import mitxmako.middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
 log = logging.getLogger(__name__)
