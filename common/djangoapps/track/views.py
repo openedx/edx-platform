@@ -1,15 +1,11 @@
-import json
-import logging
 import datetime
 
-import dateutil.parser
 import pytz
 from pytz import UTC
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.conf import settings
 
 from django_future.csrf import ensure_csrf_cookie
 
@@ -56,7 +52,7 @@ def user_track(request):
         "event": request.REQUEST['event'],
         "agent": agent,
         "page": request.REQUEST['page'],
-        "time": datetime.datetime.now(UTC).isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request.META['SERVER_NAME'],
     }
 
@@ -85,7 +81,7 @@ def server_track(request, event_type, event, page=None):
         "event": event,
         "agent": agent,
         "page": page,
-        "time": datetime.datetime.now(UTC).isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request.META['SERVER_NAME'],
     }
 
@@ -130,7 +126,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
         "event": full_event,
         "agent": request_info.get('agent', 'unknown'),
         "page": page,
-        "time": datetime.datetime.utcnow().isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request_info.get('host', 'unknown')
     }
 

@@ -8,7 +8,7 @@ import json
 from django.conf import settings
 
 from track.backends import BaseBackend
-
+from track.utils import DateTimeJSONEncoder
 
 log = logging.getLogger('track.backends.logger')
 
@@ -33,7 +33,7 @@ class LoggerBackend(BaseBackend):
         self.event_logger = logging.getLogger(name)
 
     def send(self, event):
-        event_str = json.dumps(event)
+        event_str = json.dumps(event, default=DateTimeJSONEncoder)
 
         # TODO: remove trucation of the serialized event, either at a
         # higher level during the emittion of the event, or by

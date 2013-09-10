@@ -11,8 +11,6 @@ from __future__ import absolute_import
 
 import logging
 
-import dateutil
-
 from django.db import models
 
 from track.backends import BaseBackend
@@ -77,7 +75,6 @@ class DjangoBackend(BaseBackend):
         self.name = name
 
     def send(self, event):
-        event['time'] = dateutil.parser.parse(event['time'])
         field_values = {x: event.get(x, '') for x in LOGFIELDS}
         tldat = TrackingLog(**field_values)
         try:
