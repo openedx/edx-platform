@@ -381,32 +381,22 @@ class ImportTestCase(BaseCourseTestCase):
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
-        course_id = course.id
 
         print("course errors:")
 
         # Expect to find an error/exception about characters in "®esources"
-        found = False
         expect = "Invalid characters in '®esources'"
-        for (msg, err) in modulestore.get_item_errors(course.location):
-            msg_u = msg.encode("utf-8")
-            err_u = err.encode("utf-8")
-            print(msg_u)
-            print(err_u)
-            if max(msg_u.find(expect), err_u.find(expect)) >= 1:
-                found = True
+        errors = [(msg.encode("utf-8"), err.encode("utf-8"))
+                    for msg, err in
+                    modulestore.get_item_errors(course.location)]
 
-        self.assertTrue(found)
+        self.assertTrue(any(expect in msg or expect in err
+            for msg, err in errors))
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 5)
+        self.assertEqual(len(chapters), 3)
 
-        ch2 = chapters[1]
-        self.assertEquals(ch2.url_name, "secret:magic")
+        ch3 = chapters[2]
 
-        print("Ch2 location: ", ch2.location)
-
-        also_ch2 = modulestore.get_instance(course_id, ch2.location)
-        self.assertEquals(ch2, also_ch2)
 
     def test_url_name_mangling(self):
         """
