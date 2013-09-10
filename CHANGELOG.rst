@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+
+Blades: Added Learning Tools Interoperability (LTI) blade. Now LTI components 
+can be included to courses.
+
 LMS: Added alphabetical sorting of forum categories and subcategories.
 It is hidden behind a false defaulted course level flag.
 
