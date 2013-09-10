@@ -35,17 +35,18 @@ html, body {
 }
 .wrapper {
   min-height: 100%;
-  margin-bottom: -100px;
+  margin-bottom: -85px;
 }
 .wrapper:after {
   content: "";
   display: block;
 }
 .footer-short, .wrapper:after {
-  height:100px;
+  height:85px;
 }
 .footer-short {
   border-top: 1px solid #c4c5c7;
+  padding: 0;
 }
 
 footer .colophon .nav-colophon li a {
@@ -65,10 +66,7 @@ footer a:hover {
 }
 
 footer .references .copyright {
-margin: -2px 0 8px 0;
-font-size: 0.6875em;
-color: #c4c5c7;
-text-align: right;
+margin: 0;
 }
 
 footer .colophon {
@@ -139,9 +137,9 @@ float: right;
   </div>
 </div>
 </div>
-<div class="wrapper footer-wrapper fpoter-short">
-<footer class="footer-short">
-<div class="colophon">
+<div class="wrapper-footer footer-short">
+<footer>
+<div class="colophon" style="padding-top: 10px;">
   <nav class="nav-colophon">
       <ol>
           <li class="nav-colophon-01">
@@ -153,7 +151,7 @@ float: right;
           <a id="faq" href="/help">
               FAQ, ЧаВо
           </a>
-          </li>-->
+          </li>
           <li class="nav-colophon-05">
           <a id="contact" href="/contact">
               Контакты
@@ -162,9 +160,9 @@ float: right;
       </ol>
   </nav>
 </div>
-  <div class="references">
+  <div class="references" style="margin: 10px 0 0 0;">
       
-      <span>Полезные ссылки</span>
+      <span style="text-align: right;display: block;">Полезные ссылки</span>
       <nav class="nav-legal">
         <ul>
           <li class="nav-legal-01">

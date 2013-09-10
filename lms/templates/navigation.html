@@ -47,6 +47,17 @@ site_status_msg = get_site_status_msg(course_id)
         <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('{settings.PLATFORM_NAME} home')}" />
       </%block>
     </a>
+    <span style="
+    display: inline-block;
+    /* margin-top: 20px; */
+    margin-left: 130px;
+    /* float: left; */
+    font-size: initial;
+    /* font-weight: 800; */
+    white-space: nowrap;
+">Департамент образования города Москвы<br>
+центр педагогического мастерства<br>
+курсы повышения квалификации учителей</span>
   </h1>
 
     % if course:

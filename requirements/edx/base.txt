@@ -91,3 +91,4 @@ nose-ignore-docstring
 nose-exclude
 
 git+https://github.com/mfogel/django-settings-context-processor.git
+git+https://github.com/brosner/django-announcements.git
