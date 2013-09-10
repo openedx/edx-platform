@@ -1,3 +1,30 @@
+/*
+ * 025_focus_grabber.js
+ *
+ * Purpose: Provide a way to focus on autohidden Video controls.
+ *
+ *
+ * Because in HTML player mode we have a feature of autohiding controls on
+ * mouse inactivity, sometimes focus is lost from the currently selected
+ * control. What's more, when all controls are autohidden, we can't get to any
+ * of them because by default browser does not place hidden elements on the
+ * focus chain.
+ *
+ * To get around this minor annoyance, this module will manage 2 placeholder
+ * elements that will be invisible to the user's eye, but visible to the
+ * browser. This will allow for a sneaky stealing of focus and placing it where
+ * we need (on hidden controls).
+ *
+ * This code has been moved to a separate module because it provides a concrete
+ * block of functionality that can be turned on (off).
+ */
+
+/*
+ * "If you want to climb a mountain, begin at the top."
+ *
+ * ~ Zen saying
+ */
+
 (function (requirejs, require, define) {
 
 // FocusGrabber module.
@@ -19,14 +46,15 @@ function () {
     function _makeFunctionsPublic(state) {
         state.focusGrabber.enableFocusGrabber = _.bind(enableFocusGrabber, state);
         state.focusGrabber.disableFocusGrabber = _.bind(disableFocusGrabber, state);
-        state.focusGrabber.onFocus = _.bind(onFocus, state);
-        state.focusGrabber.onBlur = _.bind(onBlur, state);
     }
 
     function _renderElements(state) {
         state.focusGrabber.elFirst = state.el.find('.focus_grabber.first');
         state.focusGrabber.elLast = state.el.find('.focus_grabber.last');
 
+        // From the start, the Focus Grabber must be disabled so that
+        // tabbing (switching focus) does not land the user on one of the
+        // placeholder elements (elFirst, elLast).
         state.focusGrabber.disableFocusGrabber();
     }
 
@@ -34,8 +62,12 @@ function () {
         state.focusGrabber.elFirst.on('focus', state.focusGrabber.onFocus);
         state.focusGrabber.elLast.on('focus', state.focusGrabber.onFocus);
 
-        state.focusGrabber.elFirst.on('blur', state.focusGrabber.onBlur);
-        state.focusGrabber.elLast.on('blur', state.focusGrabber.onBlur);
+        // When the video container element receives programmatic focus, then
+        // on un-focus ('blur' event) we should trigger a 'mousemove' event so
+        // as to reveal autohidden controls.
+        state.el.on('blur', function () {
+            state.el.trigger('mousemove');
+        });
     }
 
 
@@ -44,6 +76,14 @@ function () {
     function enableFocusGrabber() {
         var tabIndex;
 
+        // When the Focus Grabber is being enabled, there are two different
+        // scenarios:
+        //
+        //     1.) Currently focused element was inside the video player.
+        //     2.) Currently focused element was somewhere else on the page.
+        //
+        // In the first case we must make sure that the video player doesn't
+        // loose focus, even though the cfontrols are uatohidden.
         if ($(document.activeElement).parents().hasClass('video')) {
             tabIndex = -1;
         } else {
@@ -53,48 +93,36 @@ function () {
         this.focusGrabber.elFirst.attr('tabindex', tabIndex);
         this.focusGrabber.elLast.attr('tabindex', tabIndex);
 
-        $(document.activeElement).blur();
-
+        // Don't loose focus. We are inside video player on some control, but
+        // because we can't remain focused on a hidden element, we will shift
+        // focus to the main video element.
+        //
+        // Once the main element will receive the un-focus ('blur') event, a
+        // 'mousemove' event will be triggered, and the video controls will
+        // receive focus once again.
         if (tabIndex === -1) {
-            this.focusGrabber.elFirst.trigger(
-                'focus',
-                {
-                    simpleFocus: true
-                }
-            );
+            this.el.focus();
+
+            this.focusGrabber.elFirst.attr('tabindex', 0);
+            this.focusGrabber.elLast.attr('tabindex', 0);
         }
     }
 
     function disableFocusGrabber() {
+        // Only programmatic focusing on these elements will be available.
+        // We don't want the user to focus on them (for example with the 'Tab'
+        // key).
         this.focusGrabber.elFirst.attr('tabindex', -1);
         this.focusGrabber.elLast.attr('tabindex', -1);
     }
 
     function onFocus(event, params) {
-        if (params && params.simpleFocus) {
-            this.focusGrabber.elFirst.attr('tabindex', 0);
-            this.focusGrabber.elLast.attr('tabindex', 0);
-
-            return;
-        }
-
+        // Once the Focus Grabber placeholder elements will gain focus, we will
+        // trigger 'mousemove' event so that the autohidden controls will
+        // become visible.
         this.el.trigger('mousemove');
-        this.el.trigger('focus');
-
-        $('html, body').animate({
-            scrollTop: this.el.offset().top
-        }, 200);
 
         this.focusGrabber.disableFocusGrabber();
-    }
-
-    function onBlur(event) {
-        this.el.trigger('mousemove');
-        this.el.trigger('focus');
-
-        $('html, body').animate({
-            scrollTop: this.el.offset().top
-        }, 200);
     }
 });
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

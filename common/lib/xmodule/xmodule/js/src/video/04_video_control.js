@@ -129,6 +129,13 @@ function () {
         this.videoControl.el.fadeOut(this.videoControl.fadeOutTimeout, function () {
             _this.controlState = 'invisible';
 
+            // If the focus was on the video control or the volume control,
+            // then we must make sure to close these dialogs. Otherwise, after
+            // next autofocus, these dialogs will be open, but the focus will
+            // not be on them.
+            _this.videoVolumeControl.el.removeClass('open');
+            _this.videoSpeedControl.el.removeClass('open');
+
             _this.focusGrabber.enableFocusGrabber();
         });
     }
