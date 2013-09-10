@@ -605,14 +605,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         raise NotImplementedError(
             'Modules must implement export_to_xml to enable xml export')
 
-    # =============================== Testing ==================================
-    def get_sample_state(self):
-        """
-        Return a list of tuples of instance_state, shared_state. Each tuple
-        defines a sample case for this module
-        """
-        return [('{}', '{}')]
-
     @property
     def xblock_kvs(self):
         """
