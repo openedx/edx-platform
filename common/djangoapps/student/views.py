@@ -32,6 +32,10 @@ from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.http import require_POST
+from django.utils.functional import Promise
+from django.utils.encoding import force_unicode
+from django.utils.simplejson import JSONEncoder
+from django.utils.translation import get_language
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -443,6 +447,7 @@ def login_user(request, error=""):
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+            AUDIT_LOG.warning(get_language())
         return HttpResponse(json.dumps({'success': False,
                                         'value': ugettext_lazy('Email or password is incorrect.')}, cls=LazyEncoder))
 
@@ -1385,12 +1390,12 @@ def change_email_settings(request):
 
     return HttpResponse(json.dumps({'success': True}))
 
-class LazyEncoder(json.JSONEncoder):
-"""Encodes django's lazy i18n strings.
-Used to serialize translated strings to JSON, because
-simplejson chokes on it otherwise.
-"""
+class LazyEncoder(JSONEncoder):
+    """Encodes django's lazy i18n strings.
+    Used to serialize translated strings to JSON, because
+    simplejson chokes on it otherwise.
+    """
     def default(self, obj):
         if isinstance(obj, Promise):
             return force_unicode(obj)
-        return obj
+        return super(LazyEncoder, self).default(obj)
