@@ -9,8 +9,15 @@
 
 <script>
 jQuery(function($){
-   $("#contact-phone").mask("(999) 999-9999");
+  $("#contact-phone").mask("(999) 999-9999");
+  $('#work-occupation').change(function(){
+    $('#work-occupation2')[$(this).val()=='sub-sub' ? 'show' : 'hide']();
+  });
+  $('#work-occupation-other').change(function(){
+    $('#work-occupation-other2')[$(this).val()=='sub-sub' ? 'show' : 'hide']();
+  });
 });
+
 </script>
 
 <section id="signup-modal" class="modal signup-modal">
@@ -147,6 +154,7 @@ jQuery(function($){
           <option value="${code}">${_(wo_occ)}</option>
           %endfor
         </select>
+        <input id="work-occupation2" type="text" name="work_occupation" value="" style="display:none"/>
           </span>
           <span class="field select" id="field-work-occupation-other">
         <label for="work-occupation-other">${_("Another occupation at educational institution")}</label>
@@ -156,6 +164,7 @@ jQuery(function($){
           <option value="${code}">${_(wo_occ)}</option>
           %endfor
         </select>
+        <input id="work-occupation-other2" type="text" name="work_occupation_other" value="" style="display:none"/>
           </span>
           <span class="field required text" id="field-work-teaching-experience">
             <label for="work-work_teaching_experience">${_('Educational experience at educational institution')}</label>
@@ -200,7 +209,7 @@ jQuery(function($){
         <div class="input-group">
           <span class="field required text" id="field-contact-phone">
             <label for="contact-phone">${_('Contact phone')}</label>
-            <input id="contact-phone" type="text" name="contact_phone" value="" placeholder="${_('e.g. (909) 123-4567')}" required aria-required="true" />
+            <input id="contact-phone" type="text" name="contact_phone" value="" placeholder="например (909) 123-4567" required aria-required="true" />
           </span>
         </div>
         </div>

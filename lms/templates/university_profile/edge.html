@@ -10,9 +10,10 @@
 
 <style>
 .olimpiada-logo-large {
-display: block;
-height: 72px;
-margin: 10px 60px 70px 250px;
+  display: block;
+  height: 72px;
+  margin: 10px auto 70px auto;
+  width: 1100px;
 }
 .log-in-form {
   width: 270px !important;
@@ -25,11 +26,11 @@ margin: 10px 60px 70px 250px;
 .banners-inner {
   overflow: hidden;  width: 930px;  height: 83px;  text-align: center;  margin-left: auto;  margin-right: auto;  background: #f0efef;  background: -moz-linear-gradient(left, #f0efef 0%, #ffffff 50%, #f0efef 100%);  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#f0efef), color-stop(50%,#ffffff), color-stop(100%,#f0efef));  background: -webkit-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -o-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -ms-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: linear-gradient(to right, #f0efef 0%,#ffffff 50%,#f0efef 100%);  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0efef', endColorstr='#f0efef',GradientType=1 );  border-bottom: 1px solid #8A8C8F;
 }
-.banners-inner a {
+.banners-inner a img {
   margin: 12px;
 }
 
-body {
+html, body {
   height:100%;
 }
 .wrapper {
@@ -43,23 +44,28 @@ body {
 .footer-short, .wrapper:after {
   height:50px;
 }
+.footer-short {
+  border-top: 1px solid #c4c5c7;
+}
 </style>
 <div class="wrapper">
-
+<div>
 <div class="olimpiada-logo-large"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Coat_of_Arms_of_Moscow.svg/200px-Coat_of_Arms_of_Moscow.svg.png?uselang=ru" style="
     float: left;
+    position: absolute;
     height: 180px;
 "><span style="
     margin-top: 20px;
-    margin-left: 40px;
+    margin-left: 200px;
     float: left;
     font-size: larger;
     font-weight: 800;
+    white-space: nowrap;
 ">Департамент образования города Москвы<br>
 центр педагогического мастерства<br>
 курсы повышения квалификации учителей<span>
  </span></span></div>
-
+</div>
 <div class="banners">
   <div class="banners-inner">
   <a href="http://www.edu.ru" target="_blank"><img src="http://www.edu.ru/db/portal/sites/edu130x59.gif" border="0" alt="Федеральный портал &quot;Российское образование&quot;" ></a>
@@ -69,7 +75,7 @@ body {
  </div>
 </div>
 
-<div class="main-wrapper" style="width:1142px">
+<div class="main-wrapper" style="width:1142px; margin-bottom:50px;">
   <div class="content">
     <div class="log-in-form">
       <h2>Новости</h2>
@@ -100,6 +106,55 @@ body {
 </div>
 </div>
 <footer class="footer-short">
+<nav class="nav-colophon">
+      <ol>
+          <li class="nav-colophon-01">
+          <a id="about" href="/about">
+              О нас
+          </a>
+          </li>
+          <li class="nav-colophon-04">
+          <a id="faq" href="/help">
+              FAQ, ЧаВо
+          </a>
+          </li>-->
+          <li class="nav-colophon-05">
+          <a id="contact" href="/contact">
+              Контакты
+          </a>
+          </li>
+      </ol>
+      </nav>
+  <div class="references">
+      
+      <span>Полезные ссылки</span>
+      <nav class="nav-legal">
+        <ul>
+          <li class="nav-legal-01">
+      <a href="http://olimpiada.ru/">Olimpiada.ru</a>
+      </li>
+      <li class="nav-legal-02">
+      <a href="http://fizteh2013.ru/">Олимпиада Физтех-2013</a>
+      </li>
+      <li class="nav-legal-03">
+      <a href="http://lomonosov.msu.ru/">Олимпиада школьников ломоносов</a>
+      </li>
+      <li class="nav-legal-04">
+      <a href="http://info.olimpiada.ru/calendar">Календарь олимпиад</a>
+</li>
+</ul>
+</nav>
+
+      <p class="copyright">© 2013 edU, часть прав сохранена.</p>
+
+      <nav class="nav-legal">
+        <ul>
+          <li class="nav-legal-02">
+            <a href="/privacy">Политика защиты персональной информации</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 <footer>
 
 </%block>
