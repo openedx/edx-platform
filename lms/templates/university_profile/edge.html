@@ -47,6 +47,35 @@ html, body {
 .footer-short {
   border-top: 1px solid #c4c5c7;
 }
+
+footer a {
+  color: #333;
+}
+
+footer a:link, footer a:visited, footer a:hover, footer a:active {
+  border-bottom: none;
+  color: #1d9dd9;
+  text-decoration: none !important;
+  font-family: "Open Sans",Verdana,Geneva,sans-serif;
+}
+
+footer .references .copyright {
+margin: -2px 0 8px 0;
+font-size: 0.6875em;
+color: #c4c5c7;
+text-align: right;
+}
+
+footer .colophon {
+margin-right: 1.69492%;
+width: 66.10169%;
+float: left;
+}
+footer .references {
+margin: -10px 0 0 0;
+width: 32.20339%;
+float: right;
+}
 </style>
 <div class="wrapper">
 <div>
@@ -106,7 +135,8 @@ html, body {
 </div>
 </div>
 <footer class="footer-short">
-<nav class="nav-colophon">
+<div class="colophon">
+  <nav class="nav-colophon">
       <ol>
           <li class="nav-colophon-01">
           <a id="about" href="/about">
@@ -124,7 +154,8 @@ html, body {
           </a>
           </li>
       </ol>
-      </nav>
+  </nav>
+</div>
   <div class="references">
       
       <span>Полезные ссылки</span>
