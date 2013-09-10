@@ -1,6 +1,6 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
-from requests.packages.oauthlib.oauth1.rfc5849 import signature
+from oauthlib.oauth1.rfc5849 import signature
 import mock
 from logging import getLogger
 logger = getLogger(__name__)

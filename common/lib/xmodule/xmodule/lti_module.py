@@ -1,15 +1,12 @@
 """
 Module that allows to insert LTI tools to page.
 
-Module uses current edx-platform 0.14.2 version of requests (oauth part).
-Please update code when upgrading requests.
-
 Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 """
 
 import logging
-import requests
+import oauthlib
 import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
@@ -192,7 +189,7 @@ class LTIModule(LTIFields, XModule):
         Also *anonymous student id* is passed to template and therefore to LTI provider.
         """
 
-        client = requests.auth.Client(
+        client = oauthlib.oauth1.Client(
             client_key=unicode(client_key),
             client_secret=unicode(client_secret)
         )
@@ -230,8 +227,8 @@ class LTIModule(LTIFields, XModule):
         params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
         del params[u'OAuth oauth_nonce']
 
-        # 0.14.2 (current) version of requests oauth library encodes signature,
-        # with 'Content-Type': 'application/x-www-form-urlencoded'
+        # oauthlib encodes signature with
+        # 'Content-Type': 'application/x-www-form-urlencoded'
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:

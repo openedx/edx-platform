@@ -39,6 +39,7 @@ mako==0.7.3
 Markdown==2.2.1
 networkx==1.7
 nltk==2.0.4
+oauthlib==0.5.1
 paramiko==1.9.0
 path.py==3.0.1
 Pillow==1.7.8
