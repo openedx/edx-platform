@@ -124,7 +124,12 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       video[0].pause();
     }
     else {
-      image[0].src = flashCapture[0].snap();
+      if (flashCapture[0].cameraAuthorized()) {
+        image[0].src = flashCapture[0].snap();
+      }
+      else {
+        return false;
+      }
     }
 
     doSnapshotButton(captureButton, resetButton, approveButton);
@@ -186,7 +191,7 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
 function objectTagForFlashCamera(name) {
   return '<object type="application/x-shockwave-flash" id="' +
          name + '" name="' + name + '" data=' +
-         '"/static/js/verify_student/CameraCapture.swf"' +
+         '"/static/js/verify_student/CameraCapture.swf?v=2"' +
           'width="500" height="375"><param name="quality" ' +
           'value="high"><param name="allowscriptaccess" ' +
           'value="sameDomain"></object>';
