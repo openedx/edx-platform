@@ -209,11 +209,11 @@ $(document).ready(function() {
 
   // add in handlers to add/remove the correct classes to the body
   // when moving between steps
-  $('#face_next_button').click(function(){
+  $('#face_next_link').click(function(){
       $('body').addClass('step-photos-id').removeClass('step-photos-cam')
   })
 
-  $('#photo_id_next_button').click(function(){
+  $('#photo_id_next_link').click(function(){
       $('body').addClass('step-review').removeClass('step-photos-id')
   })
 
