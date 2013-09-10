@@ -26,7 +26,7 @@
                     </section>
                 </div>
             </div>
-            <section class="grading-wrapper">
+            <section class="grading-wrapper" data-track-changes="${'true' if track_changes else 'false'}">
                 <div class="grading-message">
                 </div>
                 <h2>${_("Student Response")}</h2>
@@ -42,8 +42,20 @@
                         <p class="rubric-selection-container"></p>
                         <p class="score-selection-container"></p>
                         <h3>${_("Written Feedback")}</h3>
-                        <p>${_("Please include some written feedback as well.")}</p>
-                        <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
+                        % if track_changes:
+                            <p>${_("Please edit your peer's submission below.")}</p>
+                            <p class="legend">
+                                <span class="ins">${_("This is an insertion.")}</span>&nbsp;
+                                <span class="del">${_("This is a deletion.")}</span>&nbsp;
+                                <span class="ice-controls">
+                                    <a href="#" class="reset-changes"><i class="icon-refresh"></i> Reset Changes</a>
+                                </span>
+                            </p>
+                            <div name="feedback" class="feedback-area track-changes" contenteditable="true"></div>
+                        % else:
+                            <p>${_("Please include some written feedback as well.")}</p>
+                            <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
+                        % endif
                         <div class="flag-student-container"> ${_("This submission has explicit or offensive content : ")}
                             <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 
                         </div>
