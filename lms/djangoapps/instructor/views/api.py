@@ -32,6 +32,7 @@ import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
+from instructor.views.tools import _clean_field
 import instructor.access as access
 import analytics.basic
 import analytics.distributions
@@ -815,8 +816,3 @@ def _msk_from_problem_urlname(course_id, urlname):
     (org, course_name, __) = course_id.split("/")
     module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
     return module_state_key
-
-def _clean_field(field):
-    if field:
-        return field.strip()
-    return field

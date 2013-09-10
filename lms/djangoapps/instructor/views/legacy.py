@@ -41,6 +41,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
+from instructor.views.tools import _clean_field
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
@@ -1568,9 +1569,3 @@ def get_background_task_table(course_id, problem_url, student=None):
             datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
     return msg, datatable
-
-def _clean_field(field):
-    if field:
-        return field.strip()
-    return field
-
