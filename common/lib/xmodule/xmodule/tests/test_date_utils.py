@@ -1,7 +1,7 @@
 """Tests for xmodule.util.date_utils"""
 
 from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
-from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
+from xmodule.util.date_utils import get_default_time_display, get_time_display, almost_same_datetime
 from datetime import datetime, timedelta, tzinfo
 from pytz import UTC
 
@@ -31,6 +31,28 @@ def test_get_default_time_display_notz():
     assert_equals(
         "Mar 12, 1992 at 15:03",
         get_default_time_display(test_time, False))
+
+
+def test_get_time_display_return_empty():
+    assert_equals("", get_time_display(None))
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    assert_equals("", get_time_display(test_time, ""))
+
+
+def test_get_time_display():
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    assert_equals("dummy text", get_time_display(test_time, 'dummy text'))
+    assert_equals("Mar 12 1992", get_time_display(test_time, '%b %d %Y', True))
+    assert_equals("Mar 12 1992 UTC", get_time_display(test_time, '%b %d %Y %Z', False))
+    assert_equals("Mar 12 15:03", get_time_display(test_time, '%b %d %H:%M', False))
+
+
+def test_get_time_pass_through():
+    test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
+    assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time))
+    assert_equals("Mar 12, 1992 at 15:03", get_time_display(test_time, None, False))
+    assert_equals("Mar 12, 1992 at 15:03", get_time_display(test_time, "%", False))
+    assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time, "%", True))
 
 
 # pylint: disable=W0232

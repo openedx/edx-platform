@@ -31,9 +31,8 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
 
-        # Load toy course from XML
+        # Use toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
-        self.toy_course = modulestore().get_course(self.course_name)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
@@ -62,7 +61,9 @@ class TestJumpTo(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsTestCase(TestCase):
+    """ Tests for views.py methods. """
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
@@ -73,8 +74,6 @@ class ViewsTestCase(TestCase):
         self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
 
-        # This is a CourseDescriptor object
-        self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
@@ -222,3 +221,85 @@ class ViewsTestCase(TestCase):
         })
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
+
+    def test_accordion_due_date(self):
+        """
+        Tests the formatting of due dates in the accordion view.
+        """
+        def get_accordion():
+            """ Returns the HTML for the accordion """
+            return views.render_accordion(
+                request, modulestore().get_course("edX/due_date/2013_fall"),
+                "c804fa32227142a1bd9d5bc183d4a20d", None, None
+            )
+
+        request = self.request_factory.get("foo")
+        self.verify_due_date(request, get_accordion)
+
+    def test_progress_due_date(self):
+        """
+        Tests the formatting of due dates in the progress page.
+        """
+        def get_progress():
+            """ Returns the HTML for the progress page """
+            return views.progress(request, "edX/due_date/2013_fall", self.user.id).content
+
+        request = self.request_factory.get("foo")
+        self.verify_due_date(request, get_progress)
+
+    def verify_due_date(self, request, get_text):
+        """
+        Verifies that due dates are formatted properly in text returned by get_text function.
+        """
+        def set_show_timezone(show_timezone):
+            """
+            Sets the show_timezone property and returns value from get_text function.
+            """
+            course.show_timezone = show_timezone
+            course.save()
+            return get_text()
+
+        def set_due_date_format(due_date_format):
+            """
+            Sets the due_date_display_format property and returns value from get_text function.
+            """
+            course.due_date_display_format = due_date_format
+            course.save()
+            return get_text()
+
+        request.user = self.user
+        course = modulestore().get_course("edX/due_date/2013_fall")
+
+        # Default case show_timezone = True
+        text = set_show_timezone(True)
+        self.assertIn("due Sep 18, 2013 at 11:30 UTC", text)
+
+        # show_timezone = False
+        text = set_show_timezone(False)
+        self.assertNotIn("due Sep 18, 2013 at 11:30 UTC", text)
+        self.assertIn("due Sep 18, 2013 at 11:30", text)
+
+        # plain text due date
+        text = set_due_date_format("foobar")
+        self.assertNotIn("due Sep 18, 2013 at 11:30", text)
+        self.assertIn("due foobar", text)
+
+        # due date with no time
+        text = set_due_date_format(u"%b %d %Y")
+        self.assertNotIn("due Sep 18, 2013 at 11:30", text)
+        self.assertIn("due Sep 18 2013", text)
+
+        # hide due date completely
+        text = set_due_date_format(u"")
+        self.assertNotIn("due ", text)
+
+        # improperly formatted due_date_display_format falls through to default  with show_timezone arg
+        text = set_due_date_format(u"%%%")
+        self.assertNotIn("%%%", text)
+        self.assertIn("due Sep 18, 2013 at 11:30", text)
+        self.assertNotIn("due Sep 18, 2013 at 11:30 UTC", text)
+
+        set_show_timezone(True)
+        text = set_due_date_format(u"%%%")
+        self.assertNotIn("%%%", text)
+        self.assertIn("due Sep 18, 2013 at 11:30 UTC", text)

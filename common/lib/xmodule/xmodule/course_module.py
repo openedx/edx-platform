@@ -338,6 +338,10 @@ class CourseFields(object):
         ])
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
     show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
+    due_date_display_format = String(
+        help="Format supported by strftime for displaying due dates. Takes precedence over show_timezone.",
+        scope=Scope.settings, default=None
+    )
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                                scope=Scope.settings)
     course_image = String(
