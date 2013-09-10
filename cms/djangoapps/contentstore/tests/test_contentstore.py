@@ -1750,6 +1750,37 @@ class ContentStoreTest(ModuleStoreTestCase):
         location = course.location._replace(tag='c4x', category='asset', name=course.course_image)
         content_store.find(location)
 
+    def test_checklist_not_exported(self):
+        """
+        Test that checklists are not exported, since they contain
+        non-portable links.
+        """
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        course = CourseFactory.create(display_name='999')
+        location = course.location
+
+        # Make sure the checklists are modified
+        checklist_url = reverse('checklists_updates', kwargs={
+            'org': course.location.org,
+            'course': course.location.course,
+            'name': course.location.name,
+            'checklist_index': 0
+        })
+        payload = copy.copy(course.checklists[0])
+        payload['items'][0]['is_checked'] = True
+        self.client.post(checklist_url, json.dumps(payload), 'application/json')
+
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export')
+
+        filesystem = OSFS(root_dir / 'test_export/policies/999')
+        with filesystem.open('policy.json', 'r') as course_policy:
+            on_disk = json.loads(course_policy.read())
+            self.assertIn('course/999', on_disk)
+            self.assertNotIn('checklists', on_disk['course/999'])
+
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class MetadataSaveTestCase(ModuleStoreTestCase):
