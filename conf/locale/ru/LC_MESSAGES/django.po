@@ -1,11 +1,10 @@
-# #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file
 # This English source file is machine-generated. Do not check it into github.
 # Copyright (C) 2013 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2013.
 # 
-# Translators:
-# viktoria <viktoria@cde.ifmo.ru>, 2013
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -29,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-09-06 19:20+0400\n"
-"PO-Revision-Date: 2013-09-06 15:51+0400\n"
-"Last-Translator: yushchenko <pavelyushchenko@gmail.com>\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2013-09-09 16:25+0400\n"
+"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,31 +38,28 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1378468293.0\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-POOTLE-MTIME: 1378713222.0\n"
 
-# #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # This English source file is machine-generated. Do not check it into github
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2013.
-#: cms/djangoapps/contentstore/utils.py:17
+# 
+# edX translation file
+# This English source file is machine-generated. Do not check it into github
+# Copyright (C) 2013 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2013.
 #: cms/djangoapps/contentstore/utils.py:18
-#, fuzzy
 msgid "Open Ended Panel"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Открыть состав панели\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Открытоконцовая панель"
+msgstr "Открытоконцовая панель"
 
-#: cms/djangoapps/contentstore/utils.py:18
 #: cms/djangoapps/contentstore/utils.py:19 lms/templates/notes.html:60
 msgid "My Notes"
 msgstr "Мои заметки"
 
-#: cms/djangoapps/contentstore/views/course.py:115
 #: cms/djangoapps/contentstore/views/course.py:116
 msgid ""
 "Unable to create course '{name}'.\n"
@@ -101,27 +97,43 @@ msgstr ""
 "Уже существует курс, созданный той же самой организацией, с тем же номером. "
 "Измените что-нибудь, чтобы достичь уникальности."
 
+#: cms/djangoapps/contentstore/views/tabs.py:36
+#: lms/templates/courseware/courseware-error.html:6
+msgid "Courseware"
+msgstr "Курс"
+
+#: cms/djangoapps/contentstore/views/tabs.py:37
+#: cms/templates/static-pages.html:18
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:76
+msgid "Course Info"
+msgstr "Информация о курсе"
+
+#: cms/djangoapps/contentstore/views/tabs.py:38
+msgid "Discussion"
+msgstr "Дискуссии"
+
+#: cms/djangoapps/contentstore/views/tabs.py:39
+msgid "Wiki"
+msgstr "Wiki"
+
+#: cms/djangoapps/contentstore/views/tabs.py:40
+#: lms/templates/peer_grading/peer_grading.html:23
+msgid "Progress"
+msgstr "Прогресс"
+
 #: cms/djangoapps/contentstore/views/user.py:123
 msgid "Insufficient permissions"
 msgstr "Недостаточно полномочий"
 
 #: cms/djangoapps/contentstore/views/user.py:131
-#, fuzzy
 msgid "Could not find user by email address '{email}'."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Не удалось найти пользователя по адресу электронной почты '{email}'.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Не могу найти пользователя с адресом '{email}'."
+msgstr "Не могу найти пользователя с адресом '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py:157
-#, fuzzy
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Пользователь {email} уже зарегистрировал, но еще не активировал свой аккаунт.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Пользователь {email} был зарегистрирован, но еще не активировал свою учетную запись."
+"Пользователь {email} был зарегистрирован, но еще не активировал свою учетную"
+" запись."
 
 #: cms/djangoapps/contentstore/views/user.py:175
 #: cms/djangoapps/contentstore/views/user.py:218
@@ -142,312 +154,532 @@ msgid "Only instructors may create other instructors"
 msgstr "Только инструкторы могут создавать других инструкторов"
 
 #: cms/djangoapps/course_creators/models.py:33
-#, fuzzy
 msgid "unrequested"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"незарегистрирован\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"незапрошенный"
+msgstr "незапрошенный"
 
 #: cms/djangoapps/course_creators/models.py:34
-#, fuzzy
 msgid "pending"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"в ожидании\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"ожидание"
+msgstr "ожидание"
 
 #: cms/djangoapps/course_creators/models.py:35
-#, fuzzy
 msgid "granted"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"предоставленный\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"разрешено"
+msgstr "разрешено"
 
 #: cms/djangoapps/course_creators/models.py:36
 msgid "denied"
 msgstr "отказано"
 
 #: cms/djangoapps/course_creators/models.py:39
-#, fuzzy
 msgid "Studio user"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Пользователь студии\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Пользователь Студии"
+msgstr "Пользователь Студии"
 
 #: cms/djangoapps/course_creators/models.py:41
-#, fuzzy
 msgid "The date when state was last updated"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Дата состояния последнего обновления\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Дата, когда состояние было последний раз обновлено"
+msgstr "Дата, когда состояние было последний раз обновлено"
 
 #: cms/djangoapps/course_creators/models.py:43
-#, fuzzy
 msgid "Current course creator state"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Текущее состояние создателя курса\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Текущий статус создателя курса"
+msgstr "Текущий статус создателя курса"
 
 #: cms/djangoapps/course_creators/models.py:44
-#, fuzzy
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Дополнительный заметки о пользователе (например, почему отказано в доступе для создания курса)\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Дополнительные заметки о пользователе (к примеру, почему создание курсов было запрещено)"
+"Дополнительные заметки о пользователе (к примеру, почему создание курсов "
+"было запрещено)"
 
-#: common/djangoapps/student/views.py:358
+#: common/djangoapps/course_modes/models.py:35
+msgid "Honor Code Certificate"
+msgstr ""
+
+#: common/djangoapps/student/models.py:93
+msgid "Master's or professional degree"
+msgstr "Магистр"
+
+#: common/djangoapps/student/models.py:94
+msgid "Bachelor's degree"
+msgstr "Бакалавр"
+
+#: common/djangoapps/student/models.py:95
+msgid "Associate's degree"
+msgstr "Среднее профессиональное"
+
+#: common/djangoapps/student/models.py:96
+msgid "Specialist's degree"
+msgstr "Специалист"
+
+#: common/djangoapps/student/models.py:97
+msgid "Secondary/high school"
+msgstr "Начальное профессиональное"
+
+#: common/djangoapps/student/models.py:98
+msgid "Junior secondary/junior high/middle school"
+msgstr "Среднее"
+
+#: common/djangoapps/student/models.py:99
+msgid "Elementary/primary school"
+msgstr "Неполное среднее"
+
+#: common/djangoapps/student/models.py:100
+#: common/djangoapps/student/models.py:122
+#: common/djangoapps/student/models.py:143
+#: common/djangoapps/student/models.py:184
+msgid "None"
+msgstr "Нет"
+
+#: common/djangoapps/student/models.py:101
+#: common/djangoapps/student/models.py:123
+#: common/djangoapps/student/models.py:144
+#: common/djangoapps/student/models.py:177
+msgid "Other"
+msgstr "Другое"
+
+#: common/djangoapps/student/models.py:114
+msgid "School"
+msgstr "Школа"
+
+#: common/djangoapps/student/models.py:115
+msgid "Lyceum"
+msgstr "Лицей"
+
+#: common/djangoapps/student/models.py:116
+msgid "Education Center"
+msgstr "Центр образования"
+
+#: common/djangoapps/student/models.py:117
+msgid "Gymnasium"
+msgstr "Гимназия"
+
+#: common/djangoapps/student/models.py:118
+msgid "Educational complex"
+msgstr "УВК"
+
+#: common/djangoapps/student/models.py:119
+msgid "Kindergarten"
+msgstr "Детский сад"
+
+#: common/djangoapps/student/models.py:120
+msgid "Non-profit educational institution"
+msgstr "НОУ"
+
+#: common/djangoapps/student/models.py:121
+msgid "College"
+msgstr "Колледж"
+
+#: common/djangoapps/student/models.py:130
+msgid "Central Administrative Okrug"
+msgstr "Центральный административный округ"
+
+#: common/djangoapps/student/models.py:131
+msgid "Eastern Administrative Okrug"
+msgstr "Восточный административный округ"
+
+#: common/djangoapps/student/models.py:132
+msgid "Western Administrative Okrug"
+msgstr "Западный административный округ"
+
+#: common/djangoapps/student/models.py:133
+msgid "Northern Administrative Okrug"
+msgstr "Северный административный округ"
+
+#: common/djangoapps/student/models.py:134
+msgid "North-Eastern Administrative Okrug"
+msgstr "Северо-Восточный административный округ"
+
+#: common/djangoapps/student/models.py:135
+msgid "North-Western Administrative Okrug"
+msgstr "Северо-Западный административный округ"
+
+#: common/djangoapps/student/models.py:136
+msgid "South-Western Administrative Okrug"
+msgstr "Юго-Западный административный округ"
+
+#: common/djangoapps/student/models.py:137
+msgid "South-Eastern Administrative Okrug"
+msgstr "Юго-Восточный административный округ"
+
+#: common/djangoapps/student/models.py:138
+msgid "Southern Administrative Okrug"
+msgstr "Южный административный округ"
+
+#: common/djangoapps/student/models.py:139
+msgid "Zelenogradsky Administrative Okrug"
+msgstr "Зеленоградский административный округ"
+
+#: common/djangoapps/student/models.py:140
+msgid "Troitsky Administrative Okrug"
+msgstr "Троицкий административный округ"
+
+#: common/djangoapps/student/models.py:141
+msgid "Novomoskovsky Administrative Okrug"
+msgstr "Новомосковский административный округ"
+
+#: common/djangoapps/student/models.py:142
+msgid "Territorial units with special status"
+msgstr "Городского подчинения"
+
+#: common/djangoapps/student/models.py:148
+msgid "Teacher"
+msgstr "Учитель"
+
+#: common/djangoapps/student/models.py:149
+msgid "Teacher and organizer"
+msgstr "Педагог-организатор"
+
+#: common/djangoapps/student/models.py:150
+msgid "Social teacher"
+msgstr "Социальный педагог"
+
+#: common/djangoapps/student/models.py:151
+msgid "Educational Psychologist"
+msgstr "Педагог-писхолог"
+
+#: common/djangoapps/student/models.py:152
+msgid "Caregiver (including older)"
+msgstr "Воспитатель (включая старшего)"
+
+#: common/djangoapps/student/models.py:153
+msgid "Manager (Director, Head of) the educational institution"
+msgstr "Руководитель (директор, заведующий) образовательного учреждения"
+
+#: common/djangoapps/student/models.py:154
+msgid "Vice manager (director, head of) the educational institution"
+msgstr ""
+"Заместитель руководителя (директора, заведующего) образовательного "
+"учреждения"
+
+#: common/djangoapps/student/models.py:155
+msgid "Senior master"
+msgstr "Старший мастер"
+
+#: common/djangoapps/student/models.py:156
+msgid "Instructor"
+msgstr "Преподаватель"
+
+#: common/djangoapps/student/models.py:157
+msgid "Teacher-pathologists, speech therapists (speech therapist)"
+msgstr "Учитель-дефектолог, учитель-логопед(логопед)"
+
+#: common/djangoapps/student/models.py:158
+msgid "Tutor"
+msgstr "Тьютор"
+
+#: common/djangoapps/student/models.py:159
+msgid "Teacher-librarian"
+msgstr "Педагог-библиотекарь"
+
+#: common/djangoapps/student/models.py:160
+msgid "Senior leader"
+msgstr "Старший вожатый"
+
+#: common/djangoapps/student/models.py:161
+msgid "Teacher of additional education (including older)"
+msgstr "Педагог дополнительного образования (включая старшего)"
+
+#: common/djangoapps/student/models.py:162
+msgid "Musical head"
+msgstr "Музыкальный руководитель"
+
+#: common/djangoapps/student/models.py:163
+msgid "Concertmaster"
+msgstr "Концертмейстер"
+
+#: common/djangoapps/student/models.py:164
+msgid "Master of Physical Education"
+msgstr "Руководитель физического воспитания"
+
+#: common/djangoapps/student/models.py:165
+msgid "Instructor of Physical Education"
+msgstr "Инструктор по физической культуре"
+
+#: common/djangoapps/student/models.py:166
+msgid "The Methodist (including older)"
+msgstr "Методист (включая старшего)"
+
+#: common/djangoapps/student/models.py:167
+msgid "Instructor for Labour"
+msgstr "Инструктор по труду"
+
+#: common/djangoapps/student/models.py:168
+msgid "Instructor-organizer life safety"
+msgstr "Преподаватель-организатор ОБЖ"
+
+#: common/djangoapps/student/models.py:169
+msgid "Coach and teacher (including older)"
+msgstr "Тренер-преподаватель (включая старшего)"
+
+#: common/djangoapps/student/models.py:170
+msgid "Master of of industrial training"
+msgstr "Мастер производственного обучения"
+
+#: common/djangoapps/student/models.py:171
+msgid "The duty on the regime (including older)"
+msgstr "Дежурный по режиму (включая старшего)"
+
+#: common/djangoapps/student/models.py:172
+msgid "Leader"
+msgstr "Вожатый"
+
+#: common/djangoapps/student/models.py:173
+msgid "Assistant caregiver"
+msgstr "Помощник воспитателя"
+
+#: common/djangoapps/student/models.py:174
+msgid "Junior caregiver"
+msgstr "Младший воспитатель"
+
+#: common/djangoapps/student/models.py:175
+msgid "Secretary of teaching department"
+msgstr "Секретарь учебной части"
+
+#: common/djangoapps/student/models.py:176
+msgid "Dispatcher of the educational institution"
+msgstr "Диспетчер образовательного учреждения"
+
+#: common/djangoapps/student/models.py:185
+msgid "High"
+msgstr "Высшая"
+
+#: common/djangoapps/student/models.py:186
+msgid "First"
+msgstr "Первая"
+
+#: common/djangoapps/student/models.py:187
+msgid "Second"
+msgstr "Вторая"
+
 #: common/djangoapps/student/views.py:369
-#, fuzzy
 msgid "Course id not specified"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"id курса не указано\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Id курса не задан"
+msgstr "Id курса не задан"
 
-#: common/djangoapps/student/views.py:368
 #: common/djangoapps/student/views.py:379
-#, fuzzy
 msgid "Course id is invalid"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"id курса недопустимо\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Id курса некорректен"
+msgstr "Id курса некорректен"
 
-#: common/djangoapps/student/views.py:371
 #: common/djangoapps/student/views.py:382
-#, fuzzy
 msgid "Enrollment is closed"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Регистрация закрыта\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Запись на курс закрыта"
+msgstr "Запись на курс закрыта"
 
-#: common/djangoapps/student/views.py:395
 #: common/djangoapps/student/views.py:406
-#, fuzzy
 msgid "You are not enrolled in this course"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Вы не зарегистрированы в этом курсе\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Вы не записаны на этот курс"
+msgstr "Вы не записаны на этот курс"
 
-#: common/djangoapps/student/views.py:397
 #: common/djangoapps/student/views.py:408
-#, fuzzy
 msgid "Enrollment action is invalid"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Регистрация недоступна\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Недействительная запись на курс"
+msgstr "Недействительная запись на курс"
 
-#: common/djangoapps/student/views.py:409
 #: common/djangoapps/student/views.py:420
-#, fuzzy
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Произошла ошибка получения регистрационной информации. Пожалуйста, напишите нам.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
 
 #: common/djangoapps/student/views.py:439
 msgid "Too many failed login attempts. Try again later."
 msgstr "Слишком много попыток неудачного входа. Попробуйте позднее."
 
-#: common/djangoapps/student/views.py:435
 #: common/djangoapps/student/views.py:446 lms/templates/provider_login.html:42
-#, fuzzy
 msgid "Email or password is incorrect."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"E-mail  или пароль введены неверно.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"E-mail или пароль введены неверно."
+msgstr "E-mail или пароль введены неверно."
 
-#: common/djangoapps/student/views.py:482
 #: common/djangoapps/student/views.py:493
-#, fuzzy
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Этот аккаунт не был активирован. Мы  отправили вам другое активационное письмо. Пожалуйста, проверьте свою электронную почту.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Эта учетная запись не была активирована. Мы выслали еще одно активационное письмо. Пожалуйста, проверьте свою электронную почту для инструкций по активации."
+"Эта учетная запись не была активирована. Мы выслали еще одно активационное "
+"письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
+"активации."
 
-#: common/djangoapps/student/views.py:541
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "Аккаунт с публичным именем '{username}' уже существует."
-
-#: common/djangoapps/student/views.py:546
 #: common/djangoapps/student/views.py:564
-#, fuzzy
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Аккаунт с электронным адресом '{email}' уже существует.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Учетная запись с адресом '{email}' уже существует."
+msgstr "Учетная запись с адресом '{email}' уже существует."
 
-#: common/djangoapps/student/views.py:607
 #: common/djangoapps/student/views.py:648
-#, fuzzy
 msgid "Error (401 {field}). E-mail us."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Ошибка (401 {field}). Напишите нам.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Ошибка (401 {field}). Отправите сообщение об ошибке."
+msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
 
-#: common/djangoapps/student/views.py:612
 #: common/djangoapps/student/views.py:653
-#, fuzzy
 msgid "To enroll, you must follow the honor code."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Чтобы зарегистрироваться, вы должны следовать Кодексу Чести.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Для записи вы должны следовать Кодексу поведения."
+msgstr "Для записи вы должны следовать Кодексу поведения."
 
-#: common/djangoapps/student/views.py:623
 #: common/djangoapps/student/views.py:664
-#, fuzzy
 msgid "You must accept the terms of service."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Вы должны принять условия предоставления услуг.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Я согласен с условиями предоставления услуг"
+msgstr "Я согласен с условиями предоставления услуг"
 
-#: common/djangoapps/student/views.py:652
-#: common/djangoapps/student/views.py:735
-#, fuzzy
-msgid "Valid e-mail is required."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Требуется действительный адрес электронной почты.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Введите действительный адрес эл. почты!"
+#: common/djangoapps/student/views.py:683
+#: common/djangoapps/student/views.py:699
+msgid "Education level is required"
+msgstr "Требуется заполненое поле Образование"
 
-#: common/djangoapps/student/views.py:659
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr ""
-"Имя пользователя должно содержать только буквы от A до Z и цифры от 0 до 9, "
-"без пробелов."
+#: common/djangoapps/student/views.py:689
+msgid "Username must be minimum of two characters long."
+msgstr "Имя пользователя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:690
+msgid "A properly formatted e-mail is required."
+msgstr "Требуется правильный электронный адресс."
 
 #: common/djangoapps/student/views.py:691
+msgid "Your legal name must be a minimum of two characters long."
+msgstr "Ваше рельное имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:692
+msgid "A valid password is required."
+msgstr "Требуется корректный пароль."
+
+#: common/djangoapps/student/views.py:693
+msgid "Accepting Terms of Service is required."
+msgstr "Требуется принять правила использования сервиса."
+
+#: common/djangoapps/student/views.py:694
+msgid "Agreeing to the Honor Code is required."
+msgstr "Требуется принять Кодекс Чести."
+
+#: common/djangoapps/student/views.py:695
+msgid "Lastname must be a minimum of two characters long."
+msgstr "Фамилия должна быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:696
+msgid "Firstname must be a minimum of two characters long."
+msgstr "Имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:697
+msgid "Middlename must be a minimum of two characters long."
+msgstr "Отчество должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:698
+msgid "Year of birth is required"
+msgstr "Требуется год рождения"
+
+#: common/djangoapps/student/views.py:700
+msgid "Education place is required"
+msgstr "Требуется заполненое поле Название учебного учреждения"
+
+#: common/djangoapps/student/views.py:701
+msgid "Education year is required"
+msgstr "Требуется заполненое поле Год окончания учебного заведения"
+
+#: common/djangoapps/student/views.py:702
+msgid "Work type is required"
+msgstr "Требуется заполненое поле Тип образовательного учреждения"
+
+#: common/djangoapps/student/views.py:703
+msgid "Work number is required"
+msgstr "Требуется заполненое поле Номер образовательного учреждения"
+
+#: common/djangoapps/student/views.py:704
+msgid "Work name is required"
+msgstr "Требуется заполненое поле Название образовательного учреждения"
+
+#: common/djangoapps/student/views.py:705
+msgid "Work StatGrad login is required"
+msgstr ""
+"Требуется заполненое поле Логин образовательного учреждения в системе "
+"Статград"
+
+#: common/djangoapps/student/views.py:706
+msgid "Work location is required"
+msgstr "Должно быть указано местоположение рабочего места"
+
+#: common/djangoapps/student/views.py:707
+msgid "Work occupation is required"
+msgstr "Должен быть указан род занятий"
+
+#: common/djangoapps/student/views.py:708
+msgid "Work teaching experience is required"
+msgstr "Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:709
+msgid "Work qualification category is required"
+msgstr "Должна быть указана квалификация"
+
+#: common/djangoapps/student/views.py:710
+msgid "Work qualification year is required"
+msgstr "Должен быть указан стаж"
+
+#: common/djangoapps/student/views.py:711
+msgid "Contact phone is required"
+msgstr "Должен быть указан контактный телефон"
+
+#: common/djangoapps/student/views.py:721
+msgid "Education year must be numeric"
+msgstr "Год окончания должен быть числом"
+
+#: common/djangoapps/student/views.py:728
+#: common/djangoapps/student/views.py:722
+#, fuzzy
+msgid "Work teaching experience must be numeric"
+msgstr ""
+"#-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:729
+#: common/djangoapps/student/views.py:723
+#, fuzzy
+msgid "Work managing experience must be numeric"
+msgstr ""
+"#-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:724
+msgid "Work qualification year must be numeric"
+msgstr "Год получения квалификации должен быть числом"
+
+#: common/djangoapps/student/views.py:725
+msgid "Contact phone must be numeric"
+msgstr "Контактный телефон должен быть числом"
+
+#: common/djangoapps/student/views.py:735
+msgid "Valid e-mail is required."
+msgstr "Введите действительный адрес эл. почты!"
+
+#: common/djangoapps/student/views.py:742
+msgid "Valid StatGrad login is required."
+msgstr "Должен быть указан корректный логин СтатГрад"
+
 #: common/djangoapps/student/views.py:781
-#, fuzzy
 msgid "Could not send activation e-mail."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Не удалось отправить письмо для активации учетной записи.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Невозможно отправить письмо с информацией об активации."
+msgstr "Невозможно отправить письмо с информацией об активации."
 
-#: common/djangoapps/student/views.py:1000
 #: common/djangoapps/student/views.py:1089
-#, fuzzy
 msgid "Unknown error. Please e-mail us to let us know how it happened."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Неизвестная ошибка. Пожалуйста, сообщите нам, дайте знать, как это произошло.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Кажется, что-то пошло не так. Напишите нам, как это получилось"
+msgstr "Кажется, что-то пошло не так. Напишите нам, как это получилось"
 
-#: common/djangoapps/student/views.py:1019
 #: common/djangoapps/student/views.py:1108
-#, fuzzy
 msgid "Invalid e-mail or user"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Неверный e-mail или пользователь\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Неверный адрес e-mail или пользователь"
+msgstr "Неверный адрес e-mail или пользователь"
 
-#: common/djangoapps/student/views.py:1051
 #: common/djangoapps/student/views.py:1140
-#, fuzzy
 msgid "No inactive user with this e-mail exists"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Неактивных пользователей с этим адресом электронной почты не существует.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"С таким адресом не существует неактивных пользователей"
+msgstr "С таким адресом не существует неактивных пользователей"
 
-#: common/djangoapps/student/views.py:1064
 #: common/djangoapps/student/views.py:1153
-#, fuzzy
 msgid "Unable to send reactivation email"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Не удалось отправить письмо реактивации\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Невозможно отправить письмо с повторной активацией"
+msgstr "Невозможно отправить письмо с повторной активацией"
 
-#: common/djangoapps/student/views.py:1081
 #: common/djangoapps/student/views.py:1170
 msgid "Invalid password"
 msgstr "Неверный пароль"
 
-#: common/djangoapps/student/views.py:1088
 #: common/djangoapps/student/views.py:1177
-#, fuzzy
 msgid "Valid e-mail address required."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Требуется действительный адрес электронной почты.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Введите действительный адрес эл. почты!"
+msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1093
 #: common/djangoapps/student/views.py:1182
-#, fuzzy
 msgid "An account with this e-mail already exists."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Аккаунт с таким адресом электронной почты уже существует.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Учетная запись с таким адресом электронной почты уже существует."
+msgstr "Учетная запись с таким адресом электронной почты уже существует."
 
-#: common/djangoapps/student/views.py:1109
 #: common/djangoapps/student/views.py:1198
-#, fuzzy
 msgid "Old email is the same as the new email."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Старый и новый адреса электронной почты совпадают.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Старый адрес электронной почты совпадает с новым."
+msgstr "Старый адрес электронной почты совпадает с новым."
 
-#: common/djangoapps/student/views.py:1198
 #: common/djangoapps/student/views.py:1287
 msgid "Name required"
 msgstr "Требуется имя"
 
-#: common/djangoapps/student/views.py:1233
-#: common/djangoapps/student/views.py:1243
 #: common/djangoapps/student/views.py:1322
 #: common/djangoapps/student/views.py:1332
 msgid "Invalid ID"
@@ -459,39 +691,29 @@ msgstr "в"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
 msgid "Navigation"
-msgstr "Навигация"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:123
 msgid "About these documents"
-msgstr "Об этих документах"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:126
 msgid "Index"
-msgstr "Индекс"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:129
 #: lms/templates/wiki/plugins/attachments/index.html:40
 msgid "Search"
-msgstr "Поиск"
+msgstr ""
 
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:132
 #: lms/templates/static_templates/copyright.html:7
 msgid "Copyright"
 msgstr "Copyright"
 
-#: lms/djangoapps/course_modes/models.py:32
-#: common/djangoapps/course_modes/models.py:35
-msgid "Honor Code Certificate"
-msgstr ""
-
 #: lms/djangoapps/django_comment_client/base/views.py:603
-#, fuzzy, python-format
+#, python-format
 msgid "allowed file types are '%(file_types)s'"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"разрешенные типы файлов '%(file_types)s'\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"разрешенные типы '%(file_types)s'"
+msgstr "разрешенные типы '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py:618
 #, python-format
@@ -499,13 +721,9 @@ msgid "maximum upload file size is %(file_size)sK"
 msgstr "максимальный размер загружаемого файла %(file_size)sK"
 
 #: lms/djangoapps/django_comment_client/base/views.py:627
-#, fuzzy
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Ошибка загрузки файла. Пожалуйста, свяжитесь с администратором сайта. Спасибо.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Ошибка загрузки файла. Пожалуйста сообщите администратору сайта. Спасибо."
 
 #: lms/djangoapps/instructor/views/api.py:55
@@ -515,12 +733,6 @@ msgstr "Пользователь не существует."
 #: lms/djangoapps/instructor/views/api.py:61
 msgid "Task is already running."
 msgstr "Задание уже выполняется."
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:76
-#: cms/djangoapps/contentstore/views/tabs.py:37
-#: cms/templates/static-pages.html:18
-msgid "Course Info"
-msgstr "Информация о курсе"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:102
 msgid "Membership"
@@ -539,106 +751,157 @@ msgstr "Загрузка данных"
 msgid "Analytics"
 msgstr "Аналитика"
 
-#: lms/templates/registration/change_password.html:12
-#: lms/templates/registration/logged_out.html:4
-#: lms/templates/registration/password_change_done.html:5
-#: lms/templates/registration/password_change_form.html:6
-#: lms/templates/main.html:23
-msgid "Home"
-msgstr "Главная страница"
-
-#: lms/templates/registration/change_password.html:16
-#: lms/templates/registration/change_password.html:49
-#: lms/templates/registration/password_change_done.html:4
-#: lms/templates/registration/password_change_form.html:5
-msgid "Change password"
-msgstr "Поменять пароль"
-
-#: lms/templates/registration/change_password.html:25
-#: lms/templates/registration/password_change_form.html:16
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Пожалуйста, исправьте ошибку ниже."
-msgstr[1] "Пожалуйста, исправьте ошибки ниже."
-msgstr[2] "Пожалуйста, исправьте ошибки ниже."
-
-#: lms/templates/registration/change_password.html:29
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Введите новый пароль для пользователя <strong>%(username)s</strong>."
-
-#: lms/templates/registration/change_password.html:36
-#: cms/templates/login.html:30 cms/templates/signup.html:35
-#: lms/templates/login.html:119 lms/templates/login_modal.html:17
-#: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
-#: lms/templates/register.html:122 lms/templates/signup_modal.html:29
-#: lms/templates/university_profile/edge.html:19
-msgid "Password"
-msgstr "Пароль"
-
-#: lms/templates/registration/change_password.html:42
-#: lms/templates/registration/password_change_form.html:38
-msgid "Password (again)"
-msgstr "Пароль (еще раз)"
-
-#: lms/templates/registration/change_password.html:43
-msgid "Enter the same password as above, for verification."
-msgstr "Введите тот же пароль, что и выше, для проверки."
-
-#: lms/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Спасибо за проведенное сегодня время на нашем сайте."
-
-#: lms/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Войдите еще раз"
-
-#: lms/templates/registration/password_change_done.html:4
-#: lms/templates/registration/password_change_form.html:5
-msgid "Documentation"
-msgstr "Документация"
-
-#: lms/templates/registration/password_change_done.html:4
-#: lms/templates/registration/password_change_form.html:5
-msgid "Log out"
-msgstr "Выйти"
-
-#: lms/templates/registration/password_change_done.html:5
-#: lms/templates/registration/password_change_form.html:6
-#: lms/templates/registration/password_change_form.html:8
-#: lms/templates/registration/password_change_form.html:20
-msgid "Password change"
-msgstr "Изменить пароль"
-
-#: lms/templates/registration/password_change_done.html:7
-#: lms/templates/registration/password_change_done.html:11
-msgid "Password change successful"
-msgstr "Изменения пароля прошло успешно"
-
-#: lms/templates/registration/password_change_done.html:13
-msgid "Your password was changed."
-msgstr "Ваш пароль был изменен."
-
-#: lms/templates/registration/password_change_form.html:22
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new"
-" password twice so we can verify you typed it in correctly."
+#: lms/djangoapps/shoppingcart/models.py:128
+msgid "Order Payment Confirmation"
 msgstr ""
-"Пожалуйста, введите ваш старый пароль из соображений безопасности, а затем "
-"введите новый пароль дважды, чтобы мы могли проверить, что вы ввели его "
-"правильно."
 
-#: lms/templates/registration/password_change_form.html:28
-msgid "Old password"
-msgstr "Старый пароль"
+#: lms/djangoapps/shoppingcart/models.py:178
+msgid "Trying to add a different currency into the cart"
+msgstr "Попытка добавить другую валюту в корзину"
 
-#: lms/templates/registration/password_change_form.html:33
-msgid "New password"
-msgstr "Новый пароль"
+#: lms/djangoapps/shoppingcart/models.py:324
+msgid "{mode} certificate for course {course_id}"
+msgstr ""
 
-#: lms/templates/registration/password_change_form.html:44
-msgid "Change my password"
-msgstr "Поменять мой пароль"
+#: lms/djangoapps/shoppingcart/views.py:19
+msgid "You must be logged-in to add to a shopping cart"
+msgstr "Вы должны выполнить вход в систему для создания корзины покупок"
+
+#: lms/djangoapps/shoppingcart/views.py:22
+#: lms/djangoapps/shoppingcart/tests/test_views.py:67
+msgid "The course {0} is already in your cart."
+msgstr "Курс {0} уже в Вашей корзине."
+
+#: lms/djangoapps/shoppingcart/views.py:24
+#: lms/djangoapps/shoppingcart/tests/test_views.py:74
+msgid "You are already registered in course {0}."
+msgstr "Вы уже зарегистрированы на курс {0}."
+
+#: lms/djangoapps/shoppingcart/views.py:28
+#: lms/djangoapps/shoppingcart/tests/test_views.py:80
+msgid "The course you requested does not exist."
+msgstr "Запрашиваемый вами курс не существует."
+
+#: lms/djangoapps/shoppingcart/views.py:31
+msgid "Course added to cart."
+msgstr "Курс добавлен в корзину."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:142
+msgid "The payment processor did not return a required parameter: {0}"
+msgstr "Обработчик платежа не вернул требуемый параметр: {0}"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:148
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:163
+msgid "The payment processor returned a badly-typed value {0} for param {1}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:154
+msgid ""
+"The payment processor accepted an order whose number is not in our system."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:174
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:175
+msgid ""
+"The amount charged by the processor {0} {1} is different than the total cost"
+" of the order {2} {3}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:302
+msgid "Successful transaction."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:303
+msgid "The request is missing one or more required fields."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:304
+msgid "One or more fields in the request contains invalid data."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:311
+msgid ""
+"Error: General system failure. Possible fix: retry the payment after a few "
+"minutes."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:323
+msgid ""
+"The issuing bank has questions about the request. Possible fix: retry with "
+"another form of payment"
+msgstr "Банк-эмитент не подтвердил запрос. Попробуйте другие формы платежа"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:335
+msgid ""
+"Insufficient funds in the account. Possible fix: retry with another form of "
+"payment"
+msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:337
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:348
+msgid "Unknown reason"
+msgstr "Неизвестная причина"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:338
+msgid ""
+"Issuing bank unavailable. Possible fix: retry again after a few minutes"
+msgstr "Банк-эмитент недоступен. Повторите операцию через несколько минут"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:344
+msgid ""
+"The card has reached the credit limit. Possible fix: retry with another form"
+" of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:345
+msgid ""
+"Invalid card verification number. Possible fix: retry with another form of "
+"payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
+msgid ""
+"Invalid account number. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:355
+msgid ""
+"General decline by the processor.  Possible fix: retry with another form of "
+"payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:361
+msgid "The requested amount exceeds the originally authorized amount."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:362
+msgid "Processor Failure.  Possible fix: retry the payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:364
+#, fuzzy
+msgid "The authorization has already been captured"
+msgstr ""
+"#-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Эта учетная запись уже была активирована."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
+msgid ""
+"The requested transaction amount must match the previous transaction amount."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:375
+msgid "The request ID is invalid."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:385
+msgid "The transaction has already been settled or reversed."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:393
+msgid "You requested a credit for a capture that was previously voided"
+msgstr ""
 
 #: lms/templates/registration/password_reset_complete.html:8
 #: lms/templates/registration/password_reset_complete.html:56
@@ -747,7 +1010,6 @@ msgstr ""
 msgid "Password Reset Help"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:145
 #: cms/templates/login.html:49 lms/templates/login.html:169
 #: lms/templates/register.html:381
 msgid "Need Help?"
@@ -766,34 +1028,28 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
 msgstr ""
-"Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на "
-"edx.org."
 
 #: lms/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr "Пожалуйста, перейдите на следующую страницу и выберите новый пароль:"
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html:9
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
 
 #: lms/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr "Спасибо за использование нашего сайта!"
+msgstr ""
 
 #: lms/templates/registration/password_reset_email.html:13
 msgid "The edX Team"
-msgstr "Команда edX"
-
-#: lms/templates/registration/registration_complete.html:4
-msgid "Registration complete"
-msgstr ""
-
-#: lms/templates/registration/registration_complete.html:8
-msgid ""
-"An activation link has been sent to the email address you supplied, along "
-"with instructions for activating your account."
 msgstr ""
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
-msgstr "Последние изменения:"
+msgstr ""
 
 #: lms/templates/wiki/article.html:37
 msgid "See all children"
@@ -801,28 +1057,26 @@ msgstr ""
 
 #: lms/templates/wiki/article.html:48
 msgid "This article was last modified:"
-msgstr "Эта статья последний раз редактировалась:"
+msgstr ""
 
 #: lms/templates/wiki/create.html:5 lms/templates/wiki/create.html.py:30
 msgid "Add new article"
-msgstr "Добавить новую статью"
+msgstr ""
 
 #: lms/templates/wiki/create.html:37
 msgid "Create article"
-msgstr "Создать статью"
+msgstr ""
 
 #: lms/templates/wiki/create.html:42 lms/templates/wiki/delete.html:13
 #: lms/templates/wiki/delete.html.py:54
 msgid "Go back"
-msgstr "Назад"
+msgstr ""
 
 #: lms/templates/wiki/delete.html:5 lms/templates/wiki/delete.html.py:50
 #: lms/templates/wiki/edit.html:23
 msgid "Delete article"
-msgstr "Удалить статью"
+msgstr ""
 
-#: lms/templates/wiki/delete.html:9
-#: lms/templates/wiki/plugins/attachments/index.html:92
 #: cms/static/js/views/textbook.js:34 cms/templates/component.html:37
 #: lms/templates/discussion/_underscore_templates.html:75
 #: lms/templates/discussion/_underscore_templates.html:134
@@ -831,38 +1085,34 @@ msgstr "Удалить"
 
 #: lms/templates/wiki/delete.html:12
 msgid "You cannot delete a root article."
-msgstr "Вы не можете удалить корневую статью."
+msgstr ""
 
 #: lms/templates/wiki/delete.html:18
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
 msgstr ""
-"Вы не можете удалить эту статью, потому что у вас нет прав удалять статьи с "
-"детьми. Попробуйте удалить вручную дочерние статьи одну за одной."
 
 #: lms/templates/wiki/delete.html:24
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
 msgstr ""
-"Вы удаляете статью. Это значит, что дочерние статьи также будут удалены. "
-"Если вы выберите удалить, дочерние статьи также будут удалены!"
 
 #: lms/templates/wiki/delete.html:26
 msgid "Articles that will be deleted"
-msgstr "Статьи будут удалены"
+msgstr ""
 
 #: lms/templates/wiki/delete.html:32
 msgid "...and more!"
-msgstr "...и многое другое!"
+msgstr ""
 
 #: lms/templates/wiki/delete.html:40
 msgid "You are deleting an article. Please confirm."
-msgstr "Вы удаляете статью. Пожалуйста, подтвердите."
+msgstr ""
 
-#: lms/templates/wiki/edit.html:5 cms/static/js/base.js:872
-#: cms/templates/component.html:36 cms/templates/overview.html:174
+#: cms/static/js/base.js:872 cms/templates/component.html:36
+#: cms/templates/overview.html:174
 #: lms/templates/discussion/_underscore_templates.html:74
 #: lms/templates/discussion/_underscore_templates.html:133
 msgid "Edit"
@@ -870,19 +1120,19 @@ msgstr "Редактировать"
 
 #: lms/templates/wiki/edit.html:14 lms/templates/wiki/edit.html.py:34
 msgid "Save changes"
-msgstr "Сохранить изменения"
+msgstr ""
 
-#: lms/templates/wiki/edit.html:18 cms/templates/unit.html:166
+#: cms/templates/unit.html:166
 msgid "Preview"
 msgstr "Предварительный просмотр"
 
 #: lms/templates/wiki/edit.html:39
 msgid "Back to editor"
-msgstr "Вернуться к редактору"
+msgstr ""
 
 #: lms/templates/wiki/history.html:5
 msgid "History"
-msgstr "История"
+msgstr ""
 
 #: lms/templates/wiki/history.html:56
 msgid ""
@@ -891,74 +1141,68 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
-"Нажмите на каждую ревизию, чтобы увидеть список редактируемых линий. Нажмите"
-" \"Предварительный просмотр\",чтобы увидеть, как статья выглядит на этой "
-"странице. В нижней части страницы вы можете изменить данную ревизию или "
-"сделать слияние старой ревизии с текущей."
 
 #: lms/templates/wiki/history.html:75
 msgid "no log message"
-msgstr "нет журнала сообщений"
+msgstr ""
 
 #: lms/templates/wiki/history.html:87
 msgid "Preview this revision"
-msgstr "Предварительный просмотр ревизии"
+msgstr ""
 
 #: lms/templates/wiki/history.html:101
 msgid "Auto log:"
-msgstr "Автоматический журнал:"
+msgstr ""
 
 #: lms/templates/wiki/history.html:109
 msgid "Change"
-msgstr "Изменить"
+msgstr ""
 
 #: lms/templates/wiki/history.html:127 lms/templates/wiki/history.html:132
 msgid "Merge selected with current..."
-msgstr "Объединить выбранное с текущим..."
+msgstr ""
 
 #: lms/templates/wiki/history.html:137
 msgid "Switch to selected version"
-msgstr "Перейти к выбранной версии"
+msgstr ""
 
 #: lms/templates/wiki/history.html:153 lms/templates/wiki/history.html:180
 msgid "Back to history view"
-msgstr "Вернуться к истории просмотра"
+msgstr ""
 
 #: lms/templates/wiki/history.html:158 lms/templates/wiki/history.html:163
 msgid "Switch to this version"
-msgstr "Перейти на эту версию"
+msgstr ""
 
 #: lms/templates/wiki/history.html:171
 msgid "Merge with current"
-msgstr "Объединить с текущим"
+msgstr ""
 
 #: lms/templates/wiki/history.html:172
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
 msgstr ""
-"При слиянии ревизии с текущей, все данные обеих версий будут сохранены и "
-"объединены на приблизительном местоположении каждой ревизии."
 
 #: lms/templates/wiki/history.html:172
 msgid "After this, it's important to do a manual review."
-msgstr "После этого важно сделать ручную проверку."
+msgstr ""
 
 #: lms/templates/wiki/history.html:185 lms/templates/wiki/history.html:190
 msgid "Create new merged version"
-msgstr "Создать новую объединенную версию"
+msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:13
 msgid "Previewing revision"
-msgstr "Предварительный просмотр ревизии"
+msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:20
 msgid "Previewing merge between"
-msgstr "Предварительный просмотр слияния между"
+msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:22
 msgid "and"
-msgstr "и"
+msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:31
 msgid "This revision has been deleted."
@@ -975,13 +1219,10 @@ msgid ""
 "  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
 "  "
 msgstr ""
-"\n"
-"Вам нужно <a href=\"%(login_url)s\">войти</a> или <a href=\"%(signup_url)s\">зарегистрироваться</a>для использования этой функции."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html:11
 msgid "You need to log in or sign up to use this function."
 msgstr ""
-"Вам нужно войти или зарегистрироваться для использования этой функции."
 
 #: lms/templates/wiki/includes/cheatsheet.html:7
 msgid "Wiki Syntax Help"
@@ -1088,15 +1329,15 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:5
 msgid "Attachments"
-msgstr "Вложения"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:14
 msgid "Upload new file"
-msgstr "Загрузить новый файл"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:17
 msgid "Search and add file"
-msgstr "Поиск и добавление файла"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:23
 msgid "Upload File"
@@ -1104,7 +1345,7 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:27
 msgid "Upload file"
-msgstr "Загрузить файл"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:35
 msgid "Search files and articles"
@@ -1115,87 +1356,64 @@ msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
 msgstr ""
-"Вы можете использовать файлы из других статей. Эти файлы могут быть "
-"обновлены в других статьях, что может быть как хорошей, так и плохой "
-"новостью."
 
 #: lms/templates/wiki/plugins/attachments/index.html:65
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
 msgstr ""
-"Следующие файлы доступны для этой статьи. Скопируйте тэги для "
-"непосредственной ссылки на файл из текста статьи."
 
 #: lms/templates/wiki/plugins/attachments/index.html:74
 msgid "deleted"
-msgstr "удалено"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:84
 msgid "Markdown tag"
-msgstr "???"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:85
 msgid "Uploaded by"
-msgstr "Загружено "
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:86
 msgid "Size"
-msgstr "Размер"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:87
 msgid "File History"
-msgstr "История файла"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:94
 msgid "Detach"
-msgstr "Отделить"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:97
 msgid "Replace"
-msgstr "Заменить"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:104
 msgid "Restore"
-msgstr "Восстановить"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:115
 msgid "anonymous (IP logged)"
-msgstr "аноним (IP-адрес скрыт)"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:122
 msgid "File history"
-msgstr "История файла"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:122
 msgid "revisions"
-msgstr "ревизии"
+msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:130
 msgid "There are no attachments for this article."
-msgstr "Нет приложений для этой статьи."
+msgstr ""
 
 # empty
 msgid "This is a key string."
 msgstr "Это ключевая строка."
-
-#: cms/djangoapps/contentstore/views/tabs.py:36
-#: lms/templates/courseware/courseware-error.html:6
-msgid "Courseware"
-msgstr "Курс"
-
-#: cms/djangoapps/contentstore/views/tabs.py:38
-msgid "Discussion"
-msgstr "Дискуссии"
-
-#: cms/djangoapps/contentstore/views/tabs.py:39
-msgid "Wiki"
-msgstr "Wiki"
-
-#: cms/djangoapps/contentstore/views/tabs.py:40
-#: lms/templates/peer_grading/peer_grading.html:23
-msgid "Progress"
-msgstr "Прогресс"
 
 #: cms/static/coffee/src/main.js:38
 msgid ""
@@ -2346,7 +2564,7 @@ msgstr "Уникальный номер, который индентифицир
 
 #: cms/templates/index.html:119
 msgid "Course Run"
-msgstr ""
+msgstr "Учебный год"
 
 #: cms/templates/index.html:120
 msgid "e.g. 2013_Spring"
@@ -2370,7 +2588,7 @@ msgstr "Номер курса:"
 
 #: cms/templates/index.html:154
 msgid "Course Run:"
-msgstr ""
+msgstr "Учебный год:"
 
 #: cms/templates/index.html:176
 msgid "Are you staff on an existing Studio course?"
@@ -2560,6 +2778,14 @@ msgstr "Адрес электронной почты"
 #: lms/templates/university_profile/edge.html:24
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
+
+#: cms/templates/login.html:30 cms/templates/signup.html:35
+#: lms/templates/login.html:119 lms/templates/login_modal.html:17
+#: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
+#: lms/templates/register.html:122 lms/templates/signup_modal.html:29
+#: lms/templates/university_profile/edge.html:19
+msgid "Password"
+msgstr "Пароль"
 
 #: cms/templates/login.html:46 cms/templates/widgets/sock.html:17
 msgid "Studio Support"
@@ -3987,531 +4213,6 @@ msgstr ""
 msgid "name"
 msgstr "имя"
 
-#: common/djangoapps/student/models.py:93
-msgid "Master's or professional degree"
-msgstr "Магистр"
-
-#: common/djangoapps/student/models.py:94
-msgid "Bachelor's degree"
-msgstr "Бакалавр"
-
-#: common/djangoapps/student/models.py:95
-msgid "Associate's degree"
-msgstr "Среднее профессиональное"
-
-#: common/djangoapps/student/models.py:96
-msgid "Specialist's degree"
-msgstr ""
-
-#: common/djangoapps/student/models.py:97
-msgid "Secondary/high school"
-msgstr "Начальное профессиональное"
-
-#: common/djangoapps/student/models.py:98
-msgid "Junior secondary/junior high/middle school"
-msgstr "Среднее среднее"
-
-#: common/djangoapps/student/models.py:99
-msgid "Elementary/primary school"
-msgstr "Неполное среднее"
-
-#: common/djangoapps/student/models.py:100
-#: common/djangoapps/student/models.py:122
-#: common/djangoapps/student/models.py:143
-#: common/djangoapps/student/models.py:184
-msgid "None"
-msgstr "Нет"
-
-#: common/djangoapps/student/models.py:101
-#: common/djangoapps/student/models.py:123
-#: common/djangoapps/student/models.py:144
-#: common/djangoapps/student/models.py:177
-msgid "Other"
-msgstr "Другое"
-
-#: common/djangoapps/student/models.py:114
-msgid "School"
-msgstr "Школа"
-
-#: common/djangoapps/student/models.py:115
-msgid "Lyceum"
-msgstr "Лицей"
-
-#: common/djangoapps/student/models.py:116
-msgid "Education Center"
-msgstr "Центр образования"
-
-#: common/djangoapps/student/models.py:117
-msgid "Gymnasium"
-msgstr "Гимназия"
-
-#: common/djangoapps/student/models.py:118
-msgid "Educational complex"
-msgstr "УВК"
-
-#: common/djangoapps/student/models.py:119
-msgid "Kindergarten"
-msgstr "Детский сад"
-
-#: common/djangoapps/student/models.py:120
-msgid "Non-profit educational institution"
-msgstr "НОУ"
-
-#: common/djangoapps/student/models.py:121
-msgid "College"
-msgstr "Колледж"
-
-#: common/djangoapps/student/models.py:130
-msgid "Central Administrative Okrug"
-msgstr "Центральный административный округ"
-
-#: common/djangoapps/student/models.py:131
-msgid "Eastern Administrative Okrug"
-msgstr "Восточный административный округ"
-
-#: common/djangoapps/student/models.py:132
-msgid "Western Administrative Okrug"
-msgstr "Западный административный округ"
-
-#: common/djangoapps/student/models.py:133
-msgid "Northern Administrative Okrug"
-msgstr "Северный административный округ"
-
-#: common/djangoapps/student/models.py:134
-msgid "North-Eastern Administrative Okrug"
-msgstr "Северо-Восточный административный округ"
-
-#: common/djangoapps/student/models.py:135
-msgid "North-Western Administrative Okrug"
-msgstr "Северо-Западный административный округ"
-
-#: common/djangoapps/student/models.py:136
-msgid "South-Western Administrative Okrug"
-msgstr "Юго-Западный административный округ"
-
-#: common/djangoapps/student/models.py:137
-msgid "South-Eastern Administrative Okrug"
-msgstr "Юго-Восточный административный округ"
-
-#: common/djangoapps/student/models.py:138
-msgid "Southern Administrative Okrug"
-msgstr "Южный административный округ"
-
-#: common/djangoapps/student/models.py:139
-msgid "Zelenogradsky Administrative Okrug"
-msgstr "Зеленоградский административный округ"
-
-#: common/djangoapps/student/models.py:140
-msgid "Troitsky Administrative Okrug"
-msgstr "Троицкий административный округ"
-
-#: common/djangoapps/student/models.py:141
-msgid "Novomoskovsky Administrative Okrug"
-msgstr "Новомосковский административный округ"
-
-#: common/djangoapps/student/models.py:142
-msgid "Territorial units with special status"
-msgstr "Городского подчинения"
-
-#: common/djangoapps/student/models.py:148
-msgid "Teacher"
-msgstr "Учитель"
-
-#: common/djangoapps/student/models.py:149
-msgid "Teacher and organizer"
-msgstr "Педагог-организатор"
-
-#: common/djangoapps/student/models.py:150
-msgid "Social teacher"
-msgstr "Социальный педагог"
-
-#: common/djangoapps/student/models.py:151
-msgid "Educational Psychologist"
-msgstr "Педагог-писхолог"
-
-#: common/djangoapps/student/models.py:152
-msgid "Caregiver (including older)"
-msgstr "Воспитатель (включая старшего)"
-
-#: common/djangoapps/student/models.py:153
-msgid "Manager (Director, Head of) the educational institution"
-msgstr "Руководитель (директор, заведующий) образовательного учреждения"
-
-#: common/djangoapps/student/models.py:154
-msgid "Vice manager (director, head of) the educational institution"
-msgstr ""
-"Заместитель руководителя (директора, заведующего) образовательного "
-"учреждения"
-
-#: common/djangoapps/student/models.py:155
-msgid "Senior master"
-msgstr "Старший мастер"
-
-#: common/djangoapps/student/models.py:156
-msgid "Instructor"
-msgstr "Преподаватель"
-
-#: common/djangoapps/student/models.py:157
-msgid "Teacher-pathologists, speech therapists (speech therapist)"
-msgstr "Учитель-дефектолог, учитель-логопед(логопед)"
-
-#: common/djangoapps/student/models.py:158
-msgid "Tutor"
-msgstr "Тьютор"
-
-#: common/djangoapps/student/models.py:159
-msgid "Teacher-librarian"
-msgstr "Педагог-библиотекарь"
-
-#: common/djangoapps/student/models.py:160
-msgid "Senior leader"
-msgstr "Старший вожатый"
-
-#: common/djangoapps/student/models.py:161
-msgid "Teacher of additional education (including older)"
-msgstr "Педагог дополнительного образования (включая старшего)"
-
-#: common/djangoapps/student/models.py:162
-msgid "Musical head"
-msgstr "Музыкальный руководитель"
-
-#: common/djangoapps/student/models.py:163
-msgid "Concertmaster"
-msgstr "Концертмейстер"
-
-#: common/djangoapps/student/models.py:164
-msgid "Master of Physical Education"
-msgstr "Руководитель физического воспитания"
-
-#: common/djangoapps/student/models.py:165
-msgid "Instructor of Physical Education"
-msgstr "Инструктор по физической культуре"
-
-#: common/djangoapps/student/models.py:166
-msgid "The Methodist (including older)"
-msgstr "Методист (включая старшего)"
-
-#: common/djangoapps/student/models.py:167
-msgid "Instructor for Labour"
-msgstr "Инструктор по труду"
-
-#: common/djangoapps/student/models.py:168
-msgid "Instructor-organizer life safety"
-msgstr "Преподаватель-организатор ОБЖ"
-
-#: common/djangoapps/student/models.py:169
-msgid "Coach and teacher (including older)"
-msgstr "Тренер-преподаватель (включая старшего)"
-
-#: common/djangoapps/student/models.py:170
-msgid "Master of of industrial training"
-msgstr "Мастер производственного обучения"
-
-#: common/djangoapps/student/models.py:171
-msgid "The duty on the regime (including older)"
-msgstr "Дежурный по режиму (включая старшего)"
-
-#: common/djangoapps/student/models.py:172
-msgid "Leader"
-msgstr "Вожатый"
-
-#: common/djangoapps/student/models.py:173
-msgid "Assistant caregiver"
-msgstr "Помощник воспитателя"
-
-#: common/djangoapps/student/models.py:174
-msgid "Junior caregiver"
-msgstr "Младший воспитатель"
-
-#: common/djangoapps/student/models.py:175
-msgid "Secretary of teaching department"
-msgstr "Секретарь учебной части"
-
-#: common/djangoapps/student/models.py:176
-msgid "Dispatcher of the educational institution"
-msgstr "Диспетчер образовательного учреждения"
-
-#: common/djangoapps/student/models.py:185
-msgid "High"
-msgstr "Высшая"
-
-#: common/djangoapps/student/models.py:186
-msgid "First"
-msgstr "Первая"
-
-#: common/djangoapps/student/models.py:187
-msgid "Second"
-msgstr "Вторая"
-
-#: common/djangoapps/student/views.py:683
-#: common/djangoapps/student/views.py:699
-msgid "Education level is required"
-msgstr "Требуется заполненое поле Образование"
-
-#: common/djangoapps/student/views.py:689
-msgid "Username must be minimum of two characters long."
-msgstr "Имя пользователя должно быть длиннее двух символов."
-
-#: common/djangoapps/student/views.py:690
-msgid "A properly formatted e-mail is required."
-msgstr "Требуется правильный электронный адресс."
-
-#: common/djangoapps/student/views.py:691
-msgid "Your legal name must be a minimum of two characters long."
-msgstr "Ваше рельное имя должно быть длиннее двух символов."
-
-#: common/djangoapps/student/views.py:692
-msgid "A valid password is required."
-msgstr "Требуется корректный пароль."
-
-#: common/djangoapps/student/views.py:693
-msgid "Accepting Terms of Service is required."
-msgstr "Требуется принять правила использования сервиса."
-
-#: common/djangoapps/student/views.py:694
-msgid "Agreeing to the Honor Code is required."
-msgstr "Требуется принять Кодекс Чести."
-
-#: common/djangoapps/student/views.py:695
-msgid "Lastname must be a minimum of two characters long."
-msgstr "Фамилия должна быть длиннее двух символов."
-
-#: common/djangoapps/student/views.py:696
-msgid "Firstname must be a minimum of two characters long."
-msgstr "Имя должно быть длиннее двух символов."
-
-#: common/djangoapps/student/views.py:697
-msgid "Middlename must be a minimum of two characters long."
-msgstr "Отчество должно быть длиннее двух символов."
-
-#: common/djangoapps/student/views.py:698
-msgid "Year of birth is required"
-msgstr "Требуется год рождения"
-
-#: common/djangoapps/student/views.py:700
-msgid "Education place is required"
-msgstr "Требуется заполненое поле Название учебного учреждения"
-
-#: common/djangoapps/student/views.py:701
-msgid "Education year is required"
-msgstr "Требуется заполненое поле Год окончания учебного заведения"
-
-#: common/djangoapps/student/views.py:702
-msgid "Work type is required"
-msgstr "Требуется заполненое поле Тип образовательного учреждения"
-
-#: common/djangoapps/student/views.py:703
-msgid "Work number is required"
-msgstr "Требуется заполненое поле Номер образовательного учреждения"
-
-#: common/djangoapps/student/views.py:704
-msgid "Work name is required"
-msgstr "Требуется заполненое поле Название образовательного учреждения"
-
-#: common/djangoapps/student/views.py:705
-msgid "Work StatGrad login is required"
-msgstr ""
-"Требуется заполненое поле Логин образовательного учреждения в системе "
-"Статград"
-
-#: common/djangoapps/student/views.py:706
-msgid "Work location is required"
-msgstr "Должно быть указано местоположение рабочего места"
-
-#: common/djangoapps/student/views.py:707
-msgid "Work occupation is required"
-msgstr "Должен быть указан род занятий"
-
-#: common/djangoapps/student/views.py:708
-msgid "Work teaching experience is required"
-msgstr "Должен быть указан опыт работы"
-
-#: common/djangoapps/student/views.py:709
-msgid "Work qualification category is required"
-msgstr "Должна быть указана квалификация"
-
-#: common/djangoapps/student/views.py:710
-msgid "Work qualification year is required"
-msgstr "Должен быть указан стаж"
-
-#: common/djangoapps/student/views.py:711
-msgid "Contact phone is required"
-msgstr "Должен быть указан контактный телефон"
-
-#: common/djangoapps/student/views.py:721
-msgid "Education year must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:722
-#, fuzzy
-msgid "Work teaching experience must be numeric"
-msgstr "Должен быть указан опыт работы"
-
-#: common/djangoapps/student/views.py:723
-#, fuzzy
-msgid "Work managing experience must be numeric"
-msgstr "Должен быть указан опыт работы"
-
-#: common/djangoapps/student/views.py:724
-msgid "Work qualification year must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:725
-msgid "Contact phone must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:742
-msgid "Valid StatGrad login is required."
-msgstr "Должен быть указан корректный логин СтатГрад"
-
-#: lms/djangoapps/shoppingcart/models.py:128
-msgid "Order Payment Confirmation"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py:178
-msgid "Trying to add a different currency into the cart"
-msgstr "Попытка добавить другую валюту в корзину"
-
-#: lms/djangoapps/shoppingcart/models.py:324
-msgid "{mode} certificate for course {course_id}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py:19
-msgid "You must be logged-in to add to a shopping cart"
-msgstr "Вы должны выполнить вход в систему для создания корзины покупок"
-
-#: lms/djangoapps/shoppingcart/views.py:22
-#: lms/djangoapps/shoppingcart/tests/test_views.py:67
-msgid "The course {0} is already in your cart."
-msgstr "Курс {0} уже в Вашей корзине."
-
-#: lms/djangoapps/shoppingcart/views.py:24
-#: lms/djangoapps/shoppingcart/tests/test_views.py:74
-msgid "You are already registered in course {0}."
-msgstr "Вы уже зарегистрированы на курс {0}."
-
-#: lms/djangoapps/shoppingcart/views.py:28
-#: lms/djangoapps/shoppingcart/tests/test_views.py:80
-msgid "The course you requested does not exist."
-msgstr "Запрашиваемый вами курс не существует."
-
-#: lms/djangoapps/shoppingcart/views.py:31
-msgid "Course added to cart."
-msgstr "Курс добавлен в корзину."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:142
-msgid "The payment processor did not return a required parameter: {0}"
-msgstr "Обработчик платежа не вернул требуемый параметр: {0}"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:148
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:163
-msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:154
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:175
-msgid ""
-"The amount charged by the processor {0} {1} is different than the total cost"
-" of the order {2} {3}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:302
-msgid "Successful transaction."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:303
-msgid "The request is missing one or more required fields."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:304
-msgid "One or more fields in the request contains invalid data."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:311
-msgid ""
-"Error: General system failure. Possible fix: retry the payment after a few "
-"minutes."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:323
-msgid ""
-"The issuing bank has questions about the request. Possible fix: retry with "
-"another form of payment"
-msgstr "Банк-эмитент не подтвердил запрос. Попробуйте другие формы платежа"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:335
-msgid ""
-"Insufficient funds in the account. Possible fix: retry with another form of "
-"payment"
-msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:337
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:348
-msgid "Unknown reason"
-msgstr "Неизвестная причина"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:338
-msgid ""
-"Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr "Банк-эмитент недоступен. Повторите операцию через несколько минут"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:344
-msgid ""
-"The card has reached the credit limit. Possible fix: retry with another form"
-" of payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:345
-msgid ""
-"Invalid card verification number. Possible fix: retry with another form of "
-"payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
-msgid ""
-"Invalid account number. Possible fix: retry with another form of payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:355
-msgid ""
-"General decline by the processor.  Possible fix: retry with another form of "
-"payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:361
-msgid "The requested amount exceeds the originally authorized amount."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:362
-msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:364
-#, fuzzy
-msgid "The authorization has already been captured"
-msgstr "Эта учетная запись уже была активирована."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:375
-msgid "The request ID is invalid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:385
-msgid "The transaction has already been settled or reversed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:393
-msgid "You requested a credit for a capture that was previously voided"
-msgstr ""
-
 #: lms/static/admin/js/SelectFilter2.js:45
 #, python-format
 msgid "Available %s"
@@ -5432,6 +5133,10 @@ msgstr "Зарегистрироваться."
 msgid "login via openid"
 msgstr "Войти с помощью OpenID"
 
+#: lms/templates/main.html:23
+msgid "Home"
+msgstr "Главная страница"
+
 #: lms/templates/module-error.html:4
 msgid "There has been an error on the <em>{platform_name}</em> servers"
 msgstr ""
@@ -5618,7 +5323,7 @@ msgstr ""
 
 #: lms/templates/register.html:130
 msgid "Welcome {username}"
-msgstr ""
+msgstr "Добро пожаловать, {username}"
 
 #: lms/templates/register.html:131
 msgid "Enter a public username:"
@@ -5751,19 +5456,19 @@ msgstr "например yourname@domain.com"
 
 #: lms/templates/signup_modal.html:101
 msgid "e.g. 9999"
-msgstr ""
+msgstr "например 9999"
 
 #: lms/templates/signup_modal.html:113
 msgid "e.g. School of art"
-msgstr ""
+msgstr "например Школа Искусств"
 
 #: lms/templates/signup_modal.html:117
 msgid "e.g. sch9999"
-msgstr ""
+msgstr "например sch9999"
 
 #: lms/templates/signup_modal.html:179
 msgid "e.g. 9091234567"
-msgstr ""
+msgstr "например (915) 136-1232"
 
 #: lms/templates/signup_modal.html:191
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
@@ -8456,6 +8161,9 @@ msgid ""
 "penalties associated with incomplete {edX} studies, and you may register for"
 " the same course (provided we are still offering it) at a later time."
 msgstr ""
+"Вы можете удалить регистрацию с курса {edX} в любое время, это не повлечет "
+"за собой никаких санкций в отношении других незавершенных курсов {edX}. "
+"Также вы можете зарегистрироваться на этот же курс позже."
 
 #: lms/templates/static_templates/help.html:84
 #: lms/templates/static_templates/help.html:319
@@ -10670,7 +10378,7 @@ msgstr ""
 
 #: lms/templates/static_templates/media-kit.html:15
 msgid "Welcome to the <span class=\"org-name\">{edX}</span> Media Kit"
-msgstr ""
+msgstr "Добро пожаловать в <span class=\"org-name\">{edX}</span> Media Kit"
 
 #: lms/templates/static_templates/media-kit.html:19
 msgid ""
