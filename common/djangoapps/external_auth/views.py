@@ -255,7 +255,7 @@ def _signup(request, eamap):
 
     # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
     # but this only affects username, not fullname
-    username = _flatten_to_ascii(eamap.external_name)
+    username = re.sub(r'\s', '', _flatten_to_ascii(eamap.external_name), flags=re.UNICODE)
 
     context = {'has_extauth_info': True,
                'show_signup_immediately': True,
