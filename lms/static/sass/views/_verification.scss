@@ -469,13 +469,9 @@
       @include clearfix();
       width: flex-grid(12,12);
 
-      .wrapper-sts, .sts-track {
+      .sts-course, .sts-track {
         display: inline-block;
         vertical-align: middle;
-      }
-
-      .wrapper-sts {
-        width: flex-grid(9,12);
       }
 
       .sts-track {
@@ -495,19 +491,36 @@
         }
       }
 
-      .sts {
+      .sts-label {
         @extend .t-title7;
         display: block;
+        margin-bottom: ($baseline/2);
+        border-bottom: ($baseline/10) solid $m-gray-l4;
+        padding-bottom: ($baseline/2);
         color: $m-gray;
       }
 
       .sts-course {
         @extend .t-title;
+        width: flex-grid(9,12);
+        text-transform: none;
+      }
+
+      .sts-course-org, .sts-course-number {
+        @extend .t-title5;
+        @extend .t-weight4;
+        display: inline-block;
+      }
+
+      .sts-course-org {
+        margin-right: ($baseline/4);
+      }
+
+      .sts-course-name {
         @include font-size(28);
         @include line-height(28);
         @extend .t-weight4;
         display: block;
-        text-transform: none;
       }
     }
   }

@@ -18,21 +18,26 @@
   <section class="wrapper cart-list">
 
     <header class="page-header">
-  <h2 class="title">
-    <span class="wrapper-sts">
-      <span class="sts">${_("You are now registered for")}</span>
-      <span class="sts-course">${course_name} (${course_org}, ${course_num})</span>
-    </span>
-    <span class="sts-track">
-      <span class="sts-track-value">
-        <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
-      </span>
-    </span>
-  </h2>
-</header>
+      <h2 class="title">
+        <span class="sts-label">${_("You are now registered for: ")}</span>
 
+        <span class="wrapper-sts">
+          <span class="sts-course">
+            <span class="sts-course-org">${course_org}</span>
+            <span class="sts-course-number">${course_num}</span>
+            <span class="sts-course-name">${course_name}</span>
+          </span>
 
- <div class="wrapper-progress">
+          <span class="sts-track">
+            <span class="sts-track-value">
+              <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+            </span>
+          </span>
+        </span>
+      </h2>
+    </header>
+
+    <div class="wrapper-progress">
       <section class="progress">
         <h3 class="sr title">${_("Your Progress")}</h3>
 
