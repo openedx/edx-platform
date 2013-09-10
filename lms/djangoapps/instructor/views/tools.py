@@ -1,7 +1,7 @@
 """
 Tools for the instructor dashboard
 """
-def _clean_field(field):
-    if field:
-        return field.strip()
-    return field
+def strip_if_string(value):
+    if isinstance(value, basestring):
+        return value.strip()
+    return value
