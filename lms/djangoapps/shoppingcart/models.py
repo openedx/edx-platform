@@ -381,6 +381,18 @@ class CertificateItem(OrderItem):
             return super(CertificateItem, self).single_item_receipt_template
 
     @property
+    def single_item_receipt_context(self):
+        course = course_from_id(self.course_id)
+        return {
+            "course_id" : self.course_id,
+            "course_name": course.display_name_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
+            "course_start_date_text": course.start_date_text,
+            "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
+        }
+
+    @property
     def additional_instruction_text(self):
         return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
                  "and receive a full refund. To receive your refund, contact {billing_email}. "

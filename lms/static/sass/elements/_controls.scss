@@ -176,6 +176,9 @@
   cursor: default;
   pointer-events: none;
   box-shadow: none;
+  :hover {
+    pointer-events: none;
+  }
 }
 
 // ====================
