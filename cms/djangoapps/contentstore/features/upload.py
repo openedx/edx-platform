@@ -26,7 +26,7 @@ def upload_file(_step, file_name):
     #uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
-    world.browser.attach_file('files[]', os.path.abspath(path))
+    world.browser.attach_file('file', os.path.abspath(path))
     close_css = 'a.close-button'
     world.css_click(close_css)
 
@@ -43,7 +43,7 @@ def upload_file(_step, files_string):
     for f in files:
         path = os.path.join(TEST_ROOT, 'uploads/', f)
         world.browser.execute_script("$('input.file-input').css('display', 'block')")
-        world.browser.attach_file('files[]', os.path.abspath(path))
+        world.browser.attach_file('file', os.path.abspath(path))
     close_css = 'a.close-button'
     world.css_click(close_css)
 
