@@ -10,11 +10,14 @@
 <script>
 jQuery(function($){
   $("#contact-phone").mask("(999) 999-9999");
+});
+
+$(document).ready(function(){
   $('#work-occupation').change(function(){
-    $('#work-occupation2')[$(this).val()=='sub-sub' ? 'show' : 'hide']();
+    $('#work-occupation2')[$(this).val()=='other' ? 'show' : 'hide']();
   });
   $('#work-occupation-other').change(function(){
-    $('#work-occupation-other2')[$(this).val()=='sub-sub' ? 'show' : 'hide']();
+    $('#work-occupation-other2')[$(this).val()=='other' ? 'show' : 'hide']();
   });
 });
 
