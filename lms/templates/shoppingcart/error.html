@@ -1,14 +1,24 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
+
+<%block name="bodyclass">register verification-process payment-error</%block>
 
 <%block name="title"><title>${_("Payment Error")}</title></%block>
 
 
-<section class="container">
-    <p><h1>${_("There was an error processing your order!")}</h1></p>
+<div class="container">
+  <section class="wrapper">
+
+    <header class="page-header">
+      <h2 class="title">${_("There was an error processing your order")}</h2>
+    </header>
+
+    <div class="copy">
     ${error_html}
+    </div>
 
     <p><a href="${reverse('shoppingcart.views.show_cart')}">${_("Return to cart to retry payment")}</a></p>
-</section>
+
+  </section>
+</div>

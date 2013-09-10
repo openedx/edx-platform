@@ -5,7 +5,7 @@
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-confirmation</%block>
 
-<%block name="title"><title>${_("Receipt (Order")} ${order.id})</title></%block>
+<%block name="title"><title>${course_name} ${_("Registration Complete (Order")} ${order.id}) | edX</title></%block>
 
 <%block name="content">
 % if notification is not UNDEFINED:
@@ -201,7 +201,7 @@
             </div>
 
             <div class="copy">
-              <p>${_("Billed To")}:
+              <p>${_("Billed To")}:<br />
                 <span class="name-first">${order.bill_to_first}</span> <span class="name-last">${order.bill_to_last}</span><br />
                 <span class="address-street1">${order.bill_to_street1}</span> <span class="address-street2">${order.bill_to_street2}</span><br />
                 <span class="address-city">${order.bill_to_city}</span>, <span class="address-state">${order.bill_to_state}</span> <span class="address-postalcode">${order.bill_to_postalcode}</span><br />

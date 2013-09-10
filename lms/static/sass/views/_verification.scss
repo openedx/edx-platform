@@ -1365,8 +1365,8 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
-        padding: ($baseline/2) ($baseline*0.75);
+        margin: 0 ($baseline/2) ($baseline/4) 0;
+        padding: ($baseline/2);
         background: $m-gray-t0;
 
         input {
