@@ -35,7 +35,7 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
                     click: function(view) {
                         view.hide();
                         var delmsg = new CMS.Views.Notification.Mini({
-                            title: gettext("Deleting") + "&hellip;"
+                            title: gettext("Deleting&hellip;")
                         }).show();
                         textbook.destroy({
                             complete: function() {
@@ -122,7 +122,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         this.setValues();
         if(!this.model.isValid()) { return; }
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext("Saving") + "&hellip;"
+            title: gettext("Saving&hellip;")
         }).show();
         var that = this;
         this.model.save({}, {
