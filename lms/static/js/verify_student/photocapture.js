@@ -189,9 +189,11 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
 }
 
 function objectTagForFlashCamera(name) {
+  // I manually update this to have ?v={2,3,4, etc} to avoid caching of flash
+  // objects on local dev.
   return '<object type="application/x-shockwave-flash" id="' +
          name + '" name="' + name + '" data=' +
-         '"/static/js/verify_student/CameraCapture.swf?v=2"' +
+         '"/static/js/verify_student/CameraCapture.swf?v=3"' +
           'width="500" height="375"><param name="quality" ' +
           'value="high"><param name="allowscriptaccess" ' +
           'value="sameDomain"></object>';

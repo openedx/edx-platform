@@ -58,6 +58,7 @@ package
 			ExternalInterface.addCallback("reset", reset);
 			ExternalInterface.addCallback("imageDataUrl", imageDataUrl);
 			ExternalInterface.addCallback("cameraAuthorized", cameraAuthorized);
+			ExternalInterface.addCallback("hasCamera", hasCamera);
 			
 			// Notify the container that the SWF is ready to be called. 
 			ExternalInterface.call("setSWFIsReady"); 
@@ -106,6 +107,10 @@ package
 		
 		public function cameraAuthorized():Boolean {
 			return permissionGiven;
+		}
+		
+		public function hasCamera():Boolean {
+			return (Camera.names.length != 0);
 		}
 		
 		public function statusHandler(event:StatusEvent):void {
