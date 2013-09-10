@@ -1,0 +1,3 @@
+---
+before_script: "bundle install"
+script: "rake install prereqs"
