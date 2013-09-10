@@ -211,11 +211,11 @@
     fieldset {
       margin: 0;
       padding-top: 0;
-      padding-bottom: $baseline;
+      padding-bottom: $baseline*2;
     }
 
     .list-input {
-      margin: 0;
+      margin: 0 0 0 25px;
       padding: 0;
       list-style: none;
     }
@@ -305,9 +305,9 @@
       }
 
       // types - checkboxes/radio buttons
-      &.checkbox {
+      &.checkbox, .radio {
 
-        input[type="checkbox"] {
+        input[type="checkbox"], input[type="radio"] {
           display: inline-block;
           width: auto;
           margin-right: ($baseline/4);
