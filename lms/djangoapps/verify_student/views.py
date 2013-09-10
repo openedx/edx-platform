@@ -55,11 +55,15 @@ class VerifyView(View):
             chosen_price = request.session["donation_for_course"][course_id]
         else:
             chosen_price = verify_mode.min_price
+
+        course = course_from_id(course_id)
         context = {
             "progress_state": progress_state,
             "user_full_name": request.user.profile.name,
             "course_id": course_id,
-            "course_name": course_from_id(course_id).display_name,
+            "course_name": course.display_name_with_default,
+            "course_org" : course.display_org_with_default,
+            "course_num" : course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "suggested_prices": [
                 decimal.Decimal(price)
@@ -91,9 +95,12 @@ class VerifiedView(View):
         else:
             chosen_price = verify_mode.min_price.format("{:g}")
 
+        course = course_from_id(course_id)
         context = {
             "course_id": course_id,
-            "course_name": course_from_id(course_id).display_name,
+            "course_name": course.display_name_with_default,
+            "course_org" : course.display_org_with_default,
+            "course_num" : course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
@@ -150,10 +157,14 @@ def show_requirements(request, course_id):
     """
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
+
+    course = course_from_id(course_id)
     context = {
         "course_id": course_id,
+        "course_name": course.display_name_with_default,
+        "course_org" : course.display_org_with_default,
+        "course_num" : course.display_number_with_default,
         "is_not_active": not request.user.is_active,
-        "course_name": course_from_id(course_id).display_name,
     }
     return render_to_response("verify_student/show_requirements.html", context)
 

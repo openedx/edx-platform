@@ -1,8 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from student.views import course_from_id %>
-<%! from datetime import datetime %>
-<%! import pytz %>
 
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-confirmation</%block>
@@ -15,8 +13,6 @@
     ${notification}
 </section>
 % endif
-<% course_id = order_items[0].course_id %>
-<% course = course_from_id(course_id) %>
 
 <div class="container">
   <section class="wrapper cart-list">
@@ -25,7 +21,7 @@
   <h2 class="title">
     <span class="wrapper-sts">
       <span class="sts">${_("You are now registered for")}</span>
-      <span class="sts-course">${course.display_name}</span>
+      <span class="sts-course">${course_name} (${course_org}, ${course_num})</span>
     </span>
     <span class="sts-track">
       <span class="sts-track-value">
@@ -108,11 +104,11 @@
                   <tr>
                     <td>${item.line_desc}</td>
                     <td>
-                       ${_("Starts: {start_date}").format(start_date=course.start_date_text)}
+                       ${_("Starts: {start_date}").format(start_date=course_start_date_text)}
                     </td>
                     <td class="options">
-                      %if course.start > datetime.today().replace(tzinfo=pytz.utc):
-                          ${_("Starts: {start_date}").format(start_date=course.start_date_text)}
+                      %if course_has_started:
+                          ${_("Starts: {start_date}").format(start_date=course_start_date_text)}
                       %else:
                       <a class="action action-course" href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a>
                       %endif
