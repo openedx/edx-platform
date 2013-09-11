@@ -92,14 +92,14 @@
       <p>${_('Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint')}</a>.</p>
 
       <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
-${_('Write your hint here.  Please don't give away the correct answer.')}
+${_('Write your hint here.  Please don\'t give away the correct answer.')}
       </textarea>
       <br /><br />
       <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
       <div id="goodhint" style="display:none">
         <h4>${_('What makes a good hint?')}</h4>
 
-        <p>${_('It depends on the type of problem you ran into. For stupid errors -- an arithmetic error or similar -- simply letting the student you'll be helping to check their signs is sufficient.')}</p>
+        <p>${_('It depends on the type of problem you ran into. For stupid errors -- an arithmetic error or similar -- simply letting the student you\'ll be helping to check their signs is sufficient.')}</p>
 
         <p>${_('For deeper errors of understanding, the best hints allow students to discover a contradiction in how they are thinking about the problem. An example that clearly demonstrates inconsistency or <a href="http://en.wikipedia.org/wiki/Cognitive_dissonance" target="_blank"> cognitive dissonace </a>is ideal, although in most cases, not possible.')}</p>
 
@@ -133,7 +133,7 @@ ${_('Write your hint here.  Please don't give away the correct answer.')}
     % if hint_and_votes is UNDEFINED:
       ${_('Sorry, but you\'ve already voted!')}
     % else:
-      ${_('Thank you for voting!
+      ${_('Thank you for voting!')}
       <br />
       % for hint, votes in hint_and_votes:
           <span style="color:green"> ${votes} votes. </span>
