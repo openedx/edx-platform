@@ -75,6 +75,6 @@ class TestLTI(BaseTestXmodule):
             'input_fields': self.correct_headers,
             'element_class': self.item_module.location.category,
             'element_id': self.item_module.location.html_id(),
-            'launch_url': '',  # default value
+            'launch_url': 'http://www.example.com',  # default value
         }
         self.assertDictEqual(generated_context, expected_context)

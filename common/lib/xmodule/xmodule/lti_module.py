@@ -38,9 +38,12 @@ class LTIFields(object):
         vbid=put_book_id_here
         book_location=page/put_page_number_here
 
+    Default non-empty url for `launch_url` is needed due to oauthlib demand (url scheme should be presented)::
+
+    https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
-    launch_url = String(help="URL of the tool", default='', scope=Scope.settings)
+    launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
 
 
@@ -213,7 +216,6 @@ class LTIModule(LTIFields, XModule):
         body.update(custom_parameters)
 
         headers = {
-            'Host': self.system.HOSTNAME,
             # This is needed for body encoding:
             'Content-Type': 'application/x-www-form-urlencoded',
         }
