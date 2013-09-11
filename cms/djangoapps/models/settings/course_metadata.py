@@ -20,7 +20,8 @@ class CourseMetadata(object):
                      'enrollment_end',
                      'tabs',
                      'graceperiod',
-                     'checklists']
+                     'checklists',
+                     'show_timezone']
 
     @classmethod
     def fetch(cls, course_location):
