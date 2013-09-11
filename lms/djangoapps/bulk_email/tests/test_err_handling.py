@@ -13,7 +13,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 
 from bulk_email.models import CourseEmail
-from bulk_email.tasks import delegate_email_batches
+from bulk_email.tasks import perform_delegate_email_batches
+from instructor_task.models import InstructorTask
 
 from mock import patch, Mock
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
@@ -43,7 +44,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         patch.stopall()
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.course_email.retry')
+    @patch('bulk_email.tasks.send_course_email.retry')
     def test_data_err_retry(self, retry, get_conn):
         """
         Test that celery handles transient SMTPDataErrors by retrying.
@@ -65,7 +66,7 @@ class TestEmailErrors(ModuleStoreTestCase):
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email_result')
-    @patch('bulk_email.tasks.course_email.retry')
+    @patch('bulk_email.tasks.send_course_email.retry')
     def test_data_err_fail(self, retry, result, get_conn):
         """
         Test that celery handles permanent SMTPDataErrors by failing and not retrying.
@@ -93,7 +94,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertEquals(sent, settings.EMAILS_PER_TASK / 2)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.course_email.retry')
+    @patch('bulk_email.tasks.send_course_email.retry')
     def test_disconn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPServerDisconnected by retrying.
@@ -113,7 +114,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(type(exc) == SMTPServerDisconnected)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.course_email.retry')
+    @patch('bulk_email.tasks.send_course_email.retry')
     def test_conn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPConnectError by retrying.
@@ -134,7 +135,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(type(exc) == SMTPConnectError)
 
     @patch('bulk_email.tasks.course_email_result')
-    @patch('bulk_email.tasks.course_email.retry')
+    @patch('bulk_email.tasks.send_course_email.retry')
     @patch('bulk_email.tasks.log')
     @patch('bulk_email.tasks.get_connection', Mock(return_value=EmailTestException))
     def test_general_exception(self, mock_log, retry, result):
@@ -152,25 +153,29 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.client.post(self.url, test_email)
         ((log_str, email_id, to_list), _) = mock_log.exception.call_args
         self.assertTrue(mock_log.exception.called)
-        self.assertIn('caused course_email task to fail with uncaught exception.', log_str)
+        self.assertIn('caused send_course_email task to fail with uncaught exception.', log_str)
         self.assertEqual(email_id, 1)
         self.assertEqual(to_list, [self.instructor.email])
         self.assertFalse(retry.called)
         self.assertFalse(result.called)
 
     @patch('bulk_email.tasks.course_email_result')
-    @patch('bulk_email.tasks.delegate_email_batches.retry')
+    # @patch('bulk_email.tasks.delegate_email_batches.retry')
     @patch('bulk_email.tasks.log')
-    def test_nonexist_email(self, mock_log, retry, result):
+    def test_nonexist_email(self, mock_log, result):
         """
         Tests retries when the email doesn't exist
         """
-        delegate_email_batches.delay(-1, self.instructor.id)
-        ((log_str, email_id, _num_retries), _) = mock_log.warning.call_args
+        # create an InstructorTask object to pass through
+        course_id = self.course.id
+        entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
+        task_input = {"email_id": -1}
+        with self.assertRaises(CourseEmail.DoesNotExist):
+            perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
+        ((log_str, email_id), _) = mock_log.warning.call_args
         self.assertTrue(mock_log.warning.called)
         self.assertIn('Failed to get CourseEmail with id', log_str)
         self.assertEqual(email_id, -1)
-        self.assertTrue(retry.called)
         self.assertFalse(result.called)
 
     @patch('bulk_email.tasks.log')
@@ -178,9 +183,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        email = CourseEmail(course_id="I/DONT/EXIST")
+        course_id = "I/DONT/EXIST"
+        email = CourseEmail(course_id=course_id)
         email.save()
-        delegate_email_batches.delay(email.id, self.instructor.id)
+        entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
+        task_input = {"email_id": email.id}
+        with self.assertRaises(Exception):
+            perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
         ((log_str, _), _) = mock_log.exception.call_args
         self.assertTrue(mock_log.exception.called)
         self.assertIn('get_course_by_id failed:', log_str)
@@ -192,7 +201,10 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         email = CourseEmail(course_id=self.course.id, to_option="IDONTEXIST")
         email.save()
-        delegate_email_batches.delay(email.id, self.instructor.id)
+        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
+        task_input = {"email_id": email.id}
+        with self.assertRaises(Exception):
+            perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")
         ((log_str, opt_str), _) = mock_log.error.call_args
         self.assertTrue(mock_log.error.called)
         self.assertIn('Unexpected bulk email TO_OPTION found', log_str)

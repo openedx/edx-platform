@@ -262,4 +262,4 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task.task_input = "{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
-        self.assertEquals(message, "Problem rescored for 2 of 3 students (out of 5)")
+        self.assertEquals(message, "Status: rescored 2 of 3 (out of 5)")

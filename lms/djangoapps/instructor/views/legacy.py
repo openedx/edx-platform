@@ -46,7 +46,8 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students)
+                                 submit_reset_problem_attempts_for_all_students,
+                                 submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
@@ -719,6 +720,13 @@ def instructor_dashboard(request, course_id):
         html_message = request.POST.get("message")
         text_message = html_to_text(html_message)
 
+        # TODO: make sure this is committed before submitting it to the task.
+        # However, it should probably be enough to do the submit below, which
+        # will commit the transaction for the InstructorTask object.  Both should
+        # therefore be committed.  (Still, it might be clearer to do so here as well.)
+        # Actually, this should probably be moved out, so that all the validation logic
+        # we might want to add to it can be added.  There might also be something
+        # that would permit validation of the email beforehand.
         email = CourseEmail(
             course_id=course_id,
             sender=request.user,
@@ -727,13 +735,11 @@ def instructor_dashboard(request, course_id):
             html_message=html_message,
             text_message=text_message
         )
-
         email.save()
 
-        tasks.delegate_email_batches.delay(
-            email.id,
-            request.user.id
-        )
+        # TODO: make this into a task submission, so that the correct
+        # InstructorTask object gets created (for monitoring purposes)
+        submit_bulk_course_email(request, course_id, email.id)
 
         if email_to_option == "all":
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'

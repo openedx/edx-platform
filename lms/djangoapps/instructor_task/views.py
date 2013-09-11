@@ -40,7 +40,7 @@ def instructor_task_status(request):
 
     Status is returned as a JSON-serialized dict, wrapped as the content of a HTTPResponse.
 
-    The task_id can be specified to this view in one of three ways:
+    The task_id can be specified to this view in one of two ways:
 
     * by making a request containing 'task_id' as a parameter with a single value
       Returns a dict containing status information for the specified task_id
@@ -133,6 +133,8 @@ def get_task_completion_info(instructor_task):
     num_total = task_output['total']
 
     student = None
+    problem_url = None
+    email_id = None
     try:
         task_input = json.loads(instructor_task.task_input)
     except ValueError:
@@ -140,11 +142,14 @@ def get_task_completion_info(instructor_task):
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_input))
     else:
         student = task_input.get('student')
+        problem_url = task_input.get('problem_url')
+        email_id = task_input.get('email_id')
 
     if instructor_task.task_state == PROGRESS:
         # special message for providing progress updates:
         msg_format = "Progress: {action} {updated} of {attempted} so far"
-    elif student is not None:
+    elif student is not None and problem_url is not None:
+        # this reports on actions on problems for a particular student:
         if num_attempted == 0:
             msg_format = "Unable to find submission to be {action} for student '{student}'"
         elif num_updated == 0:
@@ -152,15 +157,31 @@ def get_task_completion_info(instructor_task):
         else:
             succeeded = True
             msg_format = "Problem successfully {action} for student '{student}'"
-    elif num_attempted == 0:
-        msg_format = "Unable to find any students with submissions to be {action}"
-    elif num_updated == 0:
-        msg_format = "Problem failed to be {action} for any of {attempted} students"
-    elif num_updated == num_attempted:
-        succeeded = True
-        msg_format = "Problem successfully {action} for {attempted} students"
-    else:  # num_updated < num_attempted
-        msg_format = "Problem {action} for {updated} of {attempted} students"
+    elif student is None and problem_url is not None:
+        # this reports on actions on problems for all students:
+        if num_attempted == 0:
+            msg_format = "Unable to find any students with submissions to be {action}"
+        elif num_updated == 0:
+            msg_format = "Problem failed to be {action} for any of {attempted} students"
+        elif num_updated == num_attempted:
+            succeeded = True
+            msg_format = "Problem successfully {action} for {attempted} students"
+        else:  # num_updated < num_attempted
+            msg_format = "Problem {action} for {updated} of {attempted} students"
+    elif email_id is not None:
+        # this reports on actions on bulk emails
+        if num_attempted == 0:
+            msg_format = "Unable to find any recipients to be {action}"
+        elif num_updated == 0:
+            msg_format = "Message failed to be {action} for any of {attempted} recipients "
+        elif num_updated == num_attempted:
+            succeeded = True
+            msg_format = "Message successfully {action} for {attempted} recipients"
+        else:  # num_updated < num_attempted
+            msg_format = "Message {action} for {updated} of {attempted} recipients"
+    else:
+        # provide a default:
+        msg_format = "Status: {action} {updated} of {attempted}"
 
     if student is None and num_attempted != num_total:
         msg_format += " (out of {total})"

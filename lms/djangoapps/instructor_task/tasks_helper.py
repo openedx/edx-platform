@@ -3,7 +3,6 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
-
 import json
 from time import time
 from sys import exc_info
@@ -11,11 +10,10 @@ from traceback import format_exc
 
 from celery import current_task
 from celery.utils.log import get_task_logger
-from celery.signals import worker_process_init
 from celery.states import SUCCESS, FAILURE
 
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
 
 from xmodule.modulestore.django import modulestore
@@ -49,8 +47,8 @@ def _get_current_task():
     return current_task
 
 
-def _perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn,
-                                 xmodule_instance_args):
+# def perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, task_input, action_name):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
@@ -85,6 +83,9 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     # get start time for task:
     start_time = time()
 
+    module_state_key = task_input.get('problem_url')
+    student_identifier = task_input.get('student')
+
     # find the problem descriptor:
     module_descriptor = modulestore().get_instance(course_id, module_state_key)
 
@@ -92,8 +93,8 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     modules_to_update = StudentModule.objects.filter(course_id=course_id,
                                                      module_state_key=module_state_key)
 
-    # give the option of rescoring an individual student. If not specified,
-    # then rescores all students who have responded to a problem so far
+    # give the option of updating an individual student. If not specified,
+    # then updates all students who have responded to a problem so far
     student = None
     if student_identifier is not None:
         # if an identifier is supplied, then look for the student,
@@ -132,7 +133,7 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         with dog_stats_api.timer('instructor_tasks.module.time.step', tags=['action:{name}'.format(name=action_name)]):
-            if update_fcn(module_descriptor, module_to_update, xmodule_instance_args):
+            if update_fcn(module_descriptor, module_to_update):
                 # If the update_fcn returns true, then it performed some kind of work.
                 # Logging of failures is left to the update_fcn itself.
                 num_updated += 1
@@ -144,16 +145,20 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     return task_progress
 
 
-def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
-                                xmodule_instance_args):
+def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
     """
+    Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
+
+    TODO: UPDATE THIS DOCSTRING
+    (IT's not just visiting StudentModule instances....)
+
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
     The `entry_id` is the primary key for the InstructorTask entry representing the task.  This function
-    updates the entry on success and failure of the _perform_module_state_update function it
+    updates the entry on success and failure of the perform_module_state_update function it
     wraps.  It is setting the entry's value for task_state based on what Celery would set it to once
     the task returns to Celery:  FAILURE if an exception is encountered, and SUCCESS if it returns normally.
-    Other arguments are pass-throughs to _perform_module_state_update, and documented there.
+    Other arguments are pass-throughs to perform_module_state_update, and documented there.
 
     If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
 
@@ -187,15 +192,15 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
     task_id = entry.task_id
     course_id = entry.course_id
     task_input = json.loads(entry.task_input)
+
+    # construct log message:
+    # TODO: generalize this beyond just problem and student, so it includes email_id and to_option.
+    # Can we just loop over all keys and output them all?  Just print the task_input dict itself?
     module_state_key = task_input.get('problem_url')
-    student_ident = task_input['student'] if 'student' in task_input else None
+    fmt = 'task "{task_id}": course "{course_id}" problem "{state_key}"'
+    task_info_string = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key)
 
-    fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
-    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
-
-    # add task_id to xmodule_instance_args, so that it can be output with tracking info:
-    if xmodule_instance_args is not None:
-        xmodule_instance_args['task_id'] = task_id
+    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
 
     # Now that we have an entry we can try to catch failures:
     task_progress = None
@@ -204,21 +209,47 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
         # that is running.
         request_task_id = _get_current_task().request.id
         if task_id != request_task_id:
-            fmt = 'Requested task "{task_id}" did not match actual task "{actual_id}"'
-            message = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, actual_id=request_task_id)
+            fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
+            message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
             TASK_LOG.error(message)
             raise UpdateProblemModuleStateError(message)
 
         # Now do the work:
-        with dog_stats_api.timer('instructor_tasks.module.time.overall', tags=['action:{name}'.format(name=action_name)]):
-            task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
-                                                         action_name, filter_fcn, xmodule_instance_args)
+        with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
+            # REMOVE: task_progress = visit_fcn(course_id, module_state_key, student_ident, update_fcn, action_name, filter_fcn)
+            task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+
         # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
         # But we do this within the try, in case creating the task_output causes an exception to be
         # raised.
-        entry.task_output = InstructorTask.create_output_for_success(task_progress)
-        entry.task_state = SUCCESS
-        entry.save_now()
+        # TODO: This is not the case if there are outstanding subtasks that were spawned asynchronously
+        # as part of the main task.  There is probably some way to represent this more elegantly, but for
+        # now, we will just use an explicit flag.
+        if spawns_subtasks:
+            # we change the rules here.  If it's a task with subtasks running, then we
+            # explicitly set its state, with the idea that progress will be updated
+            # directly into the InstructorTask object, rather than into the parent task's
+            # AsyncResult object.  This is because we have to write to the InstructorTask
+            # object anyway, so we may as well put status in there.  And because multiple
+            # clients are writing to it, we need the locking that a DB can provide, rather
+            # than the speed that the AsyncResult provides.
+            # So we need to change the logic of the monitor to pull status from the
+            # InstructorTask directly when the state is PROGRESS, and to pull from the
+            # AsyncResult when it's running but not marked as in PROGRESS state.  (I.e.
+            # if it's started.)  Admittedly, it's misnamed, but it should work.
+            # But we've already started the subtasks by the time we get here,
+            # so these values should already have been written.  Too late.
+            # entry.task_output = InstructorTask.create_output_for_success(task_progress)
+            # entry.task_state = PROGRESS
+            # Weird.  Note that by exiting this function successfully, will
+            # result in the AsyncResult for this task as being marked as SUCCESS.
+            # Below, we were just marking the entry to match.  But it shouldn't
+            # match, if it's not really done.
+            pass
+        else:
+            entry.task_output = InstructorTask.create_output_for_success(task_progress)
+            entry.task_state = SUCCESS
+            entry.save_now()
 
     except Exception:
         # try to write out the failure to the entry before failing
@@ -230,15 +261,40 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
         entry.save_now()
         raise
 
+    # Release any queries that the connection has been hanging onto:
+    reset_queries()
+
     # log and exit, returning task_progress info as task result:
-    fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'
-    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, progress=task_progress))
+    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
     return task_progress
 
 
 def _get_task_id_from_xmodule_args(xmodule_instance_args):
     """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
     return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID) if xmodule_instance_args is not None else UNKNOWN_TASK_ID
+
+
+def _get_xqueue_callback_url_prefix(xmodule_instance_args):
+    """
+
+    """
+    return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
+
+
+def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):
+    """
+    Make a tracking function that logs what happened.
+
+    For insertion into ModuleSystem, and used by CapaModule, which will
+    provide the event_type (as string) and event (as dict) as arguments.
+    The request_info and task_info (and page) are provided here.
+    """
+    # get request-related tracking information from args passthrough, and supplement with task-specific
+    # information:
+    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
+    task_info = {'student': student.username, 'task_id': _get_task_id_from_xmodule_args(xmodule_instance_args)}
+
+    return lambda event_type, event: task_track(request_info, task_info, event_type, event, page=source_page)
 
 
 def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args=None,
@@ -277,7 +333,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
 
 
 @transaction.autocommit
-def rescore_problem_module_state(module_descriptor, student_module, xmodule_instance_args=None):
+def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
     performs rescoring on the student's problem submission.
@@ -326,7 +382,7 @@ def rescore_problem_module_state(module_descriptor, student_module, xmodule_inst
 
 
 @transaction.autocommit
-def reset_attempts_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
+def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Resets problem attempts to zero for specified `student_module`.
 
@@ -342,17 +398,16 @@ def reset_attempts_module_state(_module_descriptor, student_module, xmodule_inst
             student_module.save()
             # get request-related tracking information from args passthrough,
             # and supplement with task-specific information:
-            request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-            task_info = {"student": student_module.student.username, "task_id": _get_task_id_from_xmodule_args(xmodule_instance_args)}
+            track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
             event_info = {"old_attempts": old_number_of_attempts, "new_attempts": 0}
-            task_track(request_info, task_info, 'problem_reset_attempts', event_info, page='x_module_task')
+            track_function('problem_reset_attempts', event_info)
 
     # consider the reset to be successful, even if no update was performed.  (It's just "optimized".)
     return True
 
 
 @transaction.autocommit
-def delete_problem_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
+def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Delete the StudentModule entry.
 
@@ -361,7 +416,47 @@ def delete_problem_module_state(_module_descriptor, student_module, xmodule_inst
     student_module.delete()
     # get request-related tracking information from args passthrough,
     # and supplement with task-specific information:
-    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-    task_info = {"student": student_module.student.username, "task_id": _get_task_id_from_xmodule_args(xmodule_instance_args)}
-    task_track(request_info, task_info, 'problem_delete_state', {}, page='x_module_task')
+    track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
+    track_function('problem_delete_state', {})
     return True
+
+
+#def perform_delegate_email_batches(entry_id, course_id, task_input, action_name):
+#    """
+#    """
+#    # Get start time for task:
+#    start_time = time()
+#
+#    # perform the main loop
+#    num_updated = 0
+#    num_attempted = 0
+#    num_total = enrolled_students.count()
+#
+#    def get_task_progress():
+#        """Return a dict containing info about current task"""
+#        current_time = time()
+#        progress = {'action_name': action_name,
+#                    'attempted': num_attempted,
+#                    'updated': num_updated,
+#                    'total': num_total,
+#                    'duration_ms': int((current_time - start_time) * 1000),
+#                    }
+#        return progress
+#
+#    task_progress = get_task_progress()
+#    _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+#    for enrolled_student in enrolled_students:
+#        num_attempted += 1
+#        # There is no try here:  if there's an error, we let it throw, and the task will
+#        # be marked as FAILED, with a stack trace.
+#        with dog_stats_api.timer('instructor_tasks.student.time.step', tags=['action:{name}'.format(name=action_name)]):
+#            if update_fcn(course_descriptor, enrolled_student):
+#                # If the update_fcn returns true, then it performed some kind of work.
+#                # Logging of failures is left to the update_fcn itself.
+#                num_updated += 1
+#
+#        # update task status:
+#        task_progress = get_task_progress()
+#        _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+#
+#    return task_progress
