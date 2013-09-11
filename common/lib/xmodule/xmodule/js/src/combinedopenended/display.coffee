@@ -581,12 +581,12 @@ class @CombinedOpenEnded
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "Hide Question"
-      new_text = "Show Question"
+    if @question_header.text() == gettext("Hide Question")
+      new_text = gettext("Show Question")
       Logger.log 'oe_hide_question', {location: @location}
     else
       Logger.log 'oe_show_question', {location: @location}
-      new_text = "Hide Question"
+      new_text = gettext("Hide Question")
     @question_header.text(new_text)
     return false
 
