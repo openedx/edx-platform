@@ -338,6 +338,12 @@ def get_course_tabs(user, course, active_page, request):
     return tabs
 
 
+def check_search_enable(course):
+    """
+    Returns a boolean representing whether or not search is enabled for the given course
+    """
+    return True
+
 def get_discussion_link(course):
     """
     Return the URL for the discussion tab for the given `course`.
