@@ -68,7 +68,7 @@ function () {
         state.videoCaption.captionMouseUp      = _.bind(captionMouseUp, state);
         state.videoCaption.captionFocus        = _.bind(captionFocus, state);
         state.videoCaption.captionBlur         = _.bind(captionBlur, state);
-        state.videoCaption.captionPressEnter   = _.bind(captionPressEnter, state);
+        state.videoCaption.captionKeyDown      = _.bind(captionKeyDown, state);
     }
 
     // ***************************************************************
@@ -332,9 +332,10 @@ function () {
         this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.captionMouseUp);
         this.videoCaption.subtitlesEl.find('li[data-index]').on('focus', this.videoCaption.captionFocus);
         this.videoCaption.subtitlesEl.find('li[data-index]').on('blur', this.videoCaption.captionBlur);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('keydown', this.videoCaption.captionPressEnter);
-        this.videoCaption.tabbing = false;
-        this.videoCaption.tabIndex = 0;
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('keydown', this.videoCaption.captionKeyDown);
+        this.videoCaption.automaticScroll = true;
+        this.videoCaption.currentCaptionIndex = 0;
+        this.videoCaption.isMouseFocus = false;
 
         this.videoCaption.subtitlesEl.prepend($('<li class="spacing">').height(this.videoCaption.topSpacingHeight()));
         this.videoCaption.subtitlesEl.append($('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight()));
@@ -342,26 +343,29 @@ function () {
         this.videoCaption.rendered = true;
     }
 
+    // On mouseEnter, hide the outline of a caption that has been tabbed to.
     function captionMouseEnter(event) {
-        var target = $(event.target);
-        var targetIndex = parseInt(target.attr('data-index'), 10); 
-        if (targetIndex === this.tabIndex) {
-            target.css('outlineWidth', '0px');
+        var caption = $(event.target);
+        var captionIndex = parseInt(caption.attr('data-index'), 10); 
+        if (captionIndex === this.videoCaption.currentCaptionIndex) {
+            caption.css('outlineWidth', '0px');
         } 
     }
 
+    // On mouseLeave, show the outline of a caption that has been tabbed to.
     function captionMouseLeave(event) {
-        var target = $(event.target);
-        var targetIndex = parseInt(target.attr('data-index'), 10); 
-        if (targetIndex === this.tabIndex) {
-            target.css('outlineWidth', '1px');
+        var caption = $(event.target),
+            captionIndex = parseInt(caption.attr('data-index'), 10); 
+        if (captionIndex === this.videoCaption.currentCaptionIndex) {
+            caption.css('outlineWidth', '1px');
         }
     }
 
     function captionMouseDown(event) {
-        var target = $(event.target);
-        target.css('outlineWidth', '0px');
-        this.videoCaption.tabbing = false;
+        var caption = $(event.target);
+        this.videoCaption.isMouseFocus = true;
+        caption.css('outlineWidth', '0px');
+        this.videoCaption.automaticScroll = true;
     }
 
     function captionMouseUp(event) {
@@ -369,30 +373,50 @@ function () {
     }
 
     function captionFocus(event) {
-        var target = $(event.target);
-        var targetIndex = parseInt(target.attr('data-index'), 10);
-        this.tabIndex = targetIndex;
-        target.css('outlineWidth', '1px');
-        target.css('outlineStyle', 'dotted');    
-        if (targetIndex === 0 ||
-            targetIndex === 1 ||
-            targetIndex === this.videoCaption.captions.length-2 || 
-            targetIndex === this.videoCaption.captions.length-1) {
-            this.videoCaption.tabbing = true;
+        var caption = $(event.target),
+            captionIndex = parseInt(caption.attr('data-index'), 10);
+        // If the focus comes from a mouse click, hide the outline and turn on
+        // automatic scrolling.
+        if (this.videoCaption.isMouseFocus) {
+            this.videoCaption.automaticScroll = true;
+            caption.css('outlineWidth', '0px');
+            caption.css('outlineStyle', 'none');  
+        }
+        // If the focus comes from tabbing, show the outline and turn off 
+        // automatic scrolling.
+        else {
+            this.videoCaption.currentCaptionIndex = captionIndex;
+            caption.css('outlineWidth', '1px');
+            caption.css('outlineStyle', 'dotted');
+            // The second and second to last elements turn automatic scrolling
+            // off again as it may have been enabled in captionBlur.    
+            if (captionIndex === 0 ||
+                captionIndex === 1 ||
+                captionIndex === this.videoCaption.captions.length-2 || 
+                captionIndex === this.videoCaption.captions.length-1) {
+                this.videoCaption.automaticScroll = false;
+            }
         }
     }
 
     function captionBlur(event) {
-        var target = $(event.target);
-        targetIndex = parseInt(target.attr('data-index'), 10);
-        target.css('outlineWidth', '0px');
-        target.css('outlineStyle', 'none');
-        if (targetIndex === 0 || targetIndex === this.videoCaption.captions.length-1) {
-            this.videoCaption.tabbing = false;
+        var caption = $(event.target), 
+            captionIndex = parseInt(caption.attr('data-index'), 10);
+        caption.css('outlineWidth', '0px');
+        caption.css('outlineStyle', 'none');
+        // If we are on first or last index, we have to turn automatic scroll on
+        // again when losing focus. There is no way to know in what direction we
+        // are tabbing. So we could be on the first element and tabbing back out
+        // of the captions or on the last element and tabbing forward out of the
+        // captions.
+        if (captionIndex === 0 || 
+            captionIndex === this.videoCaption.captions.length-1) {
+            this.videoCaption.automaticScroll = true;
         }
     }
 
-    function captionPressEnter(event) {
+    function captionKeyDown(event) {
+        this.videoCaption.isMouseFocus = false;
         if (event.which === 13) { //Enter key
             this.videoCaption.seekPlayer(event);
         }
@@ -401,7 +425,7 @@ function () {
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-        if (!this.videoCaption.frozen && el.length && !this.videoCaption.tabbing) {
+        if (!this.videoCaption.frozen && el.length && this.videoCaption.automaticScroll) {
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
                 {
