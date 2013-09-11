@@ -580,11 +580,11 @@ class @PeerGradingProblem
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
     if @question_header.text() == "Hide Prompt"
-      new_text = "Show Prompt"
+      new_text = gettext("Show Prompt")
       Logger.log 'oe_hide_question', {location: @location}
     else
       Logger.log 'oe_show_question', {location: @location}
-      new_text = "Hide Prompt"
+      new_text = gettext("Hide Prompt")
     @question_header.text(new_text)
     return false
 

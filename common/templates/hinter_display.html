@@ -1,6 +1,7 @@
 ## The hinter module passes in a field called ${op}, which determines which
 ## sub-function to render.
 
+<%! from django.utils.translation import ugettext as _ %>
 
 <%def name="get_hint()">
     % if len(hints) > 0:
@@ -65,12 +66,11 @@
     <div class="wizard-view" id="p2">
       % if hints_exist:
         <p>
-        Choose the incorrect answer for which you want to write a hint:
+        ${_('Choose the incorrect answer for which you want to write a hint:')}
         </p>
       % else:
       <p>
-        <em>Optional.</em>  Help other students by submitting a hint!  Pick one of your previous
-        answers for which you would like to write a hint:
+        ${_('<em>Optional.</em>  Help other students by submitting a hint!  Pick one of your previous answers for which you would like to write a hint:')}
       </p>
       % endif
       % for answer in user_submissions:
@@ -87,48 +87,40 @@
     <div class="wizard-view" id="p3">
 
       <p>
-        Write a hint for other students who get the wrong answer of <span id="blank-answer"></span>.
+        ${_('Write a hint for other students who get the wrong answer of')} <span id="blank-answer"></span>.
       </p>
-      <p>Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
+      <p>${_('Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint')}</a>.</p>
 
       <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
-Write your hint here.  Please don't give away the correct answer.
+${_('Write your hint here.  Please don't give away the correct answer.')}
       </textarea>
       <br /><br />
       <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
       <div id="goodhint" style="display:none">
-        <h4>What makes a good hint?</h4>
+        <h4>${_('What makes a good hint?')}</h4>
 
-        <p>It depends on the type of problem you ran into. For stupid errors --
-        an arithmetic error or similar -- simply letting the student you'll be
-        helping to check their signs is sufficient.</p>
+        <p>${_('It depends on the type of problem you ran into. For stupid errors -- an arithmetic error or similar -- simply letting the student you'll be helping to check their signs is sufficient.')}</p>
 
-        <p>For deeper errors of understanding, the best hints allow students to
-        discover a contradiction in how they are thinking about the
-        problem. An example that clearly demonstrates inconsistency or
-        <a href="http://en.wikipedia.org/wiki/Cognitive_dissonance" target="_blank"> cognitive dissonace </a>
-        is ideal, although in most cases, not possible.</p>
+        <p>${_('For deeper errors of understanding, the best hints allow students to discover a contradiction in how they are thinking about the problem. An example that clearly demonstrates inconsistency or <a href="http://en.wikipedia.org/wiki/Cognitive_dissonance" target="_blank"> cognitive dissonace </a>is ideal, although in most cases, not possible.')}</p>
 
         <p>
-          Good hints either:
+          ${_('Good hints either:')}
           <ul>
-            <li> Point out the specific misunderstanding your classmate might have </li>
-            <li> Point to concepts or theories where your classmates might have a
-            misunderstanding </li>
-            <li> Show simpler, analogous examples. </li>
-            <li> Provide references to relevant parts of the text </li>
+            <li> ${_('Point out the specific misunderstanding your classmate might have')} </li>
+            <li> ${_('Point to concepts or theories where your classmates might have a misunderstanding')} </li>
+            <li> ${_('Show simpler, analogous examples.')} </li>
+            <li> ${_('Provide references to relevant parts of the text')} </li>
           </ul>
         </p>
 
-        <p>Still, remember even a crude hint -- virtually anything short of
-        giving away the answer -- is better than no hint.</p>
+        <p>${_('Still, remember even a crude hint -- virtually anything short of giving away the answer -- is better than no hint.')}</p>
 
         <p>
-          <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
+          <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">${_('Learn even more')}</a>
         </p>
       </div>
       <p class="bottom">
-        <a href="javascript: void(0);" class="wizard-link" dest="p2"> Back </a>
+        <a href="javascript: void(0);" class="wizard-link" dest="p2"> ${_('Back')} </a>
       </p>
     </div>
   <!-- Close wizard contaner and wizard viewbox. -->
@@ -139,9 +131,9 @@ Write your hint here.  Please don't give away the correct answer.
 
 <%def name="show_votes()">
     % if hint_and_votes is UNDEFINED:
-      Sorry, but you've already voted!
+      ${_('Sorry, but you\'ve already voted!')}
     % else:
-      Thank you for voting!
+      ${_('Thank you for voting!
       <br />
       % for hint, votes in hint_and_votes:
           <span style="color:green"> ${votes} votes. </span>

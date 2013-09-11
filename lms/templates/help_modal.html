@@ -77,7 +77,7 @@ discussion_link = get_discussion_link(course) if course else None
       <input name="course_id" type="hidden" value="${course.id | h}">
 % endif
       <div class="submit">
-        <input name="submit" type="submit" value="Submit">
+        <input name="submit" type="submit" value="${_('Submit')}">
       </div>
     </form>
 
