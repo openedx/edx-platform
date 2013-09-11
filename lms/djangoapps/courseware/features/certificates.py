@@ -80,8 +80,8 @@ def should_see_the_course_on_my_dashboard(step):
 def goto_next_step(step, step_num):
     btn_css = {
         '1': '#face_next_button',
-        '2': '#face_next_button',
-        '3': '#photo_id_next_button',
+        '2': '#face_next_link',
+        '3': '#photo_id_next_link',
         '4': '#pay_button',
     }
     next_css = {
