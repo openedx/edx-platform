@@ -121,7 +121,7 @@ describe 'CombinedOpenEnded', ->
       @combined.child_state = 'initial'
       @combined.rebind()
       expect(@combined.answer_area.attr("disabled")).toBeUndefined()
-      expect(@combined.submit_button.val()).toBe(gettext("Submit")
+      expect(@combined.submit_button.val()).toBe(gettext("Submit"))
 
     it 'when our child state is post_assessment', ->
       @combined.child_state = 'post_assessment'
