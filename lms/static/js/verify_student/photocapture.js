@@ -199,7 +199,11 @@ function objectTagForFlashCamera(name) {
 
 $(document).ready(function() {
   $(".carousel-nav").addClass('sr');
-  $("#pay_button").click(submitToPaymentProcessing);
+  $("#pay_button").click(function(){
+      analytics.pageview("Payment Form");
+      submitToPaymentProcessing();
+  });
+
   // prevent browsers from keeping this button checked
   $("#confirm_pics_good").prop("checked", false)
   $("#confirm_pics_good").change(function() {
@@ -210,10 +214,12 @@ $(document).ready(function() {
   // add in handlers to add/remove the correct classes to the body
   // when moving between steps
   $('#face_next_link').click(function(){
+      analytics.pageview("Capture ID Photo");
       $('body').addClass('step-photos-id').removeClass('step-photos-cam')
   })
 
   $('#photo_id_next_link').click(function(){
+      analytics.pageview("Review Photos");
       $('body').addClass('step-review').removeClass('step-photos-id')
   })
 
@@ -229,6 +235,7 @@ $(document).ready(function() {
     $("#photo_id_capture_div").html(objectTagForFlashCamera("photo_id_flash"));
   }
 
+  analytics.pageview("Capture Face Photo");
   initSnapshotHandler(["photo_id", "face"], hasHtml5CameraSupport);
 
 });
