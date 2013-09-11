@@ -1,6 +1,5 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
-from requests.packages.oauthlib.oauth1.rfc5849 import signature
 import mock
 import threading
 import json

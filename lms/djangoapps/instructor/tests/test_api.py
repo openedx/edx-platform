@@ -4,6 +4,7 @@ Unit tests for instructor.api methods.
 # pylint: disable=E1111
 import unittest
 import json
+import requests
 from urllib import quote
 from django.conf import settings
 from django.test import TestCase
@@ -756,7 +757,7 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
     class FakeProxyResponse(object):
         """ Fake successful requests response object. """
         def __init__(self):
-            self.status_code = instructor.views.api.codes.OK
+            self.status_code = requests.status_codes.codes.OK
             self.content = '{"test_content": "robot test content"}'
 
     class FakeBadProxyResponse(object):
