@@ -58,13 +58,14 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     return InstructorTask.create(course_id, task_type, task_key, task_input, requester)
 
 
-def _get_xmodule_instance_args(request):
+def _get_xmodule_instance_args(request, task_id):
     """
     Calculate parameters needed for instantiating xmodule instances.
 
     The `request_info` will be passed to a tracking log function, to provide information
     about the source of the task request.   The `xqueue_callback_url_prefix` is used to
     permit old-style xqueue callbacks directly to the appropriate module in the LMS.
+    The `task_id` is also passed to the tracking log function.
     """
     request_info = {'username': request.user.username,
                     'ip': request.META['REMOTE_ADDR'],
@@ -74,6 +75,7 @@ def _get_xmodule_instance_args(request):
 
     xmodule_instance_args = {'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
                              'request_info': request_info,
+                             'task_id': task_id,
                              }
     return xmodule_instance_args
 
@@ -214,7 +216,7 @@ def check_arguments_for_rescoring(course_id, problem_url):
 
 def encode_problem_and_student_input(problem_url, student=None):
     """
-    Encode problem_url and optional student into task_key and task_input values.
+    Encode optional problem_url and optional student into task_key and task_input values.
 
     `problem_url` is full URL of the problem.
     `student` is the user object of the student
@@ -257,7 +259,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     # submit task:
     task_id = instructor_task.task_id
-    task_args = [instructor_task.id, _get_xmodule_instance_args(request)]
+    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
     task_class.apply_async(task_args, task_id=task_id)
 
     return instructor_task

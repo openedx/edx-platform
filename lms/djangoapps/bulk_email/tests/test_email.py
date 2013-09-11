@@ -13,7 +13,7 @@ from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentF
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from bulk_email.tasks import delegate_email_batches, course_email
+from bulk_email.tasks import send_course_email
 from bulk_email.models import CourseEmail, Optout
 
 from mock import patch
@@ -289,6 +289,9 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
     Test that exceptions are handled correctly.
     """
     def test_no_course_email_obj(self):
-        # Make sure course_email handles CourseEmail.DoesNotExist exception.
+        # Make sure send_course_email handles CourseEmail.DoesNotExist exception.
+        with self.assertRaises(KeyError):
+            send_course_email(101, [], {}, False)
+
         with self.assertRaises(CourseEmail.DoesNotExist):
-            course_email(101, [], "_", "_", "_", False)
+            send_course_email(101, [], {'course_title': 'Test'}, False)
