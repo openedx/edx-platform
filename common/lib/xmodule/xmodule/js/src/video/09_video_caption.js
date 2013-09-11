@@ -62,6 +62,13 @@ function () {
         state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
         state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
         state.videoCaption.captionURL          = _.bind(captionURL, state);
+        state.videoCaption.captionMouseEnter   = _.bind(captionMouseEnter, state);
+        state.videoCaption.captionMouseLeave   = _.bind(captionMouseLeave, state);
+        state.videoCaption.captionMouseDown    = _.bind(captionMouseDown, state);
+        state.videoCaption.captionMouseUp      = _.bind(captionMouseUp, state);
+        state.videoCaption.captionFocus        = _.bind(captionFocus, state);
+        state.videoCaption.captionBlur         = _.bind(captionBlur, state);
+        state.videoCaption.captionPressEnter   = _.bind(captionPressEnter, state);
     }
 
     // ***************************************************************
@@ -309,7 +316,8 @@ function () {
 
             liEl.attr({
                 'data-index': index,
-                'data-start': _this.videoCaption.start[index]
+                'data-start': _this.videoCaption.start[index],
+                'tabindex': 0
             });
 
             container.append(liEl);
@@ -317,7 +325,16 @@ function () {
 
         this.videoCaption.subtitlesEl.html(container.html());
 
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.seekPlayer);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseenter', this.videoCaption.captionMouseEnter);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseleave', this.videoCaption.captionMouseLeave);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('mousedown', this.videoCaption.captionMouseDown);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseup', this.videoCaption.captionMouseUp);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.captionMouseUp);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('focus', this.videoCaption.captionFocus);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('blur', this.videoCaption.captionBlur);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('keydown', this.videoCaption.captionPressEnter);
+        this.videoCaption.tabbing = false;
+        this.videoCaption.tabIndex = 0;
 
         this.videoCaption.subtitlesEl.prepend($('<li class="spacing">').height(this.videoCaption.topSpacingHeight()));
         this.videoCaption.subtitlesEl.append($('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight()));
@@ -325,10 +342,66 @@ function () {
         this.videoCaption.rendered = true;
     }
 
+    function captionMouseEnter(event) {
+        var target = $(event.target);
+        var targetIndex = parseInt(target.attr('data-index'), 10); 
+        if (targetIndex === this.tabIndex) {
+            target.css('outlineWidth', '0px');
+        } 
+    }
+
+    function captionMouseLeave(event) {
+        var target = $(event.target);
+        var targetIndex = parseInt(target.attr('data-index'), 10); 
+        if (targetIndex === this.tabIndex) {
+            target.css('outlineWidth', '1px');
+        }
+    }
+
+    function captionMouseDown(event) {
+        var target = $(event.target);
+        target.css('outlineWidth', '0px');
+        this.videoCaption.tabbing = false;
+    }
+
+    function captionMouseUp(event) {
+        this.videoCaption.seekPlayer(event);
+    }
+
+    function captionFocus(event) {
+        var target = $(event.target);
+        var targetIndex = parseInt(target.attr('data-index'), 10);
+        this.tabIndex = targetIndex;
+        target.css('outlineWidth', '1px');
+        target.css('outlineStyle', 'dotted');    
+        if (targetIndex === 0 ||
+            targetIndex === 1 ||
+            targetIndex === this.videoCaption.captions.length-2 || 
+            targetIndex === this.videoCaption.captions.length-1) {
+            this.videoCaption.tabbing = true;
+        }
+    }
+
+    function captionBlur(event) {
+        var target = $(event.target);
+        targetIndex = parseInt(target.attr('data-index'), 10);
+        target.css('outlineWidth', '0px');
+        target.css('outlineStyle', 'none');
+        if (targetIndex === 0 || targetIndex === this.videoCaption.captions.length-1) {
+            this.videoCaption.tabbing = false;
+        }
+    }
+
+    function captionPressEnter(event) {
+        if (event.which === 13) { //Enter key
+            this.videoCaption.seekPlayer(event);
+        }
+    }
+
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-        if (!this.videoCaption.frozen && el.length) {
+        if (!this.videoCaption.frozen && el.length && !this.videoCaption.tabbing) {
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
                 {
