@@ -38,7 +38,7 @@ def get_checklists(request, org, course, name):
         course_module.save()
         modulestore.update_metadata(location, own_metadata(course_module))
 
-    expanded_checklists = expand_all_checklist_action_urls(course_module)
+    expanded_checklists = expand_all_action_urls(course_module)
     return render_to_response('checklists.html',
                               {
                                   'context_course': course_module,
@@ -89,11 +89,11 @@ def update_checklist(request, org, course, name, checklist_index=None):
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all
         # the checklists.
-        expanded_checklists = expand_all_checklist_action_urls(course_module)
+        expanded_checklists = expand_all_action_urls(course_module)
         return JsonResponse(expanded_checklists)
 
 
-def expand_all_checklist_action_urls(course_module):
+def expand_all_action_urls(course_module):
     """
     Gets the checklists out of the course module and expands their action urls.
 
@@ -119,7 +119,7 @@ def expand_checklist_action_url(course_module, checklist):
         "SettingsGrading": "settings_grading",
         "CourseOutline": "course_index",
         "Checklists": "checklists",
-        }
+    }
     for item in expanded_checklist.get('items'):
         action_url = item.get('action_url')
         if action_url not in urlconf_map:
@@ -129,6 +129,6 @@ def expand_checklist_action_url(course_module, checklist):
             'org': course_module.location.org,
             'course': course_module.location.course,
             'name': course_module.location.name,
-            })
+        })
 
     return expanded_checklist
