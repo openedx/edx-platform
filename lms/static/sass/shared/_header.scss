@@ -20,17 +20,14 @@ header.global {
     float: left;
     margin: -2px 39px 0px 0px;
     position: relative;
+  }
 
-    !.slim a {
-      display: block;
-      position: absolute;
-    }
-    span {
+  span {
       display: inline-block;
-      margin-left: 130px;
+      margin-left: 30px;
       font-size: initial;
       white-space: nowrap;
-    }
+      position: absolute;
   }
 
   ol {
