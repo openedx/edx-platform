@@ -37,38 +37,37 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoCaption.autoShowCaptions    = _.bind(autoShowCaptions, state);
-        state.videoCaption.autoHideCaptions    = _.bind(autoHideCaptions, state);
-        state.videoCaption.resize              = _.bind(resize, state);
-        state.videoCaption.toggle              = _.bind(toggle, state);
-        state.videoCaption.onMouseEnter        = _.bind(onMouseEnter, state);
-        state.videoCaption.onMouseLeave        = _.bind(onMouseLeave, state);
-        state.videoCaption.onMovement          = _.bind(onMovement, state);
-        state.videoCaption.renderCaption       = _.bind(renderCaption, state);
-        state.videoCaption.captionHeight       = _.bind(captionHeight, state);
-        state.videoCaption.topSpacingHeight    = _.bind(topSpacingHeight, state);
-        state.videoCaption.bottomSpacingHeight = _.bind(bottomSpacingHeight, state);
-        state.videoCaption.scrollCaption       = _.bind(scrollCaption, state);
-        state.videoCaption.search              = _.bind(search, state);
-        state.videoCaption.play                = _.bind(play, state);
-        state.videoCaption.pause               = _.bind(pause, state);
-        state.videoCaption.seekPlayer          = _.bind(seekPlayer, state);
-        state.videoCaption.hideCaptions        = _.bind(hideCaptions, state);
-        state.videoCaption.calculateOffset     = _.bind(calculateOffset, state);
-        state.videoCaption.updatePlayTime      = _.bind(updatePlayTime, state);
-        state.videoCaption.setSubtitlesHeight  = _.bind(setSubtitlesHeight, state);
+        state.videoCaption.autoShowCaptions        = _.bind(autoShowCaptions, state);
+        state.videoCaption.autoHideCaptions        = _.bind(autoHideCaptions, state);
+        state.videoCaption.resize                  = _.bind(resize, state);
+        state.videoCaption.toggle                  = _.bind(toggle, state);
+        state.videoCaption.onMouseEnter            = _.bind(onMouseEnter, state);
+        state.videoCaption.onMouseLeave            = _.bind(onMouseLeave, state);
+        state.videoCaption.onMovement              = _.bind(onMovement, state);
+        state.videoCaption.renderCaption           = _.bind(renderCaption, state);
+        state.videoCaption.captionHeight           = _.bind(captionHeight, state);
+        state.videoCaption.topSpacingHeight        = _.bind(topSpacingHeight, state);
+        state.videoCaption.bottomSpacingHeight     = _.bind(bottomSpacingHeight, state);
+        state.videoCaption.scrollCaption           = _.bind(scrollCaption, state);
+        state.videoCaption.search                  = _.bind(search, state);
+        state.videoCaption.play                    = _.bind(play, state);
+        state.videoCaption.pause                   = _.bind(pause, state);
+        state.videoCaption.seekPlayer              = _.bind(seekPlayer, state);
+        state.videoCaption.hideCaptions            = _.bind(hideCaptions, state);
+        state.videoCaption.calculateOffset         = _.bind(calculateOffset, state);
+        state.videoCaption.updatePlayTime          = _.bind(updatePlayTime, state);
+        state.videoCaption.setSubtitlesHeight      = _.bind(setSubtitlesHeight, state);
 
-        state.videoCaption.renderElements      = _.bind(renderElements, state);
-        state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
-        state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
-        state.videoCaption.captionURL          = _.bind(captionURL, state);
-        state.videoCaption.captionMouseEnter   = _.bind(captionMouseEnter, state);
-        state.videoCaption.captionMouseLeave   = _.bind(captionMouseLeave, state);
-        state.videoCaption.captionMouseDown    = _.bind(captionMouseDown, state);
-        state.videoCaption.captionMouseUp      = _.bind(captionMouseUp, state);
-        state.videoCaption.captionFocus        = _.bind(captionFocus, state);
-        state.videoCaption.captionBlur         = _.bind(captionBlur, state);
-        state.videoCaption.captionKeyDown      = _.bind(captionKeyDown, state);
+        state.videoCaption.renderElements          = _.bind(renderElements, state);
+        state.videoCaption.bindHandlers            = _.bind(bindHandlers, state);
+        state.videoCaption.fetchCaption            = _.bind(fetchCaption, state);
+        state.videoCaption.captionURL              = _.bind(captionURL, state);
+        state.videoCaption.captionMouseEnterLeave  = _.bind(captionMouseEnterLeave, state);
+        state.videoCaption.captionMouseDown        = _.bind(captionMouseDown, state);
+        state.videoCaption.captionMouseUp          = _.bind(captionMouseUp, state);
+        state.videoCaption.captionFocus            = _.bind(captionFocus, state);
+        state.videoCaption.captionBlur             = _.bind(captionBlur, state);
+        state.videoCaption.captionKeyDown          = _.bind(captionKeyDown, state);
     }
 
     // ***************************************************************
@@ -325,14 +324,17 @@ function () {
 
         this.videoCaption.subtitlesEl.html(container.html());
 
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseenter', this.videoCaption.captionMouseEnter);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseleave', this.videoCaption.captionMouseLeave);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('mousedown', this.videoCaption.captionMouseDown);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('mouseup', this.videoCaption.captionMouseUp);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.captionMouseUp);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('focus', this.videoCaption.captionFocus);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('blur', this.videoCaption.captionBlur);
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('keydown', this.videoCaption.captionKeyDown);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on({
+            mouseenter: this.videoCaption.captionMouseEnterLeave,
+            mouseleave: this.videoCaption.captionMouseEnterLeave,
+            mousedown:  this.videoCaption.captionMouseDown,
+            mouseup:    this.videoCaption.captionMouseUp,
+            click:      this.videoCaption.captionMouseUp,
+            focus:      this.videoCaption.captionFocus,
+            blur:       this.videoCaption.captionBlur,
+            keydown:    this.videoCaption.captionKeyDown
+        });
+
         this.videoCaption.automaticScroll = true;
         this.videoCaption.currentCaptionIndex = 0;
         this.videoCaption.isMouseFocus = false;
@@ -344,21 +346,14 @@ function () {
     }
 
     // On mouseEnter, hide the outline of a caption that has been tabbed to.
-    function captionMouseEnter(event) {
-        var caption = $(event.target);
-        var captionIndex = parseInt(caption.attr('data-index'), 10); 
-        if (captionIndex === this.videoCaption.currentCaptionIndex) {
-            caption.css('outlineWidth', '0px');
-        } 
-    }
-
     // On mouseLeave, show the outline of a caption that has been tabbed to.
-    function captionMouseLeave(event) {
+    function captionMouseEnterLeave(event) {
         var caption = $(event.target),
+            outlineWidth = (event.type === 'mouseleave') ? 1 : 0,
             captionIndex = parseInt(caption.attr('data-index'), 10); 
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
-            caption.css('outlineWidth', '1px');
-        }
+            caption.css('outlineWidth', outlineWidth + 'px');
+        } 
     }
 
     function captionMouseDown(event) {
@@ -379,21 +374,22 @@ function () {
         // automatic scrolling.
         if (this.videoCaption.isMouseFocus) {
             this.videoCaption.automaticScroll = true;
-            caption.css('outlineWidth', '0px');
-            caption.css('outlineStyle', 'none');  
+            caption.css({
+                'outlineWidth': '0px',
+                'outlineStyle': 'none'
+            });
         }
         // If the focus comes from tabbing, show the outline and turn off 
         // automatic scrolling.
         else {
             this.videoCaption.currentCaptionIndex = captionIndex;
-            caption.css('outlineWidth', '1px');
-            caption.css('outlineStyle', 'dotted');
+            caption.css({
+                'outlineWidth': '1px',
+                'outlineStyle': 'dotted'
+            });
             // The second and second to last elements turn automatic scrolling
             // off again as it may have been enabled in captionBlur.    
-            if (captionIndex === 0 ||
-                captionIndex === 1 ||
-                captionIndex === this.videoCaption.captions.length-2 || 
-                captionIndex === this.videoCaption.captions.length-1) {
+            if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
                 this.videoCaption.automaticScroll = false;
             }
         }
@@ -402,8 +398,10 @@ function () {
     function captionBlur(event) {
         var caption = $(event.target), 
             captionIndex = parseInt(caption.attr('data-index'), 10);
-        caption.css('outlineWidth', '0px');
-        caption.css('outlineStyle', 'none');
+        caption.css({
+            'outlineWidth': '0px',
+            'outlineStyle': 'none'
+        });
         // If we are on first or last index, we have to turn automatic scroll on
         // again when losing focus. There is no way to know in what direction we
         // are tabbing. So we could be on the first element and tabbing back out
