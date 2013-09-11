@@ -13,6 +13,7 @@ def create_cert_course():
     name = 'Certificates'
     course_id = '{org}/{number}/{name}'.format(
         org=org, number=number, name=name)
+    world.scenario_dict['course_id'] = course_id
     world.scenario_dict['COURSE'] = world.CourseFactory.create(
         org=org, number=number, display_name=name)
 
@@ -42,6 +43,18 @@ def register():
 
     world.css_click('section.intro a.register')
     assert world.is_css_present('section.wrapper h3.title')
+
+
+@step(u'the course has an honor mode')
+def the_course_has_an_honor_mode(step):
+    create_cert_course()
+    honor_mode = world.CourseModeFactory.create(
+        course_id=world.scenario_dict['course_id'],
+        mode_slug='honor',
+        mode_display_name='honor mode',
+        min_price=0,
+        )
+    assert isinstance(honor_mode, CourseMode)
 
 
 @step(u'I select the audit track$')
@@ -171,8 +184,8 @@ def submit_payment(step):
     world.css_click(button_css)
 
 
-@step(u'I have submitted photos to verify my identity')
-def submitted_photos_to_verify_my_identity(step):
+@step(u'I have submitted face and ID photos$')
+def submitted_face_and_id_photos(step):
     step.given('I am logged in')
     step.given('I select the verified track')
     step.given('I go to step "1"')
@@ -182,6 +195,11 @@ def submitted_photos_to_verify_my_identity(step):
     step.given('I capture my "photo_id" photo')
     step.given('I approve my "photo_id" photo')
     step.given('I go to step "3"')
+
+
+@step(u'I have submitted photos to verify my identity')
+def submitted_photos_to_verify_my_identity(step):
+    step.given('I have submitted face and ID photos')
     step.given('I select a contribution amount')
     step.given('I confirm that the details match')
     step.given('I go to step "4"')
@@ -207,12 +225,13 @@ def see_the_course_on_my_dashboard(step):
 
 @step(u'I see that I am on the verified track')
 def see_that_i_am_on_the_verified_track(step):
-    assert False, 'Implement this step after the design is done'
+    id_verified_css = 'li.course-item article.course.verified'
+    assert world.is_css_present(id_verified_css)
 
 
 @step(u'I leave the flow and return$')
 def leave_the_flow_and_return(step):
-    world.browser.back()
+    world.visit('verify_student/verified/edx/999/Certificates')
 
 
 @step(u'I am at the verified page$')
@@ -220,24 +239,24 @@ def see_the_payment_page(step):
     assert world.css_find('button#pay_button')
 
 
-@step(u'I press the payment button')
-def press_payment_button(step):
-    assert False, 'This step must be implemented'
-@step(u'I have submitted face and ID photos')
-def submitted_face_and_id_photos(step):
-    assert False, 'This step must be implemented'
-@step(u'I edit my name')
+@step(u'I edit my name$')
 def edit_my_name(step):
-    assert False, 'This step must be implemented'
-@step(u'I see the new name on the confirmation page.')
-def sesee_the_new_name_on_the_confirmation_page(step):
-    assert False, 'This step must be implemented'
-@step(u'I have submitted photos')
-def submitted_photos(step):
-    assert False, 'This step must be implemented'
-@step(u'I am registered for the course')
-def seam_registered_for_the_course(step):
-    assert False, 'This step must be implemented'
-@step(u'I return to the student dashboard')
-def return_to_the_student_dashboard(step):
-    assert False, 'This step must be implemented'
+    btn_css = 'a.retake-photos'
+    world.css_click(btn_css)
+
+
+@step(u'I give a reason why I cannot pay$')
+def give_a_reason_why_i_cannot_pay(step):
+    register()
+
+    link_css = 'h5 i.expandable-icon'
+    world.css_click(link_css)
+
+    cb_css = 'input#honor-code'
+    world.css_click(cb_css)
+
+    text_css = 'li.field-explain textarea'
+    world.css_find(text_css).type('I cannot afford it.')
+
+    btn_css = 'input[value="Select Certificate"]'
+    world.css_click(btn_css)
