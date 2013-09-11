@@ -87,7 +87,7 @@ Feature: Course Settings
     Given I have opened a new course in Studio
     When I select Schedule and Details
     And I change the "Course Start Date" field to ""
-    Then the save button is disabled
+    Then the save notification button is disabled
 
   Scenario: User can upload course image
     Given I have opened a new course in Studio
