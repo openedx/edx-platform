@@ -14,8 +14,7 @@
 
 <%block name="content">
 
-%if is_no_webcam:
-<div class="wrapper-msg wrapper-msg-activate">
+<div id="no-webcam" style="display: none;" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
     <i class="msg-icon icon-warning-sign"></i>
     <div class="msg-content">
@@ -26,10 +25,8 @@
     </div>
   </div>
 </div>
-%endif
 
-%if is_no_flash:
-<div class="wrapper-msg wrapper-msg-activate">
+<div id="no-flash" style="display: none;" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
     <i class="msg-icon icon-warning-sign"></i>
     <div class="msg-content">
@@ -40,7 +37,6 @@
     </div>
   </div>
 </div>
-%endif
 
 
 <div class="container">
