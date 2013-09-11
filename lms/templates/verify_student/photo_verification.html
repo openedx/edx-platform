@@ -13,6 +13,36 @@
 </%block>
 
 <%block name="content">
+
+%if is_no_webcam:
+<div class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Webcam Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue registering, or select to {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
+%if is_no_flash:
+<div class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Flash Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have Flash installed. {a_start} Get Flash {a_end} to continue your registration.").format(a_start='<a rel="external" href="http://get.adobe.com/flashplayer/">', a_end="</a>")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
+
 <div class="container">
   <section class="wrapper">
 
