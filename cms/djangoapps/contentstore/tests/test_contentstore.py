@@ -1302,7 +1302,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
     def test_forum_unseeding_with_different_casing(self):
-        """Test new course creation and verify forum seeding """
+        """Test new course creation and verify forum unseeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         # make sure we don't delete a forum permissions set with different casing
         # than the passed in course_id. This is because Mongo and MySQL are using different collations
@@ -1310,6 +1310,20 @@ class ContentStoreTest(ModuleStoreTestCase):
         unseed_permissions_roles(course_id.upper())
         # permissions should still be there!
         self.assertTrue(are_permissions_roles_seeded(course_id))
+
+    def test_forum_unseeding_with_multiple_courses(self):
+        """Test new course creation and verify forum unseeding when there are multiple courses"""
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+
+        # unseed the forums for the first course
+        course_id = self._get_course_id(test_course_data)
+        unseed_permissions_roles(course_id)
+        self.assertFalse(are_permissions_roles_seeded(course_id))
+
+        second_course_id = self._get_course_id(second_course_data)
+        # permissions should still be there for the other course
+        self.assertTrue(are_permissions_roles_seeded(second_course_id))
 
     def _get_course_id(self, test_course_data):
         """Returns the course ID (org/number/run)."""
