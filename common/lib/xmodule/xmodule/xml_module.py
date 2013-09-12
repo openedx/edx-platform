@@ -164,7 +164,7 @@ class XmlDescriptor(XModuleDescriptor):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
-    metadata_to_export_to_policy = ('discussion_topics')
+    metadata_to_export_to_policy = ('discussion_topics', 'checklists')
 
     @classmethod
     def get_map_for_field(cls, attr):

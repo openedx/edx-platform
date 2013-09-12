@@ -1,5 +1,6 @@
 """ Unit tests for checklist methods in views.py. """
 from contentstore.utils import get_modulestore
+from contentstore.views.checklist import expand_checklist_action_url
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
@@ -22,20 +23,16 @@ class ChecklistTestCase(CourseTestCase):
     def compare_checklists(self, persisted, request):
         """
         Handles url expansion as possible difference and descends into guts
-        :param persisted:
-        :param request:
         """
         self.assertEqual(persisted['short_description'], request['short_description'])
-        compare_urls = (persisted.get('action_urls_expanded') == request.get('action_urls_expanded'))
-        pers, req = None, None
-        for pers, req in zip(persisted['items'], request['items']):
+        expanded_checklist = expand_checklist_action_url(self.course, persisted)
+        for pers, req in zip(expanded_checklist['items'], request['items']):
             self.assertEqual(pers['short_description'], req['short_description'])
-        self.assertEqual(pers['long_description'], req['long_description'])
-        self.assertEqual(pers['is_checked'], req['is_checked'])
-        if compare_urls:
+            self.assertEqual(pers['long_description'], req['long_description'])
+            self.assertEqual(pers['is_checked'], req['is_checked'])
             self.assertEqual(pers['action_url'], req['action_url'])
-        self.assertEqual(pers['action_text'], req['action_text'])
-        self.assertEqual(pers['action_external'], req['action_external'])
+            self.assertEqual(pers['action_text'], req['action_text'])
+            self.assertEqual(pers['action_external'], req['action_external'])
 
     def test_get_checklists(self):
         """ Tests the get checklists method. """
@@ -46,6 +43,11 @@ class ChecklistTestCase(CourseTestCase):
         })
         response = self.client.get(checklists_url)
         self.assertContains(response, "Getting Started With Studio")
+        # Verify expansion of action URL happened.
+        self.assertContains(response, '/mitX/333/team/Checklists_Course')
+        # Verify persisted checklist does NOT have expanded URL.
+        checklist_0 = self.get_persisted_checklists()[0]
+        self.assertEqual('ManageUsers', get_action_url(checklist_0, 0))
         payload = response.content
 
         # Now delete the checklists from the course and verify they get repopulated (for courses
@@ -67,7 +69,11 @@ class ChecklistTestCase(CourseTestCase):
             'name': self.course.location.name})
 
         returned_checklists = json.loads(self.client.get(update_url).content)
-        for pay, resp in zip(self.get_persisted_checklists(), returned_checklists):
+        # Verify that persisted checklists do not have expanded action URLs.
+        # compare_checklists will verify that returned_checklists DO have expanded action URLs.
+        pers = self.get_persisted_checklists()
+        self.assertEqual('CourseOutline', get_first_item(pers[1]).get('action_url'))
+        for pay, resp in zip(pers, returned_checklists):
             self.compare_checklists(pay, resp)
 
     def test_update_checklists_index_ignored_on_get(self):
@@ -103,19 +109,21 @@ class ChecklistTestCase(CourseTestCase):
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
-                                                           'checklist_index': 2})
+                                                           'checklist_index': 1})
 
-        def get_first_item(checklist):
-            return checklist['items'][0]
-
-        payload = self.course.checklists[2]
+        payload = self.course.checklists[1]
         self.assertFalse(get_first_item(payload).get('is_checked'))
+        self.assertEqual('CourseOutline', get_first_item(payload).get('action_url'))
         get_first_item(payload)['is_checked'] = True
 
         returned_checklist = json.loads(self.client.post(update_url, json.dumps(payload), "application/json").content)
         self.assertTrue(get_first_item(returned_checklist).get('is_checked'))
-        pers = self.get_persisted_checklists()
-        self.compare_checklists(pers[2], returned_checklist)
+        persisted_checklist = self.get_persisted_checklists()[1]
+        # Verify that persisted checklist does not have expanded action URLs.
+        # compare_checklists will verify that returned_checklist DOES have expanded action URLs.
+        self.assertEqual('CourseOutline', get_first_item(persisted_checklist).get('action_url'))
+        self.compare_checklists(persisted_checklist, returned_checklist)
+
 
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """
@@ -125,3 +133,36 @@ class ChecklistTestCase(CourseTestCase):
                                                            'checklist_index': 100})
         response = self.client.delete(update_url)
         self.assertEqual(response.status_code, 405)
+
+    def test_expand_checklist_action_url(self):
+        """
+        Tests the method to expand checklist action url.
+        """
+
+        def test_expansion(checklist, index, stored, expanded):
+            """
+            Tests that the expected expanded value is returned for the item at the given index.
+
+            Also verifies that the original checklist is not modified.
+            """
+            self.assertEqual(get_action_url(checklist, index), stored)
+            expanded_checklist = expand_checklist_action_url(self.course, checklist)
+            self.assertEqual(get_action_url(expanded_checklist, index), expanded)
+            # Verify no side effect in the original list.
+            self.assertEqual(get_action_url(checklist, index), stored)
+
+        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/mitX/333/team/Checklists_Course')
+        test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/mitX/333/course/Checklists_Course')
+        test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
+
+
+def get_first_item(checklist):
+    """ Returns the first item from the checklist. """
+    return checklist['items'][0]
+
+
+def get_action_url(checklist, index):
+    """
+    Returns the action_url for the item at the specified index in the given checklist.
+    """
+    return checklist['items'][index]['action_url']
