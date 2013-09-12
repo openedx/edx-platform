@@ -218,26 +218,3 @@ def leave_the_flow_and_return(step):
 @step(u'I am at the verified page$')
 def see_the_payment_page(step):
     assert world.css_find('button#pay_button')
-
-
-@step(u'I press the payment button')
-def press_payment_button(step):
-    assert False, 'This step must be implemented'
-@step(u'I have submitted face and ID photos')
-def submitted_face_and_id_photos(step):
-    assert False, 'This step must be implemented'
-@step(u'I edit my name')
-def edit_my_name(step):
-    assert False, 'This step must be implemented'
-@step(u'I see the new name on the confirmation page.')
-def sesee_the_new_name_on_the_confirmation_page(step):
-    assert False, 'This step must be implemented'
-@step(u'I have submitted photos')
-def submitted_photos(step):
-    assert False, 'This step must be implemented'
-@step(u'I am registered for the course')
-def seam_registered_for_the_course(step):
-    assert False, 'This step must be implemented'
-@step(u'I return to the student dashboard')
-def return_to_the_student_dashboard(step):
-    assert False, 'This step must be implemented'
