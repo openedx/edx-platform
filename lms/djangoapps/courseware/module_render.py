@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from requests.auth import HTTPBasicAuth
-from statsd import statsd
+from dogapi import dog_stats_api
 
 from capa.xqueue_interface import XQueueInterface
 from mitxmako.shortcuts import render_to_string
@@ -332,7 +332,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if grade_bucket_type is not None:
             tags.append('type:%s' % grade_bucket_type)
 
-        statsd.increment("lms.courseware.question_answered", tags=tags)
+        dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
