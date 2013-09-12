@@ -64,7 +64,7 @@ function () {
         state.videoCaption.captionURL              = _.bind(captionURL, state);
         state.videoCaption.captionMouseEnterLeave  = _.bind(captionMouseEnterLeave, state);
         state.videoCaption.captionMouseDown        = _.bind(captionMouseDown, state);
-        state.videoCaption.captionMouseUp          = _.bind(captionMouseUp, state);
+        state.videoCaption.captionClick            = _.bind(captionClick, state);
         state.videoCaption.captionFocus            = _.bind(captionFocus, state);
         state.videoCaption.captionBlur             = _.bind(captionBlur, state);
         state.videoCaption.captionKeyDown          = _.bind(captionKeyDown, state);
@@ -328,8 +328,7 @@ function () {
             mouseenter: this.videoCaption.captionMouseEnterLeave,
             mouseleave: this.videoCaption.captionMouseEnterLeave,
             mousedown:  this.videoCaption.captionMouseDown,
-            mouseup:    this.videoCaption.captionMouseUp,
-            click:      this.videoCaption.captionMouseUp,
+            click:      this.videoCaption.captionClick,
             focus:      this.videoCaption.captionFocus,
             blur:       this.videoCaption.captionBlur,
             keydown:    this.videoCaption.captionKeyDown
@@ -363,7 +362,7 @@ function () {
         this.videoCaption.automaticScroll = true;
     }
 
-    function captionMouseUp(event) {
+    function captionClick(event) {
         this.videoCaption.seekPlayer(event);
     }
 
