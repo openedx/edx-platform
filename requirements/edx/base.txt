@@ -18,6 +18,7 @@ django-followit==0.0.3
 django-keyedcache==1.4-6
 django-kombu==0.9.4
 django-mako==0.1.5pre
+django-model-utils==1.4.0
 django-masquerade==0.1.6
 django-mptt==0.5.5
 django-openid-auth==0.4
@@ -38,6 +39,7 @@ mako==0.7.3
 Markdown==2.2.1
 networkx==1.7
 nltk==2.0.4
+oauthlib==0.5.1
 paramiko==1.9.0
 path.py==3.0.1
 Pillow==1.7.8
@@ -52,7 +54,7 @@ python-memcached==1.48
 python-openid==2.2.5
 pytz==2012h
 PyYAML==3.10
-requests==0.14.2
+requests==1.2.3
 scipy==0.11.0
 Shapely==1.2.16
 sorl-thumbnail==11.12
@@ -60,7 +62,6 @@ South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==0.6
-django-model-utils==1.4.0
 
 # Used for debugging
 ipython==0.13.1
@@ -70,7 +71,6 @@ watchdog==0.6.0
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-dogstatsd-python==0.2.1
 newrelic==1.13.1.31
 
 # Used for documentation gathering

@@ -82,6 +82,12 @@ a:link, a:visited {
   &:hover {
     text-decoration: underline;
   }
+
+  &:disabled, &.is-disabled, &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 a:focus {

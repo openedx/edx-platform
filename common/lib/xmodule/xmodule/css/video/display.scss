@@ -225,6 +225,19 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 116px;
+
+            @media (max-width: 1024px) {
+              width: 86px;
+            }
+
+            h3 {
+              display: block;
+
+              @media (max-width: 1024px) {
+                display: none;
+              }
+            }
+
             outline: 0;
 
             &:focus {
@@ -247,6 +260,11 @@ div.video {
               font-weight: bold;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
+
+              @media (max-width: 1024px) {
+                padding: 0 lh(.5) 0 lh(.5);
+              }
+
               line-height: 46px;
               color: #fff;
             }
@@ -268,6 +286,11 @@ div.video {
             opacity: 0.0;
             position: absolute;
             width: 131px;
+
+            @media (max-width: 1024px) {
+              width: 101px;
+            }
+
             z-index: 10;
 
             li {

@@ -195,7 +195,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Create activated, but not enrolled, user
-        UserFactory.create(username="student3_0", email="student3_0@test.com", first_name="Jim", last_name="Tester")
+        UserFactory.create(username="student3_0", email="student3_0@test.com")
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
@@ -209,17 +209,37 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been enrolled in MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Jim Tester\n\nYou have been enrolled in MITx/999/Robot_Super_Course at edx.org by a member of the course staff. " +
-                                              "The course should now appear on your edx.org dashboard.\n\n" +
-                                              "To start accessing course materials, please visit https://edx.org/courses/MITx/999/Robot_Super_Course\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to Jim Tester")
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been enrolled in Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Robot Test\n\nYou have been enrolled in Robot Super Course "
+            "at edx.org by a member of the course staff. "
+            "The course should now appear on your edx.org dashboard.\n\n"
+            "To start accessing course materials, please visit "
+            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
+            "----\nThis email was automatically sent from edx.org to Robot Test"
+        )
 
-        self.assertEqual(mail.outbox[1].subject, 'You have been invited to register for MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[1].body, "Dear student,\n\nYou have been invited to join MITx/999/Robot_Super_Course at edx.org by a member of the course staff.\n\n" +
-                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form making sure to use student3_1@test.com in the E-mail field.\n" +
-                                              "Once you have registered and activated your account, you will see MITx/999/Robot_Super_Course listed on your dashboard.\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to student3_1@test.com")
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[1].body,
+            "Dear student,\n\nYou have been invited to join "
+            "Robot Super Course at edx.org by a member of the "
+            "course staff.\n\n"
+            "To finish your registration, please visit "
+            "https://edx.org/register and fill out the registration form "
+            "making sure to use student3_1@test.com in the E-mail field.\n"
+            "Once you have registered and activated your account, you will "
+            "see Robot Super Course listed on your dashboard.\n\n"
+            "----\nThis email was automatically sent from edx.org to "
+            "student3_1@test.com"
+        )
 
     def test_unenrollment_email_on(self):
         """
@@ -242,11 +262,23 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Student,\n\nYou have been un-enrolled from course MITx/999/Robot_Super_Course by a member of the course staff. " +
-                         "Please disregard the invitation previously sent.\n\n" +
-                         "----\nThis email was automatically sent from edx.org to student4_0@test.com")
-        self.assertEqual(mail.outbox[1].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Student,\n\nYou have been un-enrolled from course "
+            "Robot Super Course by a member of the course staff. "
+            "Please disregard the invitation previously sent.\n\n"
+            "----\nThis email was automatically sent from edx.org "
+            "to student4_0@test.com"
+        )
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+
 
     def test_send_mail_to_student(self):
         """

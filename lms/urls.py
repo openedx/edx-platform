@@ -58,7 +58,15 @@ urlpatterns = ('',  # nopep8
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),
+
 )
+
+# if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+urlpatterns += (
+    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^course_modes/', include('course_modes.urls')),
+)
+
 
 js_info_dict = {
     'domain': 'djangojs',
@@ -337,6 +345,7 @@ if settings.COURSEWARE_ENABLED:
                 'courseware.views.submission_history',
                 name='submission_history'),
         )
+
 
 if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (

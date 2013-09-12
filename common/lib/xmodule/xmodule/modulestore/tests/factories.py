@@ -27,7 +27,7 @@ class XModuleCourseFactory(Factory):
         store = editable_modulestore('direct')
 
         # Write the data to the mongo datastore
-        new_course = store.create_xmodule(location)
+        new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
 
         # This metadata code was copied from cms/djangoapps/contentstore/views.py
         if display_name is not None:

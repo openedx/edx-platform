@@ -5,6 +5,7 @@ and integration / BDD tests.
 '''
 import student.tests.factories as sf
 import xmodule.modulestore.tests.factories as xf
+import course_modes.tests.factories as cmf
 from lettuce import world
 
 
@@ -47,6 +48,14 @@ class GroupFactory(sf.GroupFactory):
 class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowedFactory):
     """
     Users allowed to enroll in the course outside of the usual window
+    """
+    pass
+
+
+@world.absorb
+class CourseModeFactory(cmf.CourseModeFactory):
+    """
+    Course modes
     """
     pass
 

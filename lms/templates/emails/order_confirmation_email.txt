@@ -1,15 +1,20 @@
 <%! from django.utils.translation import ugettext as _ %>
+${_("Hi {name}").format(name=order.user.profile.name)}
 
-${_("Thank you for your order! Payment was successful, and you should be able to see the results on your dashboard.")}
+${_("Your payment was successful. You will see the charge below on your next credit or debit card statement. The charge will show up on your statement under the company name {platform_name}. If you have billing questions, please read the FAQ or contact {billing_email}. We hope you enjoy your order.").format(platform_name=settings.PLATFORM_NAME,billing_email=settings.PAYMENT_SUPPORT_EMAIL)}
+
+${_("-The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
 
 ${_("Your order number is: {order_number}").format(order_number=order.id)}
 
-${_("Items in your order:")}
+${_("The items in your order are:")}
 
 ${_("Quantity - Description - Price")}
 %for order_item in order_items:
-    ${order_item.qty} - ${order_item.line_desc} - $(order_item.line_cost}
+    ${order_item.qty} - ${order_item.line_desc} - ${order_item.line_cost}
 %endfor
-${_("Total: {total_cost}").format(total_cost=order.total_cost)}
+${_("Total billed to credit/debit card: {total_cost}").format(total_cost=order.total_cost)}
 
-${_("If you have any issues, please contact us at {billing_email}").format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)}
+%for order_item in order_items:
+    ${order_item.additional_instruction_text}
+%endfor
