@@ -410,6 +410,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+        self.save()
 
     @status_before_must_be("must_retry", "ready", "submitted")
     def submit(self):
