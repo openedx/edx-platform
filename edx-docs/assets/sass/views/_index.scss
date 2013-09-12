@@ -29,7 +29,7 @@
     color: $gray-l2;
 
     p {
-      @extend %wipe-last-child;
+      @extend %ui-wipe-last-child;
       margin-bottom: $baseline;
     }
   }
@@ -38,7 +38,7 @@
 
   // elems: info bits
   .info {
-    @extend %wipe-last-child;
+    @extend %ui-wipe-last-child;
     margin-bottom: ($baseline*2);
   }
 
@@ -110,7 +110,7 @@
       margin-top: $baseline;
 
       .item-link {
-        @extend %wipe-last-child;
+        @extend %ui-wipe-last-child;
         margin-bottom: $baseline;
         border-bottom: 1px solid $gray-l5;
         padding-bottom: $baseline;
@@ -349,7 +349,7 @@
 
     .deco__doc1 {
       @include font-size(72);
-      @extend %depth1;
+      @extend %ui-depth1;
       left: -($baseline*2);
 
       .icon-stack-base {
@@ -364,7 +364,7 @@
 
     .deco__doc2 {
       @include font-size(100);
-      @extend %depth3;
+      @extend %ui-depth3;
       left: ($baseline*1.5);
 
       .icon-stack-base {
@@ -378,7 +378,7 @@
 
     .deco__doc3 {
       @include font-size(72);
-      @extend %depth2;
+      @extend %ui-depth2;
       right: -($baseline*2);
 
       .icon-stack-base {
@@ -455,7 +455,7 @@
     // elem: audience lists
     .item-audience {
       @extend .trans-size;
-      @extend %wipe-last-child;
+      @extend %ui-wipe-last-child;
       @include span-columns(3 of 9);
       position: relative;
 
@@ -519,24 +519,4 @@
       @extend %t-copy-sub1;
     }
   }
-
-  // ====================
-
-  // footer
-  .footer--primary {
-    @include span-columns(12);
-    margin: ($baseline*1.5) 0;
-
-    .content--copyright {
-      text-align: center;
-    }
-
-    .copyright__copy {
-      @extend %t-copy-sub1;
-    }
-  }
-
-  // ====================
-
-
 }

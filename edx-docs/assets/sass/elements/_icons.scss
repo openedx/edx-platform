@@ -25,7 +25,7 @@
   // OPTION: add this class for a visual hanging display
   &.is-hanging {
     @include box-sizing(border-box);
-    @extend %depth2;
+    @extend %ui-depth2;
     top: -($baseline/4);
 
     &:after {
