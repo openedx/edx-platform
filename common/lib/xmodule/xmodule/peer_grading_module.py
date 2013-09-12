@@ -72,6 +72,12 @@ class PeerGradingFields(object):
         scope=Scope.content
     )
 
+class InvalidLinkLocation(Exception):
+    """
+    Exception for the case in which a peer grading module tries to link to an invalid location.
+    """
+    pass
+
 
 class PeerGradingModule(PeerGradingFields, XModule):
     """
@@ -103,7 +109,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         if self.use_for_single_location:
             try:
-                self.linked_problem = self.system.get_module(self.link_to_location)
+                linked_descriptors = self.descriptor.get_required_module_descriptors()
+                if len(linked_descriptors) == 0:
+                    error_msg = "Peer grading module {0} is trying to use single problem mode without "
+                    "a location specified.".format(self.location)
+                    log.error(error_msg)
+                    raise InvalidLinkLocation(error_msg)
+                self.linked_problem = self.system.get_module(linked_descriptors[0])
             except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))

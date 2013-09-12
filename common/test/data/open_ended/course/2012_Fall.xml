@@ -4,5 +4,6 @@
     <combinedopenended url_name="SampleQuestion1Attempt"/>
     <peergrading url_name="PeerGradingSample"/>
     <peergrading url_name="PeerGradingScored"/>
+    <peergrading url_name="PeerGradingLinked"/>
   </chapter>
 </course>
