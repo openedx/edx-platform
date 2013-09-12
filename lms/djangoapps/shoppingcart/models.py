@@ -19,6 +19,7 @@ from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment
 from statsd import statsd
+from verify_student.models import SoftwareSecurePhotoVerification
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
@@ -369,6 +370,14 @@ class CertificateItem(OrderItem):
         """
         When purchase goes through, activate and update the course enrollment for the correct mode
         """
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
+            verification_attempt.submit()
+        except Exception as e:
+            log.exception(
+                "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
+            )
+
         self.course_enrollment.mode = self.mode
         self.course_enrollment.save()
         self.course_enrollment.activate()
