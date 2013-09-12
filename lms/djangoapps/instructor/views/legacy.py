@@ -41,6 +41,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
+from instructor.views.tools import strip_if_string
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
@@ -171,6 +172,9 @@ def instructor_dashboard(request, course_id):
         Form is either urlname or modulename/urlname.  If no modulename
         is provided, "problem" is assumed.
         """
+        # remove whitespace
+        urlname = strip_if_string(urlname)
+
         # tolerate an XML suffix in the urlname
         if urlname[-4:] == ".xml":
             urlname = urlname[:-4]
@@ -185,6 +189,7 @@ def instructor_dashboard(request, course_id):
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
+        unique_student_identifier = strip_if_string(unique_student_identifier)
         msg = ""
         try:
             if "@" in unique_student_identifier:
@@ -706,12 +711,14 @@ def instructor_dashboard(request, course_id):
         html_message = request.POST.get("message")
         text_message = html_to_text(html_message)
 
-        email = CourseEmail(course_id=course_id,
-                            sender=request.user,
-                            to_option=email_to_option,
-                            subject=email_subject,
-                            html_message=html_message,
-                            text_message=text_message)
+        email = CourseEmail(
+            course_id=course_id,
+            sender=request.user,
+            to_option=email_to_option,
+            subject=email_subject,
+            html_message=html_message,
+            text_message=text_message
+        )
 
         email.save()
 
@@ -994,6 +1001,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
     to do.
     """
     user = None
+    username_or_email = strip_if_string(username_or_email)
     try:
         if '@' in username_or_email:
             user = User.objects.get(email=username_or_email)
