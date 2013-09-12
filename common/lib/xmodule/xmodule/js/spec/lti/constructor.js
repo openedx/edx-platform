@@ -46,7 +46,7 @@
                 });
 
                 it(
-                    'when URL setting is filled form is not submited',
+                    'when URL setting is not filled form is not submited',
                     function () {
 
                     expect('submit').not.toHaveBeenTriggeredOn(form);
@@ -70,7 +70,7 @@
 
                     // The user "fills in" the necessary settings, and the
                     // form will get an action URL.
-                    form.attr('action', 'http://www.example.com/');
+                    form.attr('action', 'http://www.example.com/test_submit');
 
                     LTI(element);
                 });
