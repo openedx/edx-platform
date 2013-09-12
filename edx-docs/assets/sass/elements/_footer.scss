@@ -1,0 +1,54 @@
+// docs.edx.org - Footer
+// ====================
+
+// primary footer
+	.wrapper-outer-footer {
+		box-shadow: inset 0 1px 1px 1px $shadow-l1;
+		display: inline-block;
+    background: $blue-d2 url('../images/bg-mast.png') 0 0 repeat;
+
+   	.wrapper-footer {
+  		@include outer-container;
+    	@include pad(($baseline*2) ($baseline*3));
+
+    	@include media($bp-m) {
+      	@include pad(($baseline) ($baseline*2));
+    	}
+
+    	footer.primary {
+    		@include span-columns(12);
+    		color: $gray-l2;
+
+    		.copy {
+    			color: $gray-l4;
+    		}
+
+        .privacy {
+          text-align: right;
+        }
+
+    		.privacy,
+        .copyright {
+    			@extend %trans-size;
+    			@extend %t-copy-sub1;
+    			@include span-columns(6 of 12);
+
+          @include media($bp-ds) {
+            @include fill-parent;
+            margin-bottom: ($baseline/2);
+            text-align: center;
+          }
+
+          @include media($bp-m) {
+            @include fill-parent;
+            margin-bottom: ($baseline/2);
+            text-align: center;
+          }
+
+          a {
+            color: $white;
+        }
+      }
+    }
+  }
+}

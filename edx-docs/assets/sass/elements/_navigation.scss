@@ -1,0 +1,67 @@
+// docs.edx.org - Navigation
+// ====================
+
+// general
+nav {
+
+  ol, ul {
+    @extend %no-list;
+  }
+
+  .nav-item {
+
+    a {
+
+    }
+  }
+}
+
+// types - pill (left - right)
+%nav-pill {
+
+}
+
+// types - blocks (top - bottom)
+%nav-blocks {
+
+}
+
+// ====================
+
+// primary navigation
+nav.primary {
+
+  .nav-item {
+
+    a {
+
+    }
+  }
+}
+
+// ====================
+
+// secondary navigation
+nav.secondary {
+
+  &.horizontal {
+    @extend %nav-pill;
+  }
+
+  &.vertical {
+    @extend %nav-blocks;
+  }
+}
+
+// ====================
+
+nav.pagination {
+  @extend %nav-pill;
+}
+
+// ====================
+
+// footer/peripheral
+nav.peripheral {
+
+}
