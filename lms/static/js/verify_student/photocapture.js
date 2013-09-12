@@ -1,5 +1,10 @@
 var onVideoFail = function(e) {
-  console.log('Failed to get camera access!', e);
+  if(e == 'NO_DEVICES_FOUND') {
+      $('#no-webcam').show();
+  }
+  else {
+    console.log('Failed to get camera access!', e);
+  }
 };
 
 // Returns true if we are capable of video capture (regardless of whether the
@@ -110,6 +115,7 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   if (hasHtml5CameraSupport) {
     ctx = canvas[0].getContext('2d');
   }
+
   var localMediaStream = null;
 
   function snapshot(event) {
@@ -188,13 +194,38 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
 
 }
 
+function browserHasFlash() {
+  var hasFlash = false;
+  try {
+      var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+      if(fo) hasFlash = true;
+  } catch(e) {
+      if(navigator.mimeTypes["application/x-shockwave-flash"] != undefined) hasFlash = true;
+  }
+  return hasFlash;
+}
+
 function objectTagForFlashCamera(name) {
-  return '<object type="application/x-shockwave-flash" id="' +
-         name + '" name="' + name + '" data=' +
-         '"/static/js/verify_student/CameraCapture.swf?v=2"' +
-          'width="500" height="375"><param name="quality" ' +
-          'value="high"><param name="allowscriptaccess" ' +
-          'value="sameDomain"></object>';
+  // detect whether or not flash is available
+  if(browserHasFlash()) {
+      // I manually update this to have ?v={2,3,4, etc} to avoid caching of flash
+      // objects on local dev.
+      return '<object type="application/x-shockwave-flash" id="' +
+             name + '" name="' + name + '" data=' +
+             '"/static/js/verify_student/CameraCapture.swf?v=3"' +
+              'width="500" height="375"><param name="quality" ' +
+              'value="high"><param name="allowscriptaccess" ' +
+              'value="sameDomain"></object>';
+  }
+  else {
+      // display a message informing the user to install flash
+      $('#no-flash').show();
+  }
+}
+
+function linkNewWindow(e) {
+        window.open($(e.target).attr('href'));
+            e.preventDefault();
 }
 
 $(document).ready(function() {
@@ -233,9 +264,18 @@ $(document).ready(function() {
   if (!hasHtml5CameraSupport) {
     $("#face_capture_div").html(objectTagForFlashCamera("face_flash"));
     $("#photo_id_capture_div").html(objectTagForFlashCamera("photo_id_flash"));
+    // wait for the flash object to be loaded
+    // TODO: we need a better solution for this
+    setTimeout(function() {
+        if(browserHasFlash() && !$('#face_flash')[0].hasOwnProperty('hasCamera')) {
+            onVideoFail('NO_DEVICES_FOUND');
+        }
+    }, 1000);
   }
 
   analytics.pageview("Capture Face Photo");
   initSnapshotHandler(["photo_id", "face"], hasHtml5CameraSupport);
+
+  $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
 });
