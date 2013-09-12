@@ -172,6 +172,9 @@ MITX_FEATURES = {
 
     # Toggle storing detailed billing information
     'STORE_BILLING_INFO': False,
+
+    #Toggle using CME registration instead of normal
+    'USE_CME_REGISTRATION': False
 }
 
 # Used for A/B testing
@@ -836,6 +839,10 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
+    # CME Registration
+    'cme_registration',
+
 )
 
 ######################### MARKETING SITE ###############################

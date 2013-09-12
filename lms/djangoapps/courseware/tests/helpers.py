@@ -48,6 +48,9 @@ class LoginEnrollmentTestCase(TestCase):
     Provides support for user creation,
     activation, login, and course enrollment.
     """
+    def setUp(self):
+        from django.conf import settings
+
     def setup_user(self):
         """
         Create a user account, activate, and log in.

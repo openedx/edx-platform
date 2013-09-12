@@ -56,7 +56,7 @@ from courseware.access import has_access
 from external_auth.models import ExternalAuthMap
 
 from bulk_email.models import Optout
-
+from cme_registration.views import cme_register_user, cme_create_account
 import track.views
 
 from statsd import statsd
@@ -242,6 +242,9 @@ def register_user(request, extra_context=None):
     """
     This view will display the non-modal registration form
     """
+    if settings.MITX_FEATURES.get('USE_CME_REGISTRATION'):
+        return cme_register_user(request, extra_context=extra_context)
+
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
@@ -599,6 +602,9 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     """
+    if settings.MITX_FEATURES.get('USE_CME_REGISTRATION'):
+        return cme_create_account(request, post_override=post_override)
+
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
