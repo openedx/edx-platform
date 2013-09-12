@@ -230,7 +230,7 @@ PEARSON = AUTH_TOKENS.get("PEARSON")
 
 # Datadog for events!
 DATADOG = AUTH_TOKENS.get("DATADOG", {})
-DATADOG = DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
+DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
 
 # TODO: deprecated (compatibility with previous settings)
 if 'DATADOG_API' in AUTH_TOKENS:
