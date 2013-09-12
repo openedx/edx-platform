@@ -97,28 +97,31 @@ def find_peer_grading_module(course):
     @param course: A course object.
     @return: boolean found_module, string problem_url
     """
-    #Reverse the base course url
+
+    # Reverse the base course url.
     base_course_url = reverse('courses')
     found_module = False
     problem_url = ""
 
-    #Get the course id and split it
+    # Get the course id and split it.
     course_id_parts = course.id.split("/")
     log.info("COURSE ID PARTS")
     log.info(course_id_parts)
-    #Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
+    # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
     items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
                                     course_id=course.id)
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
-    #Get the first one
+    # Loop through all potential peer grading modules, and find the first one that has a path to it.
     for item in items:
         item_location = item.location
-        #Generate a url for the first module and redirect the user to it
+        # Generate a url for the first module and redirect the user to it.
         try:
             problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         except NoPathToItem:
-            log.info("Invalid peer grading module location {0} in course {1}.".format(item_location, course.id))
+            # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
+            # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
+            log.info("Invalid peer grading module location {0} in course {1}.  This module may need to be removed.".format(item_location, course.id))
             continue
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
