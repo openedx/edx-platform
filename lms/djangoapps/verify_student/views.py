@@ -180,8 +180,8 @@ def results_callback(request):
         settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_SECRET_KEY"]
     )
 
-#    if not sig_valid:
-#        return HttpResponseBadRequest(_("Signature is invalid"))
+    if not sig_valid:
+        return HttpResponseBadRequest(_("Signature is invalid"))
 
     receipt_id = body_dict.get("EdX-ID")
     result = body_dict.get("Result")
