@@ -36,28 +36,40 @@ def unseed_permissions_roles(course_id):
     """
     A utility method to clean up all forum related permissions and roles
     """
-    administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
-    moderator_role = Role.objects.get_or_create(name="Moderator", course_id=course_id)[0]
-    community_ta_role = Role.objects.get_or_create(name="Community TA", course_id=course_id)[0]
-    student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
+    try:
+        administrator_role = Role.objects.get(name="Administrator", course_id=course_id)
+        if administrator_role.course_id == course_id:
+            administrator_role.delete()
+    except Role.DoesNotExist:
+        pass
 
-    # safety switches in case the casing does not match
+    try:
+        moderator_role = Role.objects.get(name="Moderator", course_id=course_id)
+        if moderator_role.course_id == course_id:
+            moderator_role.delete()
+    except Role.DoesNotExist:
+        pass
 
-    if administrator_role.course_id == course_id:
-        administrator_role.delete()
+    try:
+        community_ta_role = Role.objects.get(name="Community TA", course_id=course_id)
+        if community_ta_role.course_id == course_id:
+            community_ta_role.delete()
+    except Role.DoesNotExist:
+        pass
 
-    if moderator_role.course_id == course_id:
-        moderator_role.delete()
-
-    if community_ta_role.course_id == course_id:
-        community_ta_role.delete()
-    
-    if student_role.course_id == course_id:
-        student_role.delete()
+    try:
+        student_role = Role.objects.get(name="Student", course_id=course_id)
+        if student_role.course_id == course_id:
+            student_role.delete()
+    except Role.DoesNotExist:
+        pass
 
 
 def are_permissions_roles_seeded(course_id):
-
+    """
+    Returns whether the forums permissions for a course have been provisioned in
+    the database
+    """
     try:
         administrator_role = Role.objects.get(name="Administrator", course_id=course_id)
         moderator_role = Role.objects.get(name="Moderator", course_id=course_id)
