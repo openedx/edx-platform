@@ -14,7 +14,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from mitxmako.middleware import MakoMiddleware
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 
 import courseware.views as views
 from xmodule.modulestore import Location
@@ -31,9 +31,8 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
 
-        # Load toy course from XML
+        # Use toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
-        self.toy_course = modulestore().get_course(self.course_name)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
@@ -62,7 +61,9 @@ class TestJumpTo(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsTestCase(TestCase):
+    """ Tests for views.py methods. """
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
@@ -73,8 +74,6 @@ class ViewsTestCase(TestCase):
         self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
 
-        # This is a CourseDescriptor object
-        self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
@@ -222,3 +221,99 @@ class ViewsTestCase(TestCase):
         })
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
+
+    def test_accordion_due_date(self):
+        """
+        Tests the formatting of due dates in the accordion view.
+        """
+        def get_accordion():
+            """ Returns the HTML for the accordion """
+            return views.render_accordion(
+                request, modulestore().get_course("edX/due_date/2013_fall"),
+                "c804fa32227142a1bd9d5bc183d4a20d", None, None
+            )
+
+        request = self.request_factory.get("foo")
+        self.verify_due_date(request, get_accordion)
+
+    def test_progress_due_date(self):
+        """
+        Tests the formatting of due dates in the progress page.
+        """
+        def get_progress():
+            """ Returns the HTML for the progress page """
+            return views.progress(request, "edX/due_date/2013_fall", self.user.id).content
+
+        request = self.request_factory.get("foo")
+        self.verify_due_date(request, get_progress)
+
+    def verify_due_date(self, request, get_text):
+        """
+        Verifies that due dates are formatted properly in text returned by get_text function.
+        """
+        def set_show_timezone(show_timezone):
+            """
+            Sets the show_timezone property and returns value from get_text function.
+
+            Note that show_timezone is deprecated and cannot be set by the user.
+            """
+            course.show_timezone = show_timezone
+            course.save()
+            return get_text()
+
+        def set_due_date_format(due_date_format):
+            """
+            Sets the due_date_display_format property and returns value from get_text function.
+            """
+            course.due_date_display_format = due_date_format
+            course.save()
+            return get_text()
+
+        request.user = self.user
+        # Clear out the modulestores, so we start with the test course in its default state.
+        clear_existing_modulestores()
+        course = modulestore().get_course("edX/due_date/2013_fall")
+
+        time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
+        time_without_utc = "due Sep 18, 2013 at 11:30"
+
+        # The test course being used has show_timezone = False in the policy file
+        # (and no due_date_display_format set). This is to test our backwards compatibility--
+        # in course_module's init method, the date_display_format will be set accordingly to
+        # remove the timezone.
+        text = get_text()
+        self.assertIn(time_without_utc, text)
+        self.assertNotIn(time_with_utc, text)
+        # Test that show_timezone has been cleared (which means you get the default value of True).
+        self.assertTrue(course.show_timezone)
+
+        # Clear out the due date format and verify you get the default (with timezone).
+        delattr(course, 'due_date_display_format')
+        course.save()
+        text = get_text()
+        self.assertIn(time_with_utc, text)
+
+        # Same for setting the due date to None
+        text = set_due_date_format(None)
+        self.assertIn(time_with_utc, text)
+
+        # plain text due date
+        text = set_due_date_format("foobar")
+        self.assertNotIn(time_with_utc, text)
+        self.assertIn("due foobar", text)
+
+        # due date with no time
+        text = set_due_date_format(u"%b %d %y")
+        self.assertNotIn(time_with_utc, text)
+        self.assertIn("due Sep 18 13", text)
+
+        # hide due date completely
+        text = set_due_date_format(u"")
+        self.assertNotIn("due ", text)
+
+        # improperly formatted due_date_display_format falls through to default
+        # (value of show_timezone does not matter-- setting to False to make that clear).
+        set_show_timezone(False)
+        text = set_due_date_format(u"%%%")
+        self.assertNotIn("%%%", text)
+        self.assertIn(time_with_utc, text)
