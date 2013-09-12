@@ -50,6 +50,7 @@ from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.views import course_from_id
 import track.views
 from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
@@ -59,6 +60,7 @@ from xblock.fields import ScopeIds
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
+
 
 log = logging.getLogger(__name__)
 
@@ -1196,7 +1198,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         #Composition of email
         d = {'site_name': stripped_site_name,
              'registration_url': registration_url,
-             'course_id': course_id,
+             'course': course,
              'auto_enroll': auto_enroll,
              'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
              }
@@ -1246,8 +1248,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             if email_students:
                 #User enrolled for first time, populate dict with user specific info
                 d['email_address'] = student
-                d['first_name'] = user.first_name
-                d['last_name'] = user.last_name
+                d['full_name'] = user.profile.name
                 d['message'] = 'enrolled_enroll'
                 send_mail_ret = send_mail_to_student(student, d)
                 status[student] += (', email sent' if send_mail_ret else '')
@@ -1283,9 +1284,10 @@ def _do_unenroll_students(course_id, students, email_students=False):
 
     stripped_site_name = _remove_preview(settings.SITE_NAME)
     if email_students:
+        course = course_from_id(course_id)
         #Composition of email
         d = {'site_name': stripped_site_name,
-             'course_id': course_id}
+             'course': course}
 
     for student in old_students:
 
@@ -1318,8 +1320,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
                 if email_students:
                     #User was enrolled
                     d['email_address'] = student
-                    d['first_name'] = user.first_name
-                    d['last_name'] = user.last_name
+                    d['full_name'] = user.profile.name
                     d['message'] = 'enrolled_unenroll'
                     send_mail_ret = send_mail_to_student(student, d)
                     status[student] += (', email sent' if send_mail_ret else '')
@@ -1348,8 +1349,7 @@ def send_mail_to_student(student, param_dict):
     `auto_enroll`: user input option (a `str`)
     `course_url`: url of course (a `str`)
     `email_address`: email of student (a `str`)
-    `first_name`: student first name (a `str`)
-    `last_name`: student last name (a `str`)
+    `full_name`: student full name (a `str`)
     `message`: type of email to send and template to use (a `str`)
                                         ]
     Returns a boolean indicating whether the email was sent successfully.
@@ -1365,9 +1365,13 @@ def send_mail_to_student(student, param_dict):
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
 
+        # Remove leading and trailing whitespace from body
+        message = message.strip()
+
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+
         return True
     else:
         return False
