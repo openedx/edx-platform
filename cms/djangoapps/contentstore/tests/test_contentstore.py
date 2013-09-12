@@ -1295,8 +1295,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
 
     def test_forum_unseeding(self):
-        """Test new course creation and verify forum seeding """
+        """Test new course creation and verify forum unseeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
         course_id = self._get_course_id(test_course_data)
         unseed_permissions_roles(course_id)
         self.assertFalse(are_permissions_roles_seeded(course_id))
