@@ -39,13 +39,13 @@
 // ====================
 
 // extends - layout
-%wrapper {
+%ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
   width: 100%;
 }
 
-%no-list {
+%ui-no-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -58,14 +58,14 @@
 }
 
 // image-replacement hidden text
-%text-hide {
+%ui-text-hide {
   text-indent: 200%;
   white-space: nowrap;
   overflow: hidden;
 }
 
 // hidden elems - screenreaders
-%text-sr {
+%ui-text-sr {
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -77,23 +77,23 @@
 }
 
 // wrapping
-%text-wrap {
+%ui-text-wrap {
   text-wrap: wrap;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
 }
 
-%fake-link {
+%ui-fake-link {
   cursor: pointer;
 }
 
-%disabled {
+%ui-disabled {
   pointer-events: none;
   outline: none;
 }
 
-%icon-inline {
+%ui-icon-inline {
   @extend %t-icon;
   display: inline-block;
   vertical-align: middle;
@@ -101,7 +101,7 @@
 }
 
 // nth-type style clearing
-%wipe-first-child {
+%ui-wipe-first-child {
 
   &:first-child {
     margin-top: 0;
@@ -110,7 +110,7 @@
   }
 }
 
-%wipe-last-child {
+%ui-wipe-last-child {
 
   &:last-child {
     margin-bottom: 0;
@@ -120,12 +120,12 @@
 }
 
 // extends - depth levels
-%depth0 { z-index: 0; }
-%depth1 { z-index: 10; }
-%depth2 { z-index: 100; }
-%depth3 { z-index: 1000; }
-%depth4 { z-index: 10000; }
-%depth5 { z-index: 100000; }
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
 
 // extends - transition
 %trans-size {
