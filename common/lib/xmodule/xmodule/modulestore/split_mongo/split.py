@@ -9,7 +9,7 @@ import copy
 from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import XModuleDescriptor, prefer_xmodules
 from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
 from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
@@ -21,6 +21,7 @@ from xblock.fields import Scope
 from xblock.runtime import Mixologist
 from bson.objectid import ObjectId
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -1391,7 +1392,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         if fields is None:
             return {}
-        cls = self.mixologist.mix(XModuleDescriptor.load_class(category))
+        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
         result = collections.defaultdict(dict)
         for field_name, value in fields.iteritems():
             field = getattr(cls, field_name)

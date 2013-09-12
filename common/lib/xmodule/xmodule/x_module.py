@@ -563,6 +563,11 @@ class ResourceTemplates(object):
             return None
 
 
+def prefer_xmodules(entry_points):
+    # Pick the first entry_point that comes from XModule
+    return sorted(entry_points, reverse=True, key=lambda e: e.dist.key == 'xmodule')[0]
+
+
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
     An XModuleDescriptor is a specification for an element of a course. This

@@ -6,7 +6,8 @@ from uuid import uuid4
 from pytz import UTC
 
 from xmodule.modulestore import Location
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import prefer_xmodules
+from xblock.core import XBlock
 
 
 class Dummy(object):
@@ -146,7 +147,7 @@ class ItemFactory(XModuleFactory):
 
         if 'boilerplate' in kwargs:
             template_id = kwargs.pop('boilerplate')
-            clz = XModuleDescriptor.load_class(category)
+            clz = XBlock.load_class(category, select=prefer_xmodules)
             template = clz.get_template(template_id)
             assert template is not None
             metadata.update(template.get('metadata', {}))

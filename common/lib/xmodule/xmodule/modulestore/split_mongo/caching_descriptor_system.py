@@ -1,13 +1,14 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import prefer_xmodules
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xblock.runtime import DbModel
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 
 log = logging.getLogger(__name__)
@@ -62,9 +63,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             if json_data is None:
                 raise ItemNotFoundError(usage_id)
 
-        class_ = XModuleDescriptor.load_class(
+        class_ = XBlock.load_class(
             json_data.get('category'),
-            self.default_class
+            self.default_class,
+            select=prefer_xmodules
         )
         return self.xblock_from_json(class_, usage_id, json_data, course_entry_override)
 

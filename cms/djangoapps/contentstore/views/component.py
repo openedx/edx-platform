@@ -24,7 +24,7 @@ from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitSt
 from models.settings.course_grading import CourseGradingModel
 
 from .access import has_access
-from xmodule.x_module import XModuleDescriptor
+from xblock.core import XBlock
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
@@ -135,7 +135,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XModuleDescriptor.load_class(category)
+    component_class = XBlock.load_class(category, select=prefer_xmodules)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 

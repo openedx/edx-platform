@@ -9,10 +9,15 @@ from xmodule_modifiers import wrap_xblock
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
+from xblock.core import XBlock
 
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
@@ -23,10 +28,6 @@ from ..utils import get_modulestore
 
 from .access import has_access
 from .helpers import _xmodule_recurse
-from xmodule.x_module import XModuleDescriptor
-from django.views.decorators.http import require_http_methods
-from xmodule.modulestore.locator import BlockUsageLocator
-from student.models import CourseEnrollment
 from django.http import HttpResponseBadRequest
 from xblock.fields import Scope
 from preview import handler_prefix, get_preview_html
@@ -67,7 +68,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'         
+                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
               if xblock locator is not specified, create a new xblock instance. The json playload can contain
@@ -259,7 +260,7 @@ def _create_item(request):
     data = None
     template_id = request.json.get('boilerplate')
     if template_id is not None:
-        clz = XModuleDescriptor.load_class(category)
+        clz = XBlock.load_class(category, select=prefer_xmodules)
         if clz is not None:
             template = clz.get_template(template_id)
             if template is not None:
