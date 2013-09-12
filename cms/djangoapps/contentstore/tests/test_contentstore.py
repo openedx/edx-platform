@@ -1303,7 +1303,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
     def test_forum_unseeding_with_different_casing(self):
-        """Test new course creation and verify forum unseeding """
+        """Make sure that we honor case sensitivity when unseeding forums"""
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         # make sure we don't delete a forum permissions set with different casing
         # than the passed in course_id. This is because Mongo and MySQL are using different collations
