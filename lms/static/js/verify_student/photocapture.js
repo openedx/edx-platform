@@ -230,6 +230,18 @@ function linkNewWindow(e) {
             e.preventDefault();
 }
 
+function waitForFlashLoad(func, flash_object) {
+    if(!flash_object.hasOwnProperty('percentLoaded') || flash_object.percentLoaded() < 100){
+        setTimeout(function() {
+            waitForFlashLoad(func, flash_object);
+        },
+        50);
+    }
+    else {
+        func(flash_object);
+    }
+}
+
 $(document).ready(function() {
   $(".carousel-nav").addClass('sr');
   $("#pay_button").click(function(){
@@ -266,13 +278,14 @@ $(document).ready(function() {
   if (!hasHtml5CameraSupport) {
     $("#face_capture_div").html(objectTagForFlashCamera("face_flash"));
     $("#photo_id_capture_div").html(objectTagForFlashCamera("photo_id_flash"));
-    // wait for the flash object to be loaded
-    // TODO: we need a better solution for this
-    setTimeout(function() {
-        if(browserHasFlash() && !$('#face_flash')[0].hasOwnProperty('hasCamera')) {
-            onVideoFail('NO_DEVICES_FOUND');
-        }
-    }, 1000);
+    // wait for the flash object to be loaded and then check for a camera
+    if(browserHasFlash()) {
+        waitForFlashLoad(function(flash_object) {
+            if(!flash_object.hasOwnProperty('hasCamera')){
+                onVideoFail('NO_DEVICES_FOUND');
+            }
+        }, $('#face_flash')[0]);
+    }
   }
 
   analytics.pageview("Capture Face Photo");
