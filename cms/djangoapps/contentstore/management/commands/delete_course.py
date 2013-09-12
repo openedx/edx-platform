@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseDescriptor
 from .prompt import query_yes_no
+from django_comment_common.utils import unseed_permissions_roles
 
 from auth.authz import _delete_course_group
 
@@ -40,6 +41,9 @@ class Command(BaseCommand):
             if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
                 loc = CourseDescriptor.id_to_location(course_id)
                 if delete_course(ms, cs, loc, commit):
+                    print 'removing forums permissions and roles...'
+                    unseed_permissions_roles(course_id)
+
                     print 'removing User permissions from course....'
                     # in the django layer, we need to remove all the user permissions groups associated with this course
                     if commit:

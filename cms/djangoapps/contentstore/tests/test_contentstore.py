@@ -55,6 +55,8 @@ from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
 
+from django_comment_common.utils import unseed_permissions_roles
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -1291,6 +1293,12 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+
+    def test_forum_unseeding(self):
+        """Test new course creation and verify forum seeding """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        unseed_permissions_roles(self._get_course_id(test_course_data))
+        self.assertFalse(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
 
     def _get_course_id(self, test_course_data):
         """Returns the course ID (org/number/run)."""
