@@ -19,6 +19,7 @@ from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment
 from dogapi import dog_stats_api
+from verify_student.models import SoftwareSecurePhotoVerification
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
@@ -371,6 +372,14 @@ class CertificateItem(OrderItem):
         """
         When purchase goes through, activate and update the course enrollment for the correct mode
         """
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
+            verification_attempt.submit()
+        except Exception as e:
+            log.exception(
+                "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
+            )
+
         self.course_enrollment.mode = self.mode
         self.course_enrollment.save()
         self.course_enrollment.activate()
@@ -383,8 +392,21 @@ class CertificateItem(OrderItem):
             return super(CertificateItem, self).single_item_receipt_template
 
     @property
+    def single_item_receipt_context(self):
+        course = course_from_id(self.course_id)
+        return {
+            "course_id" : self.course_id,
+            "course_name": course.display_name_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
+            "course_start_date_text": course.start_date_text,
+            "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
+        }
+
+    @property
     def additional_instruction_text(self):
-        return textwrap.dedent(
-            _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option \
-               and receive a full refund. To receive your refund, contact {billing_email}.").format(
-            billing_email=settings.PAYMENT_SUPPORT_EMAIL))
+        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
+                 "and receive a full refund. To receive your refund, contact {billing_email}. "
+                 "Please include your order number in your e-mail. "
+                 "Please do NOT include your credit card information.").format(
+                     billing_email=settings.PAYMENT_SUPPORT_EMAIL)

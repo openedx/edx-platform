@@ -262,3 +262,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
 
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
+
+# Student identity verification settings
+VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", "")

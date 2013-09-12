@@ -25,11 +25,18 @@ class ChooseModeView(View):
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         modes = CourseMode.modes_for_course_dict(course_id)
+
+        donation_for_course = request.session.get("donation_for_course", {})
+        chosen_price = donation_for_course.get(course_id, None)
+
+        course = course_from_id(course_id)
         context = {
             "course_id": course_id,
             "modes": modes,
-            "course_name": course_from_id(course_id).display_name,
-            "chosen_price": None,
+            "course_name": course.display_name_with_default,
+            "course_org" : course.display_org_with_default,
+            "course_num" : course.display_number_with_default,
+            "chosen_price": chosen_price,
             "error": error,
         }
         if "verified" in modes:
