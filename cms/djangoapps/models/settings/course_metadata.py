@@ -2,7 +2,6 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.fields import Scope
-from xmodule.course_module import CourseDescriptor
 from cms.xmodule_namespace import CmsBlockMixin
 
 
