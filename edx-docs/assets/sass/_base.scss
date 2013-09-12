@@ -57,5 +57,5 @@ strong {
 
 //  reset: lists
 .list--actions, .list--docs, .list--steps, .list--controls, .list--fields, .list--help, .nav--wizard, .list--tips, .field--group {
-  @extend .ui-no-list;
+  @extend %no-list;
 }
