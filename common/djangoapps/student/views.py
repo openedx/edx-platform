@@ -95,7 +95,7 @@ def index(request, extra_context={}, user=None):
     if domain == False:
         domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses(None, domain=domain)
+    courses = get_courses(user, domain=domain)
     courses = sort_by_announcement(courses)
 
     context = {'courses': courses}
