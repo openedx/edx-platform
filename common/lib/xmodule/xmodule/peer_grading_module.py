@@ -8,10 +8,9 @@ from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
-from xblock.core import Dict, String, Scope, Boolean, Integer, Float
+from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -104,14 +103,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         if self.use_for_single_location:
             try:
-                self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
+                self.linked_problem = self.system.get_module(self.link_to_location)
             except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.lms.due
+            due_date = self.linked_problem.due
             if due_date:
-                self.lms.due = due_date
+                self.due = due_date
 
         try:
             self.timeinfo = TimeInfo(self.due, self.graceperiod)
@@ -535,8 +534,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
             except Exception:
                 continue
             if descriptor:
-                problem['due'] = descriptor.lms.due
-                grace_period = descriptor.lms.graceperiod
+                problem['due'] = descriptor.due
+                grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
                 except Exception:
@@ -646,3 +645,11 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.graceperiod])
         return non_editable_fields
+
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        if self.use_for_single_location:
+            return [self.system.load_item(self.link_to_location)]
+        else:
+            return []

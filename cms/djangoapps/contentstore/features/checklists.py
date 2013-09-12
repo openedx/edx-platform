@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in
+from nose.tools import assert_true, assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
 

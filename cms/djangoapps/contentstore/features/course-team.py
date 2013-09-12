@@ -5,7 +5,7 @@ from lettuce import world, step
 from common import create_studio_user
 from django.contrib.auth.models import Group
 from auth.authz import get_course_groupname_for_role, get_user_by_email
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'

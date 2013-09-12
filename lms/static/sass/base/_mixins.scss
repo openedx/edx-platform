@@ -1,13 +1,16 @@
+// lms - utilities - mixins and extends
+// ====================
+
 // mixins - font sizing
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
-  font-size: ($sizeValue/10) + rem;
+ // font-size: ($sizeValue/10) + rem;
 }
 
 // mixins - line height
 @mixin line-height($fontSize: auto){
   line-height: ($fontSize*1.48) + px;
-  line-height: (($fontSize/10)*1.48) + rem;
+ // line-height: (($fontSize/10)*1.48) + rem;
 }
 
 // image-replacement hidden text
@@ -38,20 +41,37 @@
   @return #{$pxval / $base}em;
 }
 
-// Line-height
+// line-height
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
 
+// ====================
 
-//-----------------
-//  Theme Mixin Styles
-//-----------------
+// theme mixin styles
 @mixin login_register_h1_style {}
-
 @mixin footer_references_style {}
 
 // ====================
+
+// extends - UI - visual link
+.ui-fake-link {
+  cursor: pointer;
+}
+
+// extends - UI - functional disable
+.ui-disabled {
+  pointer-events: none;
+  outline: none;
+}
+
+// extends - UI - depth levels
+.ui-depth0 { z-index: 0; }
+.ui-depth1 { z-index: 10; }
+.ui-depth2 { z-index: 100; }
+.ui-depth3 { z-index: 1000; }
+.ui-depth4 { z-index: 10000; }
+.ui-depth5 { z-index: 100000; }
 
 // extends -hidden elems - screenreaders
 .text-sr {
@@ -63,4 +83,40 @@
   padding: 0;
   position: absolute;
   width: 1px;
+}
+
+// extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+.ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li, dt, dd {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// extends - text - image-replacement hidden text
+.text-hide {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// extends - text - wrapping
+.text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+// extends - text - text overflow by ellipsis
+.text-truncated {
+  @include box-sizing(border-box);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

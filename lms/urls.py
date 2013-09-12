@@ -3,9 +3,6 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-# Not used, the work is done in the imported module.
-from . import one_time_startup      # pylint: disable=W0611
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -61,7 +58,15 @@ urlpatterns = ('',  # nopep8
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),
+
 )
+
+# if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+urlpatterns += (
+    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^course_modes/', include('course_modes.urls')),
+)
+
 
 js_info_dict = {
     'domain': 'djangojs',
@@ -350,6 +355,7 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+
 if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
@@ -358,9 +364,6 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
             include('instructor.views.api_urls'))
     )
-
-if settings.ENABLE_JASMINE:
-    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
@@ -376,6 +379,12 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
 if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
         url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):

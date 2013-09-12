@@ -15,7 +15,7 @@ endif
 Q_FLAG        = 
 
 ifeq ($(quiet), true)
-Q_FLAG = -q
+Q_FLAG = -Q
 endif
 
 # Internal variables.

@@ -18,6 +18,8 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 from django.http import QueryDict
 
@@ -95,34 +97,39 @@ class CapaFactory(object):
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
-        model_data = {'data': CapaFactory.sample_problem_xml, 'location': location}
+        field_data = {'data': CapaFactory.sample_problem_xml}
 
         if graceperiod is not None:
-            model_data['graceperiod'] = graceperiod
+            field_data['graceperiod'] = graceperiod
         if due is not None:
-            model_data['due'] = due
+            field_data['due'] = due
         if max_attempts is not None:
-            model_data['max_attempts'] = max_attempts
+            field_data['max_attempts'] = max_attempts
         if showanswer is not None:
-            model_data['showanswer'] = showanswer
+            field_data['showanswer'] = showanswer
         if force_save_button is not None:
-            model_data['force_save_button'] = force_save_button
+            field_data['force_save_button'] = force_save_button
         if rerandomize is not None:
-            model_data['rerandomize'] = rerandomize
+            field_data['rerandomize'] = rerandomize
         if done is not None:
-            model_data['done'] = done
+            field_data['done'] = done
 
         descriptor = Mock(weight="1")
         if problem_state is not None:
-            model_data.update(problem_state)
+            field_data.update(problem_state)
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
-            model_data['attempts'] = int(attempts)
+            field_data['attempts'] = int(attempts)
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, descriptor, model_data)
+        module = CapaModule(
+            descriptor,
+            system,
+            DictFieldData(field_data),
+            ScopeIds(None, None, location, location),
+        )
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
@@ -322,7 +329,8 @@ class CapaModuleTest(unittest.TestCase):
 
         # We have to set up Django settings in order to use QueryDict
         from django.conf import settings
-        settings.configure()
+        if not settings.configured:
+            settings.configure()
 
         # Valid GET param dict
         valid_get_dict = self._querydict_from_dict({'input_1': 'test',

@@ -8,6 +8,12 @@
     right: 2em;
   }
 
+  .studio-edit-link{
+    position: absolute;
+    top: 3.5em;
+    right: 2em;
+  }
+
 	section.instructor-dashboard-content {
 		@extend .content;
     padding: 40px;
@@ -17,5 +23,56 @@
       @extend .top-header;
     }
 	}
+
+  // form fields
+  .list-fields {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .field {
+      margin-bottom: 20px;
+      padding: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // system feedback - messages
+  .msg {
+    border-radius: 1px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+
+    .copy {
+      font-weight: 600;
+    }
+  }
+
+  .msg-confirm {
+    border-top: 2px solid green;
+    background: tint(green,90%);
+
+    .copy {
+      color: green;
+    }
+  }
+
+  .list-advice {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+
+    .item {
+      font-weight: 600;
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 }
 

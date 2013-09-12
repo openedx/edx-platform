@@ -5,17 +5,17 @@ import json
 from mock import Mock, patch
 from functools import partial
 
-from courseware.model_data import LmsKeyValueStore, InvalidWriteError
-from courseware.model_data import InvalidScopeError, ModelDataCache
-from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
+from courseware.model_data import DjangoKeyValueStore
+from courseware.model_data import InvalidScopeError, FieldDataCache
+from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
-from courseware.tests.factories import ContentFactory, SettingsFactory
+from courseware.tests.factories import UserStateSummaryFactory
 from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
-from xblock.core import Scope, BlockScope
+from xblock.fields import Scope, BlockScope
 from xmodule.modulestore import Location
 from django.test import TestCase
 from django.db import DatabaseError
@@ -29,22 +29,22 @@ def mock_field(scope, name):
     return field
 
 
-def mock_descriptor(fields=[], lms_fields=[]):
+def mock_descriptor(fields=[]):
     descriptor = Mock()
     descriptor.location = location('def_id')
-    descriptor.module_class.fields = fields
-    descriptor.module_class.lms.fields = lms_fields
+    descriptor.module_class.fields.values.return_value = fields
+    descriptor.fields.values.return_value = fields
     descriptor.module_class.__name__ = 'MockProblemModule'
     return descriptor
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 course_id = 'edX/test_course/test'
 
-content_key = partial(LmsKeyValueStore.Key, Scope.content, None, location('def_id'))
-settings_key = partial(LmsKeyValueStore.Key, Scope.settings, None, location('def_id'))
-user_state_key = partial(LmsKeyValueStore.Key, Scope.user_state, 'user', location('def_id'))
-prefs_key = partial(LmsKeyValueStore.Key, Scope.preferences, 'user', 'MockProblemModule')
-user_info_key = partial(LmsKeyValueStore.Key, Scope.user_info, 'user', None)
+user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, location('def_id'))
+settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('def_id'))
+user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 'user', location('def_id'))
+prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 'user', 'MockProblemModule')
+user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 'user', None)
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
@@ -52,48 +52,17 @@ class StudentModuleFactory(cmfStudentModuleFactory):
     course_id = course_id
 
 
-class TestDescriptorFallback(TestCase):
-
-    def setUp(self):
-        self.desc_md = {
-            'field_a': 'content',
-            'field_b': 'settings',
-        }
-        self.kvs = LmsKeyValueStore(self.desc_md, None)
-
-    def test_get_from_descriptor(self):
-        self.assertEquals('content', self.kvs.get(content_key('field_a')))
-        self.assertEquals('settings', self.kvs.get(settings_key('field_b')))
-
-    def test_write_to_descriptor(self):
-        self.assertRaises(InvalidWriteError, self.kvs.set, content_key('field_a'), 'foo')
-        self.assertEquals('content', self.desc_md['field_a'])
-        self.assertRaises(InvalidWriteError, self.kvs.set, settings_key('field_b'), 'foo')
-        self.assertEquals('settings', self.desc_md['field_b'])
-
-        self.assertRaises(InvalidWriteError, self.kvs.set_many, {content_key('field_a'): 'foo'})
-        self.assertEquals('content', self.desc_md['field_a'])
-
-        self.assertRaises(InvalidWriteError, self.kvs.delete, content_key('field_a'))
-        self.assertEquals('content', self.desc_md['field_a'])
-        self.assertRaises(InvalidWriteError, self.kvs.delete, settings_key('field_b'))
-        self.assertEquals('settings', self.desc_md['field_b'])
-
-
-
-
 class TestInvalidScopes(TestCase):
     def setUp(self):
-        self.desc_md = {}
         self.user = UserFactory.create(username='user')
-        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
+        self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_invalid_scopes(self):
         for scope in (Scope(user=True, block=BlockScope.DEFINITION),
                       Scope(user=False, block=BlockScope.TYPE),
                       Scope(user=False, block=BlockScope.ALL)):
-            key = LmsKeyValueStore.Key(scope, None, None, 'field')
+            key = DjangoKeyValueStore.Key(scope, None, None, 'field')
 
             self.assertRaises(InvalidScopeError, self.kvs.get, key)
             self.assertRaises(InvalidScopeError, self.kvs.set, key, 'value')
@@ -105,11 +74,10 @@ class TestInvalidScopes(TestCase):
 class TestStudentModuleStorage(TestCase):
 
     def setUp(self):
-        self.desc_md = {}
         student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value', 'b_field': 'b_value'}))
         self.user = student_module.student
-        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
+        self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing StudentModule works"
@@ -184,9 +152,8 @@ class TestStudentModuleStorage(TestCase):
 class TestMissingStudentModule(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username='user')
-        self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.field_data_cache = FieldDataCache([mock_descriptor()], course_id, self.user)
+        self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_get_field_from_missing_student_module(self):
         "Test that getting a field from a missing StudentModule raises a KeyError"
@@ -194,12 +161,12 @@ class TestMissingStudentModule(TestCase):
 
     def test_set_field_in_missing_student_module(self):
         "Test that setting a field in a missing StudentModule creates the student module"
-        self.assertEquals(0, len(self.mdc.cache))
+        self.assertEquals(0, len(self.field_data_cache.cache))
         self.assertEquals(0, StudentModule.objects.all().count())
 
         self.kvs.set(user_state_key('a_field'), 'a_value')
 
-        self.assertEquals(1, len(self.mdc.cache))
+        self.assertEquals(1, len(self.field_data_cache.cache))
         self.assertEquals(1, StudentModule.objects.all().count())
 
         student_module = StudentModule.objects.all()[0]
@@ -237,12 +204,12 @@ class StorageTestBase(object):
             self.user = field_storage.student
         else:
             self.user = UserFactory.create()
-        self.desc_md = {}
         self.mock_descriptor = mock_descriptor([
             mock_field(self.scope, 'existing_field'),
             mock_field(self.scope, 'other_existing_field')])
-        self.mdc = ModelDataCache([self.mock_descriptor], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.field_data_cache = FieldDataCache([self.mock_descriptor], course_id, self.user)
+        self.kvs = DjangoKeyValueStore(self.field_data_cache)
+
 
     def test_set_and_get_existing_field(self):
         self.kvs.set(self.key_factory('existing_field'), 'test_value')
@@ -318,20 +285,11 @@ class StorageTestBase(object):
         self.assertEquals(exception.saved_field_names[0], 'existing_field')
 
 
-
-
-class TestSettingsStorage(StorageTestBase, TestCase):
-    factory = SettingsFactory
-    scope = Scope.settings
-    key_factory = settings_key
-    storage_class = XModuleSettingsField
-
-
 class TestContentStorage(StorageTestBase, TestCase):
-    factory = ContentFactory
-    scope = Scope.content
-    key_factory = content_key
-    storage_class = XModuleContentField
+    factory = UserStateSummaryFactory
+    scope = Scope.user_state_summary
+    key_factory = user_state_summary_key
+    storage_class = XModuleUserStateSummaryField
 
 
 class TestStudentPrefsStorage(StorageTestBase, TestCase):

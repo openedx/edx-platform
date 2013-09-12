@@ -3,7 +3,6 @@ from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
 from certificates.models import CertificateWhitelist
 
-from mitxmako.middleware import MakoMiddleware
 from courseware import grades, courses
 from django.test.client import RequestFactory
 from capa.xqueue_interface import XQueueInterface
@@ -52,14 +51,6 @@ class XQueueCertInterface(object):
     """
 
     def __init__(self, request=None):
-        # MakoMiddleware Note:
-        # Line below has the side-effect of writing to a module level lookup
-        # table that will allow problems to render themselves. If this is not
-        # present, problems that a student hasn't seen will error when loading,
-        # causing the grading system to under-count the possible score and
-        # inflate their grade. This dependency is bad and was probably recently
-        # introduced. This is the bandage until we can trace the root cause.
-        m = MakoMiddleware()
 
         # Get basic auth (username/password) for
         # xqueue connection if it's in the settings

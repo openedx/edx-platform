@@ -30,6 +30,9 @@ from path import path
 
 from .discussionsettings import *
 
+from lms.xblock.mixin import LmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
@@ -92,6 +95,7 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
     'AUTH_USE_SHIB': False,
+    'AUTH_USE_CAS': False,
 
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
@@ -160,8 +164,14 @@ MITX_FEATURES = {
     # basis in Studio)
     'ENABLE_CHAT': False,
 
+    # Allow users to enroll with methods other than just honor code certificates
+    'MULTIPLE_ENROLLMENT_ROLES' : False,
+
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False
+    'ENABLE_SHOPPING_CART': False,
+
+    # Toggle storing detailed billing information
+    'STORE_BILLING_INFO': False,
 }
 
 # Used for A/B testing
@@ -293,12 +303,14 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                        'title': 'Circuits and Electronics',
-                                        'xmlpath': '6002x/',
-                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                        }
-                   }
+COURSE_SETTINGS = {
+    '6.002x_Fall_2012': {
+        'number': '6.002x',
+        'title': 'Circuits and Electronics',
+        'xmlpath': '6002x/',
+        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+    }
+}
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
@@ -320,6 +332,12 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
 
 #################### Python sandbox ############################################
 
@@ -356,6 +374,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 
+# CMS base
+CMS_BASE = 'localhost:8001'
+
 # Site info
 SITE_ID = 1
 SITE_NAME = "edx.org"
@@ -367,7 +388,8 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
-EMAILS_PER_TASK = 10
+EMAILS_PER_TASK = 100
+EMAILS_PER_QUERY = 1000
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
@@ -603,7 +625,7 @@ PIPELINE_JS = {
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
-            'js/utility.js',
+            'js/src/utility.js',
         ],
         'output_filename': 'js/lms-application.js',
 
@@ -810,7 +832,10 @@ INSTALLED_APPS = (
     'notification_prefs',
 
     # Different Course Modes
-    'course_modes'
+    'course_modes',
+
+    # Student Identity Verification
+    'verify_student',
 )
 
 ######################### MARKETING SITE ###############################
@@ -825,6 +850,9 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
 }
 
 ######################### VISIBLE SETTINGS ###########################
@@ -871,3 +899,19 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
+
+################# Student Verification #################
+VERIFY_STUDENT = {
+    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+}
+
+######################## CAS authentication ###########################
+
+if MITX_FEATURES.get('AUTH_USE_CAS'):
+    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas.backends.CASBackend',
+    )
+    INSTALLED_APPS += ('django_cas',)
+    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)

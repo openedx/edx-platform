@@ -25,6 +25,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xmodule
 import xmodule.graders as xmgraders
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
@@ -32,7 +33,7 @@ from xmodule.html_module import HtmlDescriptor
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_cms_course_link_by_id
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -51,11 +52,14 @@ from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 
 from bulk_email.models import CourseEmail
 import datetime
 from hashlib import md5
+from html_to_text import html_to_text
 from bulk_email import tasks
 
 log = logging.getLogger(__name__)
@@ -65,11 +69,11 @@ FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
 
 
-def split_by_comma_and_whitespace(s):
+def split_by_comma_and_whitespace(a_str):
     """
-    Return string s, split by , or whitespace
+    Return string a_str, split by , or whitespace
     """
-    return re.split(r'[\s,]', s)
+    return re.split(r'[\s,]', a_str)
 
 
 @ensure_csrf_cookie
@@ -83,9 +87,11 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
-    to = None
-    subject = None
+    email_msg = ''
+    email_to_option = None
+    email_subject = None
     html_message = ''
+    show_email_tab = False
     problems = []
     plots = []
     datatable = {}
@@ -107,27 +113,21 @@ def instructor_dashboard(request, course_id):
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
-            for field in course.fields:
+            for field in course.fields.values():
                 if getattr(field.scope, 'user', False):
                     continue
 
                 data.append([field.name, json.dumps(field.read_json(course))])
-            for namespace in course.namespaces:
-                for field in getattr(course, namespace).fields:
-                    if getattr(field.scope, 'user', False):
-                        continue
-
-                    data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
         datatable['data'] = data
         return datatable
 
-    def return_csv(fn, datatable, fp=None):
+    def return_csv(func, datatable, file_pointer=None):
         """Outputs a CSV file from the contents of a datatable."""
-        if fp is None:
+        if file_pointer is None:
             response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(func)
         else:
-            response = fp
+            response = file_pointer
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -276,11 +276,11 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
                 track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
-        except ItemNotFoundError as e:
+        except ItemNotFoundError as err:
             msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
-        except Exception as e:
-            log.error("Encountered exception from rescore: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, e.message)
+        except Exception as err:
+            log.error("Encountered exception from rescore: {0}".format(err))
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, err.message)
 
     elif "Reset ALL students' attempts" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
@@ -291,12 +291,12 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
                 track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
-        except ItemNotFoundError as e:
-            log.error('Failure to reset: unknown problem "{0}"'.format(e))
+        except ItemNotFoundError as err:
+            log.error('Failure to reset: unknown problem "{0}"'.format(err))
             msg += '<font color="red">Failed to create a background task for resetting "{0}": problem not found.</font>'.format(problem_url)
-        except Exception as e:
-            log.error("Encountered exception from reset: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, e.message)
+        except Exception as err:
+            log.error("Encountered exception from reset: {0}".format(err))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, err.message)
 
     elif "Show Background Task History for Student" in action:
         # put this before the non-student case, since the use of "in" will cause this to be missed
@@ -472,10 +472,10 @@ def instructor_dashboard(request, course_id):
                     return return_csv('grades %s.csv' % aname, datatable)
 
                 elif 'remote gradebook' in action:
-                    fp = StringIO()
-                    return_csv('', datatable, fp=fp)
-                    fp.seek(0)
-                    files = {'datafile': fp}
+                    file_pointer = StringIO()
+                    return_csv('', datatable, file_pointer=file_pointer)
+                    file_pointer.seek(0)
+                    files = {'datafile': file_pointer}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
 
@@ -701,26 +701,29 @@ def instructor_dashboard(request, course_id):
     # email
 
     elif action == 'Send email':
-        to = request.POST.get("to")
-        subject = request.POST.get("subject")
+        email_to_option = request.POST.get("to_option")
+        email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
+        text_message = html_to_text(html_message)
 
         email = CourseEmail(course_id=course_id,
                             sender=request.user,
-                            to=to,
-                            subject=subject,
+                            to_option=email_to_option,
+                            subject=email_subject,
                             html_message=html_message,
-                            hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+                            text_message=text_message)
+
         email.save()
 
-        course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
-        tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
+        tasks.delegate_email_batches.delay(
+            email.id,
+            request.user.id
+        )
 
-        if to == "all":
-            msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classe\
-s (~10k), it may take 1-2 hours to send all emails.</font>"
+        if email_to_option == "all":
+            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
-            msg = "<font color='green'>Your email was successfully queued for sending.</font>"
+            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
 
     #----------------------------------------
     # psychometrics
@@ -787,17 +790,30 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
     else:
         instructor_tasks = None
 
+    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
+    # 2) enable course email
+    is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    email_editor = None
     # HTML editor for email
-    if idash_mode == 'Email':
-        html_module = HtmlDescriptor(course.system, {'data': html_message})
-        editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
-    else:
-        editor = None
+    if idash_mode == 'Email' and is_studio_course:
+        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
+        email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
+
+    # Flag for whether or not we display the email tab (depending upon
+    # what backing store this course using (Mongo vs. XML))
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
+        show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
         course_stats = get_course_stats_table()
+
     #----------------------------------------
     # context for rendering
 
@@ -810,9 +826,14 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to': to,            # email
-               'subject': subject,  # email
-               'editor': editor,    # email
+               'studio_url': studio_url,
+
+               'to_option': email_to_option,      # email
+               'subject': email_subject,          # email
+               'editor': email_editor,            # email
+               'email_msg': email_msg,            # email
+               'show_email_tab': show_email_tab,  # email
+
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
@@ -827,7 +848,6 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
-
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -1457,7 +1477,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            grade_format = getattr(s.lms, 'grade_format', None)
+            grade_format = getattr(s, 'grade_format', None)
             aname = ''
             if grade_format in graders:
                 g = graders[grade_format]

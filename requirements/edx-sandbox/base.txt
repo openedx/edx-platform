@@ -1,3 +1,11 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @jtauber - to check licensing
+#   * One of @e0d, @jarv, or @feanil - to check system requirements
+
 numpy==1.6.2
 networkx==1.7
 sympy==0.7.1
+pyparsing==1.5.6
+nltk==2.0.4

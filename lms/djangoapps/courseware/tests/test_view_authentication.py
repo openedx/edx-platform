@@ -359,7 +359,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.course.has_started())
 
         # but should be accessible for beta testers
-        self.course.lms.days_early_for_beta = 2
+        self.course.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = User.objects.get(email=student_email)

@@ -105,13 +105,15 @@ EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', 'localhost')  # django default is localhost
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', 25)  # django default is 25
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is False
-EMAILS_PER_TASK = ENV_TOKENS.get('EMAILS_PER_TASK', 10)
-
+EMAILS_PER_TASK = ENV_TOKENS.get('EMAILS_PER_TASK', 100)
+EMAILS_PER_QUERY = ENV_TOKENS.get('EMAILS_PER_QUERY', 1000)
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 JABBER = ENV_TOKENS.get('JABBER', {})
 DATABASE_ROUTERS = ENV_TOKENS.get('DATABASE_ROUTERS', [])
+
+CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -259,3 +261,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+# Student identity verification settings
+VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", "")

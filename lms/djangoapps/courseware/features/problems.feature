@@ -7,7 +7,7 @@ Feature: Answer problems
         Given External graders respond "correct"
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
-        Then My "<ProblemType>" answer is marked "correct"
+        Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
 
         Examples:
@@ -28,7 +28,7 @@ Feature: Answer problems
         Given External graders respond "incorrect"
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
-        Then My "<ProblemType>" answer is marked "incorrect"
+        Then my "<ProblemType>" answer is marked "incorrect"
         And The "<ProblemType>" problem displays a "incorrect" answer
 
         Examples:
@@ -48,7 +48,7 @@ Feature: Answer problems
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
         When I check a problem
-        Then My "<ProblemType>" answer is marked "incorrect"
+        Then my "<ProblemType>" answer is marked "incorrect"
         And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
@@ -69,7 +69,7 @@ Feature: Answer problems
         Given I am viewing a "<ProblemType>" problem
         And I answer a "<ProblemType>" problem "<Correctness>ly"
         When I reset the problem
-        Then My "<ProblemType>" answer is marked "unanswered"
+        Then my "<ProblemType>" answer is marked "unanswered"
         And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
@@ -171,3 +171,68 @@ Feature: Answer problems
         | numerical         | 1 point possible   |
         | formula           | 1 point possible   |
         | script            | 2 points possible  |
+
+
+    Scenario: I can reset the correctness of a problem after changing my answer
+        Given I am viewing a "<ProblemType>" problem
+        Then my "<ProblemType>" answer is marked "unanswered"
+        When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
+	And I wait for "1" seconds
+        And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
+        Then my "<ProblemType>" answer is marked "unanswered"
+        And I reset the problem
+
+        Examples:
+        | ProblemType     | InitialCorrectness | OtherCorrectness |
+        | drop down       | correct            | incorrect        |
+        | drop down       | incorrect          | correct          |
+        | checkbox        | correct            | incorrect        |
+        | checkbox        | incorrect          | correct          |
+        | string          | correct            | incorrect        |
+        | string          | incorrect          | correct          |
+        | numerical       | correct            | incorrect        |
+        | numerical       | incorrect          | correct          |
+        | formula         | correct            | incorrect        |
+        | formula         | incorrect          | correct          |
+        | script          | correct            | incorrect        |
+        | script          | incorrect          | correct          |
+
+    # Radio groups behave slightly differently than other types of checkboxes, because they
+    # don't put their status to the top left of the boxes (like checkboxes do), thus, they'll
+    # not ever have a status of "unanswered" once you've made an answer. They should simply NOT
+    # be marked either correct or incorrect. Arguably this behavior should be changed; when it
+    # is, these cases should move into the above Scenario.
+    Scenario: I can reset the correctness of a radiogroup problem after changing my answer
+        Given I am viewing a "<ProblemType>" problem
+        When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
+	And I wait for "1" seconds
+        Then my "<ProblemType>" answer is marked "<InitialCorrectness>"
+        And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
+        Then my "<ProblemType>" answer is NOT marked "<InitialCorrectness>"
+        And my "<ProblemType>" answer is NOT marked "<OtherCorrectness>"
+        And I reset the problem
+
+        Examples:
+        | ProblemType     | InitialCorrectness | OtherCorrectness |
+        | multiple choice | correct            | incorrect        |
+        | multiple choice | incorrect          | correct          |
+        | radio           | correct            | incorrect        |
+        | radio           | incorrect          | correct          |
+
+
+    Scenario: I can reset the correctness of a problem after submitting a blank answer
+        Given I am viewing a "<ProblemType>" problem
+        When I check a problem
+        And I input an answer on a "<ProblemType>" problem "correctly"
+        Then my "<ProblemType>" answer is marked "unanswered"
+
+        Examples:
+        | ProblemType       |
+        | drop down         |
+        | multiple choice   |
+        | checkbox          |
+        | radio             |
+        | string            |
+        | numerical         |
+        | formula           |
+        | script            |

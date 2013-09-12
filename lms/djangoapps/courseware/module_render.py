@@ -33,12 +33,12 @@ from student.models import unique_id_for_user
 
 from courseware.access import has_access
 from courseware.masquerade import setup_masquerade
-from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
+from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from xblock.runtime import KeyValueStore
-from xblock.core import Scope
-from courseware.models import StudentModule
+from xblock.fields import Scope
 from util.sandboxing import can_execute_unsafe_code
 from util.json_request import JsonResponse
+from lms.xblock.field_data import lms_field_data
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def make_track_function(request):
     return function
 
 
-def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
+def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
 
@@ -88,16 +88,16 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
     NOTE: assumes that if we got this far, user has access to course.  Returns
     None if this is not the case.
 
-    model_data_cache must include data from the course module and 2 levels of its descendents
+    field_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
+    course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
     if course_module is None:
         return None
 
     chapters = list()
     for chapter in course_module.get_display_items():
-        if chapter.lms.hide_from_toc:
+        if chapter.hide_from_toc:
             continue
 
         sections = list()
@@ -106,13 +106,13 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
             active = (chapter.url_name == active_chapter and
                       section.url_name == active_section)
 
-            if not section.lms.hide_from_toc:
+            if not section.hide_from_toc:
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
-                                 'format': section.lms.format if section.lms.format is not None else '',
-                                 'due': section.lms.due,
+                                 'format': section.format if section.format is not None else '',
+                                 'due': section.due,
                                  'active': active,
-                                 'graded': section.lms.graded,
+                                 'graded': section.graded,
                                  })
 
         chapters.append({'display_name': chapter.display_name_with_default,
@@ -122,7 +122,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
     return chapters
 
 
-def get_module(user, request, location, model_data_cache, course_id,
+def get_module(user, request, location, field_data_cache, course_id,
                position=None, not_found_ok=False, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
@@ -136,7 +136,7 @@ def get_module(user, request, location, model_data_cache, course_id,
       - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
                                 and such works based on user.
       - location              : A Location-like object identifying the module to load
-      - model_data_cache      : a ModelDataCache
+      - field_data_cache      : a FieldDataCache
       - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
@@ -154,7 +154,7 @@ def get_module(user, request, location, model_data_cache, course_id,
     try:
         location = Location(location)
         descriptor = modulestore().get_instance(course_id, location, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
+        return get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
@@ -184,7 +184,7 @@ def get_xqueue_callback_url_prefix(request):
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
-def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
+def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path=''):
     """
@@ -199,13 +199,13 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
-    return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+    return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
                                               position, wrap_xmodule_display, grade_bucket_type,
                                               static_asset_path)
 
 
-def get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                        track_function, xqueue_callback_url_prefix,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path=''):
@@ -289,34 +289,29 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         """
         # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
         # inner_get_module, not the parent's callback.  Add it as an argument....
-        return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+        return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
                                                   track_function, make_xqueue_callback,
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xblock_model_data(descriptor):
-        return DbModel(
-            LmsKeyValueStore(descriptor._model_data, model_data_cache),
-            descriptor.module_class,
-            user.id,
-            LmsUsage(descriptor.location, descriptor.location)
-        )
+    def xblock_field_data(descriptor):
+        student_data = DbModel(DjangoKeyValueStore(field_data_cache))
+        return lms_field_data(descriptor._field_data, student_data)
 
     def publish(event):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
             return
 
-        usage = LmsUsage(descriptor.location, descriptor.location)
         # Construct the key for the module
         key = KeyValueStore.Key(
             scope=Scope.user_state,
             student_id=user.id,
-            block_scope_id=usage.id,
+            block_scope_id=descriptor.location,
             field_name='grade'
         )
 
-        student_module = model_data_cache.find_or_create(key)
+        student_module = field_data_cache.find_or_create(key)
         # Update the grades
         student_module.grade = event.get('value')
         student_module.max_grade = event.get('max_value')
@@ -359,7 +354,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
             static_replace.replace_static_urls,
             data_directory=getattr(descriptor, 'data_dir', None),
             course_id=course_id,
-            static_asset_path=static_asset_path or descriptor.lms.static_asset_path,
+            static_asset_path=static_asset_path or descriptor.static_asset_path,
         ),
         replace_course_urls=partial(
             static_replace.replace_course_urls,
@@ -371,7 +366,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xblock_model_data=xblock_model_data,
+        xblock_field_data=xblock_field_data,
         publish=publish,
         anonymous_student_id=unique_id_for_user(user),
         course_id=course_id,
@@ -379,6 +374,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         s3_interface=s3_interface,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
+        mixins=descriptor.system.mixologist._mixins,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -419,7 +416,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         _get_html,
         getattr(descriptor, 'data_dir', None),
         course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.lms.static_asset_path
+        static_asset_path=static_asset_path or descriptor.static_asset_path
     )
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
@@ -453,14 +450,14 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     Retrieve target StudentModule
     """
     user = User.objects.get(id=user_id)
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
         modulestore().get_instance(course_id, mod_id),
         depth=0,
         select_for_update=True
     )
-    instance = get_module(user, request, mod_id, model_data_cache, course_id, grade_bucket_type='xqueue')
+    instance = get_module(user, request, mod_id, field_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
         msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
         log.debug(msg)
@@ -554,13 +551,13 @@ def modx_dispatch(request, dispatch, location, course_id):
         )
         raise Http404
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         request.user,
         descriptor
     )
 
-    instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.

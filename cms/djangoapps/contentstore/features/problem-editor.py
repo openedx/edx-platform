@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from common import type_in_codemirror
 
 DISPLAY_NAME = "Display Name"

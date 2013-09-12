@@ -12,12 +12,9 @@ class TestVideo(BaseTestXmodule):
 
     CATEGORY = "video"
     DATA = SOURCE_XML
-    MODEL_DATA = {
-        'data': DATA
-    }
 
     def setUp(self):
-        # Since the VideoDescriptor changes `self._model_data`,
+        # Since the VideoDescriptor changes `self._field_data`,
         # we need to instantiate `self.item_module` through
         # `self.item_descriptor` rather than directly constructing it
         super(TestVideo, self).setUp()

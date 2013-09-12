@@ -1,3 +1,9 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @jtauber - to check licensing
+#   * One of @e0d, @jarv, or @feanil - to check system requirements
+
 # Python libraries to install directly from github
 
 # Third-party:
@@ -8,6 +14,7 @@
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@446668fddc75b78512eef4e9425cbc9a3327606f#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@aa0d60627#egg=XBlock
 -e git+https://github.com/edx/codejail.git@0a1b468#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.2.1#egg=diff_cover
+-e git+https://github.com/edx/diff-cover.git@v0.2.2#egg=diff_cover
+-e git+https://github.com/edx/js-test-tool.git@v0.0.7#egg=js_test_tool

@@ -13,7 +13,7 @@ from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
 import json
 
-from xblock.core import Scope, List, String, Dict, Boolean
+from xblock.fields import Scope, List, String, Dict, Boolean
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
@@ -118,6 +118,13 @@ class Textbook(object):
 
         return table_of_contents
 
+    def __eq__(self, other):
+        return (self.title == other.title and
+                self.book_url == other.book_url)
+
+    def __ne__(self, other):
+        return not self == other
+
 
 class TextbookList(List):
     def from_json(self, values):
@@ -146,6 +153,7 @@ class TextbookList(List):
 
 
 class CourseFields(object):
+    lti_passports = List(help="LTI tools passports as id:client_key:client_secret", scope=Scope.settings)
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
@@ -737,7 +745,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         all_descriptors - This contains a list of all xmodules that can
             effect grading a student. This is used to efficiently fetch
-            all the xmodule state for a ModelDataCache without walking
+            all the xmodule state for a FieldDataCache without walking
             the descriptor tree again.
 
 
@@ -754,14 +762,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         for c in self.get_children():
             for s in c.get_children():
-                if s.lms.graded:
+                if s.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
-                    section_format = s.lms.format if s.lms.format is not None else ''
+                    section_format = s.format if s.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)

@@ -17,6 +17,7 @@
 
         % for choice_id, choice_description in choices:
         <label for="input_${id}_${choice_id}"
+            ## If the student has selected this choice...
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             <%
                 if status == 'correct':
@@ -32,6 +33,7 @@
             % endif
             >
             <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-describedby="answer_${id}" value="${choice_id}"
+            ## If the student selected this choice...
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             checked="true"
             % elif input_type != 'radio' and choice_id in value:

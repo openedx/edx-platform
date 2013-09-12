@@ -42,7 +42,7 @@ def wrap_draft(item):
     non-draft location in either case
     """
     setattr(item, 'is_draft', item.location.revision == DRAFT)
-    item.location = item.location.replace(revision=None)
+    item.scope_ids = item.scope_ids._replace(usage_id=item.location.replace(revision=None))
     return item
 
 
@@ -235,10 +235,10 @@ class DraftModuleStore(MongoModuleStore):
         """
         draft = self.get_item(location)
 
-        draft.cms.published_date = datetime.now(UTC)
-        draft.cms.published_by = published_by_id
-        super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
-        super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
+        draft.published_date = datetime.now(UTC)
+        draft.published_by = published_by_id
+        super(DraftModuleStore, self).update_item(location, draft._field_data._kvs._data)
+        super(DraftModuleStore, self).update_children(location, draft._field_data._kvs._children)
         super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)
 

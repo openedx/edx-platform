@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import datetime
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
 
 
 class Migration(SchemaMigration):
@@ -33,7 +31,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Optout', fields ['email', 'course_id']
         db.create_unique('bulk_email_optout', ['email', 'course_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Optout', fields ['email', 'course_id']
         db.delete_unique('bulk_email_optout', ['email', 'course_id'])
@@ -43,7 +40,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Optout'
         db.delete_table('bulk_email_optout')
-
 
     models = {
         'auth.group': {

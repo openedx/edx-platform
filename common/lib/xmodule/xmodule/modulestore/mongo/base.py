@@ -17,24 +17,23 @@ import sys
 import logging
 import copy
 
-from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
 from operator import attrgetter
-from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
-from xblock.core import Scope
+from xblock.runtime import DbModel
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
+from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
 log = logging.getLogger(__name__)
 
@@ -57,17 +56,16 @@ class InvalidWriteError(Exception):
     """
 
 
-class MongoKeyValueStore(KeyValueStore):
+class MongoKeyValueStore(InheritanceKeyValueStore):
     """
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, children, metadata, location, category):
+    def __init__(self, data, children, metadata):
+        super(MongoKeyValueStore, self).__init__()
         self._data = data
         self._children = children
         self._metadata = metadata
-        self._location = location
-        self._category = category
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -77,11 +75,7 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                return self._location
-            elif key.field_name == 'category':
-                return self._category
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return self._data
             else:
                 return self._data[key.field_name]
@@ -94,11 +88,7 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = value
-            elif key.field_name == 'category':
-                self._category = value
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = value
             else:
                 self._data[key.field_name] = value
@@ -112,11 +102,7 @@ class MongoKeyValueStore(KeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = Location(None)
-            elif key.field_name == 'category':
-                self._category = None
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = None
             else:
                 del self._data[key.field_name]
@@ -129,20 +115,12 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                # WHY TRUE? if it's been deleted should it be False?
-                return True
-            elif key.field_name == 'category':
-                return self._category is not None
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return True
             else:
                 return key.field_name in self._data
         else:
             return False
-
-
-MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -152,8 +130,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     TODO (cdodge) when the 'split module store' work has been completed we can remove all
     references to metadata_inheritance_tree
     """
-    def __init__(self, modulestore, module_data, default_class, resources_fs,
-                 error_tracker, render_template, cached_metadata=None):
+    def __init__(self, modulestore, module_data, default_class, cached_metadata, **kwargs):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
@@ -170,8 +147,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(self.load_item, resources_fs,
-                                                      error_tracker, render_template)
+        super(CachingDescriptorSystem, self).__init__(load_item=self.load_item, **kwargs)
+
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -190,7 +167,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
-                self.module_data.update(module.system.module_data)
+                self.module_data.update(module.runtime.module_data)
             return module
         else:
             # load the module and apply the inherited metadata
@@ -202,7 +179,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
-                for old_name, new_name in class_.metadata_translations.items():
+                for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
                     if old_name in metadata:
                         metadata[new_name] = metadata[old_name]
                         del metadata[old_name]
@@ -211,18 +188,18 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     definition.get('data', {}),
                     definition.get('children', []),
                     metadata,
-                    location,
-                    category
                 )
 
-                model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                model_data['category'] = category
-                model_data['location'] = location
-                module = class_(self, model_data)
+                field_data = DbModel(kvs)
+                scope_ids = ScopeIds(None, category, location, location)
+                module = self.construct_xblock_from_class(class_, field_data, scope_ids)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
                     non_draft_loc = location.replace(revision=None)
+
+                    # Convert the serialized fields values in self.cached_metadata
+                    # to python values
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 # decache any computed pending field settings
@@ -270,15 +247,18 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, **kwargs):
+                 user=None, password=None, mongo_options=None, **kwargs):
 
-        super(MongoModuleStore, self).__init__()
+        super(MongoModuleStore, self).__init__(**kwargs)
+
+        if mongo_options is None:
+            mongo_options = {}
 
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port,
             tz_aware=True,
-            **kwargs
+            **mongo_options
         )[db][collection]
 
         if user is not None and password is not None:
@@ -312,7 +292,7 @@ class MongoModuleStore(ModuleStoreBase):
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
         query = {'_id.org': location.org,
                  '_id.course': location.course,
-                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical', 'videosequence',
                                           'wrapper', 'problemset', 'conditional', 'randomize']}
                  }
         # we just want the Location, children, and inheritable metadata
@@ -320,8 +300,8 @@ class MongoModuleStore(ModuleStoreBase):
 
         # just get the inheritable metadata since that is all we need for the computation
         # this minimizes both data pushed over the wire
-        for attr in INHERITABLE_METADATA:
-            record_filter['metadata.{0}'.format(attr)] = 1
+        for field_name in InheritanceMixin.fields:
+            record_filter['metadata.{0}'.format(field_name)] = 1
 
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
@@ -493,13 +473,14 @@ class MongoModuleStore(ModuleStoreBase):
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
-            self,
-            data_cache,
-            self.default_class,
-            resource_fs,
-            self.error_tracker,
-            self.render_template,
-            cached_metadata,
+            modulestore=self,
+            module_data=data_cache,
+            default_class=self.default_class,
+            resources_fs=resource_fs,
+            error_tracker=self.error_tracker,
+            render_template=self.render_template,
+            cached_metadata=cached_metadata,
+            mixins=self.xblock_mixins,
         )
         return system.load_item(item['location'])
 
@@ -603,7 +584,7 @@ class MongoModuleStore(ModuleStoreBase):
         :param location: a Location--must have a category
         :param definition_data: can be empty. The initial definition_data for the kvs
         :param metadata: can be empty, the initial metadata for the kvs
-        :param system: if you already have an xmodule from the course, the xmodule.system value
+        :param system: if you already have an xblock from the course, the xblock.runtime value
         """
         if not isinstance(location, Location):
             location = Location(location)
@@ -613,13 +594,14 @@ class MongoModuleStore(ModuleStoreBase):
             metadata = {}
         if system is None:
             system = CachingDescriptorSystem(
-                self,
-                {},
-                self.default_class,
-                None,
-                self.error_tracker,
-                self.render_template,
-                {}
+                modulestore=self,
+                module_data={},
+                default_class=self.default_class,
+                resources_fs=None,
+                error_tracker=self.error_tracker,
+                render_template=self.render_template,
+                cached_metadata={},
+                mixins=self.xblock_mixins,
             )
         xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
         if definition_data is None:
@@ -627,8 +609,16 @@ class MongoModuleStore(ModuleStoreBase):
                 definition_data = getattr(xblock_class, 'data').default
             else:
                 definition_data = {}
-        dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
-        xmodule = xblock_class(system, dbmodel)
+        dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
+        xmodule = system.construct_xblock_from_class(
+            xblock_class,
+            dbmodel,
+
+            # We're loading a descriptor, so student_id is meaningless
+            # We also don't have separate notions of definition and usage ids yet,
+            # so we use the location for both.
+            ScopeIds(None, location.category, location, location)
+        )
         # decache any pending field settings from init
         xmodule.save()
         return xmodule
@@ -665,7 +655,7 @@ class MongoModuleStore(ModuleStoreBase):
         :param location: a Location--must have a category
         :param definition_data: can be empty. The initial definition_data for the kvs
         :param metadata: can be empty, the initial metadata for the kvs
-        :param system: if you already have an xmodule from the course, the xmodule.system value
+        :param system: if you already have an xblock from the course, the xblock.runtime value
         """
         # differs from split mongo in that I believe most of this logic should be above the persistence
         # layer but added it here to enable quick conversion. I'll need to reconcile these.
@@ -791,7 +781,7 @@ class MongoModuleStore(ModuleStoreBase):
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
-                    tab['name'] = metadata.get('display_name')
+                    tab['name'] = metadata.get('display_name', tab.get('name'))
                     break
             course.tabs = existing_tabs
             # Save the updates to the course to the MongoKeyValueStore
@@ -845,7 +835,7 @@ class MongoModuleStore(ModuleStoreBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def _create_new_model_data(self, category, location, definition_data, metadata):
+    def _create_new_field_data(self, category, location, definition_data, metadata):
         """
         To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs
         """
@@ -853,15 +843,7 @@ class MongoModuleStore(ModuleStoreBase):
             definition_data,
             [],
             metadata,
-            location,
-            category
         )
 
-        class_ = XModuleDescriptor.load_class(
-            category,
-            self.default_class
-        )
-        model_data = DbModel(kvs, class_, None, MongoUsage(None, location))
-        model_data['category'] = category
-        model_data['location'] = location
-        return model_data
+        field_data = DbModel(kvs)
+        return field_data
