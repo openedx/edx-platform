@@ -51,6 +51,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
+    - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
 
 # Paths to source JavaScript files
 src_paths:

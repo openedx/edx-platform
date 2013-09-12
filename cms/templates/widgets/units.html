@@ -11,7 +11,10 @@ This def will enumerate through a passed in subsection and list all of the units
       subsection_units = subsection.get_children()
   %>
   % for unit in subsection_units:
-  <li class="leaf unit" data-id="${unit.location}" data-parent-id="${subsection.location.url()}">
+  <li class="courseware-unit leaf unit is-draggable" data-id="${unit.location}" data-parent-id="${subsection.location.url()}">
+
+    <%include file="_ui-dnd-indicator-before.html" />
+
     <%
       unit_state = compute_unit_state(unit)
       if unit.location == selected:
@@ -19,7 +22,7 @@ This def will enumerate through a passed in subsection and list all of the units
       else:
         selected_class = ''
     %>
-    <div class="section-item unit-drag-handle ${selected_class}">
+    <div class="section-item ${selected_class}">
       <a href="${reverse('edit_unit', args=[unit.location])}" class="${unit_state}-item">
         <span class="${unit.scope_ids.block_type}-icon"></span>
         <span class="unit-name">${unit.display_name_with_default}</span>
@@ -27,12 +30,17 @@ This def will enumerate through a passed in subsection and list all of the units
       % if actions:
       <div class="item-actions">
 	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
+	<span data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></span>
       </div>
       % endif
     </div>
+
+    <%include file="_ui-dnd-indicator-after.html" />
   </li>
   % endfor
   <li>
+    <%include file="_ui-dnd-indicator-initial.html" />
+
     <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection.location}">
       <span class="new-unit-icon"></span>New Unit
     </a>

@@ -133,5 +133,5 @@ def reorder_subsections(_step):
     ele.action_chains.drag_and_drop_by_offset(
         ele._element,
         0,
-        10
+        25
     ).perform()
