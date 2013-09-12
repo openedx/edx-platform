@@ -394,9 +394,6 @@ class ImportTestCase(BaseCourseTestCase):
         chapters = course.get_children()
         self.assertEqual(len(chapters), 3)
 
-        ch3 = chapters[2]
-
-
     def test_url_name_mangling(self):
         """
         Make sure that url_names are only mangled once.

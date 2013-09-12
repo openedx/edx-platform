@@ -2,6 +2,7 @@ from pprint import pprint
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false
+from itertools import ifilter
 # pylint: enable=E0611
 import pymongo
 import logging
@@ -88,6 +89,19 @@ class TestMongoModuleStore(object):
     def tearDown(self):
         pass
 
+    def get_course_by_id(self, name):
+        """
+        Returns the first course with `id` of `name`, or `None` if there are none.
+        """
+        courses = self.store.get_courses()
+        return next(ifilter(lambda x: x.id == name, courses), None)
+
+    def course_with_id_exists(self, name):
+        """
+        Returns true iff there exists some course with `id` of `name`.
+        """
+        return (self.get_course_by_id(name) is not None)
+
     def test_init(self):
         '''Make sure the db loads, and print all the locations in the db.
         Call this directly from failing tests to see what is loaded'''
@@ -103,13 +117,11 @@ class TestMongoModuleStore(object):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
         assert_equals(len(courses), 5)
-        courses.sort(key=lambda c: c.id)
-        assert_equals(courses[0].id, 'edX/simple/2012_Fall')
-        assert_equals(courses[1].id, 'edX/simple_with_draft/2012_Fall')
-        assert_equals(courses[2].id, 'edX/test_import_course/2012_Fall')
-        assert_equals(courses[3].id, 'edX/test_unicode/2012_Fall')
-        assert_equals(courses[4].id, 'edX/toy/2012_Fall')
-        log.debug(str(courses))
+        assert self.course_with_id_exists('edX/simple/2012_Fall')
+        assert self.course_with_id_exists('edX/simple_with_draft/2012_Fall')
+        assert self.course_with_id_exists('edX/test_import_course/2012_Fall')
+        assert self.course_with_id_exists('edX/test_unicode/2012_Fall')
+        assert self.course_with_id_exists('edX/toy/2012_Fall')
 
     def test_loads(self):
         assert_not_equals(
@@ -173,7 +185,6 @@ class TestMongoModuleStore(object):
             )
 
     def test_static_tab_names(self):
-        courses = self.store.get_courses()
 
         def get_tab_name(index):
             """
@@ -181,7 +192,8 @@ class TestMongoModuleStore(object):
 
             Assumes the information is desired for courses[4] ('toy' course).
             """
-            return courses[4].tabs[index]['name']
+            course = self.get_course_by_id('edX/toy/2012_Fall')
+            return course.tabs[index]['name']
 
         # There was a bug where model.save was not getting called after the static tab name
         # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
