@@ -4,7 +4,7 @@ Convenience methods for working with datetime objects
 from datetime import timedelta
 
 
-def get_default_time_display(dt):
+def get_default_time_display(dtime):
     """
     Converts a datetime to a string representation. This is the default
     representation used in Studio and LMS.
@@ -12,20 +12,20 @@ def get_default_time_display(dt):
 
     If None is passed in for dt, an empty string will be returned.
     """
-    if dt is None:
+    if dtime is None:
         return u""
-    if dt.tzinfo is not None:
+    if dtime.tzinfo is not None:
         try:
-            timezone = u" " + dt.tzinfo.tzname(dt)
+            timezone = u" " + dtime.tzinfo.tzname(dtime)
         except NotImplementedError:
-            timezone = dt.strftime('%z')
+            timezone = dtime.strftime('%z')
     else:
         timezone = u" UTC"
-    return unicode(dt.strftime(u"%b %d, %Y at %H:%M{tz}")).format(
+    return unicode(dtime.strftime(u"%b %d, %Y at %H:%M{tz}")).format(
         tz=timezone).strip()
 
 
-def get_time_display(dt, format_string=None):
+def get_time_display(dtime, format_string=None):
     """
     Converts a datetime to a string representation.
 
@@ -36,12 +36,12 @@ def get_time_display(dt, format_string=None):
 
     format_string should be a unicode string that is a valid argument for datetime's strftime method.
     """
-    if dt is None or format_string is None:
-        return get_default_time_display(dt)
+    if dtime is None or format_string is None:
+        return get_default_time_display(dtime)
     try:
-        return unicode(dt.strftime(format_string))
+        return unicode(dtime.strftime(format_string))
     except ValueError:
-        return get_default_time_display(dt)
+        return get_default_time_display(dtime)
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):

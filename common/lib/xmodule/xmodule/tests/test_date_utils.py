@@ -14,14 +14,14 @@ def test_get_default_time_display():
         get_default_time_display(test_time))
 
 
-def test_get_default_time_display_notz():
+def test_get_dflt_time_disp_notz():
     test_time = datetime(1992, 3, 12, 15, 3, 30)
     assert_equals(
         "Mar 12, 1992 at 15:03 UTC",
         get_default_time_display(test_time))
 
 
-def test_get_time_display_return_empty():
+def test_get_time_disp_ret_empty():
     assert_equals("", get_time_display(None))
     test_time = datetime(1992, 3, 12, 15, 3, 30, tzinfo=UTC)
     assert_equals("", get_time_display(test_time, ""))

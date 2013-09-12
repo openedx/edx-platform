@@ -317,4 +317,3 @@ class ViewsTestCase(TestCase):
         text = set_due_date_format(u"%%%")
         self.assertNotIn("%%%", text)
         self.assertIn(time_with_utc, text)
-
