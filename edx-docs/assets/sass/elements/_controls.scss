@@ -1,0 +1,245 @@
+// docs.edx.org - Controls
+// ====================
+
+// buttons - extends
+%btn {
+  @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out, border-color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover, &:active {
+
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .icon-inline {
+    @extend %t-icon-inline;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// pill button
+%btn-pill {
+  border-radius: $baseline/5;
+}
+
+%btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+// primary button
+%btn-primary {
+  @extend %btn;
+  @extend %btn-pill;
+  padding:($baseline/2) $baseline;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: 0 ($baseline/10) 0 0 $shadow-d1;
+
+  &:hover, &:active {
+
+  }
+
+  &.current, &.active {
+    box-shadow: inset 1px 1px 2px $shadow-d1;
+
+    &:hover, &:active {
+      box-shadow: inset 1px 1px 1px $shadow-d1;
+    }
+  }
+}
+
+// secondary button
+%btn-secondary {
+  @extend %btn;
+  @extend %btn-pill;
+  border-width: 1px;
+  border-style: solid;
+  border-color: $gray-l4;
+  padding:($baseline/2) $baseline;
+  background: transparent;
+
+  &:hover, &:active {
+    border-color: $blue-s1;
+  }
+
+  &.current, &.active {
+    border-color: $blue-u1;
+  }
+}
+
+// secondary button
+%btn-tertiary {
+  @extend %btn;
+  @extend %btn-rounded;
+  border-width: 1px;
+  border-style: solid;
+  padding: ($baseline/4) ($baseline/2);
+  background: transparent;
+
+  &:hover, &:active {
+
+  }
+
+  &.current, &.active {
+
+  }
+}
+
+
+// ====================
+
+
+// gray primary button
+%btn-primary-gray {
+  @extend %btn-primary;
+  background: $gray-l1;
+  border-color: $gray-l2;
+  color: $white;
+
+  &:hover, &:active {
+    border-color: $gray-l1;
+    background: $gray;
+  }
+
+  &.current, &.active {
+    background: $gray;
+    color: $gray-l1;
+
+    &:hover, &:active {
+      background: $gray;
+    }
+  }
+}
+
+// blue primary button
+%btn-primary-blue {
+  @extend %btn-primary;
+  background: $blue;
+  border-color: $blue-s1;
+  color: $white;
+  box-shadow: 0 ($baseline/10) 0 0 $blue-d2;
+
+  &:hover, &:active {
+    background: $blue-s2;
+    border-color: $blue-s2;
+  }
+
+  &.current, &.active {
+    background: $blue-d1;
+    color: $blue-l4;
+    border-color: $blue-d2;
+
+    &:hover, &:active {
+      background: $blue-d1;
+    }
+  }
+}
+
+// pink primary button
+%btn-primary-pink {
+  @extend %btn-primary;
+  background: $pink;
+  border-color: $pink-s1;
+  color: $white;
+  box-shadow: 0 ($baseline/10) 0 0 $pink-d2;
+
+  &:hover, &:active {
+    background: $pink-s2;
+    border-color: $pink-s2;
+  }
+
+  &.current, &.active {
+    background: $pink-d1;
+    color: $pink-l4;
+    border-color: $pink-d2;
+
+    &:hover, &:active {
+      background: $pink-d1;
+    }
+  }
+}
+
+// gray secondary button
+%btn-secondary-gray {
+  @extend %btn-secondary;
+  border-color: $gray-l3;
+  color: $gray-l1;
+
+  &:hover, &:active {
+    background: $gray-l3;
+    color: $gray;
+  }
+
+  &.current, &.active {
+    background: $gray;
+    color: $gray-l5;
+
+    &:hover, &:active {
+      background: $gray;
+    }
+  }
+}
+
+// blue secondary button
+%btn-secondary-blue {
+  @extend %btn-secondary;
+  border-color: $blue-l3;
+  color: $blue;
+
+  &:hover, &:active {
+    background: $blue-l4;
+    color: $blue-s2;
+  }
+
+  &.current, &.active {
+    border-color: $blue-l3;
+    background: $blue-l3;
+    color: $blue-d1;
+
+    &:hover, &:active {
+
+    }
+  }
+}
+
+// pink secondary button
+%btn-secondary-pink {
+  @extend %btn-secondary;
+  border-color: $pink-l3;
+  color: $pink-l1;
+
+  &:hover, &:active {
+    background: $pink-l3;
+    color: $pink-d2;
+  }
+
+  &.current, &.active {
+    background: $pink-d2;
+    color: $pink-l5;
+
+    &:hover, &:active {
+      background: $pink-d2;
+    }
+  }
+}
+
+// pink tertiary button
+%btn-tertiary-pink {
+  @extend %btn-tertiary;
+  border-color: $gray-l4;
+  color: $gray-l1;
+
+  &:hover, &:active {
+    border-color: $pink;
+    color: $pink;
+  }
+}

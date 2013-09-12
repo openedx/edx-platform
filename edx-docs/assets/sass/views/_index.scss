@@ -1,0 +1,542 @@
+// docs.edx.org - Index View
+// ====================
+
+// @extend .trans-size;
+
+.view--index {
+  border-top: ($baseline/4) solid $blue-l3;
+  background: $white url('../images/bg-subtlepatterns-carbonfiber.png') 0 0 repeat;
+
+  // grid
+  .wrapper--view {
+    @include outer-container;
+    @include pad(($baseline*2) ($baseline*3));
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include pad(($baseline) ($baseline*1.5));
+    }
+  }
+
+  // ====================
+
+  // general
+  *[class$="__title"] {
+    color: $gray;
+  }
+
+  *[class$="__copy"]{
+    color: $gray-l2;
+
+    p {
+      @extend %wipe-last-child;
+      margin-bottom: $baseline;
+    }
+  }
+
+  // ====================
+
+  // elems: info bits
+  .info {
+    @extend %wipe-last-child;
+    margin-bottom: ($baseline*2);
+  }
+
+  // elems: docs lists
+  .list--docs {
+
+    // audience
+    .item-audience {
+
+      // STATE: hover
+      &:hover {
+
+        .icon-stack-base {
+          color: $gray-l2;
+        }
+
+        .item-audience__title {
+          border-top-color: $gray-l2;
+        }
+      }
+    }
+
+    .icon-stack {
+      @extend %t-icon-l;
+      position: absolute;
+      top: -($baseline);
+      left: -($baseline/4);
+
+      .icon-stack-base {
+        @include transition(color $tmg-f1 ease-in-out);
+        color: $gray-l5;
+      }
+
+      .icon-light {
+        @include font-size(20);
+      }
+    }
+
+    .item-audience__title {
+      @extend %t-title-6;
+      @extend %t-weight3;
+      @include transition(border-color $tmg-f1 ease-in-out);
+      margin-bottom: ($baseline/2);
+      border-top: ($baseline/4) solid $gray-l5;
+      padding-top: ($baseline*1.5);
+    }
+
+    .item-audience__copy {
+      @extend %t-copy-base;
+
+      // BP: small desktop
+      @include media($bp-ds) {
+       // NOTE: drat! typography extends don't work
+        @include font-size(14);
+        @include lh(14);
+      }
+
+      // BP: mobile
+      @include media($bp-m) {
+        // NOTE: drat! typography extends don't work
+        @include font-size(14);
+        @include lh(14);
+      }
+    }
+
+
+    // audience: link lists
+    .list--links {
+      margin-top: $baseline;
+
+      .item-link {
+        @extend %wipe-last-child;
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: $baseline;
+      }
+
+      .item-link__title {
+        @extend %t-title-8;
+        color: $blue-u1;
+      }
+
+      .item-link__copy {
+        @include transition(color $tmg-f1 ease-in-out);
+        @extend %t-copy-sub1;
+        color: $gray-l3;
+      }
+    }
+
+    // audience: link lists - ixd
+    .item-link__action {
+      @include transition(background $tmg-f1 ease-in-out);
+
+      &:hover {
+        .item-link__title {
+          color: $blue-s1;
+        }
+
+        .item-link__copy {
+          color: $gray-l1;
+        }
+      }
+
+      &:visited {
+        opacity: 0.9;
+      }
+    }
+
+    // audience: specific - devs
+    .item-audience--developers {
+
+    }
+
+    // audience: specific - researchers
+    .item-audience--researchers {
+
+    }
+
+    // audience: specific - authors
+    .item-audience--authors {
+
+    }
+  }
+
+  // elems: introduction
+  .introduction {
+    margin-bottom: ($baseline*2);
+  }
+
+  // ====================
+
+  // masthead
+  .wrapper--header {
+    background: $blue url('../images/bg-subtlepatterns-struckaxiom.png') 0 0 repeat;
+    @include outer-container;
+    @include pad(0 ($baseline*4));
+    border-bottom: ($baseline/4) solid $blue;
+    position: relative;
+
+    // BP: medium desktop
+    @include media($bp-dm) {
+      @include pad(0 ($baseline*4));
+    }
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      @include pad(0 ($baseline*2));
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include pad(0 ($baseline*2));
+    }
+  }
+
+  .header--primary {
+    @include span-columns(12);
+    position: relative;
+  }
+
+  // masthead: brand
+  .wrapper--logo {
+    @extend .trans-size;
+    @include span-columns(2 of 12);
+    @include shift(5);
+    position: relative;
+    top: -($baseline/2);
+    box-shadow: 0 2px 2px 0 $shadow-l1;
+    border-top: ($baseline/4) solid $blue-s1;
+    padding: ($baseline*0.75) $baseline;
+    background: $white-t;
+
+    // BP: medium desktop
+    @include media($bp-dm) {
+      @include span-columns(2 of 12);
+      @include shift(5);
+    }
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      @include span-columns(2 of 6);
+      @include shift(2);
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include span-columns(2 of 6);
+      @include shift(2);
+    }
+
+    *[class^="depth"] {
+      position: absolute;
+      top: -($baseline/4);
+    }
+
+    .depth-left {
+      @include triangle(($baseline/2), $blue-d3, down-right);
+      left: -($baseline/2);
+    }
+
+    .depth-right {
+      @include triangle(($baseline/2), $blue-d3, down-left);
+      right: -($baseline/2);
+    }
+  }
+
+  .logo-edx {
+    @include size(100% 100%);
+    display: block;
+  }
+
+  // masthead: title
+  .wrapper--title {
+    @include span-columns(12 of 12);
+    position: relative;
+    top: -($baseline*2);
+
+    // BP: medium desktop
+    @include media($bp-dm) {
+      top: -($baseline*1.5);
+    }
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      top: -($baseline);
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      top: -($baseline/2);
+    }
+  }
+
+  .logo-docs {
+    @extend %t-title-0;
+    @extend %t-weight0;
+    display: block;
+    margin-bottom: ($baseline/2);
+    color: $white-t;
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      // NOTE: drat! typography extends don't work
+      @include font-size(48);
+      @include lh(48);
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      // NOTE: drat! typography extends don't work
+      @include font-size(36);
+      @include lh(36);
+    }
+  }
+
+  .header__tagline {
+    @extend %t-title-4;
+    @extend %t-weight2;
+    position: relative;
+    top: -($baseline/2);
+    color: $white-t;
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      // NOTE: drat! typography extends don't work
+      @include font-size(20);
+      @include lh(20);
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      // NOTE: drat! typography extends don't work
+      @include font-size(18);
+      @include lh(18);
+    }
+  }
+
+  // masthead: decorative elems
+  .wrapper--deco {
+    @include span-columns(4 of 12);
+  }
+
+  .deco {
+    @include size(100% 100%);
+    display: block;
+    position: relative;
+    overflow: hidden;
+
+    .icon-stack {
+
+      .icon-stack-base {
+        color: $blue-d1;
+      }
+
+      .icon-light {
+        position: relative;
+        top: $baseline;
+        @include font-size(60);
+        color: $blue-d1;
+      }
+    }
+
+    .deco__doc1, .deco__doc2, .deco__doc3 {
+      position: absolute;
+      display: inline-block;
+      top: 0;
+    }
+
+    .deco__doc1 {
+      @include font-size(72);
+      @extend %depth1;
+      left: -($baseline*2);
+
+      .icon-stack-base {
+        // color: $blue-d1;
+      }
+
+      .icon-light {
+        @include font-size(40);
+        top: ($baseline*0.75);
+      }
+    }
+
+    .deco__doc2 {
+      @include font-size(100);
+      @extend %depth3;
+      left: ($baseline*1.5);
+
+      .icon-stack-base {
+        // color: $blue-d3;
+      }
+
+      .icon-light {
+        top: $baseline;
+      }
+    }
+
+    .deco__doc3 {
+      @include font-size(72);
+      @extend %depth2;
+      right: -($baseline*2);
+
+      .icon-stack-base {
+        // color: $blue-d2;
+      }
+
+      .icon-light {
+        @include font-size(40);
+        top: ($baseline*0.75);
+      }
+    }
+  }
+
+  // ====================
+
+  // main content
+  .content--view {
+    @include span-columns(12);
+    box-shadow: 0 2px 2px 0 $shadow-l1;
+    background: $white-t;
+    @include pad(($baseline*3));
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      @include pad(($baseline*2));
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include pad(($baseline*2));
+    }
+  }
+
+  .content__main {
+    @extend .trans-size;
+    @include span-columns(9 of 12);
+
+    // BP: medium desktop
+    @include media($bp-dm) {
+      @include fill-parent;
+      margin-bottom: ($baseline*3);
+    }
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      @include fill-parent;
+      margin-bottom: ($baseline*2);
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include fill-parent;
+      margin-bottom: ($baseline*2);
+    }
+
+    .introduction__copy {
+      @extend %t-copy-lead1;
+
+      // BP: small desktop
+      @include media($bp-ds) {
+        // NOTE: drat! typography extends don't work
+        @include font-size(16);
+        @include lh(16);
+      }
+
+      // BP: mobile
+      @include media($bp-m) {
+        // NOTE: drat! typography extends don't work
+        @include font-size(16);
+        @include lh(16);
+      }
+    }
+
+    // elem: audience lists
+    .item-audience {
+      @extend .trans-size;
+      @extend %wipe-last-child;
+      @include span-columns(3 of 9);
+      position: relative;
+
+      // BP: medium desktop
+      @include media($bp-dm) {
+        @include fill-parent;
+        margin-bottom: ($baseline*3);
+      }
+
+      // BP: small desktop
+      @include media($bp-ds) {
+        @include fill-parent;
+        margin-bottom: ($baseline*2);
+      }
+
+      // BP: mobile
+      @include media($bp-m) {
+        @include fill-parent;
+        margin-bottom: ($baseline*3);
+      }
+    }
+  }
+
+  .content__supplementary {
+    @extend .trans-size;
+    @include span-columns(3 of 12);
+
+    // BP: medium desktop
+    @include media($bp-dm) {
+      @include fill-parent;
+    }
+
+    // BP: small desktop
+    @include media($bp-ds) {
+      @include fill-parent;
+    }
+
+    // BP: mobile
+    @include media($bp-m) {
+      @include fill-parent;
+    }
+
+    .info {
+      @include transition(border-color $tmg-f1 ease-in-out);
+      border-top: ($baseline/4) solid $gray-l5;
+      padding-top: ($baseline/2);
+
+      // STATE: hover
+      &:hover {
+        border-top-color: $gray-l2;
+      }
+    }
+
+    .info__title {
+      @extend %t-title-8;
+      @extend %t-weight3;
+      margin-bottom: ($baseline/2);
+    }
+
+    .info__copy {
+      @extend %t-copy-sub1;
+    }
+  }
+
+  // ====================
+
+  // footer
+  .footer--primary {
+    @include span-columns(12);
+    margin: ($baseline*1.5) 0;
+
+    .content--copyright {
+      text-align: center;
+    }
+
+    .copyright__copy {
+      @extend %t-copy-sub1;
+    }
+  }
+
+  // ====================
+
+
+}
