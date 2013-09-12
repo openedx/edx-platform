@@ -113,15 +113,9 @@ def goto_next_step(step, step_num):
 @step(u'I capture my "([^"]*)" photo$')
 def capture_my_photo(step, name):
 
-    # Draw a red rectangle in the image element
-    snapshot_script = '"{}{}{}{}{}{}"'.format(
-        "var canvas = $('#{}_canvas');".format(name),
-        "var ctx = canvas[0].getContext('2d');",
-        "ctx.fillStyle = 'rgb(200,0,0)';",
-        "ctx.fillRect(0, 0, 640, 480);",
-        "var image = $('#{}_image');".format(name),
-        "image[0].src = canvas[0].toDataURL('image/png').replace('image/png', 'image/octet-stream');"
-        )
+    # Hard coded red dot image
+    image_data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=='
+    snapshot_script = "$('#{}_image')[0].src = '{}';".format(name, image_data)
 
     # Mirror the javascript of the photo_verification.html page
     world.browser.execute_script(snapshot_script)
