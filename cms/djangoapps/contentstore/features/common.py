@@ -232,11 +232,17 @@ def open_new_unit(step):
     world.css_click('a.new-unit-item')
 
 
-@step('the save button is disabled$')
+@step('the save notification button is disabled')
 def save_button_disabled(step):
     button_css = '.action-save'
     disabled = 'is-disabled'
     assert world.css_has_class(button_css, disabled)
+
+
+@step('the "([^"]*)" button is disabled')
+def button_disabled(step, value):
+    button_css = 'input[value="%s"]' % value
+    assert world.css_has_class(button_css, 'is-disabled')
 
 
 @step('I confirm the prompt')
