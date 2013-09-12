@@ -38,6 +38,8 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
             module = module_creator(descriptor)
+            if module is None:
+                return []
             return module.get_child_descriptors()
         else:
             return descriptor.get_children()
