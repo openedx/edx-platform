@@ -86,7 +86,7 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I change assignment type "Homework" to ""
-        Then the save button is disabled
+        Then the save notification button is disabled
 
     # IE and Safari cannot type in grade range name
     @skip_internetexplorer
