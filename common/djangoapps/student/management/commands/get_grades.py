@@ -1,4 +1,5 @@
 from courseware import grades, courses
+from certificates.models import GeneratedCertificate
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand, CommandError
 import os
@@ -27,6 +28,13 @@ class Command(BaseCommand):
     help = """
     Generate a list of grades for all students
     that are enrolled in a course.
+
+    CSV will include the following:
+      - username
+      - email
+      - grade in the certificate table if it exists
+      - computed grade
+      - grade breakdown
 
     Outputs grades to a csv file.
 
@@ -57,8 +65,7 @@ class Command(BaseCommand):
         course_id = options['course']
         print "Fetching enrolled students for {0}".format(course_id)
         enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_id).prefetch_related(
-                "groups").order_by('username')
+            courseenrollment__course_id=course_id)
         factory = RequestMock()
         request = factory.get('/')
 
@@ -69,6 +76,11 @@ class Command(BaseCommand):
         start = datetime.datetime.now()
         rows = []
         header = None
+        print "Fetching certificate data"
+        cert_grades = {cert.user.username: cert.grade
+                       for cert in list(GeneratedCertificate.objects.filter(
+                       course_id=course_id).prefetch_related('user'))}
+        print "Grading students"
         for count, student in enumerate(enrolled_students):
             count += 1
             if count % STATUS_INTERVAL == 0:
@@ -86,10 +98,13 @@ class Command(BaseCommand):
             grade = grades.grade(student, request, course)
             if not header:
                 header = [section['label'] for section in grade[u'section_breakdown']]
-                rows.append(["email", "username"] + header)
+                rows.append(["email", "username", "certificate-grade", "grade"] + header)
             percents = {section['label']: section['percent'] for section in grade[u'section_breakdown']}
             row_percents = [percents[label] for label in header]
-            rows.append([student.email, student.username] + row_percents)
+            if student.username in cert_grades:
+                rows.append([student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents)
+            else:
+                rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
         with open(options['output'], 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
