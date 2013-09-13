@@ -1,0 +1,49 @@
+// docs.edx.org - Main
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon'; // lib - bourbon
+@import 'utilities/neat/neat'; // lib - neat
+
+
+// VENDOR + REBASE *referenced/used vendor presentation and reset*
+// ====================
+@import 'vendor/normalize'; // normalize
+@import 'utilities/reset'; // general reset
+
+
+// BASE  *default edX offerings*
+// ====================
+// base - utilities
+@import 'utilities/variables';
+@import 'utilities/mixins';
+
+// base - assets
+@import 'assets/fonts'; // font imports/supporting files
+@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/anims'; // animations, keyframes
+
+// base - starter
+@import 'base';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/forms';
+@import 'elements/header';
+@import 'elements/footer';
+@import 'elements/modal'; // interstitial UI, dialogs, modal windows
+@import 'elements/system-feedback'; // alerts, notifications, states
+@import 'elements/system-help'; // help UI
+
+// base-views
+@import 'views/index'; // view: front page
+
+// base - contextual
+@import 'contexts/print'; // basic print styling
+@import 'contexts/ie'; // basic print styling
+
+// base - misc.
+@import 'shame'; // shame file

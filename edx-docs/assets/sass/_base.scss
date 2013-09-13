@@ -1,0 +1,61 @@
+// docs.edx.org - Base
+// ====================
+
+// basic
+html {
+  font-size: 62.5%;
+  overflow-y: scroll;
+}
+
+body {
+  @include font-size(16);
+  @extend %t-copy;
+}
+
+// ====================
+
+[class^="content"] {
+
+  a {
+    @include transition(color $tmg-avg ease-in-out, border $tmg-avg ease-in-out);
+    text-decoration: none;
+
+    &:link, &:visited {
+      color: $blue-u1;
+      border-bottom: 1px solid transparent;
+    }
+
+    &:hover, &:active {
+      color: $blue-s1;
+      border-bottom: 1px solid $blue-s1;
+    }
+  }
+}
+
+// ====================
+
+// layout
+[class^="wrapper-"] {
+  @extend %ui-wrapper;
+  padding: 0;
+
+  > * {
+    margin: 0 auto;
+  }
+}
+
+.sr, hr.divider {
+  @extend %ui-text-sr;
+}
+
+// ====================
+
+// elements
+strong {
+  @extend %t-weight3;
+}
+
+//  reset: lists
+.list--actions, .list--docs, .list--steps, .list--controls, .list--fields, .list--help, .nav--wizard, .list--tips, .field--group {
+  @extend %ui-no-list;
+}

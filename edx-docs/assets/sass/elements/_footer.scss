@@ -1,0 +1,21 @@
+// docs.edx.org - Footer
+// ====================
+
+// primary footer
+.wrapper--footer {
+
+}
+
+.footer--primary {
+  @include span-columns(12);
+  margin: ($baseline*1.5) 0;
+
+  .content--copyright {
+    text-align: center;
+  }
+
+  .copyright__copy {
+    @extend %t-copy-sub1;
+  }
+}
+
