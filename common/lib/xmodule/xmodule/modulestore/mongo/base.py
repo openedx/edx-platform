@@ -17,6 +17,7 @@ import sys
 import logging
 import copy
 
+from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
@@ -31,7 +32,7 @@ from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
-from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
@@ -213,6 +214,16 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     json_data['location'],
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son
 
 
 def location_to_query(location, wildcard=True):

@@ -9,10 +9,10 @@ and otherwise returns i4x://org/course/cat/name).
 from datetime import datetime
 
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import Location, namedtuple_to_son
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.mongo.base import location_to_query, get_course_id_no_run, MongoModuleStore
+from xmodule.modulestore.mongo.base import location_to_query, namedtuple_to_son, get_course_id_no_run, MongoModuleStore
 import pymongo
 from pytz import UTC
 
