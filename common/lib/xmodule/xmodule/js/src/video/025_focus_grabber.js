@@ -83,7 +83,7 @@ function () {
         //     2.) Currently focused element was somewhere else on the page.
         //
         // In the first case we must make sure that the video player doesn't
-        // loose focus, even though the cfontrols are uatohidden.
+        // loose focus, even though the controls are autohidden.
         if ($(document.activeElement).parents().hasClass('video')) {
             tabIndex = -1;
         } else {
