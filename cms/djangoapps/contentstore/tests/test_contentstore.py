@@ -353,7 +353,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_create_static_tab_and_rename(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])    
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
         item = ItemFactory.create(parent_location=course_location, category='static_tab', display_name="My Tab")
 
@@ -735,7 +735,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
             # we want to assert equality between the objects, but we know the locations
             # differ, so just make them equal for testing purposes
-            source_item.scope_ids = source_item.scope_ids._replace(def_id=new_loc, usage_id=new_loc)
+            source_item.location = new_loc
             if hasattr(source_item, 'data') and hasattr(lookup_item, 'data'):
                 self.assertEqual(source_item.data, lookup_item.data)
 
@@ -916,8 +916,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             depth=1
         )
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        draft_loc = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
-        vertical.scope_ids = vertical.scope_ids._replace(def_id=draft_loc, usage_id=draft_loc)
+        vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
 
         draft_store.save_xmodule(vertical)
         orphan_vertical = draft_store.get_item(vertical.location)
@@ -935,8 +934,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         root_dir = path(mkdtemp_clean())
 
         # now create a new/different private (draft only) vertical
-        draft_loc = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
-        vertical.scope_ids = vertical.scope_ids._replace(def_id=draft_loc, usage_id=draft_loc)
+        vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
         draft_store.save_xmodule(vertical)
         private_vertical = draft_store.get_item(vertical.location)
         vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
@@ -985,7 +983,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
         # remove old course
-        delete_course(module_store, content_store, location)
+        delete_course(module_store, content_store, location, commit=True)
 
         # reimport
         import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
