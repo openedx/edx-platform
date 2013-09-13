@@ -190,7 +190,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     err_msg
                 )
 
-            setattr(descriptor, 'data_dir', course_dir)
+            descriptor.data_dir = course_dir
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 

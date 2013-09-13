@@ -605,8 +605,8 @@ class MongoModuleStore(ModuleStoreBase):
             )
         xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
         if definition_data is None:
-            if hasattr(xblock_class, 'data') and getattr(xblock_class, 'data').default is not None:
-                definition_data = getattr(xblock_class, 'data').default
+            if hasattr(xblock_class, 'data') and xblock_class.data.default is not None:
+                definition_data = xblock_class.data.default
             else:
                 definition_data = {}
         dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
