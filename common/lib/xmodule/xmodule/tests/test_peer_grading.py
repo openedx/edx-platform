@@ -175,9 +175,9 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
 
         # Ensure that it cannot find any peer grading.
         html = peer_grading.peer_grading()
-        self.assertNotRegexpMatches(html, "Peer-Graded")
+        self.assertNotIn("Peer-Graded", html)
 
-        #Swap for our mock class, which will find peer grading.
+        # Swap for our mock class, which will find peer grading.
         peer_grading.peer_gs = MockPeerGradingServiceProblemList()
         html = peer_grading.peer_grading()
-        self.assertRegexpMatches(html, "Peer-Graded")
+        self.assertIn("Peer-Graded", html)
