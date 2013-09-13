@@ -1,0 +1,137 @@
+// docs.edx.org - Mixins & Extends
+// ====================
+
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
+    clear: both;
+  }
+}
+
+// font sizing
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+  font-size: ($sizeValue/10) + rem;
+}
+
+// line height
+@mixin lh($fontSize: auto){
+  line-height: ($fontSize*1.55) + px;
+  line-height: (($fontSize/10)*1.55) + rem;
+}
+
+// placeholder styling
+@mixin placeholder($color) {
+  :-moz-placeholder {
+    color: $color;
+  }
+  ::-webkit-input-placeholder {
+    color: $color;
+  }
+  :-ms-input-placeholder {
+     color: $color;
+  }
+}
+
+// ====================
+
+// extends - layout
+%ui-wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// image-replacement hidden text
+%ui-text-hide {
+  text-indent: 200%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// hidden elems - screenreaders
+%ui-text-sr {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+// wrapping
+%ui-text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+%ui-fake-link {
+  cursor: pointer;
+}
+
+%ui-disabled {
+  pointer-events: none;
+  outline: none;
+}
+
+%ui-icon-inline {
+  @extend %t-icon;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: ($baseline/4);
+}
+
+// nth-type style clearing
+%ui-wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+%ui-wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+// extends - depth levels
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
+
+// extends - transition
+%trans-size {
+  @include transition(width 0.25s ease-in-out, height 0.25s ease-in-out);
+}
+
+%trans-color {
+  @include transition(color 0.25s ease-in-out);
+}
