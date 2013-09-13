@@ -334,8 +334,22 @@ function () {
             keydown:    this.videoCaption.captionKeyDown
         });
 
-        this.videoCaption.automaticScroll = true;
+        // Enables or disables automatic scrolling of the captions when the
+        // video is playing. This feature has to be disabled when tabbing
+        // through them as it interferes with that action. Initially, have this
+        // flag enabled as we assume mouse use. Then, if the first caption 
+        // (through forward tabbing) or the last caption (through backwards
+        // tabbing) gets the focus, disable that feature. Renable it if tabbing
+        // then cycles out of the the captions. 
+        this.videoCaption.autoScrolling = true;
+        // Keeps track of where the focus is situated in the array of captions.
+        // Used to implement the automatic scrolling behavior and decide if the
+        // outline around a caption has to be hidden or shown on a mouseenter or
+        // mouseleave.
         this.videoCaption.currentCaptionIndex = 0;
+        // Used to track if the focus is coming from a click or tabbing. This 
+        // has to be known to decide if, when a caption gets the focus, an 
+        // outline has to be drawn (tabbing) or not (mouse click).
         this.videoCaption.isMouseFocus = false;
 
         this.videoCaption.subtitlesEl.prepend($('<li class="spacing">').height(this.videoCaption.topSpacingHeight()));
@@ -359,7 +373,7 @@ function () {
         var caption = $(event.target);
         this.videoCaption.isMouseFocus = true;
         caption.css('outlineWidth', '0px');
-        this.videoCaption.automaticScroll = true;
+        this.videoCaption.autoScrolling = true;
     }
 
     function captionClick(event) {
@@ -372,7 +386,7 @@ function () {
         // If the focus comes from a mouse click, hide the outline and turn on
         // automatic scrolling.
         if (this.videoCaption.isMouseFocus) {
-            this.videoCaption.automaticScroll = true;
+            this.videoCaption.autoScrolling = true;
             caption.css({
                 'outlineWidth': '0px',
                 'outlineStyle': 'none'
@@ -389,7 +403,7 @@ function () {
             // The second and second to last elements turn automatic scrolling
             // off again as it may have been enabled in captionBlur.    
             if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
-                this.videoCaption.automaticScroll = false;
+                this.videoCaption.autoScrolling = false;
             }
         }
     }
@@ -408,7 +422,7 @@ function () {
         // captions.
         if (captionIndex === 0 || 
             captionIndex === this.videoCaption.captions.length-1) {
-            this.videoCaption.automaticScroll = true;
+            this.videoCaption.autoScrolling = true;
         }
     }
 
@@ -422,7 +436,9 @@ function () {
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-        if (!this.videoCaption.frozen && el.length && this.videoCaption.automaticScroll) {
+        // Automatic scrolling gets disabled if one of the captions has received 
+        // focus through tabbing. 
+        if (!this.videoCaption.frozen && el.length && this.videoCaption.autoScrolling) {
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
                 {
