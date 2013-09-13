@@ -55,7 +55,7 @@ from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
 
-from django_comment_common.utils import unseed_permissions_roles
+from contentstore.utils import delete_course_and_groups
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1294,23 +1294,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
 
-    def test_forum_unseeding(self):
+    def test_forum_unseeding_on_delete(self):
         """Test new course creation and verify forum unseeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
         course_id = self._get_course_id(test_course_data)
-        unseed_permissions_roles(course_id)
+        delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
-
-    def test_forum_unseeding_with_different_casing(self):
-        """Make sure that we honor case sensitivity when unseeding forums"""
-        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        # make sure we don't delete a forum permissions set with different casing
-        # than the passed in course_id. This is because Mongo and MySQL are using different collations
-        course_id = self._get_course_id(test_course_data)
-        unseed_permissions_roles(course_id.upper())
-        # permissions should still be there!
-        self.assertTrue(are_permissions_roles_seeded(course_id))
 
     def test_forum_unseeding_with_multiple_courses(self):
         """Test new course creation and verify forum unseeding when there are multiple courses"""
@@ -1319,7 +1309,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # unseed the forums for the first course
         course_id = self._get_course_id(test_course_data)
-        unseed_permissions_roles(course_id)
+        delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
         second_course_id = self._get_course_id(second_course_data)
