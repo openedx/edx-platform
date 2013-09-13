@@ -1,26 +1,29 @@
+from datetime import datetime
 import pytz
 import logging
 import smtplib
-from datetime import datetime
+import textwrap
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
 from model_utils.managers import InheritanceManager
-from courseware.courses import get_course_about_section
-from django.core.mail import send_mail
 
+from course_modes.models import CourseMode
+from courseware.courses import get_course_about_section
 from mitxmako.shortcuts import render_to_string
+from student.views import course_from_id
+from student.models import CourseEnrollment
+from dogapi import dog_stats_api
+from verify_student.models import SoftwareSecurePhotoVerification
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-from course_modes.models import CourseMode
-from student.views import course_from_id
-from student.models import CourseEnrollment
-from statsd import statsd
-from .exceptions import *
+from .exceptions import InvalidCartItem, PurchasedCallbackException
 
 log = logging.getLogger("shoppingcart")
 
@@ -116,6 +119,7 @@ class Order(models.Model):
             self.bill_to_ccnum = ccnum
             self.bill_to_cardtype = cardtype
             self.processor_reply_dump = processor_reply_dump
+
         # save these changes on the order, then we can tell when we are in an
         # inconsistent state
         self.save()
@@ -124,6 +128,7 @@ class Order(models.Model):
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
         for item in orderitems:
             item.purchase_item()
+
         # send confirmation e-mail
         subject = _("Order Payment Confirmation")
         message = render_to_string('emails/order_confirmation_email.txt', {
@@ -194,6 +199,30 @@ class OrderItem(models.Model):
         purchase goes through.
         """
         raise NotImplementedError
+
+    @property
+    def single_item_receipt_template(self):
+        """
+        The template that should be used when there's only one item in the order
+        """
+        return 'shoppingcart/receipt.html'
+
+    @property
+    def single_item_receipt_context(self):
+        """
+        Extra variables needed to render the template specified in
+        `single_item_receipt_template`
+        """
+        return {}
+
+    @property
+    def additional_instruction_text(self):
+        """
+        Individual instructions for this order item.
+
+        Currently, only used for e-mails.
+        """
+        return ''
 
 
 class PaidCourseRegistration(OrderItem):
@@ -272,10 +301,12 @@ class PaidCourseRegistration(OrderItem):
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
         org, course_num, run = self.course_id.split("/")
-        statsd.increment("shoppingcart.PaidCourseRegistration.purchased_callback.enrollment",
-                         tags=["org:{0}".format(org),
-                               "course:{0}".format(course_num),
-                               "run:{0}".format(run)])
+        dog_stats_api.increment(
+            "shoppingcart.PaidCourseRegistration.purchased_callback.enrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
 
 
 class CertificateItem(OrderItem):
@@ -311,6 +342,13 @@ class CertificateItem(OrderItem):
             course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
         except ObjectDoesNotExist:
             course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+
+        # do some validation on the enrollment mode
+        valid_modes = CourseMode.modes_for_course_dict(course_id)
+        if mode in valid_modes:
+            mode_info = valid_modes[mode]
+        else:
+            raise InvalidCartItem(_("Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id))
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
@@ -321,8 +359,9 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = _("{mode} certificate for course {course_id}").format(mode=item.mode,
-                                                                               course_id=course_id)
+        course_name = course_from_id(course_id).display_name
+        item.line_desc = _("Certificate of Achievement, {mode_name} for course {course}").format(mode_name=mode_info.name,
+                                                                                                 course=course_name)
         item.currency = currency
         order.currency = currency
         order.save()
@@ -333,6 +372,41 @@ class CertificateItem(OrderItem):
         """
         When purchase goes through, activate and update the course enrollment for the correct mode
         """
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
+            verification_attempt.submit()
+        except Exception as e:
+            log.exception(
+                "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
+            )
+
         self.course_enrollment.mode = self.mode
         self.course_enrollment.save()
         self.course_enrollment.activate()
+
+    @property
+    def single_item_receipt_template(self):
+        if self.mode == 'verified':
+            return 'shoppingcart/verified_cert_receipt.html'
+        else:
+            return super(CertificateItem, self).single_item_receipt_template
+
+    @property
+    def single_item_receipt_context(self):
+        course = course_from_id(self.course_id)
+        return {
+            "course_id" : self.course_id,
+            "course_name": course.display_name_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
+            "course_start_date_text": course.start_date_text,
+            "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
+        }
+
+    @property
+    def additional_instruction_text(self):
+        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
+                 "and receive a full refund. To receive your refund, contact {billing_email}. "
+                 "Please include your order number in your e-mail. "
+                 "Please do NOT include your credit card information.").format(
+                     billing_email=settings.PAYMENT_SUPPORT_EMAIL)

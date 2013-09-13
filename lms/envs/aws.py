@@ -111,6 +111,8 @@ SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
+CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
+
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
 # happen with some browsers (e.g. Firefox)
@@ -227,7 +229,12 @@ PEARSON_TEST_PASSWORD = AUTH_TOKENS.get("PEARSON_TEST_PASSWORD")
 PEARSON = AUTH_TOKENS.get("PEARSON")
 
 # Datadog for events!
-DATADOG_API = AUTH_TOKENS.get("DATADOG_API")
+DATADOG = AUTH_TOKENS.get("DATADOG", {})
+DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
+
+# TODO: deprecated (compatibility with previous settings)
+if 'DATADOG_API' in AUTH_TOKENS:
+    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Analytics dashboard server
 ANALYTICS_SERVER_URL = ENV_TOKENS.get("ANALYTICS_SERVER_URL")
@@ -252,3 +259,9 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+# Event tracking
+TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
+
+# Student identity verification settings
+VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", "")

@@ -12,7 +12,7 @@ from django.utils import simplejson
 from django_comment_common.models import Role
 from django_comment_client.permissions import check_permissions_by_view
 
-from mitxmako import middleware
+import mitxmako
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
@@ -165,8 +165,8 @@ def initialize_discussion_info(course):
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
         discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
-        #Handle case where module.lms.start is None
-        entry_start_date = module.lms.start if module.lms.start else datetime.max.replace(tzinfo=pytz.UTC)
+        #Handle case where module.start is None
+        entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
@@ -335,7 +335,7 @@ def url_for_tags(course_id, tags):
 
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = middleware.lookup['main'].get_template(template_name).source
+    template = mitxmako.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
 
 

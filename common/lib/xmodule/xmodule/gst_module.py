@@ -14,7 +14,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from pkg_resources import resource_string
-from xblock.core import String, Scope
+from xblock.fields import String, Scope
 
 log = logging.getLogger(__name__)
 

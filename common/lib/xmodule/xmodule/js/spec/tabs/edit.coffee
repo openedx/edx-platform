@@ -65,7 +65,7 @@ describe "TabsEditingDescriptor", ->
 
   describe "editor/settings header", ->
     it "is hidden", ->
-      expect(@descriptor.element.find(".component-edit-header").css('display')).toEqual('none')
+      expect(@descriptor.element.closest(".component-editor").find(".component-edit-header")).toBeHidden()
 
 describe "TabsEditingDescriptor special save cases", ->
   beforeEach ->

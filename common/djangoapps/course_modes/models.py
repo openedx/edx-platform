@@ -54,6 +54,14 @@ class CourseMode(models.Model):
         return modes
 
     @classmethod
+    def modes_for_course_dict(cls, course_id):
+        """
+        Returns the modes for a particular course as a dictionary with
+        the mode slug as the key
+        """
+        return {mode.slug: mode for mode in cls.modes_for_course(course_id)}
+
+    @classmethod
     def mode_for_course(cls, course_id, mode_slug):
         """
         Returns the mode for the course corresponding to mode_slug.
@@ -67,3 +75,8 @@ class CourseMode(models.Model):
             return matched[0]
         else:
             return None
+
+    def __unicode__(self):
+        return u"{} : {}, min={}, prices={}".format(
+            self.course_id, self.mode_slug, self.min_price, self.suggested_prices
+        )

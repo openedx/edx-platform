@@ -13,11 +13,14 @@ from django.test.client import Client
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xblock.field_data import DictFieldData
+from xblock.fields import Scope
 from xmodule.tests import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.xblock.field_data import lms_field_data
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -44,6 +47,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
     CATEGORY = ""
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
+
+    def xblock_field_data(self, descriptor):
+        field_data = {}
+        field_data.update(self.MODEL_DATA)
+        student_data = DictFieldData(field_data)
+        return lms_field_data(descriptor._field_data, student_data)
 
     def setUp(self):
 
@@ -77,19 +86,14 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        self.runtime = get_test_system()
+        self.runtime = get_test_system(course_id=self.course.id)
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
 
-        model_data = {'location': self.item_descriptor.location}
-        model_data.update(self.MODEL_DATA)
+        self.runtime.xblock_field_data = self.xblock_field_data
 
-        self.item_module = self.item_descriptor.module_class(
-            self.runtime,
-            self.item_descriptor,
-            model_data
-        )
+        self.item_module = self.item_descriptor.xmodule(self.runtime)
 
         self.item_url = Location(self.item_module.location).url()
 

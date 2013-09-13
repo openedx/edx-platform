@@ -55,46 +55,6 @@
                         expect(this.state.speed).toEqual('0.75');
                     });
                 });
-
-                describe('Check Youtube link existence', function () {
-                    var statusList = {
-                        error: 'html5',
-                        timeout: 'html5',
-                        abort: 'html5',
-                        parsererror: 'html5',
-                        success: 'youtube',
-                        notmodified: 'youtube'
-                    };
-
-                    function stubDeffered(data, status) {
-                        return {
-                            always: function(callback) {
-                                callback.call(window, data, status);
-                            }
-                        }
-                    }
-
-                    function checkPlayer(videoType, data, status) {
-                        this.state = new window.Video('#example');
-                        spyOn(this.state , 'getVideoMetadata')
-                            .andReturn(stubDeffered(data, status));
-                        this.state.initialize('#example');
-
-                        expect(this.state.videoType).toEqual(videoType);
-                    }
-
-                    it('if video id is incorrect', function () {
-                        checkPlayer('html5', { error: {} }, 'success');
-                    });
-
-                    $.each(statusList, function(status, mode){
-                        it('Status:' + status + ', mode:' + mode, function () {
-                            checkPlayer(mode, {}, status);
-                        });
-                    });
-
-                });
-
             });
 
             describe('HTML5', function () {
@@ -154,10 +114,22 @@
 
                     it('parse Html5 sources', function () {
                         var html5Sources = {
-                            mp4: 'xmodule/include/fixtures/test.mp4',
-                            webm: 'xmodule/include/fixtures/test.webm',
-                            ogg: 'xmodule/include/fixtures/test.ogv'
-                        };
+                                mp4: null,
+                                webm: null,
+                                ogg: null
+                            }, v = document.createElement('video');
+
+                        if (!!(v.canPlayType && v.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''))) {
+                            html5Sources['webm'] = 'xmodule/include/fixtures/test.webm';
+                        }
+
+                        if (!!(v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''))) {
+                            html5Sources['mp4'] = 'xmodule/include/fixtures/test.mp4';
+                        }
+
+                        if (!!(v.canPlayType && v.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''))) {
+                            html5Sources['ogg'] = 'xmodule/include/fixtures/test.ogv';
+                        }
 
                         expect(state.html5Sources).toEqual(html5Sources);
                     });
@@ -211,6 +183,46 @@
                 it('return the video id for current speed', function () {
                     expect(state.youtubeId()).toEqual(this.cogebirgzzM);
                 });
+            });
+        });
+
+        describe('multiple YT on page', function () {
+            var state1, state2, state3;
+
+            beforeEach(function () {
+                loadFixtures('video_yt_multiple.html');
+
+                spyOn($, 'ajaxWithPrefix');
+
+                $.ajax.calls.length = 0;
+                $.ajaxWithPrefix.calls.length = 0;
+
+                // Because several other tests have run, the variable
+                // that stores the value of the first ajax request must be
+                // cleared so that we test a pristine state of the video
+                // module.
+                Video.clearYoutubeXhr();
+
+                state1 = new Video('#example1');
+                state2 = new Video('#example2');
+                state3 = new Video('#example3');
+            });
+
+            it('check for YT availability is performed only once', function () {
+                var numAjaxCalls = 0;
+
+                // Total ajax calls made.
+                numAjaxCalls = $.ajax.calls.length;
+
+                // Subtract ajax calls to get captions.
+                numAjaxCalls -= $.ajaxWithPrefix.calls.length;
+
+                // Subtract ajax calls to get metadata for each video.
+                numAjaxCalls -= 3;
+
+                // This should leave just one call. It was made to check
+                // for YT availability.
+                expect(numAjaxCalls).toBe(1);
             });
         });
 

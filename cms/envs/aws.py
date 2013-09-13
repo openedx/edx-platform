@@ -147,7 +147,12 @@ MODULESTORE = AUTH_TOKENS['MODULESTORE']
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
 
 # Datadog for events!
-DATADOG_API = AUTH_TOKENS.get("DATADOG_API")
+DATADOG = AUTH_TOKENS.get("DATADOG", {})
+DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
+
+# TODO: deprecated (compatibility with previous settings)
+if 'DATADOG_API' in AUTH_TOKENS:
+    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Celery Broker
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -161,3 +166,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+# Event tracking
+TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))

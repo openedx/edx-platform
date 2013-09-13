@@ -106,6 +106,9 @@ on_create()
     # Permissions
     chown vagrant.vagrant ~vagrant/.bash_profile
 
+    # Install completed entirely & successfully - set flag to skip in future runs
+    touch /opt/edx/.install_succeeded
+
     cat << EOF
 ==============================================================================
 Success - Created your development environment!
@@ -114,9 +117,8 @@ Success - Created your development environment!
 EOF
 }    # End on_create() ########################################################
 
-## only initialize / setup the development environment once:
-#   we create node_modules, so that's a good test:
-[[ -d /opt/edx/node_modules ]] || on_create
+## only initialize / setup the development environment once: 
+[[ -f /opt/edx/.install_succeeded ]] || on_create
 
 # grab what the Vagrantfile spec'd our IP to be:
 #  expecting:

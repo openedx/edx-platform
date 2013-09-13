@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.conf import settings
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from requests import put
+import requests
 from base64 import encodestring
 from json import dumps
 
@@ -29,11 +29,13 @@ from xmodule.contentstore.django import _CONTENTSTORE
 # to use staticfiles.
 try:
     import staticfiles
+    import staticfiles.handlers
 except ImportError:
     pass
 else:
     import sys
     sys.modules['django.contrib.staticfiles'] = staticfiles
+    sys.modules['django.contrib.staticfiles.handlers'] = staticfiles.handlers
 
 LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
@@ -52,12 +54,12 @@ def set_job_status(jobid, passed=True):
     """
     Sets the job status on sauce labs
     """
-    body_content = dumps({"passed": passed})
     config = get_username_and_key()
+    url = 'http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid)
+    body_content = dumps({"passed": passed})
     base64string = encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
-    result = put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid),
-        data=body_content,
-        headers={"Authorization": "Basic {}".format(base64string)})
+    headers = {"Authorization": "Basic {}".format(base64string)}
+    result = requests.put(url, data=body_content, headers=headers)
     return result.status_code == 200
 
 

@@ -2,7 +2,6 @@
 Student Views
 """
 import datetime
-import feedparser
 import json
 import logging
 import random
@@ -24,11 +23,11 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+                         HttpResponseNotAllowed, Http404)
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date
-from django.utils.http import base36_to_int
+from django.utils.http import cookie_date, base36_to_int, urlencode
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.http import require_POST
@@ -40,14 +39,13 @@ from django.utils.translation import get_language
 from ratelimitbackend.exceptions import RateLimitException
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from bs4 import BeautifulSoup
 
+from course_modes.models import CourseMode
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registration, CourseEnrollmentAllowed)
-
 from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -62,12 +60,13 @@ from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
 from external_auth.models import ExternalAuthMap
+import external_auth.views
 
 from bulk_email.models import Optout
 
 import track.views
 
-from statsd import statsd
+from dogapi import dog_stats_api
 from pytz import UTC
 
 log = logging.getLogger("mitx.student")
@@ -100,10 +99,10 @@ def index(request, extra_context={}, user=None):
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
-    if domain == False:
+    if domain is False:
         domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses(None, domain=domain)
+    courses = get_courses(user, domain=domain)
     courses = sort_by_announcement(courses)
 
     context = {'courses': courses}
@@ -274,7 +273,7 @@ def dashboard(request):
     courses = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            courses.append(course_from_id(enrollment.course_id))
+            courses.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -293,12 +292,12 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course in courses
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
+    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
 
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
@@ -340,10 +339,13 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
+            if enrollment_response.content != '':
+                return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
 
+@require_POST
 def change_enrollment(request):
     """
     Modify the enrollment status for the logged-in user.
@@ -361,17 +363,15 @@ def change_enrollment(request):
     as a post-login/registration helper, so the error messages in the responses
     should never actually be user-visible.
     """
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
     user = request.user
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
 
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
     if course_id is None:
         return HttpResponseBadRequest(_("Course id not specified"))
+
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
 
     if action == "enroll":
         # Make sure the course exists
@@ -386,11 +386,21 @@ def change_enrollment(request):
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
 
+        # If this course is available in multiple modes, redirect them to a page
+        # where they can choose which mode they want.
+        available_modes = CourseMode.modes_for_course(course_id)
+        if len(available_modes) > 1:
+            return HttpResponse(
+                reverse("course_modes_choose", kwargs={'course_id': course_id})
+            )
+
         org, course_num, run = course_id.split("/")
-        statsd.increment("common.student.enrollment",
-                         tags=["org:{0}".format(org),
-                               "course:{0}".format(course_num),
-                               "run:{0}".format(run)])
+        dog_stats_api.increment(
+            "common.student.enrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
 
         CourseEnrollment.enroll(user, course.id)
 
@@ -401,10 +411,12 @@ def change_enrollment(request):
             CourseEnrollment.unenroll(user, course_id)
 
             org, course_num, run = course_id.split("/")
-            statsd.increment("common.student.unenrollment",
-                             tags=["org:{0}".format(org),
-                                   "course:{0}".format(course_num),
-                                   "run:{0}".format(run)])
+            dog_stats_api.increment(
+                "common.student.unenrollment",
+                tags=["org:{0}".format(org),
+                      "course:{0}".format(course_num),
+                      "run:{0}".format(run)]
+            )
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
@@ -412,9 +424,49 @@ def change_enrollment(request):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
+
+def _parse_course_id_from_string(input_str):
+    """
+    Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
+    @param input_str:
+    @return: the course_id if found, None if not
+    """
+    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    if m_obj:
+        return m_obj.group('course_id')
+    return None
+
+
+def _get_course_enrollment_domain(course_id):
+    """
+    Helper function to get the enrollment domain set for a course with id course_id
+    @param course_id:
+    @return:
+    """
+    try:
+        course = course_from_id(course_id)
+        return course.enrollment_domain
+    except ItemNotFoundError:
+        return None
+
+
 @ensure_csrf_cookie
-def accounts_login(request, error=""):
+def accounts_login(request):
+    """
+    This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
+    the login path linked from the homepage uses it.
+    """
+    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+        return redirect(reverse('cas-login'))
+    # see if the "next" parameter has been set, whether it has a course context, and if so, whether
+    # there is a course-specific place to redirect
+    redirect_to = request.GET.get('next')
+    if redirect_to:
+        course_id = _parse_course_id_from_string(redirect_to)
+        if course_id and _get_course_enrollment_domain(course_id):
+            return external_auth.views.course_specific_login(request, course_id)
     return render_to_response('university_profile/edge.html', {'error': error})
+
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -431,6 +483,18 @@ def login_user(request, error=""):
     except User.DoesNotExist:
         AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
         user = None
+
+    # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
+    # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
+    # address into the Gmail login.
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and user:
+        try:
+            eamap = ExternalAuthMap.objects.get(user=user)
+            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+                return HttpResponse(json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+        except ExternalAuthMap.DoesNotExist:
+            # This is actually the common case, logging in user without external linked login
+            AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
@@ -467,10 +531,10 @@ def login_user(request, error=""):
             log.exception(e)
             raise
 
-        try_change_enrollment(request)
+        redirect_url = try_change_enrollment(request)
 
-        statsd.increment("common.student.successful_login")
-        response = HttpResponse(json.dumps({'success': True}, cls=LazyEncoder))
+        dog_stats_api.increment("common.student.successful_login")
+        response = HttpResponse(json.dumps({'success': True, 'redirect_url': redirect_url}))
 
         # set the login cookie for the edx marketing site
         # we want this cookie to be accessed via javascript
@@ -511,7 +575,11 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    response = redirect('/')
+    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+        target = reverse('cas-logout')
+    else:
+        target = '/'
+    response = redirect(target)
     response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
                            path='/',
                            domain=settings.SESSION_COOKIE_DOMAIN)
@@ -661,9 +729,10 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_not_required = settings.MITX_FEATURES.get("AUTH_USE_SHIB") \
-                       and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') \
-                       and DoExternalAuth and ("shib" in eamap.external_domain)
+    tos_not_required = (settings.MITX_FEATURES.get("AUTH_USE_SHIB") and
+                        settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and
+                        DoExternalAuth and
+                        eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX))
 
     if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
@@ -817,14 +886,14 @@ def create_account(request, post_override=None):
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
-    try_change_enrollment(request)
+    redirect_url = try_change_enrollment(request)
 
-    statsd.increment("common.student.account_created")
+    dog_stats_api.increment("common.student.account_created")
 
-    js = {'success': True}
-    HttpResponse(json.dumps(js), mimetype="application/json")
+    response_params = {'success': True,
+                       'redirect_url': redirect_url}
 
-    response = HttpResponse(json.dumps({'success': True}))
+    response = HttpResponse(json.dumps(response_params))
 
     # set the login cookie for the edx marketing site
     # we want this cookie to be accessed via javascript

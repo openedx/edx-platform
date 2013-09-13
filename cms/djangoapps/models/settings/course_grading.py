@@ -125,7 +125,7 @@ class CourseGradingModel(object):
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         descriptor.save()
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+        get_modulestore(course_location).update_item(course_location, descriptor._field_data._kvs._data)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
@@ -144,7 +144,7 @@ class CourseGradingModel(object):
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         descriptor.save()
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+        get_modulestore(course_location).update_item(course_location, descriptor._field_data._kvs._data)
 
         return cutoffs
 
@@ -168,12 +168,12 @@ class CourseGradingModel(object):
             grace_timedelta = timedelta(**graceperiodjson)
 
             descriptor = get_modulestore(course_location).get_item(course_location)
-            descriptor.lms.graceperiod = grace_timedelta
+            descriptor.graceperiod = grace_timedelta
 
             # Save the data that we've just changed to the underlying
             # MongoKeyValueStore before we update the mongo datastore.
             descriptor.save()
-            get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
+            get_modulestore(course_location).update_metadata(course_location, descriptor._field_data._kvs._metadata)
 
     @staticmethod
     def delete_grader(course_location, index):
@@ -193,7 +193,7 @@ class CourseGradingModel(object):
             # Save the data that we've just changed to the underlying
             # MongoKeyValueStore before we update the mongo datastore.
             descriptor.save()
-            get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+            get_modulestore(course_location).update_item(course_location, descriptor._field_data._kvs._data)
 
     @staticmethod
     def delete_grace_period(course_location):
@@ -204,12 +204,12 @@ class CourseGradingModel(object):
             course_location = Location(course_location)
 
         descriptor = get_modulestore(course_location).get_item(course_location)
-        del descriptor.lms.graceperiod
+        del descriptor.graceperiod
 
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         descriptor.save()
-        get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
+        get_modulestore(course_location).update_metadata(course_location, descriptor._field_data._kvs._metadata)
 
     @staticmethod
     def get_section_grader_type(location):
@@ -217,7 +217,7 @@ class CourseGradingModel(object):
             location = Location(location)
 
         descriptor = get_modulestore(location).get_item(location)
-        return {"graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
+        return {"graderType": descriptor.format if descriptor.format is not None else 'Not Graded',
                 "location": location,
                 "id": 99  # just an arbitrary value to
                 }
@@ -229,21 +229,21 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(location).get_item(location)
         if 'graderType' in jsondict and jsondict['graderType'] != u"Not Graded":
-            descriptor.lms.format = jsondict.get('graderType')
-            descriptor.lms.graded = True
+            descriptor.format = jsondict.get('graderType')
+            descriptor.graded = True
         else:
-            del descriptor.lms.format
-            del descriptor.lms.graded
+            del descriptor.format
+            del descriptor.graded
 
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         descriptor.save()
-        get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._metadata)
+        get_modulestore(location).update_metadata(location, descriptor._field_data._kvs._metadata)
 
     @staticmethod
     def convert_set_grace_period(descriptor):
         # 5 hours 59 minutes 59 seconds => converted to iso format
-        rawgrace = descriptor.lms.graceperiod
+        rawgrace = descriptor.graceperiod
         if rawgrace:
             hours_from_days = rawgrace.days * 24
             seconds = rawgrace.seconds

@@ -63,7 +63,15 @@ urlpatterns = ('',  # nopep8
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),
+
 )
+
+# if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+urlpatterns += (
+    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^course_modes/', include('course_modes.urls')),
+)
+
 
 js_info_dict = {
     'domain': 'djangojs',
@@ -343,6 +351,7 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+
 if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
@@ -366,6 +375,12 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
 if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
         url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):

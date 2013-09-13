@@ -68,8 +68,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_edx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
     }
 }
 
@@ -86,3 +86,10 @@ INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *      # pylint: disable=F0401
+except ImportError:
+    pass

@@ -12,12 +12,9 @@ class TestVideo(BaseTestXmodule):
 
     CATEGORY = "video"
     DATA = SOURCE_XML
-    MODEL_DATA = {
-        'data': DATA
-    }
 
     def setUp(self):
-        # Since the VideoDescriptor changes `self._model_data`,
+        # Since the VideoDescriptor changes `self._field_data`,
         # we need to instantiate `self.item_module` through
         # `self.item_descriptor` rather than directly constructing it
         super(TestVideo, self).setUp()
@@ -64,7 +61,9 @@ class TestVideo(BaseTestXmodule):
             'sub': u'a_sub_file.srt.sjson',
             'track': '',
             'youtube_streams': _create_youtube_string(self.item_module),
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
         self.maxDiff = None
@@ -114,7 +113,9 @@ class TestVideoNonYouTube(TestVideo):
             'sub': 'a_sub_file.srt.sjson',
             'track': '',
             'youtube_streams': '1.00:OEoXaMPEzfM',
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
         self.assertEqual(context, expected_context)

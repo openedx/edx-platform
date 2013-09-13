@@ -124,29 +124,33 @@ def create_new_course(request):
         pass
     if existing_course is not None:
         return JsonResponse({
-                'ErrMsg': _('There is already a course defined with the same '
-                    'organization, course number, and course run. Please '
-                    'change either organization or course number to be '
-                    'unique.'),
-                'OrgErrMsg': _('Please change either the organization or '
-                    'course number so that it is unique.'),
-                'CourseErrMsg': _('Please change either the organization or '
-                    'course number so that it is unique.'),
+            'ErrMsg': _('There is already a course defined with the same '
+                'organization, course number, and course run. Please '
+                'change either organization or course number to be '
+                'unique.'),
+            'OrgErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+            'CourseErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
         })
 
-    course_search_location = ['i4x', dest_location.org, dest_location.course,
-            'course', None
+    course_search_location = [
+        'i4x',
+        dest_location.org,
+        dest_location.course,
+        'course',
+        None
     ]
     courses = modulestore().get_items(course_search_location)
     if len(courses) > 0:
         return JsonResponse({
-                'ErrMsg': _('There is already a course defined with the same '
-                    'organization and course number. Please '
-                    'change at least one field to be unique.'),
-                'OrgErrMsg': _('Please change either the organization or '
-                    'course number so that it is unique.'),
-                'CourseErrMsg': _('Please change either the organization or '
-                    'course number so that it is unique.'),
+            'ErrMsg': _('There is already a course defined with the same '
+                'organization and course number. Please '
+                'change at least one field to be unique.'),
+            'OrgErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+            'CourseErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
         })
 
     # instantiate the CourseDescriptor and then persist it
@@ -156,15 +160,15 @@ def create_new_course(request):
     else:
         metadata = {'display_name': display_name}
     modulestore('direct').create_and_save_xmodule(
-            dest_location,
-            metadata=metadata
+        dest_location,
+        metadata=metadata
     )
     new_course = modulestore('direct').get_item(dest_location)
 
     # clone a default 'about' overview module as well
     dest_about_location = dest_location.replace(
-            category='about',
-            name='overview'
+        category='about',
+        name='overview'
     )
     overview_template = AboutDescriptor.get_template('overview.yaml')
     modulestore('direct').create_and_save_xmodule(
@@ -203,13 +207,16 @@ def course_info(request, org, course, name, provided_id=None):
     # get current updates
     location = Location(['i4x', org, course, 'course_info', "updates"])
 
-    return render_to_response('course_info.html', {
-        'context_course': course_module,
-        'url_base': "/" + org + "/" + course + "/",
-        'course_updates': json.dumps(get_course_updates(location)),
-        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url(),
-        'base_asset_url': StaticContent.get_base_url_path_for_course_assets(location) + '/'})
-
+    return render_to_response(
+        'course_info.html',
+        {
+            'context_course': course_module,
+            'url_base': "/" + org + "/" + course + "/",
+            'course_updates': json.dumps(get_course_updates(location)),
+            'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url(),
+            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(location) + '/'
+        }
+    )
 
 @expect_json
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
@@ -245,7 +252,7 @@ def course_info_updates(request, org, course, provided_id=None):
                 content_type="text/plain"
             )
     # can be either and sometimes django is rewriting one to the other:
-    elif request.method in ('POST', 'PUT'): 
+    elif request.method in ('POST', 'PUT'):
         try:
             return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
@@ -380,7 +387,7 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
         return JsonResponse(CourseGradingModel.fetch_grader(
-                Location(location), grader_index
+            Location(location), grader_index
         ))
     elif request.method == "DELETE":
         # ??? Should this return anything? Perhaps success fail?
@@ -388,8 +395,8 @@ def course_grader_updates(request, org, course, name, grader_index=None):
         return JsonResponse()
     else:  # post or put, doesn't matter.
         return JsonResponse(CourseGradingModel.update_grader_from_json(
-                Location(location),
-                request.POST
+            Location(location),
+            request.POST
         ))
 
 
@@ -411,8 +418,8 @@ def course_advanced_updates(request, org, course, name):
         return JsonResponse(CourseMetadata.fetch(location))
     elif request.method == 'DELETE':
         return JsonResponse(CourseMetadata.delete_key(
-                location,
-                json.loads(request.body)
+            location,
+            json.loads(request.body)
         ))
     else:
         # NOTE: request.POST is messed up because expect_json
@@ -479,9 +486,9 @@ def course_advanced_updates(request, org, course, name):
                         filter_tabs = False
         try:
             return JsonResponse(CourseMetadata.update_from_json(
-                    location,
-                    request_body,
-                    filter_tabs=filter_tabs
+                location,
+                request_body,
+                filter_tabs=filter_tabs
             ))
         except (TypeError, ValueError) as err:
             return HttpResponseBadRequest(
@@ -585,8 +592,8 @@ def textbook_index(request, org, course, name):
             # MongoKeyValueStore before we update the mongo datastore.
             course_module.save()
             store.update_metadata(
-                    course_module.location,
-                    own_metadata(course_module)
+                course_module.location,
+                own_metadata(course_module)
             )
             return JsonResponse(course_module.pdf_textbooks)
     else:

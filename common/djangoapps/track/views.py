@@ -1,35 +1,23 @@
-import json
-import logging
-import pytz
 import datetime
-import dateutil.parser
+
+import pytz
+from pytz import UTC
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.conf import settings
-from mitxmako.shortcuts import render_to_response
 
 from django_future.csrf import ensure_csrf_cookie
+
+from mitxmako.shortcuts import render_to_response
+
+from track import tracker
 from track.models import TrackingLog
-from pytz import UTC
-
-log = logging.getLogger("tracking")
-
-LOGFIELDS = ['username', 'ip', 'event_source', 'event_type', 'event', 'agent', 'page', 'time', 'host']
 
 
 def log_event(event):
-    """Write tracking event to log file, and optionally to TrackingLog model."""
-    event_str = json.dumps(event)
-    log.info(event_str[:settings.TRACK_MAX_EVENT])
-    if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-        event['time'] = dateutil.parser.parse(event['time'])
-        tldat = TrackingLog(**dict((x, event[x]) for x in LOGFIELDS))
-        try:
-            tldat.save()
-        except Exception as err:
-            log.exception(err)
+    """Capture a event by sending it to the register trackers"""
+    tracker.send(event)
 
 
 def user_track(request):
@@ -64,11 +52,12 @@ def user_track(request):
         "event": request.REQUEST['event'],
         "agent": agent,
         "page": request.REQUEST['page'],
-        "time": datetime.datetime.now(UTC).isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request.META['SERVER_NAME'],
     }
 
     log_event(event)
+
     return HttpResponse('success')
 
 
@@ -92,12 +81,13 @@ def server_track(request, event_type, event, page=None):
         "event": event,
         "agent": agent,
         "page": page,
-        "time": datetime.datetime.now(UTC).isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request.META['SERVER_NAME'],
     }
 
-    if event_type.startswith("/event_logs") and request.user.is_staff:  # don't log
-        return
+    if event_type.startswith("/event_logs") and request.user.is_staff:
+        return  # don't log
+
     log_event(event)
 
 
@@ -136,7 +126,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
         "event": full_event,
         "agent": request_info.get('agent', 'unknown'),
         "page": page,
-        "time": datetime.datetime.utcnow().isoformat(),
+        "time": datetime.datetime.now(UTC),
         "host": request_info.get('host', 'unknown')
     }
 

@@ -226,7 +226,7 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
                 children.push(ui.draggable.data('id'));
         }
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext('Saving') + '&hellip;'
+            title: gettext('Saving&hellip;')
         });
         saving.show();
         $.ajax({
