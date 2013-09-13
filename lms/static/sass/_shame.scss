@@ -198,6 +198,25 @@
   }
 }
 
+// ====================
+
+// Verification: overriding reset link style for nav/header
+.verification-process {
+
+  header.global {
+
+    .logo a:hover, .logo:active {
+      border: none;
+      text-decoration: none;
+      padding-bottom: 0;
+    }
+
+    .nav-global a:hover, .nav-global a:active {
+      border: none;
+    }
+  }
+}
+
 
 // ====================
 
