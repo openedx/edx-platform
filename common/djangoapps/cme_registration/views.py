@@ -241,30 +241,31 @@ def validate_required_fields(post_vars):
     """
 
     #Add additional required fields here
-    required_fields_dict = {'username': 'Username must be minimum of two characters long.',
-                            'email': 'A properly formatted e-mail is required.',
-                            'name': 'Your legal name must be a minimum of two characters long.',
-                            'password': 'A valid password is required.',
-                            'profession': 'Choose your profession.',
-                            'license_number': 'Enter your license number.',
-                            'patient_population': 'Choose your patient population',
-                            'specialty': 'Choose your specialty',
-                            'address_1': 'Enter your Address 01',
-                            'city': 'Enter your city',
-                            'state_province': 'Choose your state/Province',
-                            'postal_code': 'Enter your postal code',
-                            'country': 'Choose your country',
-                            'phone_number': 'Enter your phone number',
-                            'hear_about_us': 'Choose how you heard about us'
-                            }
+    required_fields_list = [{'email': 'A properly formatted e-mail is required.'},
+                            {'password': 'A valid password is required.'},
+                            {'username': 'Username must be minimum of two characters long.'},
+                            {'name': 'Your legal name must be a minimum of two characters long.'},
+                            {'profession': 'Choose your profession.'},
+                            {'license_number': 'Enter your license number.'},
+                            {'patient_population': 'Choose your patient population'},
+                            {'specialty': 'Choose your specialty'},
+                            {'address_1': 'Enter your Address 01'},
+                            {'city': 'Enter your city'},
+                            {'state_province': 'Choose your state/Province'},
+                            {'postal_code': 'Enter your postal code'},
+                            {'country': 'Choose your country'},
+                            {'phone_number': 'Enter your phone number'},
+                            {'hear_about_us': 'Choose how you heard about us'}
+                           ]
 
     error = {}
-    for k, val in required_fields_dict.items():
-        if len(post_vars.get(k)) < 2:
-            error['success'] = False
-            error['value'] = val
-            error['field'] = k
-            return error
+    for required_field in required_fields_list:
+        for key, val in required_field.iteritems():   
+            if len(post_vars.get(key)) < 2:
+                error['success'] = False
+                error['value'] = val
+                error['field'] = key
+                return error
 
 
 def validate_required_boxes(post_vars):
