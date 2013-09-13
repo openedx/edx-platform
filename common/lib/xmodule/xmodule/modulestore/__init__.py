@@ -10,7 +10,6 @@ from collections import namedtuple
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
-from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
@@ -449,13 +448,3 @@ class ModuleStoreBase(ModuleStore):
             if c.id == course_id:
                 return c
         return None
-
-
-def namedtuple_to_son(namedtuple, prefix=''):
-    """
-    Converts a namedtuple into a SON object with the same key order
-    """
-    son = SON()
-    for idx, field_name in enumerate(namedtuple._fields):
-        son[prefix + field_name] = namedtuple[idx]
-    return son
