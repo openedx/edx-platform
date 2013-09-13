@@ -146,6 +146,13 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
 
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
     @property
     def url_name(self):
         if self.descriptor:
@@ -456,6 +463,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 return self.scope_ids.usage_id
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
+
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
 
     @property
     def url_name(self):
