@@ -531,7 +531,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         def _find_corresponding_module_for_location(location):
             """
-            Find the peer grading module that links to the given location.
+            Find the peer grading module that exists at the given location.
             """
             try:
                 return self.descriptor.system.load_item(location)
@@ -540,7 +540,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Problem {0} does not exist in this course.".format(location))
                 raise
             except NoPathToItem:
-                # The linked problem doesn't exist.
+                # The linked problem does not have a path to it (ie is in a draft or other strange state).
                 log.error("Cannot find a path to problem {0} in this course.".format(location))
                 raise
 
