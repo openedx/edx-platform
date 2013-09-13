@@ -74,6 +74,8 @@
 
       .icon-light {
         @include font-size(20);
+        position: relative;
+        top: -($baseline/10);
       }
     }
 
@@ -88,6 +90,7 @@
 
     .item-audience__copy {
       @extend %t-copy-base;
+      margin-bottom: ($baseline*0.75);
 
       // BP: small desktop
       @include media($bp-ds) {
@@ -107,17 +110,16 @@
 
     // audience: link lists
     .list--links {
-      margin-top: $baseline;
 
       .item-link {
         @extend %ui-wipe-last-child;
-        margin-bottom: $baseline;
+        @include pad(0 0 ($baseline/2) 0);
+        margin-bottom: ($baseline/2);
         border-bottom: 1px solid $gray-l5;
-        padding-bottom: $baseline;
       }
 
       .item-link__title {
-        @extend %t-title-8;
+        @extend %t-title-7;
         color: $blue-u1;
       }
 
@@ -338,7 +340,7 @@
 
   .content__main {
     @extend .trans-size;
-    @include span-columns(9 of 12);
+    @include span-columns(8 of 12);
 
     // BP: medium desktop
     @include media($bp-dm) {
@@ -380,7 +382,7 @@
     .item-audience {
       @extend .trans-size;
       @extend %ui-wipe-last-child;
-      @include span-columns(3 of 9);
+      @include span-columns(4 of 8);
       position: relative;
 
       // BP: medium desktop
@@ -400,12 +402,81 @@
         @include fill-parent;
         margin-bottom: ($baseline*3);
       }
+
+      &.item-audience--developers {
+        @include span-columns(8 of 8);
+        margin-bottom: ($baseline*2);
+
+        // NOTE: semi-nasty hack for visual display harmony
+        .list--links {
+          @extend %ui-wipe-last-child;
+          @include span-columns(8 of 8);
+          @include pad(0 0 ($baseline/2) 0);
+          border-bottom: 1px solid $gray-l5;
+          margin-top: ($baseline*0.75);
+
+          &:first-child {
+            margin-top: 0;
+          }
+
+          // BP: medium desktop
+          @include media($bp-dm) {
+            @include pad(0);
+            margin-top: 0;
+            border-bottom: none;
+          }
+
+          // BP: small desktop
+          @include media($bp-ds) {
+            @include pad(0);
+            margin-top: 0;
+            border-bottom: none;
+          }
+
+          // BP: mobile
+          @include media($bp-m) {
+            @include pad(0);
+            margin-top: 0;
+            border-bottom: none;
+          }
+        }
+
+        .item-link {
+          @include span-columns(4 of 8);
+          @include pad(0);
+          border: none;
+
+          // BP: medium desktop
+          @include media($bp-dm) {
+            @include fill-parent;
+            @include pad(0 0 ($baseline/2) 0);
+            margin-bottom: ($baseline/2);
+            border-bottom: 1px solid $gray-l5;
+          }
+
+          // BP: small desktop
+          @include media($bp-ds) {
+            @include fill-parent;
+            @include pad(0 0 ($baseline/2) 0);
+            margin-bottom: ($baseline/2);
+            border-bottom: 1px solid $gray-l5;
+          }
+
+          // BP: mobile
+          @include media($bp-m) {
+            @include fill-parent;
+            @include pad(0 0 ($baseline/2) 0);
+            margin-bottom: ($baseline/2);
+            border-bottom: 1px solid $gray-l5;
+          }
+        }
+      }
     }
   }
 
   .content__supplementary {
     @extend .trans-size;
-    @include span-columns(3 of 12);
+    @include span-columns(4 of 12);
 
     // BP: medium desktop
     @include media($bp-dm) {
