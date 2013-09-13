@@ -50,7 +50,11 @@ var submitToPaymentProcessing = function() {
     $("#pay_form").submit();
   })
   .fail(function(jqXhr,text_status, error_thrown) {
-    alert(jqXhr.responseText);
+      if(jqXhr.status == 400) {
+          $('#order-error .copy p').html(jqXhr.responseText);
+      }
+      $('#order-error').show();
+      $("html, body").animate({ scrollTop: 0 });
   });
 }
 
