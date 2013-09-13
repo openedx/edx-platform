@@ -41,7 +41,7 @@ def wrap_draft(item):
     draft, and `False` otherwise. Sets the item's location to the
     non-draft location in either case
     """
-    setattr(item, 'is_draft', item.location.revision == DRAFT)
+    item.is_draft = (item.location.revision == DRAFT)
     item.scope_ids = item.scope_ids._replace(usage_id=item.location.replace(revision=None))
     return item
 
