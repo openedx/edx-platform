@@ -320,3 +320,22 @@ class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
         self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingFound(ModuleStoreTestCase):
+    """
+    Test to see if peer grading modules can be found properly.
+    """
+
+    def setUp(self):
+        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+
+    def test_peer_grading_nopath(self):
+        """
+        The open_ended_nopath course contains a peer grading module with no path to it.
+        Ensure that the exception is caught.
+        """
+
+        found, url = views.find_peer_grading_module(self.course)
+        self.assertEqual(found, False)
