@@ -1,5 +1,10 @@
 var onVideoFail = function(e) {
-  console.log('Failed to get camera access!', e);
+  if(e == 'NO_DEVICES_FOUND') {
+      $('#no-webcam').show();
+  }
+  else {
+    console.log('Failed to get camera access!', e);
+  }
 };
 
 // Returns true if we are capable of video capture (regardless of whether the
@@ -27,7 +32,9 @@ var submitToPaymentProcessing = function() {
     "/verify_student/create_order",
     {
       "course_id" : course_id,
-      "contribution": contribution
+      "contribution": contribution,
+      "face_image" : $("#face_image")[0].src,
+      "photo_id_image" : $("#photo_id_image")[0].src
     },
     function(data) {
       for (prop in data) {
@@ -47,18 +54,20 @@ var submitToPaymentProcessing = function() {
   });
 }
 
-function doResetButton(resetButton, captureButton, approveButton, nextButton) {
+function doResetButton(resetButton, captureButton, approveButton, nextButtonNav, nextLink) {
   approveButton.removeClass('approved');
-  nextButton.addClass('disabled');
+  nextButtonNav.addClass('is-not-ready');
+  nextLink.attr('href', "#");
 
   captureButton.show();
   resetButton.hide();
   approveButton.hide();
 }
 
-function doApproveButton(approveButton, nextButton) {
+function doApproveButton(approveButton, nextButtonNav, nextLink) {
+  nextButtonNav.removeClass('is-not-ready');
   approveButton.addClass('approved');
-  nextButton.removeClass('disabled');
+  nextLink.attr('href', "#next");
 }
 
 function doSnapshotButton(captureButton, resetButton, approveButton) {
@@ -67,9 +76,10 @@ function doSnapshotButton(captureButton, resetButton, approveButton) {
   approveButton.show();
 }
 
-
 function submitNameChange(event) {
   event.preventDefault();
+  $("#lean_overlay").fadeOut(200);
+  $("#edit-name").css({ 'display' : 'none' });
   var full_name = $('input[name="name"]').val();
   var xhr = $.post(
     "/change_name",
@@ -84,7 +94,7 @@ function submitNameChange(event) {
   .fail(function(jqXhr,text_status, error_thrown) {
     $('.message-copy').html(jqXhr.responseText);
   });
-  
+
 }
 
 function initSnapshotHandler(names, hasHtml5CameraSupport) {
@@ -99,13 +109,15 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   var captureButton = $("#" + name + "_capture_button");
   var resetButton = $("#" + name + "_reset_button");
   var approveButton = $("#" + name + "_approve_button");
-  var nextButton = $("#" + name + "_next_button");
+  var nextButtonNav = $("#" + name + "_next_button_nav");
+  var nextLink = $("#" + name + "_next_link");
   var flashCapture = $("#" + name + "_flash");
 
   var ctx = null;
   if (hasHtml5CameraSupport) {
     ctx = canvas[0].getContext('2d');
   }
+
   var localMediaStream = null;
 
   function snapshot(event) {
@@ -120,7 +132,12 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       video[0].pause();
     }
     else {
-      image[0].src = flashCapture[0].snap();
+      if (flashCapture[0].cameraAuthorized()) {
+        image[0].src = flashCapture[0].snap();
+      }
+      else {
+        return false;
+      }
     }
 
     doSnapshotButton(captureButton, resetButton, approveButton);
@@ -137,12 +154,12 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
       flashCapture[0].reset();
     }
 
-    doResetButton(resetButton, captureButton, approveButton, nextButton);
+    doResetButton(resetButton, captureButton, approveButton, nextButtonNav, nextLink);
     return false;
   }
 
   function approve() {
-    doApproveButton(approveButton, nextButton)
+    doApproveButton(approveButton, nextButtonNav, nextLink)
     return false;
   }
 
@@ -150,7 +167,8 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   captureButton.show();
   resetButton.hide();
   approveButton.hide();
-  nextButton.addClass('disabled');
+  nextButtonNav.addClass('is-not-ready');
+  nextLink.attr('href', "#");
 
   // Connect event handlers...
   video.click(snapshot);
@@ -178,18 +196,59 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
 
 }
 
+function browserHasFlash() {
+  var hasFlash = false;
+  try {
+      var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+      if(fo) hasFlash = true;
+  } catch(e) {
+      if(navigator.mimeTypes["application/x-shockwave-flash"] != undefined) hasFlash = true;
+  }
+  return hasFlash;
+}
+
 function objectTagForFlashCamera(name) {
-  return '<object type="application/x-shockwave-flash" id="' +
-         name + '" name="' + name + '" data=' +
-         '"/static/js/verify_student/CameraCapture.swf"' +
-          'width="500" height="375"><param name="quality" ' +
-          'value="high"><param name="allowscriptaccess" ' +
-          'value="sameDomain"></object>';
+  // detect whether or not flash is available
+  if(browserHasFlash()) {
+      // I manually update this to have ?v={2,3,4, etc} to avoid caching of flash
+      // objects on local dev.
+      return '<object type="application/x-shockwave-flash" id="' +
+             name + '" name="' + name + '" data=' +
+             '"/static/js/verify_student/CameraCapture.swf?v=3"' +
+              'width="500" height="375"><param name="quality" ' +
+              'value="high"><param name="allowscriptaccess" ' +
+              'value="sameDomain"></object>';
+  }
+  else {
+      // display a message informing the user to install flash
+      $('#no-flash').show();
+  }
+}
+
+function linkNewWindow(e) {
+        window.open($(e.target).attr('href'));
+            e.preventDefault();
+}
+
+function waitForFlashLoad(func, flash_object) {
+    if(!flash_object.hasOwnProperty('percentLoaded') || flash_object.percentLoaded() < 100){
+        setTimeout(function() {
+            waitForFlashLoad(func, flash_object);
+        },
+        50);
+    }
+    else {
+        func(flash_object);
+    }
 }
 
 $(document).ready(function() {
   $(".carousel-nav").addClass('sr');
-  $("#pay_button").click(submitToPaymentProcessing);
+  $("#pay_button").click(function(){
+      analytics.pageview("Payment Form");
+      submitToPaymentProcessing();
+  });
+
   // prevent browsers from keeping this button checked
   $("#confirm_pics_good").prop("checked", false)
   $("#confirm_pics_good").change(function() {
@@ -199,11 +258,13 @@ $(document).ready(function() {
 
   // add in handlers to add/remove the correct classes to the body
   // when moving between steps
-  $('#face_next_button').click(function(){
+  $('#face_next_link').click(function(){
+      analytics.pageview("Capture ID Photo");
       $('body').addClass('step-photos-id').removeClass('step-photos-cam')
   })
 
-  $('#photo_id_next_button').click(function(){
+  $('#photo_id_next_link').click(function(){
+      analytics.pageview("Review Photos");
       $('body').addClass('step-review').removeClass('step-photos-id')
   })
 
@@ -217,8 +278,19 @@ $(document).ready(function() {
   if (!hasHtml5CameraSupport) {
     $("#face_capture_div").html(objectTagForFlashCamera("face_flash"));
     $("#photo_id_capture_div").html(objectTagForFlashCamera("photo_id_flash"));
+    // wait for the flash object to be loaded and then check for a camera
+    if(browserHasFlash()) {
+        waitForFlashLoad(function(flash_object) {
+            if(!flash_object.hasOwnProperty('hasCamera')){
+                onVideoFail('NO_DEVICES_FOUND');
+            }
+        }, $('#face_flash')[0]);
+    }
   }
 
+  analytics.pageview("Capture Face Photo");
   initSnapshotHandler(["photo_id", "face"], hasHtml5CameraSupport);
+
+  $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
 });

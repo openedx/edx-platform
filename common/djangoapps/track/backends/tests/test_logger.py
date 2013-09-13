@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+import datetime
 
 from django.test import TestCase
 
@@ -26,16 +27,25 @@ class TestLoggerBackend(TestCase):
         # Send a couple of events and check if they were recorded
         # by the logger. The events are serialized to JSON.
 
-        event = {'test': True}
-        event_as_json = json.dumps(event)
+        event = {
+            'test': True,
+            'time': datetime.datetime(2012, 05, 01, 07, 27, 01, 200),
+            'date': datetime.date(2012, 05, 07),
+        }
 
         self.backend.send(event)
         self.backend.send(event)
 
-        self.assertEqual(
-            self.handler.messages['info'],
-            [event_as_json, event_as_json]
-        )
+        saved_events = [json.loads(e) for e in self.handler.messages['info']]
+
+        unpacked_event = {
+            'test': True,
+            'time': '2012-05-01T07:27:01.000200+00:00',
+            'date': '2012-05-07'
+        }
+
+        self.assertEqual(saved_events[0], unpacked_event)
+        self.assertEqual(saved_events[1], unpacked_event)
 
 
 class MockLoggingHandler(logging.Handler):

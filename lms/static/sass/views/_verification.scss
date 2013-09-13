@@ -218,10 +218,15 @@
 
 
   // reset: forms
-  input {
+  input,textarea {
     font-style: normal;
     font-weight: 400;
     margin-right: ($baseline/5);
+    padding: ($baseline/4) ($baseline/2);
+  }
+
+  textarea {
+    padding: ($baseline/2);
   }
 
   label {
@@ -464,13 +469,9 @@
       @include clearfix();
       width: flex-grid(12,12);
 
-      .wrapper-sts, .sts-track {
+      .sts-course, .sts-track {
         display: inline-block;
         vertical-align: middle;
-      }
-
-      .wrapper-sts {
-        width: flex-grid(9,12);
       }
 
       .sts-track {
@@ -490,19 +491,36 @@
         }
       }
 
-      .sts {
+      .sts-label {
         @extend .t-title7;
         display: block;
+        margin-bottom: ($baseline/2);
+        border-bottom: ($baseline/10) solid $m-gray-l4;
+        padding-bottom: ($baseline/2);
         color: $m-gray;
       }
 
       .sts-course {
         @extend .t-title;
+        width: flex-grid(9,12);
+        text-transform: none;
+      }
+
+      .sts-course-org, .sts-course-number {
+        @extend .t-title5;
+        @extend .t-weight4;
+        display: inline-block;
+      }
+
+      .sts-course-org {
+        margin-right: ($baseline/4);
+      }
+
+      .sts-course-name {
         @include font-size(28);
         @include line-height(28);
         @extend .t-weight4;
         display: block;
-        text-transform: none;
       }
     }
   }
@@ -680,6 +698,7 @@
           // help - general list
           .list-help {
             margin-top: ($baseline/2);
+            color: $black;
 
             .help-item {
               margin-bottom: ($baseline/4);
@@ -865,6 +884,7 @@
           }
 
           .help-tips {
+            margin-left: $baseline;
 
             .title {
               @extend .hd-lv5;
@@ -876,6 +896,7 @@
 
             // help - general list
             .list-tips {
+              color: $black;
 
               .tip {
                 margin-bottom: ($baseline/4);
@@ -1496,7 +1517,7 @@
         border-color: $m-pink-l3;
 
         .title {
-          @extend .t-title4;
+          @extend .t-title5;
           @extend .t-weight4;
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
@@ -1615,6 +1636,27 @@
 
   // VIEW: review photos
   &.step-review {
+    .modal.edit-name .submit input {
+      color: #fff;
+    }
+
+    .modal {
+
+      fieldset {
+        margin-top: $baseline;
+      }
+
+      .close-modal {
+        @include font-size(24);
+        color: $m-blue-d3;
+
+        &:hover {
+          color: $m-blue-d1;
+          border: none;
+        }
+      }
+
+    }
 
     .nav-wizard {
 

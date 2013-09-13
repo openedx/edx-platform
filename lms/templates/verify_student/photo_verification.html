@@ -13,6 +13,32 @@
 </%block>
 
 <%block name="content">
+
+<div id="no-webcam" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Webcam Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue registering, or select to {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="no-flash" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Flash Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have Flash installed. {a_start} Get Flash {a_end} to continue your registration.").format(a_start='<a rel="external" href="http://get.adobe.com/flashplayer/">', a_end="</a>")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="container">
   <section class="wrapper">
 
@@ -79,7 +105,7 @@
                   <div class="placeholder-cam" id="face_capture_div">
 
                     <div class="placeholder-art">
-                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission. <br />Still not working? You can {a_start} audit the course  {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
                     </div>
 
                     <video id="face_video" autoplay></video><br/>
@@ -133,18 +159,20 @@
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
+                        <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
+                        <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
                       </dl>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <nav class="nav-wizard"> <!-- FIXME: Additional class is-ready, is-not-ready -->
+              <nav class="nav-wizard" id="face_next_button_nav">
                 <span class="help help-inline">${_("Once you verify your photo looks good, you can move on to step 2.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="face_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
+                    <a id="face_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
                   </li>
                 </ol>
               </nav>
@@ -164,7 +192,7 @@
                   <div class="placeholder-cam" id="photo_id_capture_div">
 
                     <div class="placeholder-art">
-                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission. Still not working? You can {a_start} audit the course  {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
                     </div>
 
                     <video id="photo_id_video" autoplay></video><br/>
@@ -226,12 +254,12 @@
                 </div>
               </div>
 
-              <nav class="nav-wizard">
+              <nav class="nav-wizard" id="photo_id_next_button_nav">
                 <span class="help help-inline">${_("Once you verify your ID photo looks good, you can move on to step 3.")}</span>
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a class="next action-primary" id="photo_id_next_button" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
+                    <a id="photo_id_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
                   </li>
                 </ol>
               </nav>
@@ -247,19 +275,6 @@
 
               <div class="wrapper-task">
                 <ol class="review-tasks">
-                  <li class="review-task review-task-name">
-                    <h4 class="title">${_("Check Your Name")}</h4>
-
-                    <div class="copy">
-                        <p>${_("Make sure your full name on your edX account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
-                    </div>
-
-                    <ul class="list-actions">
-                      <li class="action action-editname">
-                        <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
-                      </li>
-                    </ul>
-                  </li>
 
                   <li class="review-task review-task-photos">
                     <h4 class="title">${_("Review the Photos You've Taken")}</h4>
@@ -311,6 +326,20 @@
                         </li>
                       </ul>
                     </div>
+                  </li>
+
+                  <li class="review-task review-task-name">
+                    <h4 class="title">${_("Check Your Name")}</h4>
+
+                    <div class="copy">
+                        <p>${_("Make sure your full name on your edX account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
+                    </div>
+
+                    <ul class="list-actions">
+                      <li class="action action-editname">
+                        <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
+                      </li>
+                    </ul>
                   </li>
 
                   <li class="review-task  review-task-contribution">

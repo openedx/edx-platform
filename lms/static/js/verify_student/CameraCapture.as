@@ -18,11 +18,13 @@ package
 	import flash.display.PNGEncoderOptions;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.StatusEvent;
 	import flash.external.ExternalInterface;
 	import flash.geom.Rectangle;
 	import flash.media.Camera;
 	import flash.media.Video;
 	import flash.utils.ByteArray;
+	
 	import mx.utils.Base64Encoder;
 	
 	[SWF(width="640", height="480")]
@@ -35,15 +37,17 @@ package
 		private var camera:Camera;
 		private var video:Video;
 		private var b64EncodedImage:String = null;
+		private var permissionGiven:Boolean = false;
 		
 		public function CameraCapture()
 		{
-			addEventListener(Event.ADDED_TO_STAGE, init);
+			addEventListener(Event.ADDED_TO_STAGE, init); 
 		}
 		
 		protected function init(e:Event):void {
 			camera = Camera.getCamera();
 			camera.setMode(VIDEO_WIDTH, VIDEO_HEIGHT, 30);
+			camera.addEventListener(StatusEvent.STATUS, statusHandler);
 			
 			video = new Video(VIDEO_WIDTH, VIDEO_HEIGHT);
 			video.attachCamera(camera);
@@ -53,6 +57,8 @@ package
 			ExternalInterface.addCallback("snap", snap);
 			ExternalInterface.addCallback("reset", reset);
 			ExternalInterface.addCallback("imageDataUrl", imageDataUrl);
+			ExternalInterface.addCallback("cameraAuthorized", cameraAuthorized);
+			ExternalInterface.addCallback("hasCamera", hasCamera);
 			
 			// Notify the container that the SWF is ready to be called. 
 			ExternalInterface.call("setSWFIsReady"); 
@@ -97,6 +103,28 @@ package
 				return "data:image/png;base64," + b64EncodedImage;
 			}
 			return "";
+		}
+		
+		public function cameraAuthorized():Boolean {
+			return permissionGiven;
+		}
+		
+		public function hasCamera():Boolean {
+			return (Camera.names.length != 0);
+		}
+		
+		public function statusHandler(event:StatusEvent):void {
+			switch (event.code) 
+			{ 
+				case "Camera.Muted": 
+					// User clicked Deny.
+					permissionGiven = false;
+					break; 
+				case "Camera.Unmuted": 
+					// "User clicked Accept.
+					permissionGiven = true;
+					break; 
+			} 			
 		}
 	}
 }
