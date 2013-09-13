@@ -4,6 +4,10 @@ from .import get_test_system
 from test_util_open_ended import MockQueryDict, DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
 import json
+from mock import Mock
+from xmodule.peer_grading_module import PeerGradingModule
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 import logging
 
@@ -181,3 +185,53 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         peer_grading.peer_gs = MockPeerGradingServiceProblemList()
         html = peer_grading.peer_grading()
         self.assertIn("Peer-Graded", html)
+
+class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
+    """
+    Test peer grading that is linked to an open ended module.
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
+                                 "PeerGradingLinked"])
+    coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended",
+                             "SampleQuestion"])
+
+    def setUp(self):
+        """
+        Create a peer grading module from a test system.
+        """
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.setup_modulestore(COURSE)
+
+    def test_linked_problem(self):
+        """
+        Check to see if a peer grading module with a linked problem loads properly.
+        """
+
+        # Mock the linked problem descriptor.
+        linked_descriptor = Mock()
+        linked_descriptor.location = self.coe_location
+
+        # Mock the peer grading descriptor.
+        pg_descriptor = Mock()
+        pg_descriptor.location = self.problem_location
+        pg_descriptor.get_required_module_descriptors = lambda: [linked_descriptor, ]
+
+        # Setup the proper field data for the peer grading module.
+        field_data = DictFieldData({
+            'data': '<peergrading/>',
+            'location': self.problem_location,
+            'use_for_single_location': True,
+            'link_to_location': self.coe_location,
+        })
+
+        # Initialize the peer grading module.
+        peer_grading = PeerGradingModule(
+            pg_descriptor,
+            self.test_system,
+            field_data,
+            ScopeIds(None, None, self.problem_location, self.problem_location)
+        )
+
+        # Ensure that it is properly setup.
+        self.assertTrue(peer_grading.use_for_single_location)
