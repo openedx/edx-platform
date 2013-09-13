@@ -476,7 +476,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         body = {
             "EdX-ID": str(self.receipt_id),
-            "ExpectedName": self.user.profile.name,
+            "ExpectedName": self.name,
             "PhotoID": self.image_url("photo_id"),
             "PhotoIDKey": self.photo_id_key,
             "SendResponseTo": callback_url,
