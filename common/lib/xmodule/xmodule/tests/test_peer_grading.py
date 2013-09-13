@@ -2,6 +2,12 @@ import unittest
 from xmodule.modulestore import Location
 from .import get_test_system
 from test_util_open_ended import MockQueryDict, DummyModulestore
+from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
+import json
+from mock import Mock
+from xmodule.peer_grading_module import PeerGradingModule
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 import logging
 
@@ -136,6 +142,13 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         self.peer_grading.get_instance_state()
 
+class MockPeerGradingServiceProblemList(MockPeerGradingService):
+    def get_problem_list(self, course_id, grader_id):
+        return {'success': True,
+                'problem_list': [
+                    {"num_graded": 3, "num_pending": 681, "num_required": 3, "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion", "problem_name": "Peer-Graded Essay"},
+                ]}
+
 class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
@@ -155,3 +168,20 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     def test_metadata_load(self):
         peer_grading = self.get_module_from_location(self.problem_location, COURSE)
         self.assertEqual(peer_grading.closed(), False)
+
+    def test_problem_list(self):
+        """
+        Test to see if a peer grading problem list can be correctly initialized.
+        """
+
+        # Initialize peer grading module.
+        peer_grading = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Ensure that it cannot find any peer grading.
+        html = peer_grading.peer_grading()
+        self.assertNotIn("Peer-Graded", html)
+
+        # Swap for our mock class, which will find peer grading.
+        peer_grading.peer_gs = MockPeerGradingServiceProblemList()
+        html = peer_grading.peer_grading()
+        self.assertIn("Peer-Graded", html)
