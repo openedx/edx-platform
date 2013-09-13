@@ -131,7 +131,8 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     body_str = body_string(body_dict)
     message = headers_str + body_str
 
-    hashed = hmac.new(secret_key, message, sha256)
+    # hmac needs a byte string for it's starting key, can't be unicode.
+    hashed = hmac.new(secret_key.encode('utf-8'), message, sha256)
     signature = binascii.b2a_base64(hashed.digest()).rstrip('\n')
     authorization_header = "SSI {}:{}".format(access_key, signature)
 
@@ -161,7 +162,7 @@ def body_string(body_dict):
     for key, value in sorted(body_dict.items()):
         if value is None:
             value = "null"
-        body_list.append(u"{}:{}\n".format(key, value))
+        body_list.append(u"{}:{}\n".format(key, value).encode('utf-8'))
 
     return "".join(body_list) # Note that trailing \n's are important
 
