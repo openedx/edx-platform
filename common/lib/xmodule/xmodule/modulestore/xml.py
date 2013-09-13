@@ -20,8 +20,10 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
 from xmodule.html_module import HtmlDescriptor
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
+from xblock.plugin import PluginMissingError
 
 from . import ModuleStoreBase, Location, XML_MODULESTORE_TYPE
 
@@ -163,7 +165,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 make_name_unique(xml_data)
 
-                descriptor = XModuleDescriptor.load_from_xml(
+                descriptor = create_block_from_xml(
                     etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
@@ -217,6 +219,38 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             process_xml=process_xml,
             **kwargs
         )
+
+
+def create_block_from_xml(xml_data, system, org=None, course=None, default_class=None):
+    """
+    Create an XBlock instance from XML data.
+
+    `xml_data' is a string containing valid xml.
+
+    `system` is an XMLParsingSystem.
+
+    `org` and `course` are optional strings that will be used in the generated
+    block's url identifiers.
+
+    `default_class` is the class to instantiate of the XML indicates a class
+    that can't be loaded.
+
+    Returns the fully instantiated XBlock.
+
+    """
+    node = etree.fromstring(xml_data)
+    raw_class = XBlock.load_class(node.tag, default_class)
+    xblock_class = system.mixologist.mix(raw_class)
+
+    # leave next line commented out - useful for low-level debugging
+    # log.debug('[create_block_from_xml] tag=%s, class=%s' % (node.tag, xblock_class))
+
+    url_name = node.get('url_name', node.get('slug'))
+    location = Location('i4x', org, course, node.tag, url_name)
+
+    scope_ids = ScopeIds(None, location.category, location, location)
+    xblock = xblock_class.parse_xml(node, system, scope_ids)
+    return xblock
 
 
 class ParentTracker(object):

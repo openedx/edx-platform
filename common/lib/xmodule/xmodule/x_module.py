@@ -524,32 +524,15 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
-    @staticmethod
-    def load_from_xml(xml_data,
-                      system,
-                      org=None,
-                      course=None,
-                      default_class=None):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of xml_data.
-
-        xml_data must be a string containing valid xml
-
-        system is an XMLParsingSystem
-
-        org and course are optional strings that will be used in the generated
-            module's url identifiers
+        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        class_ = system.mixologist.mix(XModuleDescriptor.load_class(
-            etree.fromstring(xml_data).tag,
-            default_class
-        ))
-        # leave next line, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-        #        etree.fromstring(xml_data).tag,class_))
-
-        return class_.from_xml(xml_data, system, org, course)
+        xml = etree.tostring(node)
+        # TODO: change from_xml to not take org and course, it can use self.system.
+        block = cls.from_xml(xml, runtime, runtime.org, runtime.course)
+        return block
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -713,7 +696,9 @@ class DescriptorSystem(Runtime):
                that you're about to re-raise---let the caller track them.
         """
 
-        super(DescriptorSystem, self).__init__(**kwargs)
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(DescriptorSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
 
         self.load_item = load_item
         self.resources_fs = resources_fs
@@ -835,7 +820,10 @@ class ModuleSystem(Runtime):
             not to allow the execution of unsafe, unsandboxed code.
 
         """
-        super(ModuleSystem, self).__init__(**kwargs)
+
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(ModuleSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
 
         self.ajax_url = ajax_url
         self.xqueue = xqueue
