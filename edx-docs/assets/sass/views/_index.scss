@@ -223,14 +223,14 @@
     @include media($bp-ds) {
       @include span-columns(2 of 6);
       @include shift(2);
-      @include pad(($baseline*0.25) ($baseline/2));
+      @include pad(($baseline/2) ($baseline*0.75));
     }
 
     // BP: mobile
     @include media($bp-m) {
       @include span-columns(2 of 6);
       @include shift(2);
-      @include pad(($baseline/10) ($baseline/10));
+      @include pad(($baseline/2) ($baseline/2));
     }
 
     *[class^="depth"] {
