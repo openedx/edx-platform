@@ -612,8 +612,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'problem_location': problem_location,
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
-            'count_graded': count_graded,
-            'count_required': count_required,
             # Checked above
             'staff_access': False,
             'track_changes': getattr(module, 'track_changes', False),
