@@ -124,9 +124,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Linked location {0} for peer grading module {1} cannot be linked to.".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.due
-            if due_date:
-                self.due = due_date
 
         try:
             self.timeinfo = TimeInfo(self.due, self.graceperiod)
