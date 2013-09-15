@@ -146,6 +146,13 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
 
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
     @property
     def url_name(self):
         if self.descriptor:
@@ -457,6 +464,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
 
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
     @property
     def url_name(self):
         if isinstance(self.location, Location):
@@ -562,10 +576,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        class_ = XModuleDescriptor.load_class(
+        class_ = system.mixologist.mix(XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
-        )
+        ))
         # leave next line, commented out - useful for low-level debugging
         # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
         #        etree.fromstring(xml_data).tag,class_))
