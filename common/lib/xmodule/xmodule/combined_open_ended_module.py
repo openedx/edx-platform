@@ -234,6 +234,14 @@ class CombinedOpenEndedFields(object):
         default=False,
         scope=Scope.settings
     )
+    track_changes = Boolean(
+        display_name="Peer Track Changes",
+        help=("EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  "
+              "If set to 'True', peer graders will be able to make changes to the student "
+              "submission and those changes will be tracked and shown along with the graded feedback."),
+        default=False,
+        scope=Scope.settings
+    )
     due = Date(
         help="Date that this problem is due by",
         scope=Scope.settings
