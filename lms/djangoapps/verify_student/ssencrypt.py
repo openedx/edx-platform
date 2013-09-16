@@ -164,9 +164,9 @@ def header_string(headers_dict):
 
 def body_string(body_dict, prefix=""):
     """
-    This version actually doesn't support nested lists and dicts. The code for
-    that was a little gnarly and we don't use that functionality, so there's no
-    real test for correctness.
+    Return a canonical string representation of the body of a JSON request or
+    response. This canonical representation will be used as an input to the
+    hashing used to generate a signature.
     """
     body_list = []
     for key, value in sorted(body_dict.items()):
