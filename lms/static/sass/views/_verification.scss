@@ -372,6 +372,10 @@
     .copy {
       @extend .copy-detail;
     }
+
+    strong {
+      color: $m-gray-d4;
+    }
   }
 
   // ====================
@@ -693,6 +697,10 @@
 
           .copy {
             @extend .copy-detail;
+          }
+
+          .example {
+            color: $m-gray-l2;
           }
 
           // help - general list
@@ -1636,6 +1644,11 @@
 
   // VIEW: review photos
   &.step-review {
+
+    .help-item-technical {
+      display: none;
+    }
+
     .modal.edit-name .submit input {
       color: #fff;
     }
@@ -1655,7 +1668,6 @@
           border: none;
         }
       }
-
     }
 
     .nav-wizard {
@@ -1732,6 +1744,10 @@
 
   // VIEW: confirmation/receipt
   &.step-confirmation {
+
+    .help-item-technical {
+      display: none;
+    }
 
     // progress nav
     .progress .progress-step {
