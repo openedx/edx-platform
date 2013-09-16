@@ -41,7 +41,7 @@ class OpenEnded
   post: (cmd, data, callback) ->
       # if this post request fails, the error callback will catch it
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occured while performing javascript ajax post."})
+        .error => callback({success: false, error: "Error occurred while performing javascript ajax post."})
 
   after_action_wrapper: (target, action_type) ->
     tr_parent = target.parent().parent()
