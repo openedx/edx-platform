@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Improved accessibility of forum navigation sort buttons
+
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
 
