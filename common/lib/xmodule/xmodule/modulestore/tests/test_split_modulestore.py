@@ -17,6 +17,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from pytz import UTC
 from path import path
 import re
+import random
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -249,7 +250,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(result.children), 1)
         self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
         self.assertEqual(len(result.children[0].children), 1)
-
 
 class SplitModuleItemTests(SplitModuleTest):
     '''
@@ -966,6 +966,27 @@ class TestCourseCreation(SplitModuleTest):
         modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
         course = modulestore().get_course(CourseLocator(course_id=locator.course_id, branch="published"))
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
+
+    def test_create_with_root(self):
+        """
+        Test create_course with a specified root id and category
+        """
+        user = random.getrandbits(32)
+        new_course = modulestore().create_course(
+            'test_org', 'test_transaction', user,
+            root_usage_id='top', root_category='chapter'
+        )
+        self.assertEqual(new_course.location.usage_id, 'top')
+        self.assertEqual(new_course.category, 'chapter')
+        # look at db to verify
+        db_structure = modulestore().structures.find_one({
+            '_id': new_course.location.as_object_id(new_course.location.version_guid)
+        })
+        self.assertIsNotNone(db_structure, "Didn't find course")
+        self.assertNotIn('course', db_structure['blocks'])
+        self.assertIn('top', db_structure['blocks'])
+        self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
+
 
 
 class TestInheritance(SplitModuleTest):

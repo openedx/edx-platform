@@ -378,7 +378,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         return self.get_item(location, depth=depth)
 
-    def get_parent_locations(self, locator, usage_id=None):
+    def get_parent_locations(self, locator, course_id=None):
         '''
         Return the locations (Locators w/ usage_ids) for the parents of this location in this
         course. Could use get_items(location, {'children': usage_id}) but this is slightly faster.
@@ -387,7 +387,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         :param locator: BlockUsageLocator restricting search scope
         :param usage_id: ignored. Only included for API compatibility. Specify the usage_id within the locator.
         '''
-
         course = self._lookup_course(locator)
         items = []
         for parent_id, value in course['blocks'].iteritems():
@@ -717,7 +716,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
     def create_course(
         self, org, prettyid, user_id, id_root=None, fields=None,
-        master_branch='draft', versions_dict=None, root_category='course'):
+        master_branch='draft', versions_dict=None, root_category='course',
+        root_usage_id='course'
+        ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
@@ -749,7 +750,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         provide any fields overrides, see above). if not provided, will create a mostly empty course
         structure with just a category course root xblock.
         """
-        partitioned_fields = self._partition_fields_by_scope('course', fields)
+        partitioned_fields = self._partition_fields_by_scope(root_category, fields)
         block_fields = partitioned_fields.setdefault(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
@@ -773,13 +774,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
             self.definitions.update({'_id': definition_id}, {'$set': {"edit_info.original_version": definition_id}})
 
             draft_structure = {
-                'root': 'course',
+                'root': root_usage_id,
                 'previous_version': None,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.now(UTC),
                 'blocks': {
-                    'course': {
-                        'category': 'course',
+                    root_usage_id: {
+                        'category': root_category,
                         'definition': definition_id,
                         'fields': block_fields,
                         'edit_info': {
@@ -794,7 +795,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             draft_structure['original_version'] = new_id
             self.structures.update({'_id': new_id},
                 {'$set': {"original_version": new_id,
-                    'blocks.course.edit_info.update_version': new_id}})
+                    'blocks.{}.edit_info.update_version'.format(root_usage_id): new_id}})
             if versions_dict is None:
                 versions_dict = {master_branch: new_id}
             else:
