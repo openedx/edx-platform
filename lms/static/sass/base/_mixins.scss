@@ -55,26 +55,26 @@
 // ====================
 
 // extends - UI - visual link
-.ui-fake-link {
+%ui-fake-link {
   cursor: pointer;
 }
 
 // extends - UI - functional disable
-.ui-disabled {
+%ui-disabled {
   pointer-events: none;
   outline: none;
 }
 
 // extends - UI - depth levels
-.ui-depth0 { z-index: 0; }
-.ui-depth1 { z-index: 10; }
-.ui-depth2 { z-index: 100; }
-.ui-depth3 { z-index: 1000; }
-.ui-depth4 { z-index: 10000; }
-.ui-depth5 { z-index: 100000; }
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
 
 // extends -hidden elems - screenreaders
-.text-sr {
+%text-sr {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   height: 1px;
@@ -86,7 +86,7 @@
 }
 
 // extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
-.ui-no-list {
+%ui-no-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -99,14 +99,14 @@
 }
 
 // extends - text - image-replacement hidden text
-.text-hide {
+%text-hide {
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
 }
 
 // extends - text - wrapping
-.text-wrap {
+%text-wrap {
   text-wrap: wrap;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
@@ -114,7 +114,7 @@
 }
 
 // extends - text - text overflow by ellipsis
-.text-truncated {
+%text-truncated {
   @include box-sizing(border-box);
   overflow: hidden;
   white-space: nowrap;

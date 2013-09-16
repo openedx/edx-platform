@@ -274,7 +274,7 @@
 
     // UI: course list
     .listing-courses {
-      @extend .ui-no-list;
+      @extend %ui-no-list;
 
       .course-item {
         margin-bottom: ($baseline*2.5);
@@ -294,7 +294,7 @@
       @include box-sizing(box);
       @include transition(all 0.15s linear 0s);
       @include clearfix();
-      @extend .ui-depth2;
+      @extend %ui-depth2;
       position: relative;
 
       .cover {
@@ -418,7 +418,7 @@
 
       // STATE: course mode - verified
       &.verified {
-        @extend .ui-depth2;
+        @extend %ui-depth2;
         margin-top: ($baseline*2.5);
         border-top: 1px solid $verified-color-lvl3;
         padding-top: ($baseline*1.25);
@@ -438,11 +438,11 @@
           text-align: center;
 
           .label {
-            @extend .text-sr;
+            @extend %text-sr;
           }
 
           .deco-graphic {
-            @extend .ui-depth3;
+            @extend %ui-depth3;
             width: 40px;
             position: absolute;
             left: -30px;
@@ -450,8 +450,8 @@
           }
 
           .sts-enrollment-value {
-            @extend .ui-depth1;
-            @extend .copy-badge;
+            @extend %ui-depth1;
+            @extend %copy-badge;
             border-radius: 0;
             padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
             color: $white;
