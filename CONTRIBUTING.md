@@ -2,8 +2,8 @@ Contributions are very welcome. The easiest way is to fork the repo and then mak
 
 Please review:
 
-* [[Python Guidelines]]
-* [[Javascript Guidelines]]
+* [Python Guidelines](https://github.com/edx/edx-platform/wiki/Python-Guidelines)
+* [Javascript Guidelines](https://github.com/edx/edx-platform/wiki/Javascript-Guidelines)
 * [Testing](https://github.com/edx/edx-platform/blob/master/docs/internal/testing.md)
 
 Coding conventions should be followed and your commit should *increase* test coverage, not decrease it. For more involved contributions, you may want to discuss your intentions on the mailing list *before* you start coding.
