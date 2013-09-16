@@ -127,9 +127,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     """
     Returns a (message, signature) pair.
     """
-    headers_str = "{}\n\n{}".format(method, header_string(headers_dict))
-    body_str = body_string(body_dict)
-    message = headers_str + body_str
+    message = signing_format_message(method, headers_dict, body_dict)
 
     # hmac needs a byte string for it's starting key, can't be unicode.
     hashed = hmac.new(secret_key.encode('utf-8'), message, sha256)
@@ -138,6 +136,18 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
 
     message += '\n'
     return message, signature, authorization_header
+
+def signing_format_message(method, headers_dict, body_dict):
+    """
+    Given a dictionary of headers and a dictionary of the JSON for the body,
+    will return a str that represents the normalized version of this messsage
+    that will be used to generate a signature.
+    """
+    headers_str = "{}\n\n{}".format(method, header_string(headers_dict))
+    body_str = body_string(body_dict)
+    message = headers_str + body_str
+
+    return message
 
 def header_string(headers_dict):
     """Given a dictionary of headers, return a canonical string representation."""
@@ -152,7 +162,7 @@ def header_string(headers_dict):
 
     return "".join(header_list) # Note that trailing \n's are important
 
-def body_string(body_dict):
+def body_string(body_dict, prefix=""):
     """
     This version actually doesn't support nested lists and dicts. The code for
     that was a little gnarly and we don't use that functionality, so there's no
@@ -160,9 +170,18 @@ def body_string(body_dict):
     """
     body_list = []
     for key, value in sorted(body_dict.items()):
-        if value is None:
-            value = "null"
-        body_list.append(u"{}:{}\n".format(key, value).encode('utf-8'))
+        if isinstance(value, (list, tuple)):
+            for i, arr in enumerate(value):
+                if isinstance(arr, dict):
+                    body_list.append(body_string(arr, u"{}.{}.".format(key, i)))
+                else:
+                    body_list.append(u"{}.{}:{}\n".format(key, i, arr).encode('utf-8'))
+        elif isinstance(value, dict):
+            body_list.append(body_string(value, key + ":"))
+        else:
+            if value is None:
+                value = "null"
+            body_list.append(u"{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
 
     return "".join(body_list) # Note that trailing \n's are important
 
