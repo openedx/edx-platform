@@ -77,7 +77,7 @@ $('#fileupload').fileupload({
                 e.preventDefault();
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
-                    if (result.status != 200) {
+                    if (result.status != 200 && result.status != 302) {
                         alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
                         submitBtn.show();
                         bar.hide();
