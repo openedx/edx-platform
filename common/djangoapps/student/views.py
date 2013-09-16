@@ -10,6 +10,7 @@ import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
+import csv
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -1546,6 +1547,77 @@ def accept_name_change(request):
         raise Http404
 
     return accept_name_change_by_id(int(request.POST['id']))
+
+
+_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
+
+@require_POST
+@login_required
+@ensure_csrf_cookie
+def import_users(request, post_override=None):
+    post_vars = post_override if post_override else request.POST
+    f = request.FILES['file']
+    data = csv.DictReader(f, delimiter=':', quoting=csv.QUOTE_NONE)
+
+    js = {}
+    js['passwords'] = {}
+
+    for idx, row in enumerate(data):
+        row['firstname'] = row.pop('first-name')
+        row['lastname'] = row.pop('second-name')
+        row['middlename'] = row.pop('patronymic')
+        #row['email'] = row.pop('email')
+        row['work_login'] = row.pop('login')
+
+
+        name = u"%s %s %s" % (post_vars.get('lastname'), post_vars.get('firstname'), post_vars.get('middlename'))
+
+        user = User(username=post_vars['email'],
+                email=post_vars['email'],
+                is_active=False)
+        password = id_generator(8, _ALPHABET)
+        user.set_password(password)
+        registration = Registration()
+        try:
+            user.save()
+        except IntegrityError:
+            # Figure out the cause of the integrity error
+            if len(User.objects.filter(email=post_vars['email'])) > 0:
+                user = User.objects.filter(email=post_vars['email'])[0];
+                profile = UserProfile.objects.get(user=user)
+                if (profile.name != name):
+                    js['success'] = False
+                    js['log'] += _('Error in row: %s:Duplicate email with different names: %s') % (idx, row)
+                    continue
+                #profile update
+                js['success'] = False
+                js['log'] += _('Error in row: %s:TOO: %s') % (idx, row)
+                continue
+        raise
+
+        registration.register(user)
+
+        profile = UserProfile(user=user)
+        
+        profile.name = "%s %s %s" % (post_vars.get('lastname'), post_vars.get('firstname'), post_vars.get('middlename'))
+        profile.lastname = post_vars.get('lastname')
+        profile.firstname = post_vars.get('firstname')
+        profile.middlename = post_vars.get('middlename')
+        
+        profile.work_number = post_vars.get('work_number')
+    
+        js['passwords'][post_vars['email']] = password
+        try:
+            profile.save()
+        except Exception:
+            log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+
+
+    return HttpResponse(json.dumps(js, cls=LazyEncoder))
+
 
 
 @require_POST

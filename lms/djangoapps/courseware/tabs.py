@@ -324,7 +324,9 @@ def get_course_tabs(user, course, active_page, request):
         # expect handlers to return lists--handles things that are turned off
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
-        gen = VALID_TAB_TYPES[tab['type']].generator
+        if not (tab['type'] == 'wiki' and course.hide_wiki_tab):
+            gen = VALID_TAB_TYPES[tab['type']].generator
+
         tabs.extend(gen(tab, user, course, active_page, request))
 
     # Instructor tab is special--automatically added if user is staff for the course
@@ -380,7 +382,8 @@ def get_default_tabs(user, course, active_page, request):
     if discussion_link:
         tabs.append(CourseTab('Discussion', discussion_link, active_page == 'discussion'))
 
-    tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page, request))
+    if user.is_authenticated() and not course.hide_wiki_tab:
+        tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page, request))
 
     if user.is_authenticated() and not course.hide_progress_tab:
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page, request))

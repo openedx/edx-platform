@@ -84,9 +84,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
-    lastname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
-    firstname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
-    middlename = models.CharField(blank=False, null=True, max_length=30, db_index=True)
+    lastname = models.CharField(blank=True, null=True, max_length=30, db_index=True)
+    firstname = models.CharField(blank=True, null=True, max_length=30, db_index=True)
+    middlename = models.CharField(blank=True, null=True, max_length=30, db_index=True)
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
@@ -126,8 +126,8 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
 
-    education_place = models.CharField(blank=False, null=True, max_length=255, db_index=False)
-    education_year = models.IntegerField(blank=False, null=True, db_index=True)
+    education_place = models.CharField(blank=True, null=True, max_length=255, db_index=False)
+    education_year = models.IntegerField(blank=True, null=True, db_index=True)
     education_qualification = models.CharField(blank=True, null=True, max_length=30)
     education_specialty = models.CharField(blank=True, null=True, max_length=30)
 
@@ -143,10 +143,10 @@ class UserProfile(models.Model):
         ('none', _('None')),
         ('other', _('Other'))
     )
-    work_type = models.CharField(blank=False, null=True, max_length=6, choices=WORK_TYPE_CHOICES)
-    work_number = models.IntegerField(blank=False, null=True, db_index=True)
-    work_name = models.CharField(blank=False, null=True, max_length=255, db_index=False)
-    work_login = models.CharField(blank=False, null=True, max_length=10, db_index=False)
+    work_type = models.CharField(blank=True, null=True, max_length=6, choices=WORK_TYPE_CHOICES)
+    work_number = models.IntegerField(blank=True, null=True, db_index=True)
+    work_name = models.CharField(blank=True, null=True, max_length=255, db_index=False)
+    work_login = models.CharField(blank=True, null=True, max_length=10, db_index=False)
     WORK_LOCATION_CHOICES = (
         ('CAO', _('Central Administrative Okrug')),
         ('EAO', _('Eastern Administrative Okrug')),
@@ -164,7 +164,7 @@ class UserProfile(models.Model):
         ('non', _('None')),
         ('other', _('Other'))
     )
-    work_location = models.CharField(blank=False, null=True, max_length=6, db_index=False, choices=WORK_LOCATION_CHOICES)
+    work_location = models.CharField(blank=True, null=True, max_length=6, db_index=False, choices=WORK_LOCATION_CHOICES)
     WORK_OCCUPATION_CHOICES = (
         ('tchr', _('Teacher')),
         ('tchrorg', _('Teacher and organizer')),
@@ -197,20 +197,20 @@ class UserProfile(models.Model):
         ('disp', _('Dispatcher of the educational institution')),
         ('other', _('Other'))
     )
-    work_occupation = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
+    work_occupation = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
     work_occupation_other = models.CharField(blank=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
     work_teaching_experience = models.IntegerField(blank=True, null=True, db_index=True)
-    work_managing_experience = models.IntegerField(blank=False, null=True, db_index=True)
+    work_managing_experience = models.IntegerField(blank=True, null=True, db_index=True)
     WORK_QUALIFICATION_CATEGORY_CHOICES = (
         ('none', _("None")),
         ('high', _("High")),
         ('first', _("First")),
         ('second', _("Second"))
     )
-    work_qualification_category = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES)
-    work_qualification_category_year = models.IntegerField(blank=False, null=True, db_index=True)
+    work_qualification_category = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES)
+    work_qualification_category_year = models.IntegerField(blank=True, null=True, db_index=True)
 
-    contact_phone = models.CharField(blank=False, null=True, max_length=10, db_index=False)
+    contact_phone = models.CharField(blank=True, null=True, max_length=10, db_index=False)
 
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
