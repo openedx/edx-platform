@@ -362,6 +362,8 @@ class CourseFields(object):
     # Explicit comparison to True because we always want to return a bool.
     hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
 
+    hide_wiki_tab = Boolean(help="DO NOT USE THISE", scope=Scope.settings)
+
     display_organization = String(help="An optional display string for the course organization that will get rendered in the LMS",
                                   scope=Scope.settings)
 
@@ -435,7 +437,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             else:
                 tabs.append({'type': 'discussion', 'name': 'Discussion'})
 
-            tabs.append({'type': 'wiki', 'name': 'Wiki'})
+            if not self.hide_wiki_tab:
+                tabs.append({'type': 'wiki', 'name': 'Wiki'})
 
             if not self.hide_progress_tab:
                 tabs.append({'type': 'progress', 'name': 'Progress'})
