@@ -75,6 +75,9 @@ def modulestore(name='default'):
     if name not in _MODULESTORES:
         _MODULESTORES[name] = create_modulestore_instance(settings.MODULESTORE[name]['ENGINE'],
                                                           settings.MODULESTORE[name]['OPTIONS'])
+        # inject loc_mapper into newly created modulestore if it needs it
+        if name == 'split' and _loc_singleton is not None:
+            _MODULESTORES['split'].loc_mapper = _loc_singleton
 
     return _MODULESTORES[name]
 
@@ -91,6 +94,9 @@ def loc_mapper():
     if _loc_singleton is None:
         # instantiate
         _loc_singleton = LocMapperStore(settings.modulestore_options)
+    # inject into split mongo modulestore
+    if 'split' in _MODULESTORES:
+        _MODULESTORES['split'].loc_mapper = _loc_singleton
     return _loc_singleton
 
 

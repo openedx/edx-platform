@@ -5,20 +5,21 @@ import pymongo
 import re
 from importlib import import_module
 from path import path
+import collections
+import copy
+from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree, LocalId
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
-from xmodule.modulestore import inheritance, ModuleStoreBase
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
+from xmodule.modulestore import inheritance, ModuleStoreBase, Location
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
 from xblock.fields import Scope
 from xblock.runtime import Mixologist
-from pytz import UTC
-import collections
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -49,14 +50,17 @@ class SplitMongoModuleStore(ModuleStoreBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
+    # pylint: disable=C0103
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
                  user=None, password=None,
                  mongo_options=None,
+                 loc_mapper=None,
                  **kwargs):
 
         super(SplitMongoModuleStore, self).__init__(**kwargs)
+        self.loc_mapper = loc_mapper
         if mongo_options is None:
             mongo_options = {}
 
@@ -320,6 +324,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
+        # intended for temporary support of some pointers being old-style
+        if isinstance(location, Location):
+            if self.loc_mapper is None:
+                raise InsufficientSpecificationError('No location mapper configured')
+            else:
+                location = self.loc_mapper.translate_location(
+                    None, location, location.revision is None,
+                    add_entry_if_missing=False
+                )
         assert isinstance(location, BlockUsageLocator)
         if not location.is_initialized():
             raise InsufficientSpecificationError("Not yet initialized: %s" % location)
