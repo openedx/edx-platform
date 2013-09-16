@@ -165,7 +165,7 @@ def log_into_studio(
     world.log_in(username=uname, password=password, email=email, name=name)
     # Navigate to the studio dashboard
     world.visit('/')
-    assert_in(uname, world.css_text('h2.title', timeout=60))
+    assert_in(uname, world.css_text('h2.title', timeout=10))
 
 
 def create_a_course():

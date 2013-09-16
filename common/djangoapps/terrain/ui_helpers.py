@@ -5,7 +5,7 @@ from lettuce import world
 import time
 import platform
 from urllib import quote_plus
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -54,8 +54,11 @@ def wait_for_present(css_selector, timeout=30):
     Throws an error if the wait_for time expires.
     Otherwise this method will return None
     """
-    WebDriverWait(driver=world.browser.driver,
-        timeout=60).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    try:
+        WebDriverWait(driver=world.browser.driver,
+            timeout=60).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    except TimeoutException:
+        raise TimeoutException("Timed out waiting for {} to be present.".format(css_selector))
 
 
 @world.absorb
@@ -65,8 +68,11 @@ def wait_for_visible(css_selector, timeout=30):
     Throws an error if the wait_for time expires.
     Otherwise this method will return None
     """
-    WebDriverWait(driver=world.browser.driver,
-        timeout=timeout).until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    try:
+        WebDriverWait(driver=world.browser.driver,
+            timeout=timeout).until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    except TimeoutException:
+        raise TimeoutException("Timed out waiting for {} to be visible.".format(css_selector))
 
 
 @world.absorb
@@ -76,8 +82,11 @@ def wait_for_invisible(css_selector, timeout=30):
     Throws an error if the wait_for time expires.
     Otherwise this method will return None
     """
-    WebDriverWait(driver=world.browser.driver,
-        timeout=timeout).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    try:
+        WebDriverWait(driver=world.browser.driver,
+            timeout=timeout).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+    except TimeoutException:
+        raise TimeoutException("Timed out waiting for {} to be invisible.".format(css_selector))
 
 
 @world.absorb
@@ -89,8 +98,11 @@ def wait_for_clickable(css_selector, timeout=30):
     """
     # Sometimes the element is clickable then gets obscured.
     # In this case, pause so that it is not reported clickable too early
-    WebDriverWait(world.browser.driver,
-        timeout=timeout).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector,)))
+    try:
+        WebDriverWait(world.browser.driver,
+            timeout=timeout).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector,)))
+    except TimeoutException:
+        raise TimeoutException("Timed out waiting for {} to be clickable.".format(css_selector))
 
 
 @world.absorb
@@ -114,7 +126,8 @@ def css_click(css_selector, index=0, wait_time=30):
     This method will return True if the click worked.
     """
     wait_for_clickable(css_selector, timeout=wait_time)
-    assert world.css_find(css_selector)[index].visible
+    assert_true(world.css_find(css_selector)[index].visible,
+                msg="Element {}[{}] is present but not visible".format(css_selector, index))
 
     # Sometimes you can't click in the center of the element, as
     # another element might be on top of it. In this case, try
@@ -146,7 +159,8 @@ def css_click_at(css_selector, index=0, x_coord=10, y_coord=10, timeout=5):
     '''
     wait_for_clickable(css_selector, timeout=timeout)
     element = css_find(css_selector)[index]
-    assert element.visible
+    assert_true(element.visible,
+                msg="Element {}[{}] is present but not visible".format(css_selector, index))
 
     element.action_chains.move_to_element_with_offset(element._element, x_coord, y_coord)
     element.action_chains.click()
@@ -158,7 +172,7 @@ def id_click(elem_id):
     """
     Perform a click on an element as specified by its id
     """
-    css_click('#%s' % elem_id)
+    css_click('#{}'.format(elem_id))
 
 
 @world.absorb
