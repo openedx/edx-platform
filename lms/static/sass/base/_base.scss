@@ -223,7 +223,7 @@ mark {
 }
 
 .sr {
-  @extend .text-sr;
+  @extend %text-sr;
 }
 
 .help-tab {
