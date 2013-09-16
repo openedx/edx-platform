@@ -30,13 +30,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
-        # TODO find all references to resources_fs and make handle None
         super(CachingDescriptorSystem, self).__init__(load_item=self._load_item, **kwargs)
         self.modulestore = modulestore
         self.course_entry = course_entry
         self.lazy = lazy
         self.module_data = module_data
-        # TODO see if self.course_id is needed: is already in course_entry but could be > 1 value
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry.get('blocks', {}),
@@ -60,7 +58,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             self.modulestore.cache_items(self, [usage_id], lazy=self.lazy)
             json_data = self.module_data.get(usage_id)
             if json_data is None:
-                raise ItemNotFoundError
+                raise ItemNotFoundError(usage_id)
 
         class_ = XModuleDescriptor.load_class(
             json_data.get('category'),

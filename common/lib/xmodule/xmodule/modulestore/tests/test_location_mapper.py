@@ -192,6 +192,14 @@ class TestLocationMapper(unittest.TestCase):
             add_entry_if_missing=True
         )
         self.assertEqual(prob_locator.course_id, new_style_course_id)
+        # create an entry w/o a guid name
+        other_location = Location('i4x', org, course, 'chapter', 'intro')
+        locator = loc_mapper().translate_location(
+            old_style_course_id,
+            other_location,
+            add_entry_if_missing=True
+        )
+        self.assertEqual(locator.usage_id, 'intro')
 
         # add a distractor course
         loc_mapper().create_map_entry(
