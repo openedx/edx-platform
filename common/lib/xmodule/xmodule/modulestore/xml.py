@@ -29,7 +29,7 @@ from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+                                 remove_comments=False, remove_blank_text=True)
 
 etree.set_default_parser(edx_xml_parser)
 
