@@ -362,17 +362,21 @@ function () {
     // On mouseLeave, show the outline of a caption that has been tabbed to.
     function captionMouseEnterLeave(event) {
         var caption = $(event.target),
-            outlineWidth = (event.type === 'mouseleave') ? 1 : 0,
             captionIndex = parseInt(caption.attr('data-index'), 10); 
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
-            caption.css('outlineWidth', outlineWidth + 'px');
+            if (event.type === 'mouseenter') {
+                caption.removeClass('focused').addClass('unfocused');
+            }
+            else { // mouseleave
+                caption.removeClass('unfocused').addClass('focused');
+            }
         } 
     }
 
     function captionMouseDown(event) {
         var caption = $(event.target);
         this.videoCaption.isMouseFocus = true;
-        caption.css('outlineWidth', '0px');
+        caption.removeClass('focused').addClass('unfocused');
         this.videoCaption.autoScrolling = true;
     }
 
@@ -383,23 +387,19 @@ function () {
     function captionFocus(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
-        // If the focus comes from a mouse click, hide the outline and turn on
-        // automatic scrolling.
+        // If the focus comes from a mouse click, hide the outline, turn on
+        // automatic scrolling and set currentCaptionIndex to point outside of
+        // caption list (ie -1) to disable mouseenter, mouseleave behavior. 
         if (this.videoCaption.isMouseFocus) {
             this.videoCaption.autoScrolling = true;
-            caption.css({
-                'outlineWidth': '0px',
-                'outlineStyle': 'none'
-            });
+            caption.removeClass('focused').addClass('unfocused');
+            this.videoCaption.currentCaptionIndex = -1;
         }
         // If the focus comes from tabbing, show the outline and turn off 
         // automatic scrolling.
         else {
             this.videoCaption.currentCaptionIndex = captionIndex;
-            caption.css({
-                'outlineWidth': '1px',
-                'outlineStyle': 'dotted'
-            });
+            caption.removeClass('unfocused').addClass('focused');
             // The second and second to last elements turn automatic scrolling
             // off again as it may have been enabled in captionBlur.    
             if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
@@ -411,10 +411,7 @@ function () {
     function captionBlur(event) {
         var caption = $(event.target), 
             captionIndex = parseInt(caption.attr('data-index'), 10);
-        caption.css({
-            'outlineWidth': '0px',
-            'outlineStyle': 'none'
-        });
+        caption.removeClass('focused').addClass('unfocused');
         // If we are on first or last index, we have to turn automatic scroll on
         // again when losing focus. There is no way to know in what direction we
         // are tabbing. So we could be on the first element and tabbing back out

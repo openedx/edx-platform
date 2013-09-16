@@ -531,6 +531,16 @@ div.video {
         font-weight: 700;
       }
 
+      &.unfocused {
+        outline-width: 0px;
+        outline-style: none;
+      }
+
+      &.focused {
+        outline-width: 1px;
+        outline-style: dotted;
+      }
+
       &:hover {
         color: $blue;
       }
