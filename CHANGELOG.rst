@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Fixed a bug that caused links from forum user profile pages to
+threads to lead to 404s if the course id contained a '-' character.
+
 Common: Added configurable backends for tracking events. Tracking events using
 the python logging module is the default backend. Support for MongoDB and a
 Django database is also available.
