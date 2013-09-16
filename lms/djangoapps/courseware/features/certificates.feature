@@ -8,6 +8,9 @@ Feature: Verified certificates
         When I select the audit track
         Then I should see the course on my dashboard
 
+    # There is currently no way to avoid trying to upload
+    # the photos to S3 for processing
+    @skip
     Scenario: I can submit photos to verify my identity
         Given I am logged in
         When I select the verified track
@@ -23,11 +26,18 @@ Feature: Verified certificates
         And I go to step "4"
         Then I am at the payment page
 
+    # There is currently no way to avoid trying to upload
+    # the photos to S3 for processing
+    @skip
     Scenario: I can pay for a verified certificate
         Given I have submitted photos to verify my identity
         When I submit valid payment information
         Then I see that my payment was successful
 
+
+    # There is currently no way to avoid trying to upload
+    # the photos to S3 for processing
+    @skip
     Scenario: Verified courses display correctly on dashboard
         Given I have submitted photos to verify my identity
         When I submit valid payment information
