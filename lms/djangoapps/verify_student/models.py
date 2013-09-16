@@ -500,7 +500,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         header_txt = "\n".join(
             "{}: {}".format(h, v) for h,v in sorted(headers.items())
         )
-        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
+        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
         return header_txt + "\n\n" + body_txt
 
@@ -509,7 +509,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
+            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
         )
         log.debug("Sent request to Software Secure for {}".format(self.receipt_id))
         log.debug("Headers:\n{}\n\n".format(headers))
