@@ -256,4 +256,4 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_VHOST)
 
 # Student identity verification settings
-VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", "")
+VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
