@@ -648,6 +648,13 @@ class TestItemCrud(SplitModuleTest):
                 continue_version=True
             )
 
+        # start a new transaction
+        new_ele = modulestore().create_item(
+            new_course.location, 'chapter', user,
+            fields={'display_name': 'chapter 2'},
+            continue_version=False
+        )
+        transaction_guid = new_ele.location.version_guid
         # ensure force w/ continue gives exception
         with self.assertRaises(VersionConflictError):
             _fail = modulestore().create_item(
@@ -656,13 +663,6 @@ class TestItemCrud(SplitModuleTest):
                 force=True, continue_version=True
             )
 
-        # start a new transaction
-        new_ele = modulestore().create_item(
-            new_course.location, 'chapter', user,
-            fields={'display_name': 'chapter 2'},
-            continue_version=False
-        )
-        transaction_guid = new_ele.location.version_guid
         # ensure trying to continue the old one gives exception
         with self.assertRaises(VersionConflictError):
             _fail = modulestore().create_item(

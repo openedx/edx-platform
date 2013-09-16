@@ -1201,7 +1201,12 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 inheriting_settings[field_name] = block_fields[field_name]
 
         for child in block_fields.get('children', []):
-            self.inherit_settings(block_map, block_map[child], inheriting_settings)
+            try:
+                self.inherit_settings(block_map, block_map[child], inheriting_settings)
+            except KeyError:
+                # here's where we need logic for looking up in other structures when we allow cross pointers
+                # but it's also getting this during course creation if creating top down w/ children set.
+                pass
 
     def descendants(self, block_map, usage_id, depth, descendent_map):
         """
@@ -1235,6 +1240,22 @@ class SplitMongoModuleStore(ModuleStoreBase):
             return None
         else:
             return DescriptionLocator(definition['_id'])
+
+    def internal_clean_children(self, course_locator):
+        """
+        Only intended for rather low level methods to use. Goes through the children attrs of
+        each block removing any whose usage_id is not a member of the course. Does not generate
+        a new version of the course but overwrites the existing one.
+
+        :param course_locator: the course to clean
+        """
+        original_structure = self._lookup_course(course_locator)
+        for block in original_structure['blocks'].itervalues():
+            if 'fields' in block and 'children' in block['fields']:
+                block['fields']["children"] = [
+                    usage_id for usage_id in block['fields']["children"] if usage_id in original_structure['blocks']
+                ]
+        self.structures.update({'_id': original_structure['_id']}, original_structure)
 
 
     def _block_matches(self, value, qualifiers):
