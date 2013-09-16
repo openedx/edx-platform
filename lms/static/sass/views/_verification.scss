@@ -1414,6 +1414,10 @@
   // VIEW: requirements
   &.step-requirements {
 
+    .help-item-technical {
+      display: none;
+    }
+
     // progress nav
     .progress .progress-step {
 
