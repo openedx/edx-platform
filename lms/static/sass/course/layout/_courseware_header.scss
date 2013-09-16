@@ -112,7 +112,7 @@ header.global.slim {
     padding-right: 20px;
 
     &:before {
-      @extend .faded-vertical-divider;
+      @extend %faded-vertical-divider;
       content: "";
       display: block;
       height: 35px;
@@ -123,7 +123,7 @@ header.global.slim {
     }
 
     &:after {
-      @extend .faded-vertical-divider-light;
+      @extend %faded-vertical-divider-light;
       content: "";
       display: block;
       height: 35px;
