@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_equal  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror
 
 DISPLAY_NAME = "Display Name"
@@ -197,9 +197,20 @@ def high_level_source_in_editor(step):
 
 
 def verify_high_level_source_links(step, visible):
-    assert_equal(visible, world.is_css_present('.launch-latex-compiler'))
+    if visible:
+        assert_true(world.is_css_present('.launch-latex-compiler'),
+                    msg="Expected to find the latex button but it is not present.")
+    else:
+        assert_true(world.is_css_not_present('.launch-latex-compiler'),
+                    msg="Expected not to find the latex button but it is present.")
+
     world.cancel_component(step)
-    assert_equal(visible, world.is_css_present('.upload-button'))
+    if visible:
+        assert_true(world.is_css_present('.upload-button'),
+                    msg="Expected to find the upload button but it is not present.")
+    else:
+        assert_true(world.is_css_not_present('.upload-button'),
+                    msg="Expected not to find the upload button but it is present.")
 
 
 def verify_modified_weight():

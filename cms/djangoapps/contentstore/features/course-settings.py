@@ -113,7 +113,7 @@ def test_i_have_entered_a_new_course_start_date(step):
 
 @step('The warning about course start date goes away$')
 def test_the_warning_about_course_start_date_goes_away(step):
-    assert_equal(0, len(world.css_find('.message-error')))
+    assert world.is_css_not_present('.message-error')
     assert_false('error' in world.css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
     assert_false('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 

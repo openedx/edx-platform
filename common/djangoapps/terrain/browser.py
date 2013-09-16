@@ -75,7 +75,8 @@ def make_desired_capabilities():
     desired_capabilities['build'] = settings.SAUCE.get('BUILD')
     desired_capabilities['video-upload-on-pass'] = False
     desired_capabilities['sauce-advisor'] = False
-    desired_capabilities['record-screenshots'] = False
+    desired_capabilities['capture-html'] = True
+    desired_capabilities['record-screenshots'] = True
     desired_capabilities['selenium-version'] = "2.34.0"
     desired_capabilities['max-duration'] = 3600
     desired_capabilities['public'] = 'public restricted'
@@ -164,15 +165,18 @@ def reset_databases(scenario):
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
-# Uncomment below to trigger a screenshot on error
-# @after.each_scenario
+@after.each_scenario
 def screenshot_on_error(scenario):
     """
     Save a screenshot to help with debugging.
     """
     if scenario.failed:
-        world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
-
+        try:
+            output_dir = '{}/log'.format(settings.TEST_ROOT)
+            image_name = '{}/{}.png'.format(output_dir, scenario.name.replace(' ', '_'))
+            world.browser.driver.save_screenshot(image_name)
+        except WebDriverException:
+            LOGGER.error('Could not capture a screenshot')
 
 @after.all
 def teardown_browser(total):
