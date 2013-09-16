@@ -187,27 +187,27 @@
     width: flex-grid(12);
 
     &::before {
-      @extend .faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium;
       content: "";
       display: block;
     }
 
     &::after {
-      @extend .faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium;
       content: "";
       display: block;
     }
 
 
     hr {
-      @extend .faded-hr-divider-light;
+      @extend %faded-hr-divider-light;
       border: none;
       margin: 0px;
       position: relative;
       z-index: 2;
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         bottom: 0px;
         content: "";
         display: block;
@@ -229,7 +229,7 @@
         overflow: hidden;
 
         &::before {
-          @extend .faded-vertical-divider;
+          @extend %faded-vertical-divider;
           content: "";
           display: block;
           height: 80px;
@@ -240,7 +240,7 @@
         }
 
         &::after {
-          @extend .faded-vertical-divider-light;
+          @extend %faded-vertical-divider-light;
           content: "";
           display: block;
           height: 80px;

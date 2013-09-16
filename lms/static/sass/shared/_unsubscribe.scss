@@ -4,7 +4,7 @@
   h1 {
     margin-bottom: 20px;
     padding: 10px;
-    @extend .success-message-colors;
+    @extend %success-message-colors;
   }
 
   h1 + hr {
