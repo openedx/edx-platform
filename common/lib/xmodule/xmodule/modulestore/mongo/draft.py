@@ -239,7 +239,8 @@ class DraftModuleStore(MongoModuleStore):
         draft.published_date = datetime.now(UTC)
         draft.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft.get_explicitly_set_fields_by_scope(Scope.content))
-        super(DraftModuleStore, self).update_children(location, draft.children)
+        if draft.has_children:
+            super(DraftModuleStore, self).update_children(location, draft.children)
         super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)
 
