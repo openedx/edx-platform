@@ -123,11 +123,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 new_module_data
             )
 
-        # remove any which were already in module_data (not sure if there's a better way)
-        for newkey in new_module_data.iterkeys():
-            if newkey in system.module_data:
-                del new_module_data[newkey]
-
         if lazy:
             for block in new_module_data.itervalues():
                 block['definition'] = DefinitionLazyLoader(self, block['definition'])
@@ -636,45 +631,58 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return id_root
 
-    # TODO Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
+    # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
     # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
     # validation behavior a responsibility of the model layer rather than the persistence layer.
-    def create_item(self, course_or_parent_locator, category, user_id, definition_locator=None, fields=None,
-        force=False):
+    def create_item(self, course_or_parent_locator, category, user_id,
+        usage_id=None, definition_locator=None, fields=None,
+        force=False, continue_version=False):
         """
         Add a descriptor to persistence as the last child of the optional parent_location or just as an element
         of the course (if no parent provided). Return the resulting post saved version with populated locators.
 
-        If the locator is a BlockUsageLocator, then it's assumed to be the parent. If it's a CourseLocator, then it's
+        :param course_or_parent_locator: If BlockUsageLocator, then it's assumed to be the parent.
+        If it's a CourseLocator, then it's
         merely the containing course.
 
         raises InsufficientSpecificationError if there is no course locator.
         raises VersionConflictError if course_id and version_guid given and the current version head != version_guid
             and force is not True.
-        force: fork the structure and don't update the course draftVersion if the above
+        :param force: fork the structure and don't update the course draftVersion if the above
+        :param continue_revision: for multistep transactions, continue revising the given version rather than creating
+        a new version. Setting force to True conflicts with setting this to True and will cause a VersionConflictError
 
-        The incoming definition_locator should either be None to indicate this is a brand new definition or
+        :param definition_locator: should either be None to indicate this is a brand new definition or
         a pointer to the existing definition to which this block should point or from which this was derived.
         If fields does not contain any Scope.content, then definition_locator must have a value meaning that this
         block points
         to the existing definition. If fields contains Scope.content and definition_locator is not None, then
         the Scope.content fields are assumed to be a new payload for definition_locator.
 
-        Creates a new version of the course structure, creates and inserts the new block, makes the block point
+        :param usage_id: if provided, must not already exist in the structure. Provides the block id for the
+        new item in this structure. Otherwise, one is computed using the category appended w/ a few digits.
+
+        :param continue_version: continue changing the current structure at the head of the course. Very dangerous
+        unless used in the same request as started the change! See below about version conflicts.
+
+        This method creates a new version of the course structure unless continue_version is True.
+        It creates and inserts the new block, makes the block point
         to the definition which may be new or a new version of an existing or an existing.
+
         Rules for course locator:
 
         * If the course locator specifies a course_id and either it doesn't
-          specify version_guid or the one it specifies == the current draft, it progresses the course to point
-          to the new draft and sets the active version to point to the new draft
-        * If the locator has a course_id but its version_guid != current draft, it raises VersionConflictError.
+          specify version_guid or the one it specifies == the current head of the branch,
+          it progresses the course to point
+          to the new head and sets the active version to point to the new head
+        * If the locator has a course_id but its version_guid != current head, it raises VersionConflictError.
 
         NOTE: using a version_guid will end up creating a new version of the course. Your new item won't be in
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
         # find course_index entry if applicable and structures entry
-        index_entry = self._get_index_if_valid(course_or_parent_locator, force)
+        index_entry = self._get_index_if_valid(course_or_parent_locator, force, continue_version)
         structure = self._lookup_course(course_or_parent_locator)
 
         partitioned_fields = self._partition_fields_by_scope(category, fields)
@@ -686,17 +694,21 @@ class SplitMongoModuleStore(ModuleStoreBase):
             definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
 
         # copy the structure and modify the new one
-        new_structure = self._version_structure(structure, user_id)
+        if continue_version:
+            new_structure = structure
+        else:
+            new_structure = self._version_structure(structure, user_id)
+
         # generate an id
-        new_usage_id = self._generate_usage_id(new_structure['blocks'], category)
+        if usage_id is not None:
+            if usage_id in new_structure['blocks']:
+                raise DuplicateItemError(usage_id, self, 'structures')
+            else:
+                new_usage_id = usage_id
+        else:
+            new_usage_id = self._generate_usage_id(new_structure['blocks'], category)
+
         update_version_keys = ['blocks.{}.edit_info.update_version'.format(new_usage_id)]
-        if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.usage_id is not None:
-            parent = new_structure['blocks'][course_or_parent_locator.usage_id]
-            parent['fields'].setdefault('children', []).append(new_usage_id)
-            parent['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-            parent['edit_info']['edited_by'] = user_id
-            parent['edit_info']['previous_version'] = parent['edit_info']['update_version']
-            update_version_keys.append('blocks.{}.edit_info.update_version'.format(course_or_parent_locator.usage_id))
         block_fields = partitioned_fields.get(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
@@ -710,19 +722,41 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 'previous_version': None
             }
         }
-        new_id = self.structures.insert(new_structure)
+        # if given parent, add new block as child and update parent's version
+        parent = None
+        if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.usage_id is not None:
+            parent = new_structure['blocks'][course_or_parent_locator.usage_id]
+            parent['fields'].setdefault('children', []).append(new_usage_id)
+            if not continue_version or parent['edit_info']['update_version'] != structure['_id']:
+                parent['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+                parent['edit_info']['edited_by'] = user_id
+                parent['edit_info']['previous_version'] = parent['edit_info']['update_version']
+                update_version_keys.append(
+                    'blocks.{}.edit_info.update_version'.format(course_or_parent_locator.usage_id)
+                )
+        if continue_version:
+            new_id = structure['_id']
+            # db update
+            self.structures.update({'_id': new_id}, new_structure)
+            # clear cache so things get refetched and inheritance recomputed
+            self._clear_cache()
+        else:
+            new_id = self.structures.insert(new_structure)
+
         update_version_payload = {key: new_id for key in update_version_keys}
-        self.structures.update({'_id': new_id},
+        self.structures.update(
+            {'_id': new_id},
             {'$set': update_version_payload})
 
         # update the index entry if appropriate
         if index_entry is not None:
-            self._update_head(index_entry, course_or_parent_locator.branch, new_id)
+            if not continue_version:
+                self._update_head(index_entry, course_or_parent_locator.branch, new_id)
             course_parent = course_or_parent_locator.as_course_locator()
         else:
             course_parent = None
 
-        # fetch and return the new item--fetching is unnecessary but a good qc step
+        # reconstruct the new_item from the cache
         return self.get_item(BlockUsageLocator(course_id=course_parent,
                                                usage_id=new_usage_id,
                                                version_guid=new_id))
@@ -1245,10 +1279,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         if len(lista) != len(listb):
             return False
-        for idx in enumerate(lista):
-            if lista[idx] != listb[idx]:
-                itema = self._usage_id(lista[idx])
-                if itema != self._usage_id(listb[idx]):
+        for ele_a, ele_b in zip(lista, listb):
+            if ele_a != ele_b:
+                if self._usage_id(ele_a) != self._usage_id(ele_b):
                     return False
         return True
 
@@ -1262,22 +1295,31 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return xblock_or_id
 
-    def _get_index_if_valid(self, locator, force=False):
+    def _get_index_if_valid(self, locator, force=False, continue_version=False):
         """
         If the locator identifies a course and points to its draft (or plausibly its draft),
         then return the index entry.
 
         raises VersionConflictError if not the right version
 
-        :param locator:
+        :param locator: a courselocator
+        :param force: if false, raises VersionConflictError if the current head of the course != the one identified
+        by locator. Cannot be True if continue_version is True
+        :param continue_version: if True, assumes this operation requires a head version and will not create a new
+        version but instead continue an existing transaction on this version. This flag cannot be True if force is True.
         """
         if locator.course_id is None or locator.branch is None:
-            return None
+            if continue_version:
+                raise InsufficientSpecificationError(
+                    "To continue a version, the locator must point to one ({}).".format(locator)
+                )
+            else:
+                return None
         else:
             index_entry = self.course_index.find_one({'_id': locator.course_id})
             if (locator.version_guid is not None
                 and index_entry['versions'][locator.branch] != locator.version_guid
-                and not force):
+                and not force) or (force and continue_version):
                 raise VersionConflictError(
                     locator,
                     CourseLocator(
@@ -1293,8 +1335,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         :param structure:
         :param user_id:
         """
-        new_structure = structure.copy()
-        new_structure['blocks'] = new_structure['blocks'].copy()
+        new_structure = copy.deepcopy(structure)
         del new_structure['_id']
         new_structure['previous_version'] = structure['_id']
         new_structure['edited_by'] = user_id
