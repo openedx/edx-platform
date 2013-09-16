@@ -26,6 +26,8 @@ $(document).ready(function() {
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
 
+    var language = "ru"; //if you have a multilanguage site you should set this varibale in the current user language
+
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
 
@@ -155,6 +157,8 @@ $(document).ready(function() {
     $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
+
+    $.datepicker.setDefaults( $.datepicker.regional[language] );
 });
 
 function smoothScrollLink(e) {
