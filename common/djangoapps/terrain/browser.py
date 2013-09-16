@@ -88,7 +88,6 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
-    # from nose.tools import set_trace; set_trace()
     world.absorb(settings.SAUCE.get('SAUCE_ENABLED'), 'SAUCE_ENABLED')
 
     if not world.SAUCE_ENABLED:
@@ -166,15 +165,18 @@ def reset_databases(scenario):
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
-# Uncomment below to trigger a screenshot on error
-# @after.each_scenario
+@after.each_scenario
 def screenshot_on_error(scenario):
     """
     Save a screenshot to help with debugging.
     """
     if scenario.failed:
-        world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
-
+        try:
+            output_dir = '{}/log'.format(settings.TEST_ROOT)
+            image_name = '{}/{}.png'.format(output_dir, scenario.name.replace(' ', '_'))
+            world.browser.driver.save_screenshot(image_name)
+        except WebDriverException:
+            LOGGER.error('Could not capture a screenshot')
 
 @after.all
 def teardown_browser(total):

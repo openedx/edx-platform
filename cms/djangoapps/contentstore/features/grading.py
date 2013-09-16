@@ -82,9 +82,9 @@ def see_assignment_name(step, do_not, name):
     assignment_menu = world.css_find(assignment_menu_css)
     allnames = [item.html for item in assignment_menu]
     if do_not:
-        assert_not_in (name, allnames)
+        assert_not_in(name, allnames)
     else:
-        assert_in (name, allnames)
+        assert_in(name, allnames)
 
 
 @step(u'I delete the assignment type "([^"]*)"$')

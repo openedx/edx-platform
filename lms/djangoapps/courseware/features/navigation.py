@@ -80,8 +80,8 @@ def click_on_section(step, section):
     section_css = 'h3[tabindex="-1"]'
     world.css_click(section_css)
 
-    subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
-    subsection_css = 'ul.ui-accordion-content-active[id=\'%s\'] > li > a' % subid
+    subid = "ui-accordion-accordion-panel-{}".format(str(int(section) - 1))
+    subsection_css = "ul.ui-accordion-content-active[id='{}'] > li > a".format(subid)
     world.css_click(subsection_css)
 
 
