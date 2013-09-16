@@ -369,13 +369,20 @@
               </div>
 
               <nav class="nav-wizard">
-                <span class="help help-inline">${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</span>
+                <div class="prompt-verify">
+                  <h3 class="title">Before proceeding, please confirm that your details match</h3>
+
+                   <p class="copy"> ${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</p>
+
+                  <ul class="list-actions">
+                    <li class="action action-verify">
+                      <input type="checkbox" name="match" id="confirm_pics_good" />
+                      <label for="confirm_pics_good">${_("Yes! My details all match.")}</label>
+                    </li>
+                  </ul>
+                </div>
 
                 <ol class="wizard-steps">
-                  <li class="wizard-step step-match">
-                    <input type="checkbox" name="match" id="confirm_pics_good" />
-                    <label for="confirm_pics_good">${_("Yes! My details all match.")}</label>
-                  </li>
                   <li class="wizard-step step-proceed">
                     <form id="pay_form" method="post" action="${purchase_endpoint}">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">

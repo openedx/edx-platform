@@ -1672,17 +1672,34 @@
 
     .nav-wizard {
 
-      .help-inline {
-        width: flex-grid(4,12);
-        margin-top: 0
+      .prompt-verify {
+        float: left;
+        width: flex-grid(6,12);
+        margin: 0 flex-gutter() 0 0;
+
+        .title {
+          @extend .hd-lv4;
+          margin-bottom: ($baseline/4);
+        }
+
+        .copy {
+          @extend .t-copy-sub1;
+          @extend .t-weight3;
+        }
+
+        .list-actions {
+          margin-top: ($baseline/2);
+        }
+
+        .action-verify label  {
+          @extend .t-copy-sub1;
+        }
       }
 
       .wizard-steps {
-        float: right;
-        width: flex-grid(8,12);
+        margin-top: ($baseline/2);
 
         .wizard-step {
-          width: flex-grid(4,8);
           margin-right: flex-gutter();
           display: inline-block;
           vertical-align: middle;
@@ -1690,13 +1707,6 @@
           &:last-child {
             margin-right: 0;
           }
-        }
-      }
-
-      .step-match {
-
-        label {
-          @extend .t-copy-sub1;
         }
       }
 
