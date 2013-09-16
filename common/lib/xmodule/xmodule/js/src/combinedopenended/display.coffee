@@ -153,9 +153,11 @@ class @CombinedOpenEnded
     @rub = new Rubric(@coe)
     @rub.initialize(@location)
     @is_ctrl = false
+
     #Setup reset
     @reset_button = @$(@reset_button_sel)
-    @reset_button.click @reset
+    @reset_button.click @confirm_reset
+    
     #Setup next problem
     @next_problem_button = @$(@next_step_sel)
     @next_problem_button.click @next_problem
@@ -295,7 +297,7 @@ class @CombinedOpenEnded
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
-      @submit_button.click @save_answer
+      @submit_button.click @confirm_save_answer
       @setup_file_upload()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
@@ -308,7 +310,7 @@ class @CombinedOpenEnded
         @submit_button.hide()
         @queueing()
         @grader_status = @$(@grader_status_sel)
-        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span> ")
+        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span>")
       else if @child_type == "selfassessment"
         @setup_score_selection()
     else if @child_state == 'post_assessment'
@@ -357,6 +359,9 @@ class @CombinedOpenEnded
     else
       @can_upload_files = pre_can_upload_files
       @gentle_alert response.error
+
+  confirm_save_answer: (event) =>
+    @save_answer(event) if confirm('Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.')
 
   save_answer: (event) =>
     @submit_button.attr("disabled",true)
@@ -456,6 +461,9 @@ class @CombinedOpenEnded
           @errors_area.html(response.error)
     else
       @errors_area.html(@out_of_sync_message)
+
+  confirm_reset: (event) =>
+    @reset(event) if confirm('Are you sure you want to remove your previous response to this question?')
 
   reset: (event) =>
     event.preventDefault()
