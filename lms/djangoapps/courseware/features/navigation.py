@@ -80,13 +80,9 @@ def click_on_section(step, section):
     section_css = 'h3[tabindex="-1"]'
     world.css_click(section_css)
 
-    subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
-    subsection_css = 'ul.ui-accordion-content-active[id=\'%s\'] > li > a' % subid
-    prev_url = world.browser.url
-    changed_section = lambda: prev_url != world.browser.url
-
-    #for some reason needed to do it in two steps
-    world.css_click(subsection_css, success_condition=changed_section)
+    subid = "ui-accordion-accordion-panel-{}".format(str(int(section) - 1))
+    subsection_css = "ul.ui-accordion-content-active[id='{}'] > li > a".format(subid)
+    world.css_click(subsection_css)
 
 
 @step(u'I click on subsection "([^"]*)"$')

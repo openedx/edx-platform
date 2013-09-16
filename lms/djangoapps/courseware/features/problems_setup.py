@@ -166,6 +166,8 @@ def answer_problem(problem_type, correctness):
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
+        # First wait for the element to be there on the page
+        world.wait_for_visible("select#{}".format(select_name))
         world.browser.select(select_name, option_text)
 
     elif problem_type == "multiple choice":
