@@ -111,7 +111,7 @@ def enrich_varname(varname):
     """
     greek = ("alpha beta gamma delta epsilon varepsilon zeta eta theta "
              "vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon "
-             "phi varphi chi psi omega hbar").split()
+             "phi varphi chi psi omega").split()
 
     # add capital greek letters
     greek += [x.capitalize() for x in greek]
