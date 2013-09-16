@@ -670,8 +670,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         result = {}
         for field in self.fields.values():
-            if (field.scope == scope and self._field_data.has(self, field.name)):
-                result[field.name] = self._field_data.get(self, field.name)
+            if (field.scope == scope and field.is_set_on(self)):
+                result[field.name] = field.read_json(self)
         return result
 
     @property

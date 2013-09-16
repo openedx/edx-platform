@@ -15,6 +15,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.mongo.base import location_to_query, namedtuple_to_son, get_course_id_no_run, MongoModuleStore
 import pymongo
 from pytz import UTC
+from xblock.fields import Scope
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'
@@ -237,8 +238,8 @@ class DraftModuleStore(MongoModuleStore):
 
         draft.published_date = datetime.now(UTC)
         draft.published_by = published_by_id
-        super(DraftModuleStore, self).update_item(location, draft._field_data._kvs._data)
-        super(DraftModuleStore, self).update_children(location, draft._field_data._kvs._children)
+        super(DraftModuleStore, self).update_item(location, draft.get_explicitly_set_fields_by_scope(Scope.content))
+        super(DraftModuleStore, self).update_children(location, draft.children)
         super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)
 
