@@ -66,7 +66,7 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode in ("audit", "honor"):
-            CourseEnrollment.enroll(user, course_id)
+            CourseEnrollment.enroll(user, course_id, requested_mode)
             return redirect('dashboard')
 
         mode_info = allowed_modes[requested_mode]
