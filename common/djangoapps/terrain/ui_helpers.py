@@ -6,6 +6,7 @@ import time
 import platform
 from urllib import quote_plus
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -45,18 +46,25 @@ def css_has_text(css_selector, text, index=0):
 
 @world.absorb
 def wait_for(func, timeout=5):
-        WebDriverWait(world.browser.driver, timeout).until(func)
+        WebDriverWait(
+            driver=world.browser.driver,
+            timeout=timeout,
+            ignored_exceptions=(StaleElementReferenceException)
+        ).until(func)
 
 
 def wait_for_present(css_selector, timeout=30):
     """
     Waiting for the element to be present in the DOM.
-    Throws an error if the wait_for time expires.
+    Throws an error if the WebDriverWait timeout clock expires.
     Otherwise this method will return None
     """
     try:
-        WebDriverWait(driver=world.browser.driver,
-            timeout=60).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector,)))
+        WebDriverWait(
+            driver=world.browser.driver,
+            timeout=timeout,
+            ignored_exceptions=(StaleElementReferenceException)
+        ).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector,)))
     except TimeoutException:
         raise TimeoutException("Timed out waiting for {} to be present.".format(css_selector))
 
@@ -65,12 +73,15 @@ def wait_for_present(css_selector, timeout=30):
 def wait_for_visible(css_selector, timeout=30):
     """
     Waiting for the element to be visible in the DOM.
-    Throws an error if the wait_for time expires.
+    Throws an error if the WebDriverWait timeout clock expires.
     Otherwise this method will return None
     """
     try:
-        WebDriverWait(driver=world.browser.driver,
-            timeout=timeout).until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+        WebDriverWait(
+            driver=world.browser.driver,
+            timeout=timeout,
+            ignored_exceptions=(StaleElementReferenceException)
+        ).until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
     except TimeoutException:
         raise TimeoutException("Timed out waiting for {} to be visible.".format(css_selector))
 
@@ -79,12 +90,15 @@ def wait_for_visible(css_selector, timeout=30):
 def wait_for_invisible(css_selector, timeout=30):
     """
     Waiting for the element to be either invisible or not present on the DOM.
-    Throws an error if the wait_for time expires.
+    Throws an error if the WebDriverWait timeout clock expires.
     Otherwise this method will return None
     """
     try:
-        WebDriverWait(driver=world.browser.driver,
-            timeout=timeout).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
+        WebDriverWait(
+            driver=world.browser.driver,
+            timeout=timeout,
+            ignored_exceptions=(StaleElementReferenceException)
+        ).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, css_selector,)))
     except TimeoutException:
         raise TimeoutException("Timed out waiting for {} to be invisible.".format(css_selector))
 
@@ -93,14 +107,17 @@ def wait_for_invisible(css_selector, timeout=30):
 def wait_for_clickable(css_selector, timeout=30):
     """
     Waiting for the element to be present and clickable.
-    Throws an error if the wait_for time expires.
+    Throws an error if the WebDriverWait timeout clock expires.
     Otherwise this method will return None.
     """
     # Sometimes the element is clickable then gets obscured.
     # In this case, pause so that it is not reported clickable too early
     try:
-        WebDriverWait(world.browser.driver,
-            timeout=timeout).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector,)))
+        WebDriverWait(
+            driver=world.browser.driver,
+            timeout=timeout,
+            ignored_exceptions=(StaleElementReferenceException)
+        ).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector,)))
     except TimeoutException:
         raise TimeoutException("Timed out waiting for {} to be clickable.".format(css_selector))
 
@@ -133,7 +150,7 @@ def css_click(css_selector, index=0, wait_time=30):
     # another element might be on top of it. In this case, try
     # clicking in the upper left corner.
     try:
-        return world.css_find(css_selector)[index].click()
+        return retry_on_exception(lambda: world.css_find(css_selector)[index].click())
 
     except WebDriverException:
         return css_click_at(css_selector, index=index)
@@ -177,19 +194,19 @@ def id_click(elem_id):
 
 @world.absorb
 def css_fill(css_selector, text, index=0):
-    css_find(css_selector)[index].fill(text)
+    retry_on_exception(lambda: css_find(css_selector)[index].fill(text))
 
 
 @world.absorb
 def click_link(partial_text, index=0):
-    world.browser.find_link_by_partial_text(partial_text)[index].click()
+    retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click())
 
 
 @world.absorb
 def css_text(css_selector, index=0, timeout=30):
     # Wait for the css selector to appear
     if is_css_present(css_selector):
-        return css_find(css_selector, wait_time=timeout)[index].text
+        return retry_on_exception(lambda: css_find(css_selector, wait_time=timeout)[index].text)
     else:
         return ""
 
@@ -198,7 +215,7 @@ def css_text(css_selector, index=0, timeout=30):
 def css_value(css_selector, index=0):
     # Wait for the css selector to appear
     if is_css_present(css_selector):
-        return css_find(css_selector)[index].value
+        return retry_on_exception(lambda: css_find(css_selector)[index].value)
     else:
         return ""
 
@@ -209,18 +226,18 @@ def css_html(css_selector, index=0):
     Returns the HTML of a css_selector
     """
     assert is_css_present(css_selector)
-    return css_find(css_selector)[index].html
+    return retry_on_exception(lambda: css_find(css_selector)[index].html)
 
 
 @world.absorb
 def css_has_class(css_selector, class_name, index=0):
-    return css_find(css_selector)[index].has_class(class_name)
+    return retry_on_exception(lambda: css_find(css_selector)[index].has_class(class_name))
 
 
 @world.absorb
 def css_visible(css_selector, index=0):
     assert is_css_present(css_selector)
-    return css_find(css_selector)[index].visible
+    return retry_on_exception(lambda: css_find(css_selector)[index].visible)
 
 
 @world.absorb
@@ -277,15 +294,21 @@ def trigger_event(css_selector, event='change', index=0):
 
 
 @world.absorb
-def retry_on_exception(func, max_attempts=5):
+def retry_on_exception(func, max_attempts=5, ignored_exceptions=StaleElementReferenceException):
+    """
+    Retry the interaction, ignoring the passed exceptions.
+    By default ignore StaleElementReferenceException, which happens often in our application
+    when the DOM is being manipulated by client side JS.
+    Note that ignored_exceptions is passed directly to the except block, and as such can be
+    either a single exception or multiple exceptions as a parenthesized tuple.
+    """
     attempt = 0
     while attempt < max_attempts:
         try:
             return func()
             break
-        except WebDriverException:
+        except ignored_exceptions:
             world.wait(1)
             attempt += 1
-        except:
-            attempt += 1
+
     assert_true(attempt < max_attempts, 'Ran out of attempts to execute {}'.format(func))
