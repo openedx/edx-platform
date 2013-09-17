@@ -248,11 +248,11 @@ CMS.Views.EditChapter = Backbone.View.extend({
             onSuccess: function(response) {
                 var options = {};
                 if(!that.model.get('name')) {
-                    options.name = response.displayname;
+                    options.name = response.asset.display_name;
                 }
-                options.asset_path = response.url;
+                options.asset_path = response.asset.url;
                 that.model.set(options);
-            },
+            }
         });
         $(".wrapper-view").after(view.show().el);
     }

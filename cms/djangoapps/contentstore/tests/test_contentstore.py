@@ -593,9 +593,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
@@ -628,7 +628,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_empty_trashcan(self):
         '''
-        This test will exercise the empting of the asset trashcan
+        This test will exercise the emptying of the asset trashcan
         '''
         content_store = contentstore()
         trash_store = contentstore('trashcan')
@@ -644,9 +644,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         # make sure there's something in the trashcan
         all_assets = trash_store.get_all_content_for_course(course_location)

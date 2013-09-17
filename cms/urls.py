@@ -76,8 +76,8 @@ urlpatterns = ('',  # nopep8
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
         'contentstore.views.asset_index', name='asset_index'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/remove$',
-        'contentstore.views.assets.remove_asset', name='remove_asset'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/update/(?P<asset_id>.+)?.*$',
+        'contentstore.views.assets.update_asset', name='update_asset'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',

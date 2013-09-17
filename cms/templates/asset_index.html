@@ -6,38 +6,112 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="header_extras">
+    <script type="text/template" id="asset-tpl">
+        <%static:include path="js/asset.underscore"/>
+    </script>
+</%block>
+
 <%block name="jsextra">
-<script src="${static.url('js/vendor/mustache.js')}"></script>
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+    <script src="${static.url('js/vendor/mustache.js')}"></script>
+    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
+    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+
+    <script type="text/javascript">
+        CMS.URL.UPDATE_ASSET = "${update_asset_callback_url}";
+        var assets = new CMS.Models.AssetCollection(${asset_list});
+        var assetsView = new CMS.Views.Assets({collection: assets, el: $('#asset_table_body')});
+
+        $(document).ready(function() {
+            $('.uploads .upload-button').bind('click', showUploadModal);
+            $('.upload-modal .close-button').bind('click', hideModal);
+            $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+        });
+
+        var showUploadModal = function (e) {
+            e.preventDefault();
+            resetUploadModal();
+            // $modal has to be global for hideModal to work.
+            $modal = $('.upload-modal').show();
+            $('.file-input').bind('change', startUpload);
+            $('.upload-modal .file-chooser').fileupload({
+                dataType: 'json',
+                type: 'POST',
+                maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+                autoUpload: true,
+                progressall: function(e, data) {
+                    var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
+                    showUploadFeedback(e, percentComplete);
+                },
+                maxFileSize: 100 * 1000 * 1000,   // 100 MB
+                maxNumberofFiles: 100,
+                add: function(e, data) {
+                    data.process().done(function () {
+                        data.submit();
+                    });
+                },
+                done: function(e, data) {
+                    displayFinishedUpload(data.result);
+                }
+
+            });
+
+            $modalCover.show();
+        };
+
+        var showFileSelectionMenu = function(e) {
+            e.preventDefault();
+            $('.file-input').click();
+        };
+
+        var startUpload = function (e) {
+            var file = e.target.value;
+
+            $('.upload-modal h1').html(gettext('Uploading…'));
+            $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+            $('.upload-modal .choose-file-button').hide();
+            $('.upload-modal .progress-bar').removeClass('loaded').show();
+        };
+
+        var resetUploadModal = function () {
+            // Reset modal so it no longer displays information about previously
+            // completed uploads.
+            var percentVal = '0%';
+            $('.upload-modal .progress-fill').width(percentVal);
+            $('.upload-modal .progress-fill').html(percentVal);
+            $('.upload-modal .progress-bar').hide();
+
+            $('.upload-modal .file-name').show();
+            $('.upload-modal .file-name').html('');
+            $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+            $('.upload-modal .embeddable-xml-input').val('');
+            $('.upload-modal .embeddable').hide();
+        };
+
+        var showUploadFeedback = function (event, percentComplete) {
+            var percentVal = percentComplete + '%';
+            $('.upload-modal .progress-fill').width(percentVal);
+            $('.upload-modal .progress-fill').html(percentVal);
+        };
+
+        var displayFinishedUpload = function (resp) {
+            var asset = resp.asset;
+
+            $('.upload-modal h1').html(gettext('Upload New File'));
+            $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+            $('.upload-modal .embeddable').show();
+            $('.upload-modal .file-name').hide();
+            $('.upload-modal .progress-fill').html(resp.msg);
+            $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
+            $('.upload-modal .progress-fill').width('100%');
+
+            assetsView.addAsset(new CMS.Models.Asset(asset));
+        };
+
+    </script>
 </%block>
 
 <%block name="content">
-
-  <script type="text/template" id="new-asset-element">
-    <tr data-id='{{url}}'>
-      <td class="thumb-col">
-        <div class="thumb">
-          {{#thumb_url}}
-          <img src="{{thumb_url}}">
-          {{/thumb_url}}
-        </div>
-      </td>
-      <td class="name-col">
-        <a data-tooltip="Open/download this file" href="{{url}}" class="filename">{{displayname}}</a>
-        <div class="embeddable-xml"></div>
-      </td>
-      <td class="date-col">
-        {{uploadDate}}
-      </td>
-      <td class="embed-col">
-        <input type="text" class="embeddable-xml-input" value='{{portable_url}}' readonly>
-      </td>
-      <td class="delete-col">
-        <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-      </td>
-    </tr>
-  </script>
 
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
@@ -62,7 +136,7 @@
       <div class="page-actions">
         <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
       </div>
-      <article class="asset-library" data-remove-asset-callback-url='${remove_asset_callback_url}'>
+      <article class="asset-library">
         <table>
           <thead>
             <tr>
@@ -73,31 +147,8 @@
               <th class="delete-col"></th>
             </tr>
           </thead>
-          <tbody id="asset_table_body">
-          % for asset in assets:
-            <tr data-id="${asset['url']}">
-              <td class="thumb-col">
-                <div class="thumb">
-                  % if asset['thumb_url'] is not None:
-                  <img src="${asset['thumb_url']}">
-                  % endif
-                </div>
-              </td>
-              <td class="name-col">
-                <a data-tooltip="Open/download this file" href="${asset['url']}" class="filename">${asset['displayname']}</a>
-                <div class="embeddable-xml"></div>
-              </td>
-              <td class="date-col">
-                ${asset['uploadDate']}
-              </td>
-              <td class="embed-col">
-                <input type="text" class="embeddable-xml-input" value="${asset['portable_url']}" readonly>
-              </td>
-              <td class="delete-col">
-                <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-              </td>
-            </tr>
-          % endfor
+          <tbody id="asset_table_body" >
+
           </tbody>
         </table>
         <nav class="pagination wip-box">

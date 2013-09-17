@@ -1,75 +1,32 @@
 import logging
-import json
-import os
-import tarfile
-import shutil
-import cgi
-import re
 from functools import partial
-from tempfile import mkdtemp
-from path import path
 
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
-from django.core.servers.basehttp import FileWrapper
-from django.core.files.temp import NamedTemporaryFile
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
 from auth.authz import create_all_course_groups
 
-from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
-from xmodule.exceptions import NotFoundError, SerializationError
+from xmodule.exceptions import NotFoundError
 
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
+import json
+from django.utils.translation import ugettext as _
 
 
 __all__ = ['asset_index', 'upload_asset']
-
-def assets_to_json_dict(assets):
-    """
-    Transform the results of a contentstore query into something appropriate
-    for output via JSON.
-    """
-    ret = []
-    for asset in assets:
-        obj = {
-            "name": asset.get("displayname", ""),
-            "chunkSize": asset.get("chunkSize", 0),
-            "path": asset.get("filename", ""),
-            "length": asset.get("length", 0),
-        }
-        uploaded = asset.get("uploadDate")
-        if uploaded:
-            obj["uploaded"] = uploaded.isoformat()
-        thumbnail = asset.get("thumbnail_location")
-        if thumbnail:
-            obj["thumbnail"] = thumbnail
-        id_info = asset.get("_id")
-        if id_info:
-            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}" \
-                .format(
-                    org=id_info.get("org", ""),
-                    course=id_info.get("course", ""),
-                    revision=id_info.get("revision", ""),
-                    tag=id_info.get("tag", ""),
-                    category=id_info.get("category", ""),
-                    name=id_info.get("name", ""),
-            )
-        ret.append(obj)
-    return ret
 
 
 @login_required
@@ -96,32 +53,21 @@ def asset_index(request, org, course, name):
     # sort in reverse upload date order
     assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
 
-    if request.META.get('HTTP_ACCEPT', "").startswith("application/json"):
-        return JsonResponse(assets_to_json_dict(assets))
-
-    asset_display = []
+    asset_json = []
     for asset in assets:
         asset_id = asset['_id']
-        display_info = {}
-        display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'])
-
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
-        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
-        display_info['portable_url'] = StaticContent.get_static_path_from_location(asset_location)
-
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
         thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
-        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
 
-        asset_display.append(display_info)
+        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location))
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
-        'assets': asset_display,
+        'asset_list': json.dumps(asset_json),
         'upload_asset_callback_url': upload_asset_callback_url,
-        'remove_asset_callback_url': reverse('remove_asset', kwargs={
+        'update_asset_callback_url': reverse('update_asset', kwargs={
             'org': org,
             'course': course,
             'name': name
@@ -171,9 +117,6 @@ def upload_asset(request, org, course, coursename):
         content = sc_partial(upload_file.read())
         tempfile_path = None
 
-    thumbnail_content = None
-    thumbnail_location = None
-
     # first let's see if a thumbnail can be created
     (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
             content,
@@ -195,67 +138,73 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {
-            'displayname': content.name,
-            'uploadDate': get_default_time_display(readback.last_modified_at),
-            'url': StaticContent.get_url_path_from_location(content.location),
-            'portable_url': StaticContent.get_static_path_from_location(content.location),
-            'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location)
-                if thumbnail_content is not None else None,
-            'msg': 'Upload completed'
+        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location),
+        'msg': _('Upload completed')
     }
 
-    response = JsonResponse(response_payload)
-    return response
+    return JsonResponse(response_payload)
 
 
-@ensure_csrf_cookie
+@require_http_methods("DELETE")
 @login_required
-def remove_asset(request, org, course, name):
-    '''
-    This method will perform a 'soft-delete' of an asset, which is basically to
-    copy the asset from the main GridFS collection and into a Trashcan
-    '''
+@ensure_csrf_cookie
+def update_asset(request, org, course, name, asset_id):
+    """
+    restful CRUD operations for a course asset.
+    Currently only the DELETE method is implemented.
+
+    org, course, name: Attributes of the Location for the item to edit
+    asset_id: the URL of the asset (used by Backbone as the id)
+    """
     get_location_and_verify_access(request, org, course, name)
 
-    location = request.POST['location']
-
-    # make sure the location is valid
-    try:
-        loc = StaticContent.get_location_from_path(location)
-    except InvalidLocationError:
-        # return a 'Bad Request' to browser as we have a malformed Location
-        response = HttpResponse()
-        response.status_code = 400
-        return response
-
-    # also make sure the item to delete actually exists
-    try:
-        content = contentstore().find(loc)
-    except NotFoundError:
-        response = HttpResponse()
-        response.status_code = 404
-        return response
-
-    # ok, save the content into the trashcan
-    contentstore('trashcan').save(content)
-
-    # see if there is a thumbnail as well, if so move that as well
-    if content.thumbnail_location is not None:
+    if request.method == 'DELETE':
+        # make sure the location is valid
         try:
-            thumbnail_content = contentstore().find(content.thumbnail_location)
-            contentstore('trashcan').save(thumbnail_content)
-            # hard delete thumbnail from origin
-            contentstore().delete(thumbnail_content.get_id())
-            # remove from any caching
-            del_cached_content(thumbnail_content.location)
-        except:
-            pass  # OK if this is left dangling
+            loc = StaticContent.get_location_from_path(asset_id)
+        except InvalidLocationError as err:
+            # return a 'Bad Request' to browser as we have a malformed Location
+            return JsonResponse({"error": err.message}, status=400)
 
-    # delete the original
-    contentstore().delete(content.get_id())
-    # remove from cache
-    del_cached_content(content.location)
+        # also make sure the item to delete actually exists
+        try:
+            content = contentstore().find(loc)
+        except NotFoundError:
+            return JsonResponse(status=404)
 
-    return HttpResponse()
+        # ok, save the content into the trashcan
+        contentstore('trashcan').save(content)
+
+        # see if there is a thumbnail as well, if so move that as well
+        if content.thumbnail_location is not None:
+            try:
+                thumbnail_content = contentstore().find(content.thumbnail_location)
+                contentstore('trashcan').save(thumbnail_content)
+                # hard delete thumbnail from origin
+                contentstore().delete(thumbnail_content.get_id())
+                # remove from any caching
+                del_cached_content(thumbnail_content.location)
+            except:
+                pass  # OK if this is left dangling
+
+        # delete the original
+        contentstore().delete(content.get_id())
+        # remove from cache
+        del_cached_content(content.location)
+        return JsonResponse()
 
 
+def _get_asset_json(display_name, date, location, thumbnail_location):
+    """
+    Helper method for formatting the asset information to send to client.
+    """
+    asset_url = StaticContent.get_url_path_from_location(location)
+    return {
+        'display_name': display_name,
+        'date_added': get_default_time_display(date),
+        'url': asset_url,
+        'portable_url': StaticContent.get_static_path_from_location(location),
+        'thumbnail': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None,
+        # Needed for Backbone delete/update.
+        'id': asset_url
+    }
