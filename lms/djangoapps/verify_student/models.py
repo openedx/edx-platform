@@ -356,6 +356,26 @@ class PhotoVerification(StatusModel):
         self.status = "denied"
         self.save()
 
+    @status_before_must_be("must_retry", "submitted", "approved", "denied")
+    def system_error(self,
+                     error_msg,
+                     error_code="",
+                     reviewing_user=None,
+                     reviewing_service=""):
+        """
+        Mark that this attempt could not be completed because of a system error.
+        Status should be moved to `must_retry`.
+        """
+        if self.status in ["approved", "denied"]:
+            return # If we were already approved or denied, just leave it.
+
+        self.error_msg = error_msg
+        self.error_code = error_code
+        self.reviewing_user = reviewing_user
+        self.reviewing_service = reviewing_service
+        self.status = "must_retry"
+        self.save()
+
 
 class SoftwareSecurePhotoVerification(PhotoVerification):
     """
@@ -500,7 +520,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         header_txt = "\n".join(
             "{}: {}".format(h, v) for h,v in sorted(headers.items())
         )
-        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
+        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
         return header_txt + "\n\n" + body_txt
 
@@ -509,7 +529,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
+            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            verify=False
         )
         log.debug("Sent request to Software Secure for {}".format(self.receipt_id))
         log.debug("Headers:\n{}\n\n".format(headers))
