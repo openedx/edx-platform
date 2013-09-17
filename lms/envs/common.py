@@ -370,11 +370,11 @@ DEFAULT_FROM_EMAIL = 'noreply.edu@olimpiada.ru'
 DEFAULT_BULK_FROM_EMAIL = 'noreply.edu@olimpiada.ru'
 EMAILS_PER_TASK = 100
 EMAILS_PER_QUERY = 1000
-DEFAULT_FEEDBACK_EMAIL = 'edu@olimpiada.ru'
-SERVER_EMAIL = 'edu@olimpiada.ru'
-TECH_SUPPORT_EMAIL = 'edu@olimpiada.ru'
-CONTACT_EMAIL = 'edu@olimpiada.ru'
-BUGS_EMAIL = 'edu@olimpiada.ru'
+DEFAULT_FEEDBACK_EMAIL = 'edu.olimpiada@yandex.ru'
+SERVER_EMAIL = 'edu.olimpiada@yandex.ru'
+TECH_SUPPORT_EMAIL = 'edu.olimpiada@yandex.ru'
+CONTACT_EMAIL = 'edu.olimpiada@yandex.ru'
+BUGS_EMAIL = 'edu.olimpiada@yandex.ru'
 ADMINS = ()
 MANAGERS = ADMINS
 

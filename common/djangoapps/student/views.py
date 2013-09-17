@@ -1379,18 +1379,36 @@ _ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
+
+@ensure_csrf_cookie
+def accounts_import(request):
+    c = {}
+    c.update(csrf(request))
+    return render_to_response("import_users.html", c) 
+
+
+def UnicodeDictReader(utf8_data, **kwargs):
+    csv_reader = csv.DictReader(utf8_data, **kwargs)
+    for row in csv_reader:
+        yield dict([(key, unicode(value, 'utf-8')) for key, value in row.iteritems()])     
+
 @require_POST
 @login_required
 @ensure_csrf_cookie
 def import_users(request, post_override=None):
     post_vars = post_override if post_override else request.POST
     f = request.FILES['file']
-    data = csv.DictReader(f, delimiter=':', quoting=csv.QUOTE_NONE)
+    if f is None:
+        return render_to_response("import_users.html", {}) 
+
+    data = UnicodeDictReader(f, delimiter=';', quoting=csv.QUOTE_NONE)
 
     js = {}
     js['passwords'] = {}
+    js['log'] = ""
 
-    for idx, row in enumerate(data):
+    for row in data:
+        log.info(row)
         row['firstname'] = row.pop('first-name')
         row['lastname'] = row.pop('second-name')
         row['middlename'] = row.pop('patronymic')
@@ -1398,45 +1416,47 @@ def import_users(request, post_override=None):
         row['work_login'] = row.pop('login')
 
 
-        name = u"%s %s %s" % (post_vars.get('lastname'), post_vars.get('firstname'), post_vars.get('middlename'))
+        name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
 
-        user = User(username=post_vars['email'],
-                email=post_vars['email'],
+        user = User(username=row['email'],
+                email=row['email'],
                 is_active=False)
         password = id_generator(8, _ALPHABET)
         user.set_password(password)
         registration = Registration()
         try:
             user.save()
+            log.info("user save")
         except IntegrityError:
             # Figure out the cause of the integrity error
-            if len(User.objects.filter(email=post_vars['email'])) > 0:
-                user = User.objects.filter(email=post_vars['email'])[0];
+            if len(User.objects.filter(email=row['email'])) > 0:
+                user = User.objects.filter(email=row['email'])[0];
                 profile = UserProfile.objects.get(user=user)
                 if (profile.name != name):
                     js['success'] = False
-                    js['log'] += _('Error in row: %s:Duplicate email with different names: %s') % (idx, row)
+                    js['log'] += u'Error in row: %s:Duplicate email with different names: %s' % (1, row)
                     continue
                 #profile update
                 js['success'] = False
-                js['log'] += _('Error in row: %s:TOO: %s') % (idx, row)
+                js['log'] += u'Error in row: %s:TODO update user discipline: %s' % (1, row)
                 continue
-        raise
+            raise
 
         registration.register(user)
 
         profile = UserProfile(user=user)
         
-        profile.name = "%s %s %s" % (post_vars.get('lastname'), post_vars.get('firstname'), post_vars.get('middlename'))
-        profile.lastname = post_vars.get('lastname')
-        profile.firstname = post_vars.get('firstname')
-        profile.middlename = post_vars.get('middlename')
+        profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
+        profile.lastname = row.get('lastname')
+        profile.firstname = row.get('firstname')
+        profile.middlename = row.get('middlename')
         
-        profile.work_number = post_vars.get('work_number')
+        profile.work_login = row.get('work_login')
     
-        js['passwords'][post_vars['email']] = password
+        js['passwords'][row['email']] = password
         try:
             profile.save()
+            log.info("profile save")
         except Exception:
             log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
 
