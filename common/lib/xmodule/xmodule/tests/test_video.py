@@ -48,6 +48,12 @@ class VideoModuleTest(LogicTest):
         output = VideoDescriptor._parse_time('00:04:07')
         self.assertEqual(output, expected)
 
+    def test_parse_time_with_float(self):
+        """Ensure that times are parsed correctly into seconds."""
+        expected = 247
+        output = VideoDescriptor._parse_time('247.0')
+        self.assertEqual(output, expected)
+
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
@@ -407,6 +413,35 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'show_captions': False,
             'start_time': 1.0,
             'end_time': 60,
+            'track': 'http://www.example.com/track',
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
+
+    def test_import_with_float_times(self):
+        """
+        Ensure that Video is able to read VideoModule's model data.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = """
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   from="1.0"
+                   to="60.0">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+            </video>
+        """
+        video = VideoDescriptor.from_xml(xml_data, module_system)
+        self.assert_attributes_equal(video, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': 1.0,
+            'end_time': 60.0,
             'track': 'http://www.example.com/track',
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
