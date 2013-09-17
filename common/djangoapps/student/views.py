@@ -1613,7 +1613,7 @@ def import_users(request, post_override=None):
                     js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
                     continue
                 #profile update
-                if profile.allowed_courses is not None
+                if profile.allowed_courses is not None:
                     profile.allowed_courses += u';%s - %s' % (course-volume-in-hours, subject)
                 continue
             raise
