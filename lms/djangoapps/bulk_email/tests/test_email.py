@@ -12,6 +12,8 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from instructor_task.models import InstructorTask
+from instructor_task.tests.factories import InstructorTaskFactory
 
 from bulk_email.tasks import send_course_email
 from bulk_email.models import CourseEmail, Optout
@@ -288,10 +290,18 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
     """
     Test that exceptions are handled correctly.
     """
+    def test_no_instructor_task(self):
+        with self.assertRaises(InstructorTask.DoesNotExist):
+            send_course_email(100, 101, [], {}, False)
+
+    def test_no_course_title(self):
+        entry = InstructorTaskFactory.create(task_key='', task_id='dummy')
+        with self.assertRaises(KeyError):
+            send_course_email(entry.id, 101, [], {}, False)
+
     def test_no_course_email_obj(self):
         # Make sure send_course_email handles CourseEmail.DoesNotExist exception.
-        with self.assertRaises(KeyError):
-            send_course_email(101, [], {}, False)
-
+        entry = InstructorTaskFactory.create(task_key='', task_id='dummy')
         with self.assertRaises(CourseEmail.DoesNotExist):
-            send_course_email(101, [], {'course_title': 'Test'}, False)
+            send_course_email(entry.id, 101, [], {'course_title': 'Test'}, False)
+

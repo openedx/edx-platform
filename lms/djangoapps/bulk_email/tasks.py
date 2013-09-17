@@ -7,17 +7,22 @@ import re
 from uuid import uuid4
 from time import time, sleep
 import json
+from sys import exc_info
+from traceback import format_exc
 
 from dogapi import dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
 
 from celery import task, current_task, group
 from celery.utils.log import get_task_logger
+from celery.states import SUCCESS, FAILURE
+
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.http import Http404
 from django.core.urlresolvers import reverse
+from django.db import transaction
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -99,11 +104,10 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     try:
         email_obj = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
-        # The retry behavior here is necessary because of a race condition between the commit of the transaction
-        # that creates this CourseEmail row and the celery pipeline that starts this task.
-        # We might possibly want to move the blocking into the view function rather than have it in this task.
-#        log.warning("Failed to get CourseEmail with id %s, retry %d", email_id, current_task.request.retries)
-#        raise delegate_email_batches.retry(arg=[email_id, user_id], exc=exc)
+        # The CourseEmail object should be committed in the view function before the task
+        # is submitted and reaches this point.  It is possible to add retry behavior here,
+        # to keep trying until the object is actually committed by the view function's return,
+        # but it's cleaner to just expect to be done.
         log.warning("Failed to get CourseEmail with id %s", email_id)
         raise
 
@@ -123,13 +127,18 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     recipient_qset = get_recipient_queryset(user_id, to_option, course_id, course.location)
     total_num_emails = recipient_qset.count()
 
+    log.info("Preparing to queue emails to %d recipient(s) for course %s, email %s, to_option %s",
+             total_num_emails, course_id, email_id, to_option)
+
     # At this point, we have some status that we can report, as to the magnitude of the overall
     # task.  That is, we know the total.  Set that, and our subtasks should work towards that goal.
     # Note that we add start_time in here, so that it can be used
     # by subtasks to calculate duration_ms values:
     progress = {'action_name': action_name,
                 'attempted': 0,
-                'updated': 0,
+                'failed': 0,
+                'skipped': 0,
+                'succeeded': 0,
                 'total': total_num_emails,
                 'duration_ms': int(0),
                 'start_time': time(),
@@ -156,6 +165,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
             subtask_id = str(uuid4())
             subtask_id_list.append(subtask_id)
             task_list.append(send_course_email.subtask((
+                entry_id,
                 email_id,
                 to_list,
                 global_email_context,
@@ -166,46 +176,95 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     # Before we actually start running the tasks we've defined,
     # the InstructorTask needs to be updated with their information.
-    # So at this point, we need to update the InstructorTask object here,
-    # not in the return.
+    # So we update the InstructorTask object here, not in the return.
+    # The monitoring code knows that it shouldn't go to the InstructorTask's task's
+    # Result for its progress when there are subtasks.  So we accumulate
+    # the results of each subtask as it completes into the InstructorTask.
     entry.task_output = InstructorTask.create_output_for_success(progress)
-
-    # TODO: the monitoring may need to track a different value here to know
-    # that it shouldn't go to the InstructorTask's task's Result for its
-    # progress.  It might be that this is getting saved.
-    # It might be enough, on the other hand, for the monitoring code to see
-    # that there are subtasks, and that it can scan these for the overall
-    # status.  (And that it shouldn't clobber the progress that is being
-    # accumulated.)  If there are no subtasks, then work as is current.
     entry.task_state = PROGRESS
 
     # now write out the subtasks information.
+    num_subtasks = len(subtask_id_list)
     subtask_status = dict.fromkeys(subtask_id_list, QUEUING)
-    entry.subtasks = json.dumps(subtask_status)
+    subtask_dict = {'total': num_subtasks, 'succeeded': 0, 'failed': 0, 'status': subtask_status}
+    entry.subtasks = json.dumps(subtask_dict)
 
     # and save the entry immediately, before any subtasks actually start work:
     entry.save_now()
 
+    log.info("Preparing to queue %d email tasks for course %s, email %s, to %s",
+             num_subtasks, course_id, email_id, to_option)
+
     # now group the subtasks, and start them running:
     task_group = group(task_list)
-    task_group_result = task_group.apply_async()
+    task_group.apply_async()
 
-    # ISSUE: we can return this result now, but it's not really the result for this task.
-    # So if we use the task_id to fetch a task result, we won't get this one.  But it
-    # might still work.  The caller just has to hold onto this, and access it in some way.
-    # Ugh.  That seems unlikely...
-    # return task_group_result
-
-    # Still want to return progress here, as this is what will be stored in the
+    # We want to return progress here, as this is what will be stored in the
     # AsyncResult for the parent task as its return value.
-    # TODO: Humph.  But it will be marked as SUCCEEDED.  And have
-    # this return value as it's "result".  So be it.  The InstructorTask
-    # will not match, because it will have different info.
+    # The Result will then be marked as SUCCEEDED, and have this return value as it's "result".
+    # That's okay, for the InstructorTask will have the "real" status.
     return progress
 
 
+def _get_current_task():
+    """Stub to make it easier to test without actually running Celery"""
+    return current_task
+
+
+@transaction.commit_manually
+def _update_subtask_status(entry_id, current_task_id, status, subtask_result):
+    """
+    Update the status of the subtask in the parent InstructorTask object tracking its progress.
+    """
+    log.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
+             current_task_id, entry_id, subtask_result)
+
+    try:
+        entry = InstructorTask.objects.select_for_update().get(pk=entry_id)
+        subtask_dict = json.loads(entry.subtasks)
+        subtask_status = subtask_dict['status']
+        if current_task_id not in subtask_status:
+            # unexpected error -- raise an exception?
+            log.warning("Unexpected task_id '%s': unable to update status for email subtask of instructor task %d",
+             current_task_id, entry_id)
+            pass
+        subtask_status[current_task_id] = status
+        # now update the parent task progress
+        task_progress = json.loads(entry.task_output)
+        start_time = task_progress['start_time']
+        task_progress['duration_ms'] = int((time() - start_time) * 1000)
+        if subtask_result is not None:
+            for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
+                task_progress[statname] += subtask_result[statname]
+        # now figure out if we're actually done (i.e. this is the last task to complete)
+        # (This might be easier by just maintaining a counter, rather than scanning the
+        # entire subtask_status dict.)
+        if status == SUCCESS:
+            subtask_dict['succeeded'] += 1
+        else:
+            subtask_dict['failed'] += 1
+        num_remaining = subtask_dict['total'] - subtask_dict['succeeded'] - subtask_dict['failed']
+        if num_remaining <= 0:
+            # we're done with the last task: update the parent status to indicate that:
+            entry.task_state = SUCCESS
+        entry.subtasks = json.dumps(subtask_dict)
+        entry.task_output = InstructorTask.create_output_for_success(task_progress)
+
+        log.info("Task output updated to %s for email subtask %s of instructor task %d",
+                 entry.task_output, current_task_id, entry_id)
+
+        log.info("about to save....")
+        entry.save()
+    except:
+        log.exception("Unexpected error while updating InstructorTask.")
+        transaction.rollback()
+    else:
+        log.info("about to commit....")
+        transaction.commit()
+
+
 @task(default_retry_delay=15, max_retries=5)  # pylint: disable=E1102
-def send_course_email(email_id, to_list, global_email_context, throttle=False):
+def send_course_email(entry_id, email_id, to_list, global_email_context, throttle=False):
     """
     Takes a primary id for a CourseEmail object and a 'to_list' of recipient objects--keys are
     'profile__name', 'email' (address), and 'pk' (in the user table).
@@ -214,9 +273,31 @@ def send_course_email(email_id, to_list, global_email_context, throttle=False):
     Sends to all addresses contained in to_list.  Emails are sent multi-part, in both plain
     text and html.
     """
-    course_title = global_email_context['course_title']
-    with dog_stats_api.timer('course_email.single_task.time.overall', tags=[_statsd_tag(course_title)]):
-        _send_course_email(email_id, to_list, global_email_context, throttle)
+    # Get entry here, as a sanity check that it actually exists.  We won't actually do anything
+    # with it right away.
+    InstructorTask.objects.get(pk=entry_id)
+    current_task_id = _get_current_task().request.id
+
+    log.info("Preparing to send email as subtask %s for instructor task %d",
+             current_task_id, entry_id)
+
+    try:
+        course_title = global_email_context['course_title']
+        with dog_stats_api.timer('course_email.single_task.time.overall', tags=[_statsd_tag(course_title)]):
+            course_email_result = _send_course_email(email_id, to_list, global_email_context, throttle)
+        # Assume that if we get here without a raise, the task was successful.
+        # Update the InstructorTask object that is storing its progress.
+        _update_subtask_status(entry_id, current_task_id, SUCCESS, course_email_result)
+
+    except Exception:
+        # try to write out the failure to the entry before failing
+        _, exception, traceback = exc_info()
+        traceback_string = format_exc(traceback) if traceback is not None else ''
+        log.warning("background task (%s) failed: %s %s", current_task_id, exception, traceback_string)
+        _update_subtask_status(entry_id, current_task_id, FAILURE, None)
+        raise
+
+    return course_email_result
 
 
 def _send_course_email(email_id, to_list, global_email_context, throttle):
@@ -284,6 +365,8 @@ def _send_course_email(email_id, to_list, global_email_context, throttle):
                 sleep(0.2)
 
             try:
+                log.info('Email with id %s to be sent to %s', email_id, email)
+
                 with dog_stats_api.timer('course_email.single_send.time.overall', tags=[_statsd_tag(course_title)]):
                     connection.send_messages([email_msg])
 
@@ -307,6 +390,8 @@ def _send_course_email(email_id, to_list, global_email_context, throttle):
             to_list.pop()
 
         connection.close()
+        # TODO: figure out how to get (or persist) real statistics for this task, so that reflects progress
+        # made over multiple retries.
         return course_email_result(num_sent, num_error, num_optout)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
@@ -333,10 +418,10 @@ def _send_course_email(email_id, to_list, global_email_context, throttle):
         raise
 
 
-# This string format code is wrapped in this function to allow mocking for a unit test
 def course_email_result(num_sent, num_error, num_optout):
-    """Return the formatted result of course_email sending."""
-    return "Sent {0}, Fail {1}, Optout {2}".format(num_sent, num_error, num_optout)
+    """Return the result of course_email sending as a dict (not a string)."""
+    attempted = num_sent + num_error
+    return {'attempted': attempted, 'succeeded': num_sent, 'skipped': num_optout, 'failed': num_error}
 
 
 def _statsd_tag(course_title):

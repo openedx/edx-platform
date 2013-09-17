@@ -31,6 +31,11 @@ TASK_LOG = get_task_logger(__name__)
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
 
+# define values for update functions to use to return status to perform_module_state_update
+UPDATE_STATUS_SUCCEEDED = 'succeeded'
+UPDATE_STATUS_FAILED = 'failed'
+UPDATE_STATUS_SKIPPED = 'skipped'
+
 
 class UpdateProblemModuleStateError(Exception):
     """
@@ -47,7 +52,6 @@ def _get_current_task():
     return current_task
 
 
-# def perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
 def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, task_input, action_name):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
@@ -69,7 +73,9 @@ def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, tas
     The return value is a dict containing the task's results, with the following keys:
 
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
+          'skipped': number of attempts that "skipped"
+          'failed': number of attempts that "failed"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
               Pass-through of input `action_name`.
@@ -111,8 +117,10 @@ def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, tas
         modules_to_update = filter_fcn(modules_to_update)
 
     # perform the main loop
-    num_updated = 0
     num_attempted = 0
+    num_succeeded = 0
+    num_skipped = 0
+    num_failed = 0
     num_total = modules_to_update.count()
 
     def get_task_progress():
@@ -120,7 +128,9 @@ def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, tas
         current_time = time()
         progress = {'action_name': action_name,
                     'attempted': num_attempted,
-                    'updated': num_updated,
+                    'succeeded': num_succeeded,
+                    'skipped': num_skipped,
+                    'failed': num_failed,
                     'total': num_total,
                     'duration_ms': int((current_time - start_time) * 1000),
                     }
@@ -133,10 +143,17 @@ def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, tas
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         with dog_stats_api.timer('instructor_tasks.module.time.step', tags=['action:{name}'.format(name=action_name)]):
-            if update_fcn(module_descriptor, module_to_update):
+            update_status = update_fcn(module_descriptor, module_to_update)
+            if update_status == UPDATE_STATUS_SUCCEEDED:
                 # If the update_fcn returns true, then it performed some kind of work.
                 # Logging of failures is left to the update_fcn itself.
-                num_updated += 1
+                num_succeeded += 1
+            elif update_status == UPDATE_STATUS_FAILED:
+                num_failed += 1
+            elif update_status == UPDATE_STATUS_SKIPPED:
+                num_skipped += 1
+            else:
+                raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
 
         # update task status:
         task_progress = get_task_progress()
@@ -163,7 +180,9 @@ def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
     If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
 
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
+          'skipped': number of attempts that "skipped"
+          'failed': number of attempts that "failed"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
               Pass-through of input `action_name`.
@@ -216,7 +235,6 @@ def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
 
         # Now do the work:
         with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
-            # REMOVE: task_progress = visit_fcn(course_id, module_state_key, student_ident, update_fcn, action_name, filter_fcn)
             task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
         # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
@@ -226,6 +244,7 @@ def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
         # as part of the main task.  There is probably some way to represent this more elegantly, but for
         # now, we will just use an explicit flag.
         if spawns_subtasks:
+            # TODO: UPDATE THIS.
             # we change the rules here.  If it's a task with subtasks running, then we
             # explicitly set its state, with the idea that progress will be updated
             # directly into the InstructorTask object, rather than into the parent task's
@@ -370,15 +389,15 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         # don't consider these fatal, but false means that the individual call didn't complete:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
                          "unexpected response {msg}".format(msg=result, course=course_id, loc=module_state_key, student=student))
-        return False
+        return UPDATE_STATUS_FAILED
     elif result['success'] not in ['correct', 'incorrect']:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
                          "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
-        return False
+        return UPDATE_STATUS_FAILED
     else:
         TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
                        "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
-        return True
+        return UPDATE_STATUS_SUCCEEDED
 
 
 @transaction.autocommit
@@ -386,8 +405,10 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
     """
     Resets problem attempts to zero for specified `student_module`.
 
-    Always returns true, indicating success, if it doesn't raise an exception due to database error.
+    Returns a status of UPDATE_STATUS_SUCCEEDED if a problem has non-zero attempts
+    that are being reset, and UPDATE_STATUS_SKIPPED otherwise.
     """
+    update_status = UPDATE_STATUS_SKIPPED
     problem_state = json.loads(student_module.state) if student_module.state else {}
     if 'attempts' in problem_state:
         old_number_of_attempts = problem_state["attempts"]
@@ -401,9 +422,9 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
             track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
             event_info = {"old_attempts": old_number_of_attempts, "new_attempts": 0}
             track_function('problem_reset_attempts', event_info)
+            update_status = UPDATE_STATUS_SUCCEEDED
 
-    # consider the reset to be successful, even if no update was performed.  (It's just "optimized".)
-    return True
+    return update_status
 
 
 @transaction.autocommit
@@ -411,52 +432,11 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     """
     Delete the StudentModule entry.
 
-    Always returns true, indicating success, if it doesn't raise an exception due to database error.
+    Always returns UPDATE_STATUS_SUCCEEDED, indicating success, if it doesn't raise an exception due to database error.
     """
     student_module.delete()
     # get request-related tracking information from args passthrough,
     # and supplement with task-specific information:
     track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
     track_function('problem_delete_state', {})
-    return True
-
-
-#def perform_delegate_email_batches(entry_id, course_id, task_input, action_name):
-#    """
-#    """
-#    # Get start time for task:
-#    start_time = time()
-#
-#    # perform the main loop
-#    num_updated = 0
-#    num_attempted = 0
-#    num_total = enrolled_students.count()
-#
-#    def get_task_progress():
-#        """Return a dict containing info about current task"""
-#        current_time = time()
-#        progress = {'action_name': action_name,
-#                    'attempted': num_attempted,
-#                    'updated': num_updated,
-#                    'total': num_total,
-#                    'duration_ms': int((current_time - start_time) * 1000),
-#                    }
-#        return progress
-#
-#    task_progress = get_task_progress()
-#    _get_current_task().update_state(state=PROGRESS, meta=task_progress)
-#    for enrolled_student in enrolled_students:
-#        num_attempted += 1
-#        # There is no try here:  if there's an error, we let it throw, and the task will
-#        # be marked as FAILED, with a stack trace.
-#        with dog_stats_api.timer('instructor_tasks.student.time.step', tags=['action:{name}'.format(name=action_name)]):
-#            if update_fcn(course_descriptor, enrolled_student):
-#                # If the update_fcn returns true, then it performed some kind of work.
-#                # Logging of failures is left to the update_fcn itself.
-#                num_updated += 1
-#
-#        # update task status:
-#        task_progress = get_task_progress()
-#        _get_current_task().update_state(state=PROGRESS, meta=task_progress)
-#
-#    return task_progress
+    return UPDATE_STATUS_SUCCEEDED

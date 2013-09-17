@@ -65,7 +65,7 @@ def instructor_task_status(request):
       'in_progress': boolean indicating if task is still running.
       'task_progress': dict containing progress information.  This includes:
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
           'duration_ms': how long the task has (or had) been running.
@@ -122,15 +122,19 @@ def get_task_completion_info(instructor_task):
     if instructor_task.task_state in [FAILURE, REVOKED]:
         return (succeeded, task_output.get('message', 'No message provided'))
 
-    if any([key not in task_output for key in ['action_name', 'attempted', 'updated', 'total']]):
+    if any([key not in task_output for key in ['action_name', 'attempted', 'total']]):
         fmt = "Invalid task_output information found for instructor_task {0}: {1}"
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, "No progress status information available")
 
     action_name = task_output['action_name']
     num_attempted = task_output['attempted']
-    num_updated = task_output['updated']
     num_total = task_output['total']
+
+    # old tasks may still have 'updated' instead of the preferred 'succeeded':
+    num_succeeded = task_output.get('updated', 0) + task_output.get('succeeded', 0)
+    num_skipped = task_output.get('skipped', 0)
+    # num_failed = task_output.get('failed', 0)
 
     student = None
     problem_url = None
@@ -147,12 +151,12 @@ def get_task_completion_info(instructor_task):
 
     if instructor_task.task_state == PROGRESS:
         # special message for providing progress updates:
-        msg_format = "Progress: {action} {updated} of {attempted} so far"
+        msg_format = "Progress: {action} {succeeded} of {attempted} so far"
     elif student is not None and problem_url is not None:
         # this reports on actions on problems for a particular student:
         if num_attempted == 0:
             msg_format = "Unable to find submission to be {action} for student '{student}'"
-        elif num_updated == 0:
+        elif num_succeeded == 0:
             msg_format = "Problem failed to be {action} for student '{student}'"
         else:
             succeeded = True
@@ -161,33 +165,40 @@ def get_task_completion_info(instructor_task):
         # this reports on actions on problems for all students:
         if num_attempted == 0:
             msg_format = "Unable to find any students with submissions to be {action}"
-        elif num_updated == 0:
+        elif num_succeeded == 0:
             msg_format = "Problem failed to be {action} for any of {attempted} students"
-        elif num_updated == num_attempted:
+        elif num_succeeded == num_attempted:
             succeeded = True
             msg_format = "Problem successfully {action} for {attempted} students"
-        else:  # num_updated < num_attempted
-            msg_format = "Problem {action} for {updated} of {attempted} students"
+        else:  # num_succeeded < num_attempted
+            msg_format = "Problem {action} for {succeeded} of {attempted} students"
     elif email_id is not None:
         # this reports on actions on bulk emails
         if num_attempted == 0:
             msg_format = "Unable to find any recipients to be {action}"
-        elif num_updated == 0:
+        elif num_succeeded == 0:
             msg_format = "Message failed to be {action} for any of {attempted} recipients "
-        elif num_updated == num_attempted:
+        elif num_succeeded == num_attempted:
             succeeded = True
             msg_format = "Message successfully {action} for {attempted} recipients"
-        else:  # num_updated < num_attempted
-            msg_format = "Message {action} for {updated} of {attempted} recipients"
+        else:  # num_succeeded < num_attempted
+            msg_format = "Message {action} for {succeeded} of {attempted} recipients"
     else:
         # provide a default:
-        msg_format = "Status: {action} {updated} of {attempted}"
+        msg_format = "Status: {action} {succeeded} of {attempted}"
+
+    if num_skipped > 0:
+        msg_format += " (skipping {skipped})"
 
     if student is None and num_attempted != num_total:
         msg_format += " (out of {total})"
 
     # Update status in task result object itself:
-    message = msg_format.format(action=action_name, updated=num_updated,
-                                attempted=num_attempted, total=num_total,
-                                student=student)
+    message = msg_format.format(
+        action=action_name,
+        succeeded=num_succeeded,
+        attempted=num_attempted,
+        total=num_total,
+        skipped=num_skipped,
+        student=student)
     return (succeeded, message)

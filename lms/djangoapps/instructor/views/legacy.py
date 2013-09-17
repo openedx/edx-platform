@@ -30,6 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 
+from bulk_email.models import CourseEmail
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
@@ -718,7 +719,6 @@ def instructor_dashboard(request, course_id):
         email_to_option = request.POST.get("to_option")
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
-        text_message = html_to_text(html_message)
 
         # TODO: make sure this is committed before submitting it to the task.
         # However, it should probably be enough to do the submit below, which
@@ -727,15 +727,7 @@ def instructor_dashboard(request, course_id):
         # Actually, this should probably be moved out, so that all the validation logic
         # we might want to add to it can be added.  There might also be something
         # that would permit validation of the email beforehand.
-        email = CourseEmail(
-            course_id=course_id,
-            sender=request.user,
-            to_option=email_to_option,
-            subject=email_subject,
-            html_message=html_message,
-            text_message=text_message
-        )
-        email.save()
+        email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
 
         # TODO: make this into a task submission, so that the correct
         # InstructorTask object gets created (for monitoring purposes)
@@ -745,6 +737,10 @@ def instructor_dashboard(request, course_id):
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+
+    elif "Show Background Email Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
+        msg += message
 
     #----------------------------------------
     # psychometrics
@@ -869,6 +865,7 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -1520,7 +1517,7 @@ def dump_grading_context(course):
     return msg
 
 
-def get_background_task_table(course_id, problem_url, student=None):
+def get_background_task_table(course_id, problem_url=None, student=None, task_type=None):
     """
     Construct the "datatable" structure to represent background task history.
 
@@ -1531,14 +1528,17 @@ def get_background_task_table(course_id, problem_url, student=None):
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    history_entries = get_instructor_task_history(course_id, problem_url, student, task_type)
     datatable = {}
     msg = ""
     # first check to see if there is any history at all
     # (note that we don't have to check that the arguments are valid; it
     # just won't find any entries.)
     if (history_entries.count()) == 0:
-        if student is not None:
+        # TODO: figure out how to deal with task_type better here...
+        if problem_url is None:
+            msg += '<font color="red">Failed to find any background tasks for course "{course}".</font>'.format(course=course_id)
+        elif student is not None:
             template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
             msg += template.format(course=course_id, problem=problem_url, student=student.username)
         else:
@@ -1575,7 +1575,9 @@ def get_background_task_table(course_id, problem_url, student=None):
                    task_message]
             datatable['data'].append(row)
 
-        if student is not None:
+        if problem_url is None:
+            datatable['title'] = "{course_id}".format(course_id=course_id)
+        elif student is not None:
             datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
                                                                                location=problem_url,
                                                                                student=student.username)
