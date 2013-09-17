@@ -339,12 +339,11 @@ class XmlDescriptor(XModuleDescriptor):
 
         return system.construct_xblock_from_class(
             cls,
-            field_data,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            field_data,
         )
 
     @classmethod

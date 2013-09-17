@@ -111,8 +111,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         try:
             module = self.construct_xblock_from_class(
                 class_,
+                ScopeIds(None, json_data.get('category'), definition_id, block_locator),
                 field_data,
-                ScopeIds(None, json_data.get('category'), definition_id, block_locator)
             )
         except Exception:
             log.warning("Failed to load descriptor", exc_info=True)

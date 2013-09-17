@@ -477,11 +477,11 @@ class XMLModuleStore(ModuleStoreBase):
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
                     module = system.construct_xblock_from_class(
                         HtmlDescriptor,
-                        DictFieldData({'data': html, 'location': loc, 'category': category}),
                         # We're loading a descriptor, so student_id is meaningless
                         # We also don't have separate notions of definition and usage ids yet,
                         # so we use the location for both
                         ScopeIds(None, category, loc, loc),
+                        DictFieldData({'data': html, 'location': loc, 'category': category}),
                     )
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
