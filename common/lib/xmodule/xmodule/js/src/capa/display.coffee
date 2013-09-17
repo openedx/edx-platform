@@ -44,12 +44,9 @@ class @Problem
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseFloat(a[1])
-        if possible == 1
-            # i18n
-            progress = "(#{possible} point possible)"
-        else
-            # i18n
-            progress = "(#{possible} points possible)"
+        # i18n
+        s = ngettext("%s point possible","%s points possible", possible)
+        progress = interpolate(s, possible)
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
