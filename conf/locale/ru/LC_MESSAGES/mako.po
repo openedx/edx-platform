@@ -3419,12 +3419,10 @@ msgid ""
 msgstr ""
 
 #: common/templates/hinter_display.html:119
-#, fuzzy
 msgid "Learn even more"
 msgstr "Обучение оцениванию"
 
 #: common/templates/hinter_display.html:123
-#, fuzzy
 msgid "Back"
 msgstr "Назад"
 
@@ -3433,9 +3431,8 @@ msgid "Sorry, but you've already voted!"
 msgstr ""
 
 #: common/templates/hinter_display.html:136
-#, fuzzy
 msgid "Thank you for voting!"
-msgstr "Спасибо за регистрацию!"
+msgstr "Спасибо за голосование!"
 
 #: lms/djangoapps/django_comment_client/base/views.py:603
 #, python-format
@@ -3603,9 +3600,8 @@ msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:364
-#, fuzzy
 msgid "The authorization has already been captured"
-msgstr "Эта учетная запись уже была активирована."
+msgstr "Авторизация уже была получена"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
 msgid ""
@@ -4382,7 +4378,6 @@ msgid "Name*"
 msgstr "Имя*"
 
 #: lms/templates/help_modal.html:67
-#, fuzzy
 msgid "E-mail*"
 msgstr "Адрес e-mail *"
 
@@ -5156,7 +5151,6 @@ msgid "e.g. Mr., Ms., Mrs., Dr."
 msgstr ""
 
 #: lms/templates/test_center_register.html:188
-#, fuzzy
 msgid "First Name"
 msgstr "Имя"
 
@@ -5165,7 +5159,6 @@ msgid "e.g. Albert"
 msgstr ""
 
 #: lms/templates/test_center_register.html:192
-#, fuzzy
 msgid "Middle Name"
 msgstr "Отчество"
 
@@ -5293,9 +5286,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/test_center_register.html:298
-#, fuzzy
 msgid "Optional Information"
-msgstr "Информация о пользователе"
+msgstr "Дополнительная информация"
 
 #: lms/templates/test_center_register.html:304
 #: lms/templates/test_center_register.html:310
@@ -5793,9 +5785,8 @@ msgid "Course Navigation"
 msgstr "Навигация по курсу"
 
 #: lms/templates/courseware/courseware.html:176
-#, fuzzy
 msgid "close"
-msgstr "Закрыть"
+msgstr "закрыть"
 
 #: lms/templates/courseware/courseware.html:208
 msgid "Open Calculator"
@@ -5907,7 +5898,6 @@ msgid "Assignment name:"
 msgstr "Название задания:"
 
 #: lms/templates/courseware/instructor_dashboard.html:210
-#, fuzzy
 msgid "Course-specific grade adjustment"
 msgstr "Поправка на оценку для студента"
 
@@ -6207,9 +6197,8 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html:73
 #: lms/templates/courseware/mktg_course_about.html:77
-#, fuzzy
 msgid "enroll"
-msgstr "Зарегистрировать"
+msgstr "зарегистрировать"
 
 #: lms/templates/courseware/news.html:5
 msgid "News - MITx 6.002x"
@@ -6504,9 +6493,8 @@ msgid "Skip"
 msgstr "Пропустить"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:21
-#, fuzzy
 msgid "Grade Distribution"
-msgstr "Распределение по полу"
+msgstr "Распределение оценки"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:23
 msgid "Loading problem list..."
@@ -6585,7 +6573,6 @@ msgid "Auto-Enroll"
 msgstr "Авторегистрировать"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:38
-#, fuzzy
 msgid "Auto Enroll"
 msgstr "Авторегистрировать"
 
@@ -6753,7 +6740,6 @@ msgid "Show Background Task History for Student"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:73
-#, fuzzy
 msgid "Then select an action"
 msgstr "Потом выберите действие:"
 
@@ -6832,9 +6818,8 @@ msgid "Ban"
 msgstr "Заблокировать"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:10
-#, fuzzy
 msgid "{course_number} Open Ended Problems"
-msgstr "{course_number} Отмеченные открытые задачи"
+msgstr "{course_number} открытые задачи"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:18
 msgid "Open Ended Problems"
@@ -6854,9 +6839,8 @@ msgid "Problem Name"
 msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:30
-#, fuzzy
 msgid "Status"
-msgstr "Статус:"
+msgstr "Статус"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:31
 msgid "Grader Type"
@@ -6916,7 +6900,6 @@ msgid "The due date has passed, and peer grading is closed at this time."
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html:9
-#, fuzzy
 msgid "Learning to Grade"
 msgstr "Обучение оцениванию"
 
@@ -7033,7 +7016,6 @@ msgid "Account already active!"
 msgstr "Учетная запись активирована!"
 
 #: lms/templates/registration/activation_complete.html:27
-#, fuzzy
 msgid "You can now {link_start}log in{link_end}."
 msgstr "Вы можете сейчас {link_start}войти{link_end}."
 
@@ -9855,7 +9837,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/jobs.html:576
-#, fuzzy
 msgid "Our Location"
 msgstr "Ваше местонахождение"
 
