@@ -46,7 +46,7 @@ class @Problem
         possible = parseFloat(a[1])
         # i18n
         s = ngettext("%s point possible","%s points possible", possible)
-        progress = interpolate(s, possible)
+        progress = interpolate(s, [possible])
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
