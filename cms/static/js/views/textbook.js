@@ -156,7 +156,6 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     initialize: function() {
         this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
         this.listenTo(this.collection, 'all', this.render);
-        this.listenTo(this.collection, 'destroy', this.handleDestroy);
     },
     tagName: "div",
     className: "textbooks-list",
@@ -185,9 +184,6 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     addOne: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.collection.add([{editing: true}]);
-    },
-    handleDestroy: function(model, collection, options) {
-        collection.remove(model);
     }
 });
 CMS.Views.EditChapter = Backbone.View.extend({
