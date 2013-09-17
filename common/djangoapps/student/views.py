@@ -1619,7 +1619,7 @@ def import_users(request, post_override=None):
                     profile.save()
                     log.info("profile save")
                 except Exception:
-                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id
+                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                 continue
             raise
 
