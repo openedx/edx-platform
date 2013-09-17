@@ -15,28 +15,6 @@
   </nav>
 
   <section class="press">
-    % for article in articles:
-      <article class="press-story">
-        <div class="article-cover">
-          <a href="${article.url}" target="_blank"/>
-            <img src="${static.url('images/press/' + article.image)}" />
-          </a>
-        </div>
-        <div class="press-info">
-          <header>
-            <h3>${article.title}</h3>
-            % if article.deck:
-              <p>${article.deck}</p>
-            % endif
-            <span class="post-date">${article.publication} | ${article.publish_date} 
-            % if article.author:
-              | By ${article.author}
-            % endif
-            </span><br/>
-          </header>
-          <a href="${article.url}" target="_blank">${article.url}</a>
-        </div>
-      </article>
-    % endfor
+    <p>Страница находится в состоянии разработки.</p>
   </section>
 </section>
