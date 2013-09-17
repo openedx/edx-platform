@@ -15,12 +15,18 @@
   <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
 </%def>
 
+<%def name="carnegie_theme_enabled()">
+  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "carnegie" %>
+</%def>
+
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
       <title>${_("Home")} | class.stanford.edu</title>
+    % elif carnegie_theme_enabled():
+      <title>${_("Home")} | CLASlite</title>
     % else:
       ## "edX" should not be translated
       <title>edX</title>

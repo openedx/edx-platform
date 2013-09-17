@@ -42,7 +42,7 @@ site_status_msg = get_site_status_msg(course_id)
   <nav>
 
   <h1 class="logo">
-    <a href="${marketing_link('ROOT')}">
+    <a href="<%block name='navigation_link'>${marketing_link('ROOT')}</%block>">
       <%block name="navigation_logo">
         <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('{settings.PLATFORM_NAME} home')}" />
       </%block>
@@ -95,17 +95,19 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
-          </li>
-          % else:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
-          </li>
-          % endif
-      % endif
+      <%block name="register_link">
+        % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            <li class="nav-global-04">
+              <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
+            </li>
+            % else:
+            <li class="nav-global-04">
+              <a class="cta cta-register" href="/register">${_("Register Now")}</a>
+            </li>
+            % endif
+        % endif
+      </%block>
     </ol>
 
     <ol class="right nav-courseware">
