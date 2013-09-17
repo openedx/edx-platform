@@ -60,16 +60,16 @@ discussion_link = get_discussion_link(course) if course else None
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
       <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
-      <label data-field="name">${_('Name*')}</label>
-      <input name="name" type="text">
-      <label data-field="email">${_('E-mail*')}</label>
-      <input name="email" type="text">
+      <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
+      <input name="name" type="text" id="feedback_form_email" aria-required="true">
+      <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
+      <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
-      <label data-field="subject">${_('Briefly describe your issue*')}</label>
-      <input name="subject" type="text">
-      <label data-field="details">${_('Tell us the details*')}
+      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue*')}</label>
+      <input name="subject" type="text" id="feedback_form_subject" aria-required="true">
+      <label data-field="details" for="feedback_form_details">${_('Tell us the details*')}
 <span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
-      <textarea name="details"></textarea>
+      <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
       <input name="course_id" type="hidden" value="${course.id | h}">
