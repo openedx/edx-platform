@@ -7,7 +7,7 @@
     width: flex-grid(12);
 
     &::after {
-      @extend .faded-hr-divider;
+      @extend %faded-hr-divider;
       content: "";
       display: block;
     }
