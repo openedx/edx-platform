@@ -64,10 +64,13 @@ def change_name(step, new_name):
 
 
 def get_index(name):
+    def html():
+        return all_pages[i].html
+
     page_name_css = 'section[data-type="HTMLModule"]'
     all_pages = world.css_find(page_name_css)
     for i in range(len(all_pages)):
-        if all_pages[i].html == '\n    {name}\n'.format(name=name):
+        if world.retry_on_exception(html) == '\n    {name}\n'.format(name=name):
             return i
     return None
 
