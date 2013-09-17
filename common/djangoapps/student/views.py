@@ -1614,7 +1614,7 @@ def import_users(request, post_override=None):
                     continue
                 #profile update
                 if profile.allowed_courses is not None:
-                    profile.allowed_courses += u';%s - %s' % (course-volume-in-hours, subject)
+                    profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
                 continue
             raise
 
@@ -1628,8 +1628,8 @@ def import_users(request, post_override=None):
         profile.middlename = row.get('middlename')
         
         profile.work_login = row.get('work_login')
-        profile.allowed_courses = u'%s - %s' % (course-volume-in-hours, subject)
-    
+        profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
+        
         js['passwords'][row['email']] = password
         try:
             profile.save()
