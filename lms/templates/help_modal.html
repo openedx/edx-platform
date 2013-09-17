@@ -9,10 +9,10 @@
 % if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal">${_("Help")}</a>
+  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <a href="#" role="button" class="close-modal" tabindex="0" title="${_('Close Modal')}">&#10005;</a>
