@@ -243,7 +243,7 @@ def signin_user(request):
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
     }
-    return render_to_response('login.html', context)
+    return render_to_response('university_profile/edge.html', context)
 
 
 @ensure_csrf_cookie
