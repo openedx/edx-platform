@@ -78,7 +78,8 @@ $('#fileupload').fileupload({
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
                     if (xhr.status != 200) {
-                        alert('${_("Your import has failed.")}\n\n' + result["ErrMsg"]);
+                        var errMsg = result.hasOwnProperty("ErrMsg") ? result["ErrMsg"] : "" ;
+                        alert('${_("Your import has failed.")}\n\n' + errMsg);
                         submitBtn.show();
                         bar.hide();
                     } 
@@ -97,12 +98,17 @@ $('#fileupload').fileupload({
     },
     done: function(e, data){
         bar.hide();
+        window.onbeforeunload = null;
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
     },
+    start: function(e) {
+        window.onbeforeunload = function() {
+            return "Your import is in progress; navigating " +
+                "away will abort it.";
+        }
+    },
     sequentialUploads: true
-
-
 
 });
 
