@@ -1615,6 +1615,11 @@ def import_users(request, post_override=None):
                 #profile update
                 if profile.allowed_courses is not None:
                     profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
+                try:
+                    profile.save()
+                    log.info("profile save")
+                except Exception:
+                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id
                 continue
             raise
 
@@ -1629,7 +1634,7 @@ def import_users(request, post_override=None):
         
         profile.work_login = row.get('work_login')
         profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
-        
+
         js['passwords'][row['email']] = password
         try:
             profile.save()
