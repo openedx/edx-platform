@@ -84,7 +84,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['task_state'], SUCCESS)
         self.assertFalse(output['in_progress'])
         expected_progress = {'attempted': 3,
-                             'updated': 2,
+                             'succeeded': 2,
                              'total': 5,
                              'action_name': 'rescored'}
         self.assertEquals(output['task_progress'], expected_progress)
@@ -121,7 +121,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         mock_result.task_id = task_id
         mock_result.state = PROGRESS
         mock_result.result = {'attempted': 5,
-                              'updated': 4,
+                              'succeeded': 4,
                               'total': 10,
                               'action_name': 'rescored'}
         output = self._test_get_status_from_result(task_id, mock_result)
@@ -165,7 +165,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         expected_progress = {'message': "Task revoked before running"}
         self.assertEquals(output['task_progress'], expected_progress)
 
-    def _get_output_for_task_success(self, attempted, updated, total, student=None):
+    def _get_output_for_task_success(self, attempted, succeeded, total, student=None):
         """returns the task_id and the result returned by instructor_task_status()."""
         # view task entry for task in progress
         instructor_task = self._create_progress_entry(student)
@@ -174,7 +174,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         mock_result.task_id = task_id
         mock_result.state = SUCCESS
         mock_result.result = {'attempted': attempted,
-                              'updated': updated,
+                              'succeeded': succeeded,
                               'total': total,
                               'action_name': 'rescored'}
         output = self._test_get_status_from_result(task_id, mock_result)
@@ -187,7 +187,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['task_state'], SUCCESS)
         self.assertFalse(output['in_progress'])
         expected_progress = {'attempted': 10,
-                             'updated': 8,
+                             'succeeded': 8,
                              'total': 10,
                              'action_name': 'rescored'}
         self.assertEquals(output['task_progress'], expected_progress)

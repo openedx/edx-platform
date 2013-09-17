@@ -88,7 +88,7 @@ class InstructorTaskTestCase(TestCase):
     def _create_progress_entry(self, student=None, task_state=PROGRESS):
         """Creates a InstructorTask entry representing a task in progress."""
         progress = {'attempted': 3,
-                    'updated': 2,
+                    'succeeded': 2,
                     'total': 5,
                     'action_name': 'rescored',
                     }
@@ -120,6 +120,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         # add a sequence to the course to which the problems can be added
         self.problem_section = ItemFactory.create(parent_location=chapter.location,
                                                   category='sequential',
+                                                  metadata={'graded': True, 'format': 'Homework'},
                                                   display_name=TEST_SECTION_NAME)
 
     @staticmethod

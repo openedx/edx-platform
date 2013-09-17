@@ -12,8 +12,9 @@ file and check it in at the same time as your model changes. To do that,
 
 """
 import logging
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
+from html_to_text import html_to_text
 
 log = logging.getLogger(__name__)
 
@@ -33,9 +34,11 @@ class Email(models.Model):
     class Meta:  # pylint: disable=C0111
         abstract = True
 
+
 SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
 SEND_TO_ALL = 'all'
+TO_OPTIONS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL]
 
 
 class CourseEmail(Email, models.Model):
@@ -51,16 +54,65 @@ class CourseEmail(Email, models.Model):
     # * All: This sends an email to anyone enrolled in the course, with any role
     #   (student, staff, or instructor)
     #
-    TO_OPTIONS = (
+    TO_OPTION_CHOICES = (
         (SEND_TO_MYSELF, 'Myself'),
         (SEND_TO_STAFF, 'Staff and instructors'),
         (SEND_TO_ALL, 'All')
     )
     course_id = models.CharField(max_length=255, db_index=True)
-    to_option = models.CharField(max_length=64, choices=TO_OPTIONS, default=SEND_TO_MYSELF)
+    to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
 
     def __unicode__(self):
         return self.subject
+
+    @classmethod
+    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None):
+        """
+        Create an instance of CourseEmail.
+
+        The CourseEmail.save_now method makes sure the CourseEmail entry is committed.
+        When called from any view that is wrapped by TransactionMiddleware,
+        and thus in a "commit-on-success" transaction, an autocommit buried within here
+        will cause any pending transaction to be committed by a successful
+        save here.  Any future database operations will take place in a
+        separate transaction.
+        """
+        # automatically generate the stripped version of the text from the HTML markup:
+        if text_message is None:
+            text_message = html_to_text(html_message)
+
+        # perform some validation here:
+        if to_option not in TO_OPTIONS:
+            fmt = 'Course email being sent to unrecognized to_option: "{to_option}" for "{course}", subject "{subject}"'
+            msg = fmt.format(to_option=to_option, course=course_id, subject=subject)
+            raise ValueError(msg)
+
+        # create the task, then save it immediately:
+        course_email = cls(
+            course_id=course_id,
+            sender=sender,
+            to_option=to_option,
+            subject=subject,
+            html_message=html_message,
+            text_message=text_message,
+        )
+        course_email.save_now()
+
+        return course_email
+
+    @transaction.autocommit
+    def save_now(self):
+        """
+        Writes InstructorTask immediately, ensuring the transaction is committed.
+
+        Autocommit annotation makes sure the database entry is committed.
+        When called from any view that is wrapped by TransactionMiddleware,
+        and thus in a "commit-on-success" transaction, this autocommit here
+        will cause any pending transaction to be committed by a successful
+        save here.  Any future database operations will take place in a
+        separate transaction.
+        """
+        self.save()
 
 
 class Optout(models.Model):

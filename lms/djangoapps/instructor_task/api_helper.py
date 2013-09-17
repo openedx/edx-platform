@@ -113,8 +113,16 @@ def _update_instructor_task(instructor_task, task_result):
     # Assume we don't always update the InstructorTask entry if we don't have to:
     entry_needs_saving = False
     task_output = None
+    entry_needs_updating = True
 
-    if result_state in [PROGRESS, SUCCESS]:
+    if result_state == SUCCESS and instructor_task.task_state == PROGRESS and len(instructor_task.subtasks) > 0:
+        # This happens when running subtasks:  the result object is marked with SUCCESS,
+        # meaning that the subtasks have successfully been defined.  However, the InstructorTask
+        # will be marked as in PROGRESS, until the last subtask completes and marks it as SUCCESS.
+        # We want to ignore the parent SUCCESS if subtasks are still running, and just trust the
+        # contents of the InstructorTask.
+        entry_needs_updating = False
+    elif result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
         log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
@@ -136,12 +144,13 @@ def _update_instructor_task(instructor_task, task_result):
     # save progress and state into the entry, even if it's not being saved:
     # when celery is run in "ALWAYS_EAGER" mode, progress needs to go back
     # with the entry passed in.
-    instructor_task.task_state = result_state
-    if task_output is not None:
-        instructor_task.task_output = task_output
+    if entry_needs_updating:
+        instructor_task.task_state = result_state
+        if task_output is not None:
+            instructor_task.task_output = task_output
 
-    if entry_needs_saving:
-        instructor_task.save()
+        if entry_needs_saving:
+            instructor_task.save()
 
 
 def get_updated_instructor_task(task_id):
@@ -177,7 +186,7 @@ def get_status_from_instructor_task(instructor_task):
       'in_progress': boolean indicating if task is still running.
       'task_progress': dict containing progress information.  This includes:
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
           'duration_ms': how long the task has (or had) been running.

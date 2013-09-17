@@ -104,14 +104,14 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
     def test_delete_undefined_problem(self):
         self._test_undefined_problem(delete_problem_state)
 
-    def _test_run_with_task(self, task_function, action_name, expected_num_updated):
+    def _test_run_with_task(self, task_function, action_name, expected_num_succeeded):
         """Run a task and check the number of StudentModules processed."""
         task_entry = self._create_input_entry()
         status = self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
         # check return value
-        self.assertEquals(status.get('attempted'), expected_num_updated)
-        self.assertEquals(status.get('updated'), expected_num_updated)
-        self.assertEquals(status.get('total'), expected_num_updated)
+        self.assertEquals(status.get('attempted'), expected_num_succeeded)
+        self.assertEquals(status.get('succeeded'), expected_num_succeeded)
+        self.assertEquals(status.get('total'), expected_num_succeeded)
         self.assertEquals(status.get('action_name'), action_name)
         self.assertGreater('duration_ms', 0)
         # compare with entry in table:
@@ -209,7 +209,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         status = self._run_task_with_mock_celery(reset_problem_attempts, task_entry.id, task_entry.task_id)
         # check return value
         self.assertEquals(status.get('attempted'), 1)
-        self.assertEquals(status.get('updated'), 1)
+        self.assertEquals(status.get('succeeded'), 1)
         self.assertEquals(status.get('total'), 1)
         self.assertEquals(status.get('action_name'), 'reset')
         self.assertGreater('duration_ms', 0)
@@ -371,7 +371,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output.get('attempted'), num_students)
-        self.assertEquals(output.get('updated'), num_students)
+        self.assertEquals(output.get('succeeded'), num_students)
         self.assertEquals(output.get('total'), num_students)
         self.assertEquals(output.get('action_name'), 'rescored')
         self.assertGreater('duration_ms', 0)

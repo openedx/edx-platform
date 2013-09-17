@@ -227,7 +227,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
-        self.assertEqual(status['updated'], 0)
+        self.assertEqual(status['succeeded'], 0)
         self.assertEqual(status['total'], 1)
 
     def define_code_response_problem(self, problem_url_name):
