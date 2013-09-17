@@ -1,1 +1,1 @@
-Your account for ${settings.PLATFORM_NAME}
+Ваша учетная запись на курсах повышения квалификации учителей

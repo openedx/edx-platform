@@ -1,8 +1,7 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 
-Thank you for signing up for ${settings.PLATFORM_NAME}! To activate
-your account, please copy and paste this address into your web
-browser's address bar:
+Спасибо за регистрацию на курсах повышения квалификации учителей
+Чтобы активировать вашу учетную запись, перейдите по ссылке указанной ниже:
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -10,15 +9,6 @@ browser's address bar:
   http://${ site }/activate/${ key }
 % endif
 
-## Temporary hack until we develop a better way to adjust language
-% if stanford_theme_enabled():
-  If you didn't request this, you don't need to do anything; you won't
-  receive any more email from us. Please do not reply to this e-mail;
-  if you require assistance, check the about section of the
-  ${settings.PLATFORM_NAME} Courses web site.
-% else:
-  If you didn't request this, you don't need to do anything; you won't
-  receive any more email from us. Please do not reply to this e-mail;
-  if you require assistance, check the help section of the
-  ${settings.PLATFORM_NAME} web site.
-% endif
+Данные вашей учетной записи:
+Эл. почта: ${ email }
+Пароль: ${ password }

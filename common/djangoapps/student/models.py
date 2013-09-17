@@ -191,6 +191,8 @@ class UserProfile(models.Model):
 
     contact_phone = models.CharField(blank=True, null=True, max_length=10, db_index=False)
 
+    allowed_courses = models.CharField(blank=True, null=True, max_length=255, db_index=False)
+
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
