@@ -33,14 +33,22 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 if verbose:
                     log.debug('importing static content %s...', content_path)
 
+                try:
+                    with open(content_path, 'rb') as f:
+                        data = f.read()
+                except IOError:
+                    if filename.startswith('._'):
+                        # OS X "companion files". See http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
+                        continue
+                    # Not a 'hidden file', then re-raise exception
+                    raise
+
                 fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
                 if fullname_with_subpath.startswith('/'):
                     fullname_with_subpath = fullname_with_subpath[1:]
                 content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
                 mime_type = mimetypes.guess_type(filename)[0]
 
-                with open(content_path, 'rb') as f:
-                    data = f.read()
 
                 content = StaticContent(content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
 
