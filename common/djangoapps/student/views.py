@@ -1581,8 +1581,9 @@ def import_users(request, post_override=None):
     js = {}
     js['passwords'] = {}
     js['log'] = ""
-
+    idx = 0
     for row in data:
+        idx += 1
         log.info(row)
         row['firstname'] = row.pop('first-name')
         row['lastname'] = row.pop('second-name')
@@ -1609,11 +1610,11 @@ def import_users(request, post_override=None):
                 profile = UserProfile.objects.get(user=user)
                 if (profile.name != name):
                     js['success'] = False
-                    js['log'] += u'Error in row: %s:Duplicate email with different names: %s' % (1, row)
+                    js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
                     continue
                 #profile update
-                js['success'] = False
-                js['log'] += u'Error in row: %s:TODO update user discipline: %s' % (1, row)
+                if profile.allowed_courses is not None
+                    profile.allowed_courses += u';%s - %s' % (course-volume-in-hours, subject)
                 continue
             raise
 
@@ -1627,6 +1628,7 @@ def import_users(request, post_override=None):
         profile.middlename = row.get('middlename')
         
         profile.work_login = row.get('work_login')
+        profile.allowed_courses = u'%s - %s' % (course-volume-in-hours, subject)
     
         js['passwords'][row['email']] = password
         try:
@@ -1635,6 +1637,33 @@ def import_users(request, post_override=None):
         except Exception:
             log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
 
+        d = {'name': row['lastname'],
+             'login': row['email'],
+             'password': password,
+             'key': registration.activation_key,
+             }
+
+        # composes activation email
+        subject = render_to_string('emails/activation_email_subject.txt', d)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email_batch.txt', d)
+
+        # dont send email if we are doing load testing or random user generation for some reason
+        if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+            try:
+                if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                    dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+                    message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                               '-' * 80 + '\n\n' + message)
+                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+                else:
+                    _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            except:
+                log.warning('Unable to send activation email to user', exc_info=True)
+                js['success'] = False
+                js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
+                continue
 
     return HttpResponse(json.dumps(js, cls=LazyEncoder))
 

@@ -1,3 +1,1 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-${_("Your account for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}
+Ваша учетная запись на курсах повышения квалификации учителей
