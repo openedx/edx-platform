@@ -27,7 +27,7 @@ class @PeerGradingProblemBackend
     else
       # if this post request fails, the error callback will catch it
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occurred while performing this operation"})
+        .error => callback({success: false, error: "Error occured while performing this operation"})
 
   mock: (cmd, data) ->
     if cmd == 'is_student_calibrated'
@@ -460,8 +460,8 @@ class @PeerGradingProblem
       @flag_student_container.hide()
       @answer_unknown_container.hide()
 
-      @feedback_area.val("Once you are done with training and are grading real student essays, you will be asked to share feedback with them in addition to grading their rubric.")
-      @feedback_area.attr('disabled', true)
+      @feedback_area.val("")
+
       @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
@@ -499,7 +499,6 @@ class @PeerGradingProblem
         @change_tracker.rebindTracker()
       else
         @feedback_area.val("")
-      @feedback_area.attr('disabled', false)
       @answer_unknown_checkbox.removeAttr("checked")
       @flag_student_checkbox.removeAttr("checked")
       @submit_button.show()
@@ -510,7 +509,7 @@ class @PeerGradingProblem
     else if response.error
       @render_error(response.error)
     else
-      @render_error("An error occurred when retrieving the next submission.")
+      @render_error("An error occured when retrieving the next submission.")
 
   make_paragraphs: (text) ->
     paragraph_split = text.split(/\n\s*\n/)
