@@ -385,12 +385,16 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         if not str_time:
             return ''
         else:
-            obj_time = time.strptime(str_time, '%H:%M:%S')
-            return datetime.timedelta(
-                hours=obj_time.tm_hour,
-                minutes=obj_time.tm_min,
-                seconds=obj_time.tm_sec
-            ).total_seconds()
+            try:
+                obj_time = time.strptime(str_time, '%H:%M:%S')
+                return datetime.timedelta(
+                    hours=obj_time.tm_hour,
+                    minutes=obj_time.tm_min,
+                    seconds=obj_time.tm_sec
+                ).total_seconds()
+            except ValueError:
+                # We've seen serialized versions of float in this field
+                return float(str_time)
 
 
 def _create_youtube_string(module):
