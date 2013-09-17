@@ -75,6 +75,10 @@ class OptionInputTest(unittest.TestCase):
         check("('a', 'b')", ['a', 'b'])
         check("('a b','b')", ['a b', 'b'])
         check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
+        check(u"('б','в')", [u'б', u'в'])
+        check(u"('б', 'в')", [u'б', u'в'])
+        check(u"('б в','в')", [u'б в', u'в'])
+        check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
 
 
 class ChoiceGroupTest(unittest.TestCase):
