@@ -66,8 +66,9 @@ def change_name(step, new_name):
 def get_index(name):
     page_name_css = 'section[data-type="HTMLModule"]'
     all_pages = world.css_find(page_name_css)
+    from nose.tools import set_trace; set_trace()
     for i in range(len(all_pages)):
-        if all_pages[i].html == '\n    {name}\n'.format(name=name):
+        if world.retry_on_exception(lambda: all_pages[i].html) == '\n    {name}\n'.format(name=name):
             return i
     return None
 
