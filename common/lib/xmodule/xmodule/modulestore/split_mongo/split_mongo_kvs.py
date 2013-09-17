@@ -1,7 +1,6 @@
 import copy
 from xblock.fields import Scope
 from collections import namedtuple
-from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
