@@ -40,10 +40,12 @@
       )}</p>
 
       <h2>${_("Media")}</h2>
-      <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.').format(
+      <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {emails}.').format(
         link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
         link_end='</a>',
-        email='<a href="mailto:{email}">{email}</a>'.format(email="press@edx.org"),
+        emails='<a href="mailto:{email}">{email}</a>'.format(
+          email="press@edx.org"
+        )
         )}</p>
 
       <h2>${_("Universities")}</h2>

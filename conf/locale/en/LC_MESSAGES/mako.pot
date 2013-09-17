@@ -147,7 +147,7 @@ msgid "<em>Editing:</em> %s"
 msgstr ""
 
 #: cms/static/coffee/src/views/module_edit.js:131
-#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:843
+#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:847
 #: cms/static/js/models/section.js:26
 #: cms/static/js/views/course_info_edit.js:121
 #: cms/static/js/views/course_info_edit.js:330
@@ -175,14 +175,14 @@ msgid "OK"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js:111
-#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:398
+#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:402
 #: cms/static/js/views/course_info_edit.js:186
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js:124
-#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:414
+#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:418
 #: cms/static/js/views/assets.js:43
 #: cms/static/js/views/course_info_edit.js:204
 #: cms/static/js/views/textbook.js:48
@@ -211,78 +211,78 @@ msgstr ""
 msgid "Yes, delete this component"
 msgstr ""
 
-#: cms/static/js/base.js:83
+#: cms/static/js/base.js:85
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 
-#: cms/static/js/base.js:86
+#: cms/static/js/base.js:88
 msgid "This link will open in a modal window"
 msgstr ""
 
-#: cms/static/js/base.js:204 cms/templates/overview.html:135
+#: cms/static/js/base.js:208 cms/templates/overview.html:135
 msgid "Collapse All Sections"
 msgstr ""
 
-#: cms/static/js/base.js:206
+#: cms/static/js/base.js:210
 msgid "Expand All Sections"
 msgstr ""
 
-#: cms/static/js/base.js:245
+#: cms/static/js/base.js:249
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr ""
 
-#: cms/static/js/base.js:310
+#: cms/static/js/base.js:314
 msgid "start"
 msgstr ""
 
-#: cms/static/js/base.js:335
+#: cms/static/js/base.js:339
 msgid "There has been an error while saving your changes."
 msgstr ""
 
-#: cms/static/js/base.js:382
+#: cms/static/js/base.js:386
 msgid "Delete this ?"
 msgstr ""
 
-#: cms/static/js/base.js:383
+#: cms/static/js/base.js:387
 msgid "Deleting this  is permanent and cannot be undone."
 msgstr ""
 
-#: cms/static/js/base.js:386
+#: cms/static/js/base.js:390
 msgid "Yes, delete this "
 msgstr ""
 
-#: cms/static/js/base.js:462
+#: cms/static/js/base.js:466
 msgid "Hide Studio Help"
 msgstr ""
 
-#: cms/static/js/base.js:464 cms/templates/widgets/sock.html:6
+#: cms/static/js/base.js:468 cms/templates/widgets/sock.html:6
 msgid "Looking for Help with Studio?"
 msgstr ""
 
-#: cms/static/js/base.js:626
+#: cms/static/js/base.js:630
 msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 
-#: cms/static/js/base.js:641
+#: cms/static/js/base.js:645
 msgid ""
 "Course fields must have a combined length of no more than 80 characters."
 msgstr ""
 
-#: cms/static/js/base.js:676
+#: cms/static/js/base.js:680
 msgid "Required field."
 msgstr ""
 
-#: cms/static/js/base.js:868 cms/templates/overview.html:171
+#: cms/static/js/base.js:872 cms/templates/overview.html:171
 msgid "Will Release:"
 msgstr ""
 
-#: cms/static/js/base.js:869
+#: cms/static/js/base.js:873
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
 msgstr ""
 
-#: cms/static/js/base.js:872 cms/templates/component.html:36
+#: cms/static/js/base.js:876 cms/templates/component.html:36
 #: cms/templates/overview.html:174
 #: lms/templates/discussion/_underscore_templates.html:74
 #: lms/templates/discussion/_underscore_templates.html:133
@@ -1382,15 +1382,23 @@ msgstr ""
 
 #: cms/templates/login.html:29 lms/templates/login.html:122
 #: lms/templates/login_modal.html:33
-#: lms/templates/university_profile/edge.html:24
+#: lms/templates/university_profile/edge.html:150
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:133
+#: lms/templates/university_profile/edge.html.BASE.21781.html:128
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:127
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:127
 msgid "Forgot password?"
 msgstr ""
 
 #: cms/templates/login.html:30 cms/templates/signup.html:35
 #: lms/templates/login.html:119 lms/templates/login_modal.html:17
 #: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
-#: lms/templates/register.html:122 lms/templates/signup_modal.html:29
-#: lms/templates/university_profile/edge.html:19
+#: lms/templates/register.html:122 lms/templates/signup_modal.html:45
+#: lms/templates/university_profile/edge.html:145
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:128
+#: lms/templates/university_profile/edge.html.BASE.21781.html:123
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:122
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:122
 msgid "Password"
 msgstr ""
 
@@ -2186,108 +2194,108 @@ msgid "Required Information to Sign Up for edX Studio"
 msgstr ""
 
 #: cms/templates/signup.html:40 lms/templates/register.html:171
-#: lms/templates/signup_modal.html:36
+#: lms/templates/signup_modal.html:52
 msgid "Lastname"
 msgstr ""
 
 #: cms/templates/signup.html:44 lms/templates/register.html:175
-#: lms/templates/signup_modal.html:40
+#: lms/templates/signup_modal.html:56
 msgid "Firstname"
 msgstr ""
 
 #: cms/templates/signup.html:48 lms/templates/register.html:179
-#: lms/templates/signup_modal.html:44
+#: lms/templates/signup_modal.html:60
 msgid "Middlename"
 msgstr ""
 
 #: cms/templates/signup.html:52 lms/templates/register.html:183
-#: lms/templates/signup_modal.html:48
+#: lms/templates/signup_modal.html:64
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr ""
 
 #: cms/templates/signup.html:61 lms/templates/register.html:192
-#: lms/templates/signup_modal.html:57
+#: lms/templates/signup_modal.html:73
 msgid "Highest Level of Education Completed"
 msgstr ""
 
 #: cms/templates/signup.html:70 lms/templates/register.html:201
-#: lms/templates/signup_modal.html:66
+#: lms/templates/signup_modal.html:82
 msgid "Place where Education Completed"
 msgstr ""
 
 #: cms/templates/signup.html:74 lms/templates/register.html:205
-#: lms/templates/signup_modal.html:70
+#: lms/templates/signup_modal.html:86
 msgid "Year when education was Completed"
 msgstr ""
 
 #: cms/templates/signup.html:84 lms/templates/register.html:215
-#: lms/templates/signup_modal.html:80
+#: lms/templates/signup_modal.html:96
 msgid "Diploma qualification"
 msgstr ""
 
 #: cms/templates/signup.html:88 lms/templates/register.html:219
-#: lms/templates/signup_modal.html:84
+#: lms/templates/signup_modal.html:100
 msgid "Diploma specialty"
 msgstr ""
 
 #: cms/templates/signup.html:92 lms/templates/register.html:223
-#: lms/templates/signup_modal.html:91
+#: lms/templates/signup_modal.html:107
 msgid "Type of educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:101 lms/templates/register.html:232
-#: lms/templates/signup_modal.html:100
+#: lms/templates/signup_modal.html:116
 msgid "Number of educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:105 lms/templates/register.html:236
-#: lms/templates/signup_modal.html:112
+#: lms/templates/signup_modal.html:128
 msgid "Name of educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:109 lms/templates/register.html:240
-#: lms/templates/signup_modal.html:116
+#: lms/templates/signup_modal.html:132
 msgid "StatGrad login of educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:113 lms/templates/register.html:244
-#: lms/templates/signup_modal.html:128
+#: lms/templates/signup_modal.html:144
 msgid "Okrug of educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:122 lms/templates/register.html:253
-#: lms/templates/signup_modal.html:137
+#: lms/templates/signup_modal.html:153
 msgid "Occupation at educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:131 lms/templates/register.html:262
-#: lms/templates/signup_modal.html:146
+#: lms/templates/signup_modal.html:163
 msgid "Another occupation at educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:140 lms/templates/register.html:271
-#: lms/templates/signup_modal.html:155
+#: lms/templates/signup_modal.html:173
 msgid "Educational experience at educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:144 lms/templates/register.html:275
-#: lms/templates/signup_modal.html:159
+#: lms/templates/signup_modal.html:177
 msgid "Managing experience at educational institution"
 msgstr ""
 
 #: cms/templates/signup.html:148 lms/templates/register.html:279
-#: lms/templates/signup_modal.html:163
+#: lms/templates/signup_modal.html:181
 msgid "Qualification category"
 msgstr ""
 
 #: cms/templates/signup.html:157 lms/templates/register.html:288
-#: lms/templates/signup_modal.html:172
+#: lms/templates/signup_modal.html:190
 msgid "Qualification category year"
 msgstr ""
 
 #: cms/templates/signup.html:161 lms/templates/register.html:292
-#: lms/templates/signup_modal.html:178
+#: lms/templates/signup_modal.html:214
 msgid "Contact phone"
 msgstr ""
 
@@ -2596,7 +2604,7 @@ msgid "Help &amp; Account Navigation"
 msgstr ""
 
 #: cms/templates/widgets/header.html:104 lms/templates/help_modal.html:12
-#: lms/templates/navigation.html:76
+#: lms/templates/navigation.html:80
 #: lms/templates/static_templates/help.html:14
 msgid "Help"
 msgstr ""
@@ -2986,228 +2994,165 @@ msgstr ""
 msgid "Second"
 msgstr ""
 
-#: common/djangoapps/student/views.py:369
+#: common/djangoapps/student/views.py:375
 msgid "Course id not specified"
 msgstr ""
 
-#: common/djangoapps/student/views.py:379
+#: common/djangoapps/student/views.py:385
 msgid "Course id is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:382
+#: common/djangoapps/student/views.py:388
 msgid "Enrollment is closed"
 msgstr ""
 
-#: common/djangoapps/student/views.py:406
+#: common/djangoapps/student/views.py:412
 msgid "You are not enrolled in this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:408
+#: common/djangoapps/student/views.py:414
 msgid "Enrollment action is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:420
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-
-#: common/djangoapps/student/views.py:439
-msgid "Too many failed login attempts. Try again later."
-msgstr ""
-
-#: common/djangoapps/student/views.py:446 lms/templates/provider_login.html:42
-msgid "Email or password is incorrect."
-msgstr ""
-
-#: common/djangoapps/student/views.py:493
-msgid ""
-"This account has not been activated. We have sent another activation "
-"message. Please check your e-mail for the activation instructions."
-msgstr ""
-
-#: common/djangoapps/student/views.py:564
-msgid "An account with the Email '{email}' already exists."
-msgstr ""
-
-#: common/djangoapps/student/views.py:648
-msgid "Error (401 {field}). E-mail us."
-msgstr ""
-
-#: common/djangoapps/student/views.py:653
-msgid "To enroll, you must follow the honor code."
-msgstr ""
-
-#: common/djangoapps/student/views.py:664
-msgid "You must accept the terms of service."
-msgstr ""
-
-#: common/djangoapps/student/views.py:683
-#: common/djangoapps/student/views.py:699
+#: common/djangoapps/student/views.py:690
 msgid "Education level is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:689
-msgid "Username must be minimum of two characters long."
-msgstr ""
-
-#: common/djangoapps/student/views.py:690
-msgid "A properly formatted e-mail is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:691
-msgid "Your legal name must be a minimum of two characters long."
-msgstr ""
-
-#: common/djangoapps/student/views.py:692
-msgid "A valid password is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:693
-msgid "Accepting Terms of Service is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:694
-msgid "Agreeing to the Honor Code is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:695
-msgid "Lastname must be a minimum of two characters long."
-msgstr ""
-
-#: common/djangoapps/student/views.py:696
-msgid "Firstname must be a minimum of two characters long."
-msgstr ""
-
-#: common/djangoapps/student/views.py:697
-msgid "Middlename must be a minimum of two characters long."
-msgstr ""
-
-#: common/djangoapps/student/views.py:698
-msgid "Year of birth is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:700
-msgid "Education place is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:701
-msgid "Education year is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:702
-msgid "Work type is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:703
-msgid "Work number is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:704
-msgid "Work name is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:705
-msgid "Work StatGrad login is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:706
-msgid "Work location is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:707
-msgid "Work occupation is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:708
-msgid "Work teaching experience is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:709
-msgid "Work qualification category is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:710
-msgid "Work qualification year is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:711
-msgid "Contact phone is required"
-msgstr ""
-
-#: common/djangoapps/student/views.py:721
-msgid "Education year must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:722
-msgid "Work teaching experience must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:723
-msgid "Work managing experience must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:724
-msgid "Work qualification year must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:725
-msgid "Contact phone must be numeric"
-msgstr ""
-
-#: common/djangoapps/student/views.py:735
-msgid "Valid e-mail is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:742
-msgid "Valid StatGrad login is required."
-msgstr ""
-
-#: common/djangoapps/student/views.py:781
+#: common/djangoapps/student/views.py:793
 msgid "Could not send activation e-mail."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1089
+#: common/djangoapps/student/views.py:1101
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1108
+#: common/djangoapps/student/views.py:1120
 msgid "Invalid e-mail or user"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1140
+#: common/djangoapps/student/views.py:1152
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1153
+#: common/djangoapps/student/views.py:1165
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1170
+#: common/djangoapps/student/views.py:1182
 msgid "Invalid password"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1177
+#: common/djangoapps/student/views.py:1189
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1182
+#: common/djangoapps/student/views.py:1194
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1198
+#: common/djangoapps/student/views.py:1210
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1287
+#: common/djangoapps/student/views.py:1299
 msgid "Name required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1322
-#: common/djangoapps/student/views.py:1332
+#: common/djangoapps/student/views.py:1334
+#: common/djangoapps/student/views.py:1344
 msgid "Invalid ID"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/util/date_utils.py:30
 msgid "at"
+msgstr ""
+
+#: common/templates/hinter_display.html:69
+msgid "Choose the incorrect answer for which you want to write a hint:"
+msgstr ""
+
+#: common/templates/hinter_display.html:73
+msgid ""
+"<em>Optional.</em>  Help other students by submitting a hint!  Pick one of "
+"your previous answers for which you would like to write a hint:"
+msgstr ""
+
+#: common/templates/hinter_display.html:90
+msgid "Write a hint for other students who get the wrong answer of"
+msgstr ""
+
+#: common/templates/hinter_display.html:92
+msgid ""
+"Read about <a class=\"expand\" data-target=\"goodhint\" href=\"javascript:"
+"void(0);\">what makes a good hint"
+msgstr ""
+
+#: common/templates/hinter_display.html:95
+msgid "Write your hint here.  Please don't give away the correct answer."
+msgstr ""
+
+#: common/templates/hinter_display.html:100
+msgid "What makes a good hint?"
+msgstr ""
+
+#: common/templates/hinter_display.html:102
+msgid ""
+"It depends on the type of problem you ran into. For stupid errors -- an "
+"arithmetic error or similar -- simply letting the student you'll be helping "
+"to check their signs is sufficient."
+msgstr ""
+
+#: common/templates/hinter_display.html:104
+msgid ""
+"For deeper errors of understanding, the best hints allow students to "
+"discover a contradiction in how they are thinking about the problem. An "
+"example that clearly demonstrates inconsistency or <a href=\"http://en."
+"wikipedia.org/wiki/Cognitive_dissonance\" target=\"_blank\"> cognitive "
+"dissonace </a>is ideal, although in most cases, not possible."
+msgstr ""
+
+#: common/templates/hinter_display.html:107
+msgid "Good hints either:"
+msgstr ""
+
+#: common/templates/hinter_display.html:109
+msgid "Point out the specific misunderstanding your classmate might have"
+msgstr ""
+
+#: common/templates/hinter_display.html:110
+msgid ""
+"Point to concepts or theories where your classmates might have a "
+"misunderstanding"
+msgstr ""
+
+#: common/templates/hinter_display.html:111
+msgid "Show simpler, analogous examples."
+msgstr ""
+
+#: common/templates/hinter_display.html:112
+msgid "Provide references to relevant parts of the text"
+msgstr ""
+
+#: common/templates/hinter_display.html:116
+msgid ""
+"Still, remember even a crude hint -- virtually anything short of giving away "
+"the answer -- is better than no hint."
+msgstr ""
+
+#: common/templates/hinter_display.html:119
+msgid "Learn even more"
+msgstr ""
+
+#: common/templates/hinter_display.html:123
+msgid "Back"
+msgstr ""
+
+#: common/templates/hinter_display.html:134
+msgid "Sorry, but you've already voted!"
+msgstr ""
+
+#: common/templates/hinter_display.html:136
+msgid "Thank you for voting!"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py:603
@@ -3586,16 +3531,14 @@ msgstr ""
 msgid "Faq"
 msgstr ""
 
-#: lms/templates/contact.html:11 lms/templates/footer.html:23
-#: lms/templates/static_templates/about.html:13
+#: lms/templates/contact.html:11 lms/templates/static_templates/about.html:13
 #: lms/templates/static_templates/contact.html:13
 #: lms/templates/static_templates/faq.html:13
 #: lms/templates/static_templates/press.html:13
 msgid "Press"
 msgstr ""
 
-#: lms/templates/contact.html:12 lms/templates/footer.html:33
-#: lms/templates/static_templates/about.html:14
+#: lms/templates/contact.html:12 lms/templates/static_templates/about.html:14
 #: lms/templates/static_templates/contact.html:14
 #: lms/templates/static_templates/faq.html:14
 #: lms/templates/static_templates/press.html:14
@@ -3654,14 +3597,13 @@ msgid "Media"
 msgstr ""
 
 #: lms/templates/contact.html:41
-#: lms/templates/static_templates/contact.html:43
 msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
 
 #: lms/templates/contact.html:47
-#: lms/templates/static_templates/contact.html:49
+#: lms/templates/static_templates/contact.html:51
 msgid "Universities"
 msgstr ""
 
@@ -3694,7 +3636,11 @@ msgid "edit"
 msgstr ""
 
 #: lms/templates/dashboard.html:161
-#: lms/templates/university_profile/edge.html:15
+#: lms/templates/university_profile/edge.html:141
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:124
+#: lms/templates/university_profile/edge.html.BASE.21781.html:119
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:118
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:118
 msgid "Email"
 msgstr ""
 
@@ -4005,40 +3951,6 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-#: lms/templates/footer.html:13
-msgid "About"
-msgstr ""
-
-#: lms/templates/footer.html:18 lms/templates/static_templates/jobs.html:5
-msgid "Jobs"
-msgstr ""
-
-#: lms/templates/footer.html:28 lms/templates/static_templates/faq.html:7
-msgid "FAQ"
-msgstr ""
-
-#: lms/templates/footer.html:42
-msgid ""
-"{platform_name} is a non-profit created by founding partners {Harvard} and "
-"{MIT} whose mission is to bring the best of higher education to students of "
-"all ages anywhere in the world, wherever there is Internet access. "
-"{platform_name}'s free online MOOCs are interactive and subjects include "
-"computer science, public health, and artificial intelligence."
-msgstr ""
-
-#: lms/templates/footer.html:77
-msgid "&copy; 2013 {platform_name}, some rights reserved."
-msgstr ""
-
-#: lms/templates/footer.html:82
-msgid "Terms of Service and Honor Code"
-msgstr ""
-
-#: lms/templates/footer.html:85 lms/templates/static_templates/privacy.html:7
-#: lms/templates/static_templates/privacy.html:10
-msgid "Privacy Policy"
-msgstr ""
-
 #: lms/templates/forgot_password_modal.html:8
 msgid "Password Reset"
 msgstr ""
@@ -4123,6 +4035,17 @@ msgstr ""
 
 #: lms/templates/help_modal.html:73
 msgid "Include error messages, steps which lead to the issue, etc"
+msgstr ""
+
+#: lms/templates/help_modal.html:80
+#: lms/templates/combinedopenended/openended/open_ended.html:34
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:22
+#: lms/templates/discussion/_underscore_templates.html:20
+#: lms/templates/discussion/_underscore_templates.html:111
+#: lms/templates/instructor/staff_grading.html:58
+#: lms/templates/instructor/staff_grading.html:81
+#: lms/templates/peer_grading/peer_grading_problem.html:55
+msgid "Submit"
 msgstr ""
 
 #: lms/templates/help_modal.html:93
@@ -4218,7 +4141,7 @@ msgstr ""
 #: lms/templates/login.html:115 lms/templates/login_modal.html:14
 #: lms/templates/provider_login.html:44 lms/templates/provider_login.html:45
 #: lms/templates/register.html:118 lms/templates/register.html:139
-#: lms/templates/signup_modal.html:25
+#: lms/templates/signup_modal.html:41
 msgid "E-mail"
 msgstr ""
 
@@ -4261,7 +4184,11 @@ msgid "View our help section for answers to commonly asked questions."
 msgstr ""
 
 #: lms/templates/login_modal.html:9 lms/templates/provider_login.html:37
-#: lms/templates/university_profile/edge.html:23
+#: lms/templates/university_profile/edge.html:149
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:132
+#: lms/templates/university_profile/edge.html.BASE.21781.html:127
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:126
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:126
 msgid "Log In"
 msgstr ""
 
@@ -4337,43 +4264,43 @@ msgstr ""
 msgid "{settings.PLATFORM_NAME} home"
 msgstr ""
 
-#: lms/templates/navigation.html:61
+#: lms/templates/navigation.html:65
 msgid "Find Courses"
 msgstr ""
 
-#: lms/templates/navigation.html:69
+#: lms/templates/navigation.html:73
 msgid "Dashboard for:"
 msgstr ""
 
-#: lms/templates/navigation.html:73
+#: lms/templates/navigation.html:77
 msgid "More options dropdown"
 msgstr ""
 
-#: lms/templates/navigation.html:78
+#: lms/templates/navigation.html:82
 msgid "Log Out"
 msgstr ""
 
-#: lms/templates/navigation.html:88
+#: lms/templates/navigation.html:92
 msgid "How it Works"
 msgstr ""
 
-#: lms/templates/navigation.html:91 lms/templates/courseware/courses.html:6
+#: lms/templates/navigation.html:95 lms/templates/courseware/courses.html:6
 msgid "Courses"
 msgstr ""
 
-#: lms/templates/navigation.html:94
+#: lms/templates/navigation.html:98
 msgid "Schools"
 msgstr ""
 
-#: lms/templates/navigation.html:101 lms/templates/navigation.html:105
+#: lms/templates/navigation.html:105 lms/templates/navigation.html:109
 msgid "Register Now"
 msgstr ""
 
-#: lms/templates/navigation.html:115 lms/templates/navigation.html:117
+#: lms/templates/navigation.html:119 lms/templates/navigation.html:121
 msgid "Log in"
 msgstr ""
 
-#: lms/templates/navigation.html:126
+#: lms/templates/navigation.html:130
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}"
@@ -4414,6 +4341,10 @@ msgstr ""
 
 #: lms/templates/problem.html:31
 msgid "You have used {num_used} of {num_total} submissions"
+msgstr ""
+
+#: lms/templates/provider_login.html:42
+msgid "Email or password is incorrect."
 msgstr ""
 
 #: lms/templates/provider_login.html:49
@@ -4498,11 +4429,14 @@ msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr ""
 
 #: lms/templates/register.html:338
-#: lms/templates/university_profile/edge.html:31
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
+#: lms/templates/university_profile/edge.html.BASE.21781.html:135
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
 msgid "Register"
 msgstr ""
 
-#: lms/templates/register.html:338 lms/templates/signup_modal.html:205
+#: lms/templates/register.html:338 lms/templates/signup_modal.html:241
 msgid "Create My Account"
 msgstr ""
 
@@ -4575,47 +4509,43 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: lms/templates/signup_modal.html:14
+#: lms/templates/signup_modal.html:30
 msgid "Sign Up for {span_start}{platform_name}{span_end}"
 msgstr ""
 
-#: lms/templates/signup_modal.html:26
+#: lms/templates/signup_modal.html:42
 msgid "e.g. yourname@domain.com"
 msgstr ""
 
-#: lms/templates/signup_modal.html:101
+#: lms/templates/signup_modal.html:117
 msgid "e.g. 9999"
 msgstr ""
 
-#: lms/templates/signup_modal.html:113
+#: lms/templates/signup_modal.html:129
 msgid "e.g. School of art"
 msgstr ""
 
-#: lms/templates/signup_modal.html:117
+#: lms/templates/signup_modal.html:133
 msgid "e.g. sch9999"
 msgstr ""
 
-#: lms/templates/signup_modal.html:179
-msgid "e.g. 9091234567"
-msgstr ""
-
-#: lms/templates/signup_modal.html:191
+#: lms/templates/signup_modal.html:227
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
 msgstr ""
 
-#: lms/templates/signup_modal.html:198
+#: lms/templates/signup_modal.html:234
 msgid "I agree to the {link_start}Honor Code{link_end}*"
 msgstr ""
 
-#: lms/templates/signup_modal.html:212
+#: lms/templates/signup_modal.html:248
 msgid "Already have an account?"
 msgstr ""
 
-#: lms/templates/signup_modal.html:212
+#: lms/templates/signup_modal.html:248
 msgid "Login."
 msgstr ""
 
-#: lms/templates/signup_modal.html:219
+#: lms/templates/signup_modal.html:255
 msgid "Close Modal"
 msgstr ""
 
@@ -5317,16 +5247,6 @@ msgstr ""
 msgid "Unanswered"
 msgstr ""
 
-#: lms/templates/combinedopenended/openended/open_ended.html:34
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:22
-#: lms/templates/discussion/_underscore_templates.html:20
-#: lms/templates/discussion/_underscore_templates.html:111
-#: lms/templates/instructor/staff_grading.html:58
-#: lms/templates/instructor/staff_grading.html:81
-#: lms/templates/peer_grading/peer_grading_problem.html:55
-msgid "Submit"
-msgstr ""
-
 #: lms/templates/combinedopenended/openended/open_ended.html:35
 msgid "Skip Post-Assessment"
 msgstr ""
@@ -5389,10 +5309,6 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html:125
 msgid "Overview"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html:142
-msgid "Share with friends and family!"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html:168
@@ -6735,86 +6651,6 @@ msgstr ""
 msgid "About {edX}"
 msgstr ""
 
-#: lms/templates/static_templates/about.html:30
-msgid "About {span_start}{edX}{span_end}"
-msgstr ""
-
-#: lms/templates/static_templates/about.html:31
-msgid ""
-"{EdX} is a not-for-profit enterprise of its founding partners "
-"{harvard_university} and the {massachusetts_institute_of_technology} that "
-"features learning designed specifically for interactive study via the web. "
-"Based on a long history of collaboration and their shared educational "
-"missions, the founders are creating a new online-learning experience with "
-"online courses that reflect their disciplinary breadth.  Along with offering "
-"online courses, the institutions will use {edX} to research how students "
-"learn and how technology can transform learning&ndash;both on-campus and "
-"worldwide. Anant Agarwal, former Director of {MIT}'s Computer Science and "
-"Artificial Intelligence Laboratory, serves as the first president of {edX}. "
-"{EdX}'s goals combine the desire to reach out to students of all ages, "
-"means, and nations, and to deliver these teachings from a faculty who "
-"reflect the diversity of its audience. {EdX} is based in Cambridge, "
-"Massachusetts and is governed by {MIT} and {Harvard}."
-msgstr ""
-
-#: lms/templates/static_templates/about.html:41
-msgid "{harvard_university}"
-msgstr ""
-
-#: lms/templates/static_templates/about.html:42
-msgid ""
-"{harvard_university} is devoted to excellence in teaching, learning, and "
-"research, and to developing leaders in many disciplines who make a "
-"difference globally. {Harvard} faculty are engaged with teaching and "
-"research to push the boundaries of human knowledge.  The University has "
-"twelve degree-granting Schools in addition to the "
-"{radcliffe_institute_for_advanced_study}."
-msgstr ""
-
-#: lms/templates/static_templates/about.html:43
-msgid ""
-"Established in 1636, {Harvard} is the oldest institution of higher education "
-"in the United States. The University, which is based in Cambridge and "
-"Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, "
-"including undergraduate, graduate, and professional students. {Harvard} has "
-"more than 360,000 alumni around the world."
-msgstr ""
-
-#: lms/templates/static_templates/about.html:53
-msgid "{massachusetts_institute_of_technology}"
-msgstr ""
-
-#: lms/templates/static_templates/about.html:54
-msgid ""
-"The {massachusetts_institute_of_technology} &mdash; a coeducational, "
-"privately endowed research university founded in 1861 &mdash; is dedicated "
-"to advancing knowledge and educating students in science, technology, and "
-"other areas of scholarship that will best serve the nation and the world in "
-"the 21st century. The Institute has close to 1,000 faculty and 10,000 "
-"undergraduate and graduate students. It is organized into five Schools: "
-"Architecture and Urban Planning; Engineering; Humanities, Arts, and Social "
-"Sciences; {Sloan} School of Management; and Science."
-msgstr ""
-
-#: lms/templates/static_templates/about.html:55
-msgid ""
-"{MIT}'s commitment to innovation has led to a host of scientific "
-"breakthroughs and technological advances. Achievements of the Institute's "
-"faculty and graduates have included the first chemical synthesis of "
-"penicillin and vitamin A, the development of inertial guidance systems, "
-"modern technologies for artificial limbs, and the magnetic core memory that "
-"made possible the development of digital computers. 78 alumni, faculty, "
-"researchers and staff have won Nobel Prizes."
-msgstr ""
-
-#: lms/templates/static_templates/about.html:56
-msgid ""
-"Current areas of research and education include neuroscience and the study "
-"of the brain and mind, bioengineering, cancer, energy, the environment and "
-"sustainable development, information sciences and technology, new media, "
-"financial technology, and entrepreneurship."
-msgstr ""
-
 #: lms/templates/static_templates/contact.html:7
 msgid "Contact {platform_name}"
 msgstr ""
@@ -6839,17 +6675,23 @@ msgid ""
 "issues, you can reach us at the following: {bug_email}."
 msgstr ""
 
-#: lms/templates/static_templates/contact.html:52
+#: lms/templates/static_templates/contact.html:43
+msgid ""
+"Please visit our {link_start}media/press page{link_end} for more "
+"information. For any media or press inquiries, please email {emails}."
+msgstr ""
+
+#: lms/templates/static_templates/contact.html:54
 msgid ""
 "If you are a university wishing to collaborate or you have questions about "
 "{platform_name}, please email {email}."
 msgstr ""
 
-#: lms/templates/static_templates/contact.html:57
+#: lms/templates/static_templates/contact.html:59
 msgid "Accessibility"
 msgstr ""
 
-#: lms/templates/static_templates/contact.html:58
+#: lms/templates/static_templates/contact.html:60
 msgid ""
 "{platform_name} strives to create an innovative online-learning platform "
 "that promotes accessibility for everyone, including students with "
@@ -6899,6 +6741,10 @@ msgstr ""
 msgid ""
 "{MIT} and <i>{MITx}</i> are trademarks of the {MIT_long}, and may not be "
 "used without permission."
+msgstr ""
+
+#: lms/templates/static_templates/faq.html:7
+msgid "FAQ"
 msgstr ""
 
 #: lms/templates/static_templates/faq.html:23
@@ -7101,562 +6947,6 @@ msgstr ""
 msgid "{edX} Help"
 msgstr ""
 
-#: lms/templates/static_templates/help.html:20
-#: lms/templates/static_templates/help.html:318
-msgid "{edX} Basics"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:22
-msgid "How do I sign up to take a class?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:24
-msgid ""
-"Simply create an {edX} account (it's free) and then register for the course "
-"of your choice (also free). Follow the prompts on the {edX} website."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:28
-msgid "What does it cost to take a class? Is this really free?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:30
-msgid ""
-"{EdX} courses are free for everyone. All you need is an Internet connection."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:34
-msgid "What happens after I sign up for a course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:36
-msgid ""
-"You will receive an activation email. Follow the prompts in that email to "
-"activate your account. You will need to log in each time you access your "
-"course(s). Once the course begins, it's time to hit the virtual books. You "
-"can access the lectures, homework, tutorials, etc., for each week, one week "
-"at a time."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:40
-msgid "Who can take an {edX} course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:42
-msgid ""
-"You, your mom, your little brother, your grandfather -- anyone with Internet "
-"access can take an {edX} course. Free."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:46
-msgid "Are the courses only offered in English?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:48
-msgid ""
-"Some {edX} courses include a translation of the lecture in the text bar to "
-"the right of the video. Some have the specific option of requesting a course "
-"in other languages. Please check your course to determine foreign language "
-"options."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:52
-msgid "When will there be more courses on other subjects?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:54
-msgid ""
-"We are continually reviewing and creating courses to add to the {edX} "
-"platform. Please check the website for future course announcements. You can "
-"also \"friend\" {edX} on Facebook - you'll receive updates and announcements."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:58
-msgid "When does my course start and/or finish?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:60
-msgid ""
-"You can find the start and stop dates for each course on each course "
-"description page."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:64
-msgid "Is there a walk-through of a sample course session?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:66
-msgid ""
-" There are video introductions for every course that will give you a good "
-"sense of how the course works and what to expect."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:70
-msgid ""
-"I don't have the prerequisites for a course that I am interested in. Can I "
-"still take the course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:72
-msgid ""
-"We do not check students for prerequisites, so you are allowed to attempt "
-"the course. However, if you do not know prerequisite subjects before taking "
-"a class, you will have to learn the prerequisite material on your own over "
-"the semester, which can be an extremely difficult task."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:76
-msgid ""
-"What happens if I have to quit a course? Are there any penalties? Will I be "
-"able to take another course in the future?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:78
-#: lms/templates/static_templates/help.html:222
-msgid ""
-"You may unregister from an {edX} course at anytime, there are absolutely no "
-"penalties associated with incomplete {edX} studies, and you may register for "
-"the same course (provided we are still offering it) at a later time."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:84
-#: lms/templates/static_templates/help.html:319
-msgid "The Classes"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:86
-msgid "How much work will I have to do to pass my course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:88
-msgid ""
-"The projected hours of study required for each course are described on the "
-"specific course description page."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:92
-msgid "What should I do before I take a course (prerequisites)?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:94
-msgid ""
-"Each course is different - some have prerequisites, and some don't. Take a "
-"look at your specific course's recommended prerequisites. If you do not have "
-"a particular prerequisite, you may still take the course."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:98
-msgid ""
-"What books should I read? (I am interested in reading materials before the "
-"class starts)."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:100
-msgid ""
-"Take a look at the specific course prerequisites. All required academic "
-"materials will be provided during the course, within the browser. Some of "
-"the course descriptions may list additional resources. For supplemental "
-"reading material before or during the course, you can post a question on the "
-"course's Discussion Forum to ask your online coursemates for suggestions."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:104
-msgid " Can I download the book for my course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:106
-msgid ""
-"{EdX} book content may only be viewed within the browser, and downloading it "
-"violates copyright laws. If you need or want a hard copy of the book, we "
-"recommend that you purchase a copy."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:110
-msgid "Can I take more than one course at a time?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:112
-msgid ""
-"You may take multiple edX courses, however we recommend checking the "
-"requirements on each course description page to determine your available "
-"study hours and the demands of the intended courses."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:116
-msgid "How do I log in to take an {edX} class?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:118
-msgid ""
-"Once you sign up for a course and activate your account, click on the \"Log "
-"In\" button on the edx.org home page. You will need to type in your email "
-"address and {edX} password each time you log in."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:122
-msgid "What time is the class?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:124
-msgid ""
-"{EdX} classes take place at your convenience. Prefer to sleep in and study "
-"late? No worries. Videos and problem sets are available 24 hours a day, "
-"which means you can watch video and complete work whenever you have spare "
-"time. You simply log in to your course via the Internet and work through the "
-"course material, one week at a time."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:128
-msgid "If I miss a week, how does this affect my grade?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:130
-msgid ""
-"It is certainly possible to pass an {edX} course if you miss a week; "
-"however, coursework is progressive, so you should review and study what you "
-"may have missed. You can check your progress dashboard in the course to see "
-"your course average along the way if you have any concerns."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:134
-msgid "How can I meet/find other students?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:136
-msgid ""
-"All {edX} courses have Discussion Forums where you can chat with and help "
-"each other within the framework of the Honor Code."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:140
-#: lms/templates/static_templates/help.html:214
-msgid "How can I talk to professors, fellows and teaching assistants?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:142
-#: lms/templates/static_templates/help.html:216
-msgid ""
-"The Discussion Forums are the best place to reach out to the {edX} teaching "
-"team for your class, and you don't have to wait in line or rearrange your "
-"schedule to fit your professor's - just post your questions. The response "
-"isn't always immediate, but it's usually pretty darned quick."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:147
-msgid "Getting help."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:149
-msgid ""
-"You have a vibrant, global community of fellow online learners available "
-"24-7 to help with the course within the framework of the Honor Code, as well "
-"as support from the TAs who monitor the course. Take a look at the course's "
-"Discussion Forum where you can review questions, answers and comments from "
-"fellow online learners, as well as post a question."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:153
-msgid "Can I re-take a course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:155
-msgid ""
-"Good news: there are unlimited \"mulligans\" in {edX}. You may re-take {edX} "
-"courses as often as you wish. Your performance in any particular offering of "
-"a course will not effect your standing in future offerings of any {edX} "
-"course, including future offerings of the same course."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:159
-msgid ""
-"Enrollment for a course that I am interested in is open, but the course has "
-"already started. Can I still enroll?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:161
-msgid ""
-"Yes, but you will not be able to turn in any assignments or exams that have "
-"already been due. If it is early in the course, you might still be able to "
-"earn enough points for a certificate, but you will have to check with the "
-"course in question in order to find out more."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:165
-msgid "Is there an exam at the end?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:167
-msgid ""
-"Different courses have slightly different structures. Please check the "
-"course material description to see if there is a final exam or final project."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:171
-msgid "Will the same courses be offered again in the future?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:173
-msgid "Existing {edX} courses will be re-offered, and more courses added."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:180
-msgid "Certificates & Credits"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:183
-msgid "Will I get a certificate for taking an {edX} course?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:185
-msgid ""
-"Online learners who receive a passing grade for a course will receive a "
-"certificate of mastery at the discretion of {edX} and the underlying {X} "
-"University that offered the course. For example, a certificate of mastery "
-"for {MITx}'s 6.002x Circuits &amp; Electronics will come from {edX} and "
-"{MITx}."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:186
-msgid ""
-"If you passed the course, your certificate of mastery will be delivered "
-"online through edx.org. So be sure to check your email in the weeks "
-"following the final grading - you will be able to download and print your "
-"certificate. Note: At this time, {edX} is holding certificates for learners "
-"connected with Cuba, Iran, Syria and Sudan pending confirmation that the "
-"issuance is in compliance with U.S. embargoes."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:190
-msgid "How are {edX} certificates delivered?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:192
-msgid ""
-"{EdX} certificates are delivered online through edx.org. So be sure to check "
-"your email in the weeks following the final grading - you will be able to "
-"download and print your certificate."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:196
-msgid ""
-"What is the difference between a proctored certificate and an honor code "
-"certificate?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:198
-msgid ""
-"A proctored certificate is given to students who take and pass an exam under "
-"proctored conditions. An honor-code certificate is given to students who "
-"have completed all of the necessary online coursework associated with a "
-"course and have signed <link> the {edX} honor code </link>."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:202
-msgid "Can I get both a proctored certificate and an honor code certificate?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:204
-msgid ""
-"Yes. The requirements for both certificates can be independently satisfied."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:208
-msgid "Will my grade be shown on my certificate?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:210
-msgid ""
-"No. Grades are not displayed on either honor code or proctored certificates."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:220
-msgid ""
-"The only certificates distributed with grades by {edX} were for the initial "
-"prototype course."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:226
-msgid "Will my university accept my {edX} coursework for credit?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:228
-msgid ""
-"Each educational institution makes its own decision regarding whether to "
-"accept {edX} coursework for credit. Check with your university for its "
-"policy."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:232
-msgid "I lost my {edX} certificate - can you resend it to me?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:234
-msgid ""
-"Please log back in to your account to find certificates from the same "
-"profile page where they were originally posted. You will be able to re-print "
-"your certificate from there."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:240
-msgid "edX & Open Source"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:242
-msgid "What's open source?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:244
-msgid ""
-"Open source is a philosophy that generally refers to making software freely "
-"available for use or modification as users see fit. In exchange for use of "
-"the software, users generally add their contributions to the software, "
-"making it a public collaboration. The {edX} platform will be made available "
-"as open source code in order to allow world talent to improve and share it "
-"on an ongoing basis."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:248
-msgid "When/how can I get the open-source platform technology?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:250
-msgid ""
-"We are still building the {edX} technology platform and will be making "
-"announcements in the future about its availability."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:256
-#: lms/templates/static_templates/help.html:322
-msgid "Other Help Questions - Account Questions"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:258
-msgid "My username is taken."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:260
-msgid ""
-"Now's your chance to be creative: please try a different, more unique "
-"username - for example, try adding a random number to the end."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:264
-msgid "Why does my password show on my course login page?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:266
-msgid ""
-"Oops! This may be because of the way you created your account. For example, "
-"you may have mistakenly typed your password into the login box."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:270
-msgid "I am having login problems (password/email unrecognized)."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:272
-msgid ""
-"Please check your browser's settings to make sure that you have the current "
-"version of Firefox or Chrome, and then try logging in again. If you find "
-"access impossible, you may simply create a new account using an alternate "
-"email address - the old, unused account will disappear later."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:276
-msgid "I did not receive an activation email."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:278
-msgid "If you did not receive an activation email it may be because:"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:280
-msgid "There was a typo in your email address."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:281
-msgid ""
-"Your spam filter may have caught the activation email. Please check your "
-"spam folder. "
-msgstr ""
-
-#: lms/templates/static_templates/help.html:282
-msgid ""
-"You may be using an older browser. We recommend downloading the current "
-"version of Firefox or Chrome. "
-msgstr ""
-
-#: lms/templates/static_templates/help.html:283
-msgid ""
-"JavaScript is disabled in your browser. Please check your browser settings "
-"and confirm that JavaScript is enabled. "
-msgstr ""
-
-#: lms/templates/static_templates/help.html:285
-msgid ""
-"If you continue to have problems activating your account, we recommend that "
-"you try creating a new account. There is no need to do anything about the "
-"old account. If it is not activated through the link in the email, it will "
-"disappear later."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:289
-msgid "Can I delete my account?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:291
-msgid ""
-"There's no need to delete you account. An old, unused {edX} account with no "
-"course completions associated with it will disappear."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:295
-msgid "I made a mistake creating my username - how do I fix it?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:297
-msgid ""
-"In most cases it would simplest and fastest to create a new account.  Your "
-"old unused account will vanish naturally. If you were not aware of your "
-"mistake until much later, you should send us a detailed change request and "
-"we will do our best to edit your username.  Please bear in mind that "
-"usernames are unique, and the one you want may be taken."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:301
-msgid ""
-"I am experiencing problems with the display. E.g., There are tools missing "
-"from the course display, or I am unable to view video."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:303
-msgid ""
-"Please check your browser and settings. We recommend downloading the current "
-"version of Firefox or Chrome. Alternatively, you may re-register with a "
-"different email account. There is no need to delete the old account, as it "
-"will disappear if unused."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:307
-msgid "How can I help {edX}?"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:309
-msgid ""
-"You may not realize it, but just by taking a course you are helping {edX}. "
-"That's because the {edX} platform has been specifically designed to not only "
-"teach, but also gather data about learning. {EdX} will utilize this data to "
-"find out how to improve education online and on-campus."
-msgstr ""
-
-#: lms/templates/static_templates/help.html:320
-msgid "Certificates and Credits"
-msgstr ""
-
-#: lms/templates/static_templates/help.html:321
-msgid "{edX} & Open source"
-msgstr ""
-
 #: lms/templates/static_templates/honor.html:8
 #: lms/templates/static_templates/honor.html:11
 msgid "Honor Code"
@@ -7736,6 +7026,10 @@ msgstr ""
 msgid ""
 "Present ideas and written work to fellow {edX} learners or others for "
 "comment or criticism."
+msgstr ""
+
+#: lms/templates/static_templates/jobs.html:5
+msgid "Jobs"
 msgstr ""
 
 #: lms/templates/static_templates/jobs.html:8
@@ -9513,348 +8807,9 @@ msgstr ""
 msgid "{edX} in the Press"
 msgstr ""
 
-#: lms/templates/static_templates/privacy.html:14
-msgid ""
-"NOTICE: on September 26, 2012 {edX} adopted an amended Privacy Policy, "
-"providing as follows:"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:16
-msgid "Confidentiality &amp; Security of Personal Information"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:17
-msgid ""
-"We care about the confidentiality and security of your personal information. "
-"We will use commercially reasonable efforts to keep your Personal "
-"Information secure. (&ldquo;Personal Information&rdquo; is defined below.) "
-"However, no method of transmitting or storing electronic data is ever "
-"completely secure, and we therefore cannot guarantee the security of "
-"information transmitted to or stored by the {edX} Website. (As used in this "
-"Privacy Policy, &ldquo;we,&rdquo; &ldquo;us&rdquo; and &ldquo;our&rdquo; "
-"refer to {edX}.)"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:18
-msgid ""
-"This Privacy Policy only applies to information that we collect through the "
-"{edX} Website (the &ldquo;Site,&rdquo; which consists of all content and "
-"pages located within the edX.org web domain) and does not apply to "
-"information that we may collect from you in other ways (for example, this "
-"policy does not apply to information that you may provide to us over the "
-"phone, by fax or through conventional mail). In addition, please note that "
-"your education records are protected by the Family Educational Rights and "
-"Privacy Act (&ldquo;FERPA&rdquo;) to the extent FERPA applies. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:20
-msgid "Usernames and Postings"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:21
-msgid ""
-"Comments or other information posted by you to our forums, wikis or other "
-"areas of the Site designed for public communications or communications among "
-"registered class members may be viewed and downloaded by others who visit "
-"the Site. For this reason, we encourage you to use discretion when deciding "
-"whether to post any information that can be used to identify you to those "
-"forums (or other public or classwide areas)."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:23
-msgid "What You Consent to by Using Our Site"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:24
-msgid ""
-"By accessing, browsing, or registering for the Site, you consent and agree "
-"that information about you collected through the Site may be used and "
-"disclosed in accordance with the Privacy Policy and our Terms of Service and "
-"as permitted or required by law, and that such information may be "
-"transferred to, processed in and stored in the United States and elsewhere. "
-"If you do not agree with these terms, then please do not access, browse, or "
-"register for the Site. If you choose not to provide us with certain "
-"information required to provide you with various services offered on our "
-"Site, you may not be able to establish a user account and we may not be able "
-"to provide you with those services."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:25
-msgid ""
-"As used in this Privacy Policy, &ldquo;Personal Information&rdquo; means any "
-"information about yourself that you may provide to us when using the Site, "
-"such as when you sign up for a user account or enter into a transaction "
-"through the Site, which may include (but is not limited to) your name, "
-"contact information, gender, date of birth, and occupation."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:27
-msgid "Information We Collect and How We Use It"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:28
-msgid ""
-"We collect information, including Personal Information, when you sign up for "
-"a user account, participate in online courses, send us email messages and/or "
-"participate in our public forums. We collect information about student "
-"performance and patterns of learning. We track information indicating, among "
-"other things, which pages of our Site were visited, the order in which they "
-"were visited, when they were visited and which hyperlinks and other user "
-"interface controls were used."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:30
-msgid ""
-"We may log the IP address, operating system and browser software used by "
-"each user of the Site, and we may be able to determine from an IP address a "
-"user's Internet Service Provider and the geographic location of his or her "
-"point of connectivity. Various web analytics tools are used to collect this "
-"information. Some of the information is collected through cookies (small "
-"text files placed on your computer that store information about you, which "
-"can be accessed by the Site). You should be able to control how and whether "
-"cookies will be accepted by your web browser. Most browsers offer "
-"instructions on how to reset the browser to reject cookies in the &ldquo;"
-"Help&rdquo; section of the toolbar. If you reject our cookies, many "
-"functions and conveniences of this Site may not work properly. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:32
-msgid ""
-"Among other things, we and the educational institutions that provide courses "
-"through {edX} (the &ldquo;Universities&rdquo;) may use the information about "
-"you collected through the Site (including your Personal Information) in "
-"connection with the following:"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:34
-msgid ""
-"To enable the Universities to provide, administer and improve the courses."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:35
-msgid ""
-"To help us and the Universities improve {edX} offerings, both individually "
-"(e.g., by course staff when working with a student) and in aggregate, and to "
-"individualize the experience and to evaluate the access and use of the Site "
-"and the impact of {edX} on the worldwide educational community. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:36
-msgid ""
-"For purposes of scientific research, particularly, for example, in the areas "
-"of cognitive science and education. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:37
-msgid ""
-"For the purpose for which you specifically provided the information, for "
-"example, to respond to a specific inquiry or provide you with access to the "
-"specific course content and/or services you select."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:38
-msgid ""
-"To track both individual and aggregate attendance, progress and completion "
-"of an online course, and to analyze statistics on student performance and "
-"how students learn."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:39
-msgid ""
-"To monitor and detect violations of the Honor Code, the Terms of Service, as "
-"well as other misuses and potential misuses of the Site. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:40
-msgid ""
-"To publish information, but not Personal Information, gathered about {edX} "
-"access, use, impact and student performance."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:41
-msgid ""
-"To send you updates about online courses offered by {edX} or other events, "
-"to send you communications about products or services of {edX}, {edX} "
-"affiliates, or selected business partners that may be of interest to you, or "
-"to send you email messages about Site maintenance or updates."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:42
-msgid ""
-"To archive this information and/or use it for future communications with you."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:43
-msgid ""
-"To maintain and improve the functioning and security of the Site and our "
-"software, systems and network."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:44
-msgid ""
-"For purposes described elsewhere in this Privacy Policy (including, e.g., "
-"Sharing with Third Parties)."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:45
-msgid ""
-"As otherwise described to you at the point of collection, pursuant to your "
-"consent, or as otherwise permitted by law."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:48
-msgid "Sharing with Third Parties"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:49
-msgid ""
-"We will share information we collect with the Universities, and we and the "
-"Universities may share this information (including Personal Information) "
-"with third parties as follows:"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:51
-msgid ""
-"With service providers or contractors that perform certain functions on our "
-"or the Universities' behalf, including processing information that you "
-"provide to us on the Site, processing purchases and other transactions "
-"through the Site, operating the Site or portions of it, providing or "
-"administering courses, or in connection with other aspects of {edX} or "
-"University services."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:52
-msgid ""
-"With other visitors to the Site, to the extent that you submit comments, "
-"course work or other information or content (collectively, &ldquo;"
-"Postings&rdquo;) to a portion of the Site designed for public "
-"communications; and with other members of an {edX} class of which you are a "
-"member, to the extent you submit Postings to a portion of the Site designed "
-"for viewing by those class members. We may provide your Postings to students "
-"who later enroll in the same classes as you, within the context of the "
-"forums, the courseware or otherwise. If we do re-post your Postings "
-"originally made to non-public portions of the Site, we will post them "
-"without your real name and e-mail (except with explicit permission), but we "
-"may use your username.  "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:53
-msgid ""
-"For purposes of scientific research, particularly, for example, in the areas "
-"of cognitive science and education. However, we will only share Personal "
-"Information about you for this purpose to the extent doing so complies with "
-"applicable law."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:54
-msgid ""
-"To provide opportunities for you to communicate with other users who may "
-"have similar interests or educational goals. For instance, we may recommend "
-"specific study partners or connect potential student mentees and mentors. In "
-"such cases, we may use all information collected about you to determine who "
-"might be interested in communicating with you, but we will only provide "
-"other users your username, and not disclose your real name or e-mail address "
-"to your contact. "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:55
-msgid ""
-"To respond to subpoenas, court orders, or other legal process; in response "
-"to a request for cooperation from law enforcement or another government "
-"agency; to investigate, prevent or take action regarding illegal activities, "
-"suspected fraud, security or technical issues, or to enforce our Terms of "
-"Service, Honor Code or this Privacy Policy; as otherwise may be required by "
-"applicable law; or to protect our rights, property or safety or those of "
-"others."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:56
-msgid ""
-"With affiliates of {edX} or the Universities, or with successors in the "
-"event of a merger, acquisition or reorganization, for their use consistent "
-"with this Privacy Policy.     "
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:57
-msgid ""
-"As otherwise described to you at the point of collection, pursuant to your "
-"consent, or otherwise as permitted by law (e.g., disclosures permitted under "
-"FERPA, to the extent FERPA applies to the information)."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:58
-msgid ""
-"For integration with third party services. For example, videos and other "
-"content may be hosted on YouTube and other websites not controlled by {edX}."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:61
-msgid ""
-"In addition, we may share aggregated information that does not personally "
-"identify you with the public and with third parties, including, e.g., "
-"researchers and business partners."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:63
-msgid "Links to Other Websites"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:65
-msgid ""
-"The Sites may contain links to websites published by other content "
-"providers. These other websites are not under our control, and you "
-"acknowledge and agree that we are not responsible for the collection and use "
-"of your information by such websites. We encourage you to review the privacy "
-"policies of each website you visit and use."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:67
-msgid "Personalization and Pedagogical Improvements"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:68
-msgid ""
-"Our goal is to provide current and future visitors with the best possible "
-"educational experience. To further this goal, we sometimes present different "
-"users with different versions of course materials and software. We do this "
-"to personalize the experience to the individual learner (assess the "
-"learner's level of ability and learning style, and present materials best "
-"suited to the learner), to evaluate the effectiveness of our course "
-"materials, to improve our understanding of the learning process and to "
-"otherwise improve the effectiveness of our offerings. We may publish or "
-"otherwise publicize results from this process, but, unless otherwise "
-"permitted under this Privacy Policy, those publications or public "
-"disclosures will not include Personal Information."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:70
-msgid "Changing Our Privacy Policy"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:71
-msgid ""
-"Please note that we review and may make changes to this Privacy Policy from "
-"time to time. Any changes to this Privacy Policy will be effective "
-"immediately upon posting on this page, with an updated effective date. By "
-"accessing the Site after any changes have been made, you signify your "
-"agreement on a prospective basis to the modified Privacy Policy and any "
-"changes contained therein. Be sure to return to this page periodically to "
-"ensure familiarity with the most current version of this Privacy Policy."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:73
-msgid "Privacy Concerns"
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:74
-msgid ""
-"If you have privacy concerns, have disclosed data you would prefer to keep "
-"private, or would like to access the information we maintain about you, "
-"please contact us at <a href=\"mailto:privacy@edx.org\">privacy@edx.org</a>."
-msgstr ""
-
-#: lms/templates/static_templates/privacy.html:76
-msgid "<strong>Effective Date:</strong> September 26, 2012"
+#: lms/templates/static_templates/privacy.html:7
+#: lms/templates/static_templates/privacy.html:10
+msgid "Privacy Policy"
 msgstr ""
 
 #: lms/templates/static_templates/server-down.html:5
@@ -9889,19 +8844,25 @@ msgid ""
 "{tech_support_email}</a> to report any problems or downtime."
 msgstr ""
 
-#: lms/templates/university_profile/edge.html:4
-#: lms/templates/university_profile/edge.html:9
-msgid "edX edge"
-msgstr ""
-
-#: lms/templates/university_profile/edge.html:12
+#: lms/templates/university_profile/edge.html:138
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:121
+#: lms/templates/university_profile/edge.html.BASE.21781.html:116
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:115
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:115
 msgid "Log in to your courses"
 msgstr ""
 
-#: lms/templates/university_profile/edge.html:29
+#: lms/templates/university_profile/edge.html:155
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:138
+#: lms/templates/university_profile/edge.html.BASE.21781.html:133
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:132
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:132
 msgid "Register for classes"
 msgstr ""
 
-#: lms/templates/university_profile/edge.html:30
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:139
+#: lms/templates/university_profile/edge.html.BASE.21781.html:134
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:133
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:133
 msgid "Take free online courses from today's leading universities."
 msgstr ""

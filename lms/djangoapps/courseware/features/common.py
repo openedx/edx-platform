@@ -154,10 +154,10 @@ def get_courseware_with_tabs(course_id):
             'tab_classes': []
         }]
     }, {
-        'chapter_name': 'Midterm Exam',
+        'chapter_name': 'Промежуточный экзамен',
         'sections': [{
             'clickable_tab_count': 2,
-            'section_name': 'Midterm Exam',
+            'section_name': 'Промежуточный экзамен',
             'tab_classes': ['VerticalDescriptor', 'VerticalDescriptor']
         }]
     }]
