@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio/LMS: Added ability to set due date formatting through Studio's Advanced Settings.
+The key is due_date_display_format, and the value should be a format supported by Python's
+strftime function.
+
 Common: Added configurable backends for tracking events. Tracking events using
 the python logging module is the default backend. Support for MongoDB and a
 Django database is also available.
