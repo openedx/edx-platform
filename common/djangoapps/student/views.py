@@ -769,6 +769,8 @@ def create_account(request, post_override=None):
     (user, profile, registration) = ret
 
     d = {'name': post_vars['lastname'],
+         'login': post_vars['email'],
+         'password': post_vars['password'],
          'key': registration.activation_key,
          }
 
@@ -1152,6 +1154,8 @@ def reactivation_email_for_user(user):
                                         'error': _('No inactive user with this e-mail exists')}))
 
     d = {'name': user.profile.name,
+         'login': user.profile.email,
+         'password': '******',
          'key': reg.activation_key}
 
     subject = render_to_string('emails/activation_email_subject.txt', d)
