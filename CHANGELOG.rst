@@ -14,6 +14,10 @@ assessors to edit the original submitter's work.
 LMS: Fixed a bug that caused links from forum user profile pages to
 threads to lead to 404s if the course id contained a '-' character.
 
+Studio/LMS: Added ability to set due date formatting through Studio's Advanced Settings.
+The key is due_date_display_format, and the value should be a format supported by Python's
+strftime function.
+
 Common: Added configurable backends for tracking events. Tracking events using
 the python logging module is the default backend. Support for MongoDB and a
 Django database is also available.
