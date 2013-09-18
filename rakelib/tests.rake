@@ -61,7 +61,7 @@ def setup_acceptance_db(system, fasttest=false)
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
-    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
+    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--verbosity 2', '--tag -skip', harvest_args))
 end
 
 # Run documentation tests
@@ -187,7 +187,7 @@ task :coverage => :report_dirs do
 
         end
     end
-    
+
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = FileList[File.join(REPORT_DIR, '**/coverage.xml')]
 
