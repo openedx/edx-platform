@@ -1661,13 +1661,13 @@
         margin: 0 flex-gutter() 0 0;
 
         .title {
-          @extend .hd-lv4;
+          @extend %hd-lv4;
           margin-bottom: ($baseline/4);
         }
 
         .copy {
-          @extend .t-copy-sub1;
-          @extend .t-weight3;
+          @extend %t-copy-sub1;
+          @extend %t-weight3;
         }
 
         .list-actions {
@@ -1675,7 +1675,7 @@
         }
 
         .action-verify label  {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
         }
       }
 
