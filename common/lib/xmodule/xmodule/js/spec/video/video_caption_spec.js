@@ -105,8 +105,8 @@
 
         it('bind all the caption link', function() {
           $('.subtitles li[data-index]').each(function(index, link) {
-            expect($(link)).toHandleWith('mouseenter', videoCaption.captionMouseEnterLeave);
-            expect($(link)).toHandleWith('mouseleave', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mouseover', videoCaption.captionMouseOverOut);
+            expect($(link)).toHandleWith('mouseout', videoCaption.captionMouseOverOut);
             expect($(link)).toHandleWith('mousedown', videoCaption.captionMouseDown);
             expect($(link)).toHandleWith('click', videoCaption.captionClick);
             expect($(link)).toHandleWith('focus', videoCaption.captionFocus);
@@ -297,8 +297,8 @@
 
         it('bind all the caption link', function() {
           $('.subtitles li[data-index]').each(function(index, link) {
-            expect($(link)).toHandleWith('mouseenter', videoCaption.captionMouseEnterLeave);
-            expect($(link)).toHandleWith('mouseleave', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mouseover', videoCaption.captionMouseOverOut);
+            expect($(link)).toHandleWith('mouseout', videoCaption.captionMouseOverOut);
             expect($(link)).toHandleWith('mousedown', videoCaption.captionMouseDown);
             expect($(link)).toHandleWith('click', videoCaption.captionClick);
             expect($(link)).toHandleWith('focus', videoCaption.captionFocus);

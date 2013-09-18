@@ -62,7 +62,7 @@ function () {
         state.videoCaption.bindHandlers            = _.bind(bindHandlers, state);
         state.videoCaption.fetchCaption            = _.bind(fetchCaption, state);
         state.videoCaption.captionURL              = _.bind(captionURL, state);
-        state.videoCaption.captionMouseEnterLeave  = _.bind(captionMouseEnterLeave, state);
+        state.videoCaption.captionMouseOverOut     = _.bind(captionMouseOverOut, state);
         state.videoCaption.captionMouseDown        = _.bind(captionMouseDown, state);
         state.videoCaption.captionClick            = _.bind(captionClick, state);
         state.videoCaption.captionFocus            = _.bind(captionFocus, state);
@@ -325,8 +325,8 @@ function () {
         this.videoCaption.subtitlesEl.html(container.html());
 
         this.videoCaption.subtitlesEl.find('li[data-index]').on({
-            mouseenter: this.videoCaption.captionMouseEnterLeave,
-            mouseleave: this.videoCaption.captionMouseEnterLeave,
+            mouseover:  this.videoCaption.captionMouseOverOut,
+            mouseout:   this.videoCaption.captionMouseOverOut,
             mousedown:  this.videoCaption.captionMouseDown,
             click:      this.videoCaption.captionClick,
             focus:      this.videoCaption.captionFocus,
@@ -358,16 +358,16 @@ function () {
         this.videoCaption.rendered = true;
     }
 
-    // On mouseEnter, hide the outline of a caption that has been tabbed to.
-    // On mouseLeave, show the outline of a caption that has been tabbed to.
-    function captionMouseEnterLeave(event) {
+    // On mouseOver, hide the outline of a caption that has been tabbed to.
+    // On mouseOut, show the outline of a caption that has been tabbed to.
+    function captionMouseOverOut(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10); 
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
-            if (event.type === 'mouseenter') {
+            if (event.type === 'mouseover') {
                 caption.removeClass('focused').addClass('unfocused');
             }
-            else { // mouseleave
+            else { // mouseout
                 caption.removeClass('unfocused').addClass('focused');
             }
         } 
