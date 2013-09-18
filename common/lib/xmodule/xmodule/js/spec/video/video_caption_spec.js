@@ -93,6 +93,7 @@
           $('.subtitles li[data-index]').each(function(index, link) {
             expect($(link)).toHaveData('index', index);
             expect($(link)).toHaveData('start', captionsData.start[index]);
+            expect($(link)).toHaveData('tabindex', 0);
             expect($(link)).toHaveText(captionsData.text[index]);
           });
         });
@@ -104,7 +105,13 @@
 
         it('bind all the caption link', function() {
           $('.subtitles li[data-index]').each(function(index, link) {
-            expect($(link)).toHandleWith('click', videoCaption.seekPlayer);
+            expect($(link)).toHandleWith('mouseenter', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mouseleave', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mousedown', videoCaption.captionMouseDown);
+            expect($(link)).toHandleWith('click', videoCaption.captionClick);
+            expect($(link)).toHandleWith('focus', videoCaption.captionFocus);
+            expect($(link)).toHandleWith('blur', videoCaption.captionBlur);
+            expect($(link)).toHandleWith('keydown', videoCaption.captionKeyDown);
           });
         });
 
@@ -278,6 +285,7 @@
           $('.subtitles li[data-index]').each(function(index, link) {
             expect($(link)).toHaveData('index', index);
             expect($(link)).toHaveData('start', captionsData.start[index]);
+            expect($(link)).toHaveData('tabindex', 0);
             expect($(link)).toHaveText(captionsData.text[index]);
           });
         });
@@ -289,7 +297,13 @@
 
         it('bind all the caption link', function() {
           $('.subtitles li[data-index]').each(function(index, link) {
-            expect($(link)).toHandleWith('click', videoCaption.seekPlayer);
+            expect($(link)).toHandleWith('mouseenter', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mouseleave', videoCaption.captionMouseEnterLeave);
+            expect($(link)).toHandleWith('mousedown', videoCaption.captionMouseDown);
+            expect($(link)).toHandleWith('click', videoCaption.captionClick);
+            expect($(link)).toHandleWith('focus', videoCaption.captionFocus);
+            expect($(link)).toHandleWith('blur', videoCaption.captionBlur);
+            expect($(link)).toHandleWith('keydown', videoCaption.captionKeyDown);
           });
         });
 
@@ -555,6 +569,98 @@
 
         it('scroll the caption', function() {
           expect($.fn.scrollTo).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('caption accessibility', function() {
+      beforeEach(function() {
+        initialize();
+      });
+
+      describe('when getting focus through TAB key', function() {
+        beforeEach(function() {
+          $('.subtitles li:first').trigger(jQuery.Event('focus');
+        });
+
+        it('shows an outline around the caption', function() {
+          expect($('.subtitles li:first')).not.toHaveClass('unfocused');
+          expect($('.subtitles li:first')).toHaveClass('focused');
+        });
+
+        it('has automatic scrolling disabled', function() {
+          expect(videoCaption.autoScrolling).toBe(false));
+        });
+      });
+
+      describe('when loosing focus through TAB key', function() {
+        beforeEach(function() {
+          $('.subtitles li:first').trigger(jQuery.Event('blur');
+        });
+
+        it('does not show an outline around the caption', function() {
+          expect($('.subtitles li:first')).not.toHaveClass('focused');
+          expect($('.subtitles li:first')).toHaveClass('unfocused');
+        });
+
+        it('has automatic scrolling enabled', function() {
+          expect(videoCaption.autoScrolling).toBe(true));
+        });
+      });
+
+      describe('when same caption gets the focus through mouse after having 
+        focus through TAB key', function() {
+        beforeEach(function() {
+          $('.subtitles li:first').trigger(jQuery.Event('focus');
+          $('.subtitles li:first').trigger(jQuery.Event('mouseclick');
+        });
+
+        it('does not show an outline around it', function() {
+          expect($('.subtitles li:first')).not.toHaveClass('focused');
+          expect($('.subtitles li:first')).toHaveClass('unfocused');
+        });
+
+        it('has automatic scrolling enabled', function() {
+          expect(videoCaption.autoScrolling).toBe(true));
+        });
+      });
+
+      describe('when a second caption gets focus through mouse after first had 
+        focus through TAB key', function() {
+        beforeEach(function() {
+          $('.subtitles li:first').trigger(jQuery.Event('focus');
+          $('.subtitles li:last').trigger(jQuery.Event('mouseclick');
+        });
+
+        it('does not show an outline around the first', function() {
+          expect($('.subtitles li:first')).not.toHaveClass('focused');
+          expect($('.subtitles li:first')).toHaveClass('unfocused');
+        });
+
+        it('shows an outline around the second', function() {
+          expect($('.subtitles li:last')).not.toHaveClass('unfocused');
+          expect($('.subtitles li:last')).toHaveClass('focused');
+        });
+
+        it('has automatic scrolling enabled', function() {
+          expect(videoCaption.autoScrolling).toBe(true));
+        });
+      });
+
+      describe('when enter key is pressed on a caption', function() {
+        beforeEach(function() {
+          var e = $.Event('keypress');
+          e.which = 13; // ENTER key
+          $('.subtitles li:first').trigger(e);
+        });
+
+        it('shows an outline around it', function() {
+          expect($('.subtitles li:first')).not.toHaveClass('unfocused');
+          expect($('.subtitles li:first')).toHaveClass('focused');
+        });
+
+        it('calls seekPlayer', function() {
+           expect(videoCaption.seekPlayer).toHaveBeenCalled();
         });
       });
     });
