@@ -642,9 +642,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
     # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
     # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
     # validation behavior a responsibility of the model layer rather than the persistence layer.
-    def create_item(self, course_or_parent_locator, category, user_id,
+    def create_item(
+        self, course_or_parent_locator, category, user_id,
         usage_id=None, definition_locator=None, fields=None,
-        force=False, continue_version=False):
+        force=False, continue_version=False
+    ):
         """
         Add a descriptor to persistence as the last child of the optional parent_location or just as an element
         of the course (if no parent provided). Return the resulting post saved version with populated locators.
@@ -773,7 +775,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self, org, prettyid, user_id, id_root=None, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
         root_usage_id='course'
-        ):
+    ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
@@ -848,9 +850,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
             }
             new_id = self.structures.insert(draft_structure)
             draft_structure['original_version'] = new_id
-            self.structures.update({'_id': new_id},
+            self.structures.update(
+                {'_id': new_id},
                 {'$set': {"original_version": new_id,
-                    'blocks.{}.edit_info.update_version'.format(root_usage_id): new_id}})
+                    'blocks.{}.edit_info.update_version'.format(root_usage_id): new_id}}
+            )
             if versions_dict is None:
                 versions_dict = {master_branch: new_id}
             else:
@@ -1351,17 +1355,19 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 return None
         else:
             index_entry = self.course_index.find_one({'_id': locator.course_id})
-            if (locator.version_guid is not None
-                and index_entry['versions'][locator.branch] != locator.version_guid
-                and not force) or (force and continue_version):
+            is_head = (
+                locator.version_guid is None or
+                index_entry['versions'][locator.branch] == locator.version_guid
+            )
+            if (is_head or (force and not continue_version)):
+                return index_entry
+            else:
                 raise VersionConflictError(
                     locator,
                     CourseLocator(
                         course_id=index_entry['_id'],
                         version_guid=index_entry['versions'][locator.branch],
                         branch=locator.branch))
-            else:
-                return index_entry
 
     def _version_structure(self, structure, user_id):
         """

@@ -23,6 +23,9 @@ from xmodule.modulestore.mongo import draft
 
 
 class TestMigration(unittest.TestCase):
+    """
+    Test the split migrator
+    """
 
     # Snippet of what would be in the django settings envs file
     db_config = {
@@ -113,18 +116,21 @@ class TestMigration(unittest.TestCase):
         self.create_random_units(self.old_mongo, both_vert, self.draft_mongo, draft_both)
         # vertical in draft only (x2)
         location = location.replace(category='vertical', name=uuid.uuid4().hex)
-        draft_vert = self._create_and_get_item(self.draft_mongo,
+        draft_vert = self._create_and_get_item(
+            self.draft_mongo,
             location, {}, {'display_name': 'Draft vertical'}, runtime)
         chapter1.children.append(draft_vert.location.url())
         self.create_random_units(self.draft_mongo, draft_vert)
         location = location.replace(category='vertical', name=uuid.uuid4().hex)
-        draft_vert = self._create_and_get_item(self.draft_mongo,
+        draft_vert = self._create_and_get_item(
+            self.draft_mongo,
             location, {}, {'display_name': 'Draft vertical2'}, runtime)
         chapter1.children.append(draft_vert.location.url())
         self.create_random_units(self.draft_mongo, draft_vert)
         # and finally one in live only (so published has to skip 2)
         location = location.replace(category='vertical', name=uuid.uuid4().hex)
-        live_vert = self._create_and_get_item(self.old_mongo,
+        live_vert = self._create_and_get_item(
+            self.old_mongo,
             location, {}, {'display_name': 'Live vertical end'}, runtime)
         chapter1.children.append(live_vert.location.url())
         self.create_random_units(self.old_mongo, live_vert)
@@ -134,17 +140,19 @@ class TestMigration(unittest.TestCase):
 
         # now the other one w/ the conditional
         # first create some show children
-        indirect1 = self._create_and_get_item(self.old_mongo,
+        indirect1 = self._create_and_get_item(
+            self.old_mongo,
             location.replace(category='discussion', name=uuid.uuid4().hex),
             "", {'display_name': 'conditional show 1'}, runtime
         )
-        indirect2 = self._create_and_get_item(self.old_mongo,
+        indirect2 = self._create_and_get_item(
+            self.old_mongo,
             location.replace(category='html', name=uuid.uuid4().hex),
             "", {'display_name': 'conditional show 2'}, runtime
         )
         location = location.replace(category='conditional', name=uuid.uuid4().hex)
         metadata = {
-            'xml_attributes' : {
+            'xml_attributes': {
                 'sources': [live_vert.location.url(), ],
                 'completed': True,
             },
@@ -167,10 +175,10 @@ class TestMigration(unittest.TestCase):
         location = location.replace(category='about', name='overview')
         _overview = self._create_and_get_item(self.old_mongo, location, "<p>test</p>", {}, runtime)
         location = location.replace(category='course_info', name='updates')
-        _overview = self._create_and_get_item(self.old_mongo,
+        _overview = self._create_and_get_item(
+            self.old_mongo,
             location, "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, runtime
         )
-
 
     def create_random_units(self, store, parent, cc_store=None, cc_parent=None):
         """
@@ -217,7 +225,6 @@ class TestMigration(unittest.TestCase):
                     conditional.location, published, add_entry_if_missing=False
                 )
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
-
 
     def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):
         # check that locations match

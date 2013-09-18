@@ -10,6 +10,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.locator import CourseLocator
 from xmodule.modulestore.mongo import draft
 
+
 class SplitMigrator(object):
     """
     Copies courses from old mongo to split mongo and sets up location mapping so any references to the old
@@ -58,7 +59,6 @@ class SplitMigrator(object):
 
         return new_course_id
 
-
     def _copy_published_modules_to_course(self, new_course, old_course_loc, old_course_id, user_id):
         """
         Copy all of the modules from the 'direct' version of the course to the new split course.
@@ -93,7 +93,6 @@ class SplitMigrator(object):
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
         self.split_modulestore.internal_clean_children(course_version_locator)
-
 
     def _add_draft_modules_to_course(self, new_course_id, old_course_id, old_course_loc, user_id):
         """
@@ -159,8 +158,10 @@ class SplitMigrator(object):
                 new_parent.children.insert(new_parent_cursor, new_usage_id)
                 new_parent = self.split_modulestore.update_item(new_parent, user_id)
 
-
     def _get_json_fields_translate_children(self, xblock, old_course_id, published):
+        """
+        Return the json repr for explicitly set fields but convert all children to their usage_id's
+        """
         fields = self.get_json_fields_explicitly_set(xblock)
         # this will too generously copy the children even for ones that don't exist in the published b/c the old mongo
         # had no way of not having parents point to draft only children :-(
@@ -171,7 +172,6 @@ class SplitMigrator(object):
                 ).usage_id
                 for child in fields['children']]
         return fields
-
 
     def get_json_fields_explicitly_set(self, xblock):
         """
