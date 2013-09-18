@@ -1,0 +1,6 @@
+relayhost = [smtp.gmail.com]:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+smtp_tls_CAfile = /etc/postfix/cacert.pem
+smtp_use_tls = yes
