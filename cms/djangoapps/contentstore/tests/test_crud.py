@@ -2,7 +2,7 @@ import unittest
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
@@ -190,6 +190,26 @@ class TemplateTests(unittest.TestCase):
 
         version_history = modulestore('split').get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+
+    def test_split_inject_loc_mapper(self):
+        """
+        Test that creating a loc_mapper causes it to automatically attach to the split mongo store
+        """
+        # instantiate location mapper before split
+        mapper = loc_mapper()
+        # split must inject the location mapper itself since the mapper existed before it did
+        self.assertEqual(modulestore('split').loc_mapper, mapper)
+
+    def test_loc_inject_into_split(self):
+        """
+        Test that creating a loc_mapper causes it to automatically attach to the split mongo store
+        """
+        # force instantiation of split modulestore before there's a location mapper and verify
+        # it has no pointer to loc mapper
+        self.assertIsNone(modulestore('split').loc_mapper)
+        # force instantiation of location mapper which must inject itself into the split
+        mapper = loc_mapper()
+        self.assertEqual(modulestore('split').loc_mapper, mapper)
 
     # ================================= JSON PARSING ===========================
     # These are example methods for creating xmodules in memory w/o persisting them.

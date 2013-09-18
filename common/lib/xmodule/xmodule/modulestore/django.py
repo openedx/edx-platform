@@ -93,7 +93,7 @@ def loc_mapper():
     # pylint: disable=W0212
     if _loc_singleton is None:
         # instantiate
-        _loc_singleton = LocMapperStore(settings.modulestore_options)
+        _loc_singleton = LocMapperStore(**settings.DOC_STORE_CONFIG)
     # inject into split mongo modulestore
     if 'split' in _MODULESTORES:
         _MODULESTORES['split'].loc_mapper = _loc_singleton

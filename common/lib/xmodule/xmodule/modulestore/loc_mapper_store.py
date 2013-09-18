@@ -33,11 +33,6 @@ class LocMapperStore(object):
         '''
         Constructor
         '''
-        # get rid of unwanted args
-        kwargs.pop('default_class', None)
-        kwargs.pop('fs_root', None)
-        kwargs.pop('xblock_mixins', None)
-        kwargs.pop('render_template', None)
         self.db = pymongo.database.Database(
             pymongo.MongoClient(
                 host=host,

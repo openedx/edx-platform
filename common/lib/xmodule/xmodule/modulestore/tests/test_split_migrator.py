@@ -25,19 +25,22 @@ from xmodule.modulestore.mongo import draft
 class TestMigration(unittest.TestCase):
 
     # Snippet of what would be in the django settings envs file
-    modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+    db_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+    }
+
+    modulestore_options = dict({
+        'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    }
+    }, **db_config)
 
     def setUp(self):
         super(TestMigration, self).setUp()
-        self.loc_mapper = LocMapperStore(**self.modulestore_options)
+        self.loc_mapper = LocMapperStore(**self.db_config)
         self.old_mongo = MongoModuleStore(**self.modulestore_options)
         self.draft_mongo = DraftModuleStore(**self.modulestore_options)
         self.split_mongo = SplitMongoModuleStore(
