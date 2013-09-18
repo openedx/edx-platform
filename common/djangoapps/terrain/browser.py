@@ -151,7 +151,7 @@ def reset_data(scenario):
     envs/acceptance.py file: mitx_all/db/test_mitx.db
     """
     LOGGER.debug("Flushing the test database...")
-    call_command('flush', interactive=False)
+    call_command('flush', interactive=False, verbosity=0)
     world.absorb({}, 'scenario_dict')
 
 
