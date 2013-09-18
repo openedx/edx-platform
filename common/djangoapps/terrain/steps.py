@@ -138,9 +138,10 @@ def should_have_link_with_path_and_text(step, path, text):
 
 @step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
 def should_see_in_the_page(step, doesnt_appear, text):
-    multiplier = 1
-    if world.SAUCE_ENABLED:
+    if world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
         multiplier = 2
+    else:
+        multiplier = 1
     if doesnt_appear:
         assert world.browser.is_text_not_present(text, wait_time=5*multiplier)
     else:
