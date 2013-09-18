@@ -71,23 +71,6 @@ DATABASES = {
     }
 }
 
-# Set up XQueue information so that the lms will send
-# requests to a mock XQueue server running locally
-XQUEUE_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
-XQUEUE_INTERFACE = {
-    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
-    "django_auth": {
-        "username": "lms",
-        "password": "***REMOVED***"
-    },
-    "basic_auth": ('anant', 'agarwal'),
-}
-
-
-# Set up Video information so that the lms will send
-# requests to a mock Youtube server running locally
-VIDEO_PORT = XQUEUE_PORT + 2
-
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -123,12 +106,52 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
-LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
+# Where to run: local, saucelabs, or grid
+LETTUCE_SELENIUM_CLIENT = os.environ.get('LETTUCE_SELENIUM_CLIENT', 'local')
+
+SELENIUM_GRID = {
+    'URL': 'http://127.0.0.1:4444/wd/hub',
+    'BROWSER': LETTUCE_BROWSER,
+}
+
 #####################################################################
-# Lastly, see if the developer has any local overrides.
+# See if the developer has any local overrides.
 try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+# Because an override for where to run will affect which ports to use,
+# set these up after the local overrides.
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    LETTUCE_SERVER_PORT = choice(PORTS)
+    PORTS.remove(LETTUCE_SERVER_PORT)
+else:
+    LETTUCE_SERVER_PORT = randint(1024, 65535)
+
+# Set up XQueue information so that the lms will send
+# requests to a mock XQueue server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    XQUEUE_PORT = choice(PORTS)
+    PORTS.remove(XQUEUE_PORT)
+else:
+    XQUEUE_PORT = randint(1024, 65535)
+
+XQUEUE_INTERFACE = {
+    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
+# Set up Video information so that the lms will send
+# requests to a mock Youtube server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    VIDEO_PORT = choice(PORTS)
+    PORTS.remove(VIDEO_PORT)
+else:
+    VIDEO_PORT = randint(1024, 65535)
