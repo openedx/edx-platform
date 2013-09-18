@@ -319,6 +319,8 @@ function () {
                 'tabindex': 0
             });
 
+            liEl.addClass('unfocused');
+
             container.append(liEl);
         });
 
