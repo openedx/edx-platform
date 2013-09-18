@@ -107,7 +107,7 @@ def preview_module_system(request, preview_id, descriptor):
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
-        filestore=descriptor.system.resources_fs,
+        filestore=descriptor.runtime.resources_fs,
         get_module=partial(load_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
