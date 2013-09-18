@@ -159,11 +159,16 @@ TEST_TASK_DIRS.each do |dir|
     report_dir = report_dir_path(dir)
     directory report_dir
     task :report_dirs => [REPORT_DIR, report_dir]
-    task :test => "test_#{dir}"
+    task 'test:python' => "test_#{dir}"
+end
+
+namespace :test do
+    desc "Run all python tests"
+    task :python, [:test_id]
 end
 
 desc "Run all tests"
-task :test, [:test_id] => :test_docs
+task :test, [:test_id] => [:test_docs, 'test:python']
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
