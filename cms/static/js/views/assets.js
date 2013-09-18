@@ -133,23 +133,20 @@ function updateStage(stageNo){
 
 // Check for import status updates every `timemout` milliseconds, and update
 // the page accordingly.
-function getStatus(url, timeout) {
-    var currentStage = 1;
-    updateStage(currentStage);
-    var time = timeout || 500;
-    while (currentStage !== 2) {
-        setTimeout(function() {
-            $.ajax({
-                url: url,
-                success: function(data, textStatus, jqXHR) {
-                    if (0 < data["ImportStatus"] > currentStage) {
-                        currentStage = data["ImportStatus"] - 1;
-                        updateStage(currentStage);
-                    }
-                }
-            });
-        }, time);
-    }
+function getStatus(url, timeout, stage) {
+    console.log("getStatus called");
+    console.log(stage);
+    if (currentStage == 3 ) { return ;}
+    var currentStage = stage || 0;
+    // updateStage(currentStage);
+    var time = timeout || 1000;
+    $.getJSON( url,
+        function (data) {
+            setTimeout(function () {
+                getStatus(url, time, data["ImportStatus"]);
+            }, time);
+        }
+    );
 }
 
 

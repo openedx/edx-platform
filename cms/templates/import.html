@@ -89,7 +89,7 @@ $('#fileupload').fileupload({
 
     add: function(e, data) {
         submitBtn.unbind('click');
-        var file = data.files[0];
+        file = data.files[0];
         if (file.name.match(/tar\.gz$/)) {
             submitBtn.click(function(e){
                 e.preventDefault();
@@ -126,7 +126,7 @@ $('#fileupload').fileupload({
         }
         if (percentInt >= doneAt) {
             bar.hide();
-            startServerFeedback(feedbackUrl.replace("fillerName", file.name);
+            startServerFeedback(feedbackUrl.replace("fillerName", file.name));
         } else {
             bar.show();
             fill.width(percentVal);
