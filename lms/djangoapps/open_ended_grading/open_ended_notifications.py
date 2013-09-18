@@ -13,6 +13,8 @@ from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 import datetime
 
+from xblock.field_data import DictFieldData
+
 log = logging.getLogger(__name__)
 
 NOTIFICATION_CACHE_TIME = 300
@@ -68,7 +70,7 @@ def peer_grading_notifications(course, user):
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_field_data= {}
+        xmodule_field_data=DictFieldData({}),
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -129,7 +131,7 @@ def combined_notifications(course, user):
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_field_data= {}
+        xmodule_field_data=DictFieldData({})
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
