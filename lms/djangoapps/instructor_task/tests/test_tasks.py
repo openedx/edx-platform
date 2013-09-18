@@ -23,7 +23,7 @@ from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state
-from instructor_task.tasks_helper import UpdateProblemModuleStateError #, update_problem_module_state
+from instructor_task.tasks_helper import UpdateProblemModuleStateError
 
 
 PROBLEM_URL_NAME = "test_urlname"

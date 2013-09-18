@@ -52,7 +52,7 @@ def _get_current_task():
     return current_task
 
 
-def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, task_input, action_name):
+def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, task_input, action_name):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
@@ -76,7 +76,7 @@ def perform_module_state_update(update_fcn, filter_fcn, entry_id, course_id, tas
           'succeeded': number of attempts that "succeeded"
           'skipped': number of attempts that "skipped"
           'failed': number of attempts that "failed"
-          'total': number of possible subtasks to attempt
+          'total': number of possible updates to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
               Pass-through of input `action_name`.
           'duration_ms': how long the task has (or had) been running.
