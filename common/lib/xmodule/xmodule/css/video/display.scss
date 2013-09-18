@@ -525,15 +525,12 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
+      outline-width: 0px;
+      outline-style: none;
 
       &.current {
         color: #333;
         font-weight: 700;
-      }
-
-      &.unfocused {
-        outline-width: 0px;
-        outline-style: none;
       }
 
       &.focused {
