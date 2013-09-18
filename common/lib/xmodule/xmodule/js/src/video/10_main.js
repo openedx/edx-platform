@@ -4,6 +4,7 @@
 require(
 [
     'video/01_initialize.js',
+    'video/025_focus_grabber.js',
     'video/04_video_control.js',
     'video/05_video_quality_control.js',
     'video/06_video_progress_slider.js',
@@ -13,6 +14,7 @@ require(
 ],
 function (
     Initialize,
+    FocusGrabber,
     VideoControl,
     VideoQualityControl,
     VideoProgressSlider,
@@ -60,6 +62,7 @@ function (
             youtubeXhr = state.youtubeXhr;
         }
 
+        FocusGrabber(state);
         VideoControl(state);
         VideoQualityControl(state);
         VideoProgressSlider(state);
