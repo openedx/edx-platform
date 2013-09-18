@@ -299,8 +299,7 @@ def get_course_tabs(user, course, active_page):
         # multiple tabs.
         if not (tab['type'] == 'wiki' and course.hide_wiki_tab):
             gen = VALID_TAB_TYPES[tab['type']].generator
-
-        tabs.extend(gen(tab, user, course, active_page))
+            tabs.extend(gen(tab, user, course, active_page))
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
