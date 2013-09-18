@@ -347,12 +347,17 @@ padding-left: 20px;
 
 
       % endfor
+      <section class="empty-dashboard-message">
+        <a href="${marketing_link('COURSES')}">
+            ${_("Find courses now!")}
+        </a>
+      </section>
     % else:
       <section class="empty-dashboard-message">
         <p>${_("Looks like you haven't registered for any courses yet.")}</p>
-<!--        <a href="${marketing_link('COURSES')}">
+        <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
-        </a>-->
+        </a>
       </section>
     % endif
 
