@@ -28,7 +28,10 @@
             jQuery.fx.off = true;
         });
 
-        it('check existence of focus grabber elements and their position', function () {
+        it(
+            'check existence of focus grabber elements and their position',
+            function () {
+
             var firstFGEl = state.el.find('.focus_grabber.first'),
                 lastFGEl = state.el.find('.focus_grabber.last'),
                 tcWrapperEl = state.el.find('.tc-wrapper');
@@ -47,14 +50,22 @@
             expect(state.focusGrabber.elLast.attr('tabindex')).toBe(-1);
         });
 
-        it('when first focus grabber is focused "mousemove" event is triggered, grabbers are disabled', function () {
+        it(
+            'when first focus grabber is focused "mousemove" event is ' +
+            'triggered, grabbers are disabled',
+            function () {
+
             state.focusGrabber.elFirst.triggerHandler('focus');
 
             expect('mousemove').toHaveBeenTriggeredOn(state.el);
             expect(state.focusGrabber.disableFocusGrabber).toHaveBeenCalled();
         });
 
-        it('when last focus grabber is focused "mousemove" event is triggered, grabbers are disabled', function () {
+        it(
+            'when last focus grabber is focused "mousemove" event is ' +
+            'triggered, grabbers are disabled',
+            function () {
+
             state.focusGrabber.elLast.triggerHandler('focus');
 
             expect('mousemove').toHaveBeenTriggeredOn(state.el);
@@ -62,16 +73,24 @@
         });
 
         it('after controls hide focus grabbers are enabled', function () {
-
             runs(function () {
+                // Captions should not be "sticky" for the autohide mechanism
+                // to work.
                 state.videoCaption.hideCaptions(true);
+
+                // Make sure that the controls are visible. After this event
+                // is triggered a count down is started to autohide captions.
                 state.el.triggerHandler('mousemove');
             });
 
+            // Wait for the autohide to happen. We make it +100ms to make sure
+            // that there is clearly no race conditions for our expect below.
             waits(state.videoControl.fadeOutTimeout + 100);
 
             runs(function () {
-                expect(state.focusGrabber.enableFocusGrabber).toHaveBeenCalled();
+                expect(
+                    state.focusGrabber.enableFocusGrabber
+                ).toHaveBeenCalled();
             });
         });
     });
