@@ -154,7 +154,7 @@ def import_course(request, org, course, name):
                     sf.write("Extracting")
 
                 tar_file = tarfile.open(temp_filepath)
-                tar_file.extractall(course_dir + '/')
+                tar_file.extractall((course_dir + '/').encode('utf-8'))
 
                 with open(status_file, 'w+') as sf:
                     sf.write("Verifying")
