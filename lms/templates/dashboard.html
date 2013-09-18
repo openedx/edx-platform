@@ -217,9 +217,9 @@ padding-left: 20px;
       <section class="empty-dashboard-message">
         % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
           <p>${_("Looks like you haven't registered for any courses yet.")}</p>
-<!--          <a href="${marketing_link('COURSES')}">
+          <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
-          </a>-->
+          </a>
         % else:
           <p>${_("Looks like you haven't been enrolled in any courses yet.")}</p>
         %endif
