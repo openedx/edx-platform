@@ -67,12 +67,12 @@ sudo hostname $SYSTEM_FQDN
 ############
 
 # Setup Google Managed domain settings in postfix
-#sudo cat ~/edx-platform/veda/postfix-config.append >> /etc/postfix/main.cf
-#sudo cat ~/edx-platform/veda/postfix-auth.append >> /etc/postfix/sasl_passwd
-#sudo chmod 400 /etc/postfix/sasl_passwd
-#sudo postmap /etc/postfix/sasl_passwd
-#cat /etc/ssl/certs/Thawte_Premium_Server_CA.pem | sudo tee -a /etc/postfix/cacert.pem
-#sudo /etc/init.d/postfix reload
+sudo cat ~/edx-platform/veda/postfix-config.append >> /etc/postfix/main.cf
+sudo cat ~/edx-platform/veda/postfix-auth.append >> /etc/postfix/sasl_passwd
+sudo chmod 400 /etc/postfix/sasl_passwd
+sudo postmap /etc/postfix/sasl_passwd
+cat /etc/ssl/certs/Thawte_Premium_Server_CA.pem | sudo tee -a /etc/postfix/cacert.pem
+sudo /etc/init.d/postfix reload
 
 # Start edX in a detached screen session
 screen -d -m ~/start-lms.sh
