@@ -20,7 +20,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
@@ -33,7 +33,7 @@ system = ModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
-    xblock_model_data={}
+    xblock_field_data={}
 )
 
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
@@ -70,8 +70,8 @@ ALERT_DICT = {
     'Flagged Submissions': "Submissions have been flagged for review"
 }
 
-STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
-STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
+STUDENT_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify course staff."
+STAFF_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -97,25 +97,32 @@ def find_peer_grading_module(course):
     @param course: A course object.
     @return: boolean found_module, string problem_url
     """
-    #Reverse the base course url
+
+    # Reverse the base course url.
     base_course_url = reverse('courses')
     found_module = False
     problem_url = ""
 
-    #Get the course id and split it
+    # Get the course id and split it.
     course_id_parts = course.id.split("/")
     log.info("COURSE ID PARTS")
     log.info(course_id_parts)
-    #Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
+    # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
     items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
                                     course_id=course.id)
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
-    #Get the first one
-    if len(items) > 0:
-        item_location = items[0].location
-        #Generate a url for the first module and redirect the user to it
-        problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+    # Loop through all potential peer grading modules, and find the first one that has a path to it.
+    for item in items:
+        item_location = item.location
+        # Generate a url for the first module and redirect the user to it.
+        try:
+            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+        except NoPathToItem:
+            # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
+            # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
+            log.info("Invalid peer grading module location {0} in course {1}.  This module may need to be removed.".format(item_location, course.id))
+            continue
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
 

@@ -3,6 +3,26 @@
    The render here adds views for each update/handout by delegating to their collections but does not
    generate any html for the surrounding page.
 */
+
+var editWithCodeMirror = function(model, contentName, baseAssetUrl, textArea) {
+    var content = rewriteStaticLinks(model.get(contentName), baseAssetUrl, '/static/');
+    model.set(contentName, content);
+    var $codeMirror = CodeMirror.fromTextArea(textArea, {
+        mode: "text/html",
+        lineNumbers: true,
+        lineWrapping: true
+    });
+    $codeMirror.setValue(content);
+    $codeMirror.clearHistory();
+    return $codeMirror;
+};
+
+var changeContentToPreview = function (model, contentName, baseAssetUrl) {
+    var content = rewriteStaticLinks(model.get(contentName), '/static/', baseAssetUrl);
+    model.set(contentName, content);
+    return content;
+};
+
 CMS.Views.CourseInfoEdit = Backbone.View.extend({
   // takes CMS.Models.CourseInfo as model
   tagName: 'div',
@@ -11,18 +31,19 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
     // instantiate the ClassInfoUpdateView and delegate the proper dom to it
     new CMS.Views.ClassInfoUpdateView({
         el: $('body.updates'),
-        collection: this.model.get('updates')
+        collection: this.model.get('updates'),
+        base_asset_url: this.model.get('base_asset_url')
     });
 
     new CMS.Views.ClassInfoHandoutsView({
         el: this.$('#course-handouts-view'),
-        model: this.model.get('handouts')
+        model: this.model.get('handouts'),
+        base_asset_url: this.model.get('base_asset_url')
     });
     return this;
   }
 });
 
-// ??? Programming style question: should each of these classes be in separate files?
 CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     // collection is CourseUpdateCollection
     events: {
@@ -48,6 +69,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
           var self = this;
           this.collection.each(function (update) {
               try {
+                  changeContentToPreview(update, 'content', self.options['base_asset_url'])
                   var newEle = self.template({ updateModel : update });
                   $(updateEle).append(newEle);
             } catch (e) {
@@ -72,20 +94,18 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         $(updateEle).prepend($newForm);
 
         var $textArea = $newForm.find(".new-update-content").first();
-        if (this.$codeMirror == null ) {
-            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
-                mode: "text/html",
-                lineNumbers: true,
-                lineWrapping: true,
-            });
-        }
+        this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+            mode: "text/html",
+            lineNumbers: true,
+            lineWrapping: true
+        });
 
         $newForm.addClass('editing');
         this.$currentPost = $newForm.closest('li');
 
         window.$modalCover.show();
         window.$modalCover.bind('click', function() {
-            self.closeEditor(self, true);
+            self.closeEditor(true);
         });
 
         $('.date').datepicker('destroy');
@@ -98,7 +118,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext('Saving') + '&hellip;'
+            title: gettext('Saving&hellip;')
         });
         saving.show();
         var ele = this.modelDom(event);
@@ -110,7 +130,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                 ele.remove();
             }
         });
-        this.closeEditor(this);
+        this.closeEditor();
 
         analytics.track('Saved Course Update', {
             'course': course_location_analytics,
@@ -122,8 +142,10 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         event.preventDefault();
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
+        // If the model was never created (user created a new update, then pressed Cancel),
+        // we wish to remove it from the DOM.
         var targetModel = this.eventModel(event);
-        this.closeEditor(this, !targetModel.id);
+        this.closeEditor(!targetModel.id);
     },
 
     onEdit: function(event) {
@@ -134,16 +156,10 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
         $(this.editor(event)).show();
         var $textArea = this.$currentPost.find(".new-update-content").first();
-        if (this.$codeMirror == null ) {
-            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
-                mode: "text/html",
-                lineNumbers: true,
-                lineWrapping: true,
-            });
-        }
+        var targetModel = this.eventModel(event);
+        this.$codeMirror = editWithCodeMirror(targetModel, 'content', self.options['base_asset_url'], $textArea.get(0));
 
         window.$modalCover.show();
-        var targetModel = this.eventModel(event);
         window.$modalCover.bind('click', function() {
             self.closeEditor(self);
         });
@@ -167,7 +183,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                         });
                         self.modelDom(event).remove();
                         var deleting = new CMS.Views.Notification.Mini({
-                            title: gettext('Deleting') + '&hellip;'
+                            title: gettext('Deleting&hellip;')
                         });
                         deleting.show();
                         targetModel.destroy({
@@ -193,31 +209,35 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             }
         });
         confirm.show();
-},
+    },
 
-    closeEditor: function(self, removePost) {
-        var targetModel = self.collection.get(self.$currentPost.attr('name'));
+    closeEditor: function(removePost) {
+        var targetModel = this.collection.get(this.$currentPost.attr('name'));
 
         if(removePost) {
-            self.$currentPost.remove();
+            this.$currentPost.remove();
+        }
+        else {
+            // close the modal and insert the appropriate data
+            this.$currentPost.removeClass('editing');
+            this.$currentPost.find('.date-display').html(targetModel.get('date'));
+            this.$currentPost.find('.date').val(targetModel.get('date'));
+
+            var content = changeContentToPreview(targetModel, 'content', this.options['base_asset_url'])
+            try {
+                // just in case the content causes an error (embedded js errors)
+                this.$currentPost.find('.update-contents').html(content);
+                this.$currentPost.find('.new-update-content').val(content);
+            } catch (e) {
+                // ignore but handle rest of page
+            }
+            this.$currentPost.find('form').hide();
+            this.$currentPost.find('.CodeMirror').remove();
         }
 
-        // close the modal and insert the appropriate data
-        self.$currentPost.removeClass('editing');
-        self.$currentPost.find('.date-display').html(targetModel.get('date'));
-        self.$currentPost.find('.date').val(targetModel.get('date'));
-        try {
-            // just in case the content causes an error (embedded js errors)
-            self.$currentPost.find('.update-contents').html(targetModel.get('content'));
-            self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
-        } catch (e) {
-            // ignore but handle rest of page
-        }
-        self.$currentPost.find('form').hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
         this.$codeMirror = null;
-        self.$currentPost.find('.CodeMirror').remove();
     },
 
     // Dereferencing from events to screen elements
@@ -275,8 +295,8 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     render: function () {
-        var updateEle = this.$el;
-        var self = this;
+        changeContentToPreview(this.model, 'data', this.options['base_asset_url'])
+
         this.$el.html(
             $(this.template( {
                 model: this.model
@@ -295,24 +315,19 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
         var self = this;
         this.$editor.val(this.$preview.html());
         this.$form.show();
-        if (this.$codeMirror == null) {
-            this.$codeMirror = CodeMirror.fromTextArea(this.$editor.get(0), {
-                mode: "text/html",
-                lineNumbers: true,
-                lineWrapping: true,
-            });
-        }
+
+        this.$codeMirror = editWithCodeMirror(self.model, 'data', self.options['base_asset_url'], this.$editor.get(0));
+
         window.$modalCover.show();
         window.$modalCover.bind('click', function() {
-            self.closeEditor(self);
+            self.closeEditor();
         });
     },
 
     onSave: function(event) {
         this.model.set('data', this.$codeMirror.getValue());
-        this.render();
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext('Saving') + '&hellip;'
+            title: gettext('Saving&hellip;')
         });
         saving.show();
         this.model.save({}, {
@@ -320,8 +335,9 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
                 saving.hide();
             }
         });
+        this.render();
         this.$form.hide();
-        this.closeEditor(this);
+        this.closeEditor();
 
         analytics.track('Saved Course Handouts', {
             'course': course_location_analytics
@@ -331,14 +347,14 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     onCancel: function(event) {
         this.$form.hide();
-        this.closeEditor(this);
+        this.closeEditor();
     },
 
-    closeEditor: function(self) {
+    closeEditor: function() {
         this.$form.hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
-        self.$form.find('.CodeMirror').remove();
+        this.$form.find('.CodeMirror').remove();
         this.$codeMirror = null;
     }
 });

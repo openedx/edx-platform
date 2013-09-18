@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, List, Float, Boolean
+from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, Timedelta
@@ -20,7 +20,7 @@ V1_SETTINGS_ATTRIBUTES = [
 ]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                         "student_attempts", "ready_to_reset"]
+                         "student_attempts", "ready_to_reset", "old_task_states"]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
@@ -183,6 +183,13 @@ class CombinedOpenEndedFields(object):
         default=0,
         scope=Scope.user_state
     )
+    old_task_states = List(
+        help=("A list of lists of state dictionaries for student states that are saved."
+               "This field is only populated if the instructor changes tasks after"
+               "the module is created and students have attempted it (for example changes a self assessed problem to "
+               "self and peer assessed."),
+        scope = Scope.user_state
+    )
     task_states = List(
         help="List of state dictionaries of each task within this module.",
         scope=Scope.user_state
@@ -213,7 +220,7 @@ class CombinedOpenEndedFields(object):
         help="The number of times the student can try to answer this problem.",
         default=1,
         scope=Scope.settings,
-        values={"min" : 1 }
+        values={"min": 1 }
     )
     accept_file_upload = Boolean(
         display_name="Allow File Uploads",
@@ -227,14 +234,20 @@ class CombinedOpenEndedFields(object):
         default=False,
         scope=Scope.settings
     )
+    track_changes = Boolean(
+        display_name="Peer Track Changes",
+        help=("EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  "
+              "If set to 'True', peer graders will be able to make changes to the student "
+              "submission and those changes will be tracked and shown along with the graded feedback."),
+        default=False,
+        scope=Scope.settings
+    )
     due = Date(
         help="Date that this problem is due by",
-        default=None,
         scope=Scope.settings
     )
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
-        default=None,
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
@@ -244,7 +257,7 @@ class CombinedOpenEndedFields(object):
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings,
-        values={"min" : 0 , "step": ".1"},
+        values={"min": 0, "step": ".1"},
         default=1
     )
     min_to_calibrate = Integer(
@@ -252,28 +265,28 @@ class CombinedOpenEndedFields(object):
         help="The minimum number of calibration essays each student will need to complete for peer grading.",
         default=3,
         scope=Scope.settings,
-        values={"min" : 1, "max" : 20, "step" : "1"}
+        values={"min": 1, "max": 20, "step": "1"}
     )
     max_to_calibrate = Integer(
         display_name="Maximum Peer Grading Calibrations",
         help="The maximum number of calibration essays each student will need to complete for peer grading.",
         default=6,
         scope=Scope.settings,
-        values={"min" : 1, "max" : 20, "step" : "1"}
+        values={"min": 1, "max": 20, "step": "1"}
     )
     peer_grader_count = Integer(
         display_name="Peer Graders per Response",
         help="The number of peers who will grade each submission.",
         default=3,
         scope=Scope.settings,
-        values={"min" : 1, "step" : "1", "max" : 5}
+        values={"min": 1, "step": "1", "max": 5}
     )
     required_peer_grading = Integer(
         display_name="Required Peer Grading",
         help="The number of other students each student making a submission will have to grade.",
         default=3,
         scope=Scope.settings,
-        values={"min" : 1, "step" : "1", "max" : 5}
+        values={"min": 1, "step": "1", "max": 5}
     )
     markdown = String(
         help="Markdown source of this module",
@@ -381,6 +394,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
         if self.task_states is None:
             self.task_states = []
+
+        if self.old_task_states is None:
+            self.old_task_states = []
 
         version_tuple = VERSION_TUPLES[self.version]
 

@@ -5,8 +5,30 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: enhanced shib support, including detection of linked shib account
+at login page and support for the ?next= GET parameter.
+
+LMS: Experimental feature using the ICE change tracker JS pkg to allow peer 
+assessors to edit the original submitter's work.
+
+LMS: Fixed a bug that caused links from forum user profile pages to
+threads to lead to 404s if the course id contained a '-' character.
+
+Common: Added configurable backends for tracking events. Tracking events using
+the python logging module is the default backend. Support for MongoDB and a
+Django database is also available.
+
+Blades: Added Learning Tools Interoperability (LTI) blade. Now LTI components
+can be included to courses.
+
+LMS: Added alphabetical sorting of forum categories and subcategories.
+It is hidden behind a false defaulted course level flag.
+
 Studio: Allow course authors to set their course image on the schedule
 and details page, with support for JPEG and PNG images.
+
+LMS, Studio: Centralized startup code to manage.py and wsgi.py files.
+Made studio runnable using wsgi.
 
 Blades: Took videoalpha out of alpha, replacing the old video player
 
@@ -26,6 +48,9 @@ deactivate enrollments without deleting them, so that we know what course you
 logic has been consolidated into the model -- you should use new class methods
 to `enroll()`, `unenroll()`, and to check `is_enrolled()`, instead of creating
 CourseEnrollment objects or querying them directly.
+
+LMS: Added bulk email for course feature, with option to optout of individual
+course emails.
 
 Studio: Email will be sent to admin address when a user requests course creator
 privileges for Studio (edge only).
@@ -274,4 +299,3 @@ Common: Updated CodeJail.
 Common: Allow setting of authentication session cookie name.
 
 LMS: Option to email students when enroll/un-enroll them.
-

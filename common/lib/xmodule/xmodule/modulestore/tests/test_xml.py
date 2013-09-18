@@ -1,6 +1,6 @@
 import os.path
 
-from nose.tools import assert_raises, assert_equals
+from nose.tools import assert_raises, assert_equals  # pylint: disable=E0611
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml import XMLModuleStore

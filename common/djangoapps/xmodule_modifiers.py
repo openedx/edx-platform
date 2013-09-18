@@ -29,12 +29,16 @@ def wrap_xmodule(get_html, module, template, context=None):
     if context is None:
         context = {}
 
+    # If XBlock generated this class, then use the first baseclass
+    # as the name (since that's the original, unmixed class)
+    class_name = getattr(module, 'unmixed_class', module.__class__).__name__
+
     @wraps(get_html)
     def _get_html():
         context.update({
             'content': get_html(),
             'display_name': module.display_name,
-            'class_': module.__class__.__name__,
+            'class_': class_name,
             'module_name': module.js_module_name
         })
 
@@ -76,7 +80,7 @@ def replace_course_urls(get_html, course_id):
     return _get_html
 
 
-def replace_static_urls(get_html, data_dir, course_id=None):
+def replace_static_urls(get_html, data_dir, course_id=None, static_asset_path=''):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -85,7 +89,7 @@ def replace_static_urls(get_html, data_dir, course_id=None):
 
     @wraps(get_html)
     def _get_html():
-        return static_replace.replace_static_urls(get_html(), data_dir, course_id)
+        return static_replace.replace_static_urls(get_html(), data_dir, course_id, static_asset_path=static_asset_path)
     return _get_html
 
 
@@ -157,7 +161,7 @@ def add_histogram(get_html, module, user):
                 # doesn't like symlinks)
                 filepath = filename
             data_dir = osfs.root_path.rsplit('/')[-1]
-            giturl = module.lms.giturl or 'https://github.com/MITx'
+            giturl = module.giturl or 'https://github.com/MITx'
             edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
         else:
             edit_link = False
@@ -165,22 +169,21 @@ def add_histogram(get_html, module, user):
             giturl = ""
             data_dir = ""
 
-        source_file = module.lms.source_file  # source used to generate the problem XML, eg latex or word
+        source_file = module.source_file  # source used to generate the problem XML, eg latex or word
 
         # useful to indicate to staff if problem has been released or not
         # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
         now = datetime.datetime.now(UTC())
         is_released = "unknown"
-        mstart = module.descriptor.lms.start
+        mstart = module.descriptor.start
 
         if mstart is not None:
             is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
-        staff_context = {'fields': [(field.name, getattr(module, field.name)) for field in module.fields],
-                         'lms_fields': [(field.name, getattr(module.lms, field.name)) for field in module.lms.fields],
-                         'xml_attributes' : getattr(module.descriptor, 'xml_attributes', {}),
+        staff_context = {'fields': [(name, field.read_from(module)) for name, field in module.fields.items()],
+                         'xml_attributes': getattr(module.descriptor, 'xml_attributes', {}),
                          'location': module.location,
-                         'xqa_key': module.lms.xqa_key,
+                         'xqa_key': module.xqa_key,
                          'source_file': source_file,
                          'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
                          'category': str(module.__class__.__name__),

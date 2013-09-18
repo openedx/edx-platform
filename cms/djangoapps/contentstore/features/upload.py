@@ -7,8 +7,11 @@ import requests
 import string
 import random
 import os
+from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
+
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
+
 
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
@@ -30,19 +33,46 @@ def upload_file(_step, file_name):
     world.css_click(close_css)
 
 
-@step(u'I should( not)? see the file "([^"]*)" was uploaded$')
-def check_upload(_step, do_not_see_file, file_name):
+@step(u'I upload the files (".*")$')
+def upload_files(_step, files_string):
+    # Turn files_string to a list of file names
+    files = files_string.split(",")
+    files = map(lambda x: string.strip(x, ' "\''), files)
+
+    upload_css = 'a.upload-button'
+    world.css_click(upload_css)
+    #uploading the files
+    for f in files:
+        path = os.path.join(TEST_ROOT, 'uploads/', f)
+        world.browser.execute_script("$('input.file-input').css('display', 'block')")
+        world.browser.attach_file('file', os.path.abspath(path))
+    close_css = 'a.close-button'
+    world.css_click(close_css)
+
+
+@step(u'I should not see the file "([^"]*)" was uploaded$')
+def check_not_there(_step, file_name):
+    # Either there are no files, or there are files but
+    # not the one I expect not to exist.
+
+    # Since our only test for deletion right now deletes
+    # the only file that was uploaded, our success criteria
+    # will be that there are no files.
+    # In the future we can refactor if necessary.
+    names_css = 'td.name-col > a.filename'
+    assert(world.is_css_not_present(names_css))
+
+
+@step(u'I should see the file "([^"]*)" was uploaded$')
+def check_upload(_step, file_name):
     index = get_index(file_name)
-    if do_not_see_file:
-        assert index == -1
-    else:
-        assert index != -1
+    assert_not_equal(index, -1)
 
 
 @step(u'The url for the file "([^"]*)" is valid$')
 def check_url(_step, file_name):
     r = get_file(file_name)
-    assert r.status_code == 200
+    assert_equal(r.status_code , 200)
 
 
 @step(u'I delete the file "([^"]*)"$')
@@ -53,7 +83,7 @@ def delete_file(_step, file_name):
     world.css_click(delete_css, index=index)
 
     prompt_confirm_css = 'li.nav-item > a.action-primary'
-    world.css_click(prompt_confirm_css, success_condition=lambda: not world.css_visible(prompt_confirm_css))
+    world.css_click(prompt_confirm_css)
 
 
 @step(u'I should see only one "([^"]*)"$')
@@ -106,8 +136,8 @@ def get_index(file_name):
 def get_file(file_name):
     index = get_index(file_name)
     assert index != -1
-
     url_css = 'a.filename'
+
     def get_url():
         return world.css_find(url_css)[index]._element.get_attribute('href')
     url = world.retry_on_exception(get_url)

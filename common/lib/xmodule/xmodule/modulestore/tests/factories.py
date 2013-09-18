@@ -5,10 +5,9 @@ from uuid import uuid4
 from pytz import UTC
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
-from xblock.core import Scope
+from xmodule.modulestore.django import editable_modulestore
 from xmodule.x_module import XModuleDescriptor
+
 
 class XModuleCourseFactory(Factory):
     """
@@ -25,19 +24,16 @@ class XModuleCourseFactory(Factory):
         display_name = kwargs.pop('display_name', None)
         location = Location('i4x', org, number, 'course', Location.clean(display_name))
 
-        try:
-            store = modulestore('direct')
-        except KeyError:
-            store = modulestore()
+        store = editable_modulestore('direct')
 
         # Write the data to the mongo datastore
-        new_course = store.create_xmodule(location)
+        new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
 
         # This metadata code was copied from cms/djangoapps/contentstore/views.py
         if display_name is not None:
             new_course.display_name = display_name
 
-        new_course.lms.start = datetime.datetime.now(UTC).replace(microsecond=0)
+        new_course.start = datetime.datetime.now(UTC).replace(microsecond=0)
 
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
@@ -117,7 +113,7 @@ class XModuleItemFactory(Factory):
             if not isinstance(data, basestring):
                 data.update(template.get('data'))
 
-        store = modulestore('direct')
+        store = editable_modulestore('direct')
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = store.get_item(parent_location)

@@ -8,7 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from xblock.core import Float, String, Boolean, Scope
+from xblock.fields import Float, String, Boolean, Scope
 
 
 log = logging.getLogger(__name__)

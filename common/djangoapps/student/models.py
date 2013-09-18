@@ -805,7 +805,8 @@ class CourseEnrollment(models.Model):
             record.is_active = False
             record.save()
         except cls.DoesNotExist:
-            log.error("Tried to unenroll student {} from {} but they were not enrolled")
+            err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
+            log.error(err_msg.format(user, course_id))
 
     @classmethod
     def unenroll_by_email(cls, email, course_id):
@@ -827,9 +828,6 @@ class CourseEnrollment(models.Model):
     @classmethod
     def is_enrolled(cls, user, course_id):
         """
-        Remove the user from a given course. If the relevant `CourseEnrollment`
-        object doesn't exist, we log an error but don't throw an exception.
-
         Returns True if the user is enrolled in the course (the entry must exist
         and it must have `is_active=True`). Otherwise, returns False.
 
@@ -844,6 +842,23 @@ class CourseEnrollment(models.Model):
             return record.is_active
         except cls.DoesNotExist:
             return False
+
+    @classmethod
+    def enrollment_mode_for_user(cls, user, course_id):
+        """
+        Returns the enrollment mode for the given user for the given course
+
+        `user` is a Django User object
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            if record.is_active:
+                return record.mode
+            else:
+                return None
+        except cls.DoesNotExist:
+            return None
 
     @classmethod
     def enrollments_for_user(cls, user):

@@ -28,6 +28,10 @@ import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
+from lms.xblock.mixin import LmsBlockMixin
+from cms.xmodule_namespace import CmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
@@ -55,7 +59,7 @@ MITX_FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False
+    'ENABLE_CREATOR_GROUP': False,
 }
 ENABLE_JASMINE = False
 
@@ -160,6 +164,13 @@ MIDDLEWARE_CLASSES = (
     'ratelimitbackend.middleware.RateLimitMiddleware',
 )
 
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin)
+
+
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
 import monitoring.exceptions  # noqa
@@ -208,9 +219,6 @@ USE_L10N = True
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
 
-# Tracking
-TRACK_MAX_EVENT = 10000
-
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -247,7 +255,7 @@ PIPELINE_JS = {
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
              'js/models/uploads.js', 'js/views/uploads.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/utility.js',
+             'js/views/assets.js', 'js/src/utility.js',
              'js/models/settings/course_grading_policy.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
@@ -348,6 +356,9 @@ INSTALLED_APPS = (
     # Tracking
     'track',
 
+    # Monitoring
+    'datadog',
+
     # For asset pipelining
     'mitxmako',
     'pipeline',
@@ -363,6 +374,7 @@ INSTALLED_APPS = (
     # for managing course modes
     'course_modes'
 )
+
 
 ################# EDX MARKETING SITE ##################################
 
@@ -380,3 +392,20 @@ MKTG_URL_LINK_MAP = {
 }
 
 COURSES_WITH_UNSAFE_CODE = []
+
+############################## EVENT TRACKING #################################
+
+TRACK_MAX_EVENT = 10000
+
+TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking'
+        }
+    }
+}
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']

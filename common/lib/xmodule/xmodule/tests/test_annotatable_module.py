@@ -5,6 +5,8 @@ import unittest
 from lxml import etree
 from mock import Mock
 
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 from xmodule.annotatable_module import AnnotatableModule
 from xmodule.modulestore import Location
 
@@ -29,10 +31,15 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         </annotatable>
     '''
     descriptor = Mock()
-    module_data = {'data': sample_xml, 'location': location}
+    field_data = DictFieldData({'data': sample_xml})
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(get_test_system(), self.descriptor, self.module_data)
+        self.annotatable = AnnotatableModule(
+            self.descriptor,
+            get_test_system(),
+            self.field_data,
+            ScopeIds(None, None, None, None)
+        )
 
     def test_annotation_data_attr(self):
         el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')

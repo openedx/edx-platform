@@ -7,20 +7,21 @@ from terrain.steps import reload_the_page
 
 @step('I have set "show captions" to (.*)$')
 def set_show_captions(step, setting):
+    # Prevent cookies from overriding course settings
+    world.browser.cookies.delete('hide_captions')
+
     world.css_click('a.edit-button')
     world.wait_for(lambda _driver: world.css_visible('a.save-button'))
     world.browser.select('Show Captions', setting)
     world.css_click('a.save-button')
 
 
-@step('when I view the (video.*) it (.*) show the captions$')
-def shows_captions(_step, video_type, show_captions):
-    # Prevent cookies from overriding course settings
-    world.browser.cookies.delete('hide_captions')
+@step('when I view the video it (.*) show the captions$')
+def shows_captions(_step, show_captions):
     if show_captions == 'does not':
-        assert world.css_has_class('.%s' % video_type, 'closed')
+        assert world.is_css_present('div.video.closed')
     else:
-        assert world.is_css_not_present('.%s.closed' % video_type)
+        assert world.is_css_not_present('div.video.closed')
 
 
 @step('I see the correct video settings and default values$')
@@ -29,7 +30,7 @@ def correct_video_settings(_step):
                                       ['Download Track', '', False],
                                       ['Download Video', '', False],
                                       ['End Time', '0', False],
-                                      ['HTML5 Subtitles', '', False],
+                                      ['HTML5 Timed Transcript', '', False],
                                       ['Show Captions', 'True', False],
                                       ['Start Time', '0', False],
                                       ['Video Sources', '', False],

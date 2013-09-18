@@ -53,7 +53,8 @@ def main(argv):
         # Run as a django test suite
         from django.core import management
 
-        django_args = ["./manage.py", system, "--settings", "test", "test"]
+        os.environ['DJANGO_SETTINGS_MODULE'] = system + '.envs.test'
+        django_args = ["./manage.py", "test"]
         if args.nocapture:
             django_args.append("-s")
         if args.pdb:

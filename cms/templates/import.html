@@ -25,13 +25,16 @@
         <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
         <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
       </div>
-      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
+      <form id="fileupload" method="post" enctype="multipart/form-data"
+          class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
         <h2>${_("Course to import:")}</h2>
         <p class="error-block"></p>
         <a href="#" class="choose-file-button">${_("Choose File")}</a>
         <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_("change")}</a></p>
-        <input type="file" name="course-data" class="file-input">
-        <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button">
+        <input type="file" name="course-data" class="file-input" >
+        <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <p class="status-block">Unpacking...</p>
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -43,6 +46,9 @@
 </%block>
 
 <%block name="jsextra">
+<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
+<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+
 <script>
 (function() {
 
@@ -50,33 +56,61 @@ var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
+var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
 
-$('form').ajaxForm({
-    beforeSend: function() {
-        status.empty();
-        var percentVal = '0%';
+
+$('#fileupload').fileupload({
+
+    dataType: 'json',
+    type: 'POST',
+
+    maxChunkSize: 20 * 1000000, // 20 MB
+
+    autoUpload: false,
+
+    add: function(e, data) {
+        submitBtn.unbind('click');
+        var file = data.files[0];
+        if (file.name.match(/tar\.gz$/)) {
+            submitBtn.click(function(e){
+                e.preventDefault();
+                submitBtn.hide();
+                data.submit().complete(function(result, textStatus, xhr) {
+                    if (result.status != 200) {
+                        alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
+                        submitBtn.show();
+                        bar.hide();
+                    } else {
+                        if (result.responseText["ImportStatus"] == 1) {
+                            bar.hide();
+                            statusBlock.show();
+                        }
+                    }
+                });
+            });
+        } else {
+            data.files = [];
+        }
+    },
+
+    progressall: function(e, data){
+        var percentVal = parseInt(data.loaded / data.total * 100, 10) + "%";
         bar.show();
         fill.width(percentVal);
         percent.html(percentVal);
-        submitBtn.hide();
     },
-    uploadProgress: function(event, position, total, percentComplete) {
-        var percentVal = percentComplete + '%';
-        fill.width(percentVal);
-        percent.html(percentVal);
-    },
-    complete: function(xhr) {
-      if (xhr.status == 200) {
+    done: function(e, data){
+        bar.hide();
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
-      }
-      else
-        alert('${_("Your import has failed.")}\n\n' + xhr.responseText);
-        submitBtn.show();
-        bar.hide();
-    }
-  });
+    },
+    sequentialUploads: true
+
+
+
+});
+
 })();
 </script>
 </%block>

@@ -1,3 +1,6 @@
+// lms - views - user/student dashboard
+// ====================
+
 .dashboard {
   @include clearfix;
   padding: 60px 0 0 0;
@@ -224,6 +227,7 @@
     }
   }
 
+  // course listings
   .my-courses {
     float: left;
     margin: 0px;
@@ -268,21 +272,30 @@
       }
     }
 
-    .my-course {
-      clear: both;
-      @include clearfix;
-      margin-right: flex-gutter();
-      margin-bottom: 50px;
-      padding-bottom: 50px;
-      border-bottom: 1px solid $border-color-1;
-      position: relative;
-      width: flex-grid(12);
-      z-index: 20;
-      @include transition(all 0.15s linear 0s);
+    // UI: course list
+    .listing-courses {
+      @extend %ui-no-list;
 
-      &:last-child {
-        margin-bottom: none;
+      .course-item {
+        margin-bottom: ($baseline*2.5);
+        border-bottom: 4px solid $border-color-l4;
+        padding-bottom: ($baseline*2.5);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
       }
+    }
+
+    // UI: individual course item
+    .course {
+      @include box-sizing(box);
+      @include transition(all 0.15s linear 0s);
+      @include clearfix();
+      @extend %ui-depth2;
+      position: relative;
 
       .cover {
         @include box-sizing(border-box);
@@ -402,6 +415,51 @@
           }
         }
       }
+
+      // STATE: course mode - verified
+      &.verified {
+        @extend %ui-depth2;
+        margin-top: ($baseline*2.5);
+        border-top: 1px solid $verified-color-lvl3;
+        padding-top: ($baseline*1.25);
+        background: $white;
+
+        // FIXME: bad, but needed selector!
+        .info > hgroup .date-block {
+          top: ($baseline*1.25);
+        }
+
+        // course enrollment status message
+        .sts-enrollment {
+          display: inline-block;
+          position: absolute;
+          top: -28px;
+          right: ($baseline/2);
+          text-align: center;
+
+          .label {
+            @extend %text-sr;
+          }
+
+          .deco-graphic {
+            @extend %ui-depth3;
+            width: 40px;
+            position: absolute;
+            left: -30px;
+            top: -10px;
+          }
+
+          .sts-enrollment-value {
+            @extend %ui-depth1;
+            @extend %copy-badge;
+            border-radius: 0;
+            padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
+            color: $white;
+            background: $verified-color-lvl3;
+          }
+        }
+      }
+
     }
 
     .message-status {
@@ -569,6 +627,11 @@
       &:hover {
         color: #333;
       }
+    }
+
+    a.email-settings {
+      @extend a.unenroll;
+      margin-right: 10px;
     }
   }
 }

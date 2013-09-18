@@ -1,4 +1,4 @@
-﻿// needs Markdown.Converter.js at the moment
+// needs Markdown.Converter.js at the moment
 
 (function () {
 
@@ -1063,6 +1063,7 @@
 
             // The main dialog box.
             dialog = doc.createElement("div");
+            dialog.setAttribute("role", "dialog");
             dialog.className = "wmd-prompt-dialog";
             dialog.style.padding = "10px;";
             dialog.style.position = "fixed";

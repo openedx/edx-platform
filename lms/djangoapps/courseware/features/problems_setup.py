@@ -19,12 +19,13 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
-from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
 # the output.
+# 'correct', 'incorrect', and 'unanswered' keys are lists of CSS selectors
+# the presence of any in the list is sufficient
 PROBLEM_DICT = {
     'drop down': {
         'factory': OptionResponseXMLFactory(),
@@ -165,6 +166,8 @@ def answer_problem(problem_type, correctness):
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
+        # First wait for the element to be there on the page
+        world.wait_for_visible("select#{}".format(select_name))
         world.browser.select(select_name, option_text)
 
     elif problem_type == "multiple choice":

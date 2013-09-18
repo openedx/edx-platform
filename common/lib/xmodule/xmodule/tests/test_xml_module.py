@@ -2,13 +2,16 @@
 #pylint: disable=C0111
 
 from xmodule.x_module import XModuleFields
-from xblock.core import Scope, String, Dict, Boolean, Integer, Float, Any, List
+from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
+from xblock.field_data import DictFieldData
 from xmodule.fields import Date, Timedelta
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
-from .import get_test_system
-from nose.tools import assert_equals
+from nose.tools import assert_equals  # pylint: disable=E0611
 from mock import Mock
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
+from xblock.runtime import DbModel
+from xmodule.tests import get_test_descriptor_system
 
 
 class CrazyJsonString(String):
@@ -33,6 +36,11 @@ class TestFields(object):
         values=[{'display_name': 'first', 'value': 'value a'},
                 {'display_name': 'second', 'value': 'value b'}]
     )
+    showanswer = String(
+        help="When to show the problem answer to the student",
+        scope=Scope.settings,
+        default="finished"
+    )
     # Used for testing select type
     float_select = Float(scope=Scope.settings, default=.999, values=[1.23, 0.98])
     # Used for testing float type
@@ -44,114 +52,117 @@ class TestFields(object):
 
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):
-        editable_fields = self.get_xml_editable_fields({})
+        editable_fields = self.get_xml_editable_fields(DictFieldData({}))
         # Tests that the xblock fields (currently tags and name) get filtered out.
         # Also tests that xml_attributes is filtered out of XmlDescriptor.
-        self.assertEqual(1, len(editable_fields), "Expected only 1 editable field for xml descriptor.")
+        self.assertEqual(1, len(editable_fields), editable_fields)
         self.assert_field_values(
             editable_fields, 'display_name', XModuleFields.display_name,
-            explicitly_set=False, inheritable=False, value=None, default_value=None
+            explicitly_set=False, value=None, default_value=None
         )
 
     def test_override_default(self):
         # Tests that explicitly_set is correct when a value overrides the default (not inheritable).
-        editable_fields = self.get_xml_editable_fields({'display_name': 'foo'})
+        editable_fields = self.get_xml_editable_fields(DictFieldData({'display_name': 'foo'}))
         self.assert_field_values(
             editable_fields, 'display_name', XModuleFields.display_name,
-            explicitly_set=True, inheritable=False, value='foo', default_value=None
+            explicitly_set=True, value='foo', default_value=None
         )
 
     def test_integer_field(self):
-        descriptor = self.get_descriptor({'max_attempts': '7'})
+        descriptor = self.get_descriptor(DictFieldData({'max_attempts': '7'}))
         editable_fields = descriptor.editable_metadata_fields
-        self.assertEqual(7, len(editable_fields))
+        self.assertEqual(8, len(editable_fields))
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
-            explicitly_set=True, inheritable=False, value=7, default_value=1000, type='Integer',
+            explicitly_set=True, value=7, default_value=1000, type='Integer',
             options=TestFields.max_attempts.values
         )
         self.assert_field_values(
             editable_fields, 'display_name', TestFields.display_name,
-            explicitly_set=False, inheritable=False, value='local default', default_value='local default'
+            explicitly_set=False, value='local default', default_value='local default'
         )
 
-        editable_fields = self.get_descriptor({}).editable_metadata_fields
+        editable_fields = self.get_descriptor(DictFieldData({})).editable_metadata_fields
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
-            explicitly_set=False, inheritable=False, value=1000, default_value=1000, type='Integer',
+            explicitly_set=False, value=1000, default_value=1000, type='Integer',
             options=TestFields.max_attempts.values
         )
 
     def test_inherited_field(self):
-        model_val = {'display_name': 'inherited'}
-        descriptor = self.get_descriptor(model_val)
-        # Mimic an inherited value for display_name (inherited and inheritable are the same in this case).
-        descriptor._inherited_metadata = model_val
-        descriptor._inheritable_metadata = model_val
+        kvs = InheritanceKeyValueStore(initial_values={}, inherited_settings={'showanswer': 'inherited'})
+        model_data = DbModel(kvs)
+        descriptor = self.get_descriptor(model_data)
         editable_fields = descriptor.editable_metadata_fields
         self.assert_field_values(
-            editable_fields, 'display_name', TestFields.display_name,
-            explicitly_set=False, inheritable=True, value='inherited', default_value='inherited'
+            editable_fields, 'showanswer', InheritanceMixin.showanswer,
+            explicitly_set=False, value='inherited', default_value='inherited'
         )
 
-        descriptor = self.get_descriptor({'display_name': 'explicit'})
         # Mimic the case where display_name WOULD have been inherited, except we explicitly set it.
-        descriptor._inheritable_metadata = {'display_name': 'inheritable value'}
-        descriptor._inherited_metadata = {}
+        kvs = InheritanceKeyValueStore(
+            initial_values={'showanswer': 'explicit'},
+            inherited_settings={'showanswer': 'inheritable value'}
+        )
+        model_data = DbModel(kvs)
+        descriptor = self.get_descriptor(model_data)
         editable_fields = descriptor.editable_metadata_fields
         self.assert_field_values(
-            editable_fields, 'display_name', TestFields.display_name,
-            explicitly_set=True, inheritable=True, value='explicit', default_value='inheritable value'
+            editable_fields, 'showanswer', InheritanceMixin.showanswer,
+            explicitly_set=True, value='explicit', default_value='inheritable value'
         )
 
     def test_type_and_options(self):
         # test_display_name_field verifies that a String field is of type "Generic".
         # test_integer_field verifies that a Integer field is of type "Integer".
 
-        descriptor = self.get_descriptor({})
+        descriptor = self.get_descriptor(DictFieldData({}))
         editable_fields = descriptor.editable_metadata_fields
 
         # Tests for select
         self.assert_field_values(
             editable_fields, 'string_select', TestFields.string_select,
-            explicitly_set=False, inheritable=False, value='default value', default_value='default value',
+            explicitly_set=False, value='default value', default_value='default value',
             type='Select', options=[{'display_name': 'first', 'value': 'value a JSON'},
                                     {'display_name': 'second', 'value': 'value b JSON'}]
         )
 
         self.assert_field_values(
             editable_fields, 'float_select', TestFields.float_select,
-            explicitly_set=False, inheritable=False, value=.999, default_value=.999,
+            explicitly_set=False, value=.999, default_value=.999,
             type='Select', options=[1.23, 0.98]
         )
 
         self.assert_field_values(
             editable_fields, 'boolean_select', TestFields.boolean_select,
-            explicitly_set=False, inheritable=False, value=None, default_value=None,
+            explicitly_set=False, value=None, default_value=None,
             type='Select', options=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}]
         )
 
         # Test for float
         self.assert_field_values(
             editable_fields, 'float_non_select', TestFields.float_non_select,
-            explicitly_set=False, inheritable=False, value=.999, default_value=.999,
+            explicitly_set=False, value=.999, default_value=.999,
             type='Float', options={'min': 0, 'step': .3}
         )
 
         self.assert_field_values(
             editable_fields, 'list_field', TestFields.list_field,
-            explicitly_set=False, inheritable=False, value=[], default_value=[],
+            explicitly_set=False, value=[], default_value=[],
             type='List'
         )
 
     # Start of helper methods
-    def get_xml_editable_fields(self, model_data):
-        system = get_test_system()
-        system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        model_data['category'] = 'test'
-        return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
+    def get_xml_editable_fields(self, field_data):
+        runtime = get_test_descriptor_system()
+        return runtime.construct_xblock_from_class(
+            XmlDescriptor,
+            field_data=field_data,
+            scope_ids=Mock()
+        ).editable_metadata_fields
 
-    def get_descriptor(self, model_data):
+    def get_descriptor(self, field_data):
         class TestModuleDescriptor(TestFields, XmlDescriptor):
             @property
             def non_editable_metadata_fields(self):
@@ -159,11 +170,11 @@ class EditableMetadataFieldsTest(unittest.TestCase):
                 non_editable_fields.append(TestModuleDescriptor.due)
                 return non_editable_fields
 
-        system = get_test_system()
+        system = get_test_descriptor_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        return TestModuleDescriptor(runtime=system, model_data=model_data)
+        return system.construct_xblock_from_class(TestModuleDescriptor, field_data=field_data, scope_ids=Mock())
 
-    def assert_field_values(self, editable_fields, name, field, explicitly_set, inheritable, value, default_value,
+    def assert_field_values(self, editable_fields, name, field, explicitly_set, value, default_value,
                             type='Generic', options=[]):
         test_field = editable_fields[name]
 
@@ -178,7 +189,6 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         self.assertEqual(type, test_field['type'])
 
         self.assertEqual(explicitly_set, test_field['explicitly_set'])
-        self.assertEqual(inheritable, test_field['inheritable'])
 
 
 class TestSerialize(unittest.TestCase):

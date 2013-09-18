@@ -352,10 +352,10 @@ class TextlineTemplateTest(TemplateTestCase):
         super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
-        cases = [({}, ' capa_inputtype '),
-                 ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
-                 ({'inline': True}, ' capa_inputtype inline'),
-                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'), ]
+        cases = [({}, ' capa_inputtype  textline'),
+                 ({'do_math': True}, 'text-input-dynamath capa_inputtype  textline'),
+                 ({'inline': True}, ' capa_inputtype inline textline'),
+                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline textline'), ]
 
         for (context, css_class) in cases:
             base_context = self.context.copy()

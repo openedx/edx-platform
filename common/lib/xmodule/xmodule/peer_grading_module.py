@@ -8,10 +8,9 @@ from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from .timeinfo import TimeInfo
-from xblock.core import Dict, String, Scope, Boolean, Integer, Float
+from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -46,7 +45,6 @@ class PeerGradingFields(object):
     )
     due = Date(
         help="Due date that should be displayed.",
-        default=None,
         scope=Scope.settings)
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
@@ -74,6 +72,12 @@ class PeerGradingFields(object):
         scope=Scope.content
     )
 
+class InvalidLinkLocation(Exception):
+    """
+    Exception for the case in which a peer grading module tries to link to an invalid location.
+    """
+    pass
+
 
 class PeerGradingModule(PeerGradingFields, XModule):
     """
@@ -82,9 +86,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
     _VERSION = 1
 
     js = {
+        'js': [
+            resource_string(__name__, 'js/src/peergrading/ice.min.js'),
+        ],
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
+            resource_string(__name__, 'js/src/peergrading/track_changes.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ]
@@ -105,14 +113,21 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         if self.use_for_single_location:
             try:
-                self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
+                linked_descriptors = self.descriptor.get_required_module_descriptors()
+                if len(linked_descriptors) == 0:
+                    error_msg = "Peer grading module {0} is trying to use single problem mode without "
+                    "a location specified.".format(self.location)
+                    log.error(error_msg)
+                    raise InvalidLinkLocation(error_msg)
+                self.linked_problem = self.system.get_module(linked_descriptors[0])
             except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.lms.due
-            if due_date:
-                self.lms.due = due_date
+            except NoPathToItem:
+                log.error("Linked location {0} for peer grading module {1} cannot be linked to.".format(
+                    self.link_to_location, self.location))
+                raise
 
         try:
             self.timeinfo = TimeInfo(self.due, self.graceperiod)
@@ -189,9 +204,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         return json.dumps(d, cls=ComplexEncoder)
 
-    def query_data_for_location(self):
+    def query_data_for_location(self, location):
         student_id = self.system.anonymous_student_id
-        location = self.link_to_location
         success = False
         response = {}
 
@@ -229,7 +243,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             count_graded = self.student_data_for_location['count_graded']
             count_required = self.student_data_for_location['count_required']
         except:
-            success, response = self.query_data_for_location()
+            success, response = self.query_data_for_location(self.location)
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
@@ -312,17 +326,26 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged', 'answer_unknown'])
-        success, message = self._check_required(data, required)
+        required = ['location', 'submission_id', 'submission_key', 'score', 'feedback', 'submission_flagged', 'answer_unknown']
+        if data.get("submission_flagged", False) in ["false", False, "False", "FALSE"]:
+            required.append("rubric_scores[]")
+        success, message = self._check_required(data, set(required))
         if not success:
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        if 'rubric_scores[]' in required:
+            data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
             response = self.peer_gs.save_grade(**data_dict)
+            success, location_data = self.query_data_for_location(data_dict['location'])
+            #Don't check for success above because the response = statement will raise the same Exception as the one
+            #that will cause success to be false.
+            response.update({'required_done' : False})
+            if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded'])>=int(location_data['count_required']):
+                response['required_done'] = True
             return response
         except GradingServiceError:
             # This is a dev_facing_error
@@ -473,6 +496,21 @@ class PeerGradingModule(PeerGradingFields, XModule):
         })
         return html
 
+    def _find_corresponding_module_for_location(self, location):
+        """
+        Find the peer grading module that exists at the given location.
+        """
+        try:
+            return self.descriptor.system.load_item(location)
+        except ItemNotFoundError:
+            # The linked problem doesn't exist.
+            log.error("Problem {0} does not exist in this course.".format(location))
+            raise
+        except NoPathToItem:
+            # The linked problem does not have a path to it (ie is in a draft or other strange state).
+            log.error("Cannot find a path to problem {0} in this course.".format(location))
+            raise
+
     def peer_grading(self, _data=None):
         '''
         Show a peer grading interface
@@ -502,31 +540,23 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             log.error(error_text)
             success = False
-        except:
+        except Exception:
             log.exception("Could not contact peer grading service.")
             success = False
 
-
-        def _find_corresponding_module_for_location(location):
-            '''
-            find the peer grading module that links to the given location
-            '''
-            try:
-                return modulestore().get_instance(self.system.course_id, location)
-            except:
-                # the linked problem doesn't exist
-                log.error("Problem {0} does not exist in this course".format(location))
-                raise
-
+        good_problem_list = []
         for problem in problem_list:
             problem_location = problem['location']
-            descriptor = _find_corresponding_module_for_location(problem_location)
+            try:
+                descriptor = self._find_corresponding_module_for_location(problem_location)
+            except (NoPathToItem, ItemNotFoundError):
+                continue
             if descriptor:
-                problem['due'] = descriptor.lms.due
-                grace_period = descriptor.lms.graceperiod
+                problem['due'] = descriptor.due
+                grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
-                except:
+                except Exception:
                     log.error("Malformed due date or grace period string for location {0}".format(problem_location))
                     raise
                 if self._closed(problem_timeinfo):
@@ -537,13 +567,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # if we can't find the due date, assume that it doesn't have one
                 problem['due'] = None
                 problem['closed'] = False
+            good_problem_list.append(problem)
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
-            'problem_list': problem_list,
+            'problem_list': good_problem_list,
             'error_text': error_text,
             # Checked above
             'staff_access': False,
@@ -568,6 +599,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         elif data.get('location') is not None:
             problem_location = data.get('location')
 
+        module = self._find_corresponding_module_for_location(problem_location)
+
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
@@ -576,6 +609,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,
+            'track_changes': getattr(module, 'track_changes', False),
             'use_single_location': self.use_for_single_location,
         })
 
@@ -620,3 +654,11 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.graceperiod])
         return non_editable_fields
+
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        if self.use_for_single_location:
+            return [self.system.load_item(self.link_to_location)]
+        else:
+            return []

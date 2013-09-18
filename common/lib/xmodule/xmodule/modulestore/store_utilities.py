@@ -111,11 +111,18 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
         if original_loc.category != 'course':
             module.location = module.location._replace(
-                tag=dest_location.tag, org=dest_location.org, course=dest_location.course)
+                tag=dest_location.tag,
+                org=dest_location.org,
+                course=dest_location.course
+            )
         else:
             # on the course module we also have to update the module name
             module.location = module.location._replace(
-                tag=dest_location.tag, org=dest_location.org, course=dest_location.course, name=dest_location.name)
+                tag=dest_location.tag,
+                org=dest_location.org,
+                course=dest_location.course,
+                name=dest_location.name
+            )
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 

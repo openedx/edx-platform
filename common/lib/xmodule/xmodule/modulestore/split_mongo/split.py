@@ -8,14 +8,15 @@ from path import path
 
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
+from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
 from xmodule.modulestore import inheritance, ModuleStoreBase
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
-from xblock.core import Scope
+from xblock.fields import Scope
+from xblock.runtime import Mixologist
 from pytz import UTC
 import collections
 
@@ -41,6 +42,8 @@ log = logging.getLogger(__name__)
 #==============================================================================
 
 
+
+
 class SplitMongoModuleStore(ModuleStoreBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,
@@ -50,15 +53,18 @@ class SplitMongoModuleStore(ModuleStoreBase):
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
                  user=None, password=None,
+                 mongo_options=None,
                  **kwargs):
 
-        ModuleStoreBase.__init__(self)
+        super(SplitMongoModuleStore, self).__init__(**kwargs)
+        if mongo_options is None:
+            mongo_options = {}
 
         self.db = pymongo.database.Database(pymongo.MongoClient(
             host=host,
             port=port,
             tz_aware=True,
-            **kwargs
+            **mongo_options
         ), db)
 
         self.course_index = self.db[collection + '.active_versions']
@@ -89,6 +95,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
+
+        # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
+        # This is only used by _partition_fields_by_scope, which is only needed because
+        # the split mongo store is used for item creation as well as item persistence
+        self.mixologist = Mixologist(self.xblock_mixins)
 
     def cache_items(self, system, base_usage_ids, depth=0, lazy=True):
         '''
@@ -141,13 +152,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
         system = self._get_cache(course_entry['_id'])
         if system is None:
             system = CachingDescriptorSystem(
-                self,
-                course_entry,
-                {},
-                lazy,
-                self.default_class,
-                self.error_tracker,
-                self.render_template
+                modulestore=self,
+                course_entry=course_entry,
+                module_data={},
+                lazy=lazy,
+                default_class=self.default_class,
+                error_tracker=self.error_tracker,
+                render_template=self.render_template,
+                resources_fs=None,
+                mixins=self.xblock_mixins
             )
             self._add_cache(course_entry['_id'], system)
             self.cache_items(system, usage_ids, depth, lazy)
@@ -940,12 +953,12 @@ class SplitMongoModuleStore(ModuleStoreBase):
             xblock.definition_locator, is_updated = self.update_definition_from_data(
                 xblock.definition_locator, new_def_data, user_id)
 
-        if xblock.location.usage_id is None:
+        if isinstance(xblock.scope_ids.usage_id.usage_id, LocalId):
             # generate an id
             is_new = True
             is_updated = True
             usage_id = self._generate_usage_id(structure_blocks, xblock.category)
-            xblock.location.usage_id = usage_id
+            xblock.scope_ids.usage_id.usage_id = usage_id
         else:
             is_new = False
             usage_id = xblock.location.usage_id
@@ -957,9 +970,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
         updated_blocks = []
         if xblock.has_children:
             for child in xblock.children:
-                if isinstance(child, XModuleDescriptor):
-                    updated_blocks += self._persist_subdag(child, user_id, structure_blocks)
-                    children.append(child.location.usage_id)
+                if isinstance(child.usage_id, LocalId):
+                    child_block = xblock.system.get_block(child)
+                    updated_blocks += self._persist_subdag(child_block, user_id, structure_blocks)
+                    children.append(child_block.location.usage_id)
                 else:
                     children.append(child)
 
@@ -1115,11 +1129,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         return {}
 
-    def inherit_settings(self, block_map, block, inheriting_settings=None):
+    def inherit_settings(self, block_map, block_json, inheriting_settings=None):
         """
-        Updates block with any inheritable setting set by an ancestor and recurses to children.
+        Updates block_json with any inheritable setting set by an ancestor and recurses to children.
         """
-        if block is None:
+        if block_json is None:
             return
 
         if inheriting_settings is None:
@@ -1129,14 +1143,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # NOTE: this should show the values which all fields would have if inherited: i.e.,
         # not set to the locally defined value but to value set by nearest ancestor who sets it
         # ALSO NOTE: no xblock should ever define a _inherited_settings field as it will collide w/ this logic.
-        block.setdefault('_inherited_settings', {}).update(inheriting_settings)
+        block_json.setdefault('_inherited_settings', {}).update(inheriting_settings)
 
         # update the inheriting w/ what should pass to children
-        inheriting_settings = block['_inherited_settings'].copy()
-        block_fields = block['fields']
-        for field in inheritance.INHERITABLE_METADATA:
-            if field in block_fields:
-                inheriting_settings[field] = block_fields[field]
+        inheriting_settings = block_json['_inherited_settings'].copy()
+        block_fields = block_json['fields']
+        for field_name in inheritance.InheritanceMixin.fields:
+            if field_name in block_fields:
+                inheriting_settings[field_name] = block_fields[field_name]
 
         for child in block_fields.get('children', []):
             self.inherit_settings(block_map, block_map[child], inheriting_settings)
@@ -1305,7 +1319,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         if fields is None:
             return {}
-        cls = XModuleDescriptor.load_class(category)
+        cls = self.mixologist.mix(XModuleDescriptor.load_class(category))
         result = collections.defaultdict(dict)
         for field_name, value in fields.iteritems():
             field = getattr(cls, field_name)

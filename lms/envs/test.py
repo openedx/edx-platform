@@ -32,6 +32,8 @@ MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
 MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -152,6 +154,26 @@ OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+###################### Payment ##############################3
+# Enable fake payment processing page
+MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
+# Configure the payment processor to use the fake processing page
+# Since both the fake payment page and the shoppingcart app are using
+# the same settings, we can generate this randomly and guarantee
+# that they are using the same secret.
+from random import choice
+import string
+RANDOM_SHARED_SECRET = ''.join(
+    choice(string.letters + string.digits + string.punctuation)
+    for x in range(250)
+)
+
+CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
+CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 ################################# CELERY ######################################
 

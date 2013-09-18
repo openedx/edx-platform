@@ -11,10 +11,13 @@ Feature: Static Pages
         Given I have opened a new course in Studio
         And I go to the static pages page
         And I add a new page
-        When I will confirm all alerts
         And I "delete" the "Empty" page
+        Then I am shown a prompt
+        When I confirm the prompt
         Then I should not see a "Empty" static page
 
+    # Safari won't update the name properly
+    @skip_safari
     Scenario: Users can edit static pages
         Given I have opened a new course in Studio
         And I go to the static pages page

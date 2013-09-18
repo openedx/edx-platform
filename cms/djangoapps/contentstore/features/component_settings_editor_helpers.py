@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 
 
@@ -48,9 +48,7 @@ def click_component_from_menu(category, boilerplate, expected_css):
         elem_css = "a[data-category='{}']:not([data-boilerplate])".format(category)
     elements = world.css_find(elem_css)
     assert_equal(len(elements), 1)
-    world.wait_for(lambda _driver: world.css_visible(elem_css))
-    world.css_click(elem_css, success_condition=lambda: 1 == len(world.css_find(expected_css)))
-
+    world.css_click(elem_css)
 
 @world.absorb
 def edit_component_and_select_settings():

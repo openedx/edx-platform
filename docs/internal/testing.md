@@ -103,6 +103,10 @@ You can run tests using `rake` commands.  For example,
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
+You can re-run all failed python tests by running (all JS tests will still run)
+
+    rake test[--failed]
+
 You can also run the tests without `collectstatic`, which tends to be faster:
 
     rake fasttest_lms
@@ -128,6 +132,10 @@ To run a single django test:
 
     rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
 
+To re-run all failing django tests from lms or cms:
+
+    rake test_lms[--failed]
+
 To run a single nose test file:
 
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py
@@ -136,46 +144,51 @@ To run a single nose test:
 
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
 
+To run a single test and get stdout, with proper env config:
+
+    python manage.py cms --settings test test contentstore.tests.test_import_nostatic -s
+
+To run a single test and get stdout and get coverage:
+
+    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
+    python -m coverage run --rcfile=./lms/.coveragerc which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
+
+generate coverage report:
+
+    coverage report --rcfile=./common/lib/xmodule/.coveragerc
+
+or to get html report:
+
+    coverage html --rcfile=./common/lib/xmodule/.coveragerc
+
+then browse reports/common/lib/xmodule/cover/index.html
+
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
 
+
 ### Running Javascript Unit Tests
 
-To run all of the javascript unit tests, use
+We use Jasmine to run JavaScript unit tests.  To run all the JavaScript tests:
 
-    rake jasmine
+    rake test:js
 
-If the `phantomjs` binary is on the path, or the `PHANTOMJS_PATH` environment variable is
-set to point to it, then the tests will be run headless. Otherwise, they will be run in
-your default browser
+To run a specific set of JavaScript tests and print the results to the console:
 
-    export PATH=/path/to/phantomjs:$PATH
-    rake jasmine  # Runs headless
+    rake test:js:run[lms]
+    rake test:js:run[cms]
+    rake test:js:run[xmodule]
+    rake test:js:run[common]
 
-or
+To run JavaScript tests in your default browser:
 
-    PHANTOMJS_PATH=/path/to/phantomjs rake jasmine  # Runs headless
+    rake test:js:dev[lms]
+    rake test:js:dev[cms]
+    rake test:js:dev[xmodule]
+    rake test:js:dev[common]
 
-or
+These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
-    rake jasmine  # Runs in browser
-
-You can also force a run using phantomjs or the browser using the commands
-
-    rake jasmine:browser  # Runs in browser
-    rake jasmine:phantomjs  # Runs headless
-
-You can run tests for a specific subsystems as well
-
-    rake jasmine:lms  # Runs all lms javascript unit tests using the default method
-    rake jasmine:cms:browser  # Runs all cms javascript unit tests in the browser
-
-Use `rake -T` to get a list of all available subsystems
-
-**Troubleshooting**: If you get an error message while running the `rake` task,
-try running `bundle install` to install the required ruby gems.
-
-Unit tests can be run in parallel to each other and while acceptance tests are running
 
 ### Running Acceptance Tests
 

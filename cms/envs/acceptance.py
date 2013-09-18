@@ -8,6 +8,7 @@ so that we can run the lettuce acceptance tests.
 # pylint: disable=W0401, W0614
 
 from .test import *
+from lms.envs.sauce import *
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly
@@ -17,7 +18,7 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 import os
-import random
+from random import choice, randint
 
 
 def seed():
@@ -67,14 +68,13 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_edx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
     }
 }
 
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
-
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
@@ -84,5 +84,12 @@ USE_I18N = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_SERVER_PORT = random.randint(1024, 65535)
-LETTUCE_BROWSER = 'chrome'
+LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
+LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *      # pylint: disable=F0401
+except ImportError:
+    pass

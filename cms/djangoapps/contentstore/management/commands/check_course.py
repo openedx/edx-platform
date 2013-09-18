@@ -3,11 +3,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from xmodule.course_module import CourseDescriptor
 
-from request_cache.middleware import RequestCache
-
-from django.core.cache import get_cache
-
-CACHE = get_cache('mongo_metadata_inheritance')
 
 class Command(BaseCommand):
     help = '''Enumerates through the course and find common errors'''
@@ -20,12 +15,6 @@ class Command(BaseCommand):
 
         loc = CourseDescriptor.id_to_location(loc_str)
         store = modulestore()
-
-        # setup a request cache so we don't throttle the DB with all the metadata inheritance requests
-        store.set_modulestore_configuration({
-            'metadata_inheritance_cache_subsystem': CACHE,
-            'request_cache': RequestCache.get_request_cache()
-        })
 
         course = store.get_item(loc, depth=3)
 
@@ -71,4 +60,3 @@ class Command(BaseCommand):
         for item in queried_discussion_items:
             if item.location.url() not in discussion_items:
                 print 'Found dangling discussion module = {0}'.format(item.location.url())
-

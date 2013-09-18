@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_in, assert_equals
+from nose.tools import assert_in, assert_equals  # pylint: disable=E0611
 
 
 @step(u'I should see the following Partners in the Partners section')

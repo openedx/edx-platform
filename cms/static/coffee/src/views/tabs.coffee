@@ -21,7 +21,7 @@ class CMS.Views.TabsEdit extends Backbone.View
       forcePlaceholderSize: true
       axis: 'y'
       items: '> .component'
-    )    
+    )
 
   tabMoved: (event, ui) =>
     tabs = []
@@ -34,7 +34,7 @@ class CMS.Views.TabsEdit extends Backbone.View
 
     $.ajax({
       type:'POST',
-      url: '/reorder_static_tabs', 
+      url: '/reorder_static_tabs',
       data: JSON.stringify({
         tabs : tabs
       }),
@@ -64,20 +64,31 @@ class CMS.Views.TabsEdit extends Backbone.View
       course: course_location_analytics
 
   deleteTab: (event) =>
-    if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
-      return
-    $component = $(event.currentTarget).parents('.component')
+    confirm = new CMS.Views.Prompt.Warning
+      title: gettext('Delete Component Confirmation')
+      message: gettext('Are you sure you want to delete this component? This action cannot be undone.')
+      actions:
+        primary:
+          text: gettext("OK")
+          click: (view) ->
+            view.hide()
+            $component = $(event.currentTarget).parents('.component')
 
-    analytics.track "Deleted Static Page",
-      course: course_location_analytics
-      id: $component.data('id')
-
-    $.post('/delete_item', {
-      id: $component.data('id')
-    }, =>
-      $component.remove()
-    )
-
-
-
-
+            analytics.track "Deleted Static Page",
+              course: course_location_analytics
+              id: $component.data('id')
+            deleting = new CMS.Views.Notification.Mini
+              title: gettext('Deleting&hellip;')
+            deleting.show()
+            $.post('/delete_item', {
+              id: $component.data('id')
+            }, =>
+              $component.remove()
+              deleting.hide()
+            )
+        secondary: [
+          text: gettext('Cancel')
+          click: (view) ->
+            view.hide()
+        ]
+    confirm.show()

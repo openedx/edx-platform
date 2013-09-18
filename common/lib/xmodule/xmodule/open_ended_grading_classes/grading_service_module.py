@@ -11,6 +11,9 @@ log = logging.getLogger(__name__)
 
 
 class GradingServiceError(Exception):
+    """
+    Exception for grading service.  Shown when Open Response Assessment servers cannot be reached.
+    """
     pass
 
 
@@ -22,7 +25,7 @@ class GradingService(object):
     def __init__(self, config):
         self.username = config['username']
         self.password = config['password']
-        self.session = requests.session()
+        self.session = requests.Session()
         self.system = config['system']
 
     def _login(self):
@@ -39,7 +42,7 @@ class GradingService(object):
 
         response.raise_for_status()
 
-        return response.json
+        return response.json()
 
     def post(self, url, data, allow_redirects=False):
         """
@@ -62,7 +65,6 @@ class GradingService(object):
         """
         Make a get request to the grading controller
         """
-        log.debug(params)
         op = lambda: self.session.get(url,
                                       allow_redirects=allow_redirects,
                                       params=params)
@@ -86,9 +88,10 @@ class GradingService(object):
         Returns the result of operation().  Does not catch exceptions.
         """
         response = operation()
-        if (response.json
-            and response.json.get('success') is False
-            and response.json.get('error') == 'login_required'):
+        resp_json = response.json()
+        if (resp_json
+                and resp_json.get('success') is False
+                and resp_json.get('error') == 'login_required'):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()
             if r and not r.get('success'):

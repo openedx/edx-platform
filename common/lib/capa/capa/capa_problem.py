@@ -555,6 +555,13 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
+        if not isinstance(problemtree.tag, basestring):
+            # Comment and ProcessingInstruction nodes are not Elements,
+            # and we're ok leaving those behind.
+            # BTW: etree gives us no good way to distinguish these things
+            # other than to examine .tag to see if it's a string. :(
+            return
+
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
             # leave javascript intact.

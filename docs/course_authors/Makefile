@@ -15,13 +15,13 @@ endif
 Q_FLAG        = 
 
 ifeq ($(quiet), true)
-Q_FLAG = -q
+Q_FLAG = -Q
 endif
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -q -d $(BUILDDIR)/doctrees -c source $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
+ALLSPHINXOPTS   = $(Q_FLAG) -d $(BUILDDIR)/doctrees -c source $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 

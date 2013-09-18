@@ -15,8 +15,8 @@ from mitxmako.shortcuts import render_to_string
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
 from xmodule.x_module import ModuleSystem
+from xblock.fields import ScopeIds
 
 from open_ended_grading import staff_grading_service, views
 from courseware.access import _course_staff_group_name
@@ -27,14 +27,16 @@ log = logging.getLogger(__name__)
 from django.test.utils import override_settings
 
 from xmodule.tests import test_util_open_ended
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xblock.field_data import DictFieldData
 
 from courseware.tests import factories
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestStaffGradingService(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -42,8 +44,6 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -138,8 +138,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         self.assertIsNotNone(content['problem_list'])
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPeerGradingService(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -147,8 +147,6 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -161,7 +159,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location, 'category':'peergrading'}
+        field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
@@ -169,13 +167,13 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data={},
+            xblock_field_data=lambda d: d._field_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
-            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            mixins=settings.XBLOCK_MIXINS,
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, model_data)
-        model_data = {'location': location}
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, self.descriptor, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
+        self.peer_module = self.descriptor.xmodule(self.system)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
@@ -293,8 +291,8 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.assertFalse('actual_score' in response)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPanel(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Run tests on the open ended panel
     """
@@ -322,3 +320,22 @@ class TestPanel(LoginEnrollmentTestCase):
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
         self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingFound(ModuleStoreTestCase):
+    """
+    Test to see if peer grading modules can be found properly.
+    """
+
+    def setUp(self):
+        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+
+    def test_peer_grading_nopath(self):
+        """
+        The open_ended_nopath course contains a peer grading module with no path to it.
+        Ensure that the exception is caught.
+        """
+
+        found, url = views.find_peer_grading_module(self.course)
+        self.assertEqual(found, False)

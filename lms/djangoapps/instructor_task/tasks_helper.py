@@ -20,11 +20,10 @@ from dogapi import dog_stats_api
 
 from xmodule.modulestore.django import modulestore
 
-import mitxmako.middleware as middleware
 from track.views import task_track
 
 from courseware.models import StudentModule
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor_task.models import InstructorTask, PROGRESS
 
@@ -33,26 +32,6 @@ TASK_LOG = get_task_logger(__name__)
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
-
-
-def initialize_mako(sender=None, conf=None, **kwargs):
-    """
-    Get mako templates to work on celery worker server's worker thread.
-
-    The initialization of Mako templating is usually done when Django is
-    initializing middleware packages as part of processing a server request.
-    When this is run on a celery worker server, no such initialization is
-    called.
-
-    To make sure that we don't load this twice (just in case), we look for the
-    result: the defining of the lookup paths for templates.
-    """
-    if 'main' not in middleware.lookup:
-        TASK_LOG.info("Initializing Mako middleware explicitly")
-        middleware.MakoMiddleware()
-
-# Actually make the call to define the hook:
-worker_process_init.connect(initialize_mako)
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -272,7 +251,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     the need for a Request object when instantiating an xmodule instance.
     """
     # reconstitute the problem's corresponding XModule:
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
@@ -292,7 +271,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
         if xmodule_instance_args is not None else ''
 
-    return get_module_for_descriptor_internal(student, module_descriptor, model_data_cache, course_id,
+    return get_module_for_descriptor_internal(student, module_descriptor, field_data_cache, course_id,
                                               make_track_function(), xqueue_callback_url_prefix,
                                               grade_bucket_type=grade_bucket_type)
 

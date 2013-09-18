@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>
+${_("Hi {name}").format(name=order.user.profile.name)}
+
+${_("Your payment was successful. You will see the charge below on your next credit or debit card statement. The charge will show up on your statement under the company name {platform_name}. If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(platform_name=settings.PLATFORM_NAME, billing_email=settings.PAYMENT_SUPPORT_EMAIL, faq_url=marketing_link('FAQ'))}
+
+${_("-The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
+
+${_("Your order number is: {order_number}").format(order_number=order.id)}
+
+${_("The items in your order are:")}
+
+${_("Quantity - Description - Price")}
+%for order_item in order_items:
+    ${order_item.qty} - ${order_item.line_desc} - ${"$" if order_item.currency == 'usd' else ""}${order_item.line_cost} 
+%endfor
+${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=("$" if order.currency == 'usd' else ""))}
+
+%for order_item in order_items:
+    ${order_item.additional_instruction_text}
+%endfor
