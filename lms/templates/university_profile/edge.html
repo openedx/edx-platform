@@ -66,6 +66,22 @@ width: 32.20339%;
 float: right;
 }
 </style>
+
+<style>
+div.announcements-wrapper section.announcements > ol {
+list-style: none;
+margin-bottom: 1.41575em;
+padding-left: 0;
+}
+div.announcements-wrapper section.announcements > ol > li h2 {
+font-size: 0.875em;
+font-weight: bold;
+background: url("/static/images/calendar-icon.png") 0 center no-repeat;
+padding-left: 20px;
+margin-bottom: 10px;
+}
+</style>
+
 <script>
   $(window).bind("load", function() { 
        
@@ -133,6 +149,21 @@ font-size: x-large;
   <div class="content">
     <div class="log-in-form">
       <h2>Новости</h2>
+      % if site_wide_announcements:
+        <div class="announcements-wrapper">
+           <section class="announcements">
+            <ol>
+                % for announcement in site_wide_announcements:
+                <li class="announcement">
+                    <h2 class="title"><span class="date">${announcement.creation_date}</h2>
+                    ${announcement.content}
+                    <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">Убрать</a> -->
+                </li>
+                % endfor
+            </ol>
+           </section>
+        </div>
+    % endif
     </div>
     <div class="log-in-form">
       <h2>${_("Log in to your courses")}</h2>
