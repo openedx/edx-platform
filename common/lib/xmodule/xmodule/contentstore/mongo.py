@@ -24,15 +24,15 @@ class MongoContentStore(ContentStore):
 
         self.fs = gridfs.GridFS(_db, bucket)
 
-        self.fs_files = _db[bucket + ".files"]   # the underlying collection GridFS uses
+        self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
     def save(self, content):
-        id = content.get_id()
+        content_id = content.get_id()
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
-        self.delete(id)
+        self.delete(content_id)
 
-        with self.fs.new_file(_id=id, filename=content.get_url_path(), content_type=content.content_type,
+        with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
                               displayname=content.name, thumbnail_location=content.thumbnail_location,
                               import_path=content.import_path) as fp:
             if hasattr(content.data, '__iter__'):
@@ -43,25 +43,25 @@ class MongoContentStore(ContentStore):
 
         return content
 
-    def delete(self, id):
-        if self.fs.exists({"_id": id}):
-            self.fs.delete(id)
+    def delete(self, content_id):
+        if self.fs.exists({"_id": content_id}):
+            self.fs.delete(content_id)
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
-        id = StaticContent.get_id_from_location(location)
+        content_id = StaticContent.get_id_from_location(location)
         try:
             if as_stream:
-                fp = self.fs.get(id)
                 return StaticContentStream(location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                                            thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
                                            import_path=fp.import_path if hasattr(fp, 'import_path') else None,
                                            length=fp.length)
+                fp = self.fs.get(content_id)
             else:
-                with self.fs.get(id) as fp:
                     return StaticContent(location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                                          thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
                                          import_path=fp.import_path if hasattr(fp, 'import_path') else None,
                                          length=fp.length)
+                with self.fs.get(content_id) as fp:
         except NoFile:
             if throw_on_not_found:
                 raise NotFoundError()
@@ -69,9 +69,9 @@ class MongoContentStore(ContentStore):
                 return None
 
     def get_stream(self, location):
-        id = StaticContent.get_id_from_location(location)
+        content_id = StaticContent.get_id_from_location(location)
         try:
-            handle = self.fs.get(id)
+            handle = self.fs.get(content_id)
         except NoFile:
             raise NotFoundError()
 

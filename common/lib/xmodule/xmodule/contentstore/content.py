@@ -15,9 +15,9 @@ from PIL import Image
 
 class StaticContent(object):
     def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None):
+                 length=None, locked=False):
         self.location = loc
-        self.name = name   # a display string which can be edited, and thus not part of the location which needs to be fixed
+        self.name = name  # a display string which can be edited, and thus not part of the location which needs to be fixed
         self.content_type = content_type
         self._data = data
         self.length = length
