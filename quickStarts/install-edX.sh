@@ -6,6 +6,7 @@
 
 #######################
 # Variable declarations
+# FILL THESE IN ACCORDINGLY FOR YOUR CONFIGURATION / SETUP
 #######################
 SYSTEM_HOST_NAME='edx'
 SYSTEM_DOMAIN_NAME='vedaproject.org'
@@ -39,10 +40,10 @@ echo "#!/bin/bash" > ~/start-cms.sh
 echo ". /etc/bash_completion.d/virtualenvwrapper; sudo iptables -F; sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8000; workon edx-platform; cd ~/edx-platform; rake cms[dev,0.0.0.0:8001];" >> ~/start-cms.sh
 
 # Set permissions on edX startup script
-chmod +x ~/start-lms.sh
+chmod +x ~/quickStarts/start-lms.sh
 
 # Set permissions on Studio startup script
-chmod +x ~/start-cms.sh
+chmod +x ~/quickStarts/start-cms.sh
 
 # Reconfigure postfix ( use the following values [default all + remove FQDN of server when asked for which hosts this machine is the final destination] 
 sudo dpkg-reconfigure postfix
@@ -56,15 +57,12 @@ sudo hostname $SYSTEM_FQDN
 ############
 
 # Setup Google Managed domain settings in postfix
-sudo cat ~/edx-platform/veda/postfix-config.append >> /etc/postfix/main.cf
-sudo cat ~/edx-platform/veda/postfix-auth.append >> /etc/postfix/sasl_passwd
+sudo cat ~/edx-platform/quickStarts/postfix-config.append >> /etc/postfix/main.cf
+sudo cat ~/edx-platform/quickStarts/postfix-auth.append >> /etc/postfix/sasl_passwd
 sudo chmod 400 /etc/postfix/sasl_passwd
 sudo postmap /etc/postfix/sasl_passwd
 cat /etc/ssl/certs/Thawte_Premium_Server_CA.pem | sudo tee -a /etc/postfix/cacert.pem
 sudo /etc/init.d/postfix reload
 
-# Start edX in a detached screen session
-#screen -d -m ~/start-lms.sh
-
-# Start Studio in a detached screen session.
-#screen -d -m ~/start-cms.sh
+# Start Studio and edX in a detached screen session.
+screen -d -m ~/quickStarts/start-edx.sh
