@@ -146,10 +146,25 @@
     });
 
     describe('mouse movement', function() {
+      // We will store default window.setTimeout() function here.
+      var oldSetTimeout = null;
+
       beforeEach(function() {
+        // Store original window.setTimeout() function. If we do not do this, then
+        // all other tests that rely on code which uses window.setTimeout()
+        // function might (and probably will) fail.
+        oldSetTimeout = window.setTimeout;
+        // Redefine window.setTimeout() function as a spy.
         window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; })
         window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
+      });
+
+      afterEach(function () {
+        // Reset the default window.setTimeout() function. If we do not do this,
+        // then all other tests that rely on code which uses window.setTimeout()
+        // function might (and probably will) fail.
+        window.setTimeout = oldSetTimeout;
       });
 
       describe('when cursor is outside of the caption box', function() {
