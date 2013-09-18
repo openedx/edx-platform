@@ -23,7 +23,6 @@ from celery import task
 from functools import partial
 from instructor_task.tasks_helper import (run_main_task,
                                           perform_module_state_update,
-                                          # perform_delegate_email_batches,
                                           rescore_problem_module_state,
                                           reset_attempts_module_state,
                                           delete_problem_module_state,
@@ -52,7 +51,10 @@ def rescore_problem(entry_id, xmodule_instance_args):
     """
     action_name = 'rescored'
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
-    filter_fcn = lambda(modules_to_update): modules_to_update.filter(state__contains='"done": true')
+
+    def filter_fcn(modules_to_update):
+        return modules_to_update.filter(state__contains='"done": true')
+
     visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
 

@@ -34,7 +34,7 @@ class MockCourseEmailResult(object):
 
     def get_mock_course_email_result(self):
         """Wrapper for mock email function."""
-        def mock_course_email_result(sent, failed, output, **kwargs):  # pylint: disable=W0613
+        def mock_course_email_result(prev_results, sent, failed, output, **kwargs):  # pylint: disable=W0613
             """Increments count of number of emails sent."""
             self.emails_sent += sent
             return True
@@ -247,7 +247,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
 
     @override_settings(EMAILS_PER_TASK=3, EMAILS_PER_QUERY=7)
-    @patch('bulk_email.tasks.course_email_result')
+    @patch('bulk_email.tasks._course_email_result')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying
@@ -304,4 +304,3 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
         entry = InstructorTaskFactory.create(task_key='', task_id='dummy')
         with self.assertRaises(CourseEmail.DoesNotExist):
             send_course_email(entry.id, 101, [], {'course_title': 'Test'}, False)
-
