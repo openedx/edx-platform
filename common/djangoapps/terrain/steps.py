@@ -153,8 +153,8 @@ def i_am_logged_in(step):
     world.create_user('robot', 'test')
     world.log_in(username='robot', password='test')
     world.browser.visit(django_url('/'))
-    # You should not see the login link
-    assert world.is_css_not_present('a#login')
+    dash_css = 'section.container.dashboard'
+    assert world.is_css_present(dash_css)
 
 
 @step(u'I am an edX user$')
