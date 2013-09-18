@@ -70,8 +70,8 @@ ALERT_DICT = {
     'Flagged Submissions': "Submissions have been flagged for review"
 }
 
-STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
-STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
+STUDENT_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify course staff."
+STAFF_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
