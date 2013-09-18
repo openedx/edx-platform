@@ -376,8 +376,9 @@ function () {
     function captionMouseDown(event) {
         var caption = $(event.target);
         this.videoCaption.isMouseFocus = true;
-        caption.removeClass('focused').addClass('unfocused');
         this.videoCaption.autoScrolling = true;
+        caption.removeClass('focused').addClass('unfocused');
+        this.videoCaption.currentCaptionIndex = -1;
     }
 
     function captionClick(event) {
