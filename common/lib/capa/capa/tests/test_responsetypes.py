@@ -11,6 +11,7 @@ import unittest
 import textwrap
 import requests
 import mock
+import itertools
 
 from . import new_loncapa_problem, test_system
 import calc
@@ -722,6 +723,30 @@ class CodeResponseTest(ResponseTest):
             self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
             self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
+    def test_send_email_address(self):
+        '''
+        Tests that when appropriate settings are passed in via LMS courseware, the coderesonse request
+        sends the student's deanonymized email address.
+        @return:
+        '''
+        TEST_EMAIL = 'student@edx.org'       # pylint: disable=C0103
+        TEST_STUDENT_RESP = 'Lorem Ipsum'    # pylint: disable=C0103
+        answer_ids = self.problem.get_question_answers().keys()
+        student_ans = {}
+        for ans_id in answer_ids:
+            student_ans[ans_id] = TEST_STUDENT_RESP
+        self.problem.system.send_users_emailaddr_with_coderesponse = True
+        self.problem.system.deanonymized_user_email = TEST_EMAIL
+        mock_qinterface = mock.Mock()
+        # side_effect needed b/c get_score destructures the return value of send_to_queue
+        mock_send_to_queue = mock.Mock(side_effect=itertools.repeat((False, "OK")))
+        mock_qinterface.send_to_queue = mock_send_to_queue
+        self.problem.system.xqueue['interface'] = mock_qinterface
+        self.problem.grade_answers(student_ans)
+        # From docstring of send_to_queue:  "The operation of xqueue is agnostic to the contents of (argument) 'body'"
+        (_, kwargs) = mock_send_to_queue.call_args
+        self.assertIn(TEST_EMAIL, kwargs['body'])
+        self.assertIn(TEST_STUDENT_RESP, kwargs['body'])
 
 class ChoiceResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import ChoiceResponseXMLFactory

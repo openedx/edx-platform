@@ -80,6 +80,54 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # note if the URL mapping changes then this assertion will break
         self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
 
+    FEATURES_WITH_EMAIL = settings.MITX_FEATURES.copy()
+    FEATURES_WITH_EMAIL['SEND_USERS_EMAILADDR_WITH_CODERESPONSE'] = True
+
+    @override_settings(MITX_FEATURES=FEATURES_WITH_EMAIL)
+    def test_module_populated_with_user_email(self):
+        """
+        This tests that the module's system knows about the user's email when the appropriate flag is
+        set in LMS settings
+        """
+        mock_request = MagicMock()
+        mock_request.user = self.mock_user
+        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course_id, self.mock_user, course, depth=2)
+
+        module = render.get_module(
+            self.mock_user,
+            mock_request,
+            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            field_data_cache,
+            self.course_id
+        )
+        self.assertTrue(module.system.send_users_emailaddr_with_coderesponse)
+        self.assertEqual(module.system.deanonymized_user_email, self.mock_user.email)
+
+    def test_module_not_populated_with_user_email(self):
+        """
+        This tests that the module's system DOES NOT know about the user's email when the appropriate flag is NOT
+        set in LMS settings, which is the default
+        """
+        mock_request = MagicMock()
+        mock_request.user = self.mock_user
+        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course_id, self.mock_user, course, depth=2)
+
+        module = render.get_module(
+            self.mock_user,
+            mock_request,
+            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            field_data_cache,
+            self.course_id
+        )
+        self.assertFalse(hasattr(module.system, 'send_users_emailaddr_with_coderesponse'))
+        self.assertFalse(hasattr(module.system, 'deanonymized_user_email'))
+
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
                           'invalid Location', 'dummy')
