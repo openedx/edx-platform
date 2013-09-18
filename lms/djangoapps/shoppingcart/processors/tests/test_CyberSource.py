@@ -58,6 +58,28 @@ class CyberSourceTests(TestCase):
         # testing for the absence of that exception.  the trivial assert below does that
         self.assertEqual(1, 1)
 
+    def test_sign_then_verify_unicode(self):
+        """
+        Similar to the test above, which loops back to the original.
+        Testing to make sure we can handle unicode parameters
+        """
+        params = {
+            'card_accountNumber': '1234',
+            'card_cardType': '001',
+            'billTo_firstName': u'\u2699',
+            'billTo_lastName': u"\u2603",
+            'orderNumber': '1',
+            'orderCurrency': 'usd',
+            'decision': 'ACCEPT',
+            'ccAuthReply_amount': '0.00'
+        }
+
+        verify_signatures(sign(params), signed_fields_key='orderPage_signedFields',
+                          full_sig_key='orderPage_signaturePublic')
+        # if the above verify_signature fails it will throw an exception, so basically we're just
+        # testing for the absence of that exception.  the trivial assert below does that
+        self.assertEqual(1, 1)
+
     def test_verify_exception(self):
         """
         Tests that failure to verify raises the proper CCProcessorSignatureException
@@ -162,6 +184,7 @@ class CyberSourceTests(TestCase):
             'card_accountNumber': '1234',
             'card_cardType': '001',
             'billTo_firstName': student1.first_name,
+            'billTo_lastName': u"\u2603",
             'orderNumber': str(order1.id),
             'orderCurrency': 'usd',
             'decision': 'ACCEPT',
@@ -193,6 +216,7 @@ class CyberSourceTests(TestCase):
 
         # finally, tests an accepted order
         self.assertTrue(payment_accepted(params)['accepted'])
+
 
     @patch('shoppingcart.processors.CyberSource.render_to_string', autospec=True)
     def test_render_purchase_form_html(self, render):
