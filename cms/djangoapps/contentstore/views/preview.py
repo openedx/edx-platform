@@ -113,7 +113,7 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xblock_field_data=preview_field_data,
+        xmodule_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,

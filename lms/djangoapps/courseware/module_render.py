@@ -294,7 +294,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xblock_field_data(descriptor):
+    def xmodule_field_data(descriptor):
         student_data = DbModel(DjangoKeyValueStore(field_data_cache))
         return lms_field_data(descriptor._field_data, student_data)
 
@@ -368,7 +368,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xblock_field_data=xblock_field_data,
+        xmodule_field_data=xmodule_field_data,
         publish=publish,
         anonymous_student_id=unique_id_for_user(user),
         course_id=course_id,
