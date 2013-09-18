@@ -8,7 +8,7 @@
   padding: $baseline;
 
   footer.primary {
-    @extend .t-copy-sub2;
+    @extend %t-copy-sub2;
     @include clearfix();
     max-width: $fg-max-width;
     min-width: $fg-min-width;
