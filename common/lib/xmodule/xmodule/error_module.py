@@ -129,7 +129,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     @classmethod
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
-            descriptor.system,
+            descriptor.runtime,
             str(descriptor),
             error_msg,
             location=descriptor.location,

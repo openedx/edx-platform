@@ -344,7 +344,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
-        filestore=descriptor.system.resources_fs,
+        filestore=descriptor.runtime.resources_fs,
         get_module=inner_get_module,
         user=user,
         debug=settings.DEBUG,
