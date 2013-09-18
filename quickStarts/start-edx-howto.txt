@@ -1,0 +1,30 @@
+############
+# Installation
+1.) Clone the repo (most likely you already have since you are able to read this document)
+	# git clone https://github.com/zenfactory/edx-platform.git
+
+2.) Run the  installation script for your distribution assuming you are running Ubuntu:
+	~/edx-platform/quickStarts/install-edX.sh
+	
+############
+# Starting and stopping
+
+1.) Determine if any existing sessions are running. Currently we are running the server's in userland in screen sessions. To see if any are up check the list of screens by typing the following command:
+
+	$ screen -ls
+	
+If there are any screens listed you will see output like this:
+
+	hshirani@november:~$ screen -ls
+	There is a screen on:
+		10216.edX-CMS	(08/01/2013 11:44:29 PM)	(Attached)
+	1 Socket in /var/run/screen/S-hshirani.
+
+resume them one by one with the following command:
+
+	$ screen -r 10216.edX-CMS
+
+When the screen comes up type ^c (where ^ == CTRL, so CTRL+c). Then terminate the screen by typing ^d. You will be taken back to you original shell prompt. Next you need to start the two parts of edX in screen sessions again. To do so follow these instructions
+
+
+2.) Start edX by running ~/edx-platform/quickStarts/start-edx.sh
