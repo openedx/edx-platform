@@ -112,7 +112,7 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     }
 
     message = render_to_string('emails/ticket.txt', new_ticket)
-    subject, from_email, to = subject, settings.DEFAULT_FROM_EMAIL, 'pavelyushchenko@gmail.com'
+    subject, from_email, to = subject, settings.DEFAULT_FROM_EMAIL, settings.DEFAULT_FEEDBACK_EMAIL
     text_content = message
     #html_content = '<p>This is an <strong>important</strong> message.</p>'
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to],  headers = {'Reply-To': email})
