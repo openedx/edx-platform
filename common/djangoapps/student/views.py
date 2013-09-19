@@ -1423,7 +1423,7 @@ def import_users(request, post_override=None):
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
 
-        user = User(username=row['email'],
+        user = User(username=row['login'] + '_' + row['id'],
                 email=row['email'],
                 is_active=False)
         password = id_generator(8, _ALPHABET)
