@@ -15,7 +15,7 @@
 <section id="help-modal" class="modal">
   <div class="inner-wrapper" id="help_wrapper">
     <header>
-      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+      <h2><span class="edx">Помощь</span></h2>
       <hr>
     </header>
 
@@ -24,22 +24,21 @@ discussion_link = get_discussion_link(course) if course else None
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
+    <p><strong>${u'Вопросы по лекциям, домашним заданиям, инструментам или материалам данного курса</strong>, задавайте на {link_start}форуме обсуждения курса{link_end}.'.format(
       link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
       link_end='</a>',
       )}
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+    <p>${u'Есть <strong>вопрос</strong>?Вы можете найти много полезной информации в {link_start}ЧАВО{link_end}.'.format(
         link_start='<a href="{url}" target="_blank">'.format(
           url=marketing_link('FAQ')
         ),
-        link_end='</a>',
-        platform_name=settings.PLATFORM_NAME)}
+        link_end='</a>'}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
+    <p>Есть <strong>конкретный вопрос</strong>? Свяжитесь напрямую со службой поддержки:'</p>
     <hr>
 
     <div class="help-buttons">
@@ -149,28 +148,28 @@ discussion_link = get_discussion_link(course) if course else None
         showFeedback(
             event,
             gettext("problem"),
-            gettext("Report a Problem"),
-            gettext("Brief description of the problem*"),
-            gettext("Details of the problem you are encountering*") + "<span class='tip'>" +
-              gettext("Include error messages, steps which lead to the issue, etc.") + "</span>"
+            "Сообщить о проблеме",
+            "Краткое описание проблемы*",
+            "Подробное описание проблемы*" + "<span class='tip'>" +
+            "включите описание того как можно воспроизвести данную проблему" + "</span>"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
         showFeedback(
             event,
             gettext("suggestion"),
-            gettext("Make a Suggestion"),
-            gettext("Brief description of your suggestion*"),
-            gettext("Details*")
+            "${_(Make a Suggestion")}",
+            "Краткое описание вашего предложения",
+            "Ваше предложение"
         );
     });
     $("#feedback_link_question").click(function(event) {
         showFeedback(
             event,
             gettext("question"),
-            gettext("Ask a Question"),
-            gettext("Brief summary of your question*"),
-            gettext("Details*")
+            ${_("Ask a Question")},
+            "Краткое описание вашего вопроса",
+            "Подробнее"
         );
     });
     $("#feedback_form").submit(function() {
@@ -195,16 +194,16 @@ discussion_link = get_discussion_link(course) if course else None
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
-            htmlStr = gettext("An error has occurred.");
+            htmlStr = "Произошла ошибка";
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             htmlStr += " " + _.template(
-              gettext("Please {link_start}send us e-mail{link_end}."),
+              "Пожалуйста {link_start}отправьте нам письмо{link_end}.",
               {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
               {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += gettext(" Please try again later.");
+            htmlStr += " Пожалуйста попробуйте позднее ";
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
