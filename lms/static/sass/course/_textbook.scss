@@ -160,11 +160,11 @@ div.book-wrapper {
             @include transition(none);
             vertical-align: middle;
             width: 100%;
+          }
 
-            &:hover {
-              opacity: 1.0;
-              filter: alpha(opacity=100);
-            }
+          a.enabled:hover {
+            opacity: 1.0;
+            filter: alpha(opacity=100);
           }
 
           &.last {
