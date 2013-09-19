@@ -1,10 +1,10 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 
-Сообщение от ${ticket.requester.name} (${ticket.requester.email})
+Сообщение от ${ticket.get('requester').get('name')} (${ticket.get('requester').get('email')})
 
-${ticket.comment.body}
+${ticket.get('comment').get('body')}
 
 Дополнительные сведения:
-${ticket.tags}        
+${ticket.get('tags')}        
 
 Техническая поддержка курсов повышения квалификации ГБОУ ЦПМ
