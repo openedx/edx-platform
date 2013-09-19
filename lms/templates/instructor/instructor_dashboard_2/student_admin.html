@@ -19,7 +19,7 @@
   ##   <option>Getting problems...</option>
   ## </select>
 
-  <p> Specify a particular problem in the course here by its url: </p>
+  <p> ${_('Specify a particular problem in the course here by its url:')} </p>
   <input type="text" name="problem-select-single" placeholder="${_("Problem urlname")}">
   <p>
     ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
@@ -32,7 +32,7 @@
   <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
 
   %if section_data['access']['instructor']:
-    <p> You may also delete the entire state of a student for the specified module: </p>
+    <p> ${_('You may also delete the entire state of a student for the specified module:')} </p>
     <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Module")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
   %endif
 
@@ -54,7 +54,7 @@
 
 %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
   <div class="course-specific-container action-type-container">
-    <H2>Course-specific grade adjustment</h2>
+    <H2>${_('Course-specific grade adjustment')}</h2>
     <div class="request-response-error"></div>
 
     <p>
