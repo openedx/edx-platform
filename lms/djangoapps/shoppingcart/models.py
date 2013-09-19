@@ -105,6 +105,8 @@ class Order(models.Model):
         `processor_reply_dump` - all the parameters returned by the processor
 
         """
+        if self.status == 'purchased':
+            return
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)
         self.bill_to_first = first
