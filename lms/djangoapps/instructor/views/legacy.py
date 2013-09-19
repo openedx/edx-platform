@@ -57,11 +57,9 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
-
 
 log = logging.getLogger(__name__)
 
