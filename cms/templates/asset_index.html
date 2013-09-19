@@ -18,8 +18,8 @@
     <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
 
     <script type="text/javascript">
-        CMS.URL.UPDATE_ASSET = "${update_asset_callback_url}";
         var assets = new CMS.Models.AssetCollection(${asset_list});
+        assets.url = "${update_asset_callback_url}";
         var assetsView = new CMS.Views.Assets({collection: assets, el: $('#asset_table_body')});
 
         $(document).ready(function() {

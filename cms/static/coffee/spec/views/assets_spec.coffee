@@ -9,6 +9,7 @@ describe "CMS.Views.Asset", ->
         @model = new CMS.Models.Asset({display_name: "test asset", url: 'actual_asset_url', portable_url: 'portable_url', date_added: 'date', thumbnail: null, id: 'id'})
         spyOn(@model, "destroy").andCallThrough()
         @collection = new CMS.Models.AssetCollection([@model])
+        @collection.url = "update-asset-url"
         @view = new CMS.Views.Asset({model: @model})
 
         @promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
@@ -82,6 +83,7 @@ describe "CMS.Views.Assets", ->
                 {display_name: "test asset 1", url: 'actual_asset_url_1', portable_url: 'portable_url_1', date_added: 'date_1', thumbnail: null, id: 'id_1'},
                 {display_name: "test asset 2", url: 'actual_asset_url_2', portable_url: 'portable_url_2', date_added: 'date_2', thumbnail: null, id: 'id_2'}
             ])
+        @collection.url = "update-asset-url"
         @view = new CMS.Views.Assets({collection: @collection, el: $('#asset_table_body')})
 
         @promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])

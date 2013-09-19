@@ -9,9 +9,5 @@ CMS.Models.Asset = Backbone.Model.extend({
         url: "",
         portable_url: "",
         is_locked: false
-    },
-
-    url: function() {
-        return CMS.URL.UPDATE_ASSET + this.id;
     }
 });
