@@ -1598,7 +1598,7 @@ def import_users(request, post_override=None):
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
 
-        user = User(username=row['login'] + '_' + row['id'],
+        user = User(username=row['work_login'] + '_' + row['id'],
                 email=row['email'],
                 is_active=False)
         password = id_generator(8, _ALPHABET)
@@ -1606,7 +1606,7 @@ def import_users(request, post_override=None):
         registration = Registration()
         try:
             user.save()
-            log.info("user save")
+            log.info("New user:" + row['email'] + ":" + password)
         except IntegrityError:
             # Figure out the cause of the integrity error
             if len(User.objects.filter(email=row['email'])) > 0:
@@ -1621,7 +1621,6 @@ def import_users(request, post_override=None):
                     profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
                 try:
                     profile.save()
-                    log.info("profile save")
                 except Exception:
                     log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                 continue
