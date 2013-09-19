@@ -15,7 +15,7 @@ from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
@@ -1193,3 +1193,33 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                                     CapaDescriptor.force_save_button, CapaDescriptor.markdown,
                                     CapaDescriptor.text_customization])
         return non_editable_fields
+
+    # Proxy to CapaModule for access to any of its attributes
+    answer_available = module_attr('answer_available')
+    check_button_name = module_attr('check_button_name')
+    check_problem = module_attr('check_problem')
+    choose_new_seed = module_attr('choose_new_seed')
+    closed = module_attr('closed')
+    get_answer = module_attr('get_answer')
+    get_problem = module_attr('get_problem')
+    get_problem_html = module_attr('get_problem_html')
+    get_state_for_lcp = module_attr('get_state_for_lcp')
+    handle_input_ajax = module_attr('handle_input_ajax')
+    handle_problem_html_error = module_attr('handle_problem_html_error')
+    handle_ungraded_response = module_attr('handle_ungraded_response')
+    is_attempted = module_attr('is_attempted')
+    is_correct = module_attr('is_correct')
+    is_past_due = module_attr('is_past_due')
+    is_submitted = module_attr('is_submitted')
+    lcp = module_attr('lcp')
+    make_dict_of_responses = module_attr('make_dict_of_responses')
+    new_lcp = module_attr('new_lcp')
+    publish_grade = module_attr('publish_grade')
+    rescore_problem = module_attr('rescore_problem')
+    reset_problem = module_attr('reset_problem')
+    save_problem = module_attr('save_problem')
+    set_state_from_lcp = module_attr('set_state_from_lcp')
+    should_show_check_button = module_attr('should_show_check_button')
+    should_show_reset_button = module_attr('should_show_reset_button')
+    should_show_save_button = module_attr('should_show_save_button')
+    update_score = module_attr('update_score')

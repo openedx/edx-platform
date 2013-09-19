@@ -53,12 +53,12 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
             raise KeyError()
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def set(self, key, value):
         # handle any special cases
         if key.scope not in [Scope.children, Scope.settings, Scope.content]:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
         if key.scope == Scope.content:
             self._load_definition()
 
@@ -75,7 +75,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
     def delete(self, key):
         # handle any special cases
         if key.scope not in [Scope.children, Scope.settings, Scope.content]:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
         if key.scope == Scope.content:
             self._load_definition()
 

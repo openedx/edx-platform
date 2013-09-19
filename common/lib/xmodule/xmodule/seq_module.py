@@ -45,9 +45,6 @@ class SequenceModule(SequenceFields, XModule):
 
         self.rendered = False
 
-    def get_instance_state(self):
-        return json.dumps({'position': self.position})
-
     def get_html(self):
         self.render()
         return self.content

@@ -36,7 +36,6 @@ system = ModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
-    xmodule_field_data=DictFieldData({}),
 )
 
 

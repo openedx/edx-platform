@@ -10,6 +10,7 @@ from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
+from xblock.core import XBlock
 
 from . import get_test_system
 
@@ -62,7 +63,8 @@ class CHModuleFactory(object):
         """
         A factory method for making CHM's
         """
-        field_data = {'data': CHModuleFactory.sample_problem_xml}
+        # Should have a single child, but it doesn't matter what that child is
+        field_data = {'data': CHModuleFactory.sample_problem_xml, 'children': [None]}
 
         if hints is not None:
             field_data['hints'] = hints
@@ -106,7 +108,8 @@ class CHModuleFactory(object):
         # Make the descriptor have a capa problem child.
         capa_descriptor = MagicMock()
         capa_descriptor.name = 'capa'
-        descriptor.get_children = lambda: [capa_descriptor]
+        capa_descriptor.displayable_items.return_value = [capa_descriptor]
+        descriptor.get_children.return_value = [capa_descriptor]
 
         # Make a fake capa module.
         capa_module = MagicMock()
@@ -128,7 +131,7 @@ class CHModuleFactory(object):
         responder.compare_answer = compare_answer
 
         capa_module.lcp.responders = {'responder0': responder}
-        capa_module.displayable_items = lambda: [capa_module]
+        capa_module.displayable_items.return_value = [capa_module]
 
         system = get_test_system()
         # Make the system have a marginally-functional get_module
@@ -137,8 +140,7 @@ class CHModuleFactory(object):
             """
             A fake module-maker.
             """
-            if descriptor.name == 'capa':
-                return capa_module
+            return capa_module
         system.get_module = fake_get_module
         module = CrowdsourceHinterModule(descriptor, system, DictFieldData(field_data), Mock())
 
@@ -205,15 +207,15 @@ class VerticalWithModulesFactory(object):
         return module
 
 
-class FakeChild(object):
+class FakeChild(XBlock):
     """
     A fake Xmodule.
     """
     def __init__(self):
         self.runtime = get_test_system()
-        self.runtime.ajax_url = 'this/is/a/fake/ajax/url'
         self.student_view = Mock(return_value=Fragment(self.get_html()))
         self.save = Mock()
+        self.id = 'i4x://this/is/a/fake/id'
 
     def get_html(self):
         """
@@ -243,7 +245,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module.get_display_items = fake_get_display_items
         out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('This is supposed to be test html.' in out_html)
-        self.assertTrue('this/is/a/fake/ajax/url' in out_html)
+        self.assertTrue('i4x://this/is/a/fake/id' in out_html)
 
     def test_gethtml_nochild(self):
         """

@@ -350,11 +350,11 @@ class OpenEndedModuleTest(unittest.TestCase):
         """
         Test storing answer with the open ended module.
         """
-        
+
         # Create a module with no state yet.  Important that this start off as a blank slate.
         test_module = OpenEndedModule(self.test_system, self.location,
                                                 self.definition, self.descriptor, self.static_data, self.metadata)
-        
+
         saved_response = "Saved response."
         submitted_response = "Submitted response."
 
@@ -753,28 +753,36 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
+        module.save()
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        module.save()
         html = module.handle_ajax("get_html", {})
+        module.save()
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
         rubric = module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})
+        module.save()
         self.assertEqual(module.current_task_number, 0)
 
-        html = module.get_html()
+        html = module.runtime.render(module, None, 'student_view').content
         self.assertIsInstance(html, basestring)
 
         rubric = module.handle_ajax("get_combined_rubric", {})
+        module.save()
         self.assertIsInstance(rubric, basestring)
         self.assertEqual(module.state, "assessing")
         module.handle_ajax("reset", {})
+        module.save()
         self.assertEqual(module.current_task_number, 0)
 
     def test_open_ended_flow_correct(self):
@@ -789,31 +797,36 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        module.save()
         status = module.handle_ajax("get_status", {})
+        module.save()
         self.assertIsInstance(status, basestring)
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
         #Move to the next step in the problem
         try:
             module.handle_ajax("next_problem", {})
+            module.save()
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
         self.assertEqual(module.current_task_number, 1)
         try:
-            module.get_html()
+            module.runtime.render(module, None, 'student_view')
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
 
         #Try to get the rubric from the module
         module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
         #Make a fake reply from the queue
         queue_reply = {
@@ -832,22 +845,27 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         }
 
         module.handle_ajax("check_for_score", {})
+        module.save()
 
         #Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
+        module.save()
         self.assertFalse(module.ready_to_reset)
         self.assertEqual(module.current_task_number, 1)
 
         #Get html and other data client will request
-        module.get_html()
+        module.runtime.render(module, None, 'student_view')
 
         module.handle_ajax("skip_post_assessment", {})
+        module.save()
 
         #Get all results
         module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
         #reset the problem
         module.handle_ajax("reset", {})
+        module.save()
         self.assertEqual(module.state, "initial")
 
 
@@ -876,31 +894,37 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
        """
         assessment = [0, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
+        module.save()
 
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        module.save()
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})
+        module.save()
         self.assertEqual(module.current_task_number, 0)
 
-        html = module.get_html()
-        self.assertTrue(isinstance(html, basestring))
+        html = module.runtime.render(module, None, 'student_view').content
+        self.assertIsInstance(html, basestring)
 
         #Module should now be done
         rubric = module.handle_ajax("get_combined_rubric", {})
-        self.assertTrue(isinstance(rubric, basestring))
+        module.save()
+        self.assertIsInstance(rubric, basestring)
         self.assertEqual(module.state, "done")
 
         #Try to reset, should fail because only 1 attempt is allowed
         reset_data = json.loads(module.handle_ajax("reset", {}))
+        module.save()
         self.assertEqual(reset_data['success'], False)
 
 class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):

@@ -81,7 +81,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 return self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def set(self, key, value):
         if key.scope == Scope.children:
@@ -94,7 +94,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 self._data[key.field_name] = value
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def delete(self, key):
         if key.scope == Scope.children:
@@ -108,7 +108,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 del self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def has(self, key):
         if key.scope in (Scope.children, Scope.parent):

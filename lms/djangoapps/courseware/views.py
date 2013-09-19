@@ -142,7 +142,7 @@ def redirect_to_course_position(course_module):
     the first child.
 
     """
-    urlargs = {'course_id': course_module.descriptor.id}
+    urlargs = {'course_id': course_module.id}
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.

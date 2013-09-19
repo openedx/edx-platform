@@ -18,6 +18,7 @@ log = logging.getLogger('mitx.' + __name__)
 
 
 class ConditionalFields(object):
+    has_children = True
     show_tag_list = List(help="Poll answers", scope=Scope.content)
 
 
