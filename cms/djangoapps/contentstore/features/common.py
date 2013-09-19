@@ -18,6 +18,8 @@ logger = getLogger(__name__)
 from terrain.browser import reset_data
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
+PASSWORD = 'test'
+EMAIL_EXTENSION = '@edx.org'
 
 
 @step('I (?:visit|access|open) the Studio homepage$')
@@ -300,3 +302,48 @@ def upload_file(filename):
     world.browser.attach_file('file', os.path.abspath(path))
     button_css = '.upload-dialog .action-upload'
     world.css_click(button_css)
+
+
+@step(u'"([^"]*)" logs in$')
+def other_user_login(step, name):
+    step.given('I log out')
+    world.visit('/')
+
+    signin_css = 'a.action-signin'
+    world.is_css_present(signin_css)
+    world.css_click(signin_css)
+
+    def fill_login_form():
+        login_form = world.browser.find_by_css('form#login_form')
+        login_form.find_by_name('email').fill(name + EMAIL_EXTENSION)
+        login_form.find_by_name('password').fill(PASSWORD)
+        login_form.find_by_name('submit').click()
+    world.retry_on_exception(fill_login_form)
+    assert_true(world.is_css_present('.new-course-button'))
+    world.scenario_dict['USER'] = get_user_by_email(name + EMAIL_EXTENSION)
+
+
+@step(u'the user "([^"]*)" exists( as a course (admin|staff member|is_staff))?$')
+def create_other_user(_step, name, has_extra_perms, role_name):
+    email = name + EMAIL_EXTENSION
+    user = create_studio_user(uname=name, password=PASSWORD, email=email)
+    if has_extra_perms:
+        if role_name == "is_staff":
+            user.is_staff = True
+        else:
+            if role_name == "admin":
+                # admins get staff privileges, as well
+                roles = ("staff", "instructor")
+            else:
+                roles = ("staff",)
+            location = world.scenario_dict["COURSE"].location
+            for role in roles:
+                groupname = get_course_groupname_for_role(location, role)
+                group, __ = Group.objects.get_or_create(name=groupname)
+                user.groups.add(group)
+        user.save()
+
+
+@step('I log out')
+def log_out(_step):
+    world.visit('logout')

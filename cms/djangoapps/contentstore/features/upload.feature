@@ -58,3 +58,59 @@ Feature: CMS.Upload Files
         And I reload the page
         And I upload the file "test"
         Then I can download the correct "test" file
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Users can lock assets through asset index
+        Given I have opened a new course in studio
+        And I go to the files and uploads page
+        When I upload the file "test"
+        And I lock "test"
+        Then "test" is locked
+        And I see a "saving" notification
+        And I reload the page
+        Then "test" is locked
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Users can unlock assets through asset index
+        Given I have opened a course with a locked asset "test"
+        And I unlock "test"
+        Then "test" is unlocked
+        And I see a "saving" notification
+        And I reload the page
+        Then "test" is unlocked
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Locked assets can't be viewed if logged in as unregistered user
+        Given I have opened a course with a locked asset "locked.html"
+#        Then the asset "locked.html" is viewable
+        And the user "bob" exists
+        And "bob" logs in
+        Then the asset "locked.html" is protected
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Locked assets can't be viewed if logged out
+        Given I have opened a course with a locked asset "locked.html"
+        And I log out
+        Then the asset "locked.html" is protected
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Locked assets can be viewed with is_staff account
+        Given I have opened a course with a locked asset "locked.html"
+        And the user "staff" exists as a course is_staff
+#        Then the asset "locked.html" is viewable
+
+    # Uploading isn't working on safari with sauce labs
+    @skip_safari
+    Scenario: Unlocked assets can be viewed by anyone
+        Given I have opened a course with a unlocked asset "unlocked.html"
+        Then the asset "unlocked.html" is viewable
+        And the user "bob" exists
+        And "bob" logs in
+        Then the asset "unlocked.html" is viewable
+        And I log out
+        Then the asset "unlocked.html" is viewable

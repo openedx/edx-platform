@@ -2,13 +2,9 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import create_studio_user
-from django.contrib.auth.models import Group
+from common import EMAIL_EXTENSION
 from auth.authz import get_course_groupname_for_role, get_user_by_email
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
-
-PASSWORD = 'test'
-EMAIL_EXTENSION = '@edx.org'
 
 
 @step(u'(I am viewing|s?he views) the course team settings')
@@ -16,24 +12,6 @@ def view_grading_settings(_step, whom):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-team a'
     world.css_click(link_css)
-
-
-@step(u'the user "([^"]*)" exists( as a course (admin|staff member))?$')
-def create_other_user(_step, name, has_extra_perms, role_name):
-    email = name + EMAIL_EXTENSION
-    user = create_studio_user(uname=name, password=PASSWORD, email=email)
-    if has_extra_perms:
-        location = world.scenario_dict["COURSE"].location
-        if role_name == "admin":
-            # admins get staff privileges, as well
-            roles = ("staff", "instructor")
-        else:
-            roles = ("staff",)
-        for role in roles:
-            groupname = get_course_groupname_for_role(location, role)
-            group, __ = Group.objects.get_or_create(name=groupname)
-            user.groups.add(group)
-        user.save()
 
 
 @step(u'I add "([^"]*)" to the course team')
@@ -87,25 +65,6 @@ def remove_course_team_admin(_step, outer_capture, name):
     admin_btn_css = '.user-item[data-email="{email}"] .user-actions .remove-admin-role'.format(
         email=email)
     world.css_click(admin_btn_css)
-
-
-@step(u'"([^"]*)" logs in$')
-def other_user_login(_step, name):
-    world.visit('logout')
-    world.visit('/')
-
-    signin_css = 'a.action-signin'
-    world.is_css_present(signin_css)
-    world.css_click(signin_css)
-
-    def fill_login_form():
-        login_form = world.browser.find_by_css('form#login_form')
-        login_form.find_by_name('email').fill(name + EMAIL_EXTENSION)
-        login_form.find_by_name('password').fill(PASSWORD)
-        login_form.find_by_name('submit').click()
-    world.retry_on_exception(fill_login_form)
-    assert_true(world.is_css_present('.new-course-button'))
-    world.scenario_dict['USER'] = get_user_by_email(name + EMAIL_EXTENSION)
 
 
 @step(u'I( do not)? see the course on my page')

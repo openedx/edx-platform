@@ -6,7 +6,7 @@
     </div>
 </td>
 <td class="name-col">
-    <a data-tooltip="<%= gettext('Open/download this file') %>" href="<%= url %>" class="filename"><%= display_name %></a>
+    <span class="title"><a data-tooltip="<%= gettext('Open/download this file') %>" href="<%= url %>" class="filename"><%= display_name %></a></span>
 
     <div class="embeddable-xml"></div>
 </td>
@@ -16,7 +16,19 @@
 <td class="embed-col">
     <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
 </td>
-<td class="delete-col">
-    <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button"><span
-            class="delete-icon"></span></a>
+<td class="actions-col">
+    <ul>
+        <li class="action-item">
+            <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
+        </li>
+        <% if (locked) { %>
+        <li class="action-item locked">
+            <a href="#" data-tooltip="<%= gettext('Unlock this asset') %>" class="lock-asset-button action-button"><i class="icon-lock"></i> <span class="sr"><%= gettext('Unlock this asset') %></span></a>
+        </li>
+        <% } else { %>
+        <li class="action-item">
+            <a href="#" data-tooltip="<%= gettext('Lock this asset') %>" class="lock-asset-button action-button"><i class="icon-unlock-alt"></i> <span class="sr"><%= gettext('Lock this asset') %></span></a>
+        </li>
+        <% }%>
+    </ul>
 </td>
