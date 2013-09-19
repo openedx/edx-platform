@@ -94,6 +94,8 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
+    # in LMS
     'AUTH_USE_SHIB': False,
     'AUTH_USE_CAS': False,
 
@@ -291,10 +293,6 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-# FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000
-DEBUG_TRACK_LOG = False
-
 MITX_ROOT_URL = ''
 
 LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
@@ -325,6 +323,36 @@ COURSE_SETTINGS = {
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+
+############################## EVENT TRACKING #################################
+
+# FIXME: Should we be doing this truncation?
+TRACK_MAX_EVENT = 10000
+
+DEBUG_TRACK_LOG = False
+
+TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking'
+        }
+    }
+}
+
+# Backawrds compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
+# In the future, adding the backend to TRACKING_BACKENDS enough.
+if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+    TRACKING_BACKENDS.update({
+        'sql': {
+            'ENGINE': 'track.backends.django.DjangoBackend'
+        }
+    })
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -807,7 +835,7 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    #For the wiki
+    # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',  # Our customizations
@@ -818,7 +846,7 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
-    # foldit integration
+    # Foldit integration
     'foldit',
 
     # For testing
@@ -831,11 +859,14 @@ INSTALLED_APPS = (
     'django_comment_common',
     'notes',
 
+    # Monitoring
+    'datadog',
+
     # User API
     'rest_framework',
     'user_api',
 
-    # shopping cart
+    # Shopping cart
     'shoppingcart',
 
     # Notification preferences setting

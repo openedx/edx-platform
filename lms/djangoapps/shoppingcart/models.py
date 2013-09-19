@@ -18,7 +18,7 @@ from courseware.courses import get_course_about_section
 from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment
-from statsd import statsd
+from dogapi import dog_stats_api
 from verify_student.models import SoftwareSecurePhotoVerification
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -301,10 +301,12 @@ class PaidCourseRegistration(OrderItem):
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
         org, course_num, run = self.course_id.split("/")
-        statsd.increment("shoppingcart.PaidCourseRegistration.purchased_callback.enrollment",
-                         tags=["org:{0}".format(org),
-                               "course:{0}".format(course_num),
-                               "run:{0}".format(run)])
+        dog_stats_api.increment(
+            "shoppingcart.PaidCourseRegistration.purchased_callback.enrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
 
 
 class CertificateItem(OrderItem):

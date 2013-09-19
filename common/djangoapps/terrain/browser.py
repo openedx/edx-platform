@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.conf import settings
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from requests import put
+import requests
 from base64 import encodestring
 from json import dumps
 
@@ -54,12 +54,12 @@ def set_job_status(jobid, passed=True):
     """
     Sets the job status on sauce labs
     """
-    body_content = dumps({"passed": passed})
     config = get_username_and_key()
+    url = 'http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid)
+    body_content = dumps({"passed": passed})
     base64string = encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
-    result = put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid),
-        data=body_content,
-        headers={"Authorization": "Basic {}".format(base64string)})
+    headers = {"Authorization": "Basic {}".format(base64string)}
+    result = requests.put(url, data=body_content, headers=headers)
     return result.status_code == 200
 
 
@@ -75,7 +75,8 @@ def make_desired_capabilities():
     desired_capabilities['build'] = settings.SAUCE.get('BUILD')
     desired_capabilities['video-upload-on-pass'] = False
     desired_capabilities['sauce-advisor'] = False
-    desired_capabilities['record-screenshots'] = False
+    desired_capabilities['capture-html'] = True
+    desired_capabilities['record-screenshots'] = True
     desired_capabilities['selenium-version'] = "2.34.0"
     desired_capabilities['max-duration'] = 3600
     desired_capabilities['public'] = 'public restricted'
@@ -164,15 +165,18 @@ def reset_databases(scenario):
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
-# Uncomment below to trigger a screenshot on error
-# @after.each_scenario
+@after.each_scenario
 def screenshot_on_error(scenario):
     """
     Save a screenshot to help with debugging.
     """
     if scenario.failed:
-        world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
-
+        try:
+            output_dir = '{}/log'.format(settings.TEST_ROOT)
+            image_name = '{}/{}.png'.format(output_dir, scenario.name.replace(' ', '_'))
+            world.browser.driver.save_screenshot(image_name)
+        except WebDriverException:
+            LOGGER.error('Could not capture a screenshot')
 
 @after.all
 def teardown_browser(total):

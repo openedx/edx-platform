@@ -1,27 +1,27 @@
 <div id="lti_id" class="lti">
 
     <form
-        action=""
+        action="http://www.example.com"
         name="ltiLaunchForm"
         class="ltiLaunchForm"
         method="post"
         target="ltiLaunchFrame"
-        encType="application/x-www-form-urlencoded"
+        enctype="application/x-www-form-urlencoded"
     >
-
-        <input type="hidden" name="launch_presentation_return_url" value="">
-        <input type="hidden" name="lis_outcome_service_url" value="">
-        <input type="hidden" name="lis_result_sourcedid" value="">
-        <input type="hidden" name="lti_message_type" value="basic-lti-launch-request">
-        <input type="hidden" name="lti_version" value="LTI-1p0">
-        <input type="hidden" name="oauth_callback" value="about:blank">
-        <input type="hidden" name="oauth_consumer_key" value=""/>
-        <input type="hidden" name="oauth_nonce" value=""/>
-        <input type="hidden" name="oauth_signature_method" value="HMAC-SHA1"/>
-        <input type="hidden" name="oauth_timestamp" value=""/>
-        <input type="hidden" name="oauth_version" value="1.0"/>
-        <input type="hidden" name="user_id" value="default_user_id">
-        <input type="hidden" name="oauth_signature" value=""/>
+        <input name="launch_presentation_return_url" value="" />
+        <input name="lti_version" value="LTI-1p0" />
+        <input name="user_id" value="student" />
+        <input name="oauth_nonce" value="28347958723982798572" />
+        <input name="oauth_timestamp" value="2389479832" />
+        <input name="oauth_consumer_key" value="" />
+        <input name="lis_result_sourcedid" value="" />
+        <input name="oauth_signature_method" value="HMAC-SHA1" />
+        <input name="oauth_version" value="1.0" />
+        <input name="role" value="student" />
+        <input name="lis_outcome_service_url" value="" />
+        <input name="oauth_signature" value="89ru3289r3ry283y3r82ryr38yr" />
+        <input name="lti_message_type" value="basic-lti-launch-request" />
+        <input name="oauth_callback" value="about:blank" />
 
         <input type="submit" value="Press to Launch" />
     </form>
@@ -31,10 +31,6 @@
         required fields.
     </h3>
 
-    <iframe
-        name="ltiLaunchFrame"
-        class="ltiLaunchFrame"
-        src=""
-    ></iframe>
+    <iframe name="ltiLaunchFrame" class="ltiLaunchFrame" src=""></iframe>
 
 </div>

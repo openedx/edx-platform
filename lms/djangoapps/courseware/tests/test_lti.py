@@ -1,6 +1,6 @@
 """LTI integration tests"""
 
-import requests
+import oauthlib
 from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
@@ -11,7 +11,8 @@ class TestLTI(BaseTestXmodule):
     Integration test for lti xmodule.
 
     It checks overall code, by assuring that context that goes to template is correct.
-    As part of that, checks oauth signature generation by mocking signing function of `requests` library.
+    As part of that, checks oauth signature generation by mocking signing function
+    of `oauthlib` library.
     """
     CATEGORY = "lti"
 
@@ -43,7 +44,7 @@ class TestLTI(BaseTestXmodule):
             u'oauth_signature': mocked_decoded_signature
         }
 
-        saved_sign = requests.auth.Client.sign
+        saved_sign = oauthlib.oauth1.Client.sign
 
         def mocked_sign(self, *args, **kwargs):
             """
@@ -60,7 +61,7 @@ class TestLTI(BaseTestXmodule):
             headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
             return None, headers, None
 
-        patcher = mock.patch.object(requests.auth.Client, "sign", mocked_sign)
+        patcher = mock.patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -74,6 +75,6 @@ class TestLTI(BaseTestXmodule):
             'input_fields': self.correct_headers,
             'element_class': self.item_module.location.category,
             'element_id': self.item_module.location.html_id(),
-            'launch_url': '',  # default value
+            'launch_url': 'http://www.example.com',  # default value
         }
         self.assertDictEqual(generated_context, expected_context)

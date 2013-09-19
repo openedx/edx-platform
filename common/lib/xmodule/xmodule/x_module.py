@@ -349,7 +349,7 @@ class ResourceTemplates(object):
     @classmethod
     def get_template_dir(cls):
         if getattr(cls, 'template_dir_name', None):
-            dirname = os.path.join('templates', getattr(cls, 'template_dir_name'))
+            dirname = os.path.join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
@@ -619,14 +619,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         raise NotImplementedError(
             'Modules must implement export_to_xml to enable xml export')
 
-    # =============================== Testing ==================================
-    def get_sample_state(self):
-        """
-        Return a list of tuples of instance_state, shared_state. Each tuple
-        defines a sample case for this module
-        """
-        return [('{}', '{}')]
-
     @property
     def xblock_kvs(self):
         """
@@ -847,7 +839,7 @@ class ModuleSystem(Runtime):
     def __init__(
             self, ajax_url, track_function, get_module, render_template,
             replace_urls, xblock_field_data, user=None, filestore=None,
-            debug=False, xqueue=None, publish=None, node_path="",
+            debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
@@ -911,6 +903,7 @@ class ModuleSystem(Runtime):
         self.get_module = get_module
         self.render_template = render_template
         self.DEBUG = self.debug = debug
+        self.HOSTNAME = self.hostname = hostname
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path

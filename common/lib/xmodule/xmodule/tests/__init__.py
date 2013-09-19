@@ -62,6 +62,7 @@ def get_test_system(course_id=''):
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
+        hostname="edx.org",
         xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback' : Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         xblock_field_data=lambda descriptor: descriptor._field_data,

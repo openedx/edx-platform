@@ -64,10 +64,8 @@ if Backbone?
 
       sidebar = $(".sidebar")
       if scrollTop > discussionsBodyTop - @sidebar_padding
-        sidebar.addClass('fixed');
-        sidebar.css('top', @sidebar_padding);
+        sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
       else
-        sidebar.removeClass('fixed');
         sidebar.css('top', '0');
 
       sidebarWidth = .31 * $(".discussion-body").width();

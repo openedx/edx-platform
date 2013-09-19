@@ -5,10 +5,15 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-LMS: Added bulk email for course feature, with option to optout of individual
-course emails.
+Studio/LMS: Added ability to set due date formatting through Studio's Advanced Settings.
+The key is due_date_display_format, and the value should be a format supported by Python's
+strftime function.
 
-Blades: Added Learning Tools Interoperability (LTI) blade. Now LTI components 
+Common: Added configurable backends for tracking events. Tracking events using
+the python logging module is the default backend. Support for MongoDB and a
+Django database is also available.
+
+Blades: Added Learning Tools Interoperability (LTI) blade. Now LTI components
 can be included to courses.
 
 LMS: Added alphabetical sorting of forum categories and subcategories.
@@ -289,4 +294,3 @@ Common: Updated CodeJail.
 Common: Allow setting of authentication session cookie name.
 
 LMS: Option to email students when enroll/un-enroll them.
-

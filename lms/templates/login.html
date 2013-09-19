@@ -55,6 +55,12 @@
           } else {
             location.href="${reverse('dashboard')}";
           }
+        } else if(json.hasOwnProperty('redirect')) {
+          var u=decodeURI(window.location.search);
+          if (!isExternal(json.redirect)) { // a paranoid check.  Our server is the one providing json.redirect
+              location.href=json.redirect+u;
+          } // else we just remain on this page, which is fine since this particular path implies a login failure
+            // that has been generated via packet tampering (json.redirect has been messed with).
         } else {
           toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
@@ -115,7 +121,8 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">${_('E-mail')}</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" aria-described-by="email-tip" />
+            <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=settings.PLATFORM_NAME)}</span>
           </li>
           <li class="field required password" id="field-password">
             <label for="password">${_('Password')}</label>

@@ -1,15 +1,12 @@
 """
 Module that allows to insert LTI tools to page.
 
-Module uses current edx-platform 0.14.2 version of requests (oauth part).
-Please update code when upgrading requests.
-
 Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 """
 
 import logging
-import requests
+import oauthlib.oauth1
 import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
@@ -41,9 +38,12 @@ class LTIFields(object):
         vbid=put_book_id_here
         book_location=page/put_page_number_here
 
+    Default non-empty url for `launch_url` is needed due to oauthlib demand (url scheme should be presented)::
+
+    https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
-    launch_url = String(help="URL of the tool", default='', scope=Scope.settings)
+    launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
 
 
@@ -192,7 +192,7 @@ class LTIModule(LTIFields, XModule):
         Also *anonymous student id* is passed to template and therefore to LTI provider.
         """
 
-        client = requests.auth.Client(
+        client = oauthlib.oauth1.Client(
             client_key=unicode(client_key),
             client_secret=unicode(client_secret)
         )
@@ -215,14 +215,26 @@ class LTIModule(LTIFields, XModule):
         # appending custom parameter for signing
         body.update(custom_parameters)
 
-        # This is needed for body encoding:
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {
+            # This is needed for body encoding:
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
 
-        __, headers, __ = client.sign(
-            unicode(self.launch_url),
-            http_method=u'POST',
-            body=body,
-            headers=headers)
+        try:
+            __, headers, __ = client.sign(
+                unicode(self.launch_url),
+                http_method=u'POST',
+                body=body,
+                headers=headers)
+        except ValueError:  # scheme not in url
+            #https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
+            #Stubbing headers for now:
+            headers = {
+                u'Content-Type': u'application/x-www-form-urlencoded',
+                u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
+oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", \
+oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
+
         params = headers['Authorization']
         # parse headers to pass to template as part of context:
         params = dict([param.strip().replace('"', '').split('=') for param in params.split(',')])
@@ -230,8 +242,8 @@ class LTIModule(LTIFields, XModule):
         params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
         del params[u'OAuth oauth_nonce']
 
-        # 0.14.2 (current) version of requests oauth library encodes signature,
-        # with 'Content-Type': 'application/x-www-form-urlencoded'
+        # oauthlib encodes signature with
+        # 'Content-Type': 'application/x-www-form-urlencoded'
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:

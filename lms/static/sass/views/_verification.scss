@@ -3,76 +3,76 @@
 
 // MISC: extends - type
 // application: canned headings
-.hd-lv1 {
-  @extend .t-title1;
-  @extend .t-weight1;
+%hd-lv1 {
+  @extend %t-title1;
+  @extend %t-weight1;
   color: $m-gray-d4;
   margin: 0 0 ($baseline*2) 0;
 }
 
-.hd-lv2 {
-  @extend .t-title4;
-  @extend .t-weight1;
+%hd-lv2 {
+  @extend %t-title4;
+  @extend %t-weight1;
   margin: 0 0 ($baseline*0.75) 0;
   border-bottom: 1px solid $m-gray-l3;
   padding-bottom: ($baseline/2);
   color: $m-gray-d4;
 }
 
-.hd-lv3 {
-  @extend .t-title6;
-  @extend .t-weight4;
+%hd-lv3 {
+  @extend %t-title6;
+  @extend %t-weight4;
   margin: 0 0 ($baseline/4) 0;
   color: $m-gray-d4;
 }
 
-.hd-lv4 {
-  @extend .t-title6;
-  @extend .t-weight2;
+%hd-lv4 {
+  @extend %t-title6;
+  @extend %t-weight2;
   margin: 0 0 $baseline 0;
   color: $m-gray-d4;
 }
 
-.hd-lv5 {
-  @extend .t-title7;
-  @extend .t-weight4;
+%hd-lv5 {
+  @extend %t-title7;
+  @extend %t-weight4;
   margin: 0 0 ($baseline/4) 0;
   color: $m-gray-d4;
 }
 
 // application: canned copy
-.copy-base {
-  @extend .t-copy-base;
+%copy-base {
+  @extend %t-copy-base;
   color: $m-gray-d2;
 }
 
-.copy-lead1 {
-  @extend .t-copy-lead2;
+%copy-lead1 {
+  @extend %t-copy-lead2;
   color: $m-gray;
 }
 
-.copy-detail {
-  @extend .t-copy-sub1;
-  @extend .t-weight3;
+%copy-detail {
+  @extend %t-copy-sub1;
+  @extend %t-weight3;
   color: $m-gray-d1;
 }
 
-.copy-metadata {
-  @extend .t-copy-sub2;
+%copy-metadata {
+  @extend %t-copy-sub2;
   color: $m-gray-d1;
 
 
-  .copy-metadata-value {
-    @extend .t-weight2;
+  %copy-metadata-value {
+    @extend %t-weight2;
   }
 
-  .copy-metadata-value {
-    @extend .t-weight4;
+  %copy-metadata-value {
+    @extend %t-weight4;
   }
 }
 
 // application: canned links
-.copy-link {
+%copy-link {
   border-bottom: 1px dotted transparent;
 
   &:hover, &:active {
@@ -80,9 +80,9 @@
   }
 }
 
-.copy-badge {
-  @extend .t-title8;
-  @extend .t-weight5;
+%copy-badge {
+  @extend %t-title8;
+  @extend %t-weight5;
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
   text-transform: uppercase;
@@ -90,14 +90,14 @@
 
 // ====================
 
-.btn-verify-primary {
-  @extend .btn-primary-green;
+%btn-verify-primary {
+  @extend %btn-primary-green;
 }
 
 // ====================
 
 // MISC: extends - UI - window
-.ui-window {
+%ui-window {
   @include clearfix();
   border-radius: ($baseline/10);
   box-shadow: 0 1px 2px 1px $shadow-l1;
@@ -109,7 +109,7 @@
 // ====================
 
 // MISC: extends - UI - well
-.ui-well {
+%ui-well {
   box-shadow: inset 0 1px 2px 1px $shadow-l1;
   padding: ($baseline*0.75) $baseline;
 }
@@ -130,10 +130,6 @@
     margin-right: ($baseline/4);
   }
 
-  .expandable-area {
-   // @include transition(opacity 0.25s ease-in-out 0s, height 0.25s ease-in-out 0s);
-  }
-
   // STATE: active
   &.is-ready {
 
@@ -142,22 +138,13 @@
     }
 
     .title-expand {
-      @extend .ui-fake-link;
+      @extend %ui-fake-link;
       color: $m-blue-d2;
 
       &:hover {
         color: $m-blue;
       }
     }
-
-/* using jquery
-    .expandable-area {
-      visibility: none;
-      height: 0;
-      opacity: 0.0;
-      overflow-y: scroll;
-    }
-*/
   }
 
   // STATE: expanded
@@ -167,14 +154,6 @@
       @include transform(rotate(0));
       @include transform-origin(50% 50%);
     }
-
-/*
-    .expandable-area {
-      visibility: visible;
-      height: ($baseline*16);
-      opacity: 1.0;
-    }
-*/
   }
 }
 
@@ -193,7 +172,7 @@
 
   // reset: typography - heading
   h1, h2, h3, h4, h5 ,h6 {
-    @extend .t-title;
+    @extend %t-title;
     color: $m-gray-d4;
   }
 
@@ -230,7 +209,7 @@
   }
 
   label {
-    @extend .t-weight4;
+    @extend %t-weight4;
     font-family: $sans-serif;
     font-style: normal;
     color: $m-gray-d4;
@@ -239,7 +218,7 @@
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
-    @extend .t-weight4;
+    @extend %t-weight4;
     text-transform: none;
     text-shadow: none;
     letter-spacing: 0;
@@ -255,7 +234,7 @@
 
   //  reset: lists
   .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
-    @extend .ui-no-list;
+    @extend %ui-no-list;
   }
 
   // ====================
@@ -275,24 +254,24 @@
 
   // elements: common copy
   .title {
-    @extend .t-title5;
-    @extend .t-weight1;
+    @extend %t-title5;
+    @extend %t-weight1;
   }
 
   .copy {
-    @extend .t-weight1;
+    @extend %t-weight1;
   }
 
   // ====================
 
   // elements - controls
   .action-primary {
-    @extend .btn-primary-blue;
+    @extend %btn-primary-blue;
     border: none;
   }
 
   .action-confirm {
-    @extend .btn-verify-primary;
+    @extend %btn-verify-primary;
     border: none;
   }
 
@@ -306,7 +285,7 @@
   .wrapper-report {
 
     .report {
-      @extend .ui-window;
+      @extend %ui-window;
       width: flex-grid(12,12);
       border-color: $m-gray-t3;
       border-collapse:collapse;
@@ -316,14 +295,14 @@
       }
 
       td {
-        @extend .t-weight3;
+        @extend %t-weight3;
         vertical-align: middle;
         padding: ($baseline*0.75) $baseline;
         color: $m-gray-d3;
       }
 
       th {
-        @extend .t-weight2;
+        @extend %t-weight2;
         padding: ($baseline/2) $baseline;
       }
 
@@ -334,8 +313,8 @@
         }
 
         th[scope="col"] {
-          @extend .t-title7;
-          @extend .t-weight2;
+          @extend %t-title7;
+          @extend %t-weight2;
           vertical-align: middle;
           color: $m-gray-l1;
           background: $m-gray-l4;
@@ -365,12 +344,16 @@
   .help-item {
 
     .title {
-      @extend .hd-lv4;
+      @extend %hd-lv4;
       margin-bottom: ($baseline/4);
     }
 
     .copy {
-      @extend .copy-detail;
+      @extend %copy-detail;
+    }
+
+    strong {
+      color: $m-gray-d2;
     }
   }
 
@@ -393,18 +376,18 @@
       width: flex-grid(11,12);
 
       .title {
-        @extend .t-title6;
-        @extend .t-weight4;
+        @extend %t-title6;
+        @extend %t-weight4;
       }
 
       .copy {
-        @extend .t-copy-sub1;
+        @extend %t-copy-sub1;
       }
     }
 
     .msg-icon {
       width: flex-grid(1,12);
-      @extend .t-icon2;
+      @extend %t-icon2;
       text-align: center;
       color: $m-blue;
     }
@@ -479,7 +462,7 @@
         text-align: right;
 
         .sts-track-value {
-          @extend .copy-badge;
+          @extend %copy-badge;
           color: $white;
           background: $verified-color-lvl3;
 
@@ -492,7 +475,7 @@
       }
 
       .sts-label {
-        @extend .t-title7;
+        @extend %t-title7;
         display: block;
         margin-bottom: ($baseline/2);
         border-bottom: ($baseline/10) solid $m-gray-l4;
@@ -501,14 +484,14 @@
       }
 
       .sts-course {
-        @extend .t-title;
+        @extend %t-title;
         width: flex-grid(9,12);
         text-transform: none;
       }
 
       .sts-course-org, .sts-course-number {
-        @extend .t-title5;
-        @extend .t-weight4;
+        @extend %t-title5;
+        @extend %t-weight4;
         display: inline-block;
       }
 
@@ -519,7 +502,7 @@
       .sts-course-name {
         @include font-size(28);
         @include line-height(28);
-        @extend .t-weight4;
+        @extend %t-weight4;
         display: block;
       }
     }
@@ -535,7 +518,7 @@
 
   .progress-sts {
     @include size(($baseline/4));
-    @extend .ui-depth1;
+    @extend %ui-depth1;
     position: absolute;
     top: 43px;
     left: 7%;
@@ -566,7 +549,7 @@
     }
 
     .progress-step {
-      @extend .ui-depth2;
+      @extend %ui-depth2;
       position: relative;
       display: table-cell;
       height: ($baseline*6);
@@ -585,8 +568,8 @@
         background: $white;
 
         .step-number {
-          @extend .t-title7;
-          @extend .t-weight4;
+          @extend %t-title7;
+          @extend %t-weight4;
           @include line-height(0);
           margin: 16px auto 0 auto;
           color: $m-gray-l1;
@@ -594,8 +577,8 @@
       }
 
       .step-name {
-        @extend .t-title7;
-        @extend .t-weight4;
+        @extend %t-title7;
+        @extend %t-weight4;
         color: $m-gray-l1;
       }
 
@@ -660,12 +643,12 @@
       width: flex-grid(12,12);
 
       > .title {
-        @extend .hd-lv2;
+        @extend %hd-lv2;
         color: $m-blue-d1;
       }
 
       .instruction {
-        @extend .t-copy-lead1;
+        @extend %t-copy-lead1;
         margin-bottom: $baseline;
       }
     }
@@ -688,11 +671,15 @@
           }
 
           .title {
-            @extend .hd-lv3;
+            @extend %hd-lv3;
           }
 
           .copy {
-            @extend .copy-detail;
+            @extend %copy-detail;
+          }
+
+          .example {
+            color: $m-gray-l2;
           }
 
           // help - general list
@@ -721,7 +708,7 @@
       }
 
       .task {
-        @extend .ui-window;
+        @extend %ui-window;
         float: left;
         width: flex-grid(6,12);
         margin-right: flex-gutter();
@@ -739,11 +726,11 @@
           position: absolute;
 
           .action {
-            @extend .btn-primary-blue;
+            @extend %btn-primary-blue;
             padding: ($baseline/2) ($baseline*0.75);
 
             *[class^="icon-"] {
-              @extend .t-icon4;
+              @extend %t-icon4;
               padding: ($baseline*.25) ($baseline*.5);
               display: block;
             }
@@ -763,7 +750,7 @@
           &.approved {
 
             .action {
-              @extend .btn-verify-primary;
+              @extend %btn-verify-primary;
             }
           }
         }
@@ -804,7 +791,7 @@
           text-align: right;
 
           .action-retakephotos a {
-            @extend .btn-primary-blue;
+            @extend %btn-primary-blue;
             @include font-size(14);
             padding: ($baseline/2) ($baseline*.75);
           }
@@ -841,14 +828,14 @@
         }
 
         > .title {
-          @extend .hd-lv3;
+          @extend %hd-lv3;
         }
 
         .copy {
-          @extend .copy-base;
+          @extend %copy-base;
 
           strong {
-            @extend .t-weight5;
+            @extend %t-weight5;
             color: $m-gray-d4;
           }
         }
@@ -872,7 +859,7 @@
             }
 
             .placeholder-photo {
-              @extend .ui-window;
+              @extend %ui-window;
               padding: ($baseline*0.75) $baseline;
 
               img {
@@ -887,11 +874,11 @@
             margin-left: $baseline;
 
             .title {
-              @extend .hd-lv5;
+              @extend %hd-lv5;
             }
 
             .copy {
-              @extend .copy-detail;
+              @extend %copy-detail;
             }
 
             // help - general list
@@ -932,7 +919,7 @@
           text-align: right;
 
           .action-editname a {
-            @extend .btn-primary-blue;
+            @extend %btn-primary-blue;
             @include font-size(14);
             padding: ($baseline/2) ($baseline*.75);
           }
@@ -971,7 +958,7 @@
             }
 
             .contribution-option-other1 label, .contribution-option-other2 label {
-              @extend .text-sr;
+              @extend %text-sr;
             }
           }
         }
@@ -1027,8 +1014,8 @@
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
-      @extend .t-copy-lead1;
-      @extend .t-weight4;
+      @extend %t-copy-lead1;
+      @extend %t-weight4;
       position: absolute;
       top: -($baseline*1.25);
       left: 45%;
@@ -1044,7 +1031,7 @@
 
   // UI: nav - wizard
   .nav-wizard {
-    @extend .ui-well;
+    @extend %ui-well;
     @include clearfix;
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
@@ -1055,7 +1042,7 @@
     }
 
     .help-inline {
-      @extend .t-copy-sub1;
+      @extend %t-copy-sub1;
       float: left;
       width: flex-grid(6,12);
       margin: ($baseline*0.75) flex-gutter() 0 0;
@@ -1076,7 +1063,7 @@
       background: $m-gray-l4;
 
       .action-primary {
-        @extend .btn-primary-disabled;
+        @extend %btn-primary-disabled;
       }
     }
   }
@@ -1112,7 +1099,7 @@
       }
 
       .label-value {
-        @extend .t-weight4;
+        @extend %t-weight4;
       }
 
       .denomination-name {
@@ -1134,7 +1121,7 @@
   .list-faq {
 
     .faq-question {
-      @extend .hd-lv3;
+      @extend %hd-lv3;
       border-bottom: 1px solid $m-gray-l4;
       padding-bottom: ($baseline/4);
     }
@@ -1155,12 +1142,12 @@
     width: flex-grid(12,12);
 
     > .title {
-      @extend .hd-lv2;
+      @extend %hd-lv2;
       color: $m-blue-d1;
     }
 
     .instruction {
-      @extend .t-copy-lead1;
+      @extend %t-copy-lead1;
       margin-bottom: $baseline;
     }
   }
@@ -1197,7 +1184,7 @@
   &.step-select-track {
 
     .sts-track {
-      @extend .text-sr;
+      @extend %text-sr;
     }
 
     .form-register-choose {
@@ -1241,17 +1228,17 @@
       }
 
       .title {
-        @extend .t-title5;
-        @extend .t-weight5;
+        @extend %t-title5;
+        @extend %t-weight5;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend .t-copy-base;
+        @extend %t-copy-base;
       }
 
       .action-select input {
-        @extend .t-weight4;
+        @extend %t-weight4;
         padding: ($baseline/2) ($baseline*0.75);
       }
     }
@@ -1268,7 +1255,7 @@
       }
 
       .action-select input {
-        @extend .btn-primary-blue;
+        @extend %btn-primary-blue;
       }
     }
 
@@ -1298,7 +1285,7 @@
       }
 
       .action-intro {
-        @extend .copy-detail;
+        @extend %copy-detail;
         width: flex-grid(3,8);
         text-align: left;
       }
@@ -1308,7 +1295,7 @@
       }
 
       .action-select input {
-        @extend .btn-verify-primary;
+        @extend %btn-verify-primary;
       }
 
       .action-intro {
@@ -1317,7 +1304,7 @@
 
       // extra register options/info
       .title-expand {
-        @extend .t-copy-sub1;
+        @extend %t-copy-sub1;
         font-weight: 500 !important;
         display: inline-block;
         margin: 0;
@@ -1332,14 +1319,14 @@
       width: flex-grid(4,12);
 
       .title {
-        @extend .hd-lv4;
-        @extend .t-weight4;
+        @extend %hd-lv4;
+        @extend %t-weight4;
         margin-top: $baseline;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend .copy-detail;
+        @extend %copy-detail;
       }
     }
 
@@ -1353,8 +1340,8 @@
       margin: $baseline 0;
 
       .label {
-        @extend .hd-lv4;
-        @extend .t-weight4;
+        @extend %hd-lv4;
+        @extend %t-weight4;
         margin-bottom: ($baseline/2);
       }
     }
@@ -1397,7 +1384,7 @@
         }
 
         .contribution-option-other1 label, .contribution-option-other2 label {
-          @extend .text-sr;
+          @extend %text-sr;
         }
       }
     }
@@ -1405,6 +1392,10 @@
 
   // VIEW: requirements
   &.step-requirements {
+
+    .help-item-technical {
+      display: none;
+    }
 
     // progress nav
     .progress .progress-step {
@@ -1434,7 +1425,7 @@
       width: flex-grid(12,12);
 
       .req {
-        @extend .ui-window;
+        @extend %ui-window;
         width: flex-grid(4,12);
         min-height: ($baseline*15);
         float: left;
@@ -1447,8 +1438,8 @@
         }
 
         .title {
-          @extend .t-title5;
-          @extend .t-weight4;
+          @extend %t-title5;
+          @extend %t-weight4;
           padding: $baseline;
           border-bottom: 1px solid $verified-color-lvl4;
           background: $verified-color-lvl5;
@@ -1464,7 +1455,7 @@
           border-radius: ($baseline*10);
 
           *[class^="icon"] {
-            @extend .t-icon1;
+            @extend %t-icon1;
             color: $white;
           }
 
@@ -1473,12 +1464,12 @@
           }
 
           .icon-under {
-            @extend .ui-depth1;
+            @extend %ui-depth1;
           }
 
           .icon-over {
-            @extend .ui-depth2;
-            @extend .t-icon5;
+            @extend %ui-depth2;
+            @extend %t-icon5;
             position: absolute;
             left: 24px;
             top: 34px;
@@ -1496,13 +1487,13 @@
         }
 
         .copy-super {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
           margin-bottom: ($baseline/2);
           color: $verified-color-lvl1;
         }
 
         .copy-sub {
-          @extend .t-copy-sub2;
+          @extend %t-copy-sub2;
         }
 
         .actions {
@@ -1517,8 +1508,8 @@
         border-color: $m-pink-l3;
 
         .title {
-          @extend .t-title5;
-          @extend .t-weight4;
+          @extend %t-title5;
+          @extend %t-weight4;
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
           color: $m-pink;
@@ -1529,12 +1520,12 @@
         }
 
         .copy-super {
-          @extend .t-copy-lead1;
+          @extend %t-copy-lead1;
           color: $m-pink;
         }
 
         .copy-sub {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
         }
       }
 
@@ -1636,6 +1627,11 @@
 
   // VIEW: review photos
   &.step-review {
+
+    .help-item-technical {
+      display: none;
+    }
+
     .modal.edit-name .submit input {
       color: #fff;
     }
@@ -1655,22 +1651,38 @@
           border: none;
         }
       }
-
     }
 
     .nav-wizard {
 
-      .help-inline {
-        width: flex-grid(4,12);
-        margin-top: 0
+      .prompt-verify {
+        float: left;
+        width: flex-grid(6,12);
+        margin: 0 flex-gutter() 0 0;
+
+        .title {
+          @extend %hd-lv4;
+          margin-bottom: ($baseline/4);
+        }
+
+        .copy {
+          @extend %t-copy-sub1;
+          @extend %t-weight3;
+        }
+
+        .list-actions {
+          margin-top: ($baseline/2);
+        }
+
+        .action-verify label  {
+          @extend %t-copy-sub1;
+        }
       }
 
       .wizard-steps {
-        float: right;
-        width: flex-grid(8,12);
+        margin-top: ($baseline/2);
 
         .wizard-step {
-          width: flex-grid(4,8);
           margin-right: flex-gutter();
           display: inline-block;
           vertical-align: middle;
@@ -1684,7 +1696,7 @@
       .step-match {
 
         label {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
         }
       }
 
@@ -1732,6 +1744,10 @@
 
   // VIEW: confirmation/receipt
   &.step-confirmation {
+
+    .help-item-technical {
+      display: none;
+    }
 
     // progress nav
     .progress .progress-step {
@@ -1784,12 +1800,12 @@
         }
 
         > .title {
-          @extend .hd-lv3;
+          @extend %hd-lv3;
           margin-bottom: $baseline;
         }
 
         .copy {
-          @extend .copy-base;
+          @extend %copy-base;
           margin-bottom: $baseline;
         }
       }
@@ -1801,7 +1817,7 @@
       .options {
 
         .action-course {
-          @extend .btn-primary-blue;
+          @extend %btn-primary-blue;
           @include font-size(14);
           padding: 5px 10px;
         }
@@ -1810,7 +1826,7 @@
       .course-actions {
 
         .action-dashboard {
-          @extend .btn-primary-blue;
+          @extend %btn-primary-blue;
         }
       }
     }
@@ -1839,7 +1855,7 @@
 .register.is-verified {
 
   .nav-wizard .price-value {
-    @extend .t-weight4;
+    @extend %t-weight4;
     @include font-size(16);
     margin-top: 18px;
     color: $m-blue-d1;

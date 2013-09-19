@@ -11,7 +11,6 @@ DISPLAY_NAME_KEY = "display_name"
 DISPLAY_NAME_VALUE = '"Robot Super Course"'
 
 
-############### ACTIONS ####################
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
     world.click_course_settings()
@@ -45,7 +44,6 @@ def create_value_not_in_quotes(step):
     change_display_name_value(step, 'quote me')
 
 
-############### RESULTS ####################
 @step('I see default advanced settings$')
 def i_see_default_advanced_settings(step):
     # Test only a few of the existing properties (there are around 34 of them)
@@ -88,12 +86,13 @@ def the_policy_key_value_is_changed(step):
     assert_equal(get_display_name_value(), '"foo"')
 
 
-############# HELPERS ###############
 def assert_policy_entries(expected_keys, expected_values):
     for key, value in zip(expected_keys, expected_values):
         index = get_index_of(key)
         assert_false(index == -1, "Could not find key: {key}".format(key=key))
-        assert_equal(value, world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+        found_value = world.css_find(VALUE_CSS)[index].value
+        assert_equal(value, found_value,
+            "Expected {} to have value {} but found {}".format(key, value, found_value))
 
 
 def get_index_of(expected_key):

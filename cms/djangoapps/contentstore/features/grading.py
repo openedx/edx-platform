@@ -5,6 +5,7 @@ from lettuce import world, step
 from common import *
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
+from nose.tools import assert_in, assert_not_in  # pylint: disable=E0611
 
 
 @step(u'I am viewing the grading settings')
@@ -65,21 +66,25 @@ def change_assignment_name(step, old_name, new_name):
 
 @step(u'I go back to the main course page')
 def main_course_page(step):
-    main_page_link_css = 'a[href="/%s/%s/course/%s"]' % (world.scenario_dict['COURSE'].org,
-                                                        world.scenario_dict['COURSE'].number,
-                                                        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
-    world.css_click(main_page_link_css)
+    main_page_link = '/{}/{}/course/{}'.format(world.scenario_dict['COURSE'].org,
+                                               world.scenario_dict['COURSE'].number,
+                                               world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
+    world.visit(main_page_link)
+    assert_in('Course Outline', world.css_text('h1.page-header'))
 
 
 @step(u'I do( not)? see the assignment name "([^"]*)"$')
 def see_assignment_name(step, do_not, name):
     assignment_menu_css = 'ul.menu > li > a'
+    # First assert that it is there, make take a bit to redraw
+    assert world.css_find(assignment_menu_css)
+
     assignment_menu = world.css_find(assignment_menu_css)
     allnames = [item.html for item in assignment_menu]
     if do_not:
-        assert not name in allnames
+        assert_not_in(name, allnames)
     else:
-        assert name in allnames
+        assert_in(name, allnames)
 
 
 @step(u'I delete the assignment type "([^"]*)"$')

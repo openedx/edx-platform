@@ -16,9 +16,9 @@ window.LTI = (function () {
 
         // If the Form's action attribute is set (i.e. we can perform a normal
         // submit), then we submit the form and make the frame shown.
-        if (form.attr('action')) {
+        if (form.attr('action') && form.attr('action') !== 'http://www.example.com') {
             form.submit();
-            element.find('.lti').addClass('rendered')
+            element.find('.lti').addClass('rendered');
         }
     }
 

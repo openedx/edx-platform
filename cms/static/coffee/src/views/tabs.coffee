@@ -21,7 +21,7 @@ class CMS.Views.TabsEdit extends Backbone.View
       forcePlaceholderSize: true
       axis: 'y'
       items: '> .component'
-    )    
+    )
 
   tabMoved: (event, ui) =>
     tabs = []
@@ -34,7 +34,7 @@ class CMS.Views.TabsEdit extends Backbone.View
 
     $.ajax({
       type:'POST',
-      url: '/reorder_static_tabs', 
+      url: '/reorder_static_tabs',
       data: JSON.stringify({
         tabs : tabs
       }),
@@ -78,7 +78,7 @@ class CMS.Views.TabsEdit extends Backbone.View
               course: course_location_analytics
               id: $component.data('id')
             deleting = new CMS.Views.Notification.Mini
-              title: gettext('Deleting') + '&hellip;'
+              title: gettext('Deleting&hellip;')
             deleting.show()
             $.post('/delete_item', {
               id: $component.data('id')
