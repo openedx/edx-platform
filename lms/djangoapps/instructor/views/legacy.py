@@ -56,7 +56,7 @@ import track.views
 from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-
+from django.utils.translation import ugettext as _u
 
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
@@ -108,7 +108,7 @@ def instructor_dashboard(request, course_id):
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
         datatable = {'header': ['Statistic', 'Value'],
-                     'title': 'Course Statistics At A Glance',
+                     'title': _u('Course Statistics At A Glance'),
                      }
         data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
         data += [['Date', timezone.now().isoformat()]]
