@@ -34,7 +34,9 @@ class MongoContentStore(ContentStore):
 
         with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
                               displayname=content.name, thumbnail_location=content.thumbnail_location,
-                              import_path=content.import_path) as fp:
+                              import_path=content.import_path,
+                              # getattr b/c caching may mean some pickled instances don't have attr
+                              locked=getattr(content, 'locked', False)) as fp:
             if hasattr(content.data, '__iter__'):
                 for chunk in content.data:
                     fp.write(chunk)
@@ -51,17 +53,21 @@ class MongoContentStore(ContentStore):
         content_id = StaticContent.get_id_from_location(location)
         try:
             if as_stream:
-                return StaticContentStream(location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
-                                           thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
-                                           import_path=fp.import_path if hasattr(fp, 'import_path') else None,
-                                           length=fp.length)
                 fp = self.fs.get(content_id)
+                return StaticContentStream(
+                    location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
+                    thumbnail_location=getattr(fp, 'thumbnail_location', None),
+                    import_path=getattr(fp, 'import_path', None),
+                    length=fp.length, locked=getattr(fp, 'locked', False)
+                )
             else:
-                    return StaticContent(location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
-                                         thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
-                                         import_path=fp.import_path if hasattr(fp, 'import_path') else None,
-                                         length=fp.length)
                 with self.fs.get(content_id) as fp:
+                    return StaticContent(
+                        location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
+                        thumbnail_location=getattr(fp, 'thumbnail_location', None),
+                        import_path=getattr(fp, 'import_path', None),
+                        length=fp.length, locked=getattr(fp, 'locked', False)
+                    )
         except NoFile:
             if throw_on_not_found:
                 raise NotFoundError()
@@ -135,3 +141,61 @@ class MongoContentStore(ContentStore):
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         items = self.fs_files.find(location_to_query(course_filter))
         return list(items)
+
+    def set_attr(self, location, attr, value=True):
+        """
+        Add/set the given attr on the asset at the given location. Does not allow overwriting gridFS built in
+        attrs such as _id, md5, uploadDate, length. Value can be any type which pymongo accepts.
+
+        Returns nothing
+
+        Raises NotFoundError if no such item exists
+        Raises AttributeError is attr is one of the build in attrs.
+
+        :param location: a c4x asset location
+        :param attr: which attribute to set
+        :param value: the value to set it to (any type pymongo accepts such as datetime, number, string)
+        """
+        self.set_attrs(location, {attr: value})
+
+    def get_attr(self, location, attr, default=None):
+        """
+        Get the value of attr set on location. If attr is unset, it returns default. Unlike set, this accessor
+        does allow getting the value of reserved keywords.
+        :param location: a c4x asset location
+        """
+        return self.get_attrs(location).get(attr, default)
+
+    def set_attrs(self, location, attr_dict):
+        """
+        Like set_attr but sets multiple key value pairs.
+
+        Returns nothing.
+
+        Raises NotFoundError if no such item exists
+        Raises AttributeError is attr_dict has any attrs which are one of the build in attrs.
+
+        :param location:  a c4x asset location
+        """
+        for attr in attr_dict.iterkeys():
+            if attr in ['_id', 'md5', 'uploadDate', 'length']:
+                raise AttributeError("{} is a protected attribute.".format(attr))
+        item = self.fs_files.find_one(location_to_query(location))
+        if item is None:
+            raise NotFoundError()
+        self.fs_files.update({"_id": item["_id"]}, {"$set": attr_dict})
+
+    def get_attrs(self, location):
+        """
+        Gets all of the attributes associated with the given asset. Note, returns even built in attrs
+        such as md5 which you cannot resubmit in an update; so, don't call set_attrs with the result of this
+        but only with the set of attrs you want to explicitly update.
+
+        The attrs will be a superset of _id, contentType, chunkSize, filename, uploadDate, & md5
+
+        :param location: a c4x asset location
+        """
+        item = self.fs_files.find_one(location_to_query(location))
+        if item is None:
+            raise NotFoundError()
+        return item

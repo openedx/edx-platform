@@ -26,6 +26,7 @@ class StaticContent(object):
         # optional information about where this file was imported from. This is needed to support import/export
         # cycles
         self.import_path = import_path
+        self.locked = locked
 
     @property
     def is_thumbnail(self):
@@ -133,10 +134,10 @@ class StaticContent(object):
 
 class StaticContentStream(StaticContent):
     def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None):
+                 length=None, locked=False):
         super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
                                                   thumbnail_location=thumbnail_location, import_path=import_path,
-                                                  length=length)
+                                                  length=length, locked=locked)
         self._stream = stream
 
     def stream_data(self):
@@ -153,7 +154,7 @@ class StaticContentStream(StaticContent):
         self._stream.seek(0)
         content = StaticContent(self.location, self.name, self.content_type, self._stream.read(),
                                 last_modified_at=self.last_modified_at, thumbnail_location=self.thumbnail_location,
-                                import_path=self.import_path, length=self.length)
+                                import_path=self.import_path, length=self.length, locked=self.locked)
         return content
 
 
