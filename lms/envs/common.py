@@ -92,7 +92,7 @@ MITX_FEATURES = {
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
-    'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
+    'ACCESS_REQUIRE_STAFF_FOR_COURSE': True,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
@@ -433,7 +433,7 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "edu.olimpiada.ru"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')

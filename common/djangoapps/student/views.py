@@ -1588,13 +1588,11 @@ def import_users(request, post_override=None):
     idx = 0
     for row in data:
         idx += 1
-        log.info(row)
         row['firstname'] = row.pop('first-name')
         row['lastname'] = row.pop('second-name')
         row['middlename'] = row.pop('patronymic')
         #row['email'] = row.pop('email')
         row['work_login'] = row.pop('login')
-
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
 
@@ -1629,7 +1627,7 @@ def import_users(request, post_override=None):
         registration.register(user)
 
         profile = UserProfile(user=user)
-        
+      
         profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
         profile.lastname = row.get('lastname')
         profile.firstname = row.get('firstname')
@@ -1641,23 +1639,22 @@ def import_users(request, post_override=None):
         js['passwords'][row['email']] = password
         try:
             profile.save()
-            log.info("profile save")
         except Exception:
             log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
 
         d = {'name': row['lastname'],
-             'login': row['email'],
-             'password': password,
-             'key': registration.activation_key,
-             }
+                'login': row['email'],
+                 'password': password,
+                 'key': registration.activation_key,
+                 }
 
-        # composes activation email
+            # composes activation email
         subject = render_to_string('emails/activation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
+            # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/activation_email_batch.txt', d)
 
-        # dont send email if we are doing load testing or random user generation for some reason
+            # dont send email if we are doing load testing or random user generation for some reason
         if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
             try:
                 if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
@@ -1672,7 +1669,7 @@ def import_users(request, post_override=None):
                 js['success'] = False
                 js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
                 continue
-
+        transaction.commit()
     return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
 
