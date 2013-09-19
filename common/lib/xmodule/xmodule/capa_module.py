@@ -213,6 +213,7 @@ class CapaModule(CapaFields, XModule):
                 loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
+            logging.exception("Something awful happened!")
             if self.system.DEBUG:
                 log.warning(msg)
                 # TODO (vshnayder): This logic should be general, not here--and may

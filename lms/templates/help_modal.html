@@ -31,11 +31,11 @@ discussion_link = get_discussion_link(course) if course else None
     </p>
 % endif
 
-    <p>${u'Есть <strong>вопрос</strong>?Вы можете найти много полезной информации в {link_start}ЧАВО{link_end}.'.format(
+    <p>${"Есть <strong>вопрос</strong>?Вы можете найти много полезной информации в {link_start}ЧАВО{link_end}.".format(
         link_start='<a href="{url}" target="_blank">'.format(
           url=marketing_link('FAQ')
         ),
-        link_end='</a>'}
+        link_end='</a>')}
       </p>
 
     <p>Есть <strong>конкретный вопрос</strong>? Свяжитесь напрямую со службой поддержки:'</p>
@@ -103,12 +103,8 @@ discussion_link = get_discussion_link(course) if course else None
         close_time = "22:00"
     %>
     <p>
-    ${_(
-        'Thank you for your inquiry or feedback.  We typically respond to a request '
-        'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
-        'review our {link_start}detailed FAQs{link_end} where most questions have '
-        'already been answered.'
-    ).format(
+    ${
+        'Спасибо за сообщение. Обычно мы отвечаем в течении одного рабочего дня.'.format(
         open_time=open_time,
         close_time=close_time,
         link_start='<a href="{}" target="_blank">'.format(marketing_link('FAQ')),
@@ -158,7 +154,7 @@ discussion_link = get_discussion_link(course) if course else None
         showFeedback(
             event,
             gettext("suggestion"),
-            "${_(Make a Suggestion")}",
+            "${_("Make a suggestion")}",
             "Краткое описание вашего предложения",
             "Ваше предложение"
         );
@@ -167,7 +163,7 @@ discussion_link = get_discussion_link(course) if course else None
         showFeedback(
             event,
             gettext("question"),
-            ${_("Ask a Question")},
+            "${_("Ask a question")}",
             "Краткое описание вашего вопроса",
             "Подробнее"
         );
