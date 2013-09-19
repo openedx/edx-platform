@@ -96,10 +96,10 @@ class InstructorTaskTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
-    the setup of a course and problem in order to access StudentModule state.
+    the setup of a course.
     """
     course = None
     current_user = None
@@ -150,6 +150,31 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return self._create_user(username, is_staff=False)
 
     @staticmethod
+    def get_task_status(task_id):
+        """Use api method to fetch task status, using mock request."""
+        mock_request = Mock()
+        mock_request.REQUEST = {'task_id': task_id}
+        response = instructor_task_status(mock_request)
+        status = json.loads(response.content)
+        return status
+
+    def create_task_request(self, requester_username):
+        """Generate request that can be used for submitting tasks"""
+        request = Mock()
+        request.user = User.objects.get(username=requester_username)
+        request.get_host = Mock(return_value="testhost")
+        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
+        request.is_secure = Mock(return_value=False)
+        return request
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
+    """
+    Base test class for InstructorTask-related tests that require
+    the setup of a course and problem in order to access StudentModule state.
+    """
+    @staticmethod
     def problem_location(problem_url_name):
         """
         Create an internal location for a test problem.
@@ -192,21 +217,3 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
                                          module_type=descriptor.location.category,
                                          module_state_key=descriptor.location.url(),
                                          )
-
-    @staticmethod
-    def get_task_status(task_id):
-        """Use api method to fetch task status, using mock request."""
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
-        return status
-
-    def create_task_request(self, requester_username):
-        """Generate request that can be used for submitting tasks"""
-        request = Mock()
-        request.user = User.objects.get(username=requester_username)
-        request.get_host = Mock(return_value="testhost")
-        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
-        request.is_secure = Mock(return_value=False)
-        return request
