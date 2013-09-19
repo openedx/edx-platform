@@ -154,8 +154,9 @@ def combined_notifications(course, user):
         controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
                                                                          last_time_viewed)
         notifications = json.loads(controller_response)
-        if notifications['success']:
-            if notifications['staff_needs_to_grade'] or notifications['student_needs_to_peer_grade']:
+        if notifications.get('success'):
+            if (notifications.get('staff_needs_to_grade') or
+                notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action
