@@ -1424,7 +1424,7 @@ def import_users(request, post_override=None):
         user = User(username=row['work_login'] + '_' + row['id'],
                 email=row['email'],
                 is_active=False)
-        password = id_generator(8, _ALPHABET)
+        password = row.get('password',id_generator(8, _ALPHABET))
         user.set_password(password)
         registration = Registration()
         try:
