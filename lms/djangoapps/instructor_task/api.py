@@ -190,7 +190,6 @@ def submit_bulk_course_email(request, course_id, email_id):
     """
     # check arguments:  make sure that the course is defined?
     # TODO: what is the right test here?
-    # modulestore().get_instance(course_id, problem_url)
 
     # This should also make sure that the email exists.
     # We can also pull out the To argument here, so that is displayed in
@@ -200,10 +199,10 @@ def submit_bulk_course_email(request, course_id, email_id):
 
     task_type = 'bulk_course_email'
     task_class = send_bulk_course_email
-    # TODO: figure out if we need to encode in a standard way, or if we can get away
-    # with doing this manually.  Shouldn't be hard to make the encode call explicitly,
-    # and allow no problem_url or student to be defined.  Like this:
-    # task_input, task_key = encode_problem_and_student_input()
+    # Pass in the to_option as a separate argument, even though it's (currently)
+    # in the CourseEmail.  That way it's visible in the progress status.
+    # (At some point in the future, we might take the recipient out of the CourseEmail,
+    # so that the same saved email can be sent to different recipients, as it is tested.)
     task_input = {'email_id': email_id, 'to_option': to_option}
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:

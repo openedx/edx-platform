@@ -6,16 +6,21 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.tests.factories import UserFactory
 
-from instructor_task.api import (get_running_instructor_tasks,
-                                 get_instructor_task_history,
-                                 submit_rescore_problem_for_all_students,
-                                 submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_delete_problem_state_for_all_students)
+from bulk_email.models import CourseEmail, SEND_TO_ALL
+from instructor_task.api import (
+    get_running_instructor_tasks,
+    get_instructor_task_history,
+    submit_rescore_problem_for_all_students,
+    submit_rescore_problem_for_student,
+    submit_reset_problem_attempts_for_all_students,
+    submit_delete_problem_state_for_all_students,
+    submit_bulk_course_email,
+)
 
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import InstructorTask, PROGRESS
 from instructor_task.tests.test_base import (InstructorTaskTestCase,
+                                             InstructorTaskCourseTestCase,
                                              InstructorTaskModuleTestCase,
                                              TEST_COURSE_ID)
 
@@ -46,8 +51,8 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(set(task_ids), set(expected_ids))
 
 
-class InstructorTaskSubmitTest(InstructorTaskModuleTestCase):
-    """Tests API methods that involve the submission of background tasks."""
+class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
+    """Tests API methods that involve the submission of module-based background tasks."""
 
     def setUp(self):
         self.initialize_course()
@@ -136,3 +141,28 @@ class InstructorTaskSubmitTest(InstructorTaskModuleTestCase):
 
     def test_submit_delete_all(self):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
+
+
+class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
+    """Tests API methods that involve the submission of course-based background tasks."""
+
+    def setUp(self):
+        self.initialize_course()
+        self.student = UserFactory.create(username="student", email="student@edx.org")
+        self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
+
+    def _define_course_email(self):
+        course_email = CourseEmail.create(self.course.id, self.instructor, SEND_TO_ALL, "Test Subject", "<p>This is a test message</p>")
+        return course_email.id
+
+    def test_submit_bulk_email_all(self):
+        email_id = self._define_course_email()
+        instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)
+
+        # test resubmitting, by updating the existing record:
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
+        instructor_task.task_state = PROGRESS
+        instructor_task.save()
+
+        with self.assertRaises(AlreadyRunningError):
+            instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)

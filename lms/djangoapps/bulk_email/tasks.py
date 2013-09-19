@@ -166,7 +166,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
             to_list = recipient_sublist[i * chunk:i * chunk + chunk]
             subtask_id = str(uuid4())
             subtask_id_list.append(subtask_id)
-            subtask_progress = _course_email_result(None, 0, 0, 0)
+            subtask_progress = update_subtask_result(None, 0, 0, 0)
             task_list.append(send_course_email.subtask((
                 entry_id,
                 email_id,
@@ -259,14 +259,14 @@ def _update_subtask_status(entry_id, current_task_id, status, subtask_result):
 
         log.info("Task output updated to %s for email subtask %s of instructor task %d",
                  entry.task_output, current_task_id, entry_id)
-        # TODO: temporary -- switch to debug
+        # TODO: temporary -- switch to debug once working
         log.info("about to save....")
         entry.save()
     except:
         log.exception("Unexpected error while updating InstructorTask.")
         transaction.rollback()
     else:
-        # TODO: temporary -- switch to debug
+        # TODO: temporary -- switch to debug once working
         log.info("about to commit....")
         transaction.commit()
 
@@ -289,40 +289,69 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     current_task_id = _get_current_task().request.id
     retry_index = _get_current_task().request.retries
 
-    log.info("Preparing to send email as subtask %s for instructor task %d",
-             current_task_id, entry_id)
+    log.info("Preparing to send email as subtask %s for instructor task %d, retry %d",
+             current_task_id, entry_id, retry_index)
 
     try:
         course_title = global_email_context['course_title']
         course_email_result_value = None
+        send_exception = None
         with dog_stats_api.timer('course_email.single_task.time.overall', tags=[_statsd_tag(course_title)]):
-            course_email_result_value = _send_course_email(email_id, to_list, global_email_context, subtask_progress, retry_index)
-        # Assume that if we get here without a raise, the task was successful.
-        # Update the InstructorTask object that is storing its progress.
-        _update_subtask_status(entry_id, current_task_id, SUCCESS, course_email_result_value)
+            course_email_result_value, send_exception = _send_course_email(
+                current_task_id,
+                email_id,
+                to_list,
+                global_email_context,
+                subtask_progress,
+                retry_index,
+        )
+        if send_exception is None:
+            # Update the InstructorTask object that is storing its progress.
+            _update_subtask_status(entry_id, current_task_id, SUCCESS, course_email_result_value)
+        else:
+            log.error("background task (%s) failed: %s", current_task_id, send_exception)
+            _update_subtask_status(entry_id, current_task_id, FAILURE, course_email_result_value)
+            raise send_exception
 
     except Exception:
         # try to write out the failure to the entry before failing
         _, exception, traceback = exc_info()
         traceback_string = format_exc(traceback) if traceback is not None else ''
-        log.warning("background task (%s) failed: %s %s", current_task_id, exception, traceback_string)
+        log.error("background task (%s) failed: %s %s", current_task_id, exception, traceback_string)
         _update_subtask_status(entry_id, current_task_id, FAILURE, subtask_progress)
         raise
 
     return course_email_result_value
 
 
-def _send_course_email(email_id, to_list, global_email_context, subtask_progress, retry_index):
+def _send_course_email(task_id, email_id, to_list, global_email_context, subtask_progress, retry_index):
     """
     Performs the email sending task.
+
+    Returns a tuple of two values:
+      * First value is a dict which represents current progress.  Keys are:
+
+        'attempted': number of emails attempted
+        'succeeded': number of emails succeeded
+        'skipped': number of emails skipped (due to optout)
+        'failed': number of emails not sent because of some failure
+
+      * Second value is an exception returned by the innards of the method, indicating a fatal error.
+        In this case, the number of recipients that were not sent have already been added to the
+        'failed' count above.
     """
     throttle = retry_index > 0
 
+    num_optout = 0
+    num_sent = 0
+    num_error = 0
+
     try:
         course_email = CourseEmail.objects.get(id=email_id)
-    except CourseEmail.DoesNotExist:
-        log.exception("Could not find email id:{} to send.".format(email_id))
-        raise
+    except CourseEmail.DoesNotExist as exc:
+        log.exception("Task %s: could not find email id:%s to send.", task_id, email_id)
+        num_error += len(to_list)
+        return update_subtask_result(subtask_progress, num_sent, num_error, num_optout), exc
 
     # exclude optouts (if not a retry):
     # Note that we don't have to do the optout logic at all if this is a retry,
@@ -330,7 +359,6 @@ def _send_course_email(email_id, to_list, global_email_context, subtask_progress
     # attempt.  Anyone on the to_list on a retry has already passed the filter
     # that existed at that time, and we don't need to keep checking for changes
     # in the Optout list.
-    num_optout = 0
     if retry_index == 0:
         optouts = (Optout.objects.filter(course_id=course_email.course_id,
                                          user__in=[i['pk'] for i in to_list])
@@ -350,8 +378,6 @@ def _send_course_email(email_id, to_list, global_email_context, subtask_progress
 
     course_email_template = CourseEmailTemplate.get_template()
 
-    num_sent = 0
-    num_error = 0
     try:
         connection = get_connection()
         connection.open()
@@ -404,45 +430,47 @@ def _send_course_email(email_id, to_list, global_email_context, subtask_progress
                     raise exc
                 else:
                     # This will fall through and not retry the message, since it will be popped
-                    log.warning('Email with id %s not delivered to %s due to error %s', email_id, email, exc.smtp_error)
-
+                    log.warning('Task %s: email with id %s not delivered to %s due to error %s', task_id, email_id, email, exc.smtp_error)
                     dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
-
                     num_error += 1
 
             to_list.pop()
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
-        # Error caught here cause the email to be retried.  The entire task is actually retried without popping the list
-        # Reasoning is that all of these errors may be temporary condition.
-        # TODO: figure out what this means.  Presumably we have popped the list with those that have succeeded
-        # and failed, rather than those needing a later retry.
-        log.warning('Email with id %d not delivered due to temporary error %s, retrying send to %d recipients',
-                    email_id, exc, len(to_list))
+        # Errors caught here cause the email to be retried.  The entire task is actually retried
+        # without popping the current recipient off of the existing list.
+        # Errors caught are those that indicate a temporary condition that might succeed on retry.
+        connection.close()
+        log.warning('Task %s: email with id %d not delivered due to temporary error %s, retrying send to %d recipients',
+                    task_id, email_id, exc, len(to_list))
         raise send_course_email.retry(
             arg=[
                 email_id,
                 to_list,
                 global_email_context,
-                _course_email_result(subtask_progress, num_sent, num_error, num_optout),
+                update_subtask_result(subtask_progress, num_sent, num_error, num_optout),
             ],
             exc=exc,
             countdown=(2 ** retry_index) * 15
         )
-    except:
-        log.exception('Email with id %d caused send_course_email task to fail with uncaught exception. To list: %s',
-                      email_id,
-                      [i['email'] for i in to_list])
-        # Close the connection before we exit
+    except Exception as exc:
+
+        # If we have a general exception for this request, we need to figure out what to do with it.
+        # If we're going to just mark it as failed
+        # And the log message below should indicate which task_id is failing, so we have a chance to
+        # reconstruct the problems.
         connection.close()
-        raise
+        log.exception('Task %s: email with id %d caused send_course_email task to fail with uncaught exception. To list: %s',
+                      task_id, email_id, [i['email'] for i in to_list])
+        num_error += len(to_list)
+        return update_subtask_result(subtask_progress, num_sent, num_error, num_optout), exc
     else:
-        connection.close()
         # Add current progress to any progress stemming from previous retries:
-        return _course_email_result(subtask_progress, num_sent, num_error, num_optout)
+        connection.close()
+        return update_subtask_result(subtask_progress, num_sent, num_error, num_optout), None
 
 
-def _course_email_result(previous_result, new_num_sent, new_num_error, new_num_optout):
+def update_subtask_result(previous_result, new_num_sent, new_num_error, new_num_optout):
     """Return the result of course_email sending as a dict (not a string)."""
     attempted = new_num_sent + new_num_error
     current_result = {'attempted': attempted, 'succeeded': new_num_sent, 'skipped': new_num_optout, 'failed': new_num_error}
