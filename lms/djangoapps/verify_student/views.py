@@ -54,6 +54,10 @@ class VerifyView(View):
             progress_state = "start"
 
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        # if the course doesn't have a verified mode, we want to kick them
+        # from the flow
+        if not verify_mode:
+            return redirect(reverse('dashboard'))
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
         else:
