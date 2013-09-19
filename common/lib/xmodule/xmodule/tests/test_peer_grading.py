@@ -4,10 +4,11 @@ from .import get_test_system
 from test_util_open_ended import MockQueryDict, DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
 from mock import Mock
-from xmodule.peer_grading_module import PeerGradingModule
+from xmodule.peer_grading_module import PeerGradingModule, InvalidLinkLocation
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+import json
 
 import logging
 
@@ -215,26 +216,31 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
-    def test_linked_problem(self):
+    def _create_peer_grading_with_linked_problem(self, location, valid_linked_descriptor=True):
         """
-        Check to see if a peer grading module with a linked problem loads properly.
+        Create a peer grading problem with a linked location.
         """
 
         # Mock the linked problem descriptor.
         linked_descriptor = Mock()
-        linked_descriptor.location = self.coe_location
+        linked_descriptor.location = location
 
         # Mock the peer grading descriptor.
         pg_descriptor = Mock()
         pg_descriptor.location = self.problem_location
-        pg_descriptor.get_required_module_descriptors = lambda: [linked_descriptor, ]
+
+        if valid_linked_descriptor:
+            pg_descriptor.get_required_module_descriptors = lambda: [linked_descriptor, ]
+        else:
+            pg_descriptor.get_required_module_descriptors = lambda: []
 
         # Setup the proper field data for the peer grading module.
         field_data = DictFieldData({
             'data': '<peergrading/>',
             'location': self.problem_location,
             'use_for_single_location': True,
-            'link_to_location': self.coe_location,
+            'link_to_location': self.coe_location.url(),
+            'graded': True,
         })
 
         # Initialize the peer grading module.
@@ -245,8 +251,68 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
             ScopeIds(None, None, self.problem_location, self.problem_location)
         )
 
+        return peer_grading
+
+    def test_invalid_link(self):
+        """
+        Ensure that a peer grading problem with no linked locations raises an error.
+        """
+
+        # Setup the peer grading module with no linked locations.
+        with self.assertRaises(InvalidLinkLocation):
+            self._create_peer_grading_with_linked_problem(self.coe_location, valid_linked_descriptor=False)
+
+
+    def test_linked_problem(self):
+        """
+        Ensure that a peer grading problem with a linked location loads properly.
+        """
+
+        # Setup the peer grading module with the proper linked location.
+        peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
+
         # Ensure that it is properly setup.
         self.assertTrue(peer_grading.use_for_single_location)
+
+    def test_linked_ajax(self):
+        """
+        Ensure that a peer grading problem with a linked location responds to ajax calls.
+        """
+
+        # Setup the peer grading module with the proper linked location.
+        peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
+
+        # If we specify a location, it will render the problem for that location.
+        data = peer_grading.handle_ajax('problem', {'location' : self.coe_location})
+        self.assertTrue(json.loads(data)['success'])
+
+        # If we don't specify a location, it should use the linked location.
+        data = peer_grading.handle_ajax('problem', {})
+        self.assertTrue(json.loads(data)['success'])
+
+    def test_linked_score(self):
+        """
+        Ensure that a peer grading problem with a linked location is properly scored.
+        """
+
+        # Setup the peer grading module with the proper linked location.
+        peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
+
+        score_dict = peer_grading.get_score()
+
+        self.assertEqual(score_dict['score'], 1)
+        self.assertEqual(score_dict['total'], 1)
+
+    def test_get_next_submission(self):
+        """
+        Ensure that a peer grading problem with a linked location can get a submission to score.
+        """
+
+        # Setup the peer grading module with the proper linked location.
+        peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
+
+        data = peer_grading.handle_ajax('get_next_submission', {'location': self.coe_location})
+        self.assertEqual(json.loads(data)['submission_id'], 1)
 
 
 class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
