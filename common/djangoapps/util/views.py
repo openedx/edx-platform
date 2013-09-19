@@ -9,12 +9,14 @@ from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
 from dogapi import dog_stats_api
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
+
 import zendesk
 
 import calc
 import track.views
 
+from django.core.mail import EmailMultiAlternatives
 
 log = logging.getLogger(__name__)
 
@@ -91,7 +93,7 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     and user state. Returns a boolean value indicating whether ticket creation
     was successful, regardless of whether the private comment update succeeded.
     """
-    zendesk_api = _ZendeskApi()
+    # zendesk_api = _ZendeskApi()
 
     additional_info_string = (
         "Additional information:\n\n" +
@@ -108,21 +110,30 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
             "tags": zendesk_tags
         }
     }
-    try:
-        ticket_id = zendesk_api.create_ticket(new_ticket)
-    except zendesk.ZendeskError as err:
-        log.error("Error creating Zendesk ticket: %s", str(err))
-        return False
+
+    message = render_to_string('emails/ticket.txt', new_ticket)
+    subject, from_email, to = subject, settings.DEFAULT_FROM_EMAIL, 'pavelyushchenko@gmail.com'
+    text_content = message
+    #html_content = '<p>This is an <strong>important</strong> message.</p>'
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to],  headers = {'Reply-To': email})
+    #msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+    # try:
+    #     ticket_id = zendesk_api.create_ticket(new_ticket)
+    # except zendesk.ZendeskError as err:
+    #     log.error("Error creating Zendesk ticket: %s", str(err))
+    #     return False
 
     # Additional information is provided as a private update so the information
     # is not visible to the user.
-    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
-    try:
-        zendesk_api.update_ticket(ticket_id, ticket_update)
-    except zendesk.ZendeskError as err:
-        log.error("Error updating Zendesk ticket: %s", str(err))
-        # The update is not strictly necessary, so do not indicate failure to the user
-        pass
+    # ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
+    # try:
+    #     zendesk_api.update_ticket(ticket_id, ticket_update)
+    # except zendesk.ZendeskError as err:
+    #     log.error("Error updating Zendesk ticket: %s", str(err))
+    #     # The update is not strictly necessary, so do not indicate failure to the user
+    #     pass
 
     return True
 
@@ -155,12 +166,12 @@ def submit_feedback(request):
         raise Http404()
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
-    if (
-        not settings.ZENDESK_URL or
-        not settings.ZENDESK_USER or
-        not settings.ZENDESK_API_KEY
-    ):
-        raise Exception("Zendesk enabled but not configured")
+    # if (
+    #     not settings.ZENDESK_URL or
+    #     not settings.ZENDESK_USER or
+    #     not settings.ZENDESK_API_KEY
+    # ):
+    #     raise Exception("Zendesk enabled but not configured")
 
     def build_error_response(status_code, field, err_msg):
         return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
