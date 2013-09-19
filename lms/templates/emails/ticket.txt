@@ -1,0 +1,10 @@
+<%namespace file="../main.html" import="stanford_theme_enabled" />
+
+Сообщение от ${ticket.requester.name} (${ticket.requester.email})
+
+${ticket.comment.body}
+
+Дополнительные сведения:
+${ticket.tags}        
+
+Техническая поддержка курсов повышения квалификации ГБОУ ЦПМ
