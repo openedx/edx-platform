@@ -31,12 +31,7 @@ CMS.Views.Assets = Backbone.View.extend({
 
     addAsset: function (model) {
         // If asset is not already being shown, add it.
-        if (_.all(
-            this.collection.models,
-            function (asset) {
-                return asset.get('url') !== model.get('url');
-            })) {
-
+        if (this.collection.findWhere({'url': model.get('url')}) === undefined) {
             this.collection.add(model, {at: 0});
             var view = new CMS.Views.Asset({model: model});
             this.$el.prepend(view.render().el);
