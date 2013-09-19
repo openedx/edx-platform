@@ -36,8 +36,13 @@ def is_css_present(css_selector, wait_time=10):
 
 @world.absorb
 def is_css_not_present(css_selector, wait_time=5):
-    return world.browser.is_element_not_present_by_css(css_selector, wait_time=wait_time)
-
+    world.browser.driver.implicitly_wait(1)
+    try:
+        return world.browser.is_element_not_present_by_css(css_selector, wait_time=wait_time)
+    except:
+        raise
+    finally:
+        world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
 
 @world.absorb
 def css_has_text(css_selector, text, index=0):
