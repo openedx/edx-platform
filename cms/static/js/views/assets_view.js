@@ -10,7 +10,7 @@ CMS.Views.Assets = Backbone.View.extend({
         this.$el.empty();
 
         var self = this;
-        _.each(this.collection.models,
+        this.collection.each(
             function(asset) {
                 var view = new CMS.Views.Asset({model: asset});
                 self.$el.append(view.render().el);

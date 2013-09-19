@@ -145,7 +145,7 @@ def upload_asset(request, org, course, coursename):
     return JsonResponse(response_payload)
 
 
-@require_http_methods("DELETE")
+@require_http_methods(("DELETE",))
 @login_required
 @ensure_csrf_cookie
 def update_asset(request, org, course, name, asset_id):
@@ -158,40 +158,39 @@ def update_asset(request, org, course, name, asset_id):
     """
     get_location_and_verify_access(request, org, course, name)
 
-    if request.method == 'DELETE':
-        # make sure the location is valid
+    # make sure the location is valid
+    try:
+        loc = StaticContent.get_location_from_path(asset_id)
+    except InvalidLocationError as err:
+        # return a 'Bad Request' to browser as we have a malformed Location
+        return JsonResponse({"error": err.message}, status=400)
+
+    # also make sure the item to delete actually exists
+    try:
+        content = contentstore().find(loc)
+    except NotFoundError:
+        return JsonResponse(status=404)
+
+    # ok, save the content into the trashcan
+    contentstore('trashcan').save(content)
+
+    # see if there is a thumbnail as well, if so move that as well
+    if content.thumbnail_location is not None:
         try:
-            loc = StaticContent.get_location_from_path(asset_id)
-        except InvalidLocationError as err:
-            # return a 'Bad Request' to browser as we have a malformed Location
-            return JsonResponse({"error": err.message}, status=400)
+            thumbnail_content = contentstore().find(content.thumbnail_location)
+            contentstore('trashcan').save(thumbnail_content)
+            # hard delete thumbnail from origin
+            contentstore().delete(thumbnail_content.get_id())
+            # remove from any caching
+            del_cached_content(thumbnail_content.location)
+        except:
+            pass  # OK if this is left dangling
 
-        # also make sure the item to delete actually exists
-        try:
-            content = contentstore().find(loc)
-        except NotFoundError:
-            return JsonResponse(status=404)
-
-        # ok, save the content into the trashcan
-        contentstore('trashcan').save(content)
-
-        # see if there is a thumbnail as well, if so move that as well
-        if content.thumbnail_location is not None:
-            try:
-                thumbnail_content = contentstore().find(content.thumbnail_location)
-                contentstore('trashcan').save(thumbnail_content)
-                # hard delete thumbnail from origin
-                contentstore().delete(thumbnail_content.get_id())
-                # remove from any caching
-                del_cached_content(thumbnail_content.location)
-            except:
-                pass  # OK if this is left dangling
-
-        # delete the original
-        contentstore().delete(content.get_id())
-        # remove from cache
-        del_cached_content(content.location)
-        return JsonResponse()
+    # delete the original
+    contentstore().delete(content.get_id())
+    # remove from cache
+    del_cached_content(content.location)
+    return JsonResponse()
 
 
 def _get_asset_json(display_name, date, location, thumbnail_location):
