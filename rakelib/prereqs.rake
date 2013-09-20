@@ -29,9 +29,9 @@ task :install_python_prereqs => "ws:migrate" do
     unchanged = 'Python requirements unchanged, nothing to install'
     when_changed(unchanged, ['requirements/**/*'], [site_packages_dir]) do
         ENV['PIP_DOWNLOAD_CACHE'] ||= '.pip_download_cache'
-        sh('pip install --exists-action w -r requirements/edx/pre.txt')
-        sh('pip install --exists-action w -r requirements/edx/base.txt')
-        sh('pip install --exists-action w -r requirements/edx/post.txt')
+        sh('pip install -q --exists-action w -r requirements/edx/pre.txt')
+        sh('pip install -q --exists-action w -r requirements/edx/base.txt')
+        sh('pip install -q --exists-action w -r requirements/edx/post.txt')
         # requirements/private.txt is used to install our libs as
         # working dirs, or for personal-use tools.
         if File.file?("requirements/private.txt")
