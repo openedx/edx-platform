@@ -16,9 +16,9 @@ HTML5_SOURCES_INCORRECT = [
     'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp99'
 ]
 
-@step('when I view the (.*) it has autoplay enabled$')
-def does_autoplay_video(_step, video_type):
-    assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'True')
+@step('when I view the (.*) it does not have autoplay enabled$')
+def does_not_autoplay(_step, video_type):
+    assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
 
 
 @step('the course has a Video component in (.*) mode$')
