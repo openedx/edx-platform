@@ -26,6 +26,7 @@ V1_SETTINGS_ATTRIBUTES = [
     "max_to_calibrate",
     "peer_grader_count",
     "required_peer_grading",
+    "peer_grade_finished_submissions_when_none_pending",
 ]
 
 V1_STUDENT_ATTRIBUTES = [
@@ -302,6 +303,13 @@ class CombinedOpenEndedFields(object):
         default=3,
         scope=Scope.settings,
         values={"min": 1, "step": "1", "max": 5}
+    )
+    peer_grade_finished_submissions_when_none_pending = Boolean(
+        display_name="New Peer Graders can Receive 'Fully-Graded' Submissions",
+        help=("Allow students to peer grade submissions that already have the requisite number of graders, "
+              "but ONLY WHEN all submissions they are eligible to grade already have enough graders."),
+        default=False,
+        scope=Scope.settings,
     )
     markdown = String(
         help="Markdown source of this module",
