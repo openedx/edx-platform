@@ -127,6 +127,9 @@ class CombinedOpenEndedV1Module():
         self.peer_grader_count = instance_state.get('peer_grader_count', 3)
         self.min_to_calibrate = instance_state.get('min_to_calibrate', 3)
         self.max_to_calibrate = instance_state.get('max_to_calibrate', 6)
+        self.peer_grade_finished_submissions_when_none_pending = instance_state.get(
+            'peer_grade_finished_submissions_when_none_pending', False
+        )
 
         due_date = instance_state.get('due', None)
 
@@ -158,6 +161,9 @@ class CombinedOpenEndedV1Module():
                 'peer_grader_count': self.peer_grader_count,
                 'min_to_calibrate': self.min_to_calibrate,
                 'max_to_calibrate': self.max_to_calibrate,
+                'peer_grade_finished_submissions_when_none_pending': (
+                    self.peer_grade_finished_submissions_when_none_pending
+                ),
             }
         }
 
