@@ -332,10 +332,14 @@
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        <p>${_("Looks like you haven't registered for any courses yet.")}</p>
-        <a href="${marketing_link('COURSES')}">
+        % if settings.MITX_FEATURES.get('ENABLE_STUDENT_SELF_ENROLLMENT'):
+          <p>${_("Looks like you haven't registered for any courses yet.")}</p>
+          <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
-        </a>
+          </a>
+        % else:
+          <p>${_("Looks like you haven't joined any courses yet.")}</p>
+        %endif
       </section>
     % endif
 

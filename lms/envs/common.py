@@ -103,6 +103,9 @@ MITX_FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
+    # Can be turned off if all courses are invite-only. Effects views and templates.
+    'ENABLE_STUDENT_SELF_ENROLLMENT': True,
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
