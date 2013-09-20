@@ -379,6 +379,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.system.mixologist._mixins,
     )
+    if settings.MITX_FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
+        system.set('send_users_emailaddr_with_coderesponse', True)
+        if user.is_authenticated():
+            system.set('deanonymized_user_email', user.email)
+        else:
+            system.set('deanonymized_user_email', '')
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
