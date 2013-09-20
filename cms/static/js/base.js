@@ -421,11 +421,6 @@ function _deleteItem($el, type) {
     confirm.show();
 }
 
-function markAsLoaded() {
-    $('.upload-modal .copy-button').css('display', 'inline-block');
-    $('.upload-modal .progress-bar').addClass('loaded');
-}
-
 function hideModal(e) {
     if (e) {
         e.preventDefault();
