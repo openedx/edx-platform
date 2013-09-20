@@ -1,6 +1,8 @@
 var onVideoFail = function(e) {
   if(e == 'NO_DEVICES_FOUND') {
       $('#no-webcam').show();
+      $('#face_capture_button').hide();
+      $('#photo_id_capture_button').hide();
   }
   else {
     console.log('Failed to get camera access!', e);
