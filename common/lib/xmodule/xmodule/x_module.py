@@ -555,7 +555,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses
+        This may be overridden by subclasses.
 
         xml_data: A string of xml that will be translated into data and children
             for this module
@@ -565,13 +565,12 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        raise NotImplementedError(
-            'Modules must implement from_xml to be parsable from xml')
+        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
-        underneath it.  May also write required resources out to resource_fs
+        underneath it.  May also write required resources out to resource_fs.
 
         Assumes that modules have single parentage (that no module appears twice
         in the same course), and that it is thus safe to nest modules as xml
@@ -581,8 +580,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         XModuleDescriptor using the from_xml method with the same system, org,
         and course
         """
-        raise NotImplementedError(
-            'Modules must implement export_to_xml to enable xml export')
+        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
@@ -756,8 +754,6 @@ class DescriptorSystem(Runtime):
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, process_xml, policy, **kwargs):
         """
-        load_item, resources_fs, error_tracker: see DescriptorSystem
-
         policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor

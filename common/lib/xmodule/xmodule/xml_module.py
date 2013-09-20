@@ -217,8 +217,7 @@ class XmlDescriptor(XModuleDescriptor):
             # give the class a chance to fix it up. The file will be written out
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
-            if not system.resources_fs.exists(filepath) and hasattr(
-                    cls, 'backcompat_paths'):
+            if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
