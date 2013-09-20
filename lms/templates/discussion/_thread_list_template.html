@@ -12,7 +12,11 @@
                 <i class="icon icon-reorder"></i>
                 <span class="sr">${_("Discussion Topics")}</span>
             </a>
-            <a href="#" class="browse-topic-drop-btn"><span class="current-board">${_("Show All Discussions")}</span> <span class="drop-arrow">▾</span></a>
+            <a href="#" class="browse-topic-drop-btn" aria-haspopup="true" aria-owns="browse-topic-drop-menu">
+                <span class="sr">${_("Discussion topics; current selection is: ")}</span>
+                <span class="current-board">${_("Show All Discussions")}</span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
         </div>
         <%include file="_filter_dropdown.html" />
         <div class="search">
