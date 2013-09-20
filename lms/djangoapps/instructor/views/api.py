@@ -38,6 +38,10 @@ import analytics.basic
 import analytics.distributions
 import analytics.csvs
 
+from bulk_email.models import CourseEmail
+from html_to_text import html_to_text
+from bulk_email import tasks
+
 log = logging.getLogger(__name__)
 
 
@@ -727,6 +731,50 @@ def update_forum_role_membership(request, course_id):
         'action': action,
     }
     return JsonResponse(response_payload)
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff') """ todo determine if this is correct """
+@require_query_params(
+        email_to_option="group to send email to",
+        email_subject="the email's subject",
+        html_message="the html-formatted email",
+        text_message="the text version of the email"
+    )
+def send_bulk_email(request, course_id):
+    """
+    Send a bulk email.
+
+    todo add more description
+
+    Query paramaters:
+    todo fill this in
+    """
+    course = get_course_by_id(course_id)
+    has_instructor_access = has_access(request.user, course, 'instructor')
+    email_to_option = request.POST.get("to_option")
+    email_subject = request.POST.get("subject")
+    html_message = request.POST.get("message")
+    text_message = html_to_text(html_message)
+
+    email = CourseEmail(
+        course_id = course_id,
+        sender=request.user,
+        to_option=email_to_option,
+        subject=email_subject,
+        html_message=html_message,
+        text_message=text_message
+    )
+    email.save()
+    tasks.delegate_email_batches.delay(
+        email.id,
+        request.user.id
+    )
+
+    if email_to_option = "all":
+        email_msg = 'SUCCESS todo fill this in'
+    else:
+        mail_msg = 'SUCCESS todo fill this in'
 
 
 @ensure_csrf_cookie
