@@ -1,0 +1,22 @@
+<td class="thumb-col">
+    <div class="thumb">
+        <% if (thumbnail !== '') { %>
+        <img src="<%= thumbnail %>">
+        <% } %>
+    </div>
+</td>
+<td class="name-col">
+    <a data-tooltip="<%= gettext('Open/download this file') %>" href="<%= url %>" class="filename"><%= display_name %></a>
+
+    <div class="embeddable-xml"></div>
+</td>
+<td class="date-col">
+    <%= date_added %>
+</td>
+<td class="embed-col">
+    <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
+</td>
+<td class="delete-col">
+    <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button"><span
+            class="delete-icon"></span></a>
+</td>
