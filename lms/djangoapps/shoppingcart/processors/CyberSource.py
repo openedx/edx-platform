@@ -54,7 +54,7 @@ def processor_hash(value):
     Performs the base64(HMAC_SHA1(key, value)) used by CyberSource Hosted Order Page
     """
     shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET', '')
-    hash_obj = hmac.new(shared_secret, value, sha1)
+    hash_obj = hmac.new(shared_secret.encode('utf-8'), value.encode('utf-8'), sha1)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
 
@@ -71,10 +71,10 @@ def sign(params, signed_fields_key='orderPage_signedFields', full_sig_key='order
     params['orderPage_timestamp'] = int(time.time() * 1000)
     params['orderPage_version'] = order_page_version
     params['orderPage_serialNumber'] = serial_number
-    fields = ",".join(params.keys())
-    values = ",".join(["{0}={1}".format(i, params[i]) for i in params.keys()])
+    fields = u",".join(params.keys())
+    values = u",".join([u"{0}={1}".format(i, params[i]) for i in params.keys()])
     fields_sig = processor_hash(fields)
-    values += ",signedFieldsPublicSignature=" + fields_sig
+    values += u",signedFieldsPublicSignature=" + fields_sig
     params[full_sig_key] = processor_hash(values)
     params[signed_fields_key] = fields
 
@@ -90,9 +90,9 @@ def verify_signatures(params, signed_fields_key='signedFields', full_sig_key='si
     raises CCProcessorSignatureException if not verified
     """
     signed_fields = params.get(signed_fields_key, '').split(',')
-    data = ",".join(["{0}={1}".format(k, params.get(k, '')) for k in signed_fields])
+    data = u",".join([u"{0}={1}".format(k, params.get(k, '')) for k in signed_fields])
     signed_fields_sig = processor_hash(params.get(signed_fields_key, ''))
-    data += ",signedFieldsPublicSignature=" + signed_fields_sig
+    data += u",signedFieldsPublicSignature=" + signed_fields_sig
     returned_sig = params.get(full_sig_key, '')
     if processor_hash(data) != returned_sig:
         raise CCProcessorSignatureException()
@@ -102,8 +102,15 @@ def render_purchase_form_html(cart):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
     """
-    purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
+    return render_to_string('shoppingcart/cybersource_form.html', {
+        'action': get_purchase_endpoint(),
+        'params': get_signed_purchase_params(cart),
+    })
 
+def get_signed_purchase_params(cart):
+    return sign(get_purchase_params(cart))
+
+def get_purchase_params(cart):
     total_cost = cart.total_cost
     amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
@@ -112,13 +119,11 @@ def render_purchase_form_html(cart):
     params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
     params['orderNumber'] = "{0:d}".format(cart.id)
-    signed_param_dict = sign(params)
 
-    return render_to_string('shoppingcart/cybersource_form.html', {
-        'action': purchase_endpoint,
-        'params': signed_param_dict,
-    })
+    return params
 
+def get_purchase_endpoint():
+    return settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
 
 def payment_accepted(params):
     """

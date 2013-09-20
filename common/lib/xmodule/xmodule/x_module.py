@@ -146,6 +146,13 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
 
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
     @property
     def url_name(self):
         if self.descriptor:
@@ -342,7 +349,7 @@ class ResourceTemplates(object):
     @classmethod
     def get_template_dir(cls):
         if getattr(cls, 'template_dir_name', None):
-            dirname = os.path.join('templates', getattr(cls, 'template_dir_name'))
+            dirname = os.path.join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
@@ -457,6 +464,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             else:
                 return BlockUsageLocator(self.scope_ids.usage_id)
 
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
     @property
     def url_name(self):
         if isinstance(self.location, Location):
@@ -523,7 +537,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         module = system.construct_xblock_from_class(
             self.module_class,
             descriptor=self,
-            field_data=system.xblock_field_data(self),
+            field_data=system.xmodule_field_data(self),
             scope_ids=self.scope_ids,
         )
         module.save()
@@ -562,10 +576,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        class_ = XModuleDescriptor.load_class(
+        class_ = system.mixologist.mix(XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
-        )
+        ))
         # leave next line, commented out - useful for low-level debugging
         # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
         #        etree.fromstring(xml_data).tag,class_))
@@ -604,14 +618,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError(
             'Modules must implement export_to_xml to enable xml export')
-
-    # =============================== Testing ==================================
-    def get_sample_state(self):
-        """
-        Return a list of tuples of instance_state, shared_state. Each tuple
-        defines a sample case for this module
-        """
-        return [('{}', '{}')]
 
     @property
     def xblock_kvs(self):
@@ -832,8 +838,8 @@ class ModuleSystem(Runtime):
     '''
     def __init__(
             self, ajax_url, track_function, get_module, render_template,
-            replace_urls, xblock_field_data, user=None, filestore=None,
-            debug=False, xqueue=None, publish=None, node_path="",
+            replace_urls, xmodule_field_data, user=None, filestore=None,
+            debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
@@ -877,7 +883,7 @@ class ModuleSystem(Runtime):
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        xblock_field_data - A function that constructs a field_data for an xblock from its
+        xmodule_field_data - A function that constructs a field_data for an xblock from its
             corresponding descriptor
 
         cache - A cache object with two methods:
@@ -897,13 +903,14 @@ class ModuleSystem(Runtime):
         self.get_module = get_module
         self.render_template = render_template
         self.DEBUG = self.debug = debug
+        self.HOSTNAME = self.hostname = hostname
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
-        self.xblock_field_data = xblock_field_data
+        self.xmodule_field_data = xmodule_field_data
 
         if publish is None:
             publish = lambda e: None

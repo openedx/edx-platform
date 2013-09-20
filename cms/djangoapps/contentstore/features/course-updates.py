@@ -4,6 +4,7 @@
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror
+from nose.tools import assert_in  # pylint: disable=E0611
 
 
 @step(u'I go to the course updates page')
@@ -21,14 +22,17 @@ def add_update(_step, text):
     change_text(text)
 
 
-@step(u'I should( not)? see the update "([^"]*)"$')
-def check_update(_step, doesnt_see_update, text):
+@step(u'I should see the update "([^"]*)"$')
+def check_update(_step, text):
     update_css = 'div.update-contents'
-    update = world.css_find(update_css, wait_time=1)
-    if doesnt_see_update:
-        assert len(update) == 0 or not text in update.html
-    else:
-        assert text in update.html
+    update_html = world.css_find(update_css).html
+    assert_in(text, update_html)
+
+
+@step(u'I should not see the update "([^"]*)"$')
+def check_no_update(_step, text):
+    update_css = 'div.update-contents'
+    assert world.is_css_not_present(update_css)
 
 
 @step(u'I modify the text to "([^"]*)"$')

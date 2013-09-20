@@ -3,8 +3,11 @@
 <%! from django.conf import settings %>
 
 <%inherit file="../main.html" />
+<%block name="bodyclass">register verification-process step-requirements</%block>
 
-<%block name="title"><title>${_("Receipt for Order")} ${order.id}</title></%block>
+<%block name="title"><title>${_("Register for [Course Name] | Receipt (Order")} ${order.id})</title></%block>
+
+<%block name="content">
 
 % if notification is not UNDEFINED:
 <section class="notification">
@@ -12,8 +15,15 @@
 </section>
 % endif
 
-<section class="container cart-list">
-    <p><h1>${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h1></p>
+<div class="container">
+  <section class="wrapper cart-list">
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <h3 class="title">${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h3>
+
+
+
     <h2>${_("Order #")}${order.id}</h2>
     <h2>${_("Date:")} ${order.purchase_time.date().isoformat()}</h2>
     <h2>${_("Items ordered:")}</h2>
@@ -57,4 +67,6 @@
         ${order.bill_to_country.upper()}<br />
     </p>
 
-</section>
+  </section>
+</div>
+</%block>

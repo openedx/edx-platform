@@ -48,16 +48,31 @@ describe 'CombinedOpenEnded', ->
       expect(@combined.task_count).toEqual 2
       expect(@combined.task_number).toEqual 1
 
-    it 'subelements are made collapsible', -> 
+    it 'subelements are made collapsible', ->
       expect(Collapsible.setCollapsibles).toHaveBeenCalled()
 
 
   describe 'poll', ->
+    # We will store default window.setTimeout() function here.
+    oldSetTimeout = null
+
     beforeEach =>
       # setup the spies
       @combined = new CombinedOpenEnded @element
       spyOn(@combined, 'reload').andCallFake -> return 0
+
+      # Store original window.setTimeout() function. If we do not do this, then
+      # all other tests that rely on code which uses window.setTimeout()
+      # function might (and probably will) fail.
+      oldSetTimeout = window.setTimeout
+      # Redefine window.setTimeout() function as a spy.
       window.setTimeout = jasmine.createSpy().andCallFake (callback, timeout) -> return 5
+
+    afterEach =>
+      # Reset the default window.setTimeout() function. If we do not do this,
+      # then all other tests that rely on code which uses window.setTimeout()
+      # function might (and probably will) fail.
+      window.setTimeout = oldSetTimeout
 
     it 'polls at the correct intervals', =>
       fakeResponseContinue = state: 'not done'
@@ -67,18 +82,33 @@ describe 'CombinedOpenEnded', ->
       expect(window.queuePollerID).toBe(5)
 
     it 'polling stops properly', =>
-      fakeResponseDone = state: "done" 
+      fakeResponseDone = state: "done"
       spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(fakeResponseDone)
       @combined.poll()
       expect(window.queuePollerID).toBeUndefined()
       expect(window.setTimeout).not.toHaveBeenCalled()
 
   describe 'rebind', ->
+    # We will store default window.setTimeout() function here.
+    oldSetTimeout = null
+
     beforeEach ->
       @combined = new CombinedOpenEnded @element
       spyOn(@combined, 'queueing').andCallFake -> return 0
       spyOn(@combined, 'skip_post_assessment').andCallFake -> return 0
+
+      # Store original window.setTimeout() function. If we do not do this, then
+      # all other tests that rely on code which uses window.setTimeout()
+      # function might (and probably will) fail.
+      oldSetTimeout = window.setTimeout
+      # Redefine window.setTimeout() function as a spy.
       window.setTimeout = jasmine.createSpy().andCallFake (callback, timeout) -> return 5
+
+    afterEach =>
+      # Reset the default window.setTimeout() function. If we do not do this,
+      # then all other tests that rely on code which uses window.setTimeout()
+      # function might (and probably will) fail.
+      window.setTimeout = oldSetTimeout
 
     it 'when our child is in an assessing state', ->
       @combined.child_state = 'assessing'
@@ -87,19 +117,19 @@ describe 'CombinedOpenEnded', ->
       expect(@combined.submit_button.val()).toBe("Submit assessment")
       expect(@combined.queueing).toHaveBeenCalled()
 
-    it 'when our child state is initial', -> 
+    it 'when our child state is initial', ->
       @combined.child_state = 'initial'
       @combined.rebind()
       expect(@combined.answer_area.attr("disabled")).toBeUndefined()
       expect(@combined.submit_button.val()).toBe("Submit")
 
-    it 'when our child state is post_assessment', -> 
+    it 'when our child state is post_assessment', ->
       @combined.child_state = 'post_assessment'
       @combined.rebind()
       expect(@combined.answer_area.attr("disabled")).toBe("disabled")
       expect(@combined.submit_button.val()).toBe("Submit post-assessment")
 
-    it 'when our child state is done', -> 
+    it 'when our child state is done', ->
       spyOn(@combined, 'next_problem').andCallFake ->
       @combined.child_state = 'done'
       @combined.rebind()
@@ -112,7 +142,7 @@ describe 'CombinedOpenEnded', ->
       @combined.child_state = 'done'
 
     it 'handling a successful call', ->
-      fakeResponse = 
+      fakeResponse =
         success: true
         html: "dummy html"
         allow_reset: false

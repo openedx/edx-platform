@@ -25,7 +25,7 @@ describe "CMS.Models.Textbook", ->
             expect(@model.isEmpty()).toBeTruthy()
 
         it "should have a URL set", ->
-            expect(_.result(@model, "url")).toBeTruthy()
+            expect(@model.url()).toBeTruthy()
 
         it "should be able to reset itself", ->
             @model.set("name", "foobar")
@@ -124,14 +124,14 @@ describe "CMS.Models.Textbook", ->
 
 describe "CMS.Collections.TextbookSet", ->
     beforeEach ->
-        CMS.URL.TEXTBOOK = "/textbooks"
+        CMS.URL.TEXTBOOKS = "/textbooks"
         @collection = new CMS.Collections.TextbookSet()
 
     afterEach ->
-        delete CMS.URL.TEXTBOOK
+        delete CMS.URL.TEXTBOOKS
 
     it "should have a url set", ->
-        expect(_.result(@collection, "url"), "/textbooks")
+        expect(@collection.url()).toEqual("/textbooks")
 
     it "can call save", ->
         spyOn(@collection, "sync")

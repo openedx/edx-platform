@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from requests.auth import HTTPBasicAuth
-from statsd import statsd
+from dogapi import dog_stats_api
 
 from capa.xqueue_interface import XQueueInterface
 from mitxmako.shortcuts import render_to_string
@@ -294,7 +294,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xblock_field_data(descriptor):
+    def xmodule_field_data(descriptor):
         student_data = DbModel(DjangoKeyValueStore(field_data_cache))
         return lms_field_data(descriptor._field_data, student_data)
 
@@ -332,7 +332,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if grade_bucket_type is not None:
             tags.append('type:%s' % grade_bucket_type)
 
-        statsd.increment("lms.courseware.question_answered", tags=tags)
+        dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -344,9 +344,11 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
-        filestore=descriptor.system.resources_fs,
+        filestore=descriptor.runtime.resources_fs,
         get_module=inner_get_module,
         user=user,
+        debug=settings.DEBUG,
+        hostname=settings.SITE_NAME,
         # TODO (cpennington): This should be removed when all html from
         # a module is coming through get_html and is therefore covered
         # by the replace_static_urls code below
@@ -366,7 +368,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xblock_field_data=xblock_field_data,
+        xmodule_field_data=xmodule_field_data,
         publish=publish,
         anonymous_student_id=unique_id_for_user(user),
         course_id=course_id,
@@ -380,7 +382,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData

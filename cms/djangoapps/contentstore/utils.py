@@ -5,12 +5,16 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.contentstore.content import StaticContent
-from django.core.urlresolvers import reverse
+from xmodule.contentstore.django import contentstore
 import copy
 import logging
 import re
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from django.utils.translation import ugettext as _
+from django_comment_common.utils import unseed_permissions_roles
+from auth.authz import _delete_course_group
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.course_module import CourseDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -18,6 +22,31 @@ log = logging.getLogger(__name__)
 OPEN_ENDED_PANEL = {"name": _("Open Ended Panel"), "type": "open_ended"}
 NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
+
+
+def delete_course_and_groups(course_id, commit=False):
+    """
+    This deletes the courseware associated with a course_id as well as cleaning update_item
+    the various user table stuff (groups, permissions, etc.)
+    """
+    module_store = modulestore('direct')
+    content_store = contentstore()
+
+    org, course_num, run = course_id.split("/")
+    module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
+
+    loc = CourseDescriptor.id_to_location(course_id)
+    if delete_course(module_store, content_store, loc, commit):
+        print 'removing forums permissions and roles...'
+        unseed_permissions_roles(course_id)
+
+        print 'removing User permissions from course....'
+        # in the django layer, we need to remove all the user permissions groups associated with this course
+        if commit:
+            try:
+                _delete_course_group(loc)
+            except Exception as err:
+                log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
 
 
 def get_modulestore(category_or_location):

@@ -31,7 +31,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
             try:
                 content_path = os.path.join(dirname, filename)
                 if verbose:
-                    log.debug('importing static content {0}...'.format(content_path))
+                    log.debug('importing static content %s...', content_path)
 
                 fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
                 if fullname_with_subpath.startswith('/'):
@@ -375,29 +375,21 @@ def remap_namespace(module, target_location_namespace):
     # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
     # the caller passed in
     if module.location.category != 'course':
-        new_location = module.location._replace(
+        module.location = module.location._replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course
-        )
-        module.scope_ids = module.scope_ids._replace(
-            def_id=new_location,
-            usage_id=new_location
         )
     else:
         original_location = module.location
         #
         # module is a course module
         #
-        new_location = module.location._replace(
+        module.location = module.location._replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course,
             name=target_location_namespace.name
-        )
-        module.scope_ids = module.scope_ids._replace(
-            def_id=new_location,
-            usage_id=new_location
         )
         #
         # There is more re-namespacing work we have to do when importing course modules

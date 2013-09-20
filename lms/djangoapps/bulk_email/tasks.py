@@ -6,6 +6,7 @@ import math
 import re
 import time
 
+from dogapi import dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
 
 from django.conf import settings
@@ -15,8 +16,6 @@ from django.http import Http404
 from celery import task, current_task
 from celery.utils.log import get_task_logger
 from django.core.urlresolvers import reverse
-from statsd import statsd
-from dogapi import dog_stats_api
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -192,7 +191,7 @@ def _send_course_email(email_id, to_list, course_title, course_url, image_url, t
                 with dog_stats_api.timer('course_email.single_send.time.overall', tags=[_statsd_tag(course_title)]):
                     connection.send_messages([email_msg])
 
-                statsd.increment('course_email.sent', tags=[_statsd_tag(course_title)])
+                dog_stats_api.increment('course_email.sent', tags=[_statsd_tag(course_title)])
 
                 log.info('Email with id %s sent to %s', email_id, email)
                 num_sent += 1
@@ -205,7 +204,7 @@ def _send_course_email(email_id, to_list, course_title, course_url, image_url, t
                     # This will fall through and not retry the message, since it will be popped
                     log.warning('Email with id %s not delivered to %s due to error %s', email_id, email, exc.smtp_error)
 
-                    statsd.increment('course_email.error', tags=[_statsd_tag(course_title)])
+                    dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
 
                     num_error += 1
 

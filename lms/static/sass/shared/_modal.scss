@@ -84,14 +84,14 @@
       }
 
       hr {
-        @extend .faded-hr-divider-light;
+        @extend %faded-hr-divider-light;
         border: none;
         margin: 0px;
         position: relative;
         z-index: 2;
 
         &::after {
-          @extend .faded-hr-divider;
+          @extend %faded-hr-divider;
           bottom: 0px;
           content: "";
           display: block;
@@ -282,21 +282,15 @@
       right: 2px;
       top: 0px;
       z-index: 3;
-
-      .inner {
-        p {
-          color: $lighter-base-font-color;
-          font: normal 1.2rem/1.2rem $sans-serif;
-          text-align: center;
-          text-shadow: 0 1px rgba(255,255,255, 0.8);
-          @include transition(all 0.15s ease-out 0s);
-        }
-      }
+      color: $lighter-base-font-color;
+      font: normal 1.2rem/1.2rem $sans-serif;
+      text-align: center;
+      text-shadow: 0 1px rgba(255,255,255, 0.8);
+      @include transition(all 0.15s ease-out 0s);
 
       &:hover {
-        p {
-          color: $base-font-color;
-        }
+        color: $base-font-color;
+        text-decoration: none;
       }
     }
   }

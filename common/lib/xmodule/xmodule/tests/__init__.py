@@ -40,7 +40,7 @@ open_ended_grading_interface = {
     }
 
 
-def get_test_system():
+def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
 
@@ -62,11 +62,13 @@ def get_test_system():
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
+        hostname="edx.org",
         xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback' : Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-        xblock_field_data=lambda descriptor: descriptor._field_data,
+        xmodule_field_data=lambda descriptor: descriptor._field_data,
         anonymous_student_id='student',
-        open_ended_grading_interface=open_ended_grading_interface
+        open_ended_grading_interface=open_ended_grading_interface,
+        course_id=course_id,
     )
 
 

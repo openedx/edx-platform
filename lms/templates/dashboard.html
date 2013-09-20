@@ -13,6 +13,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="title"><title>${_("Dashboard")}</title></%block>
+<%block name="bodyclass">view-dashboard is-authenticated</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -101,7 +102,7 @@
         },
         error: function(xhr, textStatus, error) {
           if (xhr.status == 403) {
-            location.href = "${reverse('signin_user')}";          
+            location.href = "${reverse('signin_user')}";
           }
         }
       });
@@ -157,167 +158,178 @@
     </header>
 
     % if len(courses) > 0:
-      % for course in courses:
-
-        <article class="my-course">
-          <%
-            course_target = reverse('info', args=[course.id])
-          %>
-
-
-
-          % if course.id in show_courseware_links_for:
-            <a href="${course_target}" class="cover">
-              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
-            </a>
-          % else:
-            <div class="cover">
-              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
-            </div>
-          % endif
-
-          <section class="info">
-            <hgroup>
-              <p class="date-block">
-              % if course.has_ended():
-              ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
-              % elif course.has_started():
-              ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
-              % else:   # hasn't started yet
-              ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
-              % endif
-              </p>
-              <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3>
-                % if course.id in show_courseware_links_for:
-                  <a href="${course_target}">${course.display_number_with_default | h} ${course.display_name_with_default}</a>
-                % else:
-                  <span>${course.display_number_with_default | h} ${course.display_name_with_default}</span>
-                % endif
-              </h3>
-            </hgroup>
-
+      <ul class="listing-courses">
+        % for course, enrollment in courses:
+        <li class="course-item">
+          <article class="course ${enrollment.mode}">
             <%
-                testcenter_exam_info = course.current_test_center_exam
-                registration = exam_registrations.get(course.id)
-                testcenter_register_target = reverse('begin_exam_registration', args=[course.id])
+              course_target = reverse('info', args=[course.id])
             %>
-            % if testcenter_exam_info is not None:
-
-                % if registration is None and testcenter_exam_info.is_registering():
-                <div class="message message-status is-shown exam-register">
-                  <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">${_("Register for Pearson exam")}</a>
-                  <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on {end_date}").format(end_date="<strong>{}</strong>".format(testcenter_exam_info.registration_end_date_text))}</p>
-                </div>
-                % endif
-                <!-- display a registration for a current exam, even if the registration period is over -->
-                % if registration is not None:
-                    % if registration.is_accepted:
-                <div class="message message-status is-shown exam-schedule">
-                   <a href="${registration.registration_signup_url}" class="button exam-button">${_("Schedule Pearson exam")}</a>
-                   <p class="exam-registration-number">${_("{link_start}Registration{link_end} number: {number}").format(
-                      link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
-                      link_end='</a>',
-                      number=registration.client_candidate_id,
-                    )}</p>
-                   <p class="message-copy">${_("Write this down! You'll need it to schedule your exam.")}</p>
-                </div>
-                    % endif
-                    % if  registration.is_rejected:
-                <div class="message message-status is-shown exam-schedule">
-                  <p class="message-copy">
-                    <strong>${_("Your registration for the Pearson exam has been rejected. Please {link_start}see your registration status details{link_end}.").format(
-                      link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
-                      link_end='</a>')}</strong>
-                    ${_("Otherwise {link_start}contact edX at {email}{link_end} for further help.").format(
-                      link_start='<a class="contact-link" href="mailto:{email}?subject=Pearson VUE Exam - {about} {number}">'.format(email="exam-help@edx.org", about=get_course_about_section(course, 'university'), number=course.display_number_with_default),
-                      link_end='</a>',
-                      email="exam-help@edx.org",
-                     )}
-                </div>
-                    % endif
-                   	% if not registration.is_accepted and not registration.is_rejected:
-	            <div class="message message-status is-shown">
-                  <p class="message-copy"><strong>${_("Your {link_start}registration for the Pearson exam{link_end} is pending.").format(link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target), link_end='</a>')}</strong>
-                  ${_("Within a few days, you should see a confirmation number here, which can be used to schedule your exam.")}
-                  </p>
-                </div>
-                    % endif
-                % endif
-            % endif
-
-            <%
-            cert_status = cert_statuses.get(course.id)
-            %>
-            % if course.has_ended() and cert_status:
-                <%
-                if cert_status['status'] == 'generating':
-                    status_css_class = 'course-status-certrendering'
-                elif cert_status['status'] == 'ready':
-                    status_css_class = 'course-status-certavailable'
-                elif cert_status['status'] == 'notpassing':
-                    status_css_class = 'course-status-certnotavailable'
-                else:
-                    status_css_class = 'course-status-processing'
-                %>
-                <div class="message message-status ${status_css_class} is-shown">
-
-                % if cert_status['status'] == 'processing':
-                      <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
-                % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
-                      <p class="message-copy">${_("Your final grade:")}
-                      <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-                      % if cert_status['status'] == 'notpassing':
-                         ${_("Grade required for a certificate:")} <span class="grade-value">
-                           ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
-                      % elif cert_status['status'] == 'restricted':
-                          <p class="message-copy">
-                          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
-                          </p>
-                      % endif
-                      </p>
-                % endif
-
-                % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
-                  <ul class="actions">
-                    % if cert_status['show_disabled_download_button']:
-                      <li class="action"><span class="disabled">
-                          ${_("Your Certificate is Generating")}</span></li>
-                    % elif cert_status['show_download_url']:
-                      <li class="action">
-                      <a class="btn" href="${cert_status['download_url']}"
-                         title="${_('This link will open/download a PDF document')}">
-                         Download Your PDF Certificate</a></li>
-                    % endif
-
-                    % if cert_status['show_survey_button']:
-                      <li class="action"><a class="cta" href="${cert_status['survey_url']}">
-                             ${_('Complete our course feedback survey')}</a></li>
-                    % endif
-                  </ul>
-                % endif
-                </div>
-
-            % endif
 
             % if course.id in show_courseware_links_for:
-              % if course.has_ended():
-                <a href="${course_target}" class="enter-course archived">${_('View Archived Course')}</a>
-              % else:
-                <a href="${course_target}" class="enter-course">${_('View Course')}</a>
-              % endif
+              <a href="${course_target}" class="cover">
+                <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
+              </a>
+            % else:
+              <div class="cover">
+                <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
+              </div>
             % endif
-            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
-	    % if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE:
-	      <!-- Only show the Email Settings link/modal if this course has bulk email feature enabled -->
-              <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
-	    % endif
+
+            % if enrollment.mode == "verified":
+            <span class="sts-enrollment">
+              <span class="label">${_("Enrolled as: ")}</span>
+              <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
+              <span class="sts-enrollment-value">${_("ID Verified")}</span>
+            </span>
+            % endif
+
+            <section class="info">
+              <hgroup>
+                <p class="date-block">
+                % if course.has_ended():
+                ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
+                % elif course.has_started():
+                ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
+                % else:   # hasn't started yet
+                ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
+                % endif
+                </p>
+                <h2 class="university">${get_course_about_section(course, 'university')}</h2>
+                <h3>
+                  % if course.id in show_courseware_links_for:
+                    <a href="${course_target}">${course.display_number_with_default | h} ${course.display_name_with_default}</a>
+                  % else:
+                    <span>${course.display_number_with_default | h} ${course.display_name_with_default}</span>
+                  % endif
+                </h3>
+              </hgroup>
+
+              <%
+                  testcenter_exam_info = course.current_test_center_exam
+                  registration = exam_registrations.get(course.id)
+                  testcenter_register_target = reverse('begin_exam_registration', args=[course.id])
+              %>
+              % if testcenter_exam_info is not None:
+
+                  % if registration is None and testcenter_exam_info.is_registering():
+                  <div class="message message-status is-shown exam-register">
+                    <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">${_("Register for Pearson exam")}</a>
+                    <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on {end_date}").format(end_date="<strong>{}</strong>".format(testcenter_exam_info.registration_end_date_text))}</p>
+                  </div>
+                  % endif
+                  <!-- display a registration for a current exam, even if the registration period is over -->
+                  % if registration is not None:
+                      % if registration.is_accepted:
+                  <div class="message message-status is-shown exam-schedule">
+                     <a href="${registration.registration_signup_url}" class="button exam-button">${_("Schedule Pearson exam")}</a>
+                     <p class="exam-registration-number">${_("{link_start}Registration{link_end} number: {number}").format(
+                        link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
+                        link_end='</a>',
+                        number=registration.client_candidate_id,
+                      )}</p>
+                     <p class="message-copy">${_("Write this down! You'll need it to schedule your exam.")}</p>
+                  </div>
+                      % endif
+                      % if  registration.is_rejected:
+                  <div class="message message-status is-shown exam-schedule">
+                    <p class="message-copy">
+                      <strong>${_("Your registration for the Pearson exam has been rejected. Please {link_start}see your registration status details{link_end}.").format(
+                        link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
+                        link_end='</a>')}</strong>
+                      ${_("Otherwise {link_start}contact edX at {email}{link_end} for further help.").format(
+                        link_start='<a class="contact-link" href="mailto:{email}?subject=Pearson VUE Exam - {about} {number}">'.format(email="exam-help@edx.org", about=get_course_about_section(course, 'university'), number=course.display_number_with_default),
+                        link_end='</a>',
+                        email="exam-help@edx.org",
+                       )}
+                  </div>
+                      % endif
+                     	% if not registration.is_accepted and not registration.is_rejected:
+  	            <div class="message message-status is-shown">
+                    <p class="message-copy"><strong>${_("Your {link_start}registration for the Pearson exam{link_end} is pending.").format(link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target), link_end='</a>')}</strong>
+                    ${_("Within a few days, you should see a confirmation number here, which can be used to schedule your exam.")}
+                    </p>
+                  </div>
+                      % endif
+                  % endif
+              % endif
+
+              <%
+              cert_status = cert_statuses.get(course.id)
+              %>
+              % if course.has_ended() and cert_status:
+                  <%
+                  if cert_status['status'] == 'generating':
+                      status_css_class = 'course-status-certrendering'
+                  elif cert_status['status'] == 'ready':
+                      status_css_class = 'course-status-certavailable'
+                  elif cert_status['status'] == 'notpassing':
+                      status_css_class = 'course-status-certnotavailable'
+                  else:
+                      status_css_class = 'course-status-processing'
+                  %>
+                  <div class="message message-status ${status_css_class} is-shown">
+
+                  % if cert_status['status'] == 'processing':
+                        <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
+                  % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
+                        <p class="message-copy">${_("Your final grade:")}
+                        <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+                        % if cert_status['status'] == 'notpassing':
+                           ${_("Grade required for a certificate:")} <span class="grade-value">
+                             ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+                        % elif cert_status['status'] == 'restricted':
+                            <p class="message-copy">
+                            ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
+                            </p>
+                        % endif
+                        </p>
+                  % endif
+
+                  % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
+                    <ul class="actions">
+                      % if cert_status['show_disabled_download_button']:
+                        <li class="action"><span class="disabled">
+                            ${_("Your Certificate is Generating")}</span></li>
+                      % elif cert_status['show_download_url']:
+                        <li class="action">
+                        <a class="btn" href="${cert_status['download_url']}"
+                           title="${_('This link will open/download a PDF document')}">
+                           Download Your PDF Certificate</a></li>
+                      % endif
+
+                      % if cert_status['show_survey_button']:
+                        <li class="action"><a class="cta" href="${cert_status['survey_url']}">
+                               ${_('Complete our course feedback survey')}</a></li>
+                      % endif
+                    </ul>
+                  % endif
+                  </div>
+
+              % endif
+
+              % if course.id in show_courseware_links_for:
+                % if course.has_ended():
+                  <a href="${course_target}" class="enter-course archived">${_('View Archived Course')}</a>
+                % else:
+                  <a href="${course_target}" class="enter-course">${_('View Course')}</a>
+                % endif
+              % endif
+
+
+
+              <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
+
+  	    % if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE:
+  	      <!-- Only show the Email Settings link/modal if this course has bulk email feature enabled -->
+                <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
+  	    % endif
           </section>
         </article>
-
-
-
+      </li>
       % endfor
+
+      </ul>
     % else:
       <section class="empty-dashboard-message">
         <p>${_("Looks like you haven't registered for any courses yet.")}</p>
@@ -356,15 +368,11 @@
       <input name="course_id" id="email_settings_course_id" type="hidden" />
       <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
       <div class="submit">
-        <input type="submit" id="submit" value="Save Settings" />
+        <input type="submit" id="submit" value="${_('Save Settings')}" />
       </div>
     </form>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>
 
@@ -381,15 +389,11 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="Unregister" />
+        <input name="submit" type="submit" value="${_('Unregister')}" />
       </div>
     </form>
 
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>
 
@@ -406,11 +410,7 @@
         </section>
       </form>
     </div>
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>
 
@@ -439,11 +439,7 @@
         </fieldset>
       </form>
     </div>
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>
 
@@ -471,10 +467,6 @@
         </fieldset>
       </form>
     </div>
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
   </div>
 </section>

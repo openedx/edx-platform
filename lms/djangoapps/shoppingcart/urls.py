@@ -13,3 +13,10 @@ if settings.MITX_FEATURES['ENABLE_SHOPPING_CART']:
         url(r'^remove_item/$', 'remove_item'),
         url(r'^add/course/(?P<course_id>[^/]+/[^/]+/[^/]+)/$', 'add_course_to_cart', name='add_course_to_cart'),
     )
+
+if settings.MITX_FEATURES.get('ENABLE_PAYMENT_FAKE'):
+    from shoppingcart.tests.payment_fake import PaymentFakeView
+    urlpatterns += patterns(
+        'shoppingcart.tests.payment_fake',
+        url(r'^payment_fake', PaymentFakeView.as_view())
+    )

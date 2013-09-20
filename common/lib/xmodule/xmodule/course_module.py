@@ -153,6 +153,7 @@ class TextbookList(List):
 
 
 class CourseFields(object):
+    lti_passports = List(help="LTI tools passports as id:client_key:client_secret", scope=Scope.settings)
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
@@ -336,7 +337,14 @@ class CourseFields(object):
                                       "action_external": False}]}
         ])
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
-    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
+    show_timezone = Boolean(
+        help="True if timezones should be shown on dates in the courseware. Deprecated in favor of due_date_display_format.",
+        scope=Scope.settings, default=True
+    )
+    due_date_display_format = String(
+        help="Format supported by strftime for displaying due dates. Takes precedence over show_timezone.",
+        scope=Scope.settings, default=None
+    )
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                                scope=Scope.settings)
     course_image = String(
@@ -390,7 +398,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             elif isinstance(self.location, CourseLocator):
                 self.wiki_slug = self.location.course_id or self.display_name
 
-        msg = None
+        if self.due_date_display_format is None and self.show_timezone is False:
+            # For existing courses with show_timezone set to False (and no due_date_display_format specified),
+            # set the due_date_display_format to what would have been shown previously (with no timezone).
+            # Then remove show_timezone so that if the user clears out the due_date_display_format,
+            # they get the default date display.
+            self.due_date_display_format = u"%b %d, %Y at %H:%M"
+            delattr(self, 'show_timezone')
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
