@@ -22,8 +22,7 @@ class StaticContentServer(object):
                 return response
 
             # first look in our cache so we don't have to round-trip to the DB
-            #content = get_cached_content(loc)
-            content = None
+            content = get_cached_content(loc)
             if content is None:
                 # nope, not in cache, let's fetch from DB
                 try:
@@ -47,7 +46,7 @@ class StaticContentServer(object):
             # Check that user has access to content
             if getattr(content, "locked", False):
                 if not hasattr(request, "user") or not request.user.is_authenticated():
-                    return redirect('root')
+                    return redirect('login')
                 course_id = "/".join([loc.org, loc.course, loc.name])
                 if not CourseEnrollment.is_enrolled(request.user, course_id):
                     return redirect('dashboard')
