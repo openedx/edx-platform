@@ -12,5 +12,9 @@ $ ->
 	# if not, set 'aria-hidden' to 'true'
 	if MathJax? and not isMPInstalled()
 		$("#mathjax-accessibility-message").attr("aria-hidden", "false")
+
+	if MathJax? and $("#mathplayer-browser-message").length > 0
+		$("#mathplayer-browser-message").attr("aria-hidden", "false")
+		
 	else
 		$("#mathjax-accessibility-message").attr("aria-hidden", "true")
