@@ -1,4 +1,6 @@
 from django.http import HttpResponse, HttpResponseNotModified
+from django.shortcuts import redirect
+from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
@@ -20,7 +22,8 @@ class StaticContentServer(object):
                 return response
 
             # first look in our cache so we don't have to round-trip to the DB
-            content = get_cached_content(loc)
+            #content = get_cached_content(loc)
+            content = None
             if content is None:
                 # nope, not in cache, let's fetch from DB
                 try:
@@ -40,6 +43,15 @@ class StaticContentServer(object):
             else:
                 # NOP here, but we may wish to add a "cache-hit" counter in the future
                 pass
+
+            # Check that user has access to content
+            if getattr(content, "locked", False):
+                if not hasattr(request, "user") or not request.user.is_authenticated():
+                    return redirect('root')
+                course_id = "/".join([loc.org, loc.course, loc.name])
+                if not CourseEnrollment.is_enrolled(request.user, course_id):
+                    return redirect('dashboard')
+
 
             # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
 
