@@ -184,7 +184,7 @@ def update_asset(request, org, course, name, asset_id):
             # remove from any caching
             del_cached_content(thumbnail_content.location)
         except:
-            pass  # OK if this is left dangling
+            logging.warning('Could not delete thumbnail: ' + content.thumbnail_location)
 
     # delete the original
     contentstore().delete(content.get_id())
