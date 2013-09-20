@@ -10,7 +10,6 @@ from django.views.decorators.http import require_POST
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
-from auth.authz import create_all_course_groups
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
