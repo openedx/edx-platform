@@ -233,10 +233,13 @@ def _flatten_to_ascii(txt):
     """
     Flattens possibly unicode txt to ascii (django username limitation)
     @param name:
-    @return:
+    @return: the flattened txt (in the same type as was originally passed in)
     """
-    return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
-
+    if isinstance(txt, str):
+        txt = txt.decode('utf-8')
+        return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
+    else:
+        return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
 
 @ensure_csrf_cookie
 @cache_if_anonymous
