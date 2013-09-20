@@ -12,6 +12,7 @@ from .content import StaticContent, ContentStore, StaticContentStream
 from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
 import os
+import json
 
 
 class MongoContentStore(ContentStore):
@@ -103,12 +104,19 @@ class MongoContentStore(ContentStore):
         with disk_fs.open(content.name, 'wb') as asset_file:
             asset_file.write(content.data)
 
-    def export_all_for_course(self, course_location, output_directory):
+    def export_all_for_course(self, course_location, output_directory, policy_file):
+        policy = {}
         assets = self.get_all_content_for_course(course_location)
 
         for asset in assets:
             asset_location = Location(asset['_id'])
             self.export(asset_location, output_directory)
+            for attr, value in asset.iteritems():
+                if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
+                    policy.setdefault(asset_location.url(), {})[attr] = value
+
+        with open(policy_file, 'w') as f:
+            json.dump(policy, f)
 
     def get_all_content_thumbnails_for_course(self, location):
         return self._get_all_content_for_course(location, get_thumbnails=True)
