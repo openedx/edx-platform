@@ -15,6 +15,7 @@ from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentF
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
+from instructor_task.subtasks import update_subtask_result
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -33,7 +34,7 @@ class MockCourseEmailResult(object):
         def mock_update_subtask_result(prev_results, sent, failed, output, **kwargs):  # pylint: disable=W0613
             """Increments count of number of emails sent."""
             self.emails_sent += sent
-            return True
+            return update_subtask_result(prev_results, sent, failed, output)
         return mock_update_subtask_result
 
 
