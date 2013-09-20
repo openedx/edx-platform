@@ -34,7 +34,6 @@ try:
 except ImportError:
     from django.contrib.csrf.middleware import csrf_exempt
 from django_future.csrf import ensure_csrf_cookie
-from util.cache import cache_if_anonymous
 
 import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
@@ -137,8 +136,6 @@ def _external_login_or_signup(request,
                               fullname,
                               retfun=None):
     """Generic external auth login or signup"""
-    logout(request)
-
     # see if we have a map from this external_id to an edX username
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id,
@@ -242,7 +239,6 @@ def _flatten_to_ascii(txt):
         return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
 
 @ensure_csrf_cookie
-@cache_if_anonymous
 def _signup(request, eamap):
     """
     Present form to complete for signup via external authentication.
