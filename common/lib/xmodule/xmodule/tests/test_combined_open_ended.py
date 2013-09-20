@@ -344,6 +344,41 @@ class OpenEndedModuleTest(unittest.TestCase):
         score = self.openendedmodule.latest_score()
         self.assertEquals(score, 1)
 
+    def test_open_ended_display(self):
+        """
+        Test storing answer with the open ended module.
+        """
+        
+        # Create a module with no state yet.  Important that this start off as a blank slate.
+        test_module = OpenEndedModule(self.test_system, self.location,
+                                                self.definition, self.descriptor, self.static_data, self.metadata)
+        
+        saved_response = "Saved response."
+        submitted_response = "Submitted response."
+
+        # Initially, there will be no stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # And the initial answer to display will be an empty string.
+        self.assertEqual(test_module.get_display_answer(), "")
+
+        # Now, store an answer in the module.
+        test_module.handle_ajax("store_answer", {'student_answer' : saved_response}, get_test_system())
+        # The stored answer should now equal our response.
+        self.assertEqual(test_module.stored_answer, saved_response)
+        self.assertEqual(test_module.get_display_answer(), saved_response)
+
+        # Mock out the send_to_grader function so it doesn't try to connect to the xqueue.
+        test_module.send_to_grader = Mock(return_value=True)
+        # Submit a student response to the question.
+        test_module.handle_ajax(
+            "save_answer",
+            {"student_answer": submitted_response, "can_upload_files": False, "student_file": None},
+            get_test_system()
+        )
+        # Submitting an answer should clear the stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # Confirm that the answer is stored properly.
+        self.assertEqual(test_module.latest_answer(), submitted_response)
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     """

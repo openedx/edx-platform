@@ -14,13 +14,28 @@ import textwrap
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
-    "display_name", "max_attempts", "graded", "accept_file_upload",
-    "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
-    "max_to_calibrate", "peer_grader_count", "required_peer_grading",
+    "display_name",
+    "max_attempts",
+    "graded",
+    "accept_file_upload",
+    "skip_spelling_checks",
+    "due",
+    "graceperiod",
+    "weight",
+    "min_to_calibrate",
+    "max_to_calibrate",
+    "peer_grader_count",
+    "required_peer_grading",
 ]
 
-V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                         "student_attempts", "ready_to_reset", "old_task_states"]
+V1_STUDENT_ATTRIBUTES = [
+    "current_task_number",
+    "task_states",
+    "state",
+    "student_attempts",
+    "ready_to_reset",
+    "old_task_states",
+]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 

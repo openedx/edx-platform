@@ -784,6 +784,7 @@ class CombinedOpenEndedV1Module():
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
         self.current_task_number = 0
         self.ready_to_reset = False
+
         self.setup_next_task()
         return {'success': True, 'html': self.get_html_nonsystem()}
 
