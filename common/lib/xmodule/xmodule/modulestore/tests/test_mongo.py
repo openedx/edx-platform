@@ -20,6 +20,8 @@ from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
+from IPython.testing.nose_assert_methods import assert_in, assert_not_in
+from xmodule.exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -202,6 +204,55 @@ class TestMongoModuleStore(object):
         assert_equals('Syllabus', get_tab_name(2))
         assert_equals('Resources', get_tab_name(3))
         assert_equals('Discussion', get_tab_name(4))
+
+    def test_contentstore_attrs(self):
+        """
+        Test getting, setting, and defaulting the locked attr and arbitrary attrs.
+        """
+        location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
+        course_content = TestMongoModuleStore.content_store.get_all_content_for_course(location)
+        assert len(course_content) > 0
+        # a bit overkill, could just do for content[0]
+        for content in course_content:
+            assert not content.get('locked', False)
+            assert not TestMongoModuleStore.content_store.get_attr(content['_id'], 'locked', False)
+            attrs = TestMongoModuleStore.content_store.get_attrs(content['_id'])
+            assert_in('uploadDate', attrs)
+            assert not attrs.get('locked', False)
+            TestMongoModuleStore.content_store.set_attr(content['_id'], 'locked', True)
+            assert TestMongoModuleStore.content_store.get_attr(content['_id'], 'locked', False)
+            attrs = TestMongoModuleStore.content_store.get_attrs(content['_id'])
+            assert_in('locked', attrs)
+            assert attrs['locked'] is True
+            TestMongoModuleStore.content_store.set_attrs(content['_id'], {'miscel': 99})
+            assert_equals(TestMongoModuleStore.content_store.get_attr(content['_id'], 'miscel'), 99)
+        assert_raises(
+            AttributeError, TestMongoModuleStore.content_store.set_attr, course_content[0],
+            'md5', 'ff1532598830e3feac91c2449eaa60d6'
+        )
+        assert_raises(
+            AttributeError, TestMongoModuleStore.content_store.set_attrs, course_content[0],
+            {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'}
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.get_attr,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            'displayname'
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.set_attr,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            'displayname', 'hello'
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.get_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus')
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.set_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            {'displayname': 'hello'}
+        )
 
 
 class TestMongoKeyValueStore(object):
