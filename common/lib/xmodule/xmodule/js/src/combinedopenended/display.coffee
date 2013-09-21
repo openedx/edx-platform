@@ -693,7 +693,7 @@ class @CombinedOpenEnded
       OmniPlayer.loaded.YT = true
       coeVideoId = @coe.data('videoId')
       if coeVideoId != null && coeVideoId != ""
-        textarea = @coe.find('textarea')
+        textarea = $(@answer_area_sel)
         @video_button = @submit_button.after('<input type="button"/>').next()
         @video_button.attr
           value: 'Snippet'

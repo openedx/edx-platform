@@ -94,7 +94,7 @@ class CombinedOpenEndedV1Module():
 
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
-        self.video_id = instance_state.get('video_id', "Test Video ID #Cody")
+        self.video_id = instance_state.get('video_id', "OEoXaMPEzfM")
 
         # We need to set the location here so the child modules can use it
         system.set('location', location)

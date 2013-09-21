@@ -529,7 +529,7 @@ describe "VideoClipper", ->
           $('[rel*=blModal]').click()
           expect(VideoClipper.modal.open).toHaveBeenCalled()
 
-  describe '.cleanUp', ->
+  describe ".cleanUp", ->
     beforeEach ->
       VideoClipper.cleanUp()
       loadFixtures('video_clipper_question.html')
@@ -556,6 +556,31 @@ describe "VideoClipper", ->
       expect($('#bookMarklet-overlay')).toExist()
       VideoClipper.cleanUp()
       expect($('#bookMarklet-overlay')).not.toExist()
+
+    it 'removes VideoClipper.player', ->
+      player = jasmine.createSpyObj('player', ['remove'])
+      VideoClipper.player = player
+      VideoClipper.cleanUp()
+      expect(player.remove).toHaveBeenCalled()
+
+    it 'makes VideoClipper.player undefined', ->
+      player = jasmine.createSpyObj('player', ['remove'])
+      VideoClipper.player = player
+      VideoClipper.cleanUp()
+      expect(VideoClipper.player).not.toBeDefined()
+
+    it 'removes VideoClipper.playerV', ->
+      playerV = jasmine.createSpyObj('playerV', ['remove'])
+      VideoClipper.playerV = playerV
+      VideoClipper.cleanUp()
+      expect(playerV.remove).toHaveBeenCalled()
+
+    it 'makes VideoClipper.playerV undefined', ->
+      playerV = jasmine.createSpyObj('playerV', ['remove'])
+      VideoClipper.playerV = playerV
+      VideoClipper.cleanUp()
+      expect(VideoClipper.playerV).not.toBeDefined() 
+
 
     it 'sets VideoClipper prepared snippet to false', ->
       VideoClipper.cleanUp()
@@ -1303,5 +1328,3 @@ describe "VideoClipper", ->
       val2 = 'SOME VALUE ROUND 2'
       spyOn(VideoClipper, 'secondsToTime').andReturn val2
       expect(VideoClipper.setStartTime(val)).toEqual val2
-
-

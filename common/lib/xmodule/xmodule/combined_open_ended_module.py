@@ -15,6 +15,7 @@ log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",
+    "video_id",
     "max_attempts",
     "graded",
     "accept_file_upload",
@@ -196,7 +197,7 @@ class CombinedOpenEndedFields(object):
     )
     video_id = String(
         display_name = "Video Response ID",
-        help="This enables embedded video clips of the specified video to be part of the response.",
+        help="The youtube id of a video to include in the response if you are using the embedded video clips functionality.",
         default="",
         scope=Scope.settings
     )
