@@ -2,8 +2,8 @@
 // ====================
 
 // gray primary button
-.btn-primary-gray {
-  @extend .ui-btn-primary;
+%btn-primary-gray {
+  @extend %ui-btn-primary;
   background: $gray-l1;
   border-color: $gray-l2;
   color: $white;
@@ -24,8 +24,8 @@
 }
 
 // blue primary button
-.btn-primary-blue {
-  @extend .ui-btn-primary;
+%btn-primary-blue {
+  @extend %ui-btn-primary;
   background: $blue;
   border-color: $blue-s1;
   color: $white;
@@ -47,8 +47,8 @@
 }
 
 // green primary button
-.btn-primary-green {
-  @extend .ui-btn-primary;
+%btn-primary-green {
+  @extend %ui-btn-primary;
   background: $green;
   border-color: $green;
   color: $white;
@@ -70,8 +70,8 @@
 }
 
 // gray secondary button
-.btn-secondary-gray {
-  @extend .ui-btn-secondary;
+%btn-secondary-gray {
+  @extend %ui-btn-secondary;
   border-color: $gray-l3;
   color: $gray-l1;
 
@@ -91,8 +91,8 @@
 }
 
 // blue secondary button
-.btn-secondary-blue {
-  @extend .ui-btn-secondary;
+%btn-secondary-blue {
+  @extend %ui-btn-secondary;
   border-color: $blue-l3;
   color: $blue;
 
@@ -113,8 +113,8 @@
 }
 
 // green secondary button
-.btn-secondary-green {
-  @extend .ui-btn-secondary;
+%btn-secondary-green {
+  @extend %ui-btn-secondary;
   border-color: $green-l4;
   color: $green-l2;
 
@@ -148,9 +148,9 @@
 // ====================
 
 // simple dropdown button styling - should we move this elsewhere?
-.ui-btn-dd {
-  @extend .ui-btn;
-  @extend .ui-btn-pill;
+%ui-btn-dd {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
   padding:($baseline/4) ($baseline/2);
   border-width: 1px;
   border-style: solid;
@@ -158,7 +158,7 @@
   text-align: center;
 
   &:hover, &:active {
-    @extend .ui-fake-link;
+    @extend %ui-fake-link;
     border-color: $gray-l3;
   }
 
@@ -169,8 +169,8 @@
 }
 
 // layout-based buttons - nav dd
-.ui-btn-dd-nav-primary {
-  @extend .ui-btn-dd;
+%ui-btn-dd-nav-primary {
+  @extend %ui-btn-dd;
   background: $white;
   border-color: $white;
   color: $gray-d1;
@@ -197,6 +197,6 @@
 // ====================
 
 // specific buttons - view live
-.view-live-button {
-  @extend .t-action4;
+%view-live-button {
+  @extend %t-action4;
 }

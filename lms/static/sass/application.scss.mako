@@ -9,7 +9,8 @@
 
 @import 'base/reset';
 @import 'vendor/font-awesome';
-
+@import 'vendor/responsive-carousel/responsive-carousel';
+@import 'vendor/responsive-carousel/responsive-carousel.slide';
 
 // BASE  *default edX offerings*
 // ====================
@@ -36,12 +37,19 @@
 // base - assets
 @import 'base/font_face';
 @import 'base/extends';
-@import 'base/animations'; 	
+@import 'base/animations';
 
 // base - starter
 @import 'base/base';
 
-// shared - course 
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+
+// base - specific views
+@import 'views/verification';
+
+// shared - course
 @import 'shared/forms';
 @import 'shared/footer';
 @import 'shared/header';
@@ -67,7 +75,7 @@
 @import 'multicourse/help';
 @import 'multicourse/edge';
 
-// applications 
+// applications
 @import 'discussion';
 @import 'news';
 

@@ -128,7 +128,10 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Enrollment End Date")
             self.assertContains(response, "not the dates shown on your course summary page")
 
-            self.assertNotContains(response, "Introducing Your Course")
+            self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Course Image")
+            self.assertNotContains(response,"Course Overview")
+            self.assertNotContains(response,"Course Introduction Video")
             self.assertNotContains(response, "Requirements")
 
     def test_regular_site_fetch(self):
@@ -154,6 +157,9 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Course Image")
+            self.assertContains(response,"Course Overview")
+            self.assertContains(response,"Course Introduction Video")
             self.assertContains(response, "Requirements")
 
 

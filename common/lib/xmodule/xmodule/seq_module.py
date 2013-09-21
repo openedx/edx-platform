@@ -133,7 +133,7 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker("ERROR: " + str(e))
+                    system.error_tracker("ERROR: " + unicode(e))
                 continue
         return {}, children
 

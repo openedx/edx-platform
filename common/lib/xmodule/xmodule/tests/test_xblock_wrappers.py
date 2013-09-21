@@ -74,7 +74,7 @@ class TestXBlockWrapper(object):
             anonymous_student_id='dummy_anonymous_student_id',
             open_ended_grading_interface={},
             ajax_url='dummy_ajax_url',
-            xblock_field_data=lambda d: d._field_data,
+            xmodule_field_data=lambda d: d._field_data,
             get_module=Mock(),
             replace_urls=Mock(),
             track_function=Mock(),

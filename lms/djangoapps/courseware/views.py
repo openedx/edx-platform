@@ -98,7 +98,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('show_timezone', course.show_timezone)] + template_imports.items())
+                    ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -375,9 +375,14 @@ def index(request, course_id, chapter=None, section=None,
             # html, which in general will need all of its children
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_id, user, section_descriptor, depth=None)
-            section_module = get_module(request.user, request,
-                                section_descriptor.location,
-                                section_field_data_cache, course_id, position, depth=None)
+
+            section_module = get_module_for_descriptor(request.user,
+                request,
+                section_descriptor,
+                section_field_data_cache,
+                course_id,
+                position
+            )
 
             if section_module is None:
                 # User may be trying to be clever and access something

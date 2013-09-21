@@ -8,7 +8,7 @@ from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from .timeinfo import TimeInfo
 from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
@@ -72,6 +72,12 @@ class PeerGradingFields(object):
         scope=Scope.content
     )
 
+class InvalidLinkLocation(Exception):
+    """
+    Exception for the case in which a peer grading module tries to link to an invalid location.
+    """
+    pass
+
 
 class PeerGradingModule(PeerGradingFields, XModule):
     """
@@ -80,9 +86,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
     _VERSION = 1
 
     js = {
+        'js': [
+            resource_string(__name__, 'js/src/peergrading/ice.min.js'),
+        ],
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
+            resource_string(__name__, 'js/src/peergrading/track_changes.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ]
@@ -103,14 +113,21 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         if self.use_for_single_location:
             try:
-                self.linked_problem = self.system.get_module(self.link_to_location)
+                linked_descriptors = self.descriptor.get_required_module_descriptors()
+                if len(linked_descriptors) == 0:
+                    error_msg = "Peer grading module {0} is trying to use single problem mode without "
+                    "a location specified.".format(self.location)
+                    log.error(error_msg)
+                    raise InvalidLinkLocation(error_msg)
+                self.linked_problem = self.system.get_module(linked_descriptors[0])
             except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.due
-            if due_date:
-                self.due = due_date
+            except NoPathToItem:
+                log.error("Linked location {0} for peer grading module {1} cannot be linked to.".format(
+                    self.link_to_location, self.location))
+                raise
 
         try:
             self.timeinfo = TimeInfo(self.due, self.graceperiod)
@@ -479,6 +496,21 @@ class PeerGradingModule(PeerGradingFields, XModule):
         })
         return html
 
+    def _find_corresponding_module_for_location(self, location):
+        """
+        Find the peer grading module that exists at the given location.
+        """
+        try:
+            return self.descriptor.system.load_item(location)
+        except ItemNotFoundError:
+            # The linked problem doesn't exist.
+            log.error("Problem {0} does not exist in this course.".format(location))
+            raise
+        except NoPathToItem:
+            # The linked problem does not have a path to it (ie is in a draft or other strange state).
+            log.error("Cannot find a path to problem {0} in this course.".format(location))
+            raise
+
     def peer_grading(self, _data=None):
         '''
         Show a peer grading interface
@@ -512,24 +544,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
             log.exception("Could not contact peer grading service.")
             success = False
 
-
-        def _find_corresponding_module_for_location(location):
-            '''
-            find the peer grading module that links to the given location
-            '''
-            try:
-                return modulestore().get_instance(self.system.course_id, location)
-            except Exception:
-                # the linked problem doesn't exist
-                log.error("Problem {0} does not exist in this course".format(location))
-                raise
-
         good_problem_list = []
         for problem in problem_list:
             problem_location = problem['location']
             try:
-                descriptor = _find_corresponding_module_for_location(problem_location)
-            except Exception:
+                descriptor = self._find_corresponding_module_for_location(problem_location)
+            except (NoPathToItem, ItemNotFoundError):
                 continue
             if descriptor:
                 problem['due'] = descriptor.due
@@ -579,6 +599,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         elif data.get('location') is not None:
             problem_location = data.get('location')
 
+        module = self._find_corresponding_module_for_location(problem_location)
+
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
@@ -587,6 +609,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,
+            'track_changes': getattr(module, 'track_changes', False),
             'use_single_location': self.use_for_single_location,
         })
 

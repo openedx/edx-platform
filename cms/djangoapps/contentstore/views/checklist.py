@@ -1,4 +1,5 @@
 import json
+import copy
 
 from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
@@ -32,19 +33,16 @@ def get_checklists(request, org, course, name):
 
     # If course was created before checklists were introduced, copy them over
     # from the template.
-    copied = False
     if not course_module.checklists:
         course_module.checklists = CourseDescriptor.checklists.default
-        copied = True
-
-    checklists, modified = expand_checklist_action_urls(course_module)
-    if copied or modified:
         course_module.save()
         modulestore.update_metadata(location, own_metadata(course_module))
+
+    expanded_checklists = expand_all_action_urls(course_module)
     return render_to_response('checklists.html',
                               {
                                   'context_course': course_module,
-                                  'checklists': checklists
+                                  'checklists': expanded_checklists
                               })
 
 
@@ -68,14 +66,20 @@ def update_checklist(request, org, course, name, checklist_index=None):
     if request.method in ("POST", "PUT"):
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
-            course_module.checklists[index] = json.loads(request.body)
+            persisted_checklist = course_module.checklists[index]
+            modified_checklist = json.loads(request.body)
+            # Only thing the user can modify is the "checked" state.
+            # We don't want to persist what comes back from the client because it will
+            # include the expanded action URLs (which are non-portable).
+            for item_index, item in enumerate(modified_checklist.get('items')):
+                persisted_checklist['items'][item_index]['is_checked'] = item['is_checked']
             # seeming noop which triggers kvs to record that the metadata is
             # not default
             course_module.checklists = course_module.checklists
-            checklists, _ = expand_checklist_action_urls(course_module)
             course_module.save()
             modulestore.update_metadata(location, own_metadata(course_module))
-            return JsonResponse(checklists[index])
+            expanded_checklist = expand_checklist_action_url(course_module, persisted_checklist)
+            return JsonResponse(expanded_checklist)
         else:
             return HttpResponseBadRequest(
                 ( "Could not save checklist state because the checklist index "
@@ -85,23 +89,30 @@ def update_checklist(request, org, course, name, checklist_index=None):
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all
         # the checklists.
-        checklists, modified = expand_checklist_action_urls(course_module)
-        if modified:
-            course_module.save()
-            modulestore.update_metadata(location, own_metadata(course_module))
-        return JsonResponse(checklists)
+        expanded_checklists = expand_all_action_urls(course_module)
+        return JsonResponse(expanded_checklists)
 
 
-def expand_checklist_action_urls(course_module):
+def expand_all_action_urls(course_module):
     """
-    Gets the checklists out of the course module and expands their action urls
-    if they have not yet been expanded.
+    Gets the checklists out of the course module and expands their action urls.
 
-    Returns the checklists with modified urls, as well as a boolean
-    indicating whether or not the checklists were modified.
+    Returns a copy of the checklists with modified urls, without modifying the persisted version
+    of the checklists.
     """
-    checklists = course_module.checklists
-    modified = False
+    expanded_checklists = []
+    for checklist in course_module.checklists:
+        expanded_checklists.append(expand_checklist_action_url(course_module, checklist))
+    return expanded_checklists
+
+
+def expand_checklist_action_url(course_module, checklist):
+    """
+    Expands the action URLs for a given checklist and returns the modified version.
+
+    The method does a copy of the input checklist and does not modify the input argument.
+    """
+    expanded_checklist = copy.deepcopy(checklist)
     urlconf_map = {
         "ManageUsers": "manage_users",
         "SettingsDetails": "settings_details",
@@ -109,19 +120,15 @@ def expand_checklist_action_urls(course_module):
         "CourseOutline": "course_index",
         "Checklists": "checklists",
     }
-    for checklist in checklists:
-        if not checklist.get('action_urls_expanded', False):
-            for item in checklist.get('items'):
-                action_url = item.get('action_url')
-                if action_url not in urlconf_map:
-                    continue
-                urlconf_name = urlconf_map[action_url]
-                item['action_url'] = reverse(urlconf_name, kwargs={
-                    'org': course_module.location.org,
-                    'course': course_module.location.course,
-                    'name': course_module.location.name,
-                })
-            checklist['action_urls_expanded'] = True
-            modified = True
+    for item in expanded_checklist.get('items'):
+        action_url = item.get('action_url')
+        if action_url not in urlconf_map:
+            continue
+        urlconf_name = urlconf_map[action_url]
+        item['action_url'] = reverse(urlconf_name, kwargs={
+            'org': course_module.location.org,
+            'course': course_module.location.course,
+            'name': course_module.location.name,
+        })
 
-    return checklists, modified
+    return expanded_checklist

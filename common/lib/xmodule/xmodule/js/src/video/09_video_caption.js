@@ -37,31 +37,37 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoCaption.autoShowCaptions    = _.bind(autoShowCaptions, state);
-        state.videoCaption.autoHideCaptions    = _.bind(autoHideCaptions, state);
-        state.videoCaption.resize              = _.bind(resize, state);
-        state.videoCaption.toggle              = _.bind(toggle, state);
-        state.videoCaption.onMouseEnter        = _.bind(onMouseEnter, state);
-        state.videoCaption.onMouseLeave        = _.bind(onMouseLeave, state);
-        state.videoCaption.onMovement          = _.bind(onMovement, state);
-        state.videoCaption.renderCaption       = _.bind(renderCaption, state);
-        state.videoCaption.captionHeight       = _.bind(captionHeight, state);
-        state.videoCaption.topSpacingHeight    = _.bind(topSpacingHeight, state);
-        state.videoCaption.bottomSpacingHeight = _.bind(bottomSpacingHeight, state);
-        state.videoCaption.scrollCaption       = _.bind(scrollCaption, state);
-        state.videoCaption.search              = _.bind(search, state);
-        state.videoCaption.play                = _.bind(play, state);
-        state.videoCaption.pause               = _.bind(pause, state);
-        state.videoCaption.seekPlayer          = _.bind(seekPlayer, state);
-        state.videoCaption.hideCaptions        = _.bind(hideCaptions, state);
-        state.videoCaption.calculateOffset     = _.bind(calculateOffset, state);
-        state.videoCaption.updatePlayTime      = _.bind(updatePlayTime, state);
-        state.videoCaption.setSubtitlesHeight  = _.bind(setSubtitlesHeight, state);
+        state.videoCaption.autoShowCaptions        = _.bind(autoShowCaptions, state);
+        state.videoCaption.autoHideCaptions        = _.bind(autoHideCaptions, state);
+        state.videoCaption.resize                  = _.bind(resize, state);
+        state.videoCaption.toggle                  = _.bind(toggle, state);
+        state.videoCaption.onMouseEnter            = _.bind(onMouseEnter, state);
+        state.videoCaption.onMouseLeave            = _.bind(onMouseLeave, state);
+        state.videoCaption.onMovement              = _.bind(onMovement, state);
+        state.videoCaption.renderCaption           = _.bind(renderCaption, state);
+        state.videoCaption.captionHeight           = _.bind(captionHeight, state);
+        state.videoCaption.topSpacingHeight        = _.bind(topSpacingHeight, state);
+        state.videoCaption.bottomSpacingHeight     = _.bind(bottomSpacingHeight, state);
+        state.videoCaption.scrollCaption           = _.bind(scrollCaption, state);
+        state.videoCaption.search                  = _.bind(search, state);
+        state.videoCaption.play                    = _.bind(play, state);
+        state.videoCaption.pause                   = _.bind(pause, state);
+        state.videoCaption.seekPlayer              = _.bind(seekPlayer, state);
+        state.videoCaption.hideCaptions            = _.bind(hideCaptions, state);
+        state.videoCaption.calculateOffset         = _.bind(calculateOffset, state);
+        state.videoCaption.updatePlayTime          = _.bind(updatePlayTime, state);
+        state.videoCaption.setSubtitlesHeight      = _.bind(setSubtitlesHeight, state);
 
-        state.videoCaption.renderElements      = _.bind(renderElements, state);
-        state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
-        state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
-        state.videoCaption.captionURL          = _.bind(captionURL, state);
+        state.videoCaption.renderElements          = _.bind(renderElements, state);
+        state.videoCaption.bindHandlers            = _.bind(bindHandlers, state);
+        state.videoCaption.fetchCaption            = _.bind(fetchCaption, state);
+        state.videoCaption.captionURL              = _.bind(captionURL, state);
+        state.videoCaption.captionMouseOverOut     = _.bind(captionMouseOverOut, state);
+        state.videoCaption.captionMouseDown        = _.bind(captionMouseDown, state);
+        state.videoCaption.captionClick            = _.bind(captionClick, state);
+        state.videoCaption.captionFocus            = _.bind(captionFocus, state);
+        state.videoCaption.captionBlur             = _.bind(captionBlur, state);
+        state.videoCaption.captionKeyDown          = _.bind(captionKeyDown, state);
     }
 
     // ***************************************************************
@@ -309,7 +315,8 @@ function () {
 
             liEl.attr({
                 'data-index': index,
-                'data-start': _this.videoCaption.start[index]
+                'data-start': _this.videoCaption.start[index],
+                'tabindex': 0
             });
 
             container.append(liEl);
@@ -317,7 +324,33 @@ function () {
 
         this.videoCaption.subtitlesEl.html(container.html());
 
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.seekPlayer);
+        this.videoCaption.subtitlesEl.find('li[data-index]').on({
+            mouseover:  this.videoCaption.captionMouseOverOut,
+            mouseout:   this.videoCaption.captionMouseOverOut,
+            mousedown:  this.videoCaption.captionMouseDown,
+            click:      this.videoCaption.captionClick,
+            focus:      this.videoCaption.captionFocus,
+            blur:       this.videoCaption.captionBlur,
+            keydown:    this.videoCaption.captionKeyDown
+        });
+
+        // Enables or disables automatic scrolling of the captions when the
+        // video is playing. This feature has to be disabled when tabbing
+        // through them as it interferes with that action. Initially, have this
+        // flag enabled as we assume mouse use. Then, if the first caption 
+        // (through forward tabbing) or the last caption (through backwards
+        // tabbing) gets the focus, disable that feature. Renable it if tabbing
+        // then cycles out of the the captions. 
+        this.videoCaption.autoScrolling = true;
+        // Keeps track of where the focus is situated in the array of captions.
+        // Used to implement the automatic scrolling behavior and decide if the
+        // outline around a caption has to be hidden or shown on a mouseenter or
+        // mouseleave.
+        this.videoCaption.currentCaptionIndex = 0;
+        // Used to track if the focus is coming from a click or tabbing. This 
+        // has to be known to decide if, when a caption gets the focus, an 
+        // outline has to be drawn (tabbing) or not (mouse click).
+        this.videoCaption.isMouseFocus = false;
 
         this.videoCaption.subtitlesEl.prepend($('<li class="spacing">').height(this.videoCaption.topSpacingHeight()));
         this.videoCaption.subtitlesEl.append($('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight()));
@@ -325,10 +358,85 @@ function () {
         this.videoCaption.rendered = true;
     }
 
+    // On mouseOver, hide the outline of a caption that has been tabbed to.
+    // On mouseOut, show the outline of a caption that has been tabbed to.
+    function captionMouseOverOut(event) {
+        var caption = $(event.target),
+            captionIndex = parseInt(caption.attr('data-index'), 10); 
+        if (captionIndex === this.videoCaption.currentCaptionIndex) {
+            if (event.type === 'mouseover') {
+                caption.removeClass('focused');
+            }
+            else { // mouseout
+                caption.addClass('focused');
+            }
+        } 
+    }
+
+    function captionMouseDown(event) {
+        var caption = $(event.target);
+        this.videoCaption.isMouseFocus = true;
+        this.videoCaption.autoScrolling = true;
+        caption.removeClass('focused');
+        this.videoCaption.currentCaptionIndex = -1;
+    }
+
+    function captionClick(event) {
+        this.videoCaption.seekPlayer(event);
+    }
+
+    function captionFocus(event) {
+        var caption = $(event.target),
+            captionIndex = parseInt(caption.attr('data-index'), 10);
+        // If the focus comes from a mouse click, hide the outline, turn on
+        // automatic scrolling and set currentCaptionIndex to point outside of
+        // caption list (ie -1) to disable mouseenter, mouseleave behavior. 
+        if (this.videoCaption.isMouseFocus) {
+            this.videoCaption.autoScrolling = true;
+            caption.removeClass('focused');
+            this.videoCaption.currentCaptionIndex = -1;
+        }
+        // If the focus comes from tabbing, show the outline and turn off 
+        // automatic scrolling.
+        else {
+            this.videoCaption.currentCaptionIndex = captionIndex;
+            caption.addClass('focused');
+            // The second and second to last elements turn automatic scrolling
+            // off again as it may have been enabled in captionBlur.    
+            if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
+                this.videoCaption.autoScrolling = false;
+            }
+        }
+    }
+
+    function captionBlur(event) {
+        var caption = $(event.target), 
+            captionIndex = parseInt(caption.attr('data-index'), 10);
+        caption.removeClass('focused');
+        // If we are on first or last index, we have to turn automatic scroll on
+        // again when losing focus. There is no way to know in what direction we
+        // are tabbing. So we could be on the first element and tabbing back out
+        // of the captions or on the last element and tabbing forward out of the
+        // captions.
+        if (captionIndex === 0 || 
+            captionIndex === this.videoCaption.captions.length-1) {
+            this.videoCaption.autoScrolling = true;
+        }
+    }
+
+    function captionKeyDown(event) {
+        this.videoCaption.isMouseFocus = false;
+        if (event.which === 13) { //Enter key
+            this.videoCaption.seekPlayer(event);
+        }
+    }
+
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-        if (!this.videoCaption.frozen && el.length) {
+        // Automatic scrolling gets disabled if one of the captions has received 
+        // focus through tabbing. 
+        if (!this.videoCaption.frozen && el.length && this.videoCaption.autoScrolling) {
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
                 {

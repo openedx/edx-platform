@@ -218,9 +218,6 @@ USE_L10N = True
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
 
-# Tracking
-TRACK_MAX_EVENT = 10000
-
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -257,8 +254,10 @@ PIPELINE_JS = {
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
              'js/models/uploads.js', 'js/views/uploads.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/src/utility.js',
-             'js/models/settings/course_grading_policy.js'],
+             'js/src/utility.js',
+             'js/models/settings/course_grading_policy.js',
+             'js/models/asset.js', 'js/models/assets.js',
+             'js/views/assets_view.js', 'js/views/asset_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -358,6 +357,9 @@ INSTALLED_APPS = (
     # Tracking
     'track',
 
+    # Monitoring
+    'datadog',
+
     # For asset pipelining
     'mitxmako',
     'pipeline',
@@ -373,6 +375,7 @@ INSTALLED_APPS = (
     # for managing course modes
     'course_modes'
 )
+
 
 ################# EDX MARKETING SITE ##################################
 
@@ -390,3 +393,20 @@ MKTG_URL_LINK_MAP = {
 }
 
 COURSES_WITH_UNSAFE_CODE = []
+
+############################## EVENT TRACKING #################################
+
+TRACK_MAX_EVENT = 10000
+
+TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking'
+        }
+    }
+}
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']

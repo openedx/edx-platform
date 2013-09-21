@@ -40,6 +40,25 @@ div.name{
 
 section.combined-open-ended {
   @include clearfix;
+  
+  .written-feedback {
+    position: relative;
+    margin: 0px;
+    height: 150px;
+    border: 1px solid lightgray;
+    padding: 5px;
+    resize: vertical;
+    width: 99%;
+    overflow: auto;
+    
+    .del {
+      text-decoration: line-through;
+      background-color: #ffc3c3;
+    }
+    .ins {
+      background-color: #c3ffc3;
+    }
+  }
 }
 
 
@@ -303,7 +322,7 @@ div.combined-rubric-container {
 
   div.written-feedback {
       background: #f6f6f6;
-      padding: 15px;
+      padding: 5px;
     }
 }
   

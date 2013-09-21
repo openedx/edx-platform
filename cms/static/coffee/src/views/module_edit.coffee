@@ -60,8 +60,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
     payload.parent_location = parent
     $.post(
         "/create_item"
-        payload 
-        (data) => 
+        payload
+        (data) =>
             @model.set(id: data.id)
             @$el.data('id', data.id)
             @render()
@@ -85,7 +85,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     data.metadata = _.extend(data.metadata || {}, @changedMetadata())
     @hideModal()
     saving = new CMS.Views.Notification.Mini
-      title: gettext('Saving') + '&hellip;'
+      title: gettext('Saving&hellip;')
     saving.show()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)

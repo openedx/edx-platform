@@ -5,6 +5,26 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: enhanced shib support, including detection of linked shib account
+at login page and support for the ?next= GET parameter.
+
+LMS: Experimental feature using the ICE change tracker JS pkg to allow peer 
+assessors to edit the original submitter's work.
+
+LMS: Fixed a bug that caused links from forum user profile pages to
+threads to lead to 404s if the course id contained a '-' character.
+
+Studio/LMS: Added ability to set due date formatting through Studio's Advanced Settings.
+The key is due_date_display_format, and the value should be a format supported by Python's
+strftime function.
+
+Common: Added configurable backends for tracking events. Tracking events using
+the python logging module is the default backend. Support for MongoDB and a
+Django database is also available.
+
+Blades: Added Learning Tools Interoperability (LTI) blade. Now LTI components
+can be included to courses.
+
 LMS: Added alphabetical sorting of forum categories and subcategories.
 It is hidden behind a false defaulted course level flag.
 
@@ -283,4 +303,3 @@ Common: Updated CodeJail.
 Common: Allow setting of authentication session cookie name.
 
 LMS: Option to email students when enroll/un-enroll them.
-

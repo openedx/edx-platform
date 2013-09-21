@@ -2,7 +2,10 @@
 Unit tests for the asset upload endpoint.
 """
 
-import json
+#pylint: disable=C0111
+#pylint: disable=W0621
+#pylint: disable=W0212
+
 from datetime import datetime
 from io import BytesIO
 from pytz import UTC
@@ -12,7 +15,9 @@ from django.core.urlresolvers import reverse
 from contentstore.views import assets
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml_importer import import_from_xml
 
 class AssetsTestCase(CourseTestCase):
     def setUp(self):
@@ -27,20 +32,25 @@ class AssetsTestCase(CourseTestCase):
         resp = self.client.get(self.url)
         self.assertEquals(resp.status_code, 200)
 
-    def test_json(self):
-        resp = self.client.get(
-            self.url,
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEquals(resp.status_code, 200)
-        content = json.loads(resp.content)
-        self.assertIsInstance(content, list)
-
     def test_static_url_generation(self):
         location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
         path = StaticContent.get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
+
+
+class AssetsToyCourseTestCase(CourseTestCase):
+    """
+    Tests the assets returned from asset_index for the toy test course.
+    """
+    def test_toy_assets(self):
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=contentstore(), verbose=True)
+        url = reverse("asset_index", kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+
+        resp = self.client.get(url)
+        # Test a small portion of the asset data passed to the client.
+        self.assertContains(resp, "new CMS.Models.AssetCollection([{")
+        self.assertContains(resp, "/c4x/edX/toy/asset/handouts_sample_handout.txt")
 
 
 class UploadTestCase(CourseTestCase):
@@ -71,32 +81,25 @@ class UploadTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 405)
 
 
-class AssetsToJsonTestCase(TestCase):
+class AssetToJsonTestCase(TestCase):
     """
-    Unit tests for transforming the results of a database call into something
+    Unit test for transforming asset information into something
     we can send out to the client via JSON.
     """
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
-        asset = {
-            "displayname": "foo",
-            "chunkSize": 512,
-            "filename": "foo.png",
-            "length": 100,
-            "uploadDate": upload_date,
-            "_id": {
-                "course": "course",
-                "org": "org",
-                "revision": 12,
-                "category": "category",
-                "name": "name",
-                "tag": "tag",
-            }
-        }
-        output = assets.assets_to_json_dict([asset])
-        self.assertEquals(len(output), 1)
-        compare = output[0]
-        self.assertEquals(compare["name"], "foo")
-        self.assertEquals(compare["path"], "foo.png")
-        self.assertEquals(compare["uploaded"], upload_date.isoformat())
-        self.assertEquals(compare["id"], "/tag/org/course/12/category/name")
+
+        location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
+        thumbnail_location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name_thumb.jpg'])
+
+        output = assets._get_asset_json("my_file", upload_date, location, thumbnail_location)
+
+        self.assertEquals(output["display_name"], "my_file")
+        self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
+        self.assertEquals(output["url"], "/i4x/foo/bar/asset/my_file_name.jpg")
+        self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
+        self.assertEquals(output["thumbnail"], "/i4x/foo/bar/asset/my_file_name_thumb.jpg")
+        self.assertEquals(output["id"], output["url"])
+
+        output = assets._get_asset_json("name", upload_date, location, None)
+        self.assertIsNone(output["thumbnail"])

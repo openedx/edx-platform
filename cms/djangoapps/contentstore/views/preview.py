@@ -81,7 +81,6 @@ def preview_component(request, location):
         component,
         'xmodule_edit.html'
     )
-
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
         'editor': component.runtime.render(component, None, 'studio_view').content,
@@ -104,20 +103,21 @@ def preview_module_system(request, preview_id, descriptor):
         return lms_field_data(descriptor._field_data, student_data)
 
     course_id = get_course_for_item(descriptor.location).location.course_id
-
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
-        filestore=descriptor.system.resources_fs,
+        filestore=descriptor.runtime.resources_fs,
         get_module=partial(load_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xblock_field_data=preview_field_data,
+        xmodule_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         mixins=settings.XBLOCK_MIXINS,
+        course_id=course_id,
+        anonymous_student_id='student'
     )
 
 

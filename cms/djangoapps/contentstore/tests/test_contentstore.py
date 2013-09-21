@@ -55,6 +55,8 @@ from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
 
+from contentstore.utils import delete_course_and_groups
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -351,7 +353,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_create_static_tab_and_rename(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])    
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
         item = ItemFactory.create(parent_location=course_location, category='static_tab', display_name="My Tab")
 
@@ -591,9 +593,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
@@ -626,7 +628,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_empty_trashcan(self):
         '''
-        This test will exercise the empting of the asset trashcan
+        This test will exercise the emptying of the asset trashcan
         '''
         content_store = contentstore()
         trash_store = contentstore('trashcan')
@@ -642,9 +644,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         # make sure there's something in the trashcan
         all_assets = trash_store.get_all_content_for_course(course_location)
@@ -733,7 +735,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
             # we want to assert equality between the objects, but we know the locations
             # differ, so just make them equal for testing purposes
-            source_item.scope_ids = source_item.scope_ids._replace(def_id=new_loc, usage_id=new_loc)
+            source_item.location = new_loc
             if hasattr(source_item, 'data') and hasattr(lookup_item, 'data'):
                 self.assertEqual(source_item.data, lookup_item.data)
 
@@ -914,8 +916,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             depth=1
         )
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        draft_loc = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
-        vertical.scope_ids = vertical.scope_ids._replace(def_id=draft_loc, usage_id=draft_loc)
+        vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
 
         draft_store.save_xmodule(vertical)
         orphan_vertical = draft_store.get_item(vertical.location)
@@ -933,8 +934,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         root_dir = path(mkdtemp_clean())
 
         # now create a new/different private (draft only) vertical
-        draft_loc = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
-        vertical.scope_ids = vertical.scope_ids._replace(def_id=draft_loc, usage_id=draft_loc)
+        vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
         draft_store.save_xmodule(vertical)
         private_vertical = draft_store.get_item(vertical.location)
         vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
@@ -983,7 +983,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
         # remove old course
-        delete_course(module_store, content_store, location)
+        delete_course(module_store, content_store, location, commit=True)
 
         # reimport
         import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
@@ -1291,6 +1291,28 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+
+    def test_forum_unseeding_on_delete(self):
+        """Test new course creation and verify forum unseeding """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+        course_id = self._get_course_id(test_course_data)
+        delete_course_and_groups(course_id, commit=True)
+        self.assertFalse(are_permissions_roles_seeded(course_id))
+
+    def test_forum_unseeding_with_multiple_courses(self):
+        """Test new course creation and verify forum unseeding when there are multiple courses"""
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+
+        # unseed the forums for the first course
+        course_id = self._get_course_id(test_course_data)
+        delete_course_and_groups(course_id, commit=True)
+        self.assertFalse(are_permissions_roles_seeded(course_id))
+
+        second_course_id = self._get_course_id(second_course_data)
+        # permissions should still be there for the other course
+        self.assertTrue(are_permissions_roles_seeded(second_course_id))
 
     def _get_course_id(self, test_course_data):
         """Returns the course ID (org/number/run)."""

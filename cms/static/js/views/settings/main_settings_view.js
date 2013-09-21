@@ -60,7 +60,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 
         var imageURL = this.model.get('course_image_asset_path');
-        this.$el.find('#course-image-url').val(imageURL)
+        this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
 
         return this;
@@ -184,8 +184,16 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         if (forcedTarget) {
             thisTarget = forcedTarget;
             thisTarget.id = $(thisTarget).attr('id');
-        } else {
+        } else if (e !== null) {
             thisTarget = e.currentTarget;
+        } else
+        {
+            // e and forcedTarget can be null so don't deference it
+            // This is because in cases where we have a marketing site
+            // we don't display the codeMirrors for editing the marketing
+            // materials, except we do need to show the 'set course image'
+            // workflow. So in this case e = forcedTarget = null.
+            return;
         }
 
         if (!this.codeMirrors[thisTarget.id]) {
@@ -254,9 +262,9 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             model: upload,
             onSuccess: function(response) {
                 var options = {
-                    'course_image_name': response.displayname,
-                    'course_image_asset_path': response.url
-                }
+                    'course_image_name': response.asset.display_name,
+                    'course_image_asset_path': response.asset.url
+                };
                 self.model.set(options);
                 self.render();
                 $('#course-image').attr('src', self.model.get('course_image_asset_path'))

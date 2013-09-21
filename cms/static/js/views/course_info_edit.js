@@ -118,7 +118,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext('Saving') + '&hellip;'
+            title: gettext('Saving&hellip;')
         });
         saving.show();
         var ele = this.modelDom(event);
@@ -183,7 +183,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                         });
                         self.modelDom(event).remove();
                         var deleting = new CMS.Views.Notification.Mini({
-                            title: gettext('Deleting') + '&hellip;'
+                            title: gettext('Deleting&hellip;')
                         });
                         deleting.show();
                         targetModel.destroy({
@@ -327,7 +327,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     onSave: function(event) {
         this.model.set('data', this.$codeMirror.getValue());
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext('Saving') + '&hellip;'
+            title: gettext('Saving&hellip;')
         });
         saving.show();
         this.model.save({}, {

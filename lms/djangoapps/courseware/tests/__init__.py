@@ -48,7 +48,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def xblock_field_data(self, descriptor):
+    def xmodule_field_data(self, descriptor):
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
@@ -86,12 +86,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        self.runtime = get_test_system()
+        self.runtime = get_test_system(course_id=self.course.id)
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
 
-        self.runtime.xblock_field_data = self.xblock_field_data
+        self.runtime.xmodule_field_data = self.xmodule_field_data
 
         self.item_module = self.item_descriptor.xmodule(self.runtime)
 

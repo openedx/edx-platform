@@ -1,0 +1,22 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="sr message-accessibility message" id="mathjax-accessibility-message" aria-hidden="true">
+	<p class="copy">${
+		_("This page features MathJax technology to render mathematical "
+		  "formulae. To make math accessibile, we suggest using the MathPlayer "
+		  "plugin. Please visit the {link_start}MathPlayer Download "
+		  "Page{link_end} to download the plugin for your browser.").format(
+			  link_start = u'<a href="//www.dessci.com/en/products/mathplayer/'
+			                'download.htm">',
+			  link_end = u'</a>')
+	}</p>
+</div>
+
+<!--[if (lt IE 6)|(gt IE 9)|(!IE)]><!-->
+<div class="sr message-accessibility message" id="mathplayer-browser-message" aria-hidden="true">
+	<p class="copy">
+	 ${_("Your browser does not support the MathPlayer plugin. To use "
+	 	 "MathPlayer, please use Internet Explorer 6 through 9.")}
+	 </p>
+</div>
+<!--<![endif]-->
