@@ -514,8 +514,16 @@ class ShibUtilFnTest(TestCase):
     """
     def test__flatten_to_ascii(self):
         DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
+        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
         FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
         self.assertEqual(_flatten_to_ascii(u'jas\xf6n'), u'jason')  # umlaut
         self.assertEqual(_flatten_to_ascii(u'Jason\u5305'), u'Jason')  # mandarin, so it just gets dropped
         self.assertEqual(_flatten_to_ascii(u'abc'), u'abc')  # pass through
-        self.assertEqual(_flatten_to_ascii(DIACRITIC), FLATTENED)
+
+        unicode_test = _flatten_to_ascii(DIACRITIC)
+        self.assertEqual(unicode_test, FLATTENED)
+        self.assertIsInstance(unicode_test, unicode)
+
+        str_test = _flatten_to_ascii(STR_DIACRI)
+        self.assertEqual(str_test, FLATTENED)
+        self.assertIsInstance(str_test, str)
