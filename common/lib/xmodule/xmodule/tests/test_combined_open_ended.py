@@ -74,6 +74,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
+            'peer_grade_finished_submissions_when_none_pending': False,
         }
     }
     definition = Mock()
@@ -197,6 +198,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
+            'peer_grade_finished_submissions_when_none_pending': False,
         }
     }
 
