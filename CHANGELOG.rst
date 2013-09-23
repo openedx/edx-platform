@@ -5,7 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-LMS: Improved accessibility of parts of forum navigation sidebar
+LMS: Improved accessibility of parts of forum navigation sidebar.
+
+LMS: enhanced accessibility labeling and aria support for the discussion forum new post dropdown as well as response and comment area labeling.
 
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
