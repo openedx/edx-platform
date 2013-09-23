@@ -907,7 +907,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         content_store = contentstore()
 
-        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
         location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
         # get a vertical (and components in it) to copy into an orphan sub dag
@@ -986,7 +986,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         delete_course(module_store, content_store, location, commit=True)
 
         # reimport
-        import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
+        import_from_xml(
+            module_store, root_dir, ['test_export'], draft_store=draft_store, static_content_store=content_store
+        )
 
         items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'vertical', None]))
         self.assertGreater(len(items), 0)
