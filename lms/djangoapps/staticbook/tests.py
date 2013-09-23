@@ -105,10 +105,9 @@ class StaticImageBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_page_xss(self):
-        # The page in the URL used to go right on the page.
+    def test_bad_page_id(self):
+        # A bad page id will cause a 404.        
         self.make_course(textbooks=[IMAGE_BOOK])
-        # It's no longer possible to use a non-integer page.
         with self.assertRaises(NoReverseMatch):
             self.make_url('book', book_index=0, page='xyzzy')
 
