@@ -27,9 +27,11 @@
                 </span>
             </div>
             ${result['result'] | n}
-            <div class="written-feedback">
-                ${result['feedback'] | n}
-            </div>
+            % if result.get('feedback'):
+                <div class="written-feedback">
+                    ${result['feedback'] | n}
+                </div>
+            %endif
         </div>
     %endif
 
