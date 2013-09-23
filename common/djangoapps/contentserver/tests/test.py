@@ -45,31 +45,42 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
         settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
-        self.client = Client()
-
-        loc = Location('c4x', 'edX', 'toy', 'asset', 'sample_static.txt' )
-        self.loc =  loc
-
-        rel_url = StaticContent.get_url_path_from_location(loc)
         base = "http://127.0.0.1:8000"
-
+        self.client = Client()
         self.contentstore = contentstore()
+
+        # A locked the asset
+        loc = Location('c4x', 'edX', 'toy', 'asset', 'sample_static.txt' )
+        self.loc = loc
+        rel_url = StaticContent.get_url_path_from_location(loc)
+        self.url = base + rel_url
+
+        # An unlocked asset
+        loc2 = Location('c4x', 'edX', 'toy', 'asset', 'another_static.txt' )
+        self.loc2 = loc2
+        rel_url2 = StaticContent.get_url_path_from_location(loc2)
+        self.url2 = base + rel_url2
+
+
         import_from_xml(modulestore('direct'), 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
-        self.url = base + rel_url
+
+        self.contentstore.set_attr(self.loc, 'locked', True)
+
 
     def tearDown(self):
 
         MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         _CONTENTSTORE.clear()
 
-    def test_aunlocked_asset(self):
+    def test_unlocked_asset(self):
         """
         Test that unlocked assets are being served.
         """
-        # Unlock the asset
-        self.contentstore.set_attr(self.loc, 'locked', False)
-        resp = self.client.get(self.url)
+        # Logout user
+        self.client.logout()
+
+        resp = self.client.get(self.url2)
         self.assertEqual(resp.status_code, 200)
 
 
@@ -80,10 +91,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             (2) User is logged in in but not registerd for the course
             (3) User is logged in and registered
         """
-
-        # Lock the asset
-        self.contentstore.set_attr(self.loc, 'locked', True)
-
 
         # Case (1)
         resp = self.client.get(self.url)
@@ -110,7 +117,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # Case (3)
         #   Enroll student
         course_id = "/".join([self.loc.org, self.loc.course, self.loc.name])
-        self.assertTrue(CourseEnrollment.enroll(user, course_id))
+        CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
 
         resp = self.client.get(self.url)
