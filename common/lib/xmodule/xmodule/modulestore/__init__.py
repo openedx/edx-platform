@@ -169,7 +169,9 @@ class Location(_LocationBase):
             # names allow colons
             check(list_[4], INVALID_CHARS_NAME)
 
-        if isinstance(location, basestring):
+        if isinstance(location, Location):
+            return location
+        elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
                 log.debug('location is instance of %s but no URL match' % basestring)
@@ -195,8 +197,6 @@ class Location(_LocationBase):
 
             check_dict(kwargs)
             return _LocationBase.__new__(_cls, **kwargs)
-        elif isinstance(location, Location):
-            return _LocationBase.__new__(_cls, location)
         else:
             raise InvalidLocationError(location)
 
