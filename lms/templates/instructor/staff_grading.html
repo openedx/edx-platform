@@ -27,7 +27,7 @@
 <section class="problem-list-container">
   <h2>${_("Instructions")}</h2>
   <div class="instructions">
-    <p>${_("This is the list of problems that currently need to be graded in order to train the machine learning models. Each problem needs to be trained separately, and we have indicated the number of student submissions that need to be graded in order for a model to be generated. You can grade more than the minimum required number of submissions--this will improve the accuracy of machine learning, though with diminishing returns. You can see the current accuracy of machine learning while grading.")}</p>
+    <p>${_("This is the list of problems that currently need to be graded in order to train AI grading and create calibration essays for peer grading. Each problem needs to be treated separately, and we have indicated the number of student submissions that need to be graded.  You can grade more than the minimum required number of submissions--this will improve the accuracy of AI grading, though with diminishing returns. You can see the current accuracy of AI grading in the problem view.")}</p>
   </div>
 
   <h2>${_("Problem List")}</h2>
@@ -45,6 +45,9 @@
       <div class="problem-meta-info-container">
       </div>
       <div class="ml-error-info-container">
+      </div>
+      <div class="checkout-warning">
+          <p>${_("Please note that when you see a submission here, it has been temporarily removed from the grading pool.  The submission will return to the grading pool after 30 minutes without any grade being submitted.  Hitting the back button will result in a 30 minute wait to be able to grade this submission again.")}</p>
       </div>
   </div>
   <div class="prompt-information-container">

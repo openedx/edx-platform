@@ -23,6 +23,11 @@ def i_fill_in_a_new_course_information(step):
     fill_in_course_info()
 
 
+@step('I create a course with "([^"]*)", "([^"]*)", "([^"]*)", and "([^"]*)"')
+def i_create_course(step, name, org, number, run):
+    fill_in_course_info(name=name, org=org, num=number, run=run)
+
+
 @step('I create a new course$')
 def i_create_a_course(step):
     create_a_course()
@@ -32,6 +37,11 @@ def i_create_a_course(step):
 def i_click_the_course_link_in_my_courses(step):
     course_css = 'a.course-link'
     world.css_click(course_css)
+
+
+@step('I see an error about the length of the org/course/run tuple')
+def i_see_error_about_length(step):
+    assert world.css_has_text('#course_creation_error', 'The combined length of the organization, course number, and course run fields cannot be more than 65 characters.')
 
 ############ ASSERTIONS ###################
 

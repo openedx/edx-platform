@@ -1,4 +1,4 @@
-<%namespace file="../main.html" import="stanford_theme_enabled" />
+﻿<%namespace file="../main.html" import="stanford_theme_enabled" />
 
 Спасибо за регистрацию на курсах повышения квалификации учителей
 Чтобы активировать вашу учетную запись, перейдите по ссылке указанной ниже:

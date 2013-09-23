@@ -29,9 +29,9 @@ class MixedModuleStore(ModuleStoreBase):
         if 'default' not in stores:
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
 
-        for key in stores:
-            self.modulestores[key] = create_modulestore_instance(stores[key]['ENGINE'],
-                                                                 stores[key]['OPTIONS'])
+        for key, store in stores.items():
+            self.modulestores[key] = create_modulestore_instance(store['ENGINE'],
+                                                                 store['OPTIONS'])
 
     def _get_modulestore_for_courseid(self, course_id):
         """

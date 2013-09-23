@@ -7,6 +7,11 @@ from nose.tools import assert_equal  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
+from xmodule.x_module import ModuleSystem
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -24,6 +29,7 @@ from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
+from xmodule.tests import get_test_descriptor_system
 
 LEAF_XMODULES = (
     AnnotatableDescriptor,
@@ -63,26 +69,26 @@ class TestXBlockWrapper(object):
 
     @property
     def leaf_module_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        runtime.anonymous_student_id = 'dummy_anonymous_student_id'
-        runtime.open_ended_grading_interface = {}
-        runtime.seed = 5
-        runtime.get = lambda x: getattr(runtime, x)
-        runtime.ajax_url = 'dummy_ajax_url'
-        runtime.xblock_model_data = lambda d: d._model_data
-        return runtime
-
-    @property
-    def leaf_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        runtime = ModuleSystem(
+            render_template=lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs),
+            anonymous_student_id='dummy_anonymous_student_id',
+            open_ended_grading_interface={},
+            ajax_url='dummy_ajax_url',
+            xmodule_field_data=lambda d: d._field_data,
+            get_module=Mock(),
+            replace_urls=Mock(),
+            track_function=Mock(),
+        )
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
-        return descriptor_cls(
-            self.leaf_descriptor_runtime,
-            {'location': 'i4x://org/course/category/name'}
+        location = 'i4x://org/course/category/name'
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
+            DictFieldData({}),
+            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def leaf_module(self, descriptor_cls):
@@ -93,23 +99,20 @@ class TestXBlockWrapper(object):
         if depth == 0:
             runtime.get_module.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
         else:
-            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth-1)
+            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth - 1)
         runtime.position = 2
         return runtime
 
-    @property
-    def container_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        return runtime
-
     def container_descriptor(self, descriptor_cls):
-        return descriptor_cls(
-            self.container_descriptor_runtime,
-            {
-                'location': 'i4x://org/course/category/name',
+        location = 'i4x://org/course/category/name'
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
+            DictFieldData({
                 'children': range(3)
-            }
+            }),
+            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def container_module(self, descriptor_cls, depth):
@@ -185,9 +188,9 @@ class TestStudioView(TestXBlockWrapper):
 
     # Test that for all of the Descriptors listed in CONTAINER_XMODULES
     # render the same thing using studio_view as they do using get_html, under the following conditions:
-    # a) All of its descendents are xmodules
-    # b) Some of its descendents are xmodules and some are xblocks
-    # c) All of its descendents are xblocks
+    # a) All of its descendants are xmodules
+    # b) Some of its descendants are xmodules and some are xblocks
+    # c) All of its descendants are xblocks
     def test_studio_view_container_node(self):
         for descriptor_cls in CONTAINER_XMODULES:
             yield self.check_studio_view_container_node_xmodules_only, descriptor_cls

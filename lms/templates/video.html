@@ -23,13 +23,20 @@
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
     data-autoplay="${autoplay}"
+    data-yt-test-timeout="${yt_test_timeout}"
+    data-yt-test-url="${yt_test_url}"
+
+    tabindex="-1"
 >
+    <div class="focus_grabber first"></div>
+
     <div class="tc-wrapper">
         <article class="video-wrapper">
             <div class="video-player-pre"></div>
 
             <section class="video-player">
                 <div id="${id}"></div>
+                <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
             </section>
 
             <div class="video-player-post"></div>
@@ -67,6 +74,8 @@
 
         <ol class="subtitles" tabindex="0" title="Captions"><li></li></ol>
     </div>
+
+    <div class="focus_grabber last"></div>
 </div>
 
 % if sources.get('main'):

@@ -20,6 +20,7 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 
 class EmailTestException(Exception):
+    """Mock exception for email testing."""
     pass
 
 
@@ -165,7 +166,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Tests retries when the email doesn't exist
         """
         delegate_email_batches.delay(-1, self.instructor.id)
-        ((log_str, email_id, num_retries), _) = mock_log.warning.call_args
+        ((log_str, email_id, _num_retries), _) = mock_log.warning.call_args
         self.assertTrue(mock_log.warning.called)
         self.assertIn('Failed to get CourseEmail with id', log_str)
         self.assertEqual(email_id, -1)

@@ -20,13 +20,16 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
 from xmodule.html_module import HtmlDescriptor
+from xblock.fields import ScopeIds
+from xblock.field_data import DictFieldData
 
 from . import ModuleStoreBase, Location, XML_MODULESTORE_TYPE
+
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+                                 remove_comments=False, remove_blank_text=True)
 
 etree.set_default_parser(edx_xml_parser)
 
@@ -44,7 +47,7 @@ def clean_out_mako_templating(xml_string):
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 policy, error_tracker, parent_tracker,
+                 error_tracker, parent_tracker,
                  load_error_modules=True, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
@@ -170,7 +173,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                msg = "Error loading from xml. " + str(err)[:200]
+                msg = "Error loading from xml. " + unicode(err)[:200]
                 log.warning(msg)
                 # Normally, we don't want lots of exception traces in our logs from common
                 # content problems.  But if you're debugging the xml loading code itself,
@@ -187,7 +190,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     err_msg
                 )
 
-            setattr(descriptor, 'data_dir', course_dir)
+            descriptor.data_dir = course_dir
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
@@ -206,11 +209,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # policy to be loaded.  For now, just add the course_id here...
         load_item = lambda location: xmlstore.get_instance(course_id, location)
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
-
-        MakoDescriptorSystem.__init__(self, load_item, resources_fs,
-                                      error_tracker, render_template, **kwargs)
-        XMLParsingSystem.__init__(self, load_item, resources_fs,
-                                  error_tracker, process_xml, policy, **kwargs)
+        super(ImportSystem, self).__init__(
+            load_item=load_item,
+            resources_fs=resources_fs,
+            render_template=render_template,
+            error_tracker=error_tracker,
+            process_xml=process_xml,
+            **kwargs
+        )
 
 
 class ParentTracker(object):
@@ -311,7 +317,8 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir.encode("utf-8"),
+                    unicode(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
@@ -412,13 +419,14 @@ class XMLModuleStore(ModuleStoreBase):
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
             system = ImportSystem(
-                self,
-                course_id,
-                course_dir,
-                policy,
-                tracker,
-                self.parent_trackers[course_id],
-                self.load_error_modules,
+                xmlstore=self,
+                course_id=course_id,
+                course_dir=course_dir,
+                error_tracker=tracker,
+                parent_tracker=self.parent_trackers[course_id],
+                load_error_modules=self.load_error_modules,
+                policy=policy,
+                mixins=self.xblock_mixins,
             )
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
@@ -467,9 +475,13 @@ class XMLModuleStore(ModuleStoreBase):
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = HtmlDescriptor(
-                        system,
-                        {'data': html, 'location': loc, 'category': category}
+                    module = system.construct_xblock_from_class(
+                        HtmlDescriptor,
+                        DictFieldData({'data': html, 'location': loc, 'category': category}),
+                        # We're loading a descriptor, so student_id is meaningless
+                        # We also don't have separate notions of definition and usage ids yet,
+                        # so we use the location for both
+                        ScopeIds(None, category, loc, loc),
                     )
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
@@ -482,8 +494,9 @@ class XMLModuleStore(ModuleStoreBase):
                     module.save()
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
-                    system.error_tracker("ERROR: " + str(e))
+                    logging.exception("Failed to load %s. Skipping... \
+                            Exception: %s", filepath, unicode(e))
+                    system.error_tracker("ERROR: " + unicode(e))
 
     def get_instance(self, course_id, location, depth=0):
         """

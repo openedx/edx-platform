@@ -11,15 +11,11 @@ describe "CMS.Views.UploadDialog", ->
         @model = new CMS.Models.FileUpload(
           mimeTypes: ['application/pdf']
         )
-        @chapter = new CMS.Models.Chapter()
+        @dialogResponse = dialogResponse = []
         @view = new CMS.Views.UploadDialog(
           model: @model,
           onSuccess: (response) =>
-            options = {}
-            if !@chapter.get('name')
-              options.name = response.displayname
-            options.asset_path = response.url
-            @chapter.set(options)
+            dialogResponse.push(response.response)
         )
         spyOn(@view, 'remove').andCallThrough()
 
@@ -66,7 +62,6 @@ describe "CMS.Views.UploadDialog", ->
             expect(@view.$el).toContain("#upload_error")
             expect(@view.$(".action-upload")).toHaveClass("disabled")
 
-
         it "adds body class on show()", ->
             @view.show()
             expect(@view.options.shown).toBeTruthy()
@@ -99,11 +94,10 @@ describe "CMS.Views.UploadDialog", ->
             expect(request.method).toEqual("POST")
 
             request.respond(200, {"Content-Type": "application/json"},
-                    '{"displayname": "starfish", "url": "/uploaded/starfish.pdf"}')
+                    '{"response": "dummy_response"}')
             expect(@model.get("uploading")).toBeFalsy()
             expect(@model.get("finished")).toBeTruthy()
-            expect(@chapter.get("name")).toEqual("starfish")
-            expect(@chapter.get("asset_path")).toEqual("/uploaded/starfish.pdf")
+            expect(@dialogResponse.pop()).toEqual("dummy_response")
 
         it "can handle upload errors", ->
             @view.upload()
@@ -114,7 +108,7 @@ describe "CMS.Views.UploadDialog", ->
         it "removes itself after two seconds on successful upload", ->
             @view.upload()
             @requests[0].respond(200, {"Content-Type": "application/json"},
-                    '{"displayname": "starfish", "url": "/uploaded/starfish.pdf"}')
+                    '{"response": "dummy_response"}')
             expect(@view.remove).not.toHaveBeenCalled()
             @clock.tick(2001)
             expect(@view.remove).toHaveBeenCalled()

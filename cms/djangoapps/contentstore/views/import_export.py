@@ -60,7 +60,7 @@ def import_course(request, org, course, name):
         `filename` is truncted on creation. Additionally removes dirname on
         exit.
         """
-        open("file", "w").close()
+        open(filename, "w").close()
         try:
             yield filename
         finally:
@@ -90,7 +90,7 @@ def import_course(request, org, course, name):
         try:
             matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
             content_range = matches.groupdict()
-        except KeyError:    # Single chunk 
+        except KeyError:    # Single chunk
             # no Content-Range header, so make one that will work
             content_range = {'start': 0, 'stop': 1, 'end': 2}
 
@@ -154,7 +154,7 @@ def import_course(request, org, course, name):
                     sf.write("Extracting")
 
                 tar_file = tarfile.open(temp_filepath)
-                tar_file.extractall(course_dir + '/')
+                tar_file.extractall((course_dir + '/').encode('utf-8'))
 
                 with open(status_file, 'w+') as sf:
                     sf.write("Verifying")

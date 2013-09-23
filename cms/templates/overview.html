@@ -157,19 +157,19 @@
               <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
               <div class="section-published-date">
                 <%
-                  if section.lms.start is not None:
-                      start_date_str = section.lms.start.strftime('%m/%d/%Y')
-                      start_time_str = section.lms.start.strftime('%H:%M')
+                  if section.start is not None:
+                      start_date_str = section.start.strftime('%m/%d/%Y')
+                      start_time_str = section.start.strftime('%H:%M')
                   else:
                       start_date_str = ''
                       start_time_str = ''
                 %>
-                %if section.lms.start is None:
+                %if section.start is None:
                   <span class="published-status">${_("This section has not been released.")}</span>
                   <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">${_("Schedule")}</a>
                 %else:
                   <span class="published-status"><strong>${_("Will Release:")}</strong>
-                  ${date_utils.get_default_time_display(section.lms.start)}</span>
+                  ${date_utils.get_default_time_display(section.start)}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}"
                     data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
                 %endif
@@ -199,7 +199,7 @@
                     </a>
                   </div>
 
-                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else _('Not Graded')}">
+                  <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
                   </div>
 
                   <div class="item-actions">

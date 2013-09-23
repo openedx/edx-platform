@@ -60,4 +60,3 @@ class Command(BaseCommand):
         for item in queried_discussion_items:
             if item.location.url() not in discussion_items:
                 print 'Found dangling discussion module = {0}'.format(item.location.url())
-

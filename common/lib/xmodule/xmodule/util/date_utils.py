@@ -2,7 +2,6 @@
 Convenience methods for working with datetime objects
 """
 from datetime import timedelta
-from django.utils.translation import ugettext as _
 import logging
 import datetime
 from django.utils.timezone import activate
@@ -41,6 +40,23 @@ def get_default_time_display(dt, show_timezone=True):
             timezone = u" UTC"
     return unicode(_date(dt, "l, j F Y H:i e "))
 
+def get_time_display(dtime, format_string=None):
+    """
+    Converts a datetime to a string representation.
+
+    If None is passed in for dt, an empty string will be returned.
+
+    If the format_string is None, or if format_string is improperly
+    formatted, this method will return the value from `get_default_time_display`.
+
+    format_string should be a unicode string that is a valid argument for datetime's strftime method.
+    """
+    if dtime is None or format_string is None:
+        return get_default_time_display(dtime)
+    try:
+        return unicode(dtime.strftime(format_string))
+    except ValueError:
+        return get_default_time_display(dtime)
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):
     """

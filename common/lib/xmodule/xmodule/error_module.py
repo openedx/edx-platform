@@ -12,7 +12,8 @@ from lxml import etree
 from xmodule.x_module import XModule, XModuleDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
-from xblock.core import String, Scope
+from xblock.fields import String, Scope, ScopeIds
+from xblock.field_data import DictFieldData
 
 
 log = logging.getLogger(__name__)
@@ -95,16 +96,19 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             )
 
         # real metadata stays in the content, but add a display name
-        model_data = {
+        field_data = DictFieldData({
             'error_msg': str(error_msg),
             'contents': contents,
             'display_name': 'Error: ' + location.url(),
             'location': location,
             'category': 'error'
-        }
-        return cls(
-            system,
-            model_data,
+        })
+        return system.construct_xblock_from_class(
+            cls,
+            field_data,
+            # The error module doesn't use scoped data, and thus doesn't need
+            # real scope keys
+            ScopeIds('error', None, location, location)
         )
 
     def get_context(self):
@@ -125,7 +129,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     @classmethod
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
-            descriptor.system,
+            descriptor.runtime,
             str(descriptor),
             error_msg,
             location=descriptor.location,

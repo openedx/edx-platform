@@ -6,7 +6,7 @@ from pkg_resources import resource_string
 from xmodule.editing_module import EditingDescriptor
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Scope, Integer, String
+from xblock.fields import Scope, Integer, String
 from .fields import Date
 
 

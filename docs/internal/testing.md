@@ -86,10 +86,12 @@ because the `capa` package handles problem XML.
 
 # Running Tests
 
-Before running tests, ensure that you have all the dependencies.  You can install dependencies using:
+You can run all of the unit-level tests using the command
 
-    rake install_prereqs
+    rake test
 
+This includes python, javascript, and documentation tests. It does not, however,
+run any acceptance tests.
 
 ## Running Python Unit tests
 
@@ -97,15 +99,15 @@ We use [nose](https://nose.readthedocs.org/en/latest/) through
 the [django-nose plugin](https://pypi.python.org/pypi/django-nose)
 to run the test suite.
 
-You can run tests using `rake` commands.  For example,
+You can run all the python tests using `rake` commands.  For example,
 
-    rake test
+    rake test:python
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
-You can re-run all failed python tests by running (all JS tests will still run)
+You can re-run all failed python tests by running
 
-    rake test[--failed]
+    rake test:python[--failed]
 
 You can also run the tests without `collectstatic`, which tends to be faster:
 

@@ -605,6 +605,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'save_post_assessment': self.message_post,
             'skip_post_assessment': self.skip_post_assessment,
             'check_for_score': self.check_for_score,
+            'store_answer': self.store_answer,
         }
 
         if dispatch not in handlers:
@@ -688,8 +689,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # set context variables and render template
         eta_string = None
         if self.child_state != self.INITIAL:
-            latest = self.latest_answer()
-            previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
@@ -698,8 +697,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         else:
             post_assessment = ""
             correct = ""
-            previous_answer = ""
-        previous_answer = previous_answer.replace("\n","<br/>")
+        previous_answer = self.get_display_answer()
+
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,

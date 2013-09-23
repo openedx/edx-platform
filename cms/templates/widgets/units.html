@@ -21,7 +21,7 @@ This def will enumerate through a passed in subsection and list all of the units
     %>
     <div class="section-item ${selected_class}">
       <a href="${reverse('edit_unit', args=[unit.location])}" class="${unit_state}-item">
-        <span class="${unit.category}-icon"></span>
+        <span class="${unit.scope_ids.block_type}-icon"></span>
         <span class="unit-name">${unit.display_name_with_default}</span>
       </a>
       % if actions:

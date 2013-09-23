@@ -33,7 +33,7 @@ from xmodule.html_module import HtmlDescriptor
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_cms_course_link_by_id
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -41,6 +41,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
+from instructor.views.tools import strip_if_string
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
@@ -50,13 +51,17 @@ from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.views import course_from_id
 import track.views
 from mitxmako.shortcuts import render_to_string
-
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from django.utils.translation import ugettext as _u
 
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
+
 
 log = logging.getLogger(__name__)
 
@@ -103,23 +108,17 @@ def instructor_dashboard(request, course_id):
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
         datatable = {'header': ['Statistic', 'Value'],
-                     'title': 'Course Statistics At A Glance',
+                     'title': _u('Course Statistics At A Glance'),
                      }
         data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
-            for field in course.fields:
+            for field in course.fields.values():
                 if getattr(field.scope, 'user', False):
                     continue
 
                 data.append([field.name, json.dumps(field.read_json(course))])
-            for namespace in course.namespaces:
-                for field in getattr(course, namespace).fields:
-                    if getattr(field.scope, 'user', False):
-                        continue
-
-                    data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
         datatable['data'] = data
         return datatable
 
@@ -173,6 +172,9 @@ def instructor_dashboard(request, course_id):
         Form is either urlname or modulename/urlname.  If no modulename
         is provided, "problem" is assumed.
         """
+        # remove whitespace
+        urlname = strip_if_string(urlname)
+
         # tolerate an XML suffix in the urlname
         if urlname[-4:] == ".xml":
             urlname = urlname[:-4]
@@ -187,6 +189,7 @@ def instructor_dashboard(request, course_id):
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
+        unique_student_identifier = strip_if_string(unique_student_identifier)
         msg = ""
         try:
             if "@" in unique_student_identifier:
@@ -205,7 +208,7 @@ def instructor_dashboard(request, course_id):
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
-            data_dir = getattr(course, 'data_dir')
+            data_dir = course.data_dir
             log.debug('git pull {0}'.format(data_dir))
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
@@ -219,7 +222,7 @@ def instructor_dashboard(request, course_id):
         if 'Reload course' in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
-                data_dir = getattr(course, 'data_dir')
+                data_dir = course.data_dir
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
                 track.views.server_track(request, "reload", {"directory": data_dir}, page="idashboard")
@@ -708,12 +711,14 @@ def instructor_dashboard(request, course_id):
         html_message = request.POST.get("message")
         text_message = html_to_text(html_message)
 
-        email = CourseEmail(course_id=course_id,
-                            sender=request.user,
-                            to_option=email_to_option,
-                            subject=email_subject,
-                            html_message=html_message,
-                            text_message=text_message)
+        email = CourseEmail(
+            course_id=course_id,
+            sender=request.user,
+            to_option=email_to_option,
+            subject=email_subject,
+            html_message=html_message,
+            text_message=text_message
+        )
 
         email.save()
 
@@ -792,23 +797,30 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
+    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
+    # 2) enable course email
+    is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    email_editor = None
     # HTML editor for email
-    if idash_mode == 'Email':
-        html_module = HtmlDescriptor(course.system, {'data': html_message})
+    if idash_mode == 'Email' and is_studio_course:
+        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
         email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
-    else:
-        email_editor = None
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
 
     # Flag for whether or not we display the email tab (depending upon
     # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
         course_stats = get_course_stats_table()
+
     #----------------------------------------
     # context for rendering
 
@@ -821,6 +833,7 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
+               'studio_url': studio_url,
 
                'to_option': email_to_option,      # email
                'subject': email_subject,          # email
@@ -842,7 +855,6 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
-
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -989,6 +1001,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
     to do.
     """
     user = None
+    username_or_email = strip_if_string(username_or_email)
     try:
         if '@' in username_or_email:
             user = User.objects.get(email=username_or_email)
@@ -1193,7 +1206,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         #Composition of email
         d = {'site_name': stripped_site_name,
              'registration_url': registration_url,
-             'course_id': course_id,
+             'course': course,
              'auto_enroll': auto_enroll,
              'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
              }
@@ -1243,8 +1256,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             if email_students:
                 #User enrolled for first time, populate dict with user specific info
                 d['email_address'] = student
-                d['first_name'] = user.first_name
-                d['last_name'] = user.last_name
+                d['full_name'] = user.profile.name
                 d['message'] = 'enrolled_enroll'
                 send_mail_ret = send_mail_to_student(student, d)
                 status[student] += (', email sent' if send_mail_ret else '')
@@ -1280,9 +1292,10 @@ def _do_unenroll_students(course_id, students, email_students=False):
 
     stripped_site_name = _remove_preview(settings.SITE_NAME)
     if email_students:
+        course = course_from_id(course_id)
         #Composition of email
         d = {'site_name': stripped_site_name,
-             'course_id': course_id}
+             'course': course}
 
     for student in old_students:
 
@@ -1315,8 +1328,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
                 if email_students:
                     #User was enrolled
                     d['email_address'] = student
-                    d['first_name'] = user.first_name
-                    d['last_name'] = user.last_name
+                    d['full_name'] = user.profile.name
                     d['message'] = 'enrolled_unenroll'
                     send_mail_ret = send_mail_to_student(student, d)
                     status[student] += (', email sent' if send_mail_ret else '')
@@ -1345,8 +1357,7 @@ def send_mail_to_student(student, param_dict):
     `auto_enroll`: user input option (a `str`)
     `course_url`: url of course (a `str`)
     `email_address`: email of student (a `str`)
-    `first_name`: student first name (a `str`)
-    `last_name`: student last name (a `str`)
+    `full_name`: student full name (a `str`)
     `message`: type of email to send and template to use (a `str`)
                                         ]
     Returns a boolean indicating whether the email was sent successfully.
@@ -1362,9 +1373,13 @@ def send_mail_to_student(student, param_dict):
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
 
+        # Remove leading and trailing whitespace from body
+        message = message.strip()
+
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+
         return True
     else:
         return False
@@ -1472,7 +1487,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            grade_format = getattr(s.lms, 'grade_format', None)
+            grade_format = getattr(s, 'grade_format', None)
             aname = ''
             if grade_format in graders:
                 g = graders[grade_format]

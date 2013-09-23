@@ -10,6 +10,16 @@ Feature: Upload Files
         Then I should see the file "test" was uploaded
         And The url for the file "test" is valid
 
+    @skip_safari
+    Scenario: Users can upload multiple files
+        Given I have opened a new course in studio
+        And I go to the files and uploads page
+        When I upload the files "test","test2"
+        Then I should see the file "test" was uploaded
+        And I should see the file "test2" was uploaded
+        And The url for the file "test2" is valid
+        And The url for the file "test" is valid
+
     # Uploading isn't working on safari with sauce labs
     @skip_safari
     Scenario: Users can update files

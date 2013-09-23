@@ -10,27 +10,12 @@ CMS.Views.Checklists = Backbone.View.extend({
     },
 
     initialize : function() {
-        var self = this;
-
-        this.collection.fetch({
-                complete: function () {
-                    window.templateLoader.loadRemoteTemplate("checklist",
-                        "/static/client_templates/checklist.html",
-                        function (raw_template) {
-                            self.template = _.template(raw_template);
-                            self.render();
-                        }
-                    );
-                },
-                reset: true
-            }
-        );
+        this.template = _.template($("#checklist-tpl").text());
+        this.listenTo(this.collection, 'reset', this.render);
+        this.render();
     },
 
     render: function() {
-        // catch potential outside call before template loaded
-        if (!this.template) return this;
-
         this.$el.empty();
 
         var self = this;

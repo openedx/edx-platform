@@ -1,14 +1,15 @@
 import json
+import re
+
+from django.conf import settings
 
 import views
 
 
-class TrackMiddleware:
+class TrackMiddleware(object):
     def process_request(self, request):
         try:
-            # We're already logging events, and we don't want to capture user
-            # names/passwords.
-            if request.META['PATH_INFO'] in ['/event', '/login']:
+            if not self._should_process_request(request):
                 return
 
             # Removes passwords from the tracking logs
@@ -45,3 +46,14 @@ class TrackMiddleware:
             views.server_track(request, request.META['PATH_INFO'], event)
         except:
             pass
+
+    def _should_process_request(self, request):
+        path = request.META['PATH_INFO']
+
+        ignored_url_patterns = getattr(settings, 'TRACKING_IGNORE_URL_PATTERNS', [])
+        for pattern in ignored_url_patterns:
+            # Note we are explicitly relying on python's internal caching of
+            # compiled regular expressions here.
+            if re.match(pattern, path):
+                return False
+        return True

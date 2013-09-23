@@ -72,7 +72,7 @@ $('#fileupload').fileupload({
     add: function(e, data) {
         submitBtn.unbind('click');
         var file = data.files[0];
-        if (file.type == "application/x-gzip") {
+        if (file.name.match(/tar\.gz$/)) {
             submitBtn.click(function(e){
                 e.preventDefault();
                 submitBtn.hide();

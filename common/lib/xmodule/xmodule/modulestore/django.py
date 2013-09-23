@@ -62,6 +62,7 @@ def create_modulestore_instance(engine, options):
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
+        xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         **_options
     )
 

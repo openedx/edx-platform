@@ -2,27 +2,27 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import ( HttpResponse, HttpResponseBadRequest, 
-        HttpResponseForbidden )
+from django.http import (HttpResponse, HttpResponseBadRequest,
+        HttpResponseForbidden)
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from xmodule.modulestore.exceptions import ( ItemNotFoundError, 
-        InvalidLocationError )
+from xmodule.modulestore.exceptions import (ItemNotFoundError,
+        InvalidLocationError)
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 
-from xblock.core import Scope
+from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import ( get_modulestore, get_lms_link_for_item, 
-    compute_unit_state, UnitState, get_course_for_item )
+from contentstore.utils import (get_modulestore, get_lms_link_for_item,
+    compute_unit_state, UnitState, get_course_for_item)
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -30,6 +30,7 @@ from .requests import _xmodule_recurse
 from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError
+from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -51,7 +52,8 @@ NOTE_COMPONENT_TYPES = ['notes']
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'word_cloud',
-    'graphical_slider_tool'
+    'graphical_slider_tool',
+    'lti',
 ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
@@ -91,7 +93,7 @@ def edit_subsection(request, location):
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
         logging.error(
-                'Multiple (or none) parents have been found for %', 
+                'Multiple (or none) parents have been found for %s',
                 location
         )
 
@@ -99,12 +101,14 @@ def edit_subsection(request, location):
     parent = modulestore().get_item(parent_locs[0])
 
     # remove all metadata from the generic dictionary that is presented in a
-    # more normalized UI
+    # more normalized UI. We only want to display the XBlocks fields, not
+    # the fields from any mixins that have been added
+    fields = getattr(item, 'unmixed_class', item.__class__).fields
 
     policy_metadata = dict(
         (field.name, field.read_from(item))
         for field
-        in item.fields
+        in fields.values()
         if field.name not in ['display_name', 'start', 'due', 'format']
             and field.scope == Scope.settings
     )
@@ -135,6 +139,15 @@ def edit_subsection(request, location):
     )
 
 
+def load_mixed_class(category):
+    """
+    Load an XBlock by category name, and apply all defined mixins
+    """
+    component_class = XModuleDescriptor.load_class(category)
+    mixologist = Mixologist(settings.XBLOCK_MIXINS)
+    return mixologist.mix(component_class)
+
+
 @login_required
 def edit_unit(request, location):
     """
@@ -163,22 +176,29 @@ def edit_unit(request, location):
 
     component_templates = defaultdict(list)
     for category in COMPONENT_TYPES:
-        component_class = XModuleDescriptor.load_class(category)
+        component_class = load_mixed_class(category)
         # add the default template
+        # TODO: Once mixins are defined per-application, rather than per-runtime,
+        # this should use a cms mixed-in class. (cpennington)
+        if hasattr(component_class, 'display_name'):
+            display_name = component_class.display_name.default or 'Blank'
+        else:
+            display_name = 'Blank'
         component_templates[category].append((
-            component_class.display_name.default or 'Blank',
+            display_name,
             category,
             False,  # No defaults have markdown (hardcoded current default)
             None  # no boilerplate for overrides
         ))
         # add boilerplates
-        for template in component_class.templates():
-            component_templates[category].append((
-                template['metadata'].get('display_name'),
-                category,
-                template['metadata'].get('markdown') is not None,
-                template.get('template_id')
-            ))
+        if hasattr(component_class, 'templates'):
+            for template in component_class.templates():
+                component_templates[category].append((
+                    template['metadata'].get('display_name'),
+                    category,
+                    template['metadata'].get('markdown') is not None,
+                    template.get('template_id')
+                ))
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
@@ -194,7 +214,7 @@ def edit_unit(request, location):
                 # class? i.e., can an advanced have more than one entry in the
                 # menu? one for default and others for prefilled boilerplates?
                 try:
-                    component_class = XModuleDescriptor.load_class(category)
+                    component_class = load_mixed_class(category)
 
                     component_templates['advanced'].append((
                         component_class.display_name.default or category,
@@ -272,13 +292,17 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_default_time_display(containing_subsection.lms.start)
-            if containing_subsection.lms.start is not None else None,
+        'release_date': (
+            get_default_time_display(containing_subsection.start)
+            if containing_subsection.start is not None else None
+        ),
         'section': containing_section,
         'new_unit_category': 'vertical',
         'unit_state': unit_state,
-        'published_date': get_default_time_display(item.cms.published_date)
-            if item.cms.published_date is not None else None
+        'published_date': (
+            get_default_time_display(item.published_date)
+            if item.published_date is not None else None
+        ),
     })
 
 

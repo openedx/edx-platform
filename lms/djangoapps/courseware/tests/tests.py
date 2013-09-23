@@ -136,7 +136,6 @@ class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.setup_user()
 
     def test_toy_course_loads(self):
-
         # Load one of the XML based courses
         # Our test mapping rules allow the MixedModuleStore
         # to load this course from XML, not Mongo.
