@@ -52,10 +52,6 @@ def courses(request):
     if not settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):        
         raise Http404
 
-    university = branding.get_university(request.META.get('HTTP_HOST'))
-    if university == 'edge':
-        return render_to_response('university_profile/edge.html', {})
-
     #  we do not expect this case to be reached in cases where
-    #  marketing and edge are enabled
+    #  marketing is enabled or the courses are not browsable
     return courseware.views.courses(request)
