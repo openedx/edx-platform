@@ -204,7 +204,7 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{tag}://{org}/{course}/{category}/{name}".format(**self.dict())
+        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
             url += "@" + self.revision
         return url
