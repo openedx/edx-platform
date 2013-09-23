@@ -295,7 +295,7 @@ class CourseFields(object):
                            "items": [{"short_description": "Explore the Studio Help Forum",
                                       "long_description": "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio.",
                                       "is_checked": False,
-                                      "action_url": "http://help.edge.edx.org/",
+                                      "action_url": "https://groups.google.com/d/forum/openedx-studio",
                                       "action_text": "Visit Studio Help",
                                       "action_external": True},
                                      {"short_description": "Enroll in edX 101",
