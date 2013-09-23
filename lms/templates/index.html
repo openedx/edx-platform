@@ -165,15 +165,17 @@
         </section>
       % endif
 
-      <section class="courses">
-          <ul class="courses-listing">
-          %for course in courses:
-            <li class="courses-listing-item">
-              <%include file="course.html" args="course=course" />
-            </li>
-          %endfor
-          </ul>
-      </section>
+      % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+        <section class="courses">
+            <ul class="courses-listing">
+            %for course in courses:
+              <li class="courses-listing-item">
+                <%include file="course.html" args="course=course" />
+              </li>
+            %endfor
+            </ul>
+        </section>
+      % endif
     </section>
   </section>
 </section>
