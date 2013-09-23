@@ -429,7 +429,6 @@ function hideModal(e) {
     // of the editor. Users must press Cancel or Save to exit the editor.
     // module_edit adds and removes the "is-fixed" class.
     if (!$modalCover.hasClass("is-fixed")) {
-        $('.file-input').unbind('change', startUpload);
         $modal.hide();
         $modalCover.hide();
     }
