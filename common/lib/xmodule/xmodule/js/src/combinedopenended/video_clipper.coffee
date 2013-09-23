@@ -11,8 +11,6 @@
   class 
 ###
 class @VideoClipper
-
-  @reel: 'http://web.mit.edu/colemanc/www/bookmarklet/images/film3Small.png'
   @answerClass: "bookMarklet-answer"
   @generateHtml: true
   @clippers: []
@@ -42,9 +40,6 @@ class @VideoClipper
 
     # Optional URL for thumbnail to be display by the player
     @thumbnailUrl = obj.thumbnailUrl 
-
-    # Optional URL for embed thumbnail
-    @reel = obj.reel or VideoClipper.reel
 
     # Optional class name to be added to the div that replaces the textarea
     @answerClass = obj.answerClass or VideoClipper.answerClass
@@ -475,8 +470,7 @@ class @VideoClipper
       # Logging for edX
       # Logger.log('video_clip', $.parseJSON(dataString));
       blDataEncoded = encodeURI(dataString)
-      newTag = $("<a rel='blModal' href='#bl-vid' class='bl'>"+ blDataEncoded+ "</a>").css
-        'background-image': clipper.reel
+      newTag = $("<a rel='blModal' href='#bl-vid' class='bl'>"+ blDataEncoded+ "</a>")
 
       that = this
 

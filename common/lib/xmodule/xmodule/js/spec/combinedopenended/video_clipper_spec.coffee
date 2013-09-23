@@ -25,9 +25,6 @@ describe "VideoClipper", ->
       it "uses @videoType for the instance's videoType", ->
         expect(@clippy.videoType).toEqual @videoType
 
-      it "uses VideoClipper.reel for the instance's reel", ->
-        expect(@clippy.reel).toEqual VideoClipper.reel
-
       it "uses VideoClipper.answerClass for the instance's answerClass", ->
         expect(@clippy.answerClass).toEqual VideoClipper.answerClass
 
@@ -72,9 +69,6 @@ describe "VideoClipper", ->
 
       it "uses @thumbnailUrl for the instance's thumbnailUrl", ->
         expect(@clippy.thumbnailUrl).toEqual @thumbnailUrl
-
-      it "uses the given value for the instance's reel", ->
-        expect(@clippy.reel).toEqual @reel
 
       it "uses the given value for the instance's answerClass", ->
         expect(@clippy.answerClass).toEqual @answerClass
