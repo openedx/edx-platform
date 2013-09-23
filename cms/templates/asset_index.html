@@ -74,6 +74,8 @@
         };
 
         var resetUploadModal = function () {
+            $('.file-input').unbind('change', startUpload);
+
             // Reset modal so it no longer displays information about previously
             // completed uploads.
             var percentVal = '0%';
