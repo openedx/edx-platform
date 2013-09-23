@@ -104,8 +104,7 @@ $('#fileupload').fileupload({
     },
     start: function(e) {
         window.onbeforeunload = function() {
-            return "Your import is in progress; navigating " +
-                "away will abort it.";
+            return '${_("Your import is in progress; navigating away will abort it.")}';
         }
     },
     sequentialUploads: true
