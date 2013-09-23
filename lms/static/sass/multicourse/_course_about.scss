@@ -14,6 +14,8 @@
     overflow: hidden;
     position: relative;
     width: 100%;
+    float: left;
+    padding-bottom: 40px;
 
     .intro-inner-wrapper {
       background: $course-header-bg;
