@@ -3,6 +3,7 @@ Convenience methods for working with datetime objects
 """
 from datetime import timedelta
 
+
 def get_default_time_display(dtime):
     """
     Converts a datetime to a string representation. This is the default
