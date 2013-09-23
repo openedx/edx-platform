@@ -30,7 +30,7 @@
 
           <span class="sts-track">
             <span class="sts-track-value">
-              <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+              <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
             </span>
           </span>
         </span>
@@ -100,7 +100,7 @@
                   <tr>
                     <th scope="col" >${_("Course")}</th>
                     <th scope="col" >${_("Status")}</th>
-                    <th scope="col" >${_("Options")}</th>
+                    <th scope="col" ><span class="sr">${_("Options")}</span></th>
                   </tr>
                 </thead>
 
@@ -113,9 +113,8 @@
                     </td>
                     <td class="options">
                       %if course_has_started:
-                          ${_("Starts: {start_date}").format(start_date=course_start_date_text)}
+                          <a class="action action-course" href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a>
                       %else:
-                      <a class="action action-course" href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a>
                       %endif
                     </td>
                   </tr>

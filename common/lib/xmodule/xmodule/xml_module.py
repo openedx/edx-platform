@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 # assume all XML files are persisted as utf-8.
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True,
+                                 remove_comments=False, remove_blank_text=True,
                                  encoding='utf-8')
 
 

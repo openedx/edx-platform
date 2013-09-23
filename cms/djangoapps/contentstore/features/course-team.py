@@ -5,7 +5,7 @@ from lettuce import world, step
 from common import create_studio_user
 from django.contrib.auth.models import Group
 from auth.authz import get_course_groupname_for_role, get_user_by_email
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -110,36 +110,36 @@ def other_user_login(_step, name):
 
 @step(u'I( do not)? see the course on my page')
 @step(u's?he does( not)? see the course on (his|her) page')
-def see_course(_step, inverted, gender='self'):
+def see_course(_step, do_not_see, gender='self'):
     class_css = 'h3.course-title'
-    all_courses = world.css_find(class_css, wait_time=1)
-    all_names = [item.html for item in all_courses]
-    if inverted:
-        assert not world.scenario_dict['COURSE'].display_name in all_names
+    if do_not_see:
+        assert world.is_css_not_present(class_css)
     else:
-        assert world.scenario_dict['COURSE'].display_name in all_names
+        all_courses = world.css_find(class_css)
+        all_names = [item.html for item in all_courses]
+        assert_in(world.scenario_dict['COURSE'].display_name, all_names)
 
 
 @step(u'"([^"]*)" should( not)? be marked as an admin')
-def marked_as_admin(_step, name, inverted):
+def marked_as_admin(_step, name, not_marked_admin):
     flag_css = '.user-item[data-email="{email}"] .flag-role.flag-role-admin'.format(
         email=name+EMAIL_EXTENSION)
-    if inverted:
+    if not_marked_admin:
         assert world.is_css_not_present(flag_css)
     else:
         assert world.is_css_present(flag_css)
 
 
 @step(u'I should( not)? be marked as an admin')
-def self_marked_as_admin(_step, inverted):
-    return marked_as_admin(_step, "robot+studio", inverted)
+def self_marked_as_admin(_step, not_marked_admin):
+    return marked_as_admin(_step, "robot+studio", not_marked_admin)
 
 
 @step(u'I can(not)? delete users')
 @step(u's?he can(not)? delete users')
-def can_delete_users(_step, inverted):
+def can_delete_users(_step, can_not_delete):
     to_delete_css = 'a.remove-user'
-    if inverted:
+    if can_not_delete:
         assert world.is_css_not_present(to_delete_css)
     else:
         assert world.is_css_present(to_delete_css)
@@ -147,9 +147,9 @@ def can_delete_users(_step, inverted):
 
 @step(u'I can(not)? add users')
 @step(u's?he can(not)? add users')
-def can_add_users(_step, inverted):
+def can_add_users(_step, can_not_add):
     add_css = 'a.create-user-button'
-    if inverted:
+    if can_not_add:
         assert world.is_css_not_present(add_css)
     else:
         assert world.is_css_present(add_css)
@@ -157,13 +157,13 @@ def can_add_users(_step, inverted):
 
 @step(u'I can(not)? make ("([^"]*)"|myself) a course team admin')
 @step(u's?he can(not)? make ("([^"]*)"|me) a course team admin')
-def can_make_course_admin(_step, inverted, outer_capture, name):
+def can_make_course_admin(_step, can_not_make_admin, outer_capture, name):
     if outer_capture == "myself":
         email = world.scenario_dict["USER"].email
     else:
         email = name + EMAIL_EXTENSION
     add_button_css = '.user-item[data-email="{email}"] .add-admin-role'.format(email=email)
-    if inverted:
+    if can_not_make_admin:
         assert world.is_css_not_present(add_button_css)
     else:
         assert world.is_css_present(add_button_css)

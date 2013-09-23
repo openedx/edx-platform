@@ -1,4 +1,17 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%
+nothing_to_grade_message = _(
+"""
+{p_tag}You currently do not having any peer grading to do.  In order to have peer grading to do:
+{ul_tag}
+{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}
+{li_tag}The instructor needs to score the essays that are used to help you better understand the grading
+criteria.{end_li_tag}
+{li_tag}There must be submissions that are waiting for grading.{end_li_tag}
+{end_ul_tag}
+{end_p_tag}
+""").format(p_tag="<p>", end_p_tag="</p>", ul_tag="<ul>", end_ul_tag="</ul>", li_tag="<li>", end_li_tag="</li>")
+%>
 <section class="container peer-grading-container">
     <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
         <div class="error-container">${error_text}</div>
@@ -9,7 +22,7 @@
             % if success:
                 % if len(problem_list) == 0:
                 <div class="message-container">
-                  ${_("You currently do not having any peer grading to do.  In order to have peer grading to do, you need to have submitted a response to a peer grading problem.  The instructor also needs to score the essays that are used to help you better understand the grading criteria.")}
+                  ${nothing_to_grade_message}
                 </div>
                 %else:
                 <div class="problem-list-container">

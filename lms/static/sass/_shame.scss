@@ -5,7 +5,7 @@
 // edx.org marketing site - 7/2013 visual button revamp
 
 // extends btn
-.m-btn {
+%m-btn {
   @include box-sizing(border-box);
   @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
   display: inline-block;
@@ -22,22 +22,22 @@
   }
 }
 
-.m-btn-pill {
+%m-btn-pill {
   border-radius: ($baseline/5);
 }
 
-.m-btn-rounded {
+%m-btn-rounded {
   border-radius: ($baseline/2);
 }
 
-.m-btn-edged {
+%m-btn-edged {
   border-radius: ($baseline/10);
 }
 
 // primary button
-.m-btn-base {
-  @extend .m-btn;
-  @extend .m-btn-edged;
+%m-btn-base {
+  @extend %m-btn;
+  @extend %m-btn-edged;
   border: none;
   padding:($baseline/2) ($baseline);
   text-align: center;
@@ -55,8 +55,8 @@
 }
 
 // primary button
-.m-btn-primary {
-  @extend .m-btn-base;
+%m-btn-primary {
+  @extend %m-btn-base;
   box-shadow: 0 2px 1px 0 $action-primary-shadow;
   background: $action-primary-bg;
   color: $action-primary-fg;
@@ -83,8 +83,8 @@
 }
 
 // secondary button
-.m-btn-secondary {
-  @extend .m-btn-base;
+%m-btn-secondary {
+  @extend %m-btn-base;
   box-shadow: 0 2px 1px 0 $action-secondary-shadow;
   background: $action-secondary-bg;
   color: $action-secondary-fg;
@@ -160,7 +160,7 @@
 
     // register or access courseware
     &.action-register, &.access-courseware {
-      @extend .m-btn-primary;
+      @extend %m-btn-primary;
       display: block;
 
       .track {
@@ -183,17 +183,36 @@
 
     // already registered but course not started or registration is closed
     &.is-registered, &.registration-closed {
-      @extend .m-btn-secondary;
+      @extend %m-btn-secondary;
       pointer-events: none !important;
       display: block;
     }
 
     // coming soon
     &.coming-soon {
-      @extend .m-btn-secondary;
+      @extend %m-btn-secondary;
       pointer-events: none !important;
       outline: none;
       display: block;
+    }
+  }
+}
+
+// ====================
+
+// Verification: overriding reset link style for nav/header
+.verification-process {
+
+  header.global {
+
+    .logo a:hover, .logo:active {
+      border: none;
+      text-decoration: none;
+      padding-bottom: 0;
+    }
+
+    .nav-global a:hover, .nav-global a:active {
+      border: none;
     }
   }
 }

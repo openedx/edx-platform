@@ -8,9 +8,9 @@ Feature: Video component
 
   # Firefox doesn't have HTML5 (only mp4 - fix here)
   @skip_firefox
-  Scenario: Autoplay is enabled in LMS for a Video component
+  Scenario: Autoplay is disabled in LMS for a Video component
   Given the course has a Video component in HTML5 mode
-  Then when I view the video it has autoplay enabled
+  Then when I view the video it does not have autoplay enabled
 
 # Youtube testing
 Scenario: Video component is fully rendered in the LMS in Youtube mode with HTML5 sources

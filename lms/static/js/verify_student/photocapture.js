@@ -1,6 +1,8 @@
 var onVideoFail = function(e) {
   if(e == 'NO_DEVICES_FOUND') {
       $('#no-webcam').show();
+      $('#face_capture_button').hide();
+      $('#photo_id_capture_button').hide();
   }
   else {
     console.log('Failed to get camera access!', e);
@@ -50,7 +52,11 @@ var submitToPaymentProcessing = function() {
     $("#pay_form").submit();
   })
   .fail(function(jqXhr,text_status, error_thrown) {
-    alert(jqXhr.responseText);
+      if(jqXhr.status == 400) {
+          $('#order-error .copy p').html(jqXhr.responseText);
+      }
+      $('#order-error').show();
+      $("html, body").animate({ scrollTop: 0 });
   });
 }
 

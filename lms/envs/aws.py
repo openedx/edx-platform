@@ -187,6 +187,10 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
+# Event Tracking
+if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
+    TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
@@ -264,4 +268,4 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
 # Student identity verification settings
-VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", "")
+VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)

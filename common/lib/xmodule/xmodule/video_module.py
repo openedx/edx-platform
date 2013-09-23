@@ -136,6 +136,7 @@ class VideoModule(VideoFields, XModule):
     js = {
         'js': [
             resource_string(__name__, 'js/src/video/01_initialize.js'),
+            resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
             resource_string(__name__, 'js/src/video/02_html5_video.js'),
             resource_string(__name__, 'js/src/video/03_video_player.js'),
             resource_string(__name__, 'js/src/video/04_video_control.js'),
@@ -187,7 +188,7 @@ class VideoModule(VideoFields, XModule):
             'show_captions': json.dumps(self.show_captions),
             'start': self.start_time,
             'end': self.end_time,
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
@@ -385,12 +386,16 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         if not str_time:
             return ''
         else:
-            obj_time = time.strptime(str_time, '%H:%M:%S')
-            return datetime.timedelta(
-                hours=obj_time.tm_hour,
-                minutes=obj_time.tm_min,
-                seconds=obj_time.tm_sec
-            ).total_seconds()
+            try:
+                obj_time = time.strptime(str_time, '%H:%M:%S')
+                return datetime.timedelta(
+                    hours=obj_time.tm_hour,
+                    minutes=obj_time.tm_min,
+                    seconds=obj_time.tm_sec
+                ).total_seconds()
+            except ValueError:
+                # We've seen serialized versions of float in this field
+                return float(str_time)
 
 
 def _create_youtube_string(module):

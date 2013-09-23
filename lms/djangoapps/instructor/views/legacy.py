@@ -56,7 +56,7 @@ import track.views
 from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-
+from django.utils.translation import ugettext as _u
 
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
@@ -108,7 +108,7 @@ def instructor_dashboard(request, course_id):
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
         datatable = {'header': ['Statistic', 'Value'],
-                     'title': 'Course Statistics At A Glance',
+                     'title': _u('Course Statistics At A Glance'),
                      }
         data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
         data += [['Date', timezone.now().isoformat()]]
@@ -208,7 +208,7 @@ def instructor_dashboard(request, course_id):
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
-            data_dir = getattr(course, 'data_dir')
+            data_dir = course.data_dir
             log.debug('git pull {0}'.format(data_dir))
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
@@ -222,7 +222,7 @@ def instructor_dashboard(request, course_id):
         if 'Reload course' in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
-                data_dir = getattr(course, 'data_dir')
+                data_dir = course.data_dir
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
                 track.views.server_track(request, "reload", {"directory": data_dir}, page="idashboard")

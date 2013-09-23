@@ -43,18 +43,18 @@ LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 MAX_VALID_BROWSER_ATTEMPTS = 20
 
 
-def get_username_and_key():
+def get_saucelabs_username_and_key():
     """
     Returns the Sauce Labs username and access ID as set by environment variables
     """
     return {"username": settings.SAUCE.get('USERNAME'), "access-key": settings.SAUCE.get('ACCESS_ID')}
 
 
-def set_job_status(jobid, passed=True):
+def set_saucelabs_job_status(jobid, passed=True):
     """
     Sets the job status on sauce labs
     """
-    config = get_username_and_key()
+    config = get_saucelabs_username_and_key()
     url = 'http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid)
     body_content = dumps({"passed": passed})
     base64string = encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
@@ -63,7 +63,7 @@ def set_job_status(jobid, passed=True):
     return result.status_code == 200
 
 
-def make_desired_capabilities():
+def make_saucelabs_desired_capabilities():
     """
     Returns a DesiredCapabilities object corresponding to the environment sauce parameters
     """
@@ -75,7 +75,8 @@ def make_desired_capabilities():
     desired_capabilities['build'] = settings.SAUCE.get('BUILD')
     desired_capabilities['video-upload-on-pass'] = False
     desired_capabilities['sauce-advisor'] = False
-    desired_capabilities['record-screenshots'] = False
+    desired_capabilities['capture-html'] = True
+    desired_capabilities['record-screenshots'] = True
     desired_capabilities['selenium-version'] = "2.34.0"
     desired_capabilities['max-duration'] = 3600
     desired_capabilities['public'] = 'public restricted'
@@ -87,9 +88,9 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
-    world.absorb(settings.SAUCE.get('SAUCE_ENABLED'), 'SAUCE_ENABLED')
+    world.absorb(settings.LETTUCE_SELENIUM_CLIENT, 'LETTUCE_SELENIUM_CLIENT')
 
-    if not world.SAUCE_ENABLED:
+    if world.LETTUCE_SELENIUM_CLIENT == 'local':
         browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
 
         # There is an issue with ChromeDriver2 r195627 on Ubuntu
@@ -120,14 +121,25 @@ def initial_setup(server):
 
         world.browser.driver.set_window_size(1280, 1024)
 
-    else:
-        config = get_username_and_key()
+    elif world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+        config = get_saucelabs_username_and_key()
         world.browser = Browser(
             'remote',
             url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'], config['access-key']),
-            **make_desired_capabilities()
+            **make_saucelabs_desired_capabilities()
         )
         world.browser.driver.implicitly_wait(30)
+
+    elif world.LETTUCE_SELENIUM_CLIENT == 'grid':
+        world.browser = Browser(
+            'remote',
+            url=settings.SELENIUM_GRID.get('URL'),
+            browser=settings.SELENIUM_GRID.get('BROWSER'),
+        )
+        world.browser.driver.implicitly_wait(30)
+
+    else:
+        raise Exception("Unknown selenium client '{}'".format(world.LETTUCE_SELENIUM_CLIENT))
 
     world.absorb(world.browser.driver.session_id, 'jobid')
 
@@ -139,7 +151,7 @@ def reset_data(scenario):
     envs/acceptance.py file: mitx_all/db/test_mitx.db
     """
     LOGGER.debug("Flushing the test database...")
-    call_command('flush', interactive=False)
+    call_command('flush', interactive=False, verbosity=0)
     world.absorb({}, 'scenario_dict')
 
 
@@ -164,21 +176,24 @@ def reset_databases(scenario):
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
-# Uncomment below to trigger a screenshot on error
-# @after.each_scenario
+@after.each_scenario
 def screenshot_on_error(scenario):
     """
     Save a screenshot to help with debugging.
     """
     if scenario.failed:
-        world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
-
+        try:
+            output_dir = '{}/log'.format(settings.TEST_ROOT)
+            image_name = '{}/{}.png'.format(output_dir, scenario.name.replace(' ', '_'))
+            world.browser.driver.save_screenshot(image_name)
+        except WebDriverException:
+            LOGGER.error('Could not capture a screenshot')
 
 @after.all
 def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if world.SAUCE_ENABLED:
-        set_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
+    if world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+        set_saucelabs_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()

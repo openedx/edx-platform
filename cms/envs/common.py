@@ -254,8 +254,10 @@ PIPELINE_JS = {
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
              'js/models/uploads.js', 'js/views/uploads.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/src/utility.js',
-             'js/models/settings/course_grading_policy.js'],
+             'js/src/utility.js',
+             'js/models/settings/course_grading_policy.js',
+             'js/models/asset.js', 'js/models/assets.js',
+             'js/views/assets_view.js', 'js/views/asset_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -404,3 +406,7 @@ TRACKING_BACKENDS = {
         }
     }
 }
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']

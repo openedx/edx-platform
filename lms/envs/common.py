@@ -144,8 +144,8 @@ MITX_FEATURES = {
     # Toggle to indicate use of a custom theme
     'USE_CUSTOM_THEME': False,
 
-    # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True,
+    # Don't autoplay videos for students
+    'AUTOPLAY_VIDEOS': False,
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
@@ -337,6 +337,10 @@ if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
             'ENGINE': 'track.backends.django.DjangoBackend'
         }
     })
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}

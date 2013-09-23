@@ -466,7 +466,7 @@ body.course.unit {
 
         .action-primary {
           @include blue-button;
-          @extend .t-action2;
+          @extend %t-action2;
           @include transition(all .15s);
           display: inline-block;
           padding: ($baseline/5) $baseline;
@@ -476,7 +476,7 @@ body.course.unit {
 
         .action-secondary {
           @include grey-button;
-          @extend .t-action2;
+          @extend %t-action2;
           @include transition(all .15s);
           display: inline-block;
           padding: ($baseline/5) $baseline;
@@ -500,7 +500,7 @@ body.course.unit {
 
   //Component Name
   .component-name {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
     width: 50%;
     color: $white;
     font-weight: 600;
@@ -637,7 +637,7 @@ body.course.unit {
       }
 
       .setting-label {
-        @extend .t-copy-sub1;
+        @extend %t-copy-sub1;
         @include transition(color $tmg-f2 ease-in-out 0s);
         vertical-align: middle;
         display: inline-block;
@@ -794,8 +794,8 @@ body.course.unit {
         }
 
         .create-setting {
-          @extend .ui-btn-flat-outline;
-          @extend .t-action3;
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
           display: block;
           width: 100%;
           padding: ($baseline/2);
@@ -974,7 +974,7 @@ body.unit {
     .unit-id {
 
       .label {
-        @extend .t-title7;
+        @extend %t-title7;
         margin-bottom: ($baseline/4);
         color: $gray-d1;
       }
