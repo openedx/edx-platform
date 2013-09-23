@@ -63,7 +63,7 @@ class MongoContentStore(ContentStore):
             else:
                 with self.fs.get(content_id) as fp:
                     return StaticContent(
-                        location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
+                        location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=getattr(fp, 'thumbnail_location', None),
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False)
