@@ -46,10 +46,10 @@ class StaticContentServer(object):
             # Check that user has access to content
             if getattr(content, "locked", False):
                 if not hasattr(request, "user") or not request.user.is_authenticated():
-                    return redirect('login')
-                course_id = "/".join([loc.org, loc.course, loc.name])
-                if not CourseEnrollment.is_enrolled(request.user, course_id):
-                    return redirect('dashboard')
+                    return HttpResponse('Unauthorized', status=403)
+                course_partial_id = "/".join([loc.org, loc.course])
+                if not CourseEnrollment.is_enrolled_by_partial(request.user, course_partial_id):
+                    return HttpResponse('Unauthorized', status=403)
 
 
             # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)

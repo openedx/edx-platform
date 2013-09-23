@@ -94,8 +94,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # Case (1)
         resp = self.client.get(self.url)
-        self.assertEqual(resp.status_code, 302)
-        self.assertTrue(resp.has_header("LOCATION"))
+        self.assertEqual(resp.status_code, 403)
 
         # Case (2)
         #   Create user and login
@@ -110,13 +109,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         resp = self.client.get(self.url)
         log.debug("Received response %s", resp)
-        self.assertEqual(resp.status_code, 302)
-        self.assertTrue(resp.has_header("LOCATION"))
-        self.assertIn("dashboard", resp["LOCATION"])
+        self.assertEqual(resp.status_code, 403)
 
         # Case (3)
         #   Enroll student
-        course_id = "/".join([self.loc.org, self.loc.course, self.loc.name])
+        course_id = "/".join([self.loc.org, self.loc.course, '2012_Fall'])
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
 
