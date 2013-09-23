@@ -65,13 +65,11 @@
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
-  % if not course:
     % if theme_enabled():
       <%include file="theme-google-analytics.html" />
     % else:
       <%include file="google_analytics.html" />
     % endif
-  % endif
 
   <%include file="widgets/segment-io.html" />
 
