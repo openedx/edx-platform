@@ -151,7 +151,7 @@ body.discussion {
       padding: $baseline*2;
       @include box-sizing(border-box);
 
-      label {
+      .topic-dropdown-label {
         font-size: 22px;
         font-weight: 700;
         color: $white;
@@ -220,6 +220,10 @@ body.discussion {
           &:hover,
           &.focused {
             background-color: #666;
+          }
+
+          .topic-menu-span {
+            color: #eee;
           }
         }
 
