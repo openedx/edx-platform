@@ -16,45 +16,142 @@
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-    <article class="import-overview">
-      <div class="description">
-        <p><strong>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</strong></p>
-        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
-        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+      <div class="introduction">
+        <p>${_("You may import existing course structure and content into Studio.")}</p>
+
+          <p>${_("Importing is not something to take lightly as the course content you successfully upload will replace your current content and cannot be reversed. Please be certain you want to replace your course's content.")}</p>
       </div>
+
       <form id="fileupload" method="post" enctype="multipart/form-data"
           class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
-        <h2>${_("Course to import:")}</h2>
+
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+
+        <h2 class="title">${_("Select a File (.tar.gz format) to Replace Your Course Content")}</h2>
+
         <p class="error-block"></p>
-        <a href="#" class="choose-file-button">${_("Choose File")}</a>
-        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_("change")}</a></p>
-        <input type="file" name="course-data" class="file-input" >
-        <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <div id="status-info-block" class="status-info-block">
-            <p class="status-info not-started">
-            <i class="icon-check-empty"></i> 
-            Unpacking
-            </p>
-            <p class="status-info not-started">
-            <i class="icon-check-empty"></i> 
-            Verifying
-            </p>
-            <p class="status-info not-started">
-            <i class="icon-check-empty"></i> 
-            Importing
-            </p>
+
+        <a href="#" class="action action-choose-file choose-file-button">${_("Choose File")}</a>
+
+        <div class="wrapper wrapper-file-name file-name-block">
+            <h3 class="title">
+              <span class="label">File Chosen:</span>
+              <span class="file-name"></span>
+            </h3>
+
+          <input type="file" name="course-data" class="file-input" />
+
+          <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" />
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-          <div class="percent">0%</div>
+
+        <div class="wrapper wrapper-status">
+          <h3 class="title">${_("Course Import Status")}</h3>
+
+          <ol class="status-progress list-progress">
+            <li class="item-progresspoint item-progresspoint-upload is-complete">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-check"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+
+                <h3 class="title">${_("Uploading")}</h3>
+
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                  <div class="percent">0%</div>
+                </div>
+
+                <p class="copy">${_("Transferring your file to our servers")}</p>
+
+                <div class="msg msg-leaving">
+                  <h4 class="title">${_("Upload Complete: you can now safely leave")}</h4>
+                  <p class="copy">${_("The rest of the process happens within Studio's servers. You are now safe to leave this page but please refrain from editing any course content until this new content is completely imported.")}</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-unpack is-started">
+              <span class="deco status-visual">
+                <i class="icon-cog icon-spin"></i>
+                <i class="icon-check"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Unpacking")}</h3>
+                <p class="copy">${_("Expanding and preparing folder/file structure")}</p>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-unpack has-error">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-check"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Unpacking")}</h3>
+                <p class="copy is-updated">${_("We're sorry something went wrong with the import of your course data. Please try again.")}</p>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-verify is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-check"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Verifying")}</h3>
+                <p class="copy">${_("Reviewing semantics, syntax, and required data")}</p>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-import is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-check"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Importing")}</h3>
+                <p class="copy">${_("Replacing previous course content with imported content")}</p>
+              </div>
+            </li>
+          </ol>
         </div>
       </form>
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Current Content & Importing")}</h3>
+        <p>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Gzipped Tar Files (.tar.gz) Only")}</h3>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Warning: Auto-generated Nodes")}</h3>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
+      </div>
+    </aside>
+  </section>
 </div>
 </%block>
 
