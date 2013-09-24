@@ -1,4 +1,5 @@
 (function (window, undefined) {
+
     window.Transcripts = window.Transcripts || {};
 
     // window.Transcripts is a namespace that is complemented with several

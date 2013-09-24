@@ -5,6 +5,7 @@
 
         initialize: function () {
             // prepare data for CMS.Views.Metadata.Editor
+
             var metadata = this.$el.data('metadata'),
                 models = this.toModels(metadata);
 
@@ -53,7 +54,7 @@
         * @function
         *
         * Synchronize data from `Advanced` tab of Video player with data in
-        * `Basic` tab. It calls when we goes from `Advanced` to `Basic` tab.
+        * `Basic` tab. It is called when we go from `Advanced` to `Basic` tab.
         *
         * @param {object} metadataCollection Collection containing all models
         *                                    with information about metadata
@@ -67,7 +68,7 @@
                 values = {},
                 videoUrl;
 
-            // if metadataCollection is not passed, just exit.
+            // If metadataCollection is not passed, just exit.
             if (!metadataCollection) {
                 return false;
             }
@@ -98,7 +99,7 @@
 
             videoUrl.setValue(result);
 
-            //Synchronize other fields that has the same `field_name` property.
+            // Synchronize other fields that has the same `field_name` property.
             utils.syncCollections(metadataCollection, this.collection);
         },
 
@@ -106,7 +107,7 @@
         * @function
         *
         * Synchronize data from `Basic` tab of Video player with data in
-        * `Advanced` tab. It calls when we goes from `Basic` to `Advanced` tab.
+        * `Advanced` tab. It is called when we go from `Basic` to `Advanced` tab.
         *
         * @param {object} metadataCollection Collection containing all models
         *                                    with information about metadata
@@ -136,19 +137,19 @@
             videoUrlValue = getField(this.collection, 'video_url')
                                 .getDisplayValue();
 
-            // Change list representation format to more convenient format and
-            // group them by mode (`youtube`, `html5`).
+            // Change list representation format to more convenient and group
+            // them by mode (`youtube`, `html5`).
             //                  Before:
             // [
-            //      {mode: `youtube`, type: `youtube`, ...},
-            //      {mode: `html5`, type: `mp4`, ...}
-            //      {mode: `html5`, type: `webm`, ...}
+            //      'http://youtu.be/OEoXaMPEzfM',
+            //      'video_name.mp4',
+            //      'video_name.webm'
             // ]
             //                  After:
             // {
             //      youtube: [{mode: `youtube`, type: `youtube`, ...}],
             //      html5: [
-            //          {mode: `html5`, type: `mp4`, ...}
+            //          {mode: `html5`, type: `mp4`, ...},
             //          {mode: `html5`, type: `webm`, ...}
             //      ]
             // }
@@ -173,7 +174,7 @@
                 youtube.setValue(result);
             }
 
-            // if utils.Storage contain some subtitles, update them.
+            // If utils.Storage contain some subtitles, update them.
             if (_.isString(subsValue)) {
                 subs.setValue(subsValue);
                 // After updating should be removed, because it might overwrite
@@ -181,7 +182,7 @@
                 utils.Storage.remove('sub');
             }
 
-            //Synchronize other fields that has the same `field_name` property.
+            // Synchronize other fields that has the same `field_name` property.
             utils.syncCollections(this.collection, metadataCollection);
         }
 

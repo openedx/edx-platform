@@ -4,18 +4,28 @@ import os
 import json
 import tempfile
 from uuid import uuid4
+import copy
+from pymongo import MongoClient
+
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
+from django.test.utils import override_settings
+from django.conf import settings
 
 from contentstore import transcripts_utils
 from contentstore.tests.utils import CourseTestCase
 from cache_toolbox.core import del_cached_content
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class Basetranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 
@@ -70,6 +80,9 @@ class Basetranscripts(CourseTestCase):
             1.5: item.youtube_id_1_5
         }
 
+    def tearDown(self):
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
 
 class TestUploadtranscripts(Basetranscripts):

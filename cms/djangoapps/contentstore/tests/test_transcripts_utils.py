@@ -1,14 +1,22 @@
 """ Tests for transcripts_utils. """
-from contentstore import transcripts_utils
 import unittest
 from uuid import uuid4
+import copy
+from pymongo import MongoClient
+
+from django.test.utils import override_settings
+from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory
-
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
+from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from contentstore import transcripts_utils
+
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 class TestGenerateSubs(unittest.TestCase):
@@ -61,6 +69,7 @@ class TestGenerateSubs(unittest.TestCase):
         )
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class TestSaveSubsToStore(ModuleStoreTestCase):
     """Tests for `save_subs_to_store` function."""
 
@@ -115,8 +124,11 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
     def tearDown(self):
         self.clear_subs_content()
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     """Tests for `download_youtube_subs` function."""
 
@@ -139,6 +151,10 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     def setUp(self):
         self.course = CourseFactory.create(
             org=self.org, number=self.number, display_name=self.display_name)
+
+    def tearDown(self):
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def test_success_downloading_subs(self):
         good_youtube_subs = {

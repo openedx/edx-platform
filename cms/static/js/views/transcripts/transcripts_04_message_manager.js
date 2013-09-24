@@ -11,6 +11,7 @@
             'click .setting-use-existing': 'useExistingHandler'
         },
 
+        // Pre-defined dict with anchors to status templates.
         templates: {
             not_found: '#transcripts-not-found',
             found: '#transcripts-found',
@@ -25,6 +26,7 @@
             _.bindAll(this);
 
             this.component_id = this.$el.closest('.component').data('id');
+
             this.fileUploader = new Transcripts.FileUploader({
                 el: this.$el,
                 messenger: this,
@@ -35,6 +37,18 @@
         render: function (template_id, params) {
             var tplHtml = $(this.templates[template_id]).text(),
                 videoList = this.options.parent.getVideoObjectsList(),
+            // Change list representation format to more convenient and group
+            // them by video property.
+            //                  Before:
+            // [
+            //      {mode: `html5`, type: `mp4`, video: `video_name_1`},
+            //      {mode: `html5`, type: `webm`, video: `video_name_2`}
+            // ]
+            //                  After:
+            // {
+            //      `video_name_1`: [{mode: `html5`, type: `webm`, ...}],
+            //      `video_name_2`: [{mode: `html5`, type: `mp4`, ...}]
+            // }
                 groupedList = _.groupBy(
                     videoList,
                     function (value) {
@@ -67,6 +81,16 @@
             return this;
         },
 
+        /**
+        * @function
+        *
+        * Shows error message.
+        *
+        * @param {string} err Error message that will be shown
+        *
+        * @param {boolean} hideButtons Hide buttons
+        *
+        */
         showError: function (err, hideButtons) {
             var $error = this.$el.find('.transcripts-error-message');
 
@@ -85,6 +109,12 @@
             }
         },
 
+        /**
+        * @function
+        *
+        * Hides error message.
+        *
+        */
         hideError: function () {
             this.$el.find('.transcripts-error-message')
                 .addClass(this.invisibleClass);
@@ -93,18 +123,42 @@
                 .removeClass(this.invisibleClass);
         },
 
+        /**
+        * @function
+        *
+        * Handle import button.
+        *
+        * @params {object} event Event object.
+        *
+        */
         importHandler: function (event) {
             event.preventDefault();
 
             this.processCommand('replace', 'Error: Import failed.');
         },
 
+        /**
+        * @function
+        *
+        * Handle replace button.
+        *
+        * @params {object} event Event object.
+        *
+        */
         replaceHandler: function (event) {
             event.preventDefault();
 
             this.processCommand('replace', 'Error: Replacing failed.');
         },
 
+        /**
+        * @function
+        *
+        * Handle choose buttons.
+        *
+        * @params {object} event Event object.
+        *
+        */
         chooseHandler: function (event) {
             event.preventDefault();
 
@@ -113,6 +167,35 @@
             this.processCommand('choose', 'Error: Choosing failed.', videoId);
         },
 
+        /**
+        * @function
+        *
+        * Handle `use existing` button.
+        *
+        * @params {object} event Event object.
+        *
+        */
+        useExistingHandler: function (event) {
+            event.preventDefault();
+
+            this.processCommand('rename', 'Error: Choosing failed.');
+        },
+
+        /**
+        * @function
+        *
+        * Decorator for `command` function in the Transcripts.Utils.
+        *
+        * @params {string} action Action that will be invoked on server. Is a part
+        *                         of url.
+        *
+        * @params {string} errorMessage Error massage that will be shown if any
+        *                               connection error occurs
+        *
+        * @params {string} videoId Extra parameter that sometimes should be sent
+        *                          to the server
+        *
+        */
         processCommand: function (action, errorMessage, videoId) {
             var self = this,
                 utils = Transcripts.Utils,
@@ -139,16 +222,6 @@
                 .fail(function (resp) {
                     self.showError(errorMessage);
                 });
-        },
-
-        useExistingHandler: function (event) {
-            event.preventDefault();
-
-            this.useExistingTranscript();
-        },
-
-        useExistingTranscript: function () {
-            this.processCommand('rename', 'Error: Choosing failed.');
         }
 
     });

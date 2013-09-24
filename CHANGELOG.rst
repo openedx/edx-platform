@@ -40,6 +40,8 @@ LMS: Improved accessibility of parts of forum navigation sidebar.
 LMS: enhanced accessibility labeling and aria support for the discussion forum
 new post dropdown as well as response and comment area labeling.
 
+Blades: Add Studio timed transcripts editor to video player.
+
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
 

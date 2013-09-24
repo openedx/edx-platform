@@ -1,6 +1,8 @@
 (function (window, undefined) {
     Transcripts.FileUploader = Backbone.View.extend({
         invisibleClass: 'is-invisible',
+
+        // Pre-defined list of supported file formats.
         validFileExtensions: ['srt'],
 
         events: {
@@ -9,6 +11,7 @@
         },
 
         uploadTpl: '#transcripts-file-upload',
+
         initialize: function () {
             _.bindAll(this);
 
@@ -39,6 +42,12 @@
             }
         },
 
+        /**
+        * @function
+        *
+        * Uploads file to the server. Get file from the `file` property.
+        *
+        */
         upload: function () {
             if (!this.file) {
                 return;
@@ -51,20 +60,39 @@
             });
         },
 
+        /**
+        * @function
+        *
+        * Handle click event on `upload` button.
+        *
+        * @param {object} event Event object.
+        *
+        */
         clickHandler: function (event) {
             event.preventDefault();
 
             this.$input
                 .val(null)
+                // Show system upload window
                 .trigger('click');
         },
 
+        /**
+        * @function
+        *
+        * Handle change event.
+        *
+        * @param {object} event Event object.
+        *
+        */
         changeHadler: function (event) {
             event.preventDefault();
 
             this.options.messenger.hideError();
             this.file = this.$input.get(0).files[0];
 
+            // if file has valid file extension, than upload file.
+            // Otherwise, show error message.
             if (this.checkExtValidity(this.file)) {
                 this.upload();
             } else {
@@ -73,7 +101,22 @@
             }
         },
 
+        /**
+        * @function
+        *
+        * Checks that file has supported extension.
+        *
+        * @param {object} file Object with information about file.
+        *
+        * @returns {boolean} Indicate that file has supported or unsupported
+        *                    extension.
+        *
+        */
         checkExtValidity: function (file) {
+            if (!file.name) {
+                return void(0);
+            }
+
             var fileExtension = file.name
                                     .split('.')
                                     .pop()
@@ -86,6 +129,12 @@
             return false;
         },
 
+        /**
+        * @function
+        *
+        * Resets progress bar.
+        *
+        */
         xhrResetProgressBar: function () {
             var percentVal = '0%';
 
@@ -95,6 +144,21 @@
                 .removeClass(this.invisibleClass);
         },
 
+        /**
+        * @function
+        *
+        * Callback function to be invoked with upload progress information
+        * (if supported by the browser).
+        *
+        * @param {object} event Event object.
+        *
+        * @param {integer} position Amount of transmitted bytes.
+        * *
+        * @param {integer} total Total size of file.
+        * *
+        * @param {integer} percentComplete Object with information about file.
+        *
+        */
         xhrProgressHandler: function (event, position, total, percentComplete) {
             var percentVal = percentComplete + '%';
 
@@ -103,6 +167,12 @@
                 .html(percentVal);
         },
 
+        /**
+        * @function
+        *
+        * Handle complete uploading.
+        *
+        */
         xhrCompleteHandler: function (xhr) {
             var utils = Transcripts.Utils,
                 resp = JSON.parse(xhr.responseText),

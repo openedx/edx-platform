@@ -9,11 +9,12 @@ import json
 hlskey = hashlib.md5(module.location.url()).hexdigest()
 from os import listdir
 from os.path import isfile, join
-try:
-  path = 'cms/static/js/views/transcripts/'
-  files = [ f for f in listdir(path) if isfile(join(path,f)) and f.endswith('.js') ]
-except:
-  files = []
+
+from django.conf import settings
+
+path = join(settings.PROJECT_ROOT, 'static/js/views/transcripts/')
+files = [f for f in listdir(path) if isfile(join(path,f)) and f.endswith('.js')]
+files.sort()
 %>
 
 %for file in files:

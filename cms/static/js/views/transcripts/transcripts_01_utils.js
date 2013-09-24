@@ -5,7 +5,7 @@
         /**
         * @function
         *
-        * Adds some data to the Storage object. If data with existents `data_id`
+        * Adds some data to the Storage object. If data with existent `data_id`
         * is added, nothing happens.
         *
         * @param {string} data_id Unique identifier for the data.
@@ -101,8 +101,6 @@
 
             return function (url) {
                 if (typeof url !== 'string') {
-                    console.log('Transcripts.Utils.parseYoutubeLink');
-                    console.log('TypeError: Wrong argument type.');
 
                     return void(0);
                 }
@@ -138,8 +136,6 @@
 
             return function (url) {
                 if (typeof url !== 'string') {
-                    console.log('Transcripts.Utils.parseHTML5Link');
-                    console.log('TypeError: Wrong argument type.');
 
                     return void(0);
                 }
@@ -255,7 +251,7 @@
         *
         * Sends Ajax requests in appropriate format.
         *
-        * @param {string} action Action that will be invoked on server. Is part
+        * @param {string} action Action that will be invoked on server. Is a part
         *                        of url.
         * @param {string} component_id Id of component.
         * @param {array} videoList List of object with information about inserted

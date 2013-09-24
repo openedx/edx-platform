@@ -100,13 +100,13 @@
                 it('no arguments', function () {
                     var result = utils.parseYoutubeLink();
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
 
                 it('wrong data type', function () {
                     var result = utils.parseYoutubeLink(1);
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
 
                 it('videoId is wrong', function () {
@@ -159,13 +159,13 @@
                 it('no arguments', function () {
                     var result = utils.parseHTML5Link();
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
 
                 it('wrong data type', function () {
                     var result = utils.parseHTML5Link(1);
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
 
                 var html5WrongUrls = [
