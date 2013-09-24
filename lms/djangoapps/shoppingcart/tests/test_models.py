@@ -1,19 +1,21 @@
 """
 Tests for the Shopping Cart Models
 """
+import smtplib
+from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
-from factory import DjangoModelFactory
-from mock import patch
+from mock import patch, MagicMock
 from django.core import mail
 from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-
+from django.contrib.auth.models import AnonymousUser
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from shoppingcart.models import Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration
+from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
+                                 OrderItemSubclassPK)
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -39,13 +41,24 @@ class OrderTest(ModuleStoreTestCase):
         cart2 = Order.get_cart_for_user(user=self.user)
         self.assertEquals(cart2.orderitem_set.count(), 1)
 
+    def test_user_cart_has_items(self):
+        anon = AnonymousUser()
+        self.assertFalse(Order.user_cart_has_items(anon))
+        self.assertFalse(Order.user_cart_has_items(self.user))
+        cart = Order.get_cart_for_user(self.user)
+        item = OrderItem(order=cart, user=self.user)
+        item.save()
+        self.assertTrue(Order.user_cart_has_items(self.user))
+
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
         CertificateItem.add_to_order(cart, 'org/test/Test_Course_1', self.cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), 2)
+        self.assertTrue(cart.has_items())
         cart.clear()
         self.assertEquals(cart.orderitem_set.count(), 0)
+        self.assertFalse(cart.has_items())
 
     def test_add_item_to_cart_currency_match(self):
         cart = Order.get_cart_for_user(user=self.user)
@@ -111,6 +124,22 @@ class OrderTest(ModuleStoreTestCase):
         cart.purchase()
         self.assertEquals(len(mail.outbox), 1)
 
+    @patch('shoppingcart.models.log.error')
+    def test_purchase_item_email_smtp_failure(self, error_logger):
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
+        with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+            cart.purchase()
+            self.assertTrue(error_logger.called)
+
+    @patch('shoppingcart.models.log.error')
+    def test_purchase_item_email_boto_failure(self, error_logger):
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
+        with patch('shoppingcart.models.send_mail', side_effect=BotoServerError("status", "reason")):
+            cart.purchase()
+            self.assertTrue(error_logger.called)
+
     def purchase_with_data(self, cart):
         """ purchase a cart with billing information """
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
@@ -127,8 +156,9 @@ class OrderTest(ModuleStoreTestCase):
             cardtype='001',
         )
 
+    @patch('shoppingcart.models.render_to_string')
     @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
-    def test_billing_info_storage_on(self):
+    def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
         self.assertNotEqual(cart.bill_to_first, '')
@@ -141,9 +171,12 @@ class OrderTest(ModuleStoreTestCase):
         self.assertNotEqual(cart.bill_to_city, '')
         self.assertNotEqual(cart.bill_to_state, '')
         self.assertNotEqual(cart.bill_to_country, '')
+        ((_, context), _) = render.call_args
+        self.assertTrue(context['has_billing_info'])
 
+    @patch('shoppingcart.models.render_to_string')
     @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
-    def test_billing_info_storage_off(self):
+    def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
         self.assertNotEqual(cart.bill_to_first, '')
@@ -157,19 +190,49 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEqual(cart.bill_to_street2, '')
         self.assertEqual(cart.bill_to_ccnum, '')
         self.assertEqual(cart.bill_to_cardtype, '')
+        ((_, context), _) = render.call_args
+        self.assertFalse(context['has_billing_info'])
+
+    mock_gen_inst = MagicMock(return_value=(OrderItemSubclassPK(OrderItem, 1), set([])))
+
+    def test_generate_receipt_instructions_callchain(self):
+        """
+        This tests the generate_receipt_instructions call chain (ie calling the function on the
+        cart also calls it on items in the cart
+        """
+        cart = Order.get_cart_for_user(self.user)
+        item = OrderItem(user=self.user, order=cart)
+        item.save()
+        self.assertTrue(cart.has_items())
+        with patch.object(OrderItem, 'generate_receipt_instructions', self.mock_gen_inst):
+            cart.generate_receipt_instructions()
+            self.mock_gen_inst.assert_called_with()
 
 
 class OrderItemTest(TestCase):
     def setUp(self):
         self.user = UserFactory.create()
 
-    def test_orderItem_purchased_callback(self):
+    def test_order_item_purchased_callback(self):
         """
         This tests that calling purchased_callback on the base OrderItem class raises NotImplementedError
         """
         item = OrderItem(user=self.user, order=Order.get_cart_for_user(self.user))
         with self.assertRaises(NotImplementedError):
             item.purchased_callback()
+
+    def test_order_item_generate_receipt_instructions(self):
+        """
+        This tests that the generate_receipt_instructions call chain and also
+        that calling it on the base OrderItem class returns an empty list
+        """
+        cart = Order.get_cart_for_user(self.user)
+        item = OrderItem(user=self.user, order=cart)
+        item.save()
+        self.assertTrue(cart.has_items())
+        (inst_dict, inst_set) = cart.generate_receipt_instructions()
+        self.assertDictEqual({item.pk_with_subclass: set([])}, inst_dict)
+        self.assertEquals(set([]), inst_set)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -195,8 +258,8 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.mode, "honor")
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
-        self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
-        self.assertFalse(PaidCourseRegistration.part_of_order(self.cart, self.course_id + "abcd"))
+        self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_id))
+        self.assertFalse(PaidCourseRegistration.contained_in_order(self.cart, self.course_id + "abcd"))
         self.assertEqual(self.cart.total_cost, self.cost)
 
     def test_add_with_default_mode(self):
@@ -212,7 +275,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
-        self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
+        self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_id))
 
     def test_purchased_callback(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
@@ -220,6 +283,26 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
         reg1 = PaidCourseRegistration.objects.get(id=reg1.id)  # reload from DB to get side-effect
         self.assertEqual(reg1.status, "purchased")
+
+    def test_generate_receipt_instructions(self):
+        """
+        Add 2 courses to the order and make sure the instruction_set only contains 1 element (no dups)
+        """
+        course2 = CourseFactory.create(org='MITx', number='998', display_name='Robot Duper Course')
+        course_mode2 = CourseMode(course_id=course2.id,
+                                  mode_slug="honor",
+                                  mode_display_name="honor cert",
+                                  min_price=self.cost)
+        course_mode2.save()
+        pr1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
+        pr2 = PaidCourseRegistration.add_to_order(self.cart, course2.id)
+        self.cart.purchase()
+        inst_dict, inst_set = self.cart.generate_receipt_instructions()
+        self.assertEqual(2, len(inst_dict))
+        self.assertEqual(1, len(inst_set))
+        self.assertIn("dashboard", inst_set.pop())
+        self.assertIn(pr1.pk_with_subclass, inst_dict)
+        self.assertIn(pr2.pk_with_subclass, inst_dict)
 
     def test_purchased_callback_exception(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)

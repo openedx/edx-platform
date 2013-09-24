@@ -85,7 +85,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id]))
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
+        self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_id))
 
 
     @patch('shoppingcart.views.render_purchase_form_html', form_mock)
