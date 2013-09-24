@@ -54,6 +54,10 @@ class VerifyView(View):
             progress_state = "start"
 
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        # if the course doesn't have a verified mode, we want to kick them
+        # from the flow
+        if not verify_mode:
+            return redirect(reverse('dashboard'))
         if course_id in request.session.get("donation_for_course", {}):
             chosen_price = request.session["donation_for_course"][course_id]
         else:
@@ -166,7 +170,17 @@ def results_callback(request):
     verified to be who they said they are.
     """
     body = request.body
-    body_dict = json.loads(body)
+
+    try:
+        body_dict = json.loads(body)
+    except ValueError:
+        log.exception("Invalid JSON received from Software Secure:\n\n{}\n".format(body))
+        return HttpResponseBadRequest("Invalid JSON. Received:\n\n{}".format(body))
+
+    if not isinstance(body_dict, dict):
+        log.error("Reply from Software Secure is not a dict:\n\n{}\n".format(body))
+        return HttpResponseBadRequest("JSON should be dict. Received:\n\n{}".format(body))
+
     headers = {
         "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
         "Date": request.META.get("HTTP_DATE", "")

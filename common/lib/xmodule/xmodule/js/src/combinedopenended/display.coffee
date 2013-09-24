@@ -119,6 +119,7 @@ class @CombinedOpenEnded
   next_rubric_sel: '.rubric-next-button'
   previous_rubric_sel: '.rubric-previous-button'
   oe_alert_sel: '.open-ended-alert'
+  save_button_sel: '.save-button'
 
   constructor: (el) ->
     @el=el
@@ -153,9 +154,11 @@ class @CombinedOpenEnded
     @rub = new Rubric(@coe)
     @rub.initialize(@location)
     @is_ctrl = false
+
     #Setup reset
     @reset_button = @$(@reset_button_sel)
-    @reset_button.click @reset
+    @reset_button.click @confirm_reset
+    
     #Setup next problem
     @next_problem_button = @$(@next_step_sel)
     @next_problem_button.click @next_problem
@@ -181,6 +184,7 @@ class @CombinedOpenEnded
     @hint_wrapper = @$(@oe).find(@hint_wrapper_sel)
     @message_wrapper = @$(@oe).find(@message_wrapper_sel)
     @submit_button = @$(@oe).find(@submit_button_sel)
+    @save_button = @$(@oe).find(@save_button_sel)
     @child_state = @oe.data('state')
     @child_type = @oe.data('child-type')
     if @child_type=="openended"
@@ -268,6 +272,8 @@ class @CombinedOpenEnded
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
+    @save_button.unbind('click')
+    @save_button.hide()
     @reset_button.hide()
     @hide_file_upload()
     @next_problem_button.hide()
@@ -291,8 +297,10 @@ class @CombinedOpenEnded
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
-      @submit_button.click @save_answer
+      @submit_button.click @confirm_save_answer
       @setup_file_upload()
+      @save_button.click @store_answer
+      @save_button.show()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -304,7 +312,7 @@ class @CombinedOpenEnded
         @submit_button.hide()
         @queueing()
         @grader_status = @$(@grader_status_sel)
-        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span> ")
+        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span>")
       else if @child_type == "selfassessment"
         @setup_score_selection()
     else if @child_state == 'post_assessment'
@@ -332,12 +340,25 @@ class @CombinedOpenEnded
       else
         @reset_button.show()
 
-
   find_assessment_elements: ->
     @assessment = @$('input[name="grade-selection"]')
 
   find_hint_elements: ->
     @hint_area = @$('textarea.post_assessment')
+
+  store_answer:  (event) =>
+    event.preventDefault()
+    if @child_state == 'initial'
+      data = {'student_answer' : @answer_area.val()}
+      @save_button.attr("disabled",true)
+      $.postWithPrefix "#{@ajax_url}/store_answer", data, (response) =>
+        if response.success
+          @gentle_alert("Answer saved.")
+        else
+          @errors_area.html(response.error)
+        @save_button.attr("disabled",false)
+    else
+      @errors_area.html(@out_of_sync_message)
 
   replace_answer: (response) =>
     if response.success
@@ -354,7 +375,11 @@ class @CombinedOpenEnded
       @can_upload_files = pre_can_upload_files
       @gentle_alert response.error
 
+  confirm_save_answer: (event) =>
+    @save_answer(event) if confirm('Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.')
+
   save_answer: (event) =>
+    @$el.find(@oe_alert_sel).remove()
     @submit_button.attr("disabled",true)
     @submit_button.hide()
     event.preventDefault()
@@ -452,6 +477,9 @@ class @CombinedOpenEnded
           @errors_area.html(response.error)
     else
       @errors_area.html(@out_of_sync_message)
+
+  confirm_reset: (event) =>
+    @reset(event) if confirm('Are you sure you want to remove your previous response to this question?')
 
   reset: (event) =>
     event.preventDefault()

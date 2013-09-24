@@ -7,6 +7,8 @@ from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
+from xblock.field_data import DictFieldData
+
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
@@ -33,7 +35,7 @@ system = ModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
-    xblock_field_data={}
+    xmodule_field_data=DictFieldData({}),
 )
 
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
@@ -70,8 +72,8 @@ ALERT_DICT = {
     'Flagged Submissions': "Submissions have been flagged for review"
 }
 
-STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
-STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
+STUDENT_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify course staff."
+STAFF_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

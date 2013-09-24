@@ -6,38 +6,26 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="header_extras">
+    <script type="text/template" id="asset-tpl">
+        <%static:include path="js/asset.underscore"/>
+    </script>
+</%block>
+
 <%block name="jsextra">
-<script src="${static.url('js/vendor/mustache.js')}"></script>
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+    <script src="${static.url('js/vendor/mustache.js')}"></script>
+    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
+    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+
+    <script type="text/javascript">
+        var assets = new CMS.Models.AssetCollection(${asset_list});
+        assets.url = "${update_asset_callback_url}";
+        // TODO remove setting on window object after RequireJS.
+        window.assetsView = new CMS.Views.Assets({collection: assets, el: $('#asset_table_body')});
+    </script>
 </%block>
 
 <%block name="content">
-
-  <script type="text/template" id="new-asset-element">
-    <tr data-id='{{url}}'>
-      <td class="thumb-col">
-        <div class="thumb">
-          {{#thumb_url}}
-          <img src="{{thumb_url}}">
-          {{/thumb_url}}
-        </div>
-      </td>
-      <td class="name-col">
-        <a data-tooltip="Open/download this file" href="{{url}}" class="filename">{{displayname}}</a>
-        <div class="embeddable-xml"></div>
-      </td>
-      <td class="date-col">
-        {{uploadDate}}
-      </td>
-      <td class="embed-col">
-        <input type="text" class="embeddable-xml-input" value='{{portable_url}}' readonly>
-      </td>
-      <td class="delete-col">
-        <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-      </td>
-    </tr>
-  </script>
 
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
@@ -62,7 +50,7 @@
       <div class="page-actions">
         <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
       </div>
-      <article class="asset-library" data-remove-asset-callback-url='${remove_asset_callback_url}'>
+      <article class="asset-library">
         <table>
           <thead>
             <tr>
@@ -73,31 +61,8 @@
               <th class="delete-col"></th>
             </tr>
           </thead>
-          <tbody id="asset_table_body">
-          % for asset in assets:
-            <tr data-id="${asset['url']}">
-              <td class="thumb-col">
-                <div class="thumb">
-                  % if asset['thumb_url'] is not None:
-                  <img src="${asset['thumb_url']}">
-                  % endif
-                </div>
-              </td>
-              <td class="name-col">
-                <a data-tooltip="Open/download this file" href="${asset['url']}" class="filename">${asset['displayname']}</a>
-                <div class="embeddable-xml"></div>
-              </td>
-              <td class="date-col">
-                ${asset['uploadDate']}
-              </td>
-              <td class="embed-col">
-                <input type="text" class="embeddable-xml-input" value="${asset['portable_url']}" readonly>
-              </td>
-              <td class="delete-col">
-                <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-              </td>
-            </tr>
-          % endfor
+          <tbody id="asset_table_body" >
+
           </tbody>
         </table>
         <nav class="pagination wip-box">

@@ -82,6 +82,7 @@ class OpenEndedChild(object):
         self.child_state = instance_state.get('child_state', self.INITIAL)
         self.child_created = instance_state.get('child_created', False)
         self.child_attempts = instance_state.get('child_attempts', 0)
+        self.stored_answer = instance_state.get('stored_answer', None)
 
         self.max_attempts = static_data['max_attempts']
         self.child_prompt = static_data['prompt']
@@ -195,6 +196,7 @@ class OpenEndedChild(object):
         """
         answer = OpenEndedChild.sanitize_html(answer)
         self.child_history.append({'answer': answer})
+        self.stored_answer = None
 
     def record_latest_score(self, score):
         """Assumes that state is right, so we're adding a score to the latest
@@ -231,6 +233,7 @@ class OpenEndedChild(object):
             'max_score': self._max_score,
             'child_attempts': self.child_attempts,
             'child_created': False,
+            'stored_answer': self.stored_answer,
             }
         return json.dumps(state)
 
@@ -260,6 +263,33 @@ class OpenEndedChild(object):
         (error only present if not success)
         """
         self.change_state(self.INITIAL)
+        return {'success': True}
+
+    def get_display_answer(self):
+        latest = self.latest_answer()
+        if self.child_state == self.INITIAL:
+            if self.stored_answer is not None:
+                previous_answer = self.stored_answer
+            elif latest is not None and len(latest) > 0:
+                previous_answer = latest
+            else:
+                previous_answer = ""
+            previous_answer = previous_answer.replace("<br/>","\n").replace("<br>", "\n")
+        else:
+            if latest is not None and len(latest) > 0:
+                previous_answer = latest
+            else:
+                previous_answer = ""
+            previous_answer = previous_answer.replace("\n","<br/>")
+
+        return previous_answer
+
+    def store_answer(self, data, system):
+        if self.child_state != self.INITIAL:
+            # We can only store an answer if the problem has not moved into the assessment phase.
+            return self.out_of_sync_error(data)
+
+        self.stored_answer = data['student_answer']
         return {'success': True}
 
     def get_progress(self):

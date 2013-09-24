@@ -15,6 +15,13 @@ div.video {
     @include clearfix;
   }
 
+  div.focus_grabber {
+    position: relative;
+    display: inline;
+    width: 0px;
+    height: 0px;
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
@@ -518,10 +525,17 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
+      outline-width: 0px;
+      outline-style: none;
 
       &.current {
         color: #333;
         font-weight: 700;
+      }
+
+      &.focused {
+        outline-width: 1px;
+        outline-style: dotted;
       }
 
       &:hover {

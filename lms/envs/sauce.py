@@ -51,7 +51,6 @@ SAUCE_INFO = ALL_CONFIG.get(os.environ.get('SAUCE_INFO', 'Linux-chrome--'))
 
 # Information needed to utilize Sauce Labs.
 SAUCE = {
-    'SAUCE_ENABLED': os.environ.get('SAUCE_ENABLED'),
     'USERNAME': os.environ.get('SAUCE_USER_NAME'),
     'ACCESS_ID': os.environ.get('SAUCE_API_KEY'),
     'PLATFORM': SAUCE_INFO[0],
