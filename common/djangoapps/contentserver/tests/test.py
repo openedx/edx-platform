@@ -9,7 +9,6 @@ from pymongo import MongoClient
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
@@ -20,7 +19,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (studio_store_config,
-        ModuleStoreTestCase)
+    ModuleStoreTestCase)
 from xmodule.modulestore.xml_importer import import_from_xml
 
 log = logging.getLogger(__name__)
@@ -45,28 +44,39 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
         settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
-        base = "http://127.0.0.1:8000"
         self.client = Client()
         self.contentstore = contentstore()
 
-        # A locked the asset
-        loc = Location('c4x', 'edX', 'toy', 'asset', 'sample_static.txt' )
-        self.loc = loc
-        rel_url = StaticContent.get_url_path_from_location(loc)
-        self.url = base + rel_url
+        # A locked asset
+        self.loc_locked = Location('c4x', 'edX', 'toy', 'asset', 'sample_static.txt')
+        self.url_locked = StaticContent.get_url_path_from_location(self.loc_locked)
 
         # An unlocked asset
-        loc2 = Location('c4x', 'edX', 'toy', 'asset', 'another_static.txt' )
-        self.loc2 = loc2
-        rel_url2 = StaticContent.get_url_path_from_location(loc2)
-        self.url2 = base + rel_url2
-
+        self.loc_unlocked = Location('c4x', 'edX', 'toy', 'asset', 'another_static.txt')
+        self.url_unlocked = StaticContent.get_url_path_from_location(self.loc_unlocked)
 
         import_from_xml(modulestore('direct'), 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
 
-        self.contentstore.set_attr(self.loc, 'locked', True)
+        self.contentstore.set_attr(self.loc_locked, 'locked', True)
 
+        # Create user
+        self.usr = 'testuser'
+        self.pwd = 'foo'
+        email = 'test+courses@edx.org'
+        self.user = User.objects.create_user(self.usr, email, self.pwd)
+        self.user.is_active = True
+        self.user.save()
+
+        # Create staff user
+        self.staff_usr = 'stafftestuser'
+        self.staff_pwd = 'foo'
+        staff_email = 'stafftest+courses@edx.org'
+        self.staff_user = User.objects.create_user(self.staff_usr, staff_email,
+                self.staff_pwd)
+        self.staff_user.is_active = True
+        self.staff_user.is_staff = True
+        self.staff_user.save()
 
     def tearDown(self):
 
@@ -77,46 +87,50 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Test that unlocked assets are being served.
         """
-        # Logout user
         self.client.logout()
+        resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
 
-        resp = self.client.get(self.url2)
-        self.assertEqual(resp.status_code, 200)
-
-
-    def test_locked_asset(self):
+    def test_locked_asset_not_logged_in(self):
         """
-        Test that locked assets behave appropriately in case:
-            (1) User is not logged in
-            (2) User is logged in in but not registerd for the course
-            (3) User is logged in and registered
+        Test that locked assets behave appropriately in case the user is not
+        logged in.
         """
+        self.client.logout()
+        resp = self.client.get(self.url_locked)
+        self.assertEqual(resp.status_code, 403) #pylint: disable=E1103
 
-        # Case (1)
-        resp = self.client.get(self.url)
-        self.assertEqual(resp.status_code, 403)
+    def test_locked_asset_not_registered(self):
+        """
+        Test that locked assets behave appropriately in case user is logged in
+        in but not registered for the course.
+        """
+        self.client.login(username=self.usr, password=self.pwd)
+        resp = self.client.get(self.url_locked)
+        self.assertEqual(resp.status_code, 403) #pylint: disable=E1103
 
-        # Case (2)
-        #   Create user and login
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-        user = User.objects.create_user(uname, email, password)
-        user.is_active = True
-        user.save()
-        self.client.login(username=uname, password=password)
-        log.debug("User logged in")
+    def test_locked_asset_registered(self):
+        """
+        Test that locked assets behave appropriately in case user is logged in
+        and registered for the course.
+        """
+        #pylint: disable=E1101
+        course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
+        CourseEnrollment.enroll(self.user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
 
-        resp = self.client.get(self.url)
-        log.debug("Received response %s", resp)
-        self.assertEqual(resp.status_code, 403)
+        self.client.login(username=self.usr, password=self.pwd)
+        resp = self.client.get(self.url_locked)
+        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
 
-        # Case (3)
-        #   Enroll student
-        course_id = "/".join([self.loc.org, self.loc.course, '2012_Fall'])
-        CourseEnrollment.enroll(user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+    def test_locked_asset_staff(self):
+        """
+        Test that locked assets behave appropriately in case user is staff.
+        """
+        #pylint: disable=E1101
+        course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
 
-        resp = self.client.get(self.url)
-        self.assertEqual(resp.status_code, 200)
+        self.client.login(username=self.staff_usr, password=self.staff_pwd)
+        resp = self.client.get(self.url_locked)
+        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
 

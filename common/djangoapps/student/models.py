@@ -861,10 +861,10 @@ class CourseEnrollment(models.Model):
         """
         try:
             return CourseEnrollment.objects.filter(
-                    user=user,
-                    course_id__startswith=course_id_partial,
-                    is_active=1
-                ).exists()
+                user=user,
+                course_id__startswith=course_id_partial,
+                is_active=1
+            ).exists()
         except cls.DoesNotExist:
             return False
 
