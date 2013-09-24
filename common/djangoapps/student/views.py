@@ -1595,8 +1595,8 @@ def import_users(request, post_override=None):
         row['work_login'] = row.pop('login')
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
-
-        user = User(username=row['work_login'] + '_' + row['id'],
+        username = row['work_login'] + '_' + row['id']
+        user = User(username=username,
                 email=row['email'],
                 is_active=False)
         password = row.get('password',id_generator(8, _ALPHABET))
@@ -1622,6 +1622,35 @@ def import_users(request, post_override=None):
                 except Exception:
                     log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                 continue
+            if len(User.objects.filter(username=username)) > 0:
+                user = User.objects.filter(username=username)[0];
+                password = row.get('password',id_generator(8, _ALPHABET))
+                user.set_password(password)
+                user.set_email(row['email'])
+                user.save()
+                log.info("New user:" + row['email'] + ":" + password)
+                profile = UserProfile.objects.get(user=user)
+                if (profile.name != name):
+                    js['success'] = False
+                    js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
+                    continue
+                #profile update
+                if profile.allowed_courses is not None:
+                    profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
+                try:
+                    profile.save()
+                except Exception:
+                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        
+                registration.register(user)
+                d = {'name': row['lastname'],
+                'login': row['email'],
+                 'password': password,
+                 'key': registration.activation_key,
+                 }
+                _send_email(d)
+                continue
+
             raise
 
         registration.register(user)
@@ -1647,12 +1676,17 @@ def import_users(request, post_override=None):
                  'password': password,
                  'key': registration.activation_key,
                  }
+        _send_email(d)
 
+        transaction.commit()
+    return HttpResponse(json.dumps(js, cls=LazyEncoder))
+
+def _send_email(data):
             # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', d)
+        subject = render_to_string('emails/activation_email_subject.txt', data)
             # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email_batch.txt', d)
+        message = render_to_string('emails/activation_email_batch.txt', data)
 
             # dont send email if we are doing load testing or random user generation for some reason
         if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
@@ -1668,9 +1702,6 @@ def import_users(request, post_override=None):
                 log.warning('Unable to send activation email to user', exc_info=True)
                 js['success'] = False
                 js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
-                continue
-        transaction.commit()
-    return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
 
 
