@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-09-24 12:46+0400\n"
-"PO-Revision-Date: 2013-09-24 13:16+0400\n"
+"POT-Creation-Date: 2013-09-24 14:20+0400\n"
+"PO-Revision-Date: 2013-09-24 14:29+0400\n"
 "Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3672,7 +3672,7 @@ msgstr "Выберите ваше пожертвование для этого �
 #: common/templates/course_modes/choose.html:66
 #: lms/templates/verify_student/photo_verification.html:362
 msgid "):"
-msgstr ""
+msgstr "):"
 
 #: common/templates/course_modes/choose.html:79
 msgid "Why do I have to pay? What if I don't meet all the requirements?"
@@ -4729,7 +4729,7 @@ msgstr "Расскажите нам о деталях*"
 msgid "Include error messages, steps which lead to the issue, etc"
 msgstr "Включите сообщения об ошибках, шаги, которые привели к ошибке, и т. п."
 
-#: lms/templates/help_modal.html:77 lms/templates/import_users.html:30
+#: lms/templates/help_modal.html:77 lms/templates/import_users.html:29
 #: lms/templates/register-shib.html:189
 #: lms/templates/combinedopenended/openended/open_ended.html:34
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:23
@@ -6205,6 +6205,10 @@ msgstr "Редактировать курс в Студии"
 msgid "Instructor Dashboard"
 msgstr "Личная страница инструктора"
 
+#: lms/templates/courseware/instructor_dashboard.html:123
+msgid "Grades"
+msgstr "Оценки"
+
 #: lms/templates/courseware/instructor_dashboard.html:125
 msgid "Psychometrics"
 msgstr "Психометрика"
@@ -6220,7 +6224,7 @@ msgstr "Регистрация на курс"
 
 #: lms/templates/courseware/instructor_dashboard.html:130
 msgid "DataDump"
-msgstr ""
+msgstr "Вывод данных"
 
 #: lms/templates/courseware/instructor_dashboard.html:131
 msgid "Manage Groups"
@@ -6229,6 +6233,10 @@ msgstr "Управление группами"
 #: lms/templates/courseware/instructor_dashboard.html:150
 msgid "yes"
 msgstr "да"
+
+#: lms/templates/courseware/instructor_dashboard.html:162
+msgid "Dump list of enrolled students"
+msgstr "Список зачисленных студентов"
 
 #: lms/templates/courseware/instructor_dashboard.html:187
 msgid "Export grades to remote gradebook"
@@ -7045,11 +7053,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:99
 msgid "Beta Tester"
-msgstr ""
+msgstr "Бета-тестер"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:104
 msgid "Forum Admins"
-msgstr ""
+msgstr "Админы форума"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:106
 msgid ""
@@ -7730,7 +7738,9 @@ msgstr ""
 msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {emails}."
-msgstr "Пожалуйста, посетите наш раздел {link_start}медиа/пресса{link_end} для дальнейшей информации. Для запросто обращайтесь по адресу {emails}."
+msgstr ""
+"Пожалуйста, посетите наш раздел {link_start}медиа/пресса{link_end} для "
+"дальнейшей информации. Для запросто обращайтесь по адресу {emails}."
 
 #: lms/templates/static_templates/contact.html:54
 msgid ""
