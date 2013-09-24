@@ -131,12 +131,12 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
-            self.login(InstructorTaskModuleTestCase.get_user_email(username), "test")
+            self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
             self.current_user = username
 
     def _create_user(self, username, is_staff=False):
         """Creates a user and enrolls them in the test course."""
-        email = InstructorTaskModuleTestCase.get_user_email(username)
+        email = InstructorTaskCourseTestCase.get_user_email(username)
         thisuser = UserFactory.create(username=username, email=email, is_staff=is_staff)
         CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
         return thisuser
