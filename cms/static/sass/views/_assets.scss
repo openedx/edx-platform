@@ -11,23 +11,6 @@ body.course.uploads {
   .content-primary {
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
-
-    .no-assets-content {
-      @extend %ui-well;
-      padding: ($baseline*2);
-      background-color: $gray-l4;
-      text-align: center;
-      color: $gray;
-
-      .new-button {
-        @extend %t-copy-sub1;
-        margin-left: $baseline;
-
-        [class^="icon-"] {
-          margin-right: ($baseline/2);
-        }
-      }
-    }
   }
 
   .content-supplementary {
@@ -49,7 +32,6 @@ body.course.uploads {
 
     table {
       width: 100%;
-      border-top: 5px solid $gray-l4;
       word-wrap: break-word;
 
 
@@ -60,7 +42,7 @@ body.course.uploads {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
         color: $gray;
-        padding: ($baseline*.75) $baseline;
+        padding: 0 $baseline ($baseline*.75) $baseline;
         text-align: left;
         vertical-align: middle;
       }
@@ -72,7 +54,7 @@ body.course.uploads {
       }
 
       tbody {
-        box-shadow: 0 2px 5px $shadow;
+        box-shadow: 0 2px 2px $shadow-l1;
         border: 1px solid $gray-l4;
         background: $white;
 
@@ -97,14 +79,16 @@ body.course.uploads {
           }
 
           &.is-locked {
-            background: $gray-l5 url('../img/bg-micro-stripes.png') 0 0 repeat;
+            background-image: url('../img/bg-micro-stripes.png');
+            background-position: 0 0;
+            background-repeat: repeat;
 
             .locked a {
               background-color: $gray;
               color: $white;
 
               &:hover {
-                background-color: $gray-d3;
+                background-color: $blue;
               }
             }
           }
@@ -214,7 +198,7 @@ body.course.uploads {
       color: $gray-l3;
 
       &:hover {
-        background-color: $gray-l3;
+        background-color: $blue;
         color: $gray-l6;
       }
     }
