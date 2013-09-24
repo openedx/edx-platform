@@ -35,7 +35,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edU"
+PLATFORM_NAME = ""
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False

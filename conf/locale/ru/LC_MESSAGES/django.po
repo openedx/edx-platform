@@ -28,8 +28,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-09-09 14:42+0400\n"
-"PO-Revision-Date: 2013-09-23 18:32+0400\n"
+"POT-Creation-Date: 2013-09-24 14:20+0400\n"
+"PO-Revision-Date: 2013-09-24 14:22+0400\n"
 "Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "MIME-Version: 1.0\n"
@@ -470,13 +470,166 @@ msgstr "Вы не записаны на этот курс"
 msgid "Enrollment action is invalid"
 msgstr "Недействительная запись на курс"
 
-#: lms/templates/provider_login.html:42
+#: common/djangoapps/student/views.py:478
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+"Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
+
+#: common/djangoapps/student/views.py:509
+msgid "Too many failed login attempts. Try again later."
+msgstr "Слишком много попыток неудачного входа. Попробуйте позднее."
+
+#: common/djangoapps/student/views.py:517 lms/templates/provider_login.html:42
 msgid "Email or password is incorrect."
 msgstr "E-mail или пароль введены неверно."
 
+#: common/djangoapps/student/views.py:564
+msgid ""
+"This account has not been activated. We have sent another activation "
+"message. Please check your e-mail for the activation instructions."
+msgstr ""
+"Эта учетная запись не была активирована. Мы выслали еще одно активационное "
+"письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
+"активации."
+
+#: common/djangoapps/student/views.py:639
+msgid "An account with the Email '{email}' already exists."
+msgstr "Учетная запись с адресом '{email}' уже существует."
+
+#: common/djangoapps/student/views.py:723
+msgid "Error (401 {field}). E-mail us."
+msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
+
+#: common/djangoapps/student/views.py:728
+msgid "To enroll, you must follow the honor code."
+msgstr "Для записи вы должны следовать Кодексу поведения."
+
+#: common/djangoapps/student/views.py:740
+msgid "You must accept the terms of service."
+msgstr "Я согласен с условиями предоставления услуг"
+
 #: common/djangoapps/student/views.py:759
+#: common/djangoapps/student/views.py:780
 msgid "Education level is required"
 msgstr "Требуется заполненое поле Образование"
+
+#: common/djangoapps/student/views.py:770
+msgid "Username must be minimum of two characters long."
+msgstr "Имя пользователя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:771
+msgid "A properly formatted e-mail is required."
+msgstr "Требуется правильный электронный адресс."
+
+#: common/djangoapps/student/views.py:772
+msgid "Your legal name must be a minimum of two characters long."
+msgstr "Ваше рельное имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:773
+msgid "A valid password is required."
+msgstr "Требуется корректный пароль."
+
+#: common/djangoapps/student/views.py:774
+msgid "Accepting Terms of Service is required."
+msgstr "Требуется принять правила использования сервиса."
+
+#: common/djangoapps/student/views.py:775
+msgid "Agreeing to the Honor Code is required."
+msgstr "Требуется принять Кодекс Чести."
+
+#: common/djangoapps/student/views.py:776
+msgid "Lastname must be a minimum of two characters long."
+msgstr "Фамилия должна быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:777
+msgid "Firstname must be a minimum of two characters long."
+msgstr "Имя должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:778
+msgid "Middlename must be a minimum of two characters long."
+msgstr "Отчество должно быть длиннее двух символов."
+
+#: common/djangoapps/student/views.py:779
+msgid "Year of birth is required"
+msgstr "Требуется год рождения"
+
+#: common/djangoapps/student/views.py:781
+msgid "Education place is required"
+msgstr "Требуется заполненое поле Название учебного учреждения"
+
+#: common/djangoapps/student/views.py:782
+msgid "Education year is required"
+msgstr "Требуется заполненое поле Год окончания учебного заведения"
+
+#: common/djangoapps/student/views.py:783
+msgid "Work type is required"
+msgstr "Требуется заполненое поле Тип образовательного учреждения"
+
+#: common/djangoapps/student/views.py:784
+msgid "Work number is required"
+msgstr "Требуется заполненое поле Номер образовательного учреждения"
+
+#: common/djangoapps/student/views.py:785
+msgid "Work name is required"
+msgstr "Требуется заполненое поле Название образовательного учреждения"
+
+#: common/djangoapps/student/views.py:786
+msgid "Work StatGrad login is required"
+msgstr ""
+"Требуется заполненое поле Логин образовательного учреждения в системе "
+"Статград"
+
+#: common/djangoapps/student/views.py:787
+msgid "Work location is required"
+msgstr "Должно быть указано местоположение рабочего места"
+
+#: common/djangoapps/student/views.py:788
+msgid "Work occupation is required"
+msgstr "Должен быть указан род занятий"
+
+#: common/djangoapps/student/views.py:789
+msgid "Work teaching experience is required"
+msgstr "Должен быть указан опыт работы"
+
+#: common/djangoapps/student/views.py:790
+msgid "Work qualification category is required"
+msgstr "Должна быть указана квалификация"
+
+#: common/djangoapps/student/views.py:791
+msgid "Work qualification year is required"
+msgstr "Должен быть указан стаж"
+
+#: common/djangoapps/student/views.py:792
+msgid "Contact phone is required"
+msgstr "Должен быть указан контактный телефон"
+
+#: common/djangoapps/student/views.py:802
+msgid "Education year must be numeric"
+msgstr "Год окончания должен быть числом"
+
+#: common/djangoapps/student/views.py:803
+msgid "Work teaching experience must be numeric"
+msgstr "Должен быть указан опыт работы в виде числа"
+
+#: common/djangoapps/student/views.py:804
+msgid "Work managing experience must be numeric"
+msgstr "Должен быть указан опыт работы в виде числа"
+
+#: common/djangoapps/student/views.py:805
+msgid "Work qualification year must be numeric"
+msgstr "Год получения квалификации должен быть числом"
+
+#: common/djangoapps/student/views.py:806
+msgid "Contact phone must be numeric"
+msgstr "Контактный телефон должен быть числом"
+
+#: common/djangoapps/student/views.py:816
+msgid "Valid e-mail is required."
+msgstr "Введите действительный адрес эл. почты!"
+
+#: common/djangoapps/student/views.py:823
+msgid "Valid StatGrad login is required."
+msgstr "Должен быть указан корректный логин СтатГрад"
 
 #: common/djangoapps/student/views.py:864
 msgid "Could not send activation e-mail."
@@ -1527,8 +1680,8 @@ msgid "Return and resolve this issue"
 msgstr "Вернуться и решить эту проблему"
 
 #: cms/static/js/views/textbook.js:29
-msgid "Delete <%= name %>?"
-msgstr "Удалить <%= name %>?"
+msgid "Delete “<%= name %>”?"
+msgstr "Удалить \"<%= name %>\"?"
 
 #: cms/static/js/views/textbook.js:31
 msgid ""
@@ -1539,8 +1692,8 @@ msgstr ""
 "будут удалены из вашего курса."
 
 #: cms/static/js/views/textbook.js:240
-msgid "Upload a new PDF to <%= name %>"
-msgstr "Загрузить новый PDF в <%= name %>"
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "Загрузить новый PDF в \"<%= name %>\""
 
 #: cms/static/js/views/uploads.js:102
 msgid "We're sorry, there was an error"
@@ -2368,7 +2521,7 @@ msgstr "Создайте новый курс"
 msgid "Required Information to Create a New Course"
 msgstr "Требуемая информация для создания нового курса"
 
-#: cms/templates/index.html:99 cms/templates/settings.html:88
+#: cms/templates/index.html:99
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:7
 msgid "Course Name"
 msgstr "Имя курса"
@@ -2416,7 +2569,7 @@ msgstr "к примеру CS101"
 msgid "The unique number that identifies your course within your organization"
 msgstr "Уникальный номер, который индентифицирует курс в организации"
 
-#: cms/templates/index.html:119
+#: cms/templates/index.html:119 cms/templates/settings.html:88
 msgid "Course Run"
 msgstr "Учебный год"
 
@@ -4102,6 +4255,22 @@ msgstr "Выбрано неправильное количество."
 msgid "No selected price or selected price is too low."
 msgstr ""
 
+#: common/djangoapps/util/views.py:187
+msgid "Please provide a subject."
+msgstr "Пожалуйста, укажите тему."
+
+#: common/djangoapps/util/views.py:188
+msgid "Please provide details."
+msgstr "Пожалуйста, опишите детали."
+
+#: common/djangoapps/util/views.py:189
+msgid "Please provide your name."
+msgstr "Пожалуйста, укажите Ваше имя."
+
+#: common/djangoapps/util/views.py:190
+msgid "Please provide a valid e-mail."
+msgstr "Пожалуйста, укажите корректный e-mail."
+
 #: common/lib/xmodule/xmodule/capa_module.py:353
 msgid "Final Check"
 msgstr "Последняя проверка"
@@ -4145,7 +4314,7 @@ msgstr ""
 
 #: common/templates/hinter_display.html:100
 msgid "What makes a good hint?"
-msgstr ""
+msgstr "Что такое хорошая подсказка?"
 
 #: common/templates/hinter_display.html:102
 msgid ""
@@ -4239,7 +4408,7 @@ msgstr "Выберите ваше пожертвование для этого �
 #: common/templates/course_modes/choose.html:66
 #: lms/templates/verify_student/photo_verification.html:362
 msgid "):"
-msgstr ""
+msgstr "):"
 
 #: common/templates/course_modes/choose.html:79
 msgid "Why do I have to pay? What if I don't meet all the requirements?"
@@ -5111,7 +5280,7 @@ msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
 "Включите сообщения об ошибках, шаги, которые привели к ошибке, и т. п."
 
-#: lms/templates/help_modal.html:77 lms/templates/import_users.html:30
+#: lms/templates/help_modal.html:77 lms/templates/import_users.html:29
 #: lms/templates/register-shib.html:189
 #: lms/templates/combinedopenended/openended/open_ended.html:34
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:23
@@ -6591,6 +6760,11 @@ msgstr "Редактировать курс в Студии"
 msgid "Instructor Dashboard"
 msgstr "Личная страница инструктора"
 
+#: lms/templates/courseware/instructor_dashboard.html:123
+#, fuzzy
+msgid "Grades"
+msgstr "Оценено"
+
 #: lms/templates/courseware/instructor_dashboard.html:125
 msgid "Psychometrics"
 msgstr "Психометрика"
@@ -6615,6 +6789,10 @@ msgstr "Управление группами"
 #: lms/templates/courseware/instructor_dashboard.html:150
 msgid "yes"
 msgstr "да"
+
+#: lms/templates/courseware/instructor_dashboard.html:162
+msgid "Dump list of enrolled students"
+msgstr "Список зачисленных студентов"
 
 #: lms/templates/courseware/instructor_dashboard.html:187
 msgid "Export grades to remote gradebook"
@@ -7276,9 +7454,8 @@ msgid "Level of Education"
 msgstr "Уровень образования"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:4
-#, fuzzy
 msgid "Course Information"
-msgstr "Требуемая информация"
+msgstr "Информация о курсе"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:12
 msgid "Course ID"
@@ -7313,9 +7490,8 @@ msgid "Grading Configuration"
 msgstr "Конфигурация оценивания"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html:32
-#, fuzzy
 msgid "Back to Standard Dashboard"
-msgstr "Вернуться к панели"
+msgstr "Вернуться к стандартной панели"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html:42
 msgid "section_display_name"
@@ -7438,11 +7614,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:99
 msgid "Beta Tester"
-msgstr ""
+msgstr "Бета-тестер"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:104
 msgid "Forum Admins"
-msgstr ""
+msgstr "Админы форума"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:106
 msgid ""
@@ -7988,9 +8164,8 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html:93
 #: lms/templates/verify_student/show_requirements.html:61
 #: lms/templates/verify_student/verified.html:68
-#, fuzzy
 msgid "Confirmation"
-msgstr "Подтвердить"
+msgstr "Подтверждение"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:86
 msgid "Congratulations! You are now verified on "
@@ -8016,19 +8191,16 @@ msgid "Options"
 msgstr "Параметры"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:112
-#, fuzzy
 msgid "Starts: {start_date}"
-msgstr "Курс начинается - {start_date}"
+msgstr "Курс начинается: {start_date}"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:116
-#, fuzzy
 msgid "Go to Course"
-msgstr "Экспорт курса:"
+msgstr "Перейти к курсу:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:126
-#, fuzzy
 msgid "Go to your Dashboard"
-msgstr "Личная страница инструктора"
+msgstr "Перейти к вашей личной странице"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:135
 msgid "Verified Status"
@@ -8049,9 +8221,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:145
-#, fuzzy
 msgid "Payment Details"
-msgstr "Детали"
+msgstr "Детали платежа"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:148
 msgid ""
@@ -8065,9 +8236,8 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:156
 #: lms/templates/shoppingcart/verified_cert_receipt.html:158
-#, fuzzy
 msgid "Description"
-msgstr "Раздел:"
+msgstr "Описание"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:157
 msgid "Date"
@@ -8123,13 +8293,12 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/contact.html:43
-#, fuzzy
 msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {emails}."
 msgstr ""
-"Пожалуйста, посетите наш раздел {link_start}медиа/прессаlink_end} для "
-"дальнейшей информации. Для запросто обращайтесь по адресу {email}."
+"Пожалуйста, посетите наш раздел {link_start}медиа/пресса{link_end} для "
+"дальнейшей информации. Для запросто обращайтесь по адресу {emails}."
 
 #: lms/templates/static_templates/contact.html:54
 msgid ""
@@ -10438,9 +10607,8 @@ msgstr ""
 "регистрации."
 
 #: lms/templates/verify_student/photo_verification.html:45
-#, fuzzy
 msgid "Error processing your order"
-msgstr "При обработке запроса произошла ошибка!"
+msgstr "Ошибка при обработке запроса"
 
 #: lms/templates/verify_student/photo_verification.html:47
 msgid ""
@@ -10618,9 +10786,8 @@ msgid "Go to Step 3: Review Your Info"
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html:284
-#, fuzzy
 msgid "Verify Your Submission"
-msgstr "Перепроверить посылку студента"
+msgstr "Проверить Вашу посылку"
 
 #: lms/templates/verify_student/photo_verification.html:286
 msgid ""
@@ -10734,14 +10901,12 @@ msgid ""
 msgstr "Для регистрации как верифицированного студента необходимо следующее:"
 
 #: lms/templates/verify_student/show_requirements.html:83
-#, fuzzy
 msgid "Activate Your Account"
-msgstr "Создать учетную запись"
+msgstr "Активировать Вашу учетную запись"
 
 #: lms/templates/verify_student/show_requirements.html:90
-#, fuzzy
 msgid "Check your email"
-msgstr "Получать рассылку курса"
+msgstr "Проверить Ваш email"
 
 #: lms/templates/verify_student/show_requirements.html:91
 msgid ""
@@ -10750,9 +10915,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html:98
-#, fuzzy
 msgid "Identification"
-msgstr "Инструкции"
+msgstr "Идентификация"
 
 #: lms/templates/verify_student/show_requirements.html:106
 msgid "A photo identification document"
@@ -10811,9 +10975,8 @@ msgid "Go to Step 1: Take my Photo"
 msgstr ""
 
 #: lms/templates/verify_student/verified.html:52
-#, fuzzy
 msgid "ID Verification"
-msgstr "Квалификация по диплому"
+msgstr "Верификация по документу"
 
 #: lms/templates/verify_student/verified.html:80
 msgid "You've Been Verified Previously"
@@ -10829,122 +10992,6 @@ msgstr ""
 #: lms/templates/verify_student/verified.html:88
 msgid "You have decided to pay $ "
 msgstr ""
-
-#~ msgid "There was an error receiving your login information. Please email us."
-#~ msgstr ""
-#~ "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
-
-#~ msgid "Too many failed login attempts. Try again later."
-#~ msgstr "Слишком много попыток неудачного входа. Попробуйте позднее."
-
-#~ msgid ""
-#~ "This account has not been activated. We have sent another activation "
-#~ "message. Please check your e-mail for the activation instructions."
-#~ msgstr ""
-#~ "Эта учетная запись не была активирована. Мы выслали еще одно активационное "
-#~ "письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
-#~ "активации."
-
-#~ msgid "An account with the Email '{email}' already exists."
-#~ msgstr "Учетная запись с адресом '{email}' уже существует."
-
-#~ msgid "Error (401 {field}). E-mail us."
-#~ msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
-
-#~ msgid "To enroll, you must follow the honor code."
-#~ msgstr "Для записи вы должны следовать Кодексу поведения."
-
-#~ msgid "You must accept the terms of service."
-#~ msgstr "Я согласен с условиями предоставления услуг"
-
-#~ msgid "Username must be minimum of two characters long."
-#~ msgstr "Имя пользователя должно быть длиннее двух символов."
-
-#~ msgid "A properly formatted e-mail is required."
-#~ msgstr "Требуется правильный электронный адресс."
-
-#~ msgid "Your legal name must be a minimum of two characters long."
-#~ msgstr "Ваше рельное имя должно быть длиннее двух символов."
-
-#~ msgid "A valid password is required."
-#~ msgstr "Требуется корректный пароль."
-
-#~ msgid "Accepting Terms of Service is required."
-#~ msgstr "Требуется принять правила использования сервиса."
-
-#~ msgid "Agreeing to the Honor Code is required."
-#~ msgstr "Требуется принять Кодекс Чести."
-
-#~ msgid "Lastname must be a minimum of two characters long."
-#~ msgstr "Фамилия должна быть длиннее двух символов."
-
-#~ msgid "Firstname must be a minimum of two characters long."
-#~ msgstr "Имя должно быть длиннее двух символов."
-
-#~ msgid "Middlename must be a minimum of two characters long."
-#~ msgstr "Отчество должно быть длиннее двух символов."
-
-#~ msgid "Year of birth is required"
-#~ msgstr "Требуется год рождения"
-
-#~ msgid "Education place is required"
-#~ msgstr "Требуется заполненое поле Название учебного учреждения"
-
-#~ msgid "Education year is required"
-#~ msgstr "Требуется заполненое поле Год окончания учебного заведения"
-
-#~ msgid "Work type is required"
-#~ msgstr "Требуется заполненое поле Тип образовательного учреждения"
-
-#~ msgid "Work number is required"
-#~ msgstr "Требуется заполненое поле Номер образовательного учреждения"
-
-#~ msgid "Work name is required"
-#~ msgstr "Требуется заполненое поле Название образовательного учреждения"
-
-#~ msgid "Work StatGrad login is required"
-#~ msgstr ""
-#~ "Требуется заполненое поле Логин образовательного учреждения в системе "
-#~ "Статград"
-
-#~ msgid "Work location is required"
-#~ msgstr "Должно быть указано местоположение рабочего места"
-
-#~ msgid "Work occupation is required"
-#~ msgstr "Должен быть указан род занятий"
-
-#~ msgid "Work teaching experience is required"
-#~ msgstr "Должен быть указан опыт работы"
-
-#~ msgid "Work qualification category is required"
-#~ msgstr "Должна быть указана квалификация"
-
-#~ msgid "Work qualification year is required"
-#~ msgstr "Должен быть указан стаж"
-
-#~ msgid "Contact phone is required"
-#~ msgstr "Должен быть указан контактный телефон"
-
-#~ msgid "Education year must be numeric"
-#~ msgstr "Год окончания должен быть числом"
-
-#~ msgid "Work teaching experience must be numeric"
-#~ msgstr "Должен быть указан опыт работы в виде числа"
-
-#~ msgid "Work managing experience must be numeric"
-#~ msgstr "Должен быть указан опыт работы в виде числа"
-
-#~ msgid "Work qualification year must be numeric"
-#~ msgstr "Год получения квалификации должен быть числом"
-
-#~ msgid "Contact phone must be numeric"
-#~ msgstr "Контактный телефон должен быть числом"
-
-#~ msgid "Valid e-mail is required."
-#~ msgstr "Введите действительный адрес эл. почты!"
-
-#~ msgid "Valid StatGrad login is required."
-#~ msgstr "Должен быть указан корректный логин СтатГрад"
 
 #~ msgid "at"
 #~ msgstr "в"

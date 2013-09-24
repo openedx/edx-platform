@@ -1492,7 +1492,7 @@ def import_users(request, post_override=None):
         row['work_login'] = row.pop('login')
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
-        username = row['work_login'] + '_' + row['id']
+        username = row['email']
         password = row.get('password', id_generator(8, _ALPHABET))
         email = row['email']
         registration = Registration()
@@ -1502,24 +1502,28 @@ def import_users(request, post_override=None):
             is_active=False)
         user.set_password(password)
 
-        registration.register(user)
 
         try:
             user.save()
+            registration.register(user)
             log.info("New user:" + row['email'] + ":" + password)
         except IntegrityError:
-            if update_user_email is True:
-                user = User.objects.filter(username=username)[0]
-                user.set_password(password)
-                user.email = email
-                user.save()
-                log.info("New user email:" + email + ":" + password)
-                
-                registration = Registration.objects.filter(user=user)[0]
             # Figure out the cause of the integrity error
             if len(User.objects.filter(email=row['email'])) > 0:
                 user = User.objects.filter(email=row['email'])[0];
-                profile = UserProfile.objects.get(user=user)
+                profile = UserProfile()
+                try:
+                    profile = UserProfile.objects.get(user=user)
+                except Exception:
+                    profile = UserProfile(user=user)
+                  
+                    profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
+                    profile.lastname = row.get('lastname')
+                    profile.firstname = row.get('firstname')
+                    profile.middlename = row.get('middlename')
+            
+                    profile.work_login = row.get('work_login')
+                    profile.allowed_courses = u''
 
                 if (profile.name != name):
                     js['success'] = False
@@ -1536,28 +1540,29 @@ def import_users(request, post_override=None):
                     log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                     transaction.rollback()
                     continue
+                transaction.commit()
                 continue
             if len(User.objects.filter(username=username)) > 0:
                 log.warning(u'Import: Error in row %s:Duplicate username with different : ' % (idx))
                 transaction.rollback()
                 continue
 
-            profile = UserProfile(user=user)
+        profile = UserProfile(user=user)
                   
-            profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
-            profile.lastname = row.get('lastname')
-            profile.firstname = row.get('firstname')
-            profile.middlename = row.get('middlename')
+        profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
+        profile.lastname = row.get('lastname')
+        profile.firstname = row.get('firstname')
+        profile.middlename = row.get('middlename')
             
-            profile.work_login = row.get('work_login')
-            profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
+        profile.work_login = row.get('work_login')
+        profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
 
-            try:
-                profile.save()
-            except Exception:
-                log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-                transaction.rollback()
-                continue
+        try:
+            profile.save()
+        except Exception:
+            log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+            transaction.rollback()
+            continue
         
         if send_email is True:
             d = {'name': row['lastname'],
