@@ -16,15 +16,15 @@
   <section role="main" class="content">
   <h2>Пакетный импорт пользователей</h2>
   <p>Формат загружаемого CSV файла:
-  <pre>
-  	timestamp;login;id;subject;second-name;first-name;patronymic;email;course-volume-in-hours
-    2013-09-11 12:23:46.782784+00:00;sch010072;1;Ответственный по ОУ;Иванов;Иван;Иванович;dap@mioo.ru;72
-    2013-09-11 12:23:46.782784+00:00;sch010072;2;Английский язык;Иванов;Иван 5;Иванович;dap@mioo3.ru;72
-   </pre>
+<pre>timestamp;login;id;subject;second-name;first-name;patronymic;email;course-volume-in-hours
+2013-09-11 12:23:46.782784+00:00;sch010072;1;Ответственный по ОУ;Иванов;Иван;Иванович;dap@mioo.ru;72
+2013-09-11 12:23:46.782784+00:00;sch010072;2;Английский язык;Иванов;Иван 5;Иванович;dap@mioo3.ru;72</pre>
    <red>Внимание!!! Кодировка UTF-8 (работа в других кодировках не гарантируется)</red>
 </p>
     <form role="form" id="login-form" method="post" action="/accounts/import_users" enctype="multipart/form-data">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+      Отправлять письма<input type="checkbox" name="send_email" value="true" id="send-email" />
+      Обновить email пользователя<input type="checkbox" name="update_user_email" value="true" id="update-user-email" />
       <input type="file" name="file" size="40"></br></br>
       <div class="form-actions">
         <button name="submit" type="submit" id="submit">${_('Submit')}</button>
