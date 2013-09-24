@@ -69,7 +69,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                 'request_info': {},
                 }
 
-    def _run_task_with_mock_celery(self, task_function, entry_id, task_id, expected_failure_message=None):
+    def _run_task_with_mock_celery(self, task_class, entry_id, task_id, expected_failure_message=None):
         """Submit a task and mock how celery provides a current_task."""
         self.current_task = Mock()
         self.current_task.request = Mock()
@@ -77,32 +77,34 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.current_task.update_state = Mock()
         if expected_failure_message is not None:
             self.current_task.update_state.side_effect = TestTaskFailure(expected_failure_message)
+        task_args = [entry_id, self._get_xmodule_instance_args()]
+
         with patch('instructor_task.tasks_helper._get_current_task') as mock_get_task:
             mock_get_task.return_value = self.current_task
-            return task_function(entry_id, self._get_xmodule_instance_args())
+            return task_class.apply(task_args, task_id=task_id).get()
 
-    def _test_missing_current_task(self, task_function):
-        """Check that a task_function fails when celery doesn't provide a current_task."""
+    def _test_missing_current_task(self, task_class):
+        """Check that a task_class fails when celery doesn't provide a current_task."""
         task_entry = self._create_input_entry()
         with self.assertRaises(UpdateProblemModuleStateError):
-            task_function(task_entry.id, self._get_xmodule_instance_args())
+            task_class(task_entry.id, self._get_xmodule_instance_args())
 
-    def _test_undefined_course(self, task_function):
+    def _test_undefined_course(self, task_class):
         # run with celery, but no course defined
         task_entry = self._create_input_entry(course_id="bogus/course/id")
         with self.assertRaises(ItemNotFoundError):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
+            self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
-    def _test_undefined_problem(self, task_function):
+    def _test_undefined_problem(self, task_class):
         """Run with celery, but no problem defined."""
         task_entry = self._create_input_entry()
         with self.assertRaises(ItemNotFoundError):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
+            self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
-    def _test_run_with_task(self, task_function, action_name, expected_num_succeeded):
+    def _test_run_with_task(self, task_class, action_name, expected_num_succeeded):
         """Run a task and check the number of StudentModules processed."""
         task_entry = self._create_input_entry()
-        status = self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
+        status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
         # check return value
         self.assertEquals(status.get('attempted'), expected_num_succeeded)
         self.assertEquals(status.get('succeeded'), expected_num_succeeded)
@@ -114,10 +116,10 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(json.loads(entry.task_output), status)
         self.assertEquals(entry.task_state, SUCCESS)
 
-    def _test_run_with_no_state(self, task_function, action_name):
+    def _test_run_with_no_state(self, task_class, action_name):
         """Run with no StudentModules defined for the current problem."""
         self.define_option_problem(PROBLEM_URL_NAME)
-        self._test_run_with_task(task_function, action_name, 0)
+        self._test_run_with_task(task_class, action_name, 0)
 
     def _create_students_with_state(self, num_students, state=None, grade=0, max_grade=1):
         """Create students, a problem, and StudentModule objects for testing"""
@@ -145,12 +147,12 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             state = json.loads(module.state)
             self.assertEquals(state['attempts'], num_attempts)
 
-    def _test_run_with_failure(self, task_function, expected_message):
+    def _test_run_with_failure(self, task_class, expected_message):
         """Run a task and trigger an artificial failure with the given message."""
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         with self.assertRaises(TestTaskFailure):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id, expected_message)
+            self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         self.assertEquals(entry.task_state, FAILURE)
@@ -158,7 +160,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['exception'], 'TestTaskFailure')
         self.assertEquals(output['message'], expected_message)
 
-    def _test_run_with_long_error_msg(self, task_function):
+    def _test_run_with_long_error_msg(self, task_class):
         """
         Run with an error message that is so long it will require
         truncation (as well as the jettisoning of the traceback).
@@ -167,7 +169,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 1500
         with self.assertRaises(TestTaskFailure):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id, expected_message)
+            self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         self.assertEquals(entry.task_state, FAILURE)
@@ -177,7 +179,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['message'], expected_message[:len(output['message']) - 3] + "...")
         self.assertTrue('traceback' not in output)
 
-    def _test_run_with_short_error_msg(self, task_function):
+    def _test_run_with_short_error_msg(self, task_class):
         """
         Run with an error message that is short enough to fit
         in the output, but long enough that the traceback won't.
@@ -187,7 +189,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 900
         with self.assertRaises(TestTaskFailure):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id, expected_message)
+            self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         self.assertEquals(entry.task_state, FAILURE)
@@ -196,33 +198,6 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['exception'], 'TestTaskFailure')
         self.assertEquals(output['message'], expected_message)
         self.assertEquals(output['traceback'][-3:], "...")
-
-
-class TestGeneralInstructorTask(TestInstructorTasks):
-    """Tests instructor task mechanism using custom tasks"""
-
-    def test_successful_result_too_long(self):
-        # while we don't expect the existing tasks to generate output that is too
-        # long, we can test the framework will handle such an occurrence.
-        task_entry = self._create_input_entry()
-        self.define_option_problem(PROBLEM_URL_NAME)
-        action_name = 'x' * 1000
-        # define a custom task that does nothing:
-        update_fcn = lambda(_module_descriptor, _student_module): UPDATE_STATUS_SUCCEEDED
-        visit_fcn = partial(perform_module_state_update, update_fcn, None)
-        task_function = (lambda entry_id, xmodule_instance_args:
-                         run_main_task(entry_id, visit_fcn, action_name))
-        # run the task:
-        with self.assertRaises(ValueError):
-            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
-        # compare with entry in table:
-        entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(entry.task_state, FAILURE)
-        self.assertGreater(1023, len(entry.task_output))
-        output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], 'ValueError')
-        self.assertTrue("Length of task output is too long" in output['message'])
-        self.assertTrue('traceback' not in output)
 
 
 class TestRescoreInstructorTask(TestInstructorTasks):
@@ -257,8 +232,8 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
-        # TODO: figure out why this patch isn't working
-        # with patch('courseware.module_render.get_module_for_descriptor_internal') as mock_get_module:
+        # TODO: figure out why this patch isn't working, when it seems to work fine for
+        # the test_rescoring_success test below.  Weird.
         with patch('courseware.module_render.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             with self.assertRaises(UpdateProblemModuleStateError):

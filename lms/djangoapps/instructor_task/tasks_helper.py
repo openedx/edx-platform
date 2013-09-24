@@ -5,10 +5,8 @@ running state of a course.
 """
 import json
 from time import time
-from sys import exc_info
-from traceback import format_exc
 
-from celery import current_task
+from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 
@@ -35,6 +33,66 @@ UNKNOWN_TASK_ID = 'unknown-task_id'
 UPDATE_STATUS_SUCCEEDED = 'succeeded'
 UPDATE_STATUS_FAILED = 'failed'
 UPDATE_STATUS_SKIPPED = 'skipped'
+
+
+class BaseInstructorTask(Task):
+    """
+    Base task class for use with InstructorTask models.
+
+    Permits updating information about task in corresponding InstructorTask for monitoring purposes.
+
+    Assumes that the entry_id of the InstructorTask model is the first argument to the task.
+    """
+    abstract = True
+
+    def on_success(self, task_progress, task_id, args, kwargs):
+        """
+        Update InstructorTask object corresponding to this task with info about success.
+
+        Updates task_output and task_state.  But it shouldn't actually do anything
+        if the task is only creating subtasks to actually do the work.
+        """
+        TASK_LOG.info('Task success returned: %r' % (self.request, ))
+        # We should be able to find the InstructorTask object to update
+        # based on the task_id here, without having to dig into the
+        # original args to the task.  On the other hand, the entry_id
+        # is the first value passed to all such args, so we'll use that.
+        # And we assume that it exists, else we would already have had a failure.
+        entry_id = args[0]
+        entry = InstructorTask.objects.get(pk=entry_id)
+        # Check to see if any subtasks had been defined as part of this task.
+        # If not, then we know that we're done.  (If so, let the subtasks
+        # handle updating task_state themselves.)
+        if len(entry.subtasks) == 0:
+            entry.task_output = InstructorTask.create_output_for_success(task_progress)
+            entry.task_state = SUCCESS
+            entry.save_now()
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """
+        Update InstructorTask object corresponding to this task with info about failure.
+
+        Fetches and updates  exception and traceback information on failure.
+        """
+        TASK_LOG.info('Task failure returned: %r' % (self.request, ))
+        entry_id = args[0]
+        try:
+            entry = InstructorTask.objects.get(pk=entry_id)
+        except InstructorTask.DoesNotExist:
+            # if the InstructorTask object does not exist, then there's no point
+            # trying to update it.
+            pass
+        else:
+            TASK_LOG.warning("background task (%s) failed: %s %s", task_id, einfo.exception, einfo.traceback)
+            entry.task_output = InstructorTask.create_output_for_failure(einfo.exception, einfo.traceback)
+            entry.task_state = FAILURE
+            entry.save_now()
+
+    def on_retry(self, exc, task_id, args, kwargs, einfo):
+        # We don't expect this to be called for top-level tasks, at the moment....
+        # If it were, not sure what kind of status to report for it.
+        # But it would be good to know that it's being called, so at least log it.
+        TASK_LOG.info('Task retry returned: %r' % (self.request, ))
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -162,7 +220,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     return task_progress
 
 
-def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
+def run_main_task(entry_id, task_fcn, action_name):
     """
     Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
 
@@ -221,64 +279,18 @@ def run_main_task(entry_id, task_fcn, action_name, spawns_subtasks=False):
 
     TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
 
-    # Now that we have an entry we can try to catch failures:
-    task_progress = None
-    try:
-        # Check that the task_id submitted in the InstructorTask matches the current task
-        # that is running.
-        request_task_id = _get_current_task().request.id
-        if task_id != request_task_id:
-            fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
-            message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
-            TASK_LOG.error(message)
-            raise UpdateProblemModuleStateError(message)
+    # Check that the task_id submitted in the InstructorTask matches the current task
+    # that is running.
+    request_task_id = _get_current_task().request.id
+    if task_id != request_task_id:
+        fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
+        message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
+        TASK_LOG.error(message)
+        raise UpdateProblemModuleStateError(message)
 
-        # Now do the work:
-        with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
-            task_progress = task_fcn(entry_id, course_id, task_input, action_name)
-
-        # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
-        # But we do this within the try, in case creating the task_output causes an exception to be
-        # raised.
-        # TODO: This is not the case if there are outstanding subtasks that were spawned asynchronously
-        # as part of the main task.  There is probably some way to represent this more elegantly, but for
-        # now, we will just use an explicit flag.
-        if spawns_subtasks:
-            # TODO: UPDATE THIS.
-            # we change the rules here.  If it's a task with subtasks running, then we
-            # explicitly set its state, with the idea that progress will be updated
-            # directly into the InstructorTask object, rather than into the parent task's
-            # AsyncResult object.  This is because we have to write to the InstructorTask
-            # object anyway, so we may as well put status in there.  And because multiple
-            # clients are writing to it, we need the locking that a DB can provide, rather
-            # than the speed that the AsyncResult provides.
-            # So we need to change the logic of the monitor to pull status from the
-            # InstructorTask directly when the state is PROGRESS, and to pull from the
-            # AsyncResult when it's running but not marked as in PROGRESS state.  (I.e.
-            # if it's started.)  Admittedly, it's misnamed, but it should work.
-            # But we've already started the subtasks by the time we get here,
-            # so these values should already have been written.  Too late.
-            # entry.task_output = InstructorTask.create_output_for_success(task_progress)
-            # entry.task_state = PROGRESS
-            # Weird.  Note that by exiting this function successfully, will
-            # result in the AsyncResult for this task as being marked as SUCCESS.
-            # Below, we were just marking the entry to match.  But it shouldn't
-            # match, if it's not really done.
-            pass
-        else:
-            entry.task_output = InstructorTask.create_output_for_success(task_progress)
-            entry.task_state = SUCCESS
-            entry.save_now()
-
-    except Exception:
-        # try to write out the failure to the entry before failing
-        _, exception, traceback = exc_info()
-        traceback_string = format_exc(traceback) if traceback is not None else ''
-        TASK_LOG.warning("background task (%s) failed: %s %s", task_id, exception, traceback_string)
-        entry.task_output = InstructorTask.create_output_for_failure(exception, traceback_string)
-        entry.task_state = FAILURE
-        entry.save_now()
-        raise
+    # Now do the work:
+    with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
+        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
     # Release any queries that the connection has been hanging onto:
     reset_queries()
