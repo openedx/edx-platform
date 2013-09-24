@@ -194,6 +194,8 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
+        # raises exception if location is not fully specified
+        Location.ensure_fully_specified(location)
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
