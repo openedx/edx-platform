@@ -1223,8 +1223,8 @@ def reactivation_email_for_user(user):
                                         'error': _('No inactive user with this e-mail exists')}))
 
     d = {'name': user.profile.name,
-         'login': user.profile.email,
-         'password': '******',
+         'login': user.email,
+         'password': u'скрыт',
          'key': reg.activation_key}
 
     subject = render_to_string('emails/activation_email_subject.txt', d)
