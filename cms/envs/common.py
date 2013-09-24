@@ -257,6 +257,7 @@ PIPELINE_JS = {
              'js/src/utility.js',
              'js/models/settings/course_grading_policy.js',
              'js/models/asset.js', 'js/models/assets.js',
+             'js/views/assets.js',
              'js/views/assets_view.js', 'js/views/asset_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
