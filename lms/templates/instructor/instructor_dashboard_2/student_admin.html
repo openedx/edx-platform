@@ -2,25 +2,47 @@
 <%page args="section_data"/>
 
 <div class="student-specific-container action-type-container">
-  <H2>${_("Student-specific grade adjustment")}</h2>
+  <h2>${_("Student-specific grade inspection")}</h2>
   <div class="request-response-error"></div>
-
-  <input type="text" name="student-select" placeholder="${_("Student Email")}">
+  <p>
+    <!-- Doesn't work for username but this MUST work -->
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-progress" placeholder="${_("Student Email or Username")}">
+  </p>
   <br>
 
   <div class="progress-link-wrapper">
-    <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
-  </div>
+  <p>
+    ${_("Click this link to view the student's progress page:")}
 
+    <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
+  </p>
+  </div>
   <br>
+
+  <!-- These buttons don't appear to be working
+  <p>
+    ${_("Click to enroll or unenroll this student from the course:")}
   <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enrollment_url'] }">
   <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['enrollment_url'] }">
-  ## <select class="problems">
-  ##   <option>Getting problems...</option>
-  ## </select>
+  </p>
+  -->
 
-  <p> ${_('Specify a particular problem in the course here by its url:')} </p>
+  <hr>
+
+  <h2>${_("Student-specific grade adjustment")}</h2>
+
+  <p>
+    <!-- Doesn't work for username but this MUST work -->
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-grade" placeholder="${_("Student Email or Username")}">
+  </p>
+  <br>
+
+  <p> ${_('Specify a particular problem in the course here by its url:')} 
   <input type="text" name="problem-select-single" placeholder="${_("Problem urlname")}">
+  </p>
+
   <p>
     ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
     location1="<tt>i4x://university/course/problem/problemname</tt>",
@@ -29,20 +51,31 @@
     urlname2="<tt>notaproblem/someothername</tt>")
     }
   </p>
-  <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
 
-  %if section_data['access']['instructor']:
-    <p> ${_('You may also delete the entire state of a student for the specified module:')} </p>
-    <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Module")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-  %endif
+  <p>
+  ${_("Next, select an action to perform for the given user and problem:")}
+  </p>
+
+  <p>
+    <!-- Doesn't give any type of notification upon success -->
+  <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
 
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <input type="button" name="rescore-problem-single" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_problem_url'] }">
   %endif
+  </p>
+
+  <p>
+  %if section_data['access']['instructor']:
+    <p> ${_('You may also delete the entire state of a student for the specified problem:')} </p>
+    <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+  %endif
+  </p>
+
 
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p>
-      ${_("Rescoring runs in the background, and status for active tasks will appear in a table below. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in a table on the Course Info tab. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
@@ -76,18 +109,11 @@
     </p>
     <p>
     <p>
-      ${_("These actions run in the background, and status for active tasks will appear in a table below. "
+      ${_("These actions run in the background, and status for active tasks will appear in a table on the Course Info tab. "
       "To see status for all tasks submitted for this problem, click on this button")}:
     </p>
       <input type="button" name="task-history-all" value="${_("Show Background Task History for Problem")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
       <div class="task-history-all-table"></div>
     </p>
-  </div>
-
-
-  <div class="running-tasks-container action-type-container">
-    <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
-    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
   </div>
 %endif

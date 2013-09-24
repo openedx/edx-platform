@@ -80,12 +80,13 @@ class StudentAdmin
     # gather buttons
     # some buttons are optional because they can be flipped by the instructor task feature switch
     # student-specific
-    @$field_student_select        = find_and_assert @$section, "input[name='student-select']"
+    @$field_student_select_progress = find_and_assert @$section, "input[name='student-select-progress']"
+    @$field_student_select_grade  = find_and_assert @$section, "input[name='student-select-grade']"
     @$progress_link               = find_and_assert @$section, "a.progress-link"
-    @$btn_enroll                  = find_and_assert @$section, "input[name='enroll']"
-    @$btn_unenroll                = find_and_assert @$section, "input[name='unenroll']"
     @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
     @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
+    @$btn_enroll                  = @$section.find "input[name='enroll']"
+    @$btn_unenroll                = @$section.find "input[name='unenroll']"
     @$btn_delete_state_single     = @$section.find "input[name='delete-state-single']"
     @$btn_rescore_problem_single  = @$section.find "input[name='rescore-problem-single']"
     @$btn_task_history_single     = @$section.find "input[name='task-history-single']"
@@ -117,7 +118,7 @@ class StudentAdmin
     # go to student progress page
     @$progress_link.click (e) =>
       e.preventDefault()
-      email = @$field_student_select.val()
+      email = @$field_student_select_progress.val()
 
       $.ajax
         dataType: 'json'
@@ -131,7 +132,7 @@ class StudentAdmin
     @$btn_enroll.click =>
       send_data =
         action: 'enroll'
-        emails: @$field_student_select.val()
+        emails: @$field_student_select_progress.val()
         auto_enroll: false
 
       $.ajax
@@ -145,7 +146,7 @@ class StudentAdmin
     @$btn_unenroll.click =>
       send_data =
         action: 'unenroll'
-        emails: @$field_student_select.val()
+        emails: @$field_student_select_progress.val()
 
       $.ajax
         dataType: 'json'
@@ -157,7 +158,7 @@ class StudentAdmin
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
       send_data =
-        student_email: @$field_student_select.val()
+        student_email: @$field_student_select_grade.val()
         problem_to_reset: @$field_problem_select_single.val()
         delete_module: false
 
@@ -170,10 +171,10 @@ class StudentAdmin
 
     # delete state for student on problem
     @$btn_delete_state_single.click => confirm_then
-      msg: "Delete student '#{@$field_student_select.val()}'s state on problem '#{@$field_problem_select_single.val()}'?"
+      msg: "Delete student '#{@$field_student_select_grade.val()}'s state on problem '#{@$field_problem_select_single.val()}'?"
       ok: =>
         send_data =
-          student_email: @$field_student_select.val()
+          student_email: @$field_student_select_grade.val()
           problem_to_reset: @$field_problem_select_single.val()
           delete_module: true
 
@@ -187,7 +188,7 @@ class StudentAdmin
     # start task to rescore problem for student
     @$btn_rescore_problem_single.click =>
       send_data =
-        student_email: @$field_student_select.val()
+        student_email: @$field_student_select_grade.val()
         problem_to_reset: @$field_problem_select_single.val()
 
       $.ajax
@@ -200,7 +201,7 @@ class StudentAdmin
     # list task history for student+problem
     @$btn_task_history_single.click =>
       send_data =
-        student_email: @$field_student_select.val()
+        student_email: @$field_student_select_grade.val()
         problem_urlname: @$field_problem_select_single.val()
 
       if not send_data.student_email
