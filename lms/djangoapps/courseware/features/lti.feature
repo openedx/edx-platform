@@ -1,4 +1,4 @@
-Feature: LTI component
+Feature: LMS.LTI component
   As a student, I want to view LTI component in LMS.
 
   Scenario: LTI component in LMS is not rendered

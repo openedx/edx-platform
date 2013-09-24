@@ -1,4 +1,4 @@
-Feature: Video component
+Feature: LMS.Video component
   As a student, I want to view course videos in LMS.
 
   Scenario: Video component is fully rendered in the LMS in HTML5 mode

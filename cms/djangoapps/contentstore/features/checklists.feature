@@ -1,4 +1,4 @@
-Feature: Course checklists
+Feature: CMS.Course checklists
 
   Scenario: A course author sees checklists defined by edX
     Given I have opened a new course in Studio

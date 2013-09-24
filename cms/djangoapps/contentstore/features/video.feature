@@ -1,4 +1,4 @@
-Feature: Video Component
+Feature: CMS.Video Component
   As a course author, I want to be able to view my created videos in Studio.
 
   # Video Alpha Features will work in Firefox only when Firefox is the active window

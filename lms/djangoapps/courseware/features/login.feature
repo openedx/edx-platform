@@ -1,4 +1,4 @@
-Feature: Login in as a registered user
+Feature: LMS.Login in as a registered user
   As a registered user
   In order to access my content
   I want to be able to login in to edX
