@@ -5,6 +5,9 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
+from datetime import datetime, timedelta
+import pytz
+
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
@@ -22,7 +25,7 @@ class CourseModeModelTest(TestCase):
         """
         Create a new course mode
         """
-        CourseMode.objects.get_or_create(
+        return CourseMode.objects.get_or_create(
             course_id=self.course_id,
             mode_display_name=mode_name,
             mode_slug=mode_slug,
@@ -46,7 +49,13 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate')
         modes = CourseMode.modes_for_course(self.course_id)
-        self.assertEqual([Mode(u'verified', u'Verified Certificate', 0, '', 'usd')], modes)
+        mode = Mode(u'verified', u'Verified Certificate', 0, '', 'usd')
+        self.assertEqual([mode], modes)
+
+        modes_dict = CourseMode.modes_for_course_dict(self.course_id)
+        self.assertEqual(modes_dict['verified'], mode)
+        self.assertEqual(CourseMode.mode_for_course(self.course_id, 'verified'),
+                         mode)
 
     def test_modes_for_course_multiple(self):
         """
