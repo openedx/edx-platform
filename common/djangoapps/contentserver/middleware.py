@@ -1,4 +1,6 @@
-from django.http import HttpResponse, HttpResponseNotModified
+from django.http import (HttpResponse, HttpResponseNotModified,
+    HttpResponseForbidden)
+from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
@@ -41,7 +43,14 @@ class StaticContentServer(object):
                 # NOP here, but we may wish to add a "cache-hit" counter in the future
                 pass
 
-            # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
+            # Check that user has access to content
+            if getattr(content, "locked", False):
+                if not hasattr(request, "user") or not request.user.is_authenticated():
+                    return HttpResponseForbidden('Unauthorized')
+                course_partial_id = "/".join([loc.org, loc.course])
+                if not request.user.is_staff and not CourseEnrollment.is_enrolled_by_partial(
+                        request.user, course_partial_id):
+                    return HttpResponseForbidden('Unauthorized')
 
             # convert over the DB persistent last modified timestamp to a HTTP compatible
             # timestamp, so we can simply compare the strings
