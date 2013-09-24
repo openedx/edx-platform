@@ -1,9 +1,13 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+import pytz
+from datetime import datetime
+
 from django.db import models
 from collections import namedtuple
 from django.utils.translation import ugettext as _
+from django.db.models import Q
 
 Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency'])
 
@@ -32,6 +36,9 @@ class CourseMode(models.Model):
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default="usd", max_length=8)
 
+    # turn this mode off after the given expiration date
+    expiration_date = models.DateField(default=None, null=True)
+
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
     DEFAULT_MODE_SLUG = 'honor'
 
@@ -42,11 +49,14 @@ class CourseMode(models.Model):
     @classmethod
     def modes_for_course(cls, course_id):
         """
-        Returns a list of the modes for a given course id
+        Returns a list of the non-expired modes for a given course id
 
         If no modes have been set in the table, returns the default mode
         """
-        found_course_modes = cls.objects.filter(course_id=course_id)
+        now = datetime.now(pytz.UTC)
+        found_course_modes = cls.objects.filter(Q(course_id=course_id) &
+                                                Q(expiration_date__isnull=True) |
+                                                Q(expiration_date__gte=now))
         modes = ([Mode(mode.mode_slug, mode.mode_display_name, mode.min_price, mode.suggested_prices, mode.currency)
                   for mode in found_course_modes])
         if not modes:
