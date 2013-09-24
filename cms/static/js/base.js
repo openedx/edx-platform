@@ -18,6 +18,7 @@ $(document).ready(function() {
     // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
     // scopes (namely the course-info tab)
     window.$modalCover = $modalCover;
+    window.$modal = $modal;
 
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
@@ -433,6 +434,8 @@ function hideModal(e) {
         $modalCover.hide();
     }
 }
+// Have to put hideModal on the window object because of AWS pipelining (being used by asset_index.html).
+window.hideModal = hideModal;
 
 function toggleSock(e) {
     e.preventDefault();
