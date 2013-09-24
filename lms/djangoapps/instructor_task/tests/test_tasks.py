@@ -8,7 +8,6 @@ paths actually work.
 import json
 from uuid import uuid4
 from unittest import skip
-from functools import partial
 
 from mock import Mock, MagicMock, patch
 
@@ -24,7 +23,7 @@ from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state
-from instructor_task.tasks_helper import UpdateProblemModuleStateError, run_main_task, perform_module_state_update, UPDATE_STATUS_SUCCEEDED
+from instructor_task.tasks_helper import UpdateProblemModuleStateError
 
 PROBLEM_URL_NAME = "test_urlname"
 

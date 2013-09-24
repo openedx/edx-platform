@@ -5,29 +5,20 @@ from time import time
 import json
 
 from celery.utils.log import get_task_logger
-from celery.states import SUCCESS
+from celery.states import SUCCESS, RETRY
 
 from django.db import transaction
 
 from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 
-log = get_task_logger(__name__)
+TASK_LOG = get_task_logger(__name__)
 
 
-def update_subtask_result(previous_result, new_num_sent, new_num_error, new_num_optout):
+def create_subtask_result(new_num_sent, new_num_error, new_num_optout):
     """Return the result of course_email sending as a dict (not a string)."""
     attempted = new_num_sent + new_num_error
     current_result = {'attempted': attempted, 'succeeded': new_num_sent, 'skipped': new_num_optout, 'failed': new_num_error}
-    # add in any previous results:
-    if previous_result is not None:
-        for keyname in current_result:
-            if keyname in previous_result:
-                current_result[keyname] += previous_result[keyname]
     return current_result
-
-
-def create_subtask_result():
-    return update_subtask_result(None, 0, 0, 0)
 
 
 def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_id_list):
@@ -61,7 +52,7 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
     # Write out the subtasks information.
     num_subtasks = len(subtask_id_list)
     subtask_status = dict.fromkeys(subtask_id_list, QUEUING)
-    subtask_dict = {'total': num_subtasks, 'succeeded': 0, 'failed': 0, 'status': subtask_status}
+    subtask_dict = {'total': num_subtasks, 'succeeded': 0, 'failed': 0, 'retried': 0, 'status': subtask_status}
     entry.subtasks = json.dumps(subtask_dict)
 
     # and save the entry immediately, before any subtasks actually start work:
@@ -74,8 +65,8 @@ def update_subtask_status(entry_id, current_task_id, status, subtask_result):
     """
     Update the status of the subtask in the parent InstructorTask object tracking its progress.
     """
-    log.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
-             current_task_id, entry_id, subtask_result)
+    TASK_LOG.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
+                  current_task_id, entry_id, subtask_result)
 
     try:
         entry = InstructorTask.objects.select_for_update().get(pk=entry_id)
@@ -85,9 +76,17 @@ def update_subtask_status(entry_id, current_task_id, status, subtask_result):
             # unexpected error -- raise an exception
             format_str = "Unexpected task_id '{}': unable to update status for email subtask of instructor task '{}'"
             msg = format_str.format(current_task_id, entry_id)
-            log.warning(msg)
+            TASK_LOG.warning(msg)
             raise ValueError(msg)
-        subtask_status[current_task_id] = status
+
+        # Update status unless it has already been set.  This can happen
+        # when a task is retried and running in eager mode -- the retries
+        # will be updating before the original call, and we don't want their
+        # ultimate status to be clobbered by the "earlier" updates.  This
+        # should not be a problem in normal (non-eager) processing.
+        old_status = subtask_status[current_task_id]
+        if status != RETRY or old_status == QUEUING:
+            subtask_status[current_task_id] = status
 
         # Update the parent task progress
         task_progress = json.loads(entry.task_output)
@@ -102,6 +101,8 @@ def update_subtask_status(entry_id, current_task_id, status, subtask_result):
         # entire subtask_status dict.
         if status == SUCCESS:
             subtask_dict['succeeded'] += 1
+        elif status == RETRY:
+            subtask_dict['retried'] += 1
         else:
             subtask_dict['failed'] += 1
         num_remaining = subtask_dict['total'] - subtask_dict['succeeded'] - subtask_dict['failed']
@@ -111,15 +112,13 @@ def update_subtask_status(entry_id, current_task_id, status, subtask_result):
         entry.subtasks = json.dumps(subtask_dict)
         entry.task_output = InstructorTask.create_output_for_success(task_progress)
 
-        log.info("Task output updated to %s for email subtask %s of instructor task %d",
-                 entry.task_output, current_task_id, entry_id)
-        # TODO: temporary -- switch to debug once working
-        log.info("about to save....")
+        TASK_LOG.info("Task output updated to %s for email subtask %s of instructor task %d",
+                      entry.task_output, current_task_id, entry_id)
+        TASK_LOG.debug("about to save....")
         entry.save()
-    except:
-        log.exception("Unexpected error while updating InstructorTask.")
+    except Exception:
+        TASK_LOG.exception("Unexpected error while updating InstructorTask.")
         transaction.rollback()
     else:
-        # TODO: temporary -- switch to debug once working
-        log.info("about to commit....")
+        TASK_LOG.debug("about to commit....")
         transaction.commit()
