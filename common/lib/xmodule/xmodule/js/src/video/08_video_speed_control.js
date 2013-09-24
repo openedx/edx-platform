@@ -62,8 +62,6 @@ function () {
 
         state.videoSpeedControl.el = state.el.find('div.speeds');
 
-        state.videoSpeedControl.mainAnchor = state.videoSpeedControl.el.children('a');
-
         state.videoSpeedControl.videoSpeedsEl = state.videoSpeedControl.el
             .find('.video_speeds');
 
