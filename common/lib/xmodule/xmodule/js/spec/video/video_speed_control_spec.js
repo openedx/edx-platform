@@ -140,24 +140,22 @@
       });
 
       describe('make sure the speed control gets the focus afterwards', function() {
-        var focusSpy;
+        var spyEvent;
 
         beforeEach(function() {
           initialize();
           videoSpeedControl.setSpeed(1.0);
-          focusSpy = spyOn($.fn, 'focus').andCallThrough();
+          spyEvent = spyOnEvent('.speeds > a', 'focus');
         });
 
         it('when the speed is the same', function() {
           $('li[data-speed="1.0"] a').click();
-          expect(focusSpy).toHaveBeenCalled();
-          expect(focusSpy.mostRecentCall.object.selector).toEqual('.parent().parent().siblings(a)');
+          expect(spyEvent).toHaveBeenTriggered();
         });
 
         it('when the speed is not the same', function() {
           $('li[data-speed="0.75"] a').click();
-          expect(focusSpy).toHaveBeenCalled();
-          expect(focusSpy.mostRecentCall.object.selector).toEqual('.parent().parent().siblings(a)');
+          expect(spyEvent).toHaveBeenTriggered();;
         });
       });
     });
