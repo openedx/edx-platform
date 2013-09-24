@@ -150,31 +150,46 @@ function goto( mode)
           <input type='checkbox' name='use_offline_grades' value='${_("yes")}'></font> </p>
     %endif
 
+
+    <hr width="40%" style="align:left">
+    <h2>${_("Grade Downloads")}</h2>
+    % if disable_buttons:
+      <p><font color="red">
+        ${_("Note: some of these buttons are known to time out for larger "
+            "courses. We have temporarily disabled those features for courses "
+            "with more than {max_enrollment} students. We are urgently working on "
+            "fixing this issue. Thank you for your patience as we continue "
+            "working to improve the platform!").format(
+            max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+          )}
+      </font></p>
+    % endif
+
     <p>
-    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">${_("Gradebook")}</a>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
-    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">${_("Grade summary")}</a>
+    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump list of enrolled students">
+    <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump Grades for all students in this course">
-    <input type="submit" name="action" value="Download CSV of all student grades for this course">
+    <input type="submit" name="action" value="Dump Grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Download CSV of all student grades for this course" class="${'is-disabled' if disable_buttons else ''}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump all RAW grades for all students in this course">
-    <input type="submit" name="action" value="Download CSV of all RAW grades">
+    <input type="submit" name="action" value="Dump all RAW grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Download CSV of all RAW grades" class="${'is-disabled' if disable_buttons else ''}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Download CSV of answer distributions">
-    <input type="submit" name="action" value="Dump description of graded assignments configuration">
+    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump description of graded assignments configuration" class="${'is-disabled' if disable_buttons else ''}">
     </p>
     <hr width="40%" style="align:left">
 
@@ -369,9 +384,22 @@ function goto( mode)
 %if modeflag.get('Enrollment'):
 
     <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List enrolled students">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
+    <h2>${_("Enrollment Data")}</h2>
+    % if disable_buttons:
+    <p><font color="red">
+        ${_("Note: some of these buttons are known to time out for larger "
+            "courses. We have temporarily disabled those features for courses "
+            "with more than {max_enrollment} students. We are urgently working on "
+            "fixing this issue. Thank you for your patience as we continue "
+            "working to improve the platform!").format(
+            max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+          )}
+      </font></p>
+      <br>
+    % endif
+
+    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}">
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -392,7 +420,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
-
+  <h2>${_("Batch Enrollment")}</h2>
   <p>${_("Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;")}</p>
   <textarea rows="6" cols="70" name="multiple_students"></textarea>
   <p>
