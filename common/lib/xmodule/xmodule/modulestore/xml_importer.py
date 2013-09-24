@@ -27,6 +27,8 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
         with open(course_data_path / 'policies/assets.json') as f:
             policy = json.load(f)
     except (IOError, ValueError) as err:
+        # xml backed courses won't have this file, only exported courses; so, its absence is not
+        # really an exception.
         policy = {}
 
     verbose = True

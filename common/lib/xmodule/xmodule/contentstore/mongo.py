@@ -104,7 +104,16 @@ class MongoContentStore(ContentStore):
         with disk_fs.open(content.name, 'wb') as asset_file:
             asset_file.write(content.data)
 
-    def export_all_for_course(self, course_location, output_directory, policy_file):
+    def export_all_for_course(self, course_location, output_directory, assets_policy_file):
+        """
+        Export all of this course's assets to the output_directory. Export all of the assets'
+        attributes to the policy file.
+
+        :param course_location: the Location of type 'course'
+        :param output_directory: the directory under which to put all the asset files
+        :param assets_policy_file: the filename for the policy file which should be in the same
+        directory as the other policy files.
+        """
         policy = {}
         assets = self.get_all_content_for_course(course_location)
 
@@ -115,7 +124,7 @@ class MongoContentStore(ContentStore):
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
                     policy.setdefault(asset_location.url(), {})[attr] = value
 
-        with open(policy_file, 'w') as f:
+        with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
 
     def get_all_content_thumbnails_for_course(self, location):
