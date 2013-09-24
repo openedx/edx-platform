@@ -21,16 +21,18 @@ of the query for traversing StudentModule objects.
 """
 from celery import task
 from functools import partial
-from instructor_task.tasks_helper import (run_main_task,
-                                          perform_module_state_update,
-                                          rescore_problem_module_state,
-                                          reset_attempts_module_state,
-                                          delete_problem_module_state,
-                                          )
+from instructor_task.tasks_helper import (
+    run_main_task,
+    BaseInstructorTask,
+    perform_module_state_update,
+    rescore_problem_module_state,
+    reset_attempts_module_state,
+    delete_problem_module_state,
+)
 from bulk_email.tasks import perform_delegate_email_batches
 
 
-@task
+@task(base=BaseInstructorTask)
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -59,7 +61,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task
+@task(base=BaseInstructorTask)
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -80,7 +82,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task
+@task(base=BaseInstructorTask)
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -101,7 +103,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task
+@task(base=BaseInstructorTask)
 def send_bulk_course_email(entry_id, xmodule_instance_args):
     """Sends emails to in a course.
 
@@ -116,4 +118,4 @@ def send_bulk_course_email(entry_id, xmodule_instance_args):
     """
     action_name = 'emailed'
     visit_fcn = perform_delegate_email_batches
-    return run_main_task(entry_id, visit_fcn, action_name, spawns_subtasks=True)
+    return run_main_task(entry_id, visit_fcn, action_name)
