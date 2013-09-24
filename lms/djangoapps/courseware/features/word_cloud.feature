@@ -1,4 +1,4 @@
-Feature: World Cloud component
+Feature: LMS.World Cloud component
   As a student, I want to view Word Cloud component in LMS.
 
   Scenario: Word Cloud component in LMS is rendered with empty result

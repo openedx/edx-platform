@@ -1,4 +1,4 @@
-Feature: Course Settings
+Feature: CMS.Course Settings
   As a course author, I want to be able to configure my course settings.
 
   # Safari has trouble keeps dates on refresh

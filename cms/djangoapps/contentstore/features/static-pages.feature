@@ -1,4 +1,4 @@
-Feature: Static Pages
+Feature: CMS.Static Pages
     As a course author, I want to be able to add static pages
 
     Scenario: Users can add static pages

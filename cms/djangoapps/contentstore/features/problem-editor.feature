@@ -1,4 +1,4 @@
-Feature: Problem Editor
+Feature: CMS.Problem Editor
   As a course author, I want to be able to create problems and edit their settings.
 
   Scenario: User can view metadata

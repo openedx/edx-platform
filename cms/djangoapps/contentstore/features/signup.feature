@@ -1,4 +1,4 @@
-Feature: Sign in
+Feature: CMS.Sign in
   In order to use the edX content
   As a new user
   I want to signup for a student account
