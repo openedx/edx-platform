@@ -1468,7 +1468,6 @@ def UnicodeDictReader(utf8_data, **kwargs):
 @require_POST
 @login_required
 @ensure_csrf_cookie
-@transaction.commit_manually
 def import_users(request, post_override=None):
     post_vars = post_override if post_override else request.POST
     f = request.FILES['file']
@@ -1481,8 +1480,9 @@ def import_users(request, post_override=None):
     js['passwords'] = {}
     js['log'] = ""
     idx = 0
-    send_email = post_vars.get("send_email")
-    update_user_email = post_vars.get("update_user_email")
+    send_email = post_vars.get("send_email", 'false') == u'true'
+    update_user_email = post_vars.get("update_user_email", 'false') == u'true'
+    log.info("Import: params  %s %s" % (send_email, update_user_email))
     for row in data:
         idx += 1
         row['firstname'] = row.pop('first-name')
@@ -1495,13 +1495,17 @@ def import_users(request, post_override=None):
         username = row['work_login'] + '_' + row['id']
         password = row.get('password', id_generator(8, _ALPHABET))
         email = row['email']
+        registration = Registration()
 
         if update_user_email is True:
-            user = User.objects.filter(username=username)[0];
+            user = User.objects.filter(username=username)[0]
             user.set_password(password)
             user.email = email
             user.save()
             log.info("New user email:" + email + ":" + password)
+            
+            registration = Registration.objects.filter(user=user)[0]
+
             profile = UserProfile.objects.get(user=user)
             if (profile.name != name):
                 js['success'] = False
@@ -1523,7 +1527,9 @@ def import_users(request, post_override=None):
                 email=row['email'],
                 is_active=False)
             user.set_password(password)
-            registration = Registration()
+
+            registration.register(user)
+
             try:
                 user.save()
                 log.info("New user:" + row['email'] + ":" + password)
@@ -1532,6 +1538,7 @@ def import_users(request, post_override=None):
                 if len(User.objects.filter(email=row['email'])) > 0:
                     user = User.objects.filter(email=row['email'])[0];
                     profile = UserProfile.objects.get(user=user)
+
                     if (profile.name != name):
                         js['success'] = False
                         js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
@@ -1568,41 +1575,34 @@ def import_users(request, post_override=None):
             except Exception:
                 log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                 transaction.rollback()
-
-        registration.register(user)
+		continue
         
-        if send_email is True
+        if send_email is True:
             d = {'name': row['lastname'],
                 'login': row['email'],
                  'password': password,
                  'key': registration.activation_key,
                  }
-            if _send_email(d) is not True:
-                log.exception('Unable to send activation email to user', exc_info=True)
-                js['success'] = False
-                js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
-                transaction.rollback()
+            subject = render_to_string('emails/activation_email_subject.txt', d)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            message = render_to_string('emails/activation_email_batch.txt', d)
+
+            # dont send email if we are doing load testing or random user generation for some reason
+            if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+                try:
+                    _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+                except:
+                    log.exception('Unable to send activation email to user')
+                    js['success'] = False
+                    js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
+                    transaction.rollback()
+		    continue
 
         transaction.commit()
         js['passwords'][row['email']] = password
 
     return HttpResponse(json.dumps(js, cls=LazyEncoder))
-
-def _send_email(subject, message, data):
-    # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', data)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email_batch.txt', data)
-
-        # dont send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        try:
-            _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-        except:
-            return False
-    return True
-
 
 
 @require_POST
