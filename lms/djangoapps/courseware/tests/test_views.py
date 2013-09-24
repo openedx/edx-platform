@@ -1,10 +1,14 @@
-from mock import MagicMock
+"""
+Tests courseware views.py
+"""
+from mock import MagicMock, patch
 import datetime
+import unittest
 
 from django.test import TestCase
 from django.http import Http404
 from django.test.utils import override_settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test.client import RequestFactory
 
 from django.conf import settings
@@ -15,12 +19,14 @@ from student.tests.factories import AdminFactory
 from mitxmako.middleware import MakoMiddleware
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.tests.factories import CourseFactory
 
 import courseware.views as views
 from xmodule.modulestore import Location
 from pytz import UTC
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from course_modes.models import CourseMode
+import shoppingcart
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -77,6 +83,32 @@ class ViewsTestCase(TestCase):
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_course_about_in_cart(self):
+        in_cart_span = '<span class="add-to-cart">'
+        # don't mock this course due to shopping cart existence checking
+        course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
+        request = self.request_factory.get(reverse('about_course', args=[course.id]))
+        request.user = AnonymousUser()
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(in_cart_span, response.content)
+
+        # authenticated user with nothing in cart
+        request.user = self.user
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(in_cart_span, response.content)
+
+        # now add the course to the cart
+        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
+        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(in_cart_span, response.content)
+
 
     def test_user_groups(self):
         # depreciated function

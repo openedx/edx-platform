@@ -37,7 +37,7 @@ class CourseMode(models.Model):
     currency = models.CharField(default="usd", max_length=8)
 
     # turn this mode off after the given expiration date
-    expiration_date = models.DateField(default=None, null=True)
+    expiration_date = models.DateField(default=None, null=True, blank=True)
 
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
     DEFAULT_MODE_SLUG = 'honor'
@@ -85,6 +85,15 @@ class CourseMode(models.Model):
             return matched[0]
         else:
             return None
+
+    @classmethod
+    def min_course_price_for_currency(cls, course_id, currency):
+        """
+        Returns the minimum price of the course in the appropriate currency over all the course's modes.
+        If there is no mode found, will return the price of DEFAULT_MODE, which is 0
+        """
+        modes = cls.modes_for_course(course_id)
+        return min(mode.min_price for mode in modes if mode.currency == currency)
 
     def __unicode__(self):
         return u"{} : {}, min={}, prices={}".format(
