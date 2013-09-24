@@ -144,7 +144,7 @@ PROBLEM_DICT = {
                         ]
         },
         'correct': ['section.choicetextgroup_correct'],
-        'incorrect': ['span.incorrect', 'section.choicetextgroup_incorrect'],
+        'incorrect': ['section.choicetextgroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered']},
 
     'checkbox_text': {
@@ -242,7 +242,7 @@ def answer_problem(problem_type, correctness):
 def problem_has_answer(problem_type, answer_class):
     if problem_type == "drop down":
         if answer_class == 'blank':
-            assert world.browser.is_element_not_present_by_css('option[selected="true"]')
+            assert world.is_css_not_present('option[selected="true"]')
         else:
             actual = world.browser.find_by_css('option[selected="true"]').value
             expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
