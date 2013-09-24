@@ -1,3 +1,4 @@
+@shard_3
 Feature: Video Component
   As a course author, I want to be able to view my created videos in Studio.
 

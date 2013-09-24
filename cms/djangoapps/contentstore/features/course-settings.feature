@@ -1,3 +1,4 @@
+@shard_2
 Feature: Course Settings
   As a course author, I want to be able to configure my course settings.
 

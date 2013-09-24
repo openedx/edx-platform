@@ -1,3 +1,4 @@
+@shard_2
 Feature: Sign in
   In order to use the edX content
   As a new user

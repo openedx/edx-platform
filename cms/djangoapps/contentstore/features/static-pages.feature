@@ -1,3 +1,4 @@
+@shard_3
 Feature: Static Pages
     As a course author, I want to be able to add static pages
 

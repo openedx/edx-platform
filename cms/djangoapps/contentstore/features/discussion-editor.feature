@@ -1,3 +1,4 @@
+@shard_2
 Feature: Discussion Component Editor
   As a course author, I want to be able to create discussion components.
 

@@ -1,3 +1,4 @@
+@shard_1
 Feature: LTI component
   As a student, I want to view LTI component in LMS.
 

@@ -1,3 +1,4 @@
+@shard_2
 Feature: Course Team
     As a course author, I want to be able to add others to my team
 

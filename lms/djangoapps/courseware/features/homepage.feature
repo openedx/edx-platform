@@ -1,3 +1,4 @@
+@shard_1
 Feature: Homepage for web users
   In order to get an idea what edX is about
   As a an anonymous web user

@@ -1,3 +1,4 @@
+@shard_2
 Feature: Create Section
   In order offer a course on the edX platform
   As a course author

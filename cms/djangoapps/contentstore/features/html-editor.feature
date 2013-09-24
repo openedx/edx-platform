@@ -1,3 +1,4 @@
+@shard_3
 Feature: HTML Editor
   As a course author, I want to be able to create HTML blocks.
 

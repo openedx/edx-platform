@@ -1,3 +1,4 @@
+@shard_1
 Feature: Course checklists
 
   Scenario: A course author sees checklists defined by edX

@@ -1,3 +1,4 @@
+@shard_3
 Feature: Video Component Editor
   As a course author, I want to be able to create video components.
 

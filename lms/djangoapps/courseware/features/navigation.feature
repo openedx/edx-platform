@@ -1,3 +1,4 @@
+@shard_1
 Feature: Navigate Course
     As a student in an edX course
     In order to view the course properly

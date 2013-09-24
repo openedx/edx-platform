@@ -1,3 +1,4 @@
+@shard_2
 Feature: The help module should work
   In order to get help
   As a student

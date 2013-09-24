@@ -1,3 +1,4 @@
+@shard_2
 Feature: Verified certificates
     As a student,
     In order to earn a verified certificate

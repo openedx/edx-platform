@@ -1,3 +1,4 @@
+@shard_2
 Feature: Course updates
     As a course author, I want to be able to provide updates to my students
 

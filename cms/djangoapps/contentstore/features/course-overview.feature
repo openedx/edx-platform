@@ -1,3 +1,4 @@
+@shard_1
 Feature: Course Overview
     In order to quickly view the details of a course's section and set release dates and grading
     As a course author
