@@ -24,15 +24,14 @@
 
         $(document).ready(function() {
             $('.uploads .upload-button').bind('click', showUploadModal);
-            $('.upload-modal .close-button').bind('click', hideModal);
+            $('.upload-modal .close-button').bind('click', window.hideModal);
             $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
         });
 
         var showUploadModal = function (e) {
             e.preventDefault();
             resetUploadModal();
-            // $modal has to be global for hideModal to work.
-            $modal = $('.upload-modal').show();
+            window.$modal = $('.upload-modal').show();
             $('.file-input').bind('change', startUpload);
             $('.upload-modal .file-chooser').fileupload({
                 dataType: 'json',
@@ -56,7 +55,7 @@
 
             });
 
-            $modalCover.show();
+            window.$modalCover.show();
         };
 
         var showFileSelectionMenu = function(e) {
