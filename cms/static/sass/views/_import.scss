@@ -92,6 +92,11 @@
   // UI: upload progress
   .wrapper-status {
 
+    // STATE: hidden
+    &.is-hidden {
+      display: none;
+    }
+
     > .title {
       @extend .t-title4;
       margin-bottom: $baseline;
@@ -147,36 +152,6 @@
 
         // TYPE: upload
         &.item-progresspoint-upload {
-
-          // elem - progress bar
-          .progress-bar {
-            @include size(100%, ($baseline*1.5));
-            display: none;
-            margin: $baseline auto;
-            border: 1px solid $blue;
-
-            .percent {
-              @extend .t-copy-sub1;
-              color: $gray-d1;
-            }
-
-            &.loaded {
-              border-color: $blue-d1;
-
-              .progress-fill {
-                background: $blue-s1;
-                margin-bottom: ($baseline/4);
-              }
-            }
-          }
-
-          .progress-fill {
-            width: 0%;
-            height: ($baseline*1.5);
-            background: $blue;
-            color: $white;
-            @include line-height(48);
-          }
 
           // elem - safe to leave message
           .msg-leaving {
