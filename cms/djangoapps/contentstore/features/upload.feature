@@ -82,18 +82,22 @@ Feature: CMS.Upload Files
         Then "test" is unlocked
 
     # Uploading isn't working on safari with sauce labs
-    @skip_safari
-    Scenario: Locked assets can't be viewed if logged in as unregistered user
-        Given I have opened a course with a locked asset "locked.html"
-#        Then the asset "locked.html" is viewable
-        And the user "bob" exists
-        And "bob" logs in
-        Then the asset "locked.html" is protected
+    # TODO: work with Jay
+#    @skip_safari
+#    Scenario: Locked assets can't be viewed if logged in as unregistered user
+#        Given I have opened a course with a locked asset "locked.html"
+#        Then the asset "locked.html" can be clicked from the asset index
+#        And the user "bob" exists
+#        And "bob" logs in
+#        Then the asset "locked.html" is protected
 
     # Uploading isn't working on safari with sauce labs
     @skip_safari
     Scenario: Locked assets can't be viewed if logged out
         Given I have opened a course with a locked asset "locked.html"
+        # Note that logging out doesn't really matter at the moment-
+        # the asset will be protected because the user sent to middleware is the anonymous user.
+        # Need to work with Jay.
         And I log out
         Then the asset "locked.html" is protected
 
@@ -102,7 +106,8 @@ Feature: CMS.Upload Files
     Scenario: Locked assets can be viewed with is_staff account
         Given I have opened a course with a locked asset "locked.html"
         And the user "staff" exists as a course is_staff
-#        Then the asset "locked.html" is viewable
+        And "staff" logs in
+        Then the asset "locked.html" can be clicked from the asset index
 
     # Uploading isn't working on safari with sauce labs
     @skip_safari

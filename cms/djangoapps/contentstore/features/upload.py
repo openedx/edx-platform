@@ -153,11 +153,11 @@ def open_course_with_locked(step, lock_state, file_name):
 
 
 @step(u'Then the asset "([^"]*)" is (viewable|protected)')
-def view_asset(step, file_name, status):
+def view_asset(_step, file_name, status):
     url = '/c4x/MITx/999/asset/' + file_name
     if status == 'viewable':
         world.visit(url)
-        assert world.css_text('body') == 'test file'
+        _verify_body_text()
     else:
         error_thrown = False
         try:
@@ -166,6 +166,26 @@ def view_asset(step, file_name, status):
             assert e.status_code == 403
             error_thrown = True
         assert error_thrown
+
+
+@step(u'Then the asset "([^"]*)" can be clicked from the asset index')
+def click_asset_from_index(step, file_name):
+    # This is not ideal, but I'm having trouble with the middleware not having
+    # the same user in the request when I hit the URL directly.
+    course_link_css = 'a.course-link'
+    world.css_click(course_link_css)
+    step.given("I go to the files and uploads page")
+    index = get_index(file_name)
+    assert index != -1
+    world.css_click('a.filename', index=index)
+    _verify_body_text()
+
+
+def _verify_body_text():
+    def verify_text(driver):
+        return world.css_text('body') == 'test file'
+
+    world.wait_for(verify_text)
 
 
 @step('I see a confirmation that the file was deleted')
