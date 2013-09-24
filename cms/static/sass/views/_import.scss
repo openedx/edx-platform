@@ -91,9 +91,12 @@
 
   // UI: upload progress
   .wrapper-status {
+    @include transition(opacity $tmg-f2 ease-in-out 0);
+    opacity: 1.0;
 
     // STATE: hidden
     &.is-hidden {
+      opacity: 0.0;
       display: none;
     }
 
@@ -155,16 +158,27 @@
 
           // elem - safe to leave message
           .msg-leaving {
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            opacity: 0.0;
+            display: none;
 
             .title {
               @extend .t-title7;
-              font-weight: 500;
+              font-weight: 600;
               margin-bottom: ($baseline/4);
-              text-transform: uppercase;
             }
 
             .copy {
               @extend .t-copy-sub1;
+            }
+          }
+
+          // STATE: complete
+          &.is-complete {
+
+            .msg-leaving {
+              opacity: 1.0;
+              display: block;
             }
           }
         }
