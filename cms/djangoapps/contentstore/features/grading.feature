@@ -1,5 +1,5 @@
 @shard_1
-Feature: Course Grading
+Feature: CMS.Course Grading
     As a course author, I want to be able to configure how my course is graded
 
     Scenario: Users can add grading ranges

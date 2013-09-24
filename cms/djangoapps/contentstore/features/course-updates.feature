@@ -1,5 +1,5 @@
 @shard_2
-Feature: Course updates
+Feature: CMS.Course updates
     As a course author, I want to be able to provide updates to my students
 
     # Internet explorer can't select all so the update appears weirdly

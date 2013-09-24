@@ -1,5 +1,5 @@
 @shard_2
-Feature: The help module should work
+Feature: LMS.The help module should work
   In order to get help
   As a student
   I want to be able to report a problem

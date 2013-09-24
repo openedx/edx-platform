@@ -1,5 +1,5 @@
 @shard_2
-Feature: Discussion Component Editor
+Feature: CMS.Discussion Component Editor
   As a course author, I want to be able to create discussion components.
 
   Scenario: User can view metadata

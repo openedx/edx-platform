@@ -1,5 +1,5 @@
 @shard_2
-Feature: Create Subsection
+Feature: CMS.Create Subsection
   In order offer a course on the edX platform
   As a course author
   I want to create and edit subsections

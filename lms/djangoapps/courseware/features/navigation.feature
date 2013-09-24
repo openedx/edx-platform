@@ -1,5 +1,5 @@
 @shard_1
-Feature: Navigate Course
+Feature: LMS.Navigate Course
     As a student in an edX course
     In order to view the course properly
     I want to be able to navigate through the content

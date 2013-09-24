@@ -1,5 +1,5 @@
 @shard_3
-Feature: Upload Files
+Feature: CMS.Upload Files
     As a course author, I want to be able to upload files for my students
 
     # Uploading isn't working on safari with sauce labs

@@ -1,5 +1,5 @@
 @shard_2
-Feature: Create Section
+Feature: CMS.Create Section
   In order offer a course on the edX platform
   As a course author
   I want to create and edit sections

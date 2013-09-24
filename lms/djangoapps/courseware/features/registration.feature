@@ -1,5 +1,5 @@
 @shard_1
-Feature: Register for a course
+Feature: LMS.Register for a course
   As a registered user
   In order to access my class content
   I want to register for a class on the edX website
