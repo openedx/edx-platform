@@ -17,6 +17,8 @@ import calc
 import track.views
 
 from django.core.mail import EmailMultiAlternatives
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 log = logging.getLogger(__name__)
 
@@ -182,10 +184,10 @@ def submit_feedback(request):
     if not request.user.is_authenticated():
         required_fields += ["name", "email"]
     required_field_errs = {
-        "subject": "Please provide a subject.",
-        "details": "Please provide details.",
-        "name": "Please provide your name.",
-        "email": "Please provide a valid e-mail.",
+        "subject": ugettext_lazy("Please provide a subject."),
+        "details": ugettext_lazy("Please provide details."),
+        "name": ugettext_lazy("Please provide your name."),
+        "email": ugettext_lazy("Please provide a valid e-mail."),
     }
 
     for field in required_fields:
