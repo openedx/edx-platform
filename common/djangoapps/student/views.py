@@ -1468,6 +1468,7 @@ def UnicodeDictReader(utf8_data, **kwargs):
 @require_POST
 @login_required
 @ensure_csrf_cookie
+@transaction.commit_manually
 def import_users(request, post_override=None):
     post_vars = post_override if post_override else request.POST
     f = request.FILES['file']
@@ -1480,6 +1481,8 @@ def import_users(request, post_override=None):
     js['passwords'] = {}
     js['log'] = ""
     idx = 0
+    send_email = post_vars.get("send_email")
+    update_user_email = post_vars.get("update_user_email")
     for row in data:
         idx += 1
         row['firstname'] = row.pop('first-name')
@@ -1490,112 +1493,115 @@ def import_users(request, post_override=None):
 
         name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
         username = row['work_login'] + '_' + row['id']
-        user = User(username=username,
+        password = row.get('password', id_generator(8, _ALPHABET))
+        email = row['email']
+
+        if update_user_email is True:
+            user = User.objects.filter(username=username)[0];
+            user.set_password(password)
+            user.email = email
+            user.save()
+            log.info("New user email:" + email + ":" + password)
+            profile = UserProfile.objects.get(user=user)
+            if (profile.name != name):
+                js['success'] = False
+                js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
+                log.warning(u'Import: Error in row %s:Duplicate email with different names: ' % (idx))
+                transaction.rollback()
+                continue
+            #profile update
+            if profile.allowed_courses is not None:
+                profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
+            try:
+                profile.save()
+            except Exception:
+                log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+                transaction.rollback()
+                continue
+        else:    
+            user = User(username=username,
                 email=row['email'],
                 is_active=False)
-        password = row.get('password',id_generator(8, _ALPHABET))
-        user.set_password(password)
-        registration = Registration()
-        try:
-            user.save()
-            log.info("New user:" + row['email'] + ":" + password)
-        except IntegrityError:
-            # Figure out the cause of the integrity error
-            if len(User.objects.filter(email=row['email'])) > 0:
-                user = User.objects.filter(email=row['email'])[0];
-                profile = UserProfile.objects.get(user=user)
-                if (profile.name != name):
-                    js['success'] = False
-                    js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
-                    continue
-                #profile update
-                if profile.allowed_courses is not None:
-                    profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
-                try:
-                    profile.save()
-                except Exception:
-                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-                continue
-            if len(User.objects.filter(username=username)) > 0:
-                user = User.objects.filter(username=username)[0];
-                password = row.get('password',id_generator(8, _ALPHABET))
-                user.set_password(password)
-                user.set_email(row['email'])
+            user.set_password(password)
+            registration = Registration()
+            try:
                 user.save()
                 log.info("New user:" + row['email'] + ":" + password)
-                profile = UserProfile.objects.get(user=user)
-                if (profile.name != name):
-                    js['success'] = False
-                    js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
+            except IntegrityError:
+                # Figure out the cause of the integrity error
+                if len(User.objects.filter(email=row['email'])) > 0:
+                    user = User.objects.filter(email=row['email'])[0];
+                    profile = UserProfile.objects.get(user=user)
+                    if (profile.name != name):
+                        js['success'] = False
+                        js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
+                        log.warning(u'Import: Error in row %s:Duplicate email with different names: ' % (idx))
+                        transaction.rollback()
+                        continue
+                    #profile update
+                    if profile.allowed_courses is not None:
+                        profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
+                    try:
+                        profile.save()
+                    except Exception:
+                        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+                        transaction.rollback()
+                        continue
                     continue
-                #profile update
-                if profile.allowed_courses is not None:
-                    profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
-                try:
-                    profile.save()
-                except Exception:
-                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-        
-                registration.register(user)
-                d = {'name': row['lastname'],
-                'login': row['email'],
-                 'password': password,
-                 'key': registration.activation_key,
-                 }
-                _send_email(d)
-                continue
+                if len(User.objects.filter(username=username)) > 0:
+                    log.warning(u'Import: Error in row %s:Duplicate username with different : ' % (idx))
+                    transaction.rollback()
+                    continue
 
-            raise
+            profile = UserProfile(user=user)
+                  
+            profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
+            profile.lastname = row.get('lastname')
+            profile.firstname = row.get('firstname')
+            profile.middlename = row.get('middlename')
+            
+            profile.work_login = row.get('work_login')
+            profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
+
+            try:
+                profile.save()
+            except Exception:
+                log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+                transaction.rollback()
 
         registration.register(user)
-
-        profile = UserProfile(user=user)
-      
-        profile.name = "%s %s %s" % (row.get('lastname'), row.get('firstname'), row.get('middlename'))
-        profile.lastname = row.get('lastname')
-        profile.firstname = row.get('firstname')
-        profile.middlename = row.get('middlename')
         
-        profile.work_login = row.get('work_login')
-        profile.allowed_courses = u'%s - %s' % (row['course-volume-in-hours'], row['subject'])
-
-        js['passwords'][row['email']] = password
-        try:
-            profile.save()
-        except Exception:
-            log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-
-        d = {'name': row['lastname'],
+        if send_email is True
+            d = {'name': row['lastname'],
                 'login': row['email'],
                  'password': password,
                  'key': registration.activation_key,
                  }
-        _send_email(d)
-
-        transaction.commit()
-    return HttpResponse(json.dumps(js, cls=LazyEncoder))
-
-def _send_email(data):
-            # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', data)
-            # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email_batch.txt', data)
-
-            # dont send email if we are doing load testing or random user generation for some reason
-        if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-            try:
-                if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                    dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-                    message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                               '-' * 80 + '\n\n' + message)
-                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
-                else:
-                    _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-            except:
-                log.warning('Unable to send activation email to user', exc_info=True)
+            if _send_email(d) is not True:
+                log.exception('Unable to send activation email to user', exc_info=True)
                 js['success'] = False
                 js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
+                transaction.rollback()
+
+        transaction.commit()
+        js['passwords'][row['email']] = password
+
+    return HttpResponse(json.dumps(js, cls=LazyEncoder))
+
+def _send_email(subject, message, data):
+    # composes activation email
+    subject = render_to_string('emails/activation_email_subject.txt', data)
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+    message = render_to_string('emails/activation_email_batch.txt', data)
+
+        # dont send email if we are doing load testing or random user generation for some reason
+    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+        try:
+            _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        except:
+            return False
+    return True
 
 
 
