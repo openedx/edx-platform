@@ -105,6 +105,12 @@ class StaticImageBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_bad_page_id(self):
+        # A bad page id will cause a 404.        
+        self.make_course(textbooks=[IMAGE_BOOK])
+        with self.assertRaises(NoReverseMatch):
+            self.make_url('book', book_index=0, page='xyzzy')
+
 
 class StaticPdfBookTest(StaticBookTest):
     """
