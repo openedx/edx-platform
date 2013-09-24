@@ -23,8 +23,8 @@
 </p>
     <form role="form" id="login-form" method="post" action="/accounts/import_users" enctype="multipart/form-data">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-      Отправлять письма<input type="checkbox" name="send_email" value="true" id="send-email" />
-      Обновить email пользователя<input type="checkbox" name="update_user_email" value="true" id="update-user-email" />
+      Отправлять письма<input type="checkbox" name="send_email" value="true" id="send-email" /><br>
+      Обновить email пользователя<input type="checkbox" name="update_user_email" value="true" id="update-user-email" /><br>
       <input type="file" name="file" size="40"></br></br>
       <div class="form-actions">
         <button name="submit" type="submit" id="submit">${_('Submit')}</button>

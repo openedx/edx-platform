@@ -46,7 +46,7 @@ def main ():
 
 
     # Extract strings from mako templates
-    babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    babel_mako_cmd = 'pybabel extract -k ugettext_lazy -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
 
     # Extract strings from django source files
     make_django_cmd = 'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* ' \

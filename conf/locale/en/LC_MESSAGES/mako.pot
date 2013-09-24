@@ -1139,7 +1139,7 @@ msgstr ""
 msgid "Required Information to Create a New Course"
 msgstr ""
 
-#: cms/templates/index.html:99 cms/templates/settings.html:88
+#: cms/templates/index.html:99
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:7
 msgid "Course Name"
 msgstr ""
@@ -1185,7 +1185,7 @@ msgstr ""
 msgid "The unique number that identifies your course within your organization"
 msgstr ""
 
-#: cms/templates/index.html:119
+#: cms/templates/index.html:119 cms/templates/settings.html:88
 msgid "Course Run"
 msgstr ""
 
@@ -3034,8 +3034,159 @@ msgstr ""
 msgid "Enrollment action is invalid"
 msgstr ""
 
+#: common/djangoapps/student/views.py:478
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+
+#: common/djangoapps/student/views.py:509
+msgid "Too many failed login attempts. Try again later."
+msgstr ""
+
+#: common/djangoapps/student/views.py:517 lms/templates/provider_login.html:42
+msgid "Email or password is incorrect."
+msgstr ""
+
+#: common/djangoapps/student/views.py:564
+msgid ""
+"This account has not been activated. We have sent another activation "
+"message. Please check your e-mail for the activation instructions."
+msgstr ""
+
+#: common/djangoapps/student/views.py:639
+msgid "An account with the Email '{email}' already exists."
+msgstr ""
+
+#: common/djangoapps/student/views.py:723
+msgid "Error (401 {field}). E-mail us."
+msgstr ""
+
+#: common/djangoapps/student/views.py:728
+msgid "To enroll, you must follow the honor code."
+msgstr ""
+
+#: common/djangoapps/student/views.py:740
+msgid "You must accept the terms of service."
+msgstr ""
+
 #: common/djangoapps/student/views.py:759
+#: common/djangoapps/student/views.py:780
 msgid "Education level is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:770
+msgid "Username must be minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:771
+msgid "A properly formatted e-mail is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:772
+msgid "Your legal name must be a minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:773
+msgid "A valid password is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:774
+msgid "Accepting Terms of Service is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:775
+msgid "Agreeing to the Honor Code is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:776
+msgid "Lastname must be a minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:777
+msgid "Firstname must be a minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:778
+msgid "Middlename must be a minimum of two characters long."
+msgstr ""
+
+#: common/djangoapps/student/views.py:779
+msgid "Year of birth is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:781
+msgid "Education place is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:782
+msgid "Education year is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:783
+msgid "Work type is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:784
+msgid "Work number is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:785
+msgid "Work name is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:786
+msgid "Work StatGrad login is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:787
+msgid "Work location is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:788
+msgid "Work occupation is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:789
+msgid "Work teaching experience is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:790
+msgid "Work qualification category is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:791
+msgid "Work qualification year is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:792
+msgid "Contact phone is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:802
+msgid "Education year must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:803
+msgid "Work teaching experience must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:804
+msgid "Work managing experience must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:805
+msgid "Work qualification year must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:806
+msgid "Contact phone must be numeric"
+msgstr ""
+
+#: common/djangoapps/student/views.py:816
+msgid "Valid e-mail is required."
+msgstr ""
+
+#: common/djangoapps/student/views.py:823
+msgid "Valid StatGrad login is required."
 msgstr ""
 
 #: common/djangoapps/student/views.py:864
@@ -3081,6 +3232,22 @@ msgstr ""
 #: common/djangoapps/student/views.py:1407
 #: common/djangoapps/student/views.py:1417
 msgid "Invalid ID"
+msgstr ""
+
+#: common/djangoapps/util/views.py:187
+msgid "Please provide a subject."
+msgstr ""
+
+#: common/djangoapps/util/views.py:188
+msgid "Please provide details."
+msgstr ""
+
+#: common/djangoapps/util/views.py:189
+msgid "Please provide your name."
+msgstr ""
+
+#: common/djangoapps/util/views.py:190
+msgid "Please provide a valid e-mail."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:353
@@ -4517,10 +4684,6 @@ msgstr ""
 
 #: lms/templates/problem.html:31
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr ""
-
-#: lms/templates/provider_login.html:42
-msgid "Email or password is incorrect."
 msgstr ""
 
 #: lms/templates/provider_login.html:49
