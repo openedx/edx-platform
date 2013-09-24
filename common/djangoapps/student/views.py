@@ -1497,68 +1497,50 @@ def import_users(request, post_override=None):
         email = row['email']
         registration = Registration()
 
-        if update_user_email is True:
-            user = User.objects.filter(username=username)[0]
-            user.set_password(password)
-            user.email = email
+        user = User(username=username,
+            email=row['email'],
+            is_active=False)
+        user.set_password(password)
+
+        registration.register(user)
+
+        try:
             user.save()
-            log.info("New user email:" + email + ":" + password)
-            
-            registration = Registration.objects.filter(user=user)[0]
-
-            profile = UserProfile.objects.get(user=user)
-            if (profile.name != name):
-                js['success'] = False
-                js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
-                log.warning(u'Import: Error in row %s:Duplicate email with different names: ' % (idx))
-                transaction.rollback()
-                continue
-            #profile update
-            if profile.allowed_courses is not None:
-                profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
-            try:
-                profile.save()
-            except Exception:
-                log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-                transaction.rollback()
-                continue
-        else:    
-            user = User(username=username,
-                email=row['email'],
-                is_active=False)
-            user.set_password(password)
-
-            registration.register(user)
-
-            try:
+            log.info("New user:" + row['email'] + ":" + password)
+        except IntegrityError:
+            if update_user_email is True:
+                user = User.objects.filter(username=username)[0]
+                user.set_password(password)
+                user.email = email
                 user.save()
-                log.info("New user:" + row['email'] + ":" + password)
-            except IntegrityError:
-                # Figure out the cause of the integrity error
-                if len(User.objects.filter(email=row['email'])) > 0:
-                    user = User.objects.filter(email=row['email'])[0];
-                    profile = UserProfile.objects.get(user=user)
+                log.info("New user email:" + email + ":" + password)
+                
+                registration = Registration.objects.filter(user=user)[0]
+            # Figure out the cause of the integrity error
+            if len(User.objects.filter(email=row['email'])) > 0:
+                user = User.objects.filter(email=row['email'])[0];
+                profile = UserProfile.objects.get(user=user)
 
-                    if (profile.name != name):
-                        js['success'] = False
-                        js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
-                        log.warning(u'Import: Error in row %s:Duplicate email with different names: ' % (idx))
-                        transaction.rollback()
-                        continue
-                    #profile update
-                    if profile.allowed_courses is not None:
-                        profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
-                    try:
-                        profile.save()
-                    except Exception:
-                        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
-                        transaction.rollback()
-                        continue
-                    continue
-                if len(User.objects.filter(username=username)) > 0:
-                    log.warning(u'Import: Error in row %s:Duplicate username with different : ' % (idx))
+                if (profile.name != name):
+                    js['success'] = False
+                    js['log'] += u'Error in row %s:Duplicate email with different names: ' % (idx)
+                    log.warning(u'Import: Error in row %s:Duplicate email with different names: ' % (idx))
                     transaction.rollback()
                     continue
+                #profile update
+                if profile.allowed_courses is not None:
+                    profile.allowed_courses += u';%s - %s' % (row['course-volume-in-hours'], row['subject'])
+                try:
+                    profile.save()
+                except Exception:
+                    log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+                    transaction.rollback()
+                    continue
+                continue
+            if len(User.objects.filter(username=username)) > 0:
+                log.warning(u'Import: Error in row %s:Duplicate username with different : ' % (idx))
+                transaction.rollback()
+                continue
 
             profile = UserProfile(user=user)
                   
@@ -1575,7 +1557,7 @@ def import_users(request, post_override=None):
             except Exception:
                 log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
                 transaction.rollback()
-		continue
+                continue
         
         if send_email is True:
             d = {'name': row['lastname'],
