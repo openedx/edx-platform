@@ -35,11 +35,4 @@ urlpatterns = patterns(
         name="verify_student_results_callback",
     ),
 
-    url(
-        r'^show_verification_page/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
-        views.show_verification_page,
-        name="verify_student/show_verification_page"
-    ),
-
-
 )

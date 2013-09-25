@@ -1,12 +1,15 @@
+"""
+Views for the course_mode module
+"""
+
 import decimal
 from django.core.urlresolvers import reverse
 from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
+    HttpResponseBadRequest,  Http404
 )
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
-from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -18,10 +21,19 @@ from student.models import CourseEnrollment
 from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
 
-class ChooseModeView(View):
 
+class ChooseModeView(View):
+    """
+    View used when the user is asked to pick a mode
+
+    When a get request is used, shows the selection page.
+    When a post request is used, assumes that it is a form submission
+        from the selection page, parses the response, and then sends user
+        to the next step in the flow
+    """
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
+        """ Displays the course mode choice page """
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         modes = CourseMode.modes_for_course_dict(course_id)
@@ -34,8 +46,8 @@ class ChooseModeView(View):
             "course_id": course_id,
             "modes": modes,
             "course_name": course.display_name_with_default,
-            "course_org" : course.display_org_with_default,
-            "course_num" : course.display_number_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
         }
@@ -48,6 +60,7 @@ class ChooseModeView(View):
 
     @method_decorator(login_required)
     def post(self, request, course_id):
+        """ Takes the form submission from the page and parses it """
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollement,
@@ -102,6 +115,10 @@ class ChooseModeView(View):
             )
 
     def get_requested_mode(self, user_choice):
+        """
+        Given the text of `user_choice`, return the
+        corresponding course mode slug
+        """
         choices = {
             "Select Audit": "audit",
             "Select Certificate": "verified"
