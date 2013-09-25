@@ -140,7 +140,6 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'contentserver.middleware.StaticContentServer',
     'request_cache.middleware.RequestCache',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -150,6 +149,7 @@ MIDDLEWARE_CLASSES = (
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -257,6 +257,7 @@ PIPELINE_JS = {
              'js/src/utility.js',
              'js/models/settings/course_grading_policy.js',
              'js/models/asset.js', 'js/models/assets.js',
+             'js/views/assets.js',
              'js/views/assets_view.js', 'js/views/asset_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0

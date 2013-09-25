@@ -353,9 +353,13 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      @$(".sort-bar a").removeClass("active")
-      $(event.target).addClass("active")
-      @sortBy = $(event.target).data("sort")
+      activeSort = @$(".sort-bar a[class='active']")
+      activeSort.removeClass("active")
+      activeSort.attr("aria-checked", "false")
+      newSort = $(event.target)
+      newSort.addClass("active")
+      newSort.attr("aria-checked", "true")
+      @sortBy = newSort.data("sort")
 
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst

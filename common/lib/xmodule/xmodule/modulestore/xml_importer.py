@@ -2,6 +2,7 @@ import logging
 import os
 import mimetypes
 from path import path
+import json
 
 from xblock.fields import Scope
 
@@ -22,6 +23,13 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 
     # now import all static assets
     static_dir = course_data_path / subpath
+    try:
+        with open(course_data_path / 'policies/assets.json') as f:
+            policy = json.load(f)
+    except (IOError, ValueError) as err:
+        # xml backed courses won't have this file, only exported courses; so, its absence is not
+        # really an exception.
+        policy = {}
 
     verbose = True
 
@@ -46,10 +54,16 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
             content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
-            mime_type = mimetypes.guess_type(filename)[0]
 
 
-            content = StaticContent(content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
+            policy_ele = policy.get(content_loc.url(), {})
+            displayname = policy_ele.get('displayname', filename)
+            locked = policy_ele.get('locked', False)
+            mime_type = policy_ele.get('contentType', mimetypes.guess_type(filename)[0])
+            content = StaticContent(
+                content_loc, displayname, mime_type, data,
+                import_path=fullname_with_subpath, locked=locked
+            )
 
             # first let's save a thumbnail so we can get back a thumbnail location
             (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
