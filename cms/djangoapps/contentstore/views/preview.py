@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.error_module import ErrorDescriptor
@@ -79,9 +79,18 @@ def preview_component(request, location):
     # can bind to it correctly
     component.runtime.wrappers.append(partial(wrap_xmodule, 'xmodule_edit.html'))
 
+
+    try:
+        content = component.render('studio_view').content
+    # catch exceptions indiscriminately, since after this point they escape the
+    # dungeon and surface as uneditable, unsaveable, and undeletable
+    # component-goblins.
+    except Exception as exc:                          #pylint: disable=W0703
+        content = render_to_string('html_error.html', {'message': str(exc)})
+
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': component.render('studio_view').content,
+        'editor': content
     })
 
 
@@ -157,4 +166,8 @@ def get_preview_html(request, descriptor, idx):
     specified by the descriptor and idx.
     """
     module = load_preview_module(request, str(idx), descriptor)
-    return module.render("student_view").content
+    try:
+        content = module.render("student_view").content
+    except Exception as exc:                          #pylint: disable=W0703
+        content = render_to_string('html_error.html', {'message': str(exc)})
+    return content
