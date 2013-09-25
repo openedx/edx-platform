@@ -202,10 +202,16 @@ PDFJS.disableWorker = true;
             $("#pageNumber").val(pageNum);
 
             // Enable/disable the previous/next buttons
-            if (pageNum > 1) $("#previous").addClass("enabled");
-            else $("#previous").removeClass("enabled");
-            if (pageNum < pdfDocument.numPages) $("#next").addClass("enabled");
-            else $("#next").removeClass("enabled");
+            if (pageNum > 1) {
+              $("#previous").addClass("enabled");
+            } else {
+              $("#previous").removeClass("enabled");
+            }
+            if (pageNum < pdfDocument.numPages) {
+              $("#next").addClass("enabled");
+            } else {
+              $("#next").removeClass("enabled");
+            }
         }
 
         // Go to previous page
