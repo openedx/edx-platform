@@ -41,16 +41,16 @@ body.course.uploads {
       th {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
-        color: $gray;
         padding: 0 $baseline ($baseline*.75) $baseline;
-        text-align: left;
         vertical-align: middle;
+        text-align: left;
+        color: $gray;
       }
 
       td {
         padding: ($baseline/2);
-        text-align: left;
         vertical-align: middle;
+        text-align: left;
       }
 
       tbody {
@@ -112,15 +112,15 @@ body.course.uploads {
         }
 
         .name-cols {
-          width: 250px;
+          width: ($baseline*12.5);
         }
 
         .date-cols {
-          width: 100px;
+          width: ($baseline*5);
         }
 
         .embed-cols {
-          width: 200px;
+          width: ($baseline*10);
         }
 
         .actions-cols {
@@ -132,7 +132,7 @@ body.course.uploads {
           overflow: hidden;
 
           .thumb {
-            width: $baseline*5;
+            width: ($baseline*5);
 
             img {
               width: 100%;
@@ -267,20 +267,17 @@ body.course.uploads {
       border-radius: ($baseline*2);
       background: $green;
       padding-top: ($baseline/4);
-      color: #fff;
+      color: $white;
     }
 
     .close-button {
       @include transition(color $tmg-f2 ease-in-out 0s);
       position: absolute;
       top: 0;
-      right: 15px;
-      padding: 0 !important;
-      border-radius: 17px !important;
-      line-height: 29px;
-      text-align: center;
+      right: ($baseline*.75);
       border: none;
       background: none;
+      padding: 0;
 
       [class^="icon-"] {
         @extend %t-action1;
@@ -288,30 +285,31 @@ body.course.uploads {
 
       &:hover {
         background: none;
+        box-shadow: none;
         color: $blue;
       }
     }
 
     .embeddable {
       display: none;
-      margin: 30px 0 130px;
+      margin: ($baseline*1.5) 0 ($baseline*4);
 
       label {
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: ($baseline/2);
         font-weight: 700;
       }
     }
 
     .embeddable-xml-input {
       box-shadow: none;
-      width: 400px;
+      width: ($baseline*20);
     }
 
     .copy-button {
       @include white-button;
       display: none;
-      margin-bottom: 100px;
+      margin-bottom: ($baseline*5);
     }
   }
 }
