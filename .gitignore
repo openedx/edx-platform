@@ -47,3 +47,4 @@ autodeploy.properties
 .vagrant/
 logs
 .testids/
+.ropeproject/
