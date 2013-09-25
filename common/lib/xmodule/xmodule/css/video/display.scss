@@ -10,6 +10,11 @@ div.video {
   padding: 12px;
   border-radius: 5px;
 
+  &:focus, &:active, &:hover {
+    outline: 0;
+    border: 0;
+  }
+
   div.tc-wrapper {
     position: relative;
     @include clearfix;
