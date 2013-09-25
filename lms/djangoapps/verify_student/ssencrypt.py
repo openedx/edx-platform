@@ -22,16 +22,11 @@ In case of PEM encoding, the private key can be encrypted with DES or 3TDES
 according to a certain pass phrase. Only OpenSSL-compatible pass phrases are
 supported.
 """
-from collections import OrderedDict
-from email.utils import formatdate
 from hashlib import md5, sha256
-from uuid import uuid4
 import base64
 import binascii
-import json
 import hmac
 import logging
-import sys
 
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -39,11 +34,16 @@ from Crypto.PublicKey import RSA
 
 log = logging.getLogger(__name__)
 
+
 def encrypt_and_encode(data, key):
+    """ Encrypts and endcodes `data` using `key' """
     return base64.urlsafe_b64encode(aes_encrypt(data, key))
 
+
 def decode_and_decrypt(encoded_data, key):
+    """ Decrypts and decodes `data` using `key' """
     return aes_decrypt(base64.urlsafe_b64decode(encoded_data), key)
+
 
 def aes_encrypt(data, key):
     """
@@ -53,10 +53,15 @@ def aes_encrypt(data, key):
     padded_data = pad(data)
     return cipher.encrypt(padded_data)
 
+
 def aes_decrypt(encrypted_data, key):
+    """
+    Decrypt `encrypted_data` using `key`
+    """
     cipher = aes_cipher_from_key(key)
     padded_data = cipher.decrypt(encrypted_data)
     return unpad(padded_data)
+
 
 def aes_cipher_from_key(key):
     """
@@ -66,6 +71,7 @@ def aes_cipher_from_key(key):
     """
     return AES.new(key, AES.MODE_CBC, generate_aes_iv(key))
 
+
 def generate_aes_iv(key):
     """
     Return the initialization vector Software Secure expects for a given AES
@@ -73,16 +79,22 @@ def generate_aes_iv(key):
     """
     return md5(key + md5(key).hexdigest()).hexdigest()[:AES.block_size]
 
+
 def random_aes_key():
     return Random.new().read(32)
 
+
 def pad(data):
+    """ Pad the given `data` such that it fits into the proper AES block size """
     bytes_to_pad = AES.block_size - len(data) % AES.block_size
     return data + (bytes_to_pad * chr(bytes_to_pad))
 
+
 def unpad(padded_data):
+    """  remove all padding from `padded_data` """
     num_padded_bytes = ord(padded_data[-1])
     return padded_data[:-num_padded_bytes]
+
 
 def rsa_encrypt(data, rsa_pub_key_str):
     """
@@ -93,10 +105,15 @@ def rsa_encrypt(data, rsa_pub_key_str):
     encrypted_data = cipher.encrypt(data)
     return encrypted_data
 
+
 def rsa_decrypt(data, rsa_priv_key_str):
+    """
+    When given some `data` and an RSA private key, decrypt the data
+    """
     key = RSA.importKey(rsa_priv_key_str)
     cipher = PKCS1_OAEP.new(key)
     return cipher.decrypt(data)
+
 
 def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key):
     """
@@ -123,6 +140,7 @@ def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key)
 
     return True
 
+
 def generate_signed_message(method, headers_dict, body_dict, access_key, secret_key):
     """
     Returns a (message, signature) pair.
@@ -137,6 +155,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     message += '\n'
     return message, signature, authorization_header
 
+
 def signing_format_message(method, headers_dict, body_dict):
     """
     Given a dictionary of headers and a dictionary of the JSON for the body,
@@ -149,6 +168,7 @@ def signing_format_message(method, headers_dict, body_dict):
 
     return message
 
+
 def header_string(headers_dict):
     """Given a dictionary of headers, return a canonical string representation."""
     header_list = []
@@ -160,7 +180,8 @@ def header_string(headers_dict):
     if 'Content-MD5' in headers_dict:
         header_list.append(headers_dict['Content-MD5'] + "\n")
 
-    return "".join(header_list) # Note that trailing \n's are important
+    return "".join(header_list)  # Note that trailing \n's are important
+
 
 def body_string(body_dict, prefix=""):
     """
@@ -183,5 +204,5 @@ def body_string(body_dict, prefix=""):
                 value = "null"
             body_list.append(u"{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
 
-    return "".join(body_list) # Note that trailing \n's are important
+    return "".join(body_list)  # Note that trailing \n's are important
 

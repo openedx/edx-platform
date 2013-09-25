@@ -1,5 +1,5 @@
 """
-
+Views for the verification flow
 
 """
 import json
@@ -37,6 +37,12 @@ class VerifyView(View):
     @method_decorator(login_required)
     def get(self, request, course_id):
         """
+        Displays the main verification view, which contains three separate steps:
+            - Taking the standard face photo
+            - Taking the id photo
+            - Confirming that the photos and payment price are correct
+              before proceeding to payment
+
         """
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
@@ -69,8 +75,8 @@ class VerifyView(View):
             "user_full_name": request.user.profile.name,
             "course_id": course_id,
             "course_name": course.display_name_with_default,
-            "course_org" : course.display_org_with_default,
-            "course_num" : course.display_number_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "suggested_prices": [
                 decimal.Decimal(price)
@@ -106,8 +112,8 @@ class VerifiedView(View):
         context = {
             "course_id": course_id,
             "course_name": course.display_name_with_default,
-            "course_org" : course.display_org_with_default,
-            "course_num" : course.display_number_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
@@ -162,8 +168,9 @@ def create_order(request):
 
     return HttpResponse(json.dumps(params), content_type="text/json")
 
+
 @require_POST
-@csrf_exempt # SS does its own message signing, and their API won't have a cookie value
+@csrf_exempt  # SS does its own message signing, and their API won't have a cookie value
 def results_callback(request):
     """
     Software Secure will call this callback to tell us whether a user is
@@ -194,7 +201,7 @@ def results_callback(request):
         settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_SECRET_KEY"]
     )
 
-    _, access_key_and_sig = headers["Authorization"].split(" ")
+    _response, access_key_and_sig = headers["Authorization"].split(" ")
     access_key = access_key_and_sig.split(":")[0]
 
     # This is what we should be doing...
@@ -234,10 +241,11 @@ def results_callback(request):
 
     return HttpResponse("OK!")
 
+
 @login_required
 def show_requirements(request, course_id):
     """
-    Show the requirements necessary for
+    Show the requirements necessary for the verification flow.
     """
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
@@ -246,69 +254,8 @@ def show_requirements(request, course_id):
     context = {
         "course_id": course_id,
         "course_name": course.display_name_with_default,
-        "course_org" : course.display_org_with_default,
-        "course_num" : course.display_number_with_default,
+        "course_org": course.display_org_with_default,
+        "course_num": course.display_number_with_default,
         "is_not_active": not request.user.is_active,
     }
     return render_to_response("verify_student/show_requirements.html", context)
-
-
-def show_verification_page(request):
-    pass
-
-def enroll(user, course_id, mode_slug):
-    """
-    Enroll the user in a course for a certain mode.
-
-    This is the view you send folks to when they click on the enroll button.
-    This does NOT cover changing enrollment modes -- it's intended for new
-    enrollments only, and will just redirect to the dashboard if it detects
-    that an enrollment already exists.
-    """
-    # If the user is already enrolled, jump to the dashboard. Yeah, we could
-    # do upgrades here, but this method is complicated enough.
-    if CourseEnrollment.is_enrolled(user, course_id):
-        return HttpResponseRedirect(reverse('dashboard'))
-
-    available_modes = CourseModes.modes_for_course(course_id)
-
-    # If they haven't chosen a mode...
-    if not mode_slug:
-        # Does this course support multiple modes of Enrollment? If so, redirect
-        # to a page that lets them choose which mode they want.
-        if len(available_modes) > 1:
-            return HttpResponseRedirect(
-                reverse('choose_enroll_mode', kwargs={'course_id': course_id})
-            )
-        # Otherwise, we use the only mode that's supported...
-        else:
-            mode_slug = available_modes[0].slug
-
-    # If the mode is one of the simple, non-payment ones, do the enrollment and
-    # send them to their dashboard.
-    if mode_slug in ("honor", "audit"):
-        CourseEnrollment.enroll(user, course_id, mode=mode_slug)
-        return HttpResponseRedirect(reverse('dashboard'))
-
-    if mode_slug == "verify":
-        if SoftwareSecurePhotoVerification.has_submitted_recent_request(user):
-            # Capture payment info
-            # Create an order
-            # Create a VerifiedCertificate order item
-            return HttpResponse.Redirect(reverse('verified'))
-
-    # There's always at least one mode available (default is "honor"). If they
-    # haven't specified a mode, we just assume it's
-    if not mode:
-        mode = available_modes[0]
-
-    elif len(available_modes) == 1:
-        if mode != available_modes[0]:
-            raise Exception()
-
-        mode = available_modes[0]
-
-    if mode == "honor":
-        CourseEnrollment.enroll(user, course_id)
-        return HttpResponseRedirect(reverse('dashboard'))
-
