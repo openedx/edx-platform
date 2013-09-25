@@ -125,20 +125,17 @@ def modify_upload(_step, file_name):
 def lock_unlock_file(_step, _lock_state, file_name):
     index = get_index(file_name)
     assert index != -1
-    lock_css = "a.lock-asset-button"
-    world.css_click(lock_css, index=index)
+    lock_css = "input.lock-checkbox"
+    world.css_find(lock_css)[index].click()
 
 
 @step(u'Then "([^"]*)" is (locked|unlocked)$')
 def verify_lock_unlock_file(_step, file_name, lock_state):
     index = get_index(file_name)
     assert index != -1
-    lock_css = "a.lock-asset-button"
-    text = world.css_text(lock_css, index=index)
-    if lock_state == "locked":
-        assert_equal("Unlock this asset", text)
-    else:
-        assert_equal("Lock this asset", text)
+    lock_css = "input.lock-checkbox"
+    checked = world.css_find(lock_css)[index]._element.get_attribute('checked')
+    assert_equal(lock_state == "locked", bool(checked))
 
 
 @step(u'I have opened a course with a (locked|unlocked) asset "([^"]*)"$')

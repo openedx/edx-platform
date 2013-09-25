@@ -1,18 +1,18 @@
 CMS.Views.Asset = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#asset-tpl").text());
-        this.listenTo(this.model, "change", this.render);
+        this.listenTo(this.model, "change:locked", this.updateLockState);
     },
 
     tagName: "tr",
 
     events: {
         "click .remove-asset-button": "confirmDelete",
-        "click .lock-asset-button": "lockAsset"
+        "click .lock-checkbox": "lockAsset"
     },
 
     render: function() {
-        this.$el.removeClass();
+        var uniqueId = _.uniqueId('lock_asset_');
 
         this.$el.html(this.template({
             display_name: this.model.get('display_name'),
@@ -20,14 +20,26 @@ CMS.Views.Asset = Backbone.View.extend({
             date_added: this.model.get('date_added'),
             url: this.model.get('url'),
             portable_url: this.model.get('portable_url'),
-            locked: this.model.get('locked')}));
+            uniqueId: uniqueId}));
 
-        // Add a class of "locked" to the tr element if appropriate.
-        if (this.model.get('locked')) {
-            this.$el.addClass('is-locked');
-        }
+        this.updateLockState();
 
         return this;
+    },
+
+    updateLockState: function () {
+        var locked_class = "is-locked";
+
+        // Add a class of "locked" to the tr element if appropriate,
+        // and toggle locked state of hidden checkbox.
+        if (this.model.get('locked')) {
+            this.$el.addClass(locked_class);
+            this.$el.find('.lock-checkbox').attr('checked','checked');
+        }
+        else {
+            this.$el.removeClass(locked_class);
+            this.$el.find('.lock-checkbox').removeAttr('checked');
+        }
     },
 
     confirmDelete: function(e) {
@@ -67,7 +79,6 @@ CMS.Views.Asset = Backbone.View.extend({
     },
 
     lockAsset: function(e) {
-        if(e && e.preventDefault) { e.preventDefault(); }
         var asset = this.model;
         var saving = new CMS.Views.Notification.Mini({
             title: gettext("Saving&hellip;")

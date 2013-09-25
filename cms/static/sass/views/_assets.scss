@@ -94,6 +94,10 @@ body.course.uploads {
       .thumb-col {
         padding: ($baseline/2) $baseline;
 
+        .thumb {
+          width: 100px;
+        }
+
           img {
             width: 100%;
           }

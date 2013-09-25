@@ -77,7 +77,7 @@ describe "CMS.Views.Asset", ->
             expect(@collection.contains(@model)).toBeTruthy()
 
         it "should lock the asset on confirmation", ->
-            @view.render().$(".lock-asset-button").click()
+            @view.render().$(".lock-checkbox").click()
             # AJAX request has been sent, but not yet returned
             expect(@model.save).toHaveBeenCalled()
             expect(@requests.length).toEqual(1)
@@ -92,7 +92,7 @@ describe "CMS.Views.Asset", ->
             expect(@model.get("locked")).toBeTruthy()
 
         it "should not lock the asset if server errors", ->
-            @view.render().$(".lock-asset-button").click()
+            @view.render().$(".lock-checkbox").click()
             # return an error response
             @requests[0].respond(404)
             # Don't call hide because that closes the notification showing the server error.
