@@ -9,6 +9,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -17,3 +18,8 @@ def run():
     Executed during django startup
     """
     autostartup()
+
+    # trigger a forced initialization of our modulestores since this can take a while to complete
+    # and we want this done before HTTP requests are accepted
+    for store_name in settings.MODULESTORE:
+    	modulestore(store_name)
