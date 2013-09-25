@@ -366,3 +366,109 @@ Feature: Video Component Editor
         And I see choose button t_not_exist.webm number 2
         And I click choose button number 2
         And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+
+    #21
+    Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save - > change it to another one HTML5 source w/o transcripts - click on use existing - >  change it to another one HTML5 source w/o transcripts - click on use existing
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a t_not_exist.mp4 source to field number 1
+        Then I see found status message
+        And I see download_to_edit button
+        And I see upload_new_timed_transcripts button
+        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+
+        And I save changes
+        And I edit the component
+
+        And I enter a video_name_2.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+        And I click use_existing button
+        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+
+        And I enter a video_name_3.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+        And I click use_existing button
+        And I see "video_name_3" value in the "HTML5 Timed Transcript" field
+
+    #22
+    Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save -> change it to another one HTML5 source w/o transcripts - click on use existing ->  change it to another one HTML5 source w/o transcripts - do not click on use existing -> change it to another one HTML5 source w/o transcripts - click on use existing
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a t_not_exist.mp4 source to field number 1
+        Then I see found status message
+        And I see download_to_edit button
+        And I see upload_new_timed_transcripts button
+        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+
+        And I save changes
+        And I edit the component
+
+        And I enter a video_name_2.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+        And I click use_existing button
+        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+
+        And I enter a video_name_3.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+
+        And I enter a video_name_4.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+        And I click use_existing button
+        And I see "video_name_4" value in the "HTML5 Timed Transcript" field
+
+    #23
+    Scenario: Work with 2 fields: Enter HTML5 source with transcripts - save -> change it to another one HTML5 source w/o transcripts - do not click on use existing ->  add another one HTML5 source w/o transcripts - click on use existing
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a t_not_exist.mp4 source to field number 1
+        Then I see found status message
+        And I see download_to_edit button
+        And I see upload_new_timed_transcripts button
+
+        And I save changes
+        And I edit the component
+
+        And I enter a video_name_2.mp4 source to field number 1
+        Then I see use existing status message
+        And I see use_existing button
+
+        And I enter a video_name_3.webm source to field number 2
+        Then I see use existing status message
+        And I see use_existing button
+        And I click use_existing button
+        And I see "video_name_2|video_name_3" value in the "HTML5 Timed Transcript" field
+
+    #24 Uploading bug
+    #Scenario: File name and name of subs are different
+    #    Given I have created a Video component
+    #    And I edit the component
+
+    #    And I enter a video_name_1.mp4 source to field number 1
+    #    And I upload the transcripts file "test_transcripts.srt"
+    #    And I see "test_transcripts" value in the "HTML5 Timed Transcript" field
+
+    #    And I save changes
+    #    Then when I view the video it does show the captions
+    #    And I edit the component
+
+    #    Then I see found status message
+
+    #25
+    # Video can have filled item.sub, but doesn't have subs file.
+    # In this case, after changing this video by another one without subs
+    # `Not found` message should appear ( not `use existing`).
+    Scenario: Video w/o subs - another video w/o subs - Not found message
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a video_name_1.mp4 source to field number 1
+        Then I see not found status message
+

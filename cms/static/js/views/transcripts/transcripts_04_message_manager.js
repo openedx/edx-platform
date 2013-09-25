@@ -57,6 +57,7 @@
                 ),
                 html5List = (params) ? params.html5_local : [],
                 isYoutubeMode = params && params.is_youtube_mode,
+                // isYoutubeMode = false,
                 template;
 
             if (!tplHtml) {
@@ -73,7 +74,8 @@
                     component_id: encodeURIComponent(this.component_id),
                     html5_list: html5List,
                     grouped_list: groupedList,
-                    isYoutubeMode: isYoutubeMode
+                    isYoutubeMode: isYoutubeMode,
+                    subs_id: (params) ? params.subs: ''
                 }));
 
             this.fileUploader.render();

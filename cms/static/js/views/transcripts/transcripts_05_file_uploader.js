@@ -183,7 +183,7 @@
                 .addClass(this.invisibleClass);
 
             if (xhr.status === 200 && resp.status === "Success") {
-                this.options.messenger.render('uploaded');
+                this.options.messenger.render('uploaded', resp);
                 utils.Storage.set('sub', sub);
             } else {
                 this.options.messenger.showError(err);

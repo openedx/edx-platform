@@ -135,8 +135,7 @@ At the left we can see...
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(json.loads(resp.content).get('status'), 'Success')
 
-        filename = slugify(
-            os.path.splitext(os.path.basename(self.good_srt_file.name))[0])
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         item = modulestore().get_item(self.item_location)
         self.assertEqual(item.sub, filename)
 
@@ -300,7 +299,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
 
         link = reverse('process_transcripts', args=('download',))
-        resp = self.client.get(link, {'id': self.item_location})
+        resp = self.client.get(link, {'id': self.item_location, 'subs_id': "JMD_ifUUfsU"})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content, """0\n00:00:00,100 --> 00:00:00,200\nsubs #1\n\n1\n00:00:00,200 --> 00:00:00,240\nsubs #2\n\n2\n00:00:00,240 --> 00:00:00,380\nsubs #3\n\n""")
 
@@ -327,7 +326,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         link = reverse('process_transcripts', args=('download',))
-        resp = self.client.get(link, {'id': self.item_location})
+        resp = self.client.get(link, {'id': self.item_location, 'subs_id': subs_id})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(
             resp.content,
@@ -554,7 +553,7 @@ class TestChecktranscripts(Basetranscripts):
                 u'is_youtube_mode': True,
                 u'youtube_server': False,
                 u'command': u'found',
-                u'current_item_subs': u'',
+                u'current_item_subs': None,
                 u'youtube_diff': True,
                 u'html5_local': []
             }

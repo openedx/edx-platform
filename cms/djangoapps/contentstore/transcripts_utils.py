@@ -192,6 +192,7 @@ def remove_subs_from_store(subs_id, item):
     try:
         content = contentstore().find(content_location)
         contentstore().delete(content.get_id())
+        log.info("Removed subs {} from store".format(subs_id))
     except NotFoundError:
         pass
 

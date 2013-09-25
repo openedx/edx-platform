@@ -9,7 +9,6 @@ import logging
 import json
 
 from django.http import HttpResponse, Http404
-from django.template.defaultfilters import slugify
 from django.core.exceptions import PermissionDenied
 
 from xmodule.contentstore.content import StaticContent
@@ -27,13 +26,24 @@ from ..transcripts_utils import (
     generate_srt_from_sjson, remove_subs_from_store,
     requests as rqsts,
     download_youtube_subs, get_transcripts_from_youtube,
-    YOUTUBE_API
+    YOUTUBE_API,
+    save_subs_to_store,
 )
 
 from ..utils import get_modulestore
 from .access import has_access
 
 log = logging.getLogger(__name__)
+
+
+def save_module(item):
+    """
+    Proceed with additional save operations.
+    """
+    item.save()
+    store = get_modulestore(Location(item.id))
+    store.update_metadata(item.id, own_metadata(item))
+    return item
 
 
 def upload_transcripts(request):
@@ -87,7 +97,7 @@ def upload_transcripts(request):
 
     # Allow upload only if any video link is presented
     if item.youtube_id_1_0 or any(item.html5_sources):
-        sub_attr = slugify(source_subs_name)
+        sub_attr = source_subs_name
 
         # Assuming we uploaded subs for speed = 1.0
         # Generate subs and save
@@ -99,9 +109,7 @@ def upload_transcripts(request):
 
         if status:  # saving generated subtitles
             item.sub = sub_attr
-            item.save()
-            store = get_modulestore(Location(item_location))
-            store.update_metadata(item_location, own_metadata(item))
+            item = save_module(item)
             response['subs'] = item.sub
             response['status'] = 'Success'
 
@@ -114,11 +122,16 @@ def upload_transcripts(request):
 
 def download_transcripts(request):
     """
-    Download transcripts from current module.
+    Test
     """
     item_location = request.GET.get('id')
     if not item_location:
         log.error('GET data without "id" property.')
+        raise Http404
+
+    subs_id = request.GET.get('subs_id')
+    if not subs_id:
+        log.error('GET data without "subs_id" property.')
         raise Http404
 
     try:
@@ -135,43 +148,21 @@ def download_transcripts(request):
         log.error('transcripts are supported only for video" modules.')
         raise Http404
 
-    speed = 1
-    subs_found = {'youtube': False, 'html5': False}
-    # youtube subtitles has higher priority by design
-    if item.youtube_id_1_0:  # downloading subtitles from youtube speed 1.0
-        filename = 'subs_{0}.srt.sjson'.format(item.youtube_id_1_0)
-        content_location = StaticContent.compute_location(
-            item.location.org, item.location.course, filename)
-        try:
-            sjson_transcripts = contentstore().find(content_location)
-            subs_found['youtube'] = True
-            srt_file_name = item.youtube_id_1_0
-            log.debug("Downloading subs from Youtube ids")
-        except NotFoundError:
-            log.debug("Can't find content in storage for youtube sub.")
-
-    if item.sub and not subs_found['youtube']:  # downloading subtitles from html5
-        filename = 'subs_{0}.srt.sjson'.format(item.sub)
-        content_location = StaticContent.compute_location(
-            item.location.org, item.location.course, filename)
-        try:
-            sjson_transcripts = contentstore().find(content_location)
-            subs_found['html5'] = True
-            srt_file_name = item.sub
-            log.debug("Downloading subs from html5 subs ")
-        except NotFoundError:
-            log.error("Can't find content in storage for non-youtube sub.")
-
-    if subs_found['youtube'] or subs_found['html5']:
-        str_subs = generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed)
+    filename = 'subs_{0}.srt.sjson'.format(subs_id)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename)
+    try:
+        sjson_transcripts = contentstore().find(content_location)
+        log.debug("Downloading subs for {} id".format(subs_id))
+        str_subs = generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed=1.0)
         if str_subs is None:
             log.error('generate_srt_from_sjson produces no subtitles')
             raise Http404
         response = HttpResponse(str_subs, content_type='application/x-subrip')
-        response['Content-Disposition'] = 'attachment; filename="{0}.srt"'.format(srt_file_name)
+        response['Content-Disposition'] = 'attachment; filename="{0}.srt"'.format(subs_id)
         return response
-    else:
-        log.error('No youtube 1.0 or html5 transcripts')
+    except NotFoundError:
+        log.debug("Can't find content in storage for {} subs".format(subs_id))
         raise Http404
 
 
@@ -215,7 +206,15 @@ def check_transcripts(request):
         return JsonResponse(transcripts_presence)
 
     transcripts_presence['status'] = 'Success'
-    transcripts_presence['current_item_subs'] = item.sub
+
+    filename = 'subs_{0}.srt.sjson'.format(item.sub)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename)
+    try:
+        local_transcripts = contentstore().find(content_location).data
+        transcripts_presence['current_item_subs'] = item.sub
+    except NotFoundError:
+        pass
 
     # Check for youtube transcripts presence
     youtube_id = videos.get('youtube', None)
@@ -306,9 +305,15 @@ def transcripts_logic(transcripts_presence, videos):
                 subs = transcripts_presence['html5_local'][0]
             else:
                 command = 'choose'
-        else:
-            command = 'not_found'
-
+        else:  # html5 source have no subtitles
+            # check if item sub has subtitles
+            if transcripts_presence['current_item_subs'] and not transcripts_presence['is_youtube_mode']:
+                log.debug("Command is use existing {} subs".format(transcripts_presence['current_item_subs']))
+                command = 'use_existing'
+                # subs = transcripts_presence['current_item_subs']
+            else:
+                command = 'not_found'
+    log.debug('Resulted command: {}, current transcripys: {}, youtube mode: {}'.format(command, transcripts_presence['current_item_subs'], transcripts_presence['is_youtube_mode']))
     return command, subs
 
 
@@ -338,9 +343,9 @@ def choose_transcripts(request):
     if html5_id_to_remove:
         remove_subs_from_store(html5_id_to_remove, item)
 
-    if item.sub != slugify(html5_id):  # update sub value
-        item.sub = slugify(html5_id)
-        item.save()
+    if item.sub != html5_id:  # update sub value
+        item.sub = html5_id
+        item = save_module(item)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -366,8 +371,8 @@ def replace_transcripts(request):
         return JsonResponse(response)
 
     download_youtube_subs({1.0: youtube_id}, item)
-    item.sub = slugify(youtube_id)
-    item.save()
+    item.sub = youtube_id
+    item = save_module(item)
     response['status'] = 'Success'
     response['subs'] = item.sub
     return JsonResponse(response)
@@ -411,3 +416,41 @@ def validate_transcripts_data(request):
                 videos['html5'][video_data['video']] = video_data['mode']
 
     return True, data, videos, item
+
+
+def rename_transcripts(request):
+    """
+    Renames html5 subtitles
+    """
+
+    response = {
+        'status': 'Error',
+        'subs': '',
+    }
+
+    validation_status, __, videos, item = validate_transcripts_data(request)
+    if not validation_status:
+        return JsonResponse(response)
+
+    old_name = item.sub
+
+    new_name = videos['html5'].keys()[0]
+    filename = 'subs_{0}.srt.sjson'.format(old_name)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename)
+    try:
+        transcripts = contentstore().find(content_location).data
+        save_subs_to_store(json.loads(transcripts), new_name, item)
+
+        item.sub = new_name
+        item = save_module(item)
+        response['status'] = 'Success'
+        response['subs'] = item.sub
+        log.debug("Updated item.sub to {}".format(item.sub))
+    except NotFoundError:
+        log.debug("Can't find transcripts in storage for id: {}".format(old_name))
+    else:
+        pass
+        #remove_subs_from_store(old_name, item)
+    finally:
+        return JsonResponse(response)

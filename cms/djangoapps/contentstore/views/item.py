@@ -20,6 +20,7 @@ from .transcripts_ajax import (
     check_transcripts,
     choose_transcripts,
     replace_transcripts,
+    rename_transcripts,
 )
 
 from ..utils import get_modulestore
@@ -226,5 +227,6 @@ def process_transcripts(request, action):
         'check': check_transcripts,
         'choose': choose_transcripts,
         'replace': replace_transcripts,
+        'rename': rename_transcripts,
     }
     return allowed_actions.get(action, lambda x: JsonResponse())(request)

@@ -12,7 +12,7 @@
         <span><%= gettext("Upload New Timed Transcripts") %></span>
     </button>
     <% } %>
-    <a class="action setting-download" href="/transcripts/download?id=<%= component_id %>" data-tooltip="<%= gettext("Download to Edit") %>">
+    <a class="action setting-download" href="/transcripts/download?id=<%= component_id %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download to Edit") %>">
         <span><%= gettext("Download to Edit") %></span>
     </a>
 </div>

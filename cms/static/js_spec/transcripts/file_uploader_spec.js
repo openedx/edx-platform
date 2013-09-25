@@ -198,8 +198,8 @@
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.$progress).toHaveClass('is-invisible');
-                expect(view.options.messenger.render)
-                                            .toHaveBeenCalledWith('uploaded');
+                expect(view.options.messenger.render.mostRecentCall.args[0])
+                                            .toBe('uploaded');
                 expect(Transcripts.Utils.Storage.set)
                                             .toHaveBeenCalledWith('sub', 'test');
             });
@@ -212,7 +212,7 @@
                 expect(view.$progress).toHaveClass('is-invisible');
                 expect(view.options.messenger.render)
                                             .not
-                                            .toHaveBeenCalledWith('uploaded');
+                                            .toHaveBeenCalled();
                 expect(Transcripts.Utils.Storage.set)
                                             .not
                                             .toHaveBeenCalledWith('sub', 'test');

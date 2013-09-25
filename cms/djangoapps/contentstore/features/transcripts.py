@@ -20,6 +20,7 @@ STATUSES = {
     'not found': u'No Timed Transcripts',
     'replace': u'Timed Transcripts Conflict',
     'uploaded_successfully': u'Timed Transcripts uploaded successfully',
+    'use existing': u'Timed Transcripts Not Updated',
 }
 
 SELECTORS = {
@@ -27,7 +28,7 @@ SELECTORS = {
     'url_inputs': '.videolist-settings-item input.input',
     'collapse_link': '.collapse-action.collapse-setting',
     'collapse_bar': '.videolist-extra-videos',
-    'status_bar': '.transcripts-message-status'
+    'status_bar': '.transcripts-message-status',
 }
 
 # button type , button css selector, button message
@@ -37,7 +38,8 @@ BUTTONS = {
     'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download to Edit'),
     'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcripts'),
     'replace': ('.setting-replace', 'Yes, Replace EdX Timed Transcripts with YouTube Timed Transcripts'),
-    'choose': ('.setting-choose', 'Timed Transcripts from {}')
+    'choose': ('.setting-choose', 'Timed Transcripts from {}'),
+    'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcripts'),
 }
 
 
@@ -174,10 +176,16 @@ def upload_file(_step, file_name):
 
 
 @step('I see "([^"]*)" value in the "([^"]*)" field$')
-def check_transcripts_field(_step, value, field_name):
+def check_transcripts_field(_step, values, field_name):
     world.click_link_by_text('Advanced')
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
-    assert world.css_value(field_id) == value.strip()
+    values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
+    assert any(values_list)
     world.click_link_by_text('Basic')
 
+
+@step('I save changes$')
+def save_changes(_step):
+    save_css = 'a.save-button'
+    world.css_click(save_css)
 
