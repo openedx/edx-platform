@@ -21,6 +21,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
@@ -348,7 +349,8 @@ class CapaModule(CapaFields, XModule):
             final_check = (self.attempts >= self.max_attempts - 1)
         else:
             final_check = False
-        return "Final Submit" if final_check else "Submit"
+
+        return _("Final Submit") if final_check else _("Submit")
 
     def should_show_check_button(self):
         """

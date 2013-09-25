@@ -537,7 +537,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         module = system.construct_xblock_from_class(
             self.module_class,
             descriptor=self,
-            field_data=system.xblock_field_data(self),
+            field_data=system.xmodule_field_data(self),
             scope_ids=self.scope_ids,
         )
         module.save()
@@ -838,7 +838,7 @@ class ModuleSystem(Runtime):
     '''
     def __init__(
             self, ajax_url, track_function, get_module, render_template,
-            replace_urls, xblock_field_data, user=None, filestore=None,
+            replace_urls, xmodule_field_data, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
@@ -883,7 +883,7 @@ class ModuleSystem(Runtime):
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        xblock_field_data - A function that constructs a field_data for an xblock from its
+        xmodule_field_data - A function that constructs a field_data for an xblock from its
             corresponding descriptor
 
         cache - A cache object with two methods:
@@ -910,7 +910,7 @@ class ModuleSystem(Runtime):
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
-        self.xblock_field_data = xblock_field_data
+        self.xmodule_field_data = xmodule_field_data
 
         if publish is None:
             publish = lambda e: None

@@ -77,7 +77,7 @@ function () {
             state.el.on('mousemove', state.videoControl.showControls);
             state.el.on('keydown', state.videoControl.showControls);
         }
-        // The state.previousFocus is used in video_speed_control to track 
+        // The state.previousFocus is used in video_speed_control to track
         // the element that had the focus before it.
         state.videoControl.playPauseEl.on('blur', function () {
             state.previousFocus = 'playPause';
@@ -128,6 +128,15 @@ function () {
 
         this.videoControl.el.fadeOut(this.videoControl.fadeOutTimeout, function () {
             _this.controlState = 'invisible';
+
+            // If the focus was on the video control or the volume control,
+            // then we must make sure to close these dialogs. Otherwise, after
+            // next autofocus, these dialogs will be open, but the focus will
+            // not be on them.
+            _this.videoVolumeControl.el.removeClass('open');
+            _this.videoSpeedControl.el.removeClass('open');
+
+            _this.focusGrabber.enableFocusGrabber();
         });
     }
 

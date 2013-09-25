@@ -365,7 +365,7 @@ section.problem {
         li {
           display:inline;
           margin-left: 50px;
-          
+
           &:first-child {
             margin-left: 0px;
           }
@@ -436,9 +436,24 @@ section.problem {
   }
 
   table {
-    margin-bottom: lh();
+    margin: lh() 0;
     border-collapse: collapse;
     table-layout: auto;
+
+    td, th {
+
+      &.cont-justified-left {
+        text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-right {
+        text-align: right !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-center {
+        text-align: center !important; // nasty, but needed to override the bad specificity of the xmodule css selectorsstyles
+      }
+    }
 
     th {
       text-align: left;
@@ -780,7 +795,7 @@ section.problem {
 
         .result-correct {
           background: url('../images/correct-icon.png') left 20px no-repeat;
-          
+
           .result-actual-output {
             color: #090;
           }
@@ -788,7 +803,7 @@ section.problem {
 
         .result-incorrect {
           background: url('../images/incorrect-icon.png') left 20px no-repeat;
-          
+
           .result-actual-output {
             color: #B00;
           }
@@ -857,7 +872,7 @@ section.problem {
 
     input[type=radio]:checked + label {
       background: #666;
-      color: white; 
+      color: white;
     }
 
     input[class='score-selection'] {

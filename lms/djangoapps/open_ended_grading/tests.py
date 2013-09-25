@@ -34,6 +34,17 @@ from courseware.tests import factories
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 
+class EmptyStaffGradingService(object):
+    """
+    A staff grading service that does not return a problem list from get_problem_list.
+    Used for testing to see if error message for empty problem list is correctly displayed.
+    """
+
+    def get_problem_list(self, course_id, user_id):
+        """
+        Return a staff grading response that is missing a problem list key.
+        """
+        return json.dumps({'success': True, 'error': 'No problems found.'})
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -134,8 +145,29 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = check_for_post_code(self, 200, url, data)
         content = json.loads(response.content)
 
-        self.assertTrue(content['success'], str(content))
-        self.assertIsNotNone(content['problem_list'])
+        self.assertTrue(content['success'])
+        self.assertEqual(content['problem_list'], [])
+
+    @patch('open_ended_grading.staff_grading_service._service', EmptyStaffGradingService())
+    def test_get_problem_list_missing(self):
+        """
+        Test to see if a staff grading response missing a problem list is given the appropriate error.
+        Mock the staff grading service to enable the key to be missing.
+        """
+
+        # Get a valid user object.
+        instructor = User.objects.get(email=self.instructor)
+        # Mock a request object.
+        request = Mock(
+            user=instructor,
+        )
+        # Get the response and load its content.
+        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id).content)
+
+        # A valid response will have an "error" key.
+        self.assertTrue('error' in response)
+        # Check that the error text is correct.
+        self.assertIn("Cannot find", response['error'])
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -167,7 +199,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_field_data=lambda d: d._field_data,
+            xmodule_field_data=lambda d: d._field_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             mixins=settings.XBLOCK_MIXINS,

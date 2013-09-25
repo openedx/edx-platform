@@ -61,7 +61,7 @@ def setup_acceptance_db(system, fasttest=false)
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
-    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
+    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--verbosity 2', '--tag -skip', harvest_args))
 end
 
 # Run documentation tests
@@ -75,8 +75,9 @@ task :test_docs do
 end
 
 task :clean_test_files do
-    desc "Clean fixture files used by tests"
+    desc "Clean fixture files used by tests and .pyc files"
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
+    sh("find . -type f -name *.pyc -delete")
 end
 
 task :clean_reports_dir => REPORT_DIR do
@@ -86,7 +87,6 @@ task :clean_reports_dir => REPORT_DIR do
     # so that coverage.py has a place to put the reports.
     sh("find #{REPORT_DIR} -type f -delete")
 end
-
 
 TEST_TASK_DIRS = []
 
@@ -98,24 +98,32 @@ TEST_TASK_DIRS = []
 
     # Per System tasks/
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:test_id] => [:clean_test_files, :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:test_id] => [
+        :clean_test_files, :install_prereqs,
+        "#{system}:gather_assets:test", "fasttest_#{system}"
+    ]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir, :install_prereqs, :predjango] do |t, args|
+    task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
         args.with_defaults(:test_id => nil)
         run_tests(system, report_dir, args.test_id)
     end
 
     # Run acceptance tests
     desc "Run acceptance tests"
-    task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance"] do |t, args|
+    task "test_acceptance_#{system}", [:harvest_args] => [
+        :clean_test_files, :install_prereqs,
+        "#{system}:gather_assets:acceptance"
+    ] do |t, args|
         setup_acceptance_db(system)
         Rake::Task["fasttest_acceptance_#{system}"].invoke(args.harvest_args)
     end
 
     desc "Run acceptance tests without collectstatic or database migrations"
-    task "fasttest_acceptance_#{system}", [:harvest_args] => [report_dir, :clean_reports_dir, :predjango] do |t, args|
+    task "fasttest_acceptance_#{system}", [:harvest_args] => [
+        report_dir, :clean_reports_dir
+    ] do |t, args|
         args.with_defaults(:harvest_args => '')
         setup_acceptance_db(system, fasttest=true)
         run_acceptance_tests(system, report_dir, args.harvest_args)
@@ -136,7 +144,10 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     directory test_id_dir
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
+    task "test_#{lib}", [:test_id] => [
+        test_id_dir, report_dir, :clean_test_files,
+        :clean_reports_dir, :install_prereqs
+    ] do |t, args|
         args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests --id-file=#{test_ids} #{args.test_id}"
@@ -159,11 +170,16 @@ TEST_TASK_DIRS.each do |dir|
     report_dir = report_dir_path(dir)
     directory report_dir
     task :report_dirs => [REPORT_DIR, report_dir]
-    task :test => "test_#{dir}"
+    task 'test:python' => "test_#{dir}"
+end
+
+namespace :test do
+    desc "Run all python tests"
+    task :python, [:test_id]
 end
 
 desc "Run all tests"
-task :test, [:test_id] => :test_docs
+task :test, [:test_id] => [:test_docs, 'test:python']
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
@@ -182,7 +198,7 @@ task :coverage => :report_dirs do
 
         end
     end
-    
+
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = FileList[File.join(REPORT_DIR, '**/coverage.xml')]
 

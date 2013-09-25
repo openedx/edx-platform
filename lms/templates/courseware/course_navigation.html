@@ -47,9 +47,9 @@ masq = (function(){
     var el = $('#staffstatus');
     var setstat = function(status){
         if (status=='student'){
-            el.html('<font color="green">Student view</font>');
+            el.html('<font color="green">${_("Student view")}</font>');
         }else{
-            el.html('<font color="red">Staff view</font>');
+            el.html('<font color="red">${_("Staff view")}</font>');
         }
     }
     setstat('${masquerade}');

@@ -9,6 +9,8 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
+from xblock.field_data import DictFieldData
+
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
@@ -73,7 +75,7 @@ class StaffGradingService(GradingService):
             get_module = None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_field_data= {}
+            xmodule_field_data=DictFieldData({})
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
@@ -262,15 +264,26 @@ def get_problem_list(request, course_id):
             min_for_ml: the number of responses that need to be graded before
                 the ml can be run
 
+        'error': if success is False, will have an error message with more info.
     """
     _check_access(request.user, course_id)
     try:
         response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
         response = json.loads(response)
-        problem_list = response['problem_list']
+
+        # If 'problem_list' is in the response, then we got a list of problems from the ORA server.
+        # If it is not, then ORA could not find any problems.
+        if 'problem_list' in response:
+            problem_list = response['problem_list']
+        else:
+            problem_list = []
+            # Make an error messages to reflect that we could not find anything to grade.
+            response['error'] = ("Cannot find any open response problems in this course.  "
+                                 "Have you submitted answers to any open response assessment questions?  "
+                                 "If not, please do so and return to this page.")
         valid_problem_list = []
         for i in xrange(0,len(problem_list)):
-            #Needed to ensure that the 'location' key can be accessed
+            # Needed to ensure that the 'location' key can be accessed.
             try:
                 problem_list[i] = json.loads(problem_list[i])
             except Exception:

@@ -138,3 +138,15 @@ table td, th {
     text-align: left;
     font-size: 14px;
 }
+
+table td.cont-justified-left, table th.cont-justified-left {
+    text-align: left;
+}
+
+table td.cont-justified-right, table th.cont-justified-right {
+    text-align: right;
+}
+
+table td.cont-justified-center, table th.cont-justified-center {
+    text-align: center;
+}

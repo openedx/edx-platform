@@ -144,8 +144,8 @@ MITX_FEATURES = {
     # Toggle to indicate use of a custom theme
     'USE_CUSTOM_THEME': False,
 
-    # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True,
+    # Don't autoplay videos for students
+    'AUTOPLAY_VIDEOS': False,
 
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)

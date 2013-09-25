@@ -103,6 +103,14 @@ class OrderTest(ModuleStoreTestCase):
                 # verify that e-mail wasn't sent
                 self.assertEquals(len(mail.outbox), 0)
 
+    def test_purchase_twice(self):
+        cart = Order.get_cart_for_user(self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
+        # purchase the cart more than once
+        cart.purchase()
+        cart.purchase()
+        self.assertEquals(len(mail.outbox), 1)
+
     def purchase_with_data(self, cart):
         """ purchase a cart with billing information """
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
@@ -136,7 +144,6 @@ class OrderTest(ModuleStoreTestCase):
 
     @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self):
-        cart = Order.get_cart_for_user(self.user)
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
         self.assertNotEqual(cart.bill_to_first, '')

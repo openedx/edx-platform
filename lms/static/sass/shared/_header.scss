@@ -279,7 +279,7 @@ header.global {
       display: inline-block;
 
       .cta {
-        @extend .m-btn-primary;
+        @extend %m-btn-primary;
       }
     }
 

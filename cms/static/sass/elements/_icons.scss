@@ -23,8 +23,8 @@
   width: 100%;
 }
 
-.ui-badge {
-  @extend .t-title9;
+%ui-badge {
+  @extend %t-title9;
   position: relative;
   border-bottom-right-radius: ($baseline/10);
   border-bottom-left-radius: ($baseline/10);
@@ -39,7 +39,7 @@
   // OPTION: add this class for a visual hanging display
   &.is-hanging {
     @include box-sizing(border-box);
-    @extend .ui-depth2;
+    @extend %ui-depth2;
     top: -($baseline/4);
 
     &:after {
