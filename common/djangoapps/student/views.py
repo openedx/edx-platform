@@ -391,6 +391,8 @@ def change_enrollment(request):
                 reverse("course_modes_choose", kwargs={'course_id': course_id})
             )
 
+        current_mode = available_modes[0]
+
         org, course_num, run = course_id.split("/")
         dog_stats_api.increment(
             "common.student.enrollment",
@@ -399,7 +401,7 @@ def change_enrollment(request):
                   "run:{0}".format(run)]
         )
 
-        CourseEnrollment.enroll(user, course.id)
+        CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
 
