@@ -48,13 +48,20 @@ dquality_dir = File.join(REPORT_DIR, "diff_quality")
 directory dquality_dir
 
 desc "Build the html diff quality reports, and print the reports to the console."
-task :quality => dquality_dir do
+task :quality => [dquality_dir, :install_python_prereqs] do
+
     # Generage diff-quality html report for pep8, and print to console
-    sh("diff-quality --violations=pep8 --html-report #{dquality_dir}/diff_quality_pep8.html")
-    sh("diff-quality --violations=pep8")
+    # If pep8 reports exist, use those
+    # Otherwise, `diff-quality` will call pep8 itself
+    pep8_reports = FileList[File.join(REPORT_DIR, '**/pep8.report')].join(' ')
+    sh("diff-quality --violations=pep8 --html-report #{dquality_dir}/diff_quality_pep8.html #{pep8_reports}")
+    sh("diff-quality --violations=pep8 #{pep8_reports}")
 
     # Generage diff-quality html report for pylint, and print to console
+    # If pylint reports exist, use those
+    # Otherwise, `diff-quality` will call pylint itself
+    pylint_reports = FileList[File.join(REPORT_DIR, '**/pylint.report')].join(' ')
     pythonpath_prefix = "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:common:common/djangoapps:common/lib"
-    sh("#{pythonpath_prefix} diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html")
-    sh("#{pythonpath_prefix} diff-quality --violations=pylint")
+    sh("#{pythonpath_prefix} diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html #{pylint_reports}")
+    sh("#{pythonpath_prefix} diff-quality --violations=pylint #{pylint_reports}")
 end
