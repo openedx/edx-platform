@@ -113,9 +113,6 @@ Feature: CMS.Upload Files
     @skip_safari
     Scenario: Unlocked assets can be viewed by anyone
         Given I have opened a course with a unlocked asset "unlocked.html"
-        Then the asset "unlocked.html" is viewable
-        And the user "bob" exists
-        And "bob" logs in
-        Then the asset "unlocked.html" is viewable
+        Then the asset "unlocked.html" can be clicked from the asset index
         And I log out
         Then the asset "unlocked.html" is viewable
