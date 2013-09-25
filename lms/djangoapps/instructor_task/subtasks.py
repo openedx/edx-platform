@@ -14,27 +14,61 @@ from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 TASK_LOG = get_task_logger(__name__)
 
 
-def create_subtask_result(new_num_sent, new_num_error, new_num_optout):
-    """Return the result of course_email sending as a dict (not a string)."""
-    attempted = new_num_sent + new_num_error
-    current_result = {'attempted': attempted, 'succeeded': new_num_sent, 'skipped': new_num_optout, 'failed': new_num_error}
+def create_subtask_result(num_sent, num_error, num_optout):
+    """
+    Create a result of a subtask.
+
+    Keys are:  'attempted', 'succeeded', 'skipped', 'failed'.
+
+    Object must be JSON-serializable.
+    """
+    attempted = num_sent + num_error
+    current_result = {'attempted': attempted, 'succeeded': num_sent, 'skipped': num_optout, 'failed': num_error}
     return current_result
+
+
+def increment_subtask_result(subtask_result, new_num_sent, new_num_error, new_num_optout):
+    """
+    Update the result of a subtask with additional results.
+
+    Keys are:  'attempted', 'succeeded', 'skipped', 'failed'.
+    """
+    new_result = create_subtask_result(new_num_sent, new_num_error, new_num_optout)
+    for keyname in new_result:
+        if keyname in subtask_result:
+            new_result[keyname] += subtask_result[keyname]
+    return new_result
 
 
 def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_id_list):
     """
     Store initial subtask information to InstructorTask object.
 
-    # Before we actually start running the tasks we've defined,
-    # the InstructorTask needs to be updated with their information.
-    # So we update the InstructorTask object here, not in the return.
-    # The monitoring code knows that it shouldn't go to the InstructorTask's task's
-    # Result for its progress when there are subtasks.  So we accumulate
-    # the results of each subtask as it completes into the InstructorTask.
-    # At this point, we have some status that we can report, as to the magnitude of the overall
-    # task.  That is, we know the total.  Set that, and our subtasks should work towards that goal.
-    # Note that we add start_time in here, so that it can be used
-    # by subtasks to calculate duration_ms values:
+    The InstructorTask's "task_output" field is initialized.  This is a JSON-serialized dict.
+    Counters for 'attempted', 'succeeded', 'failed', 'skipped' keys are initialized to zero,
+    as is the 'duration_ms' value.  A 'start_time' is stored for later duration calculations,
+    and the total number of "things to do" is set, so the user can be told how much needs to be
+    done overall.  The `action_name` is also stored, to also help with constructing more readable
+    progress messages.
+
+    The InstructorTask's "subtasks" field is also initialized.  This is also a JSON-serialized dict.
+    Keys include 'total', 'succeeded', 'retried', 'failed', which are counters for the number of
+    subtasks.  'Total' is set here to the total number, while the other three are initialized to zero.
+    Once the counters for 'succeeded' and 'failed' match the 'total', the subtasks are done and
+    the InstructorTask's "status" will be changed to SUCCESS.
+
+    The "subtasks" field also contains a 'status' key, that contains a dict that stores status
+    information for each subtask.  At the moment, the value for each subtask (keyed by its task_id)
+    is the value of `status`, which is initialized here to QUEUING.
+
+    This information needs to be set up in the InstructorTask before any of the subtasks start
+    running.  If not, there is a chance that the subtasks could complete before the parent task
+    is done creating subtasks.  Doing so also simplifies the save() here, as it avoids the need
+    for locking.
+
+    Monitoring code should assume that if an InstructorTask has subtask information, that it should
+    rely on the status stored in the InstructorTask object, rather than status stored in the
+    corresponding AsyncResult.
     """
     progress = {
         'action_name': action_name,
@@ -64,6 +98,27 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
 def update_subtask_status(entry_id, current_task_id, status, subtask_result):
     """
     Update the status of the subtask in the parent InstructorTask object tracking its progress.
+
+    Uses select_for_update to lock the InstructorTask object while it is being updated.
+    The operation is surrounded by a try/except/else that permit the manual transaction to be
+    committed on completion, or rolled back on error.
+
+    The InstructorTask's "task_output" field is updated.  This is a JSON-serialized dict.
+    Accumulates values for 'attempted', 'succeeded', 'failed', 'skipped' from `subtask_result`
+    into the corresponding values in the InstructorTask's task_output.  Also updates the 'duration_ms'
+    value with the current interval since the original InstructorTask started.
+
+    The InstructorTask's "subtasks" field is also updated.  This is also a JSON-serialized dict.
+    Keys include 'total', 'succeeded', 'retried', 'failed', which are counters for the number of
+    subtasks.  'Total' is expected to have been set at the time the subtasks were created.
+    The other three counters are incremented depending on the value of `status`.  Once the counters
+    for 'succeeded' and 'failed' match the 'total', the subtasks are done and the InstructorTask's
+    "status" is changed to SUCCESS.
+
+    The "subtasks" field also contains a 'status' key, that contains a dict that stores status
+    information for each subtask.  At the moment, the value for each subtask (keyed by its task_id)
+    is the value of `status`, but could be expanded in future to store information about failure
+    messages, progress made, etc.
     """
     TASK_LOG.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
                   current_task_id, entry_id, subtask_result)
