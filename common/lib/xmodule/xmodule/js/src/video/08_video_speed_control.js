@@ -283,6 +283,9 @@ function () {
                 this.videoSpeedControl.currentSpeed
             );
         }
+        // When a speed entry has been selected, we want the speed control to 
+        // regain focus.
+        parentEl.parent().siblings('a').focus();
     }
 
     function reRender(params) {

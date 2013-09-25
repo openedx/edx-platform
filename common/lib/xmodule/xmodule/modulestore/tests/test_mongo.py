@@ -22,6 +22,7 @@ from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 from IPython.testing.nose_assert_methods import assert_in, assert_not_in
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
 log = logging.getLogger(__name__)
 
@@ -227,11 +228,11 @@ class TestMongoModuleStore(object):
             TestMongoModuleStore.content_store.set_attrs(content['_id'], {'miscel': 99})
             assert_equals(TestMongoModuleStore.content_store.get_attr(content['_id'], 'miscel'), 99)
         assert_raises(
-            AttributeError, TestMongoModuleStore.content_store.set_attr, course_content[0],
+            AttributeError, TestMongoModuleStore.content_store.set_attr, course_content[0]['_id'],
             'md5', 'ff1532598830e3feac91c2449eaa60d6'
         )
         assert_raises(
-            AttributeError, TestMongoModuleStore.content_store.set_attrs, course_content[0],
+            AttributeError, TestMongoModuleStore.content_store.set_attrs, course_content[0]['_id'],
             {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'}
         )
         assert_raises(
@@ -251,6 +252,11 @@ class TestMongoModuleStore(object):
         assert_raises(
             NotFoundError, TestMongoModuleStore.content_store.set_attrs,
             Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            {'displayname': 'hello'}
+        )
+        assert_raises(
+            InsufficientSpecificationError, TestMongoModuleStore.content_store.set_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', None),
             {'displayname': 'hello'}
         )
 

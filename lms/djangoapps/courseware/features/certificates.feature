@@ -1,4 +1,5 @@
-Feature: Verified certificates
+@shard_2
+Feature: LMS.Verified certificates
     As a student,
     In order to earn a verified certificate
     I want to sign up for a verified certificate course.

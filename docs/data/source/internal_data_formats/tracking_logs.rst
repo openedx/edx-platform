@@ -1,389 +1,318 @@
-#############
-Tracking Logs
-#############
+===============
+ Tracking Logs
+===============
 
-* Tracking logs are made available as separate tar files on S3 in the course-data bucket.
-* They are represented as JSON files that catalog all user interactions with the site.
-* To avoid filename collisions the tracking logs are organized by server name, where each directory corresponds to a server where they were stored. 
+The following is an inventory of all LMS event types. 
 
-*************
+This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard, 
+and a table of Instructor Event Types of all interaction with the Instructor Dashboard in the LMS.
+
 Common Fields
-*************
-
-  .. list-table::
-     :widths: 10 40 10 25
-     :header-rows: 1
-     
-     * - field
-       - details
-       - type
-       - values/format
-     * - `username`
-       - username of the user who triggered the event, empty string for anonymous events (not logged in)
-       - string
-       - 
-     * - `session`
-       - key identifying the user's session, may be undefined
-       - string
-       - 32 digits key
-     * - `time`
-       - GMT time the event was triggered
-       - string	
-       - `YYYY-MM-DDThh:mm:ss.xxxxxx`
-     * - `ip`
-       - user ip address
-       - string
-       - 
-     * - `agent`
-       - users browser agent string
-       - string
-       - 
-     * - `page`
-       - page the user was visiting when the event was generated
-       - string
-       - `$URL`
-     * - event_source
-       - event source
-       - string
-       - `browser`, `server`
-     * - `event_type`
-       - type of event triggered, values depends on `event_source`
-       - string
-       - *more details listed below*
-     * - `event`
-       - specifics of the event (dependenty of the event_type)
-       - string/json
-       - *the event string may encode a JSON record*
-       
-
-*************
-Event Sources
-*************
-
-The `event_source` field identifies whether the event originated in the browser (via javascript) or on the server (during the processing of a request).
-
-Server Events
 =============
 
-  .. list-table::
-     :widths: 20 10 10 10 50
-     :header-rows: 1
-  
-     * - event_type
-       - event fields
-       - type
-       - values/format
-       - details
-     * - `show_answer`
-       - `problem_id`
-       - string
-       - 
-       - id of the problem being shown. Ex: `i4x://MITx/6.00x/problem/L15:L15_Problem_2`
-     * - `save_problem_check`
-       - `problem_id`
-       - string
-       - 
-       - id of the problem being shown
-     * -
-       - `success`
-       - string
-       - correct, incorrect
-       - whether the problem was correct
-     * -  	
-       - `attempts`
-       - integer
-       - number of attempts
-       -
-     * - 
-       - `correct_map`
-       - string/json
-       - 
-       - see details below
-     * - 
-       - `state`
-       - string/json
-       - 
-       - current problem state
-     * - 
-       - `answers`
-       - string/json
-       -
-       - students answers
-     * -
-       - `reset_problem`
-       - problem_id
-       - string
-       - id of the problem being shown
+This section contains a table of fields common to all events.
 
 
-`correct_map` details
----------------------
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| Common Field              | Details                                                     | Type        | Values/Format                      |
++===========================+=============================================================+=============+====================================+
+| ``agent``                 | Browser agent string of the user who triggered the event.   | string      |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``event``                 | Specifics of the triggered event.                           | string/JSON |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``event_source``          | Specifies whether the triggered event originated in the     | string      | `'browser'`, `'server'`, `'task'`  |
+|                           | browser or on the server.                                   |             |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``event_type``            | The type of event triggered. Values depend on               | string      | (see below)                        |
+|                           | ``event_source``                                            |             |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``ip``                    | IP address of the user who triggered the event.             | string      |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``page``                  | Page user was visiting when the event was fired.            | string      | `'$URL'`                           |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``session``               | This key identifies the user's session. May be undefined.   | string      | 32 digits                          |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``time``                  | Gives the GMT time at which the event was fired.            | string      | `'YYYY-MM-DDThh:mm:ss.xxxxxx'`     |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``username``              | The username of the user who caused the event to fire. This | string      |                                    |
+|                           | string is empty for anonymous events (i.e., user not logged |             |                                    |
+|                           | in).                                                        |             |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+       
 
-  .. list-table::
-     :widths: 15 10 15 10
-     :header-rows: 1
-    
-     * - correct_map fields
-       - type
-       - values/format
-       - null allowed?
-     * - hint
-       - string
-       -
-       -
-     * - hintmode
-       - boolean
-       -
-       - yes
-     * - correctness
-       - string
-       - correct, incorrect
-       -
-     * - npoints
-       - integer
-       -
-       - yes
-     * - msg
-       - string
-       -
-       -
-     * - queuestate
-       - string/json
-       - keys: key, time
-       -
+Event Types
+===========
 
+There are two tables of event types -- one for student events, and one for instructor events.
+Table columns describe what each event type represents, which component it originates from, what scripting language was used to fire the event, and what ``event`` fields are associated with it.
+The ``event_source`` field from the "Common Fields" table above distinguishes between events that originated in the browser (in javascript) and events that originated on the server (during the processing of a request). 
 
-Browser Events
-==============
-
-  .. list-table::
-     :widths: 10 10 8 12 20 10
-     :header-rows: 1
-  
-     * - event_type
-       - fields
-       - type
-       - values/format
-       - details
-       - example
-     * - `book`
-       - `type`
-       - string
-       - `gotopage`	
-       -
-       -
-     * - 
-       - `old`
-       - integer	
-       - `$PAGE`
-       - from page number
-       - `2`
-     * -
-       - `new`
-       - integer
-       - `$PAGE`
-       - to page number
-       - `25`
-     * - `book`
-       - `type`
-       - string
-       - `nextpage`
-       -
-       -
-     * - 
-       - new
-       - integer
-       - `$PAGE`
-       - next page number
-       - `10`
-     * - `page_close`
-       - *empty*
-       - string
-       -
-       - 'page' field indicates which page was being closed
-       -
-     * - play_video
-       - `id`
-       - string
-       -
-       - edX id of the video being watched
-       - `i4x-HarvardX-PH207x-video-Simple_Random_Sample`
-     * -
-       - code
-       - string
-       -
-       - youtube id of the video being watched
-       - `FU3fCJNs94Y`
-     * -
-       - `currentTime`
-       - float
-       -
-       - time the video was paused at, in seconds
-       - `1.264`
-     * -
-       - `speed`
-       - string
-       - `0.75, 1.0, 1.25, 1.50`
-       - video speed being played
-       - `"1.0"`
-     * - `pause_video`
-       - `id`
-       - string
-       -
-       - edX id of the video being watched
-       -
-     * -
-       - `code`
-       - string
-       -
-       - youtube id of the video being watched
-       -
-     * -
-       - `currentTime`
-       - float
-       -
-       - time the video was paused at
-       -
-     * - 
-       - `speed`
-       - string
-       - `0.75, 1.0, 1.25, 1.50`
-       - video speed being played
-       -
-     * - `problem_check`
-       - *none*
-       - string
-       -
-       - event field contains the values of all input fields from the problem being checked (in the style of GET parameters (`key=value&key=value`))
-       -
-     * - `problem_show`
-       - `problem`
-       - string
-       - 
-       - id of the problem being checked
-       -
-     * - `seq_goto`
-       - `id`
-       - string
-       -
-       - edX id of the sequence
-       -
-     * -	
-       - `old`
-       - integer
-       -
-       - sequence element being jumped from
-       - `3`
-     * -
-       - `new`
-       - integer
-       -
-       - sequence element being jumped to
-       - `5`
-     * - `seq_next`
-       - `id`
-       - string
-       -
-       - edX id of the sequence	
-       -
-     * -	
-       - `old`
-       - integer
-       -
-       - sequence element being jumped from
-       - `4`
-     * -
-       - `new`
-       - integer
-       -
-       - sequence element being jumped to
-       - `6`
-     * - `rubric_select`
-       - `location`
-       - string
-       -
-       - location of the rubric's problem
-       - `i4x://MITx/6.00x/problem/L15:L15_Problem_2`
-     * -
-       - `category`
-       - integer
-       - 
-       - category number of the rubric selection
-       -
-     * -
-       - `value`
-       - integer
-       -
-       - value selected within the category
-       -
-     * - `(oe / peer_grading / staff_grading)`
-         `_show_problem`
-       - `location`
-       - string
-       -
-       - the location of the problem whose prompt we're showing
-       -
-     * - `(oe / peer_grading / staff_grading)`
-         `_hide_problem`
-       - `location`
-       - string
-       - 
-       - the location of the problem whose prompt we're hiding
-       -
-     * - `oe_show_full_feedback`
-       - *empty*
-       -
-       -
-       - the page where they're showing full feedback is already recorded
-       -
-     * - `oe_show_respond_to_feedback`
-       - *empty*
-       -
-       -
-       - the page where they're showing the feedback response form is already recorded
-       -
-     * - `oe_feedback_response_selected`
-       - `value`
-       - integer
-       -
-       - the value selected in the feedback response form
-       -
+Event types with several different historical names are enumerated by forward slashes. 
+Rows identical after the second column have been combined, with the corresponding event types enumerated by commas.
 
 
 
+Student Event Types
+-------------------
+
+The Student Event Type table lists the event types logged for interaction with the LMS outside the Instructor Dashboard.
 
 
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| Event Type                        | Description                   | Component           | Language        | ``event`` Fields    | Type          | Details                                                             |
++===================================+===============================+=====================+=================+=====================+===============+=====================================================================+
+| ``seq_goto``                      | Fired when a user jumps       | Sequence            | CoffeeScript/JS | ``old``             | integer       | Index of the unit being jumped from.                                |
+|                                   | between units in              |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   | a sequence.                   |                     |                 | ``new``             | integer       | Index of the unit being jumped to.                                  |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``id``              | integer       | edX ID of the sequence.                                             |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``seq_next``                      | Fired when a user navigates   | Sequence            | CoffeeScript/JS | ``old``             | integer       | Index of the unit being navigated                                   |
+|                                   | to the next unit in a         |                     |                 |                     |               | away from.                                                          |
+|                                   | sequence.                     |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new``             | integer       | Index of the unit being navigated to.                               |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``id``              | integer       | edX ID of the sequence.                                             |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``seq_prev``                      | Fired when a user navigates   | Sequence            | CoffeeScript/JS | ``old``             | integer       | Index of the unit being navigated away                              |
+|                                   | to the previous unit in a     |                     |                 |                     |               | from.                                                               |
+|                                   | sequence.                     |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new``             | integer       | Index of the unit being navigated to.                               |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``id``              | integer       | edX ID of the sequence.                                             |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_check``                 | Fired when a user wants to    | Capa                | CoffeeScript/JS |                     |               | The ``event`` field contains the                                    |
+|                                   | check a problem.              |                     |                 |                     |               | values of all input fields from the problem                         |
+|                                   |                               |                     |                 |                     |               | being checked, styled as GET parameters.                            |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_reset``                 | Fired when a problem is       | Capa                | CoffeeScript/JS |                     |               |                                                                     |
+|                                   | reset.                        |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_show``                  | Fired when a problem is       | Capa                | CoffeeScript/JS | ``problem``         | string        | ID of the problem being shown (e.g.,                                |
+|                                   | shown.                        |                     |                 |                     |               | i4x://MITx/6.00x/problem/L15:L15_Problem_2).                        |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_save``                  | Fired when a problem is       | Capa                | CoffeeScript/JS |                     |               |                                                                     |
+|                                   | saved.                        |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``oe_hide_question`` /            |                               | Combined Open-Ended | CoffeeScript/JS | ``location``        | string        | The location of the question whose prompt is                        |
+| ``oe_hide_problem``               |                               |                     |                 |                     |               | being hidden.                                                       |
+| ``peer_grading_hide_question`` /  |                               | Peer Grading        |                 |                     |               |                                                                     |
+| ``peer_grading_hide_problem``     |                               |                     |                 |                     |               |                                                                     |
+| ``staff_grading_hide_question`` / |                               | Staff Grading       |                 |                     |               |                                                                     |
+| ``staff_grading_hide_problem``    |                               |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``oe_show_question`` /            |                               | Combined Open-Ended | CoffeeScript/JS | ``location``        | string        | The location of the question whose prompt is                        |
+| ``oe_show_problem``               |                               |                     |                 |                     |               | being shown.                                                        |
+| ``peer_grading_show_question`` /  |                               | Peer Grading        |                 |                     |               |                                                                     |
+| ``peer_grading_show_problem``     |                               |                     |                 |                     |               |                                                                     |
+| ``staff_grading_show_question`` / |                               | Staff Grading       |                 |                     |               |                                                                     |
+| ``staff_grading_show_problem``    |                               |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``rubric_select``                 |                               | Combined Open-Ended | CoffeeScript/JS | ``location``        | string        | The location of the question whose rubric is                        |
+|                                   |                               |                     |                 |                     |               | being selected.                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``selection``       | integer       | Value selected on rubric.                                           |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``category``        | integer       | Rubric category selected.                                           |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``oe_show_full_feedback``         |                               | Combined Open-Ended | CoffeeScript/JS |                     |               |                                                                     |
+| ``oe_show_respond_to_feedback``   |                               |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``oe_feedback_response_selected`` |                               | Combined Open-Ended | CoffeeScript/JS | ``value``           | integer       | Value selected in the feedback response form.                       |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``page_close``                    | This event type originates    | Logger              | CoffeeScript/JS |                     |               |                                                                     |
+|                                   | from within the Logger        |                     |                 |                     |               |                                                                     |
+|                                   | itself.                       |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``play_video``                    | Fired on video play.          | Video               | CoffeeScript/JS | ``id``              | string        | EdX ID of the video being watched (e.g.,                            |
+|                                   |                               |                     |                 |                     |               | i4x-HarvardX-PH207x-video-Simple_Random_Sample).                    |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``code``            | string        | YouTube ID of the video being watched (e.g.,                        |
++-----------------------------------+-------------------------------+                     |                 |                     |               | FU3fCJNs94Y).                                                       |
+| ``pause_video``                   | Fired on video pause.         |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``currentTime``     | float         | Time the video was played at, in seconds.                           |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``speed``           | string        | Video speed in use (i.e., 0.75, 1.0, 1.25, 1.50).                   |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``book``                          | Fired when a user is reading  | PDF Viewer          |  JS             | ``type``            | string        | `'gotopage'`, `'prevpage'`, `'nextpage'`                            |
+|                                   | a PDF book.                   |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``old``             | integer       | Original page number.                                               |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new``             | integer       | Destination page number.                                            |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``showanswer`` /                  | Server-side event which       | Capa Module         | Python          | ``problem_id``      | string        | EdX ID of the problem being shown.                                  |
+| ``show_answer``                   | displays the answer to a      |                     |                 |                     |               |                                                                     |
+|                                   | problem.                      |                     |                 |                     |               |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_check_fail``            |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being checked.                                    |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``answers``         | dict          |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``failure``         | string        | `'closed'`, `'unreset'`                                             |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_check`` /               |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+| ``save_problem_check``            |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being checked.                                    |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``answers``         | dict          |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``success``         | string        | `'correct'`, `'incorrect'`                                          |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``attempts``        | integer       |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``correct_map``     | string / JSON | **See the table in**                                                |
+|                                   |                               |                     |                 |                     |               | **Addendum:** ``correct_map`` **Fields and Values below**           |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_rescore_fail``          |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being rescored.                                   |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``failure``         | string        | `'unsupported'`, `'unanswered'`, `'input_error'`, `'unexpected'`    |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``problem_rescore``               |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being rescored.                                   |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``orig_score``      | integer       |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``orig_total``      | integer       |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new_score``       | integer       |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new_total``       | integer       |                                                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``correct_map``     | string / JSON | (See above.)                                                        |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``success``         | string        | `'correct'`, `'incorrect'`                                          |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``attempts``        | integer       |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``save_problem_fail``             |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being saved.                                      |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``failure``         | string        | `'closed'`, `'done'`                                                |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``answers``         | dict          |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``save_problem_success``          |                               | Capa Module         | Python          | ``state``           | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being saved.                                      |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``answers``         | dict          |                                                                     |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``reset_problem_fail``            |                               | Capa Module         | Python          | ``old_state``       | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        |  ID of the problem being reset.                                     |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``failure``         | string        | `'closed'`, `'not_done'`                                            |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``reset_problem``                 |                               | Capa Module         | Python          | ``old_state``       | string / JSON | Current problem state.                                              |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``problem_id``      | string        | ID of the problem being reset.                                      |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``new_state``       | string / JSON | New problem state.                                                  |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+
+*Addendum:* ``correct_map`` *Fields and Values*
+-----------------------------------------------
+
+Table of ``correct_map`` field types and values for the ``problem_check`` student event type above.
+
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``correct_map`` **field**                        |  **Type**                                        | **Values / Format**                              |  **Null Allowed?**                               |
++==================================================+==================================================+==================================================+==================================================+
+| ``answer_id``                                    | string                                           |                                                  |                                                  |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``correctness``                                  | string                                           | `'correct'`, `'incorrect'`                       |                                                  |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``npoints``                                      | integer                                          | Points awarded for this ``answer_id``.           | yes                                              |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``msg``                                          | string                                           | Gives extra message response.                    |                                                  |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``hint``                                         | string                                           | Gives optional hint.                             | yes                                              |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``hintmode``                                     | string                                           | None, `'on_request'`, `'always'`                 | yes                                              |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+| ``queuestate``                                   | dict                                             | None when not queued, else `{key:' ', time:' '}` | yes                                              |
+|                                                  |                                                  | where key is a secret string and time is a       |                                                  |
+|                                                  |                                                  | string dump of a DateTime object of the form     |                                                  |
+|                                                  |                                                  | `'%Y%m%d%H%M%S'`.                                |                                                  |
++--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
+ 
+
+Instructor Event Types
+----------------------
 
 
+The Instructor Event Type table lists the event types logged for course team interaction with the Instructor Dashboard in the LMS.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| Event Type                             | Description                   | Component            | Language        | ``event`` Fields    | Type          | Details                                                             |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``list-students``,                     |                               | Instructor Dashboard | Python          |                     |               |                                                                     |
+| ``dump-grades``,                       |                               |                      |                 |                     |               |                                                                     |
+| ``dump-grades-raw``,                   |                               |                      |                 |                     |               |                                                                     |
+| ``dump-grades-csv``,                   |                               |                      |                 |                     |               |                                                                     |
+| ``dump-grades-csv-raw``,               |                               |                      |                 |                     |               |                                                                     |
+| ``dump-answer-dist-csv``,              |                               |                      |                 |                     |               |                                                                     |
+| ``dump-graded-assignments-config``     |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``rescore-all-submissions``,           |                               | Instructor Dashboard | Python          | ``problem``         | string        |                                                                     |
+| ``reset-all-attempts``                 |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``course``          | string        |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``delete-student-module-state``,       |                               | Instructor Dashboard | Python          | ``problem``         | string        |                                                                     |
+| ``rescore-student-submission``         |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``student``         | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``course``          | string        |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``reset-student-attempts``             |                               | Instructor Dashboard | Python          | ``old_attempts``    | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``student``         | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``problem``         | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``instructor``      | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``course``          | string        |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``get-student-progress-page``          |                               | Instructor Dashboard | Python          | ``student``         | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``instructor``      | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``course``          | string        |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``list-staff``,                        |                               | Instructor Dashboard | Python          |                     |               |                                                                     |
+| ``list-instructors``,                  |                               |                      |                 |                     |               |                                                                     |
+| ``list-beta-testers``                  |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``add-instructor``,                    |                               | Instructor Dashboard | Python          | ``instructor``      | string        |                                                                     |
+| ``remove-instructor``                  |                               |                      |                 |                     |               |                                                                     |
+|                                        |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``list-forum-admins``,                 |                               | Instructor Dashboard | Python          | ``course``          | string        |                                                                     |
+| ``list-forum-mods``,                   |                               |                      |                 |                     |               |                                                                     |
+| ``list-forum-community-TAs``           |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``remove-forum-admin``,                |                               | Instructor Dashboard | Python          | ``username``        | string        |                                                                     |
+| ``add-forum-admin``,                   |                               |                      |                 |                     |               |                                                                     |
+| ``remove-forum-mod``,                  |                               |                      |                 |                     |               |                                                                     |
+| ``add-forum-mod``,                     |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+| ``remove-forum-community-TA``,         |                               |                      |                 | ``course``          | string        |                                                                     |
+| ``add-forum-community-TA``             |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``psychometrics-histogram-generation`` |                               | Instructor Dashboard | Python          | ``problem``         | string        |                                                                     |
+|                                        |                               |                      |                 |                     |               |                                                                     |
+|                                        |                               |                      |                 |                     |               |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``add-or-remove-user-group``           |                               | Instructor Dashboard |     Python      | ``event_name``      | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``user``            | string        |                                                                     |
+|                                        |                               |                      |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                        |                               |                      |                 | ``event``           | string        |                                                                     |
++----------------------------------------+-------------------------------+----------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+

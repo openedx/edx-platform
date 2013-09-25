@@ -273,3 +273,20 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
             self.assertEqual(resp.status_code, code,
                              "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Workaround for a runtime error that occurs
+        intermittently when the server thread doesn't shut down
+        within 2 seconds.
+
+        Since the server is running in a Django thread and will
+        be terminated when the test suite terminates,
+        this shouldn't cause a resource allocation issue.
+        """
+        try:
+            super(OpenIdProviderLiveServerTest, cls).tearDownClass()
+        except RuntimeError:
+            print "Warning: Could not shut down test server."
+            pass

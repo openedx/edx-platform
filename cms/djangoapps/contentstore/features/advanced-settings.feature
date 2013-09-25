@@ -1,4 +1,5 @@
-Feature: Advanced (manual) course policy
+@shard_1
+Feature: CMS.Advanced (manual) course policy
   In order to specify course policy settings for which no custom user interface exists
   I want to be able to manually enter JSON key /value pairs
 

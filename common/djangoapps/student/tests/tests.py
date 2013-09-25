@@ -213,23 +213,34 @@ class EnrollInCourseTest(TestCase):
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = "edX/Test101/2013"
+        course_id_partial = "edX/Test101"
 
         # Test basic enrollment
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Enrolling them again should be harmless
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Now unenroll the user
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Unenrolling them again should also be harmless
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # The enrollment record should still exist, just be inactive
         enrollment_record = CourseEnrollment.objects.get(
