@@ -34,10 +34,6 @@ body.course.uploads {
       width: 100%;
       word-wrap: break-word;
 
-
-      thead tr {
-      }
-
       th {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
@@ -82,15 +78,6 @@ body.course.uploads {
             background-image: url('../img/bg-micro-stripes.png');
             background-position: 0 0;
             background-repeat: repeat;
-
-            .locked a {
-              background-color: $gray;
-              color: $white;
-
-              &:hover {
-                background-color: $blue;
-              }
-            }
           }
 
           &:hover {
@@ -102,49 +89,21 @@ body.course.uploads {
               color: $gray;
             }
           }
-
-
         }
 
-        .thumb-cols {
-          padding: ($baseline/2) $baseline;
-          width: 100px;
-        }
+      .thumb-col {
+        padding: ($baseline/2) $baseline;
 
-        .name-cols {
-          width: ($baseline*12.5);
-        }
-
-        .date-cols {
-          width: ($baseline*5);
-        }
-
-        .embed-cols {
-          width: ($baseline*10);
-        }
-
-        .actions-cols {
-          width: ($baseline*3);
-          padding: ($baseline/2);
-        }
-
-        .thumb-col {
-          overflow: hidden;
-
-          .thumb {
-            width: ($baseline*5);
-
-            img {
-              width: 100%;
-            }
+          img {
+            width: 100%;
           }
         }
 
+
         .name-col {
-          @extend %t-copy-sub1;
-          text-overflow: ellipsis;
 
           .title {
+            @extend %t-copy-sub1;
             display: inline-block;
             max-width: 200px;
             overflow: hidden;
@@ -163,6 +122,7 @@ body.course.uploads {
           color: $gray-l2;
 
           .embeddable-xml-input {
+            @include transition(all $tmg-f2 ease-in-out 0s);
             @extend %t-copy-sub2;
             box-shadow: none;
             border: none;
@@ -179,6 +139,7 @@ body.course.uploads {
         }
 
         .actions-col {
+          padding: ($baseline/2);
           text-align: center;
         }
       }
@@ -207,13 +168,66 @@ body.course.uploads {
       display: inline-block;
       vertical-align: bottom;
     }
-  }
 
+
+    &.action-lock {
+      position: relative;
+    }
+
+    &.action-lock label {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 30px;
+      width: 30px;
+
+      &:hover {
+        background-color: $blue;
+      }
+    }
+
+    &.action-lock .lock-checkbox {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 30px;
+      width: 30px;
+      opacity: 0;
+    }
+
+    &.action-lock .lock-checkbox:hover ~ .action-button {
+      background-color: $blue;
+      color: $gray-l6;
+    }
+
+    &.action-lock .lock-checkbox ~ .action-button {
+      .icon-lock {
+        display: none;
+      }
+
+      .icon-unlock-alt {
+        display: inline-block;
+      }
+    }
+
+    &.action-lock .lock-checkbox:checked ~ .action-button {
+      background-color: $gray;
+      color: $white;
+
+      .icon-lock {
+        display: inline-block;
+      }
+
+     .icon-unlock-alt {
+        display: none;
+      }
+    }
+
+  }
 
   .show-xml {
     @include blue-button;
   }
-
 
   .upload-modal {
     display: none;

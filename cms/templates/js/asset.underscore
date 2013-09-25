@@ -18,17 +18,13 @@
 </td>
 <td class="actions-col">
     <ul>
-        <li class="action-item">
+        <li class="action-item action-delete">
             <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
         </li>
-        <% if (locked) { %>
-        <li class="action-item locked">
-            <a href="#" data-tooltip="<%= gettext('Unlock this asset') %>" class="lock-asset-button action-button"><i class="icon-lock"></i> <span class="sr"><%= gettext('Unlock this asset') %></span></a>
+        <li class="action-item action-lock">
+            <label for="lock-asset"><span class="sr"><%= gettext('Lock this asset') %></span></label>
+            <input type="checkbox" name="lock-asset" class="lock-checkbox" data-tooltip="<%= gettext('Lock/unlock file') %>" />
+            <div class="action-button"><i class="icon-lock"></i><i class="icon-unlock-alt"></i></div>
         </li>
-        <% } else { %>
-        <li class="action-item">
-            <a href="#" data-tooltip="<%= gettext('Lock this asset') %>" class="lock-asset-button action-button"><i class="icon-unlock-alt"></i> <span class="sr"><%= gettext('Lock this asset') %></span></a>
-        </li>
-        <% }%>
     </ul>
 </td>
