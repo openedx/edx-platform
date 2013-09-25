@@ -1,4 +1,5 @@
-Feature: Component Adding
+@shard_1
+Feature: CMS.Component Adding
     As a course author, I want to be able to add a wide variety of components
 
     @skip

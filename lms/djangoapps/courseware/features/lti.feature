@@ -1,4 +1,5 @@
-Feature: LTI component
+@shard_1
+Feature: LMS.LTI component
   As a student, I want to view LTI component in LMS.
 
   Scenario: LTI component in LMS is not rendered
