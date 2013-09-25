@@ -201,7 +201,11 @@ def update_asset(request, org, course, name, asset_id):
         # method-- just changing the locked state.
         modified_asset = json.loads(request.body)
         asset_id = modified_asset['url']
-        contentstore().set_attr(get_asset_location(asset_id), 'locked', modified_asset['locked'])
+        location = get_asset_location(asset_id)
+        contentstore().set_attr(location, 'locked', modified_asset['locked'])
+        # Delete the asset from the cache so we check the lock status the next time it is requested.
+        del_cached_content(location)
+
         return JsonResponse(modified_asset, status=201)
 
 
