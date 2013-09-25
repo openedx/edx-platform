@@ -14,7 +14,7 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
 
 
-@step(u'I go to the files and uploads page')
+@step(u'I go to the files and uploads page$')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = 'li.nav-course-courseware-uploads a'
@@ -121,7 +121,7 @@ def modify_upload(_step, file_name):
     _write_test_file(file_name, new_text)
 
 
-@step(u'I (lock|unlock) "([^"]*)"')
+@step(u'I (lock|unlock) "([^"]*)"$')
 def lock_unlock_file(_step, _lock_state, file_name):
     index = get_index(file_name)
     assert index != -1
@@ -129,19 +129,19 @@ def lock_unlock_file(_step, _lock_state, file_name):
     world.css_click(lock_css, index=index)
 
 
-@step(u'Then "([^"]*)" is (locked|unlocked)')
+@step(u'Then "([^"]*)" is (locked|unlocked)$')
 def verify_lock_unlock_file(_step, file_name, lock_state):
     index = get_index(file_name)
     assert index != -1
     lock_css = "a.lock-asset-button"
-    text = (world.css_find(lock_css)[index]).text
+    text = world.css_text(lock_css, index=index)
     if lock_state == "locked":
         assert_equal("Unlock this asset", text)
     else:
         assert_equal("Lock this asset", text)
 
 
-@step(u'I have opened a course with a (locked|unlocked) asset "([^"]*)"')
+@step(u'I have opened a course with a (locked|unlocked) asset "([^"]*)"$')
 def open_course_with_locked(step, lock_state, file_name):
     step.given('I have opened a new course in studio')
     step.given('I go to the files and uploads page')
@@ -152,7 +152,7 @@ def open_course_with_locked(step, lock_state, file_name):
         step.given('I reload the page')
 
 
-@step(u'Then the asset "([^"]*)" is (viewable|protected)')
+@step(u'Then the asset "([^"]*)" is (viewable|protected)$')
 def view_asset(_step, file_name, status):
     url = '/c4x/MITx/999/asset/' + file_name
     if status == 'viewable':
@@ -168,7 +168,7 @@ def view_asset(_step, file_name, status):
         assert error_thrown
 
 
-@step(u'Then the asset "([^"]*)" can be clicked from the asset index')
+@step(u'Then the asset "([^"]*)" can be clicked from the asset index$')
 def click_asset_from_index(step, file_name):
     # This is not ideal, but I'm having trouble with the middleware not having
     # the same user in the request when I hit the URL directly.
@@ -188,7 +188,7 @@ def _verify_body_text():
     world.wait_for(verify_text)
 
 
-@step('I see a confirmation that the file was deleted')
+@step('I see a confirmation that the file was deleted$')
 def i_see_a_delete_confirmation(_step):
     alert_css = '#notification-confirmation'
     assert world.is_css_present(alert_css)

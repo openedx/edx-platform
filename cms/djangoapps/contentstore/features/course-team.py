@@ -2,7 +2,6 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import EMAIL_EXTENSION
 from auth.authz import get_course_groupname_for_role, get_user_by_email
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
@@ -21,7 +20,7 @@ def add_other_user(_step, name):
     world.wait(0.5)
 
     email_css = 'input#user-email-input'
-    world.css_fill(email_css, name + EMAIL_EXTENSION)
+    world.css_fill(email_css, name + '@edx.org')
     if world.is_firefox():
         world.trigger_event(email_css)
     confirm_css = 'form.create-user button.action-primary'
@@ -31,7 +30,7 @@ def add_other_user(_step, name):
 @step(u'I delete "([^"]*)" from the course team')
 def delete_other_user(_step, name):
     to_delete_css = '.user-item .item-actions a.remove-user[data-id="{email}"]'.format(
-        email="{0}{1}".format(name, EMAIL_EXTENSION))
+        email="{0}{1}".format(name, '@edx.org'))
     world.css_click(to_delete_css)
     # confirm prompt
     # need to wait for the animation to be done, there isn't a good success condition that won't work both on latest chrome and jenkins
@@ -52,7 +51,7 @@ def other_delete_self(_step):
 @step(u'I make "([^"]*)" a course team admin')
 def make_course_team_admin(_step, name):
     admin_btn_css = '.user-item[data-email="{email}"] .user-actions .add-admin-role'.format(
-        email=name+EMAIL_EXTENSION)
+        email=name+'@edx.org')
     world.css_click(admin_btn_css)
 
 
@@ -61,7 +60,7 @@ def remove_course_team_admin(_step, outer_capture, name):
     if outer_capture == "myself":
         email = world.scenario_dict["USER"].email
     else:
-        email = name + EMAIL_EXTENSION
+        email = name + '@edx.org'
     admin_btn_css = '.user-item[data-email="{email}"] .user-actions .remove-admin-role'.format(
         email=email)
     world.css_click(admin_btn_css)
@@ -82,7 +81,7 @@ def see_course(_step, do_not_see, gender='self'):
 @step(u'"([^"]*)" should( not)? be marked as an admin')
 def marked_as_admin(_step, name, not_marked_admin):
     flag_css = '.user-item[data-email="{email}"] .flag-role.flag-role-admin'.format(
-        email=name+EMAIL_EXTENSION)
+        email=name+'@edx.org')
     if not_marked_admin:
         assert world.is_css_not_present(flag_css)
     else:
@@ -120,7 +119,7 @@ def can_make_course_admin(_step, can_not_make_admin, outer_capture, name):
     if outer_capture == "myself":
         email = world.scenario_dict["USER"].email
     else:
-        email = name + EMAIL_EXTENSION
+        email = name + '@edx.org'
     add_button_css = '.user-item[data-email="{email}"] .add-admin-role'.format(email=email)
     if can_not_make_admin:
         assert world.is_css_not_present(add_button_css)
