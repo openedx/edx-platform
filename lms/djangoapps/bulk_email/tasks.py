@@ -162,7 +162,10 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
                 email_id,
                 to_list,
                 global_email_context,
-            ), task_id=subtask_id
+            ),
+            task_id=subtask_id,
+            routing_key=settings.HIGH_PRIORITY_QUEUE,
+            queue=settings.HIGH_PRIORITY_QUEUE,
             ))
         num_workers += num_tasks_this_query
 
@@ -174,7 +177,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     # now group the subtasks, and start them running:
     task_group = group(task_list)
-    task_group.apply_async()
+    task_group.apply_async(routing_key=settings.HIGH_PRIORITY_QUEUE, queue=settings.HIGH_PRIORITY_QUEUE)
 
     # We want to return progress here, as this is what will be stored in the
     # AsyncResult for the parent task as its return value.
@@ -217,10 +220,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context):
 
     # Get information from current task's request:
     current_task_id = _get_current_task().request.id
-    retry_index = _get_current_task().request.retries
-
-    log.info("Preparing to send email as subtask %s for instructor task %d, retry %d",
-             current_task_id, entry_id, retry_index)
+    log.info("Preparing to send email as subtask %s for instructor task %d: request = %s",
+             current_task_id, entry_id, _get_current_task().request)
 
     send_exception = None
     course_email_result_value = None
