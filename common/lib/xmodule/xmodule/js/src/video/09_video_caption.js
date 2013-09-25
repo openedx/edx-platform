@@ -453,6 +453,9 @@ function () {
             min = 0;
             max = this.videoCaption.start.length - 1;
 
+            if (time < this.videoCaption.start[min]) {
+                return -1;
+            }
             while (min < max) {
                 index = Math.ceil((max + min) / 2);
 
@@ -507,10 +510,11 @@ function () {
             newIndex = this.videoCaption.search(time);
 
             if (
-                newIndex !== void 0 &&
+                typeof newIndex !== 'undefined' &&
+                newIndex !== -1 &&
                 this.videoCaption.currentIndex !== newIndex
             ) {
-                if (this.videoCaption.currentIndex) {
+                if (typeof this.videoCaption.currentIndex !== 'undefined') {
                     this.videoCaption.subtitlesEl
                         .find('li.current')
                         .removeClass('current');
