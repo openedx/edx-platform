@@ -321,7 +321,7 @@ TRACK_MAX_EVENT = 10000
 
 DEBUG_TRACK_LOG = False
 
-TRACKING_BACKENDS = {
+LEGACY_TRACKING_BACKENDS = {
     'logger': {
         'ENGINE': 'track.backends.logger.LoggerBackend',
         'OPTIONS': {
@@ -331,9 +331,9 @@ TRACKING_BACKENDS = {
 }
 
 # Backawrds compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
-# In the future, adding the backend to TRACKING_BACKENDS enough.
+# In the future, adding the backend to LEGACY_TRACKING_BACKENDS enough.
 if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-    TRACKING_BACKENDS.update({
+    LEGACY_TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
         }

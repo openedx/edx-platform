@@ -60,7 +60,7 @@ class TestTrackerInstantiation(TestCase):
 class TestTrackerDjangoInstantiation(TestCase):
     """Test if backends are initialized properly from Django settings."""
 
-    @override_settings(TRACKING_BACKENDS=SIMPLE_SETTINGS)
+    @override_settings(LEGACY_TRACKING_BACKENDS=SIMPLE_SETTINGS)
     def test_django_simple_settings(self):
         """Test configuration of a simple backend"""
 
@@ -72,7 +72,7 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         self.assertEqual(backends.values()[0].count, 1)
 
-    @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS)
+    @override_settings(LEGACY_TRACKING_BACKENDS=MULTI_SETTINGS)
     def test_django_multi_settings(self):
         """Test if multiple backends can be configured properly."""
 
@@ -87,11 +87,11 @@ class TestTrackerDjangoInstantiation(TestCase):
         self.assertEqual(backends[0].count, event_count)
         self.assertEqual(backends[1].count, event_count)
 
-    @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS)
+    @override_settings(LEGACY_TRACKING_BACKENDS=MULTI_SETTINGS)
     def test_django_remove_settings(self):
         """Test if a backend can be remove by setting it to None."""
 
-        settings.TRACKING_BACKENDS.update({'second': None})
+        settings.LEGACY_TRACKING_BACKENDS.update({'second': None})
 
         backends = self._reload_backends()
 

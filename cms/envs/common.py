@@ -400,7 +400,7 @@ COURSES_WITH_UNSAFE_CODE = []
 
 TRACK_MAX_EVENT = 10000
 
-TRACKING_BACKENDS = {
+LEGACY_TRACKING_BACKENDS = {
     'logger': {
         'ENGINE': 'track.backends.logger.LoggerBackend',
         'OPTIONS': {

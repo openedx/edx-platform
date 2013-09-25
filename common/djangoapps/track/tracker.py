@@ -5,7 +5,7 @@ configurable backends.
 The backends can be configured using Django settings as the example
 below::
 
-  TRACKING_BACKENDS = {
+  LEGACY_TRACKING_BACKENDS = {
       'tracker_name': {
           'ENGINE': 'class.name.for.backend',
           'OPTIONS': {
@@ -42,7 +42,7 @@ def _initialize_backends_from_django_settings():
     """
     backends.clear()
 
-    config = getattr(settings, 'TRACKING_BACKENDS', {})
+    config = getattr(settings, 'LEGACY_TRACKING_BACKENDS', {})
 
     for name, values in config.iteritems():
         # Ignore empty values to turn-off default tracker backends
