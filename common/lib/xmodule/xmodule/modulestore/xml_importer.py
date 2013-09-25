@@ -56,7 +56,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
             content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
 
 
-            policy_ele = policy.get(content_loc.url(), {})
+            policy_ele = policy.get(content_loc.name, {})
             displayname = policy_ele.get('displayname', filename)
             locked = policy_ele.get('locked', False)
             mime_type = policy_ele.get('contentType', mimetypes.guess_type(filename)[0])

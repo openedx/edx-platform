@@ -122,7 +122,7 @@ class MongoContentStore(ContentStore):
             self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
-                    policy.setdefault(asset_location.url(), {})[attr] = value
+                    policy.setdefault(asset_location.name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
