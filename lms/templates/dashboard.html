@@ -167,9 +167,9 @@
           <article class="course ${enrollment.mode}">
             <%
               if waffle.flag_is_active(request, 'merge_course_tabs'):
-                course_target = reverse('courseware', args=[course.id])
+                  course_target = reverse('courseware', args=[course.id])
               else:
-                course_target = reverse('info', args=[course.id])
+                  course_target = reverse('info', args=[course.id])
             %>
 
             % if course.id in show_courseware_links_for:
