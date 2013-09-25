@@ -728,6 +728,7 @@ def submission_history(request, course_id, student_username, location):
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
