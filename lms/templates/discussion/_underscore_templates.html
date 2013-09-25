@@ -143,7 +143,7 @@
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" class="post-update" value="${_("Update response")}">
+    <input type="submit" class="post-update" value="${_('Update response')}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -175,7 +175,7 @@
 <script type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
   <section class="home-header">
-  <span class="label">DISCUSSION HOME:</span>
+  <span class="label">${_("DISCUSSION HOME")}:</span>
   % if course and course.display_name_with_default:
   <h1 class="home-title">${course.display_name_with_default}</h1>
   </section>
@@ -184,41 +184,41 @@
   <span class="label label-settings">HOW TO USE EDX DISCUSSIONS</span>
   <table class="home-helpgrid">
   <tr class="helpgrid-row helpgrid-row-navigation">
-  <td class="row-title">Find discussions</td>
+  <td class="row-title">${_("Find discussions")}</td>
   <td class="row-item">
   <i class="icon icon-reorder"></i>
-  <span class="row-description">Focus in on specific topics</span>
+  <span class="row-description">${_("Focus in on specific topics")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-search"></i>
-  <span class="row-description">Search for specific posts </span>
+  <span class="row-description">${_("Search for specific posts")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-sort"></i>
-  <span class="row-description">Sort by date, vote, or comments </span>
+  <span class="row-description">${("Sort by date, vote, or comments")}</span>
   </td>
   </tr>
   <tr class="helpgrid-row helpgrid-row-participation">
-  <td class="row-title">Engage with posts</td>
+  <td class="row-title">${_("Engage with posts")}</td>
   <td class="row-item">
   <i class="icon icon-plus"></i>
-  <span class="row-description">Upvote posts and good responses</span>
+  <span class="row-description">${_("Upvote posts and good responses")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-flag"></i>
-  <span class="row-description">Report Forum Misuse</span>
+  <span class="row-description">${_("Report Forum Misuse")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-star"></i>
-  <span class="row-description">Follow posts for updates</span>
+  <span class="row-description">${_("Follow posts for updates")}</span>
   </td>
   </tr>
   <tr class="helpgrid-row helpgrid-row-notification">
-  <td class="row-title">Receive updates</td>
+  <td class="row-title">${_("Receive updates")}</td>
   <td class="row-item-full" colspan="3">
   <input type="checkbox" class="email-setting" name="email-notification"></input>
   <i class="icon icon-envelope"></i>
-  <span class="row-description"> If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following. </span>
+  <span class="row-description">${_("If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following.")}</span>
   </td>
   </tr>
   </table>
