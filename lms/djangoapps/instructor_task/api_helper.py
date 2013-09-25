@@ -115,7 +115,7 @@ def _update_instructor_task(instructor_task, task_result):
     task_output = None
     entry_needs_updating = True
 
-    if result_state == SUCCESS and instructor_task.task_state == PROGRESS and len(instructor_task.subtasks) > 0:
+    if instructor_task.task_state == PROGRESS and len(instructor_task.subtasks) > 0:
         # This happens when running subtasks:  the result object is marked with SUCCESS,
         # meaning that the subtasks have successfully been defined.  However, the InstructorTask
         # will be marked as in PROGRESS, until the last subtask completes and marks it as SUCCESS.

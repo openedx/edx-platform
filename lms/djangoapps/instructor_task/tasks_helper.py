@@ -271,11 +271,8 @@ def run_main_task(entry_id, task_fcn, action_name):
     task_input = json.loads(entry.task_input)
 
     # construct log message:
-    # TODO: generalize this beyond just problem and student, so it includes email_id and to_option.
-    # Can we just loop over all keys and output them all?  Just print the task_input dict itself?
-    module_state_key = task_input.get('problem_url')
-    fmt = 'task "{task_id}": course "{course_id}" problem "{state_key}"'
-    task_info_string = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key)
+    fmt = 'task "{task_id}": course "{course_id}" input "{task_input}"'
+    task_info_string = fmt.format(task_id=task_id, course_id=course_id, task_input=task_input)
 
     TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
 
