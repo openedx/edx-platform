@@ -424,7 +424,7 @@ class BlockUsageLocator(CourseLocator):
         return rep + BLOCK_PREFIX + unicode(self.usage_id)
 
 
-class DescriptionLocator(Locator):
+class DefinitionLocator(Locator):
     """
     Container for how to locate a description (the course-independent content).
     """
