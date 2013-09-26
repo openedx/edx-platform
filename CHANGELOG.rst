@@ -7,6 +7,8 @@ the top.  Include a label indicating the component affected.
 
 LMS: Add split testing functionality for internal use.
 
+Studio and LMS: add ability to lock assets (cannot be viewed unless registered for class).
+
 LMS: Improved accessibility of parts of forum navigation sidebar.
 
 LMS: enhanced accessibility labeling and aria support for the discussion forum new post dropdown as well as response and comment area labeling.
