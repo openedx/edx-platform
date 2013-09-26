@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from student.models import Registration, UserProfile
 from cme_registration.models import CmeUserProfile
 from student.tests.factories import UserFactory
-
+from cme_registration.views import DENIED_COUNTRIES, validate_export_controls
 TEST_MITX_FEATURES = settings.MITX_FEATURES.copy()
 TEST_MITX_FEATURES['USE_CME_REGISTRATION'] = True
 
@@ -132,7 +132,7 @@ class TestCmeRegistration(TestCase):
         url = reverse('create_account')
         response = self.client.post(url, self.post_vars)
 
-        self.assertContains(response, '{"success": true}')
+        self.assertContains(response, '"success": true')
 
     @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
@@ -344,7 +344,7 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, self.post_vars)
 
         #Check page displays success
-        self.assertContains(response, '{"success": true}')
+        self.assertContains(response, '"success": true')
 
         #Check user was created
         user = User.objects.filter(email='test@email.com')
@@ -402,7 +402,7 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, self.post_vars)
 
         #Check page displays success
-        self.assertContains(response, '{"success": true}')
+        self.assertContains(response, '"success": true')
 
         #Check user was created
         user = User.objects.filter(email='test@email.com')
@@ -514,7 +514,7 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, self.post_vars)
 
         #Check page displays success
-        self.assertContains(response, '{"success": true}')
+        self.assertContains(response, '"success": true')
 
     @patch('cme_registration.models.CmeUserProfile.save', Mock(side_effect=Exception()))
     @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
@@ -543,3 +543,14 @@ class TestCmeRegistration(TestCase):
 
         self.assertRaises(Exception)
         self.assertContains(response, 'Could not send activation e-mail.')
+
+    def test_export_controls(self):
+        """
+        Test export controls verification
+        """
+        for country in DENIED_COUNTRIES:
+            retv = validate_export_controls({'country': country})
+            self.assertFalse(retv['success'])
+            self.assertEqual(retv['field'], 'country')
+
+        self.assertIsNone(validate_export_controls({'country': 'United States'}))
