@@ -56,7 +56,7 @@ class @TrackChanges
       key = parseInt(@attr('data-cid'))
       if key > keyOfLatestChange
         keyOfLatestChange = key
-    ICEtracker.rejectChange('[data-cid="'+ keyOfLatestChange + '"]')
+    @tracker.rejectChange('[data-cid="'+ keyOfLatestChange + '"]')
 
   stop_tracking_on_submit: () =>
     @tracker.stopTracking()
