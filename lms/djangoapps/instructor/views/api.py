@@ -509,7 +509,10 @@ def reset_student_attempts(request, course_id):
     )
 
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
     delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
@@ -538,9 +541,11 @@ def reset_student_attempts(request, course_id):
             enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
             return HttpResponseBadRequest("Module does not exist.")
+        response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
         response_payload['task'] = 'created'
+        response_payload['student'] = 'All Students'
     else:
         return HttpResponseBadRequest()
 
@@ -565,9 +570,10 @@ def rescore_problem(request, course_id):
     all_students and unique_student_identifier cannot both be present.
     """
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student = request.GET.get('unique_student_identifier', None)
-    if student is not None:
-        student = get_student_from_identifier(student)
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
 
     all_students = request.GET.get('all_students') in ['true', 'True', True]
 
@@ -585,7 +591,7 @@ def rescore_problem(request, course_id):
     response_payload['problem_to_reset'] = problem_to_reset
 
     if student:
-        response_payload['student'] = student
+        response_payload['student'] = student_identifier
         instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
