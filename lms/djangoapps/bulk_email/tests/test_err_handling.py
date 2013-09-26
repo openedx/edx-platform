@@ -67,7 +67,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(type(exc) == SMTPDataError)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.create_subtask_result')
+    @patch('bulk_email.tasks.increment_subtask_status')
     @patch('bulk_email.tasks.send_course_email.retry')
     def test_data_err_fail(self, retry, result, get_conn):
         """
@@ -91,11 +91,11 @@ class TestEmailErrors(ModuleStoreTestCase):
         # We shouldn't retry when hitting a 5xx error
         self.assertFalse(retry.called)
         # Test that after the rejected email, the rest still successfully send
-        ((sent, fail, optouts), _) = result.call_args
-        self.assertEquals(optouts, 0)
+        ((_initial_results), kwargs) = result.call_args
+        self.assertEquals(kwargs['skipped'], 0)
         expectedNumFails = int((settings.EMAILS_PER_TASK + 3) / 4.0)
-        self.assertEquals(fail, expectedNumFails)
-        self.assertEquals(sent, settings.EMAILS_PER_TASK - expectedNumFails)
+        self.assertEquals(kwargs['failed'], expectedNumFails)
+        self.assertEquals(kwargs['succeeded'], settings.EMAILS_PER_TASK - expectedNumFails)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.send_course_email.retry')
@@ -138,7 +138,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPConnectError)
 
-    @patch('bulk_email.tasks.create_subtask_result')
+    @patch('bulk_email.tasks.increment_subtask_status')
     @patch('bulk_email.tasks.send_course_email.retry')
     @patch('bulk_email.tasks.log')
     @patch('bulk_email.tasks.get_connection', Mock(return_value=EmailTestException))
@@ -163,12 +163,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertFalse(retry.called)
         # check the results being returned
         self.assertTrue(result.called)
-        ((sent, fail, optouts), _) = result.call_args
-        self.assertEquals(optouts, 0)
-        self.assertEquals(fail, 1)  # just myself
-        self.assertEquals(sent, 0)
+        ((initial_results, ), kwargs) = result.call_args
+        self.assertEquals(initial_results['skipped'], 0)
+        self.assertEquals(initial_results['failed'], 0)
+        self.assertEquals(initial_results['succeeded'], 0)
+        self.assertEquals(kwargs['failed'], 1)
 
-    @patch('bulk_email.tasks.create_subtask_result')
+    @patch('bulk_email.tasks.increment_subtask_status')
     @patch('bulk_email.tasks.log')
     def test_nonexist_email(self, mock_log, result):
         """
@@ -180,7 +181,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         task_input = {"email_id": -1}
         with self.assertRaises(CourseEmail.DoesNotExist):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
-        ((log_str, email_id), _) = mock_log.warning.call_args
+        ((log_str, _, email_id), _) = mock_log.warning.call_args
         self.assertTrue(mock_log.warning.called)
         self.assertIn('Failed to get CourseEmail with id', log_str)
         self.assertEqual(email_id, -1)
@@ -198,7 +199,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         task_input = {"email_id": email.id}
         with self.assertRaises(Exception):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
-        ((log_str, _), _) = mock_log.exception.call_args
+        ((log_str, _, _), _) = mock_log.exception.call_args
         self.assertTrue(mock_log.exception.called)
         self.assertIn('get_course_by_id failed:', log_str)
 
