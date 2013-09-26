@@ -33,7 +33,7 @@ import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
-from instructor.views.tools import strip_if_string
+from instructor.views.tools import strip_if_string, get_student_from_identifier
 import instructor.access as access
 import analytics.basic
 import analytics.distributions
@@ -456,20 +456,19 @@ def get_distribution(request, course_id):
 @common_exceptions_400
 @require_level('staff')
 @require_query_params(
-    student_email="email of student for whom to get progress url"
+    unique_student_identifier="email or username of student for whom to get progress url"
 )
 def get_student_progress_url(request, course_id):
     """
     Get the progress url of a student.
     Limited to staff access.
 
-    Takes query paremeter student_email and if the student exists
+    Takes query paremeter unique_student_identifier and if the student exists
     returns e.g. {
         'progress_url': '/../...'
     }
     """
-    student_email = strip_if_string(request.GET.get('student_email'))
-    user = User.objects.get(email=student_email)
+    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
 
@@ -496,7 +495,7 @@ def reset_student_attempts(request, course_id):
 
     Takes some of the following query paremeters
         - problem_to_reset is a urlname of a problem
-        - student_email is an email
+        - unique_student_identifier is an email or username
         - all_students is a boolean
             requires instructor access
             mutually exclusive with delete_module
@@ -510,14 +509,14 @@ def reset_student_attempts(request, course_id):
     )
 
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_email = strip_if_string(request.GET.get('student_email'))
+    student = get_student_from_identifier(request.GET.get('unique_student_identifier'))
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
     delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
-    if all_students and student_email:
+    if all_students and student:
         return HttpResponseBadRequest(
-            "all_students and student_email are mutually exclusive."
+            "all_students and unique_student_identifier are mutually exclusive."
         )
     if all_students and delete_module:
         return HttpResponseBadRequest(
@@ -534,9 +533,8 @@ def reset_student_attempts(request, course_id):
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
-    if student_email:
+    if student:
         try:
-            student = User.objects.get(email=student_email)
             enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
             return HttpResponseBadRequest("Module does not exist.")
@@ -561,21 +559,24 @@ def rescore_problem(request, course_id):
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
-        - student_email is an email
+        - unique_student_identifier is an email or username
         - all_students is a boolean
 
-    all_students and student_email cannot both be present.
+    all_students and unique_student_identifier cannot both be present.
     """
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
-    student_email = strip_if_string(request.GET.get('student_email', False))
+    student = request.GET.get('unique_student_identifier', None)
+    if student is not None:
+        student = get_student_from_identifier(student)
+
     all_students = request.GET.get('all_students') in ['true', 'True', True]
 
-    if not (problem_to_reset and (all_students or student_email)):
+    if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
 
-    if all_students and student_email:
+    if all_students and student:
         return HttpResponseBadRequest(
-            "Cannot rescore with all_students and student_email."
+            "Cannot rescore with all_students and unique_student_identifier."
         )
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
@@ -583,9 +584,8 @@ def rescore_problem(request, course_id):
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
-    if student_email:
-        response_payload['student_email'] = student_email
-        student = User.objects.get(email=student_email)
+    if student:
+        response_payload['student'] = student
         instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
@@ -608,21 +608,22 @@ def list_instructor_tasks(request, course_id):
     Takes optional query paremeters.
         - With no arguments, lists running tasks.
         - `problem_urlname` lists task history for problem
-        - `problem_urlname` and `student_email` lists task
+        - `problem_urlname` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
     problem_urlname = strip_if_string(request.GET.get('problem_urlname', False))
-    student_email = strip_if_string(request.GET.get('student_email', False))
+    student = request.GET.get('unique_student_identifier', None)
+    if student is not None:
+        student = get_student_from_identifier(student)
 
-    if student_email and not problem_urlname:
+    if student and not problem_urlname:
         return HttpResponseBadRequest(
-            "student_email must accompany problem_urlname"
+            "unique_student_identifier must accompany problem_urlname"
         )
 
     if problem_urlname:
         module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)
-        if student_email:
-            student = User.objects.get(email=student_email)
+        if student:
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)

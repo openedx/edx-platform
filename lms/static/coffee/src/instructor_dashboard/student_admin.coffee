@@ -118,15 +118,15 @@ class StudentAdmin
     # go to student progress page
     @$progress_link.click (e) =>
       e.preventDefault()
-      email = @$field_student_select_progress.val()
+      unique_student_identifier = @$field_student_select_progress.val()
 
       $.ajax
         dataType: 'json'
         url: @$progress_link.data 'endpoint'
-        data: student_email: email
+        data: unique_student_identifier: unique_student_identifier
         success: @clear_errors_then (data) ->
           window.location = data.progress_url
-        error: std_ajax_err => @$request_response_error_single.text "Error getting student progress url for '#{email}'."
+        error: std_ajax_err => @$request_response_error_single.text "Error getting student progress url for '#{unique_student_identifier}'."
 
     # enroll student
     @$btn_enroll.click =>
@@ -158,7 +158,7 @@ class StudentAdmin
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
       send_data =
-        student_email: @$field_student_select_grade.val()
+        unique_student_identifier: @$field_student_select_grade.val()
         problem_to_reset: @$field_problem_select_single.val()
         delete_module: false
 
@@ -167,14 +167,14 @@ class StudentAdmin
         url: @$btn_reset_attempts_single.data 'endpoint'
         data: send_data
         success: @clear_errors_then -> console.log 'problem attempts reset'
-        error: std_ajax_err => @$request_response_error_single.text "Error resetting problem attempts."
+        error: std_ajax_err => @$request_response_error_single.text "Error resetting problem attempts for problem '#{problem_to_reset}' and student '#{unique_student_identifier}'."
 
     # delete state for student on problem
     @$btn_delete_state_single.click => confirm_then
       msg: "Delete student '#{@$field_student_select_grade.val()}'s state on problem '#{@$field_problem_select_single.val()}'?"
       ok: =>
         send_data =
-          student_email: @$field_student_select_grade.val()
+          unique_student_identifier: @$field_student_select_grade.val()
           problem_to_reset: @$field_problem_select_single.val()
           delete_module: true
 
@@ -188,7 +188,7 @@ class StudentAdmin
     # start task to rescore problem for student
     @$btn_rescore_problem_single.click =>
       send_data =
-        student_email: @$field_student_select_grade.val()
+        unique_student_identifier: @$field_student_select_grade.val()
         problem_to_reset: @$field_problem_select_single.val()
 
       $.ajax
@@ -201,13 +201,13 @@ class StudentAdmin
     # list task history for student+problem
     @$btn_task_history_single.click =>
       send_data =
-        student_email: @$field_student_select_grade.val()
+        unique_student_identifier: @$field_student_select_grade.val()
         problem_urlname: @$field_problem_select_single.val()
 
-      if not send_data.student_email
-        return @$request_response_error_single.text "Enter a student email."
+      if not send_data.unique_student_identifier
+        return @$request_response_error_single.text "Please enter a student email address or username."
       if not send_data.problem_urlname
-        return @$request_response_error_single.text "Enter a problem urlname."
+        return @$request_response_error_single.text "Please enter a problem urlname."
 
       $.ajax
         dataType: 'json'
