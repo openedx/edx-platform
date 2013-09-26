@@ -166,9 +166,7 @@ def answer_problem(problem_type, correctness):
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
-        # First wait for the element to be there on the page
-        world.wait_for_visible("select#{}".format(select_name))
-        world.browser.select(select_name, option_text)
+        world.select_option(select_name, option_text)
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
@@ -244,7 +242,7 @@ def problem_has_answer(problem_type, answer_class):
         if answer_class == 'blank':
             assert world.is_css_not_present('option[selected="true"]')
         else:
-            actual = world.browser.find_by_css('option[selected="true"]').value
+            actual = world.css_value('option[selected="true"]')
             expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
             assert actual == expected
 
@@ -304,10 +302,6 @@ def problem_has_answer(problem_type, answer_class):
         # input type coverage in this test.
         pass
 
-
-##############################
-#       HELPER METHODS
-##############################
 
 def add_problem_to_course(course, problem_type, extraMeta=None):
     '''
