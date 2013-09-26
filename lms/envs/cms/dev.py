@@ -39,6 +39,10 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
     },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options    
+    },
 }
 
 CONTENTSTORE = {
@@ -58,3 +62,7 @@ INSTALLED_APPS += (
 DEBUG_TOOLBAR_PANELS += (
    'debug_toolbar_mongo.panel.MongoDebugPanel',
    )
+
+MONGO_DEFAULT_CONFIG_MAPPINGS = {
+    'preview.localhost': 'draft'
+}
