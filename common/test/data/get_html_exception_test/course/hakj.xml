@@ -1,0 +1,3 @@
+<course advanced_modules="[]" allow_anonymous="false" announcement="null" cohort_config="{}" days_early_for_beta="100" display_name="Principles of Biostatistics" due="null" end="2013-12-20T05:00:00Z" enrollment_end="2013-09-25T04:00:00Z" enrollment_start="2013-08-26T04:00:00Z" format="null" giturl="null" graceperiod="900 seconds" graded="false" hide_from_toc="false" html_textbooks="[]" ispublic="false" pdf_textbooks="[]" remote_gradebook="{}" rerandomize="never" show_calculator="Yes" showanswer="attempted" source_file="null" start="2013-08-26T04:00:00Z" tags="[]" xqa_key="AlQ7TjCl7Rfhc0Am6WguqjeUzGz7AuVt">
+  <chapter url_name="Week_1"/>
+</course>
