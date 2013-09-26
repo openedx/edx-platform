@@ -351,7 +351,7 @@ class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
-        self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")
+        self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestPeerGradingFound(ModuleStoreTestCase):

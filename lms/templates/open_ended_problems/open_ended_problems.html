@@ -17,38 +17,38 @@
         <div class="error-container">${error_text}</div>
         <h1>${_("Open Ended Problems")}</h1>
         <h2>${_("Instructions")}</h2>
-        <p>${_("Here are a list of open ended problems for this course.")}</p>
+        <p>${_("Here is a list of open ended problems for this course.")}</p>
         % if success:
-        % if len(problem_list) == 0:
-        <div class="message-container">
-          ${_("You have not attempted any open ended problems yet.")}
-        </div>
-        %else:
-        <table class="problem-list">
-            <tr>
-                <th>${_("Problem Name")}</th>
-                <th>${_("Status")}</th>
-                <th>${_("Grader Type")}</th>
-                <th>${_("ETA")}</th>
-            </tr>
-            %for problem in problem_list:
-            <tr>
-                <td>
-                    <a href="${problem['actual_url']}">${problem['problem_name']}</a>
-                </td>
-                <td>
-                    ${problem['state']}
-                </td>
-                <td>
-                    ${problem['grader_type']}
-                </td>
-                <td>
-                    ${problem['eta_string']}
-                </td>
-            </tr>
-            %endfor
-        </table>
-        %endif
+            % if len(problem_list) == 0:
+                <div class="message-container">
+                  ${_("You have not attempted any open ended problems yet.")}
+                </div>
+            %else:
+                <table class="problem-list">
+                    <tr>
+                        <th>${_("Problem Name")}</th>
+                        <th>${_("Status")}</th>
+                        <th>${_("Grader Type")}</th>
+                        <th>${_("ETA")}</th>
+                    </tr>
+                    %for problem in problem_list:
+                    <tr>
+                        <td>
+                            <a href="${problem['actual_url']}">${problem['problem_name']}</a>
+                        </td>
+                        <td>
+                            ${problem['state']}
+                        </td>
+                        <td>
+                            ${problem['grader_type']}
+                        </td>
+                        <td>
+                            ${problem['eta_string']}
+                        </td>
+                    </tr>
+                    %endfor
+                </table>
+            %endif
         %endif
     </div>
 </section>

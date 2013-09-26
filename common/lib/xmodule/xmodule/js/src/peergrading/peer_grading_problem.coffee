@@ -179,7 +179,9 @@ class @PeerGradingProblem
   interstitial_page_sel: '.interstitial-page'
   calibration_interstitial_page_sel: '.calibration-interstitial-page'
   error_container_sel: '.error-container'
+  peer_grading_instructions_sel: '.peer-grading-instructions'
   feedback_area_sel: '.feedback-area'
+  ice_legend_sel: '.ice-legend'
   score_selection_container_sel: '.score-selection-container'
   rubric_selection_container_sel: '.rubric-selection-container'
   submit_button_sel: '.submit-button'
@@ -239,7 +241,9 @@ class @PeerGradingProblem
 
     @submission_key_input = $("input[name='submission-key']")
     @essay_id_input = @$("input[name='essay-id']")
+    @peer_grading_instructions = @$(@peer_grading_instructions_sel)
     @feedback_area = @$(@feedback_area_sel)
+    @ice_legend = @$(@ice_legend_sel)
 
     @score_selection_container = @$(@score_selection_container_sel)
     @rubric_selection_container = @$(@rubric_selection_container_sel)
@@ -396,7 +400,7 @@ class @PeerGradingProblem
       @grading_message.fadeIn()
       message = "<p>Successfully saved your feedback. Fetching the next essay."
       if response.required_done
-        message = message + " You have done the required number of peer evals but may continue grading if you like."
+        message = message + " You have done the required number of peer assessments but may continue grading if you like."
       message = message + "</p>"
       @grading_message.html(message)
     else
@@ -459,9 +463,11 @@ class @PeerGradingProblem
       @grading_panel.find(@grading_text_sel).hide()
       @flag_student_container.hide()
       @answer_unknown_container.hide()
+      @peer_grading_instructions.hide()
       @feedback_area.attr('disabled', true)
-      feedback_text = "Once you are done with training and are grading real student essays, you will be asked to share feedback with them in addition to grading their rubric."
+      feedback_text = "Once you are done learning to grade, and are grading your peers' work, you will be asked to share written feedback with them in addition to scoring them."
       if @tracking_changes()
+        @ice_legend.hide()
         @feedback_area.attr('contenteditable', false)
         @feedback_area.text(feedback_text)
       else
@@ -498,7 +504,9 @@ class @PeerGradingProblem
       @grading_panel.find(@grading_text_sel).show()
       @flag_student_container.show()
       @answer_unknown_container.show()
+      @peer_grading_instructions.show()
       if @tracking_changes()
+        @ice_legend.show()
         @feedback_area.html(@make_paragraphs(response.student_response))
         @change_tracker.rebindTracker()
       else
@@ -598,12 +606,12 @@ class @PeerGradingProblem
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "Hide Prompt"
-      new_text = "Show Prompt"
+    if @question_header.text() == "Hide Question"
+      new_text = "Show Question"
       Logger.log 'oe_hide_question', {location: @location}
     else
       Logger.log 'oe_show_question', {location: @location}
-      new_text = "Hide Prompt"
+      new_text = "Hide Question"
     @question_header.text(new_text)
     return false
 
