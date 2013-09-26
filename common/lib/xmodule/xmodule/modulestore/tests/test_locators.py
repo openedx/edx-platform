@@ -91,8 +91,8 @@ class LocatorTest(TestCase):
                        'mit.eecs' + BRANCH_PREFIX + 'this ',
                        'mit.eecs' + BRANCH_PREFIX + 'th%is ',
                        ):
-            self.assertRaises(AssertionError, CourseLocator, course_id=bad_id)
-            self.assertRaises(AssertionError, CourseLocator, url='edx://' + bad_id)
+            self.assertRaises(ValueError, CourseLocator, course_id=bad_id)
+            self.assertRaises(ValueError, CourseLocator, url='edx://' + bad_id)
 
     def test_course_constructor_bad_url(self):
         for bad_url in ('edx://',
@@ -100,7 +100,7 @@ class LocatorTest(TestCase):
                         'http://mit.eecs',
                         'mit.eecs',
                         'edx//mit.eecs'):
-            self.assertRaises(AssertionError, CourseLocator, url=bad_url)
+            self.assertRaises(ValueError, CourseLocator, url=bad_url)
 
     def test_course_constructor_redundant_001(self):
         testurn = 'mit.eecs.6002x'
