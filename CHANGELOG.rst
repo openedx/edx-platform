@@ -7,6 +7,9 @@ the top.  Include a label indicating the component affected.
 
 LMS: Add split testing functionality for internal use.
 
+CMS: Add edit_course_tabs management command, providing a primitive
+editing capability for a course's list of tabs.
+
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered for class).
 
 LMS: Improved accessibility of parts of forum navigation sidebar.
