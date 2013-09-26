@@ -4,7 +4,7 @@ CME Registration methods
 
 import json
 import logging
-from statsd import statsd
+from dogapi import dog_stats_api
 
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -144,6 +144,7 @@ def cme_create_account(request, post_override=None):
     request.session.set_expiry(0)
 
     redirect_url = student.views.try_change_enrollment(request)
+    dog_stats_api.increment("common.student.successful_login")
 
     json_string = {'success': True,
                    'redirect_url': redirect_url}
@@ -352,7 +353,7 @@ def validate_export_controls(post_vars):
         return {
             'success': False,
             'field': 'country',
-            'value': 'We are experiencing a temporary system failure.  Try again later.'  # obfuscated message
+            'value': 'We are unable to register you at this present time.'  # obfuscated message
         }
 
 
@@ -361,7 +362,7 @@ DENIED_COUNTRIES = [
     'Korea, Democratic People\'s Republic Of',
     'Iran, Islamic Republic Of',
     'Cuba',
-    'Syrian Alab Republic',
+    'Syrian Arab Republic',
     ]
 
 #Construct dicts for specialty and sub-specialty dropdowns
