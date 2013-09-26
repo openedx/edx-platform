@@ -69,7 +69,7 @@ Feature: CMS.Course Overview
     # Safari does not have moveMouseTo implemented
     @skip_internetexplorer
     @skip_safari
-   Scenario: Notification is shown on subsection reorder
+    Scenario: Notification is shown on subsection reorder
         Given I have opened a new course section in Studio
         And I have added a new subsection
         And I have added a new subsection
