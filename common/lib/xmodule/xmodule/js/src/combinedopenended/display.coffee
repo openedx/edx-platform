@@ -357,7 +357,7 @@ class @CombinedOpenEnded
       @save_button.attr("disabled",true)
       $.postWithPrefix "#{@ajax_url}/store_answer", data, (response) =>
         if response.success
-          @gentle_alert("Answer saved.")
+          @gentle_alert("Answer saved, but not yet submitted.")
         else
           @errors_area.html(response.error)
         @save_button.attr("disabled",false)
