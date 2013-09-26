@@ -3,7 +3,7 @@ Feature: CMS.Problem Editor
   As a course author, I want to be able to create problems and edit their settings.
 
   Scenario: User can view metadata
-    Given I have created a Blank Common Problem
+    Given I have an empty course
     When I edit and select Settings
     Then I see the advanced settings and their expected values
     And Edit High Level Source is not visible
@@ -89,3 +89,13 @@ Feature: CMS.Problem Editor
     When I edit and compile the High Level Source
     Then my change to the High Level Source is persisted
     And when I view the High Level Source I see my changes
+
+  Scenario: Exceptions don't cause problem to be uneditable (bug STUD-786)
+    Given I have created a Blank Common Problem
+    And I go to the import page
+    And I import the file "get_html_exception_test.tar.gz"
+    When I go to the unit "Probability and BMI"
+    And I click on the link "edit a draft"
+    Then I see a message that says "We're having trouble rendering your component"
+    And I can edit the problem
+
