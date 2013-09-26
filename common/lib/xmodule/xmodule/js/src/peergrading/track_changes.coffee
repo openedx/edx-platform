@@ -56,7 +56,7 @@ class @TrackChanges
       key = parseInt(@attr('data-cid'))
       if key > keyToUndo
         keyToUndo = key
-    ICEtracker.rejectChange('[data-cid="'+ keyToUndo + '"]')
+    @tracker.rejectChange('[data-cid="'+ keyToUndo + '"]')
 
   stop_tracking_on_submit: () =>
     @tracker.stopTracking()
