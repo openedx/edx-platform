@@ -8,6 +8,7 @@ def strip_if_string(value):
         return value.strip()
     return value
 
+
 def get_student_from_identifier(unique_student_identifier):
     """
     Gets a student object using either an email address or username.
