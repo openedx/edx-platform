@@ -215,6 +215,10 @@ $action-secondary-active-focused-shadow: $m-pink-d2;
 $action-secondary-disabled-bg: $m-gray-d3;
 $action-secondary-disabled-fg: $white;
 
+// HEADER: graphic-based page titles
+$header-graphic-super-color: $m-blue-d1;
+$header-graphic-sub-color: $m-gray-d2;
+
 // ====================
 
 // MISC: visual horizontal rules
@@ -279,8 +283,8 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 // IMAGES: backgrounds
 $homepage-bg-image: '../images/homepage-bg.jpg';
 
-$login-banner-image: url(../images/bg-banner-login.png);
-$register-banner-image: url(../images/bg-banner-register.png);
+$login-banner-image: url(../images/bg-banner-account.png);
+$register-banner-image: url(../images/bg-banner-account.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';
 
