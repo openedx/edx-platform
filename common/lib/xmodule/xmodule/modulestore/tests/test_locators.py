@@ -208,6 +208,12 @@ class LocatorTest(TestCase):
                                      block=expected_block_ref)
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
+        agnostic = testobj.version_agnostic()
+        self.assertIsNone(agnostic.version_guid)
+        self.check_block_locn_fields(agnostic, 'test_block constructor',
+                                     course_id=expected_id,
+                                     branch=expected_branch,
+                                     block=expected_block_ref)
 
     def test_block_constructor_url_version_prefix(self):
         test_id_loc = '519665f6223ebd6980884f2b'
@@ -220,6 +226,14 @@ class LocatorTest(TestCase):
             block='lab2',
             version_guid=ObjectId(test_id_loc)
         )
+        agnostic = testobj.version_agnostic()
+        self.check_block_locn_fields(
+            agnostic, 'error parsing URL with version and block',
+            block='lab2',
+            course_id=None,
+            version_guid=ObjectId(test_id_loc)
+        )
+        self.assertIsNone(agnostic.course_id)
 
     def test_block_constructor_url_kitchen_sink(self):
         test_id_loc = '519665f6223ebd6980884f2b'
