@@ -190,6 +190,19 @@ def css_click_at(css_selector, index=0, x_coord=10, y_coord=10, timeout=5):
 
 
 @world.absorb
+def select_option(name, value, index=0, wait_time=30):
+    '''
+    A method to select an option
+    This method will return True if the selection worked.
+    '''
+    select_css = "select[name='{}']".format(name)
+    option_css = "option[value='{}']".format(value)
+
+    css_selector = "{} {}".format(select_css, option_css)
+    return css_click(css_selector=css_selector, index=index, wait_time=wait_time)
+
+
+@world.absorb
 def id_click(elem_id):
     """
     Perform a click on an element as specified by its id
