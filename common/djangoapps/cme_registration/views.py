@@ -4,7 +4,7 @@ CME Registration methods
 
 import json
 import logging
-from statsd import statsd
+from dogapi import dog_stats_api
 
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -18,6 +18,7 @@ from django.db import IntegrityError
 from django.core.mail import send_mail
 
 from student.models import Registration
+import student
 from cme_registration.models import CmeUserProfile
 from mitxmako.shortcuts import render_to_response, render_to_string
 
@@ -100,6 +101,11 @@ def cme_create_account(request, post_override=None):
         json_string['field'] = 'username'
         return HttpResponse(json.dumps(json_string))
 
+    #Validate Export controls
+    error = validate_export_controls(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_cme_create_account(post_vars)
     if isinstance(ret, HttpResponse):  # if there was an error then return that
@@ -137,12 +143,14 @@ def cme_create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)
 
-    statsd.increment("common.student.account_created")
+    redirect_url = student.views.try_change_enrollment(request)
+    dog_stats_api.increment("common.student.successful_login")
 
-    json_string = {'success': True}
-    HttpResponse(json.dumps(json_string), mimetype="application/json")
+    json_string = {'success': True,
+                   'redirect_url': redirect_url}
 
-    response = HttpResponse(json.dumps({'success': True}))
+    response = HttpResponse(json.dumps(json_string))
+
     return response
 
 
@@ -334,6 +342,28 @@ def validate_required_radios(post_vars):
             error['field'] = k
             return error
 
+
+def validate_export_controls(post_vars):
+    """
+    Checks that we are US export control compliant.
+    In keeping with the style of the rest of the app, returns failure dict if failed, else None
+    """
+    country = post_vars.get('country', '')
+    if country in DENIED_COUNTRIES:
+        return {
+            'success': False,
+            'field': 'country',
+            'value': 'We are unable to register you at this present time.'  # obfuscated message
+        }
+
+
+DENIED_COUNTRIES = [
+    'Sudan',
+    'Korea, Democratic People\'s Republic Of',
+    'Iran, Islamic Republic Of',
+    'Cuba',
+    'Syrian Arab Republic',
+    ]
 
 #Construct dicts for specialty and sub-specialty dropdowns
 SPECIALTY_CHOICES = {}

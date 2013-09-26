@@ -87,7 +87,12 @@
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
           $('.message.submission-error').removeClass('is-shown');
-          location.href="${reverse('dashboard')}";
+          if(json.redirect_url){
+            location.href=json.redirect_url;
+          }
+          else {
+            location.href="${reverse('dashboard')}";
+          }
        } else {
          $('.status.message.submission-error').addClass('is-shown').focus();
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
@@ -497,11 +502,8 @@
            </div>
          </li>
        
-         <div class="field select checkbox" id="mailing_list">
-            <input id="mailing_list" type="checkbox" name="mailing_list" value="true" checked />
-            <label for="mailing_list">Yes, include me on the mailing list for future educational activities</label>
-         </div>
-       
+            <input id="mailing_list" type="hidden" name="mailing_list" value="true" />
+
         </ol>
       </fieldset>
 
