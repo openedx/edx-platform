@@ -15,7 +15,7 @@ from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentF
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
-from instructor_task.subtasks import create_subtask_result
+from instructor_task.subtasks import increment_subtask_status
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -29,13 +29,13 @@ class MockCourseEmailResult(object):
     """
     emails_sent = 0
 
-    def get_mock_create_subtask_result(self):
+    def get_mock_increment_subtask_status(self):
         """Wrapper for mock email function."""
-        def mock_create_subtask_result(sent, failed, output, **kwargs):  # pylint: disable=W0613
+        def mock_increment_subtask_status(original_status, **kwargs):  # pylint: disable=W0613
             """Increments count of number of emails sent."""
-            self.emails_sent += sent
-            return create_subtask_result(sent, failed, output)
-        return mock_create_subtask_result
+            self.emails_sent += kwargs['succeeded']
+            return increment_subtask_status(original_status, **kwargs)
+        return mock_increment_subtask_status
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -244,13 +244,13 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
 
     @override_settings(EMAILS_PER_TASK=3, EMAILS_PER_QUERY=7)
-    @patch('bulk_email.tasks.create_subtask_result')
+    @patch('bulk_email.tasks.increment_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying
         """
         mock_factory = MockCourseEmailResult()
-        email_mock.side_effect = mock_factory.get_mock_create_subtask_result()
+        email_mock.side_effect = mock_factory.get_mock_increment_subtask_status()
         added_users = []
         for _ in xrange(LARGE_NUM_EMAILS):
             user = UserFactory()
