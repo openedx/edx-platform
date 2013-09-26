@@ -51,12 +51,12 @@ class @TrackChanges
   
   undo_change: (event) =>
     event.preventDefault()
-    keyToUndo = 0
+    keyOfLatestChange = 0
     @tracked_elements.each ->
       key = parseInt(@attr('data-cid'))
-      if key > keyToUndo
-        keyToUndo = key
-    ICEtracker.rejectChange('[data-cid="'+ keyToUndo + '"]')
+      if key > keyOfLatestChange
+        keyOfLatestChange = key
+    ICEtracker.rejectChange('[data-cid="'+ keyOfLatestChange + '"]')
 
   stop_tracking_on_submit: () =>
     @tracker.stopTracking()
