@@ -110,7 +110,7 @@ header.global {
 
     &.user {
       float: left;
-      margin-top: 4px;
+      margin-top: 10px;
 
       > li.primary {
         display: block;
@@ -232,7 +232,8 @@ header.global {
   }
 
   .nav-global {
-    margin-top: ($baseline/2);
+    margin-top: 10px;
+    margin-right: 20px;
     list-style: none;
 
     li {
@@ -251,18 +252,11 @@ header.global {
         display:block;
         @include button(shiny, $green); 
 
-        padding: ($baseline/4);
-        color: $lighter-base-font-color;
         font-weight: 600;
 
         &:hover, &:active {
           text-decoration: none;
-          color: $link-color;
         }
-      }
-
-      .green-button {
-        
       }
 
       &.active {
