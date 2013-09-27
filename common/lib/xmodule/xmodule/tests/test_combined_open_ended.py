@@ -12,7 +12,7 @@ import logging
 import unittest
 
 from lxml import etree
-from mock import Mock, MagicMock, ANY
+from mock import Mock, MagicMock, ANY, patch
 from pytz import UTC
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
@@ -26,7 +26,7 @@ from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (
     MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
-    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile
 )
 
 from xblock.field_data import DictFieldData
@@ -374,7 +374,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         # Submit a student response to the question.
         test_module.handle_ajax(
             "save_answer",
-            {"student_answer": submitted_response, "can_upload_files": False, "student_file": None},
+            {"student_answer": submitted_response},
             get_test_system()
         )
         # Submitting an answer should clear the stored answer.
@@ -753,7 +753,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
-        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files": False, "student_file": None})
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
         html = module.handle_ajax("get_html", {})
 
         #Mock a student submitting an assessment
@@ -902,3 +902,78 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         #Try to reset, should fail because only 1 attempt is allowed
         reset_data = json.loads(module.handle_ajax("reset", {}))
         self.assertEqual(reset_data['success'], False)
+
+class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
+    """
+    Test if student is able to upload images properly.
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestionImageUpload"])
+    answer_text = "Hello, this is my amazing answer."
+    file_text = "Hello, this is my amazing file."
+    file_name = "Student file 1"
+    answer_link = "http://www.edx.org"
+    autolink_tag = "<a href="
+
+    def setUp(self):
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.test_system.s3_interface = test_util_open_ended.S3_INTERFACE
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
+
+    def test_file_upload_fail(self):
+        """
+        Test to see if a student submission without a file attached fails.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer
+        response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
+        response = json.loads(response)
+        self.assertFalse(response['success'])
+        self.assertIn('error', response)
+
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.S3Connection',
+        test_util_open_ended.MockS3Connection
+    )
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.Key',
+        test_util_open_ended.MockS3Key
+    )
+    def test_file_upload_success(self):
+        """
+        Test to see if a student submission with a file is handled properly.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer with a file
+        response = module.handle_ajax("save_answer", {
+            "student_answer": self.answer_text,
+            "valid_files_attached": True,
+            "student_file": [MockUploadedFile(self.file_name, self.file_text)],
+        })
+
+        response = json.loads(response)
+        self.assertTrue(response['success'])
+        self.assertIn(self.file_name, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
+
+    def test_link_submission_success(self):
+        """
+        Students can submit links instead of files.  Check that the link is properly handled.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Simulate a student saving an answer with a link.
+        response = module.handle_ajax("save_answer", {
+            "student_answer": "{0} {1}".format(self.answer_text, self.answer_link)
+            })
+
+        response = json.loads(response)
+
+        self.assertTrue(response['success'])
+        self.assertIn(self.answer_link, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
