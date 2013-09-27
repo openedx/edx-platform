@@ -73,6 +73,24 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(mode2, CourseMode.mode_for_course(self.course_id, u'verified'))
         self.assertIsNone(CourseMode.mode_for_course(self.course_id, 'DNE'))
 
+    def test_min_course_price_for_currency(self):
+        """
+        Get the min course price for a course according to currency
+        """
+        # no modes, should get 0
+        self.assertEqual(0, CourseMode.min_course_price_for_currency(self.course_id, 'usd'))
+
+        # create some modes
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd')
+        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd')
+        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny')
+        set_modes = [mode1, mode2, mode3]
+        for mode in set_modes:
+            self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
+
+        self.assertEqual(10, CourseMode.min_course_price_for_currency(self.course_id, 'usd'))
+        self.assertEqual(80, CourseMode.min_course_price_for_currency(self.course_id, 'cny'))
+
     def test_modes_for_course_expired(self):
         expired_mode, _status = self.create_mode('verified', 'Verified Certificate')
         expired_mode.expiration_date = datetime.now(pytz.UTC) + timedelta(days=-1)
