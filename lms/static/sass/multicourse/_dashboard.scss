@@ -253,7 +253,6 @@
         @include button(shiny, $green);
 
         &:hover, &:focus {
-          color: $link-color;
           text-decoration: none;
         }
       }
