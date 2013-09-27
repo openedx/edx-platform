@@ -153,7 +153,7 @@
 
           <ol class="wizard-steps">
             <li class="wizard-step">
-            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}">${_("Go to Step 1: Take my Photo")}</a>
+            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}?upgrade=${upgrade}">${_("Go to Step 1: Take my Photo")}</a>
             </li>
           </ol>
         </nav>
