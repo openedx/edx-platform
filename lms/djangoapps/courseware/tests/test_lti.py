@@ -75,6 +75,7 @@ class TestLTI(BaseTestXmodule):
             'element_class': self.item_module.location.category,
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
+            'open_in_a_new_page': True
         }
         self.assertEqual(
             generated_context,

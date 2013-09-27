@@ -2,29 +2,17 @@ div.lti {
     // align center
     margin: 0 auto;
 
-    h3.error_message {
-        display: block;
-    }
-
     form.ltiLaunchForm {
         display: none;
     }
 
+
     iframe.ltiLaunchFrame {
         width: 100%;
         height: 800px;
-        display: none;
+        display: block;
         border: 0px;
         overflow-x: hidden;
     }
 
-    &.rendered {
-        iframe.ltiLaunchFrame {
-            display: block;
-        }
-
-        h3.error_message {
-            display: none;
-        }
-    }
 }
