@@ -15,6 +15,7 @@ from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemN
     DuplicateItemError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 from pytz import UTC
 from path import path
 import re
@@ -34,7 +35,7 @@ class SplitModuleTest(unittest.TestCase):
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
         'fs_root': '',
-        'xblock_mixins': (InheritanceMixin,)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin)
     }
 
     MODULESTORE = {

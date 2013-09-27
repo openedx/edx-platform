@@ -12,10 +12,10 @@ from xblock.runtime import DbModel
 
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
-from xmodule.x_module import XModuleFields
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.x_module import XModuleMixin
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -65,7 +65,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # Also tests that xml_attributes is filtered out of XmlDescriptor.
         self.assertEqual(1, len(editable_fields), editable_fields)
         self.assert_field_values(
-            editable_fields, 'display_name', XModuleFields.display_name,
+            editable_fields, 'display_name', XModuleMixin.display_name,
             explicitly_set=False, value=None, default_value=None
         )
 
@@ -73,7 +73,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # Tests that explicitly_set is correct when a value overrides the default (not inheritable).
         editable_fields = self.get_xml_editable_fields(DictFieldData({'display_name': 'foo'}))
         self.assert_field_values(
-            editable_fields, 'display_name', XModuleFields.display_name,
+            editable_fields, 'display_name', XModuleMixin.display_name,
             explicitly_set=True, value='foo', default_value=None
         )
 

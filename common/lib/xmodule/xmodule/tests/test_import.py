@@ -13,6 +13,7 @@ from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
+from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -42,7 +43,7 @@ class DummySystem(ImportSystem):
             error_tracker=error_tracker,
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
-            mixins=(InheritanceMixin,)
+            mixins=(InheritanceMixin, XModuleMixin)
         )
 
     def render_template(self, _template, _context):
