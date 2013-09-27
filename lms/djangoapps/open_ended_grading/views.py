@@ -74,8 +74,8 @@ ALERT_DICT = {
     'Flagged Submissions': _("Submissions have been flagged for review")
 }
 
-STUDENT_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify course staff."
-STAFF_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
+STUDENT_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify course staff.")
+STAFF_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org")
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -346,7 +346,7 @@ def combined_notifications(request, course_id):
 
             notification_item = {
                 'url': url,
-                'name': human_name,
+                'name': _(human_name),
                 'alert': has_img,
                 'description': description,
                 'alert_message': alert_message
