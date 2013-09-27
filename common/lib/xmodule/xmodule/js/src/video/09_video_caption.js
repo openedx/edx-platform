@@ -453,6 +453,9 @@ function () {
             min = 0;
             max = this.videoCaption.start.length - 1;
 
+            if (time < this.videoCaption.start[min]) {
+                return -1;
+            }
             while (min < max) {
                 index = Math.ceil((max + min) / 2);
 
@@ -497,20 +500,21 @@ function () {
                 // Total play time changes with speed change. Also there is
                 // a 250 ms delay we have to take into account.
                 time = Math.round(
-                    Time.convert(time, this.speed, '1.0') * 1000 + 250
+                    Time.convert(time, this.speed, '1.0') * 1000 + 100
                 );
             } else {
                 // Total play time remains constant when speed changes.
-                time = Math.round(parseInt(time, 10) * 1000);
+                time = Math.round(time * 1000 + 100);
             }
 
             newIndex = this.videoCaption.search(time);
 
             if (
-                newIndex !== void 0 &&
+                typeof newIndex !== 'undefined' &&
+                newIndex !== -1 &&
                 this.videoCaption.currentIndex !== newIndex
             ) {
-                if (this.videoCaption.currentIndex) {
+                if (typeof this.videoCaption.currentIndex !== 'undefined') {
                     this.videoCaption.subtitlesEl
                         .find('li.current')
                         .removeClass('current');
