@@ -44,12 +44,15 @@ class VerifyView(View):
               before proceeding to payment
 
         """
+        upgrade = request.GET.get('upgrade', False)
+
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
             return redirect(
                 reverse('verify_student_verified',
-                        kwargs={'course_id': course_id}))
+                        kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade)
+            )
         elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         else:
@@ -85,6 +88,7 @@ class VerifyView(View):
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
             "min_price": verify_mode.min_price,
+            "upgrade": upgrade,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -100,6 +104,7 @@ class VerifiedView(View):
         """
         Handle the case where we have a get request
         """
+        upgrade = request.GET.get('upgrade', False)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
@@ -117,6 +122,7 @@ class VerifiedView(View):
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
+            "upgrade": upgrade,
         }
         return render_to_response('verify_student/verified.html', context)
 
@@ -250,6 +256,7 @@ def show_requirements(request, course_id):
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
 
+    upgrade = request.GET.get('upgrade', False)
     course = course_from_id(course_id)
     context = {
         "course_id": course_id,
@@ -257,5 +264,6 @@ def show_requirements(request, course_id):
         "course_org": course.display_org_with_default,
         "course_num": course.display_number_with_default,
         "is_not_active": not request.user.is_active,
+        "upgrade": upgrade,
     }
     return render_to_response("verify_student/show_requirements.html", context)
