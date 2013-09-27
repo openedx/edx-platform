@@ -20,6 +20,16 @@ from warnings import filterwarnings
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+_system = 'cms'
+_report_dir = REPO_ROOT / 'reports' / _system
+_report_dir.makedirs_p()
+
+NOSE_ARGS = [
+    '--tests', PROJECT_ROOT / 'djangoapps', COMMON_ROOT / 'djangoapps',
+    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
+    '--xunit-file', _report_dir / 'nosetests.xml',
+]
+
 TEST_ROOT = path('test_root')
 
 # Want static files in the same dir for running on jenkins.
