@@ -3,24 +3,9 @@
 ## Again, ugly hack that needs to be changed
 ## TODO: this probably needs better formatting to look nice in an
 ##       email client (Mako leaves awkward whitespace)
-% if stanford_theme_enabled():
-  This is to confirm that you changed the e-mail associated with
-  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
-  did not make this request, please contact us at
+Это письмо является подтверждением того, что вы сменили почтовый адрес для учетной записи на курсах повышения квалификации учителей с ${old_email} на ${new_email}. 
 
-  ${settings.CONTACT_EMAIL}
-% else:
-  This is to confirm that you changed the e-mail associated with
-  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
-  did not make this request, please contact us immediately. Contact
-  information is listed at:
+Если вы этого не делали, то обратитесь в техническую поддержку edu.olimpiada@yandex.ru.
 
-  % if is_secure:
-    https://${ site }${reverse('contact')}
-  % else:
-    http://${ site }${reverse('contact')}
-  % endif
-% endif
 
-We keep a log of old e-mails, so if this request was unintentional, we
-can investigate.
+Техническая поддержка курсов повышения квалификации ГБОУ ЦПМ

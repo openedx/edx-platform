@@ -1,1 +1,1 @@
-Request to change ${settings.PLATFORM_NAME} account e-mail
+Запрос на смену почтового адреса на курсах повышения квалификации учителей
