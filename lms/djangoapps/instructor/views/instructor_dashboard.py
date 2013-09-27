@@ -38,7 +38,7 @@ def instructor_dashboard_2(request, course_id):
         raise Http404()
 
     sections = [
-        _section_course_info(course_id),
+        _section_course_info(course_id, access),
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
@@ -67,18 +67,21 @@ section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
 
-def _section_course_info(course_id):
+def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
-    section_data = {}
-    section_data['section_key'] = 'course_info'
-    section_data['section_display_name'] = _('Course Info')
-    section_data['course_id'] = course_id
-    section_data['course_display_name'] = course.display_name
-    section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
-    section_data['has_started'] = course.has_started()
-    section_data['has_ended'] = course.has_ended()
+    section_data = {
+        'section_key': 'course_info',
+        'section_display_name': _('Course Info'),
+        'course_id': course_id,
+        'access': access,
+        'course_display_name': course.display_name,
+        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id).count(),
+        'has_started': course.has_started(),
+        'has_ended': course.has_ended(),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+    }
 
     try:
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
