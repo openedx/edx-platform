@@ -6,8 +6,6 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-from pudb import set_trace
-
 import re
 import logging
 import requests
@@ -17,7 +15,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import ('HttpResponse'), HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
@@ -212,7 +210,6 @@ def students_update_enrollment(request, course_id):
         'results': results,
         'auto_enroll': auto_enroll,
     }
-    #return HttpResponse('HELLO WORLD')
     return JsonResponse(response_payload)
 
 
@@ -671,22 +668,19 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
-""" todo add that security nonsense in """
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+# todo check if staff is the desired access level
+# todo do html and plaintext messages
 @require_level('staff')
 @require_query_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
     """
     Send an email to self, staff, or everyone involved in a course.
     Query Paramaters:
-    - action 'send_email'
-    - email_to_option specifies to whom the email should be student
-    - email_subject is a string containing the email subject
-    - html_message is a TODO 
-    - text_message is TODO 
-
+    - 'send_to' specifies what group the email should be sent to
+    - 'subject' specifies email's subject
+    - 'message' specifies email's content
     """
-    # todo actually distinguish between html messages and text messages
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, course, 'instructor')
     send_to = request.GET.get("send_to")
@@ -711,7 +705,6 @@ def send_email(request, course_id):
         'course_id': course_id,
     }
     return JsonResponse(response_payload)
-    #TODO send back a response
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -775,16 +768,6 @@ def update_forum_role_membership(request, course_id):
         'action': action,
     }
     return JsonResponse(response_payload)
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_query_params(
-        email_to_option="group to send email to",
-        email_subject="the email's subject",
-        html_message="the html-formatted email",
-        text_message="the text version of the email"
-    )
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
