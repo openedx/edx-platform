@@ -15,7 +15,7 @@ CMS.Models.CourseInfo = Backbone.Model.extend({
 // course update -- biggest kludge here is the lack of a real id to map updates to originals
 CMS.Models.CourseUpdate = Backbone.Model.extend({
 	defaults: {
-		"date" : $.datepicker.formatDate('MM d, yy', new Date()),
+		"date" : $.datepicker.formatDate('d MM yy', new Date()),
 		"content" : ""
 	}
 });

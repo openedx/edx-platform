@@ -77,7 +77,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             }
           });
           this.$el.find(".new-update-form").hide();
-          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+          this.$el.find('.date').datepicker({ 'dateFormat': 'd MM yy' });
           return this;
     },
 
@@ -109,7 +109,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         });
 
         $('.date').datepicker('destroy');
-        $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+        $('.date').datepicker({ 'dateFormat': 'd MM yy' });
     },
 
     onSave: function(event) {
