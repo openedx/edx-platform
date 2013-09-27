@@ -26,7 +26,7 @@ def get_default_time_display(dtime):
         dtime = dtime.astimezone(settings_time_zone)
     else:
         timezone = u" UTC"
-    return unicode(_date(dtime, "l, j F Y H:i e "))
+    return unicode(_date(dtime, "l, d E Y H:i e "))
 
 def get_time_display(dtime, format_string=None):
     """
