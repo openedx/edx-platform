@@ -559,6 +559,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'contentserver.middleware.StaticContentServer',
+    'mongo_modulestore_default_mapper.middleware.DefaultModulestoreMapper',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',

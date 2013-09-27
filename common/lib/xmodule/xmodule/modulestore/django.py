@@ -23,6 +23,13 @@ _MODULESTORES = {}
 
 FUNCTION_KEYS = ['render_template']
 
+def get_default_modulestore_name():
+    """
+    Returns the name of the default mongo module store
+    IMPORTANT, this function can be (and is!) overloaded by middleware to help resolve
+    between preview.hostname and www.hostname
+    """
+    return 'default'
 
 def load_function(path):
     """
@@ -67,11 +74,17 @@ def create_modulestore_instance(engine, options):
     )
 
 
-def modulestore(name='default'):
+def modulestore(name=None):
     """
     This returns an instance of a modulestore of given name. This will wither return an existing
     modulestore or create a new one
     """
+
+    if not name:
+        # If caller did not specify name then we should
+        # use the default value
+        name = get_default_modulestore_name()
+
     if name not in _MODULESTORES:
         _MODULESTORES[name] = create_modulestore_instance(settings.MODULESTORE[name]['ENGINE'],
                                                           settings.MODULESTORE[name]['OPTIONS'])
