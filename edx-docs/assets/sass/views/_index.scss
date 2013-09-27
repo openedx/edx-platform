@@ -4,7 +4,7 @@
 // @extend .trans-size;
 
 .view--index {
-  border-top: ($baseline/4) solid $blue-l3;
+  border-top: ($baseline/4) solid $blue-t1;
   background: $white url('../images/bg-subtlepatterns-carbonfiber.png') 0 0 repeat;
 
   // grid
@@ -217,6 +217,7 @@
     @include media($bp-dm) {
       @include span-columns(2 of 12);
       @include shift(5);
+      @include pad(($baseline/2) ($baseline*0.75));
     }
 
     // BP: small desktop
@@ -277,13 +278,21 @@
   }
 
   .logo-docs {
-    @extend %t-title-0;
+    @extend %t-title-1;
     @extend %t-weight0;
     display: block;
     margin-bottom: ($baseline/2);
     color: $white-t;
+    cursor: default ;
 
     // BP: small desktop
+    @include media($bp-ds) {
+      // NOTE: drat! typography extends don't work
+      @include font-size(48);
+      @include lh(48);
+    }
+
+    // BP: medium desktop
     @include media($bp-ds) {
       // NOTE: drat! typography extends don't work
       @include font-size(48);
