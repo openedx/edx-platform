@@ -18,7 +18,7 @@ from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
-
+from django.template.defaultfilters import date as _date
 
 log = logging.getLogger(__name__)
 
@@ -831,7 +831,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = _date(result.strftime, "d E Y")
             except ValueError:
                 result = text.title()
 
@@ -843,7 +843,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            return _date(self.advertised_start or self.start, "d E Y")
 
     @property
     def end_date_text(self):
@@ -852,7 +852,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        return '' if self.end is None else _date(self.end.strftime, "d E Y")
 
     @property
     def forum_posts_allowed(self):

@@ -8,7 +8,7 @@
   <%
     role_names = sorted(set(map(attrgetter('name'), django_user.roles.all())))
   %>
-  <div class="sidebar-username">${django_user.username | h}</div>
+  <div class="sidebar-username">${django_user.profile.firstname + ' ' + django_user.profile.lastname | h}</div>
   <div class="sidebar-user-roles">
     ${", ".join(role_names)}
   </div>
