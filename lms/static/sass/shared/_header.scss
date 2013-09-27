@@ -109,7 +109,7 @@ header.global {
     }
 
     &.user {
-      float: right;
+      float: left;
       margin-top: 4px;
 
       > li.primary {
@@ -249,6 +249,8 @@ header.global {
 
       a {
         display:block;
+        @include green-button(); 
+
         padding: ($baseline/4);
         color: $lighter-base-font-color;
         font-weight: 600;
@@ -257,6 +259,10 @@ header.global {
           text-decoration: none;
           color: $link-color;
         }
+      }
+
+      .green-button {
+        
       }
 
       &.active {
