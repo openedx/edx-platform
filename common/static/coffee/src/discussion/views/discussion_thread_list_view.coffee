@@ -95,6 +95,7 @@ if Backbone?
       @timer = 0
       @$el.html(@template())
 
+      $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
       $(window).bind "resize", @updateSidebar
 
