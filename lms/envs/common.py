@@ -105,6 +105,9 @@ MITX_FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
+    # Can be turned off if course lists need to be hidden. Effects views and templates.
+    'COURSES_ARE_BROWSABLE': True,
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 

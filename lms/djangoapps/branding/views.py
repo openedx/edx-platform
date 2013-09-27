@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
@@ -48,10 +49,9 @@ def courses(request):
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
         return redirect(marketing_link('COURSES'), permanent=True)
 
-    university = branding.get_university(request.META.get('HTTP_HOST'))
-    if university == 'edge':
-        return render_to_response('university_profile/edge.html', {})
+    if not settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):        
+        raise Http404
 
     #  we do not expect this case to be reached in cases where
-    #  marketing and edge are enabled
+    #  marketing is enabled or the courses are not browsable
     return courseware.views.courses(request)
