@@ -271,6 +271,7 @@ function (VideoPlayer) {
 
         // The parent element of the video, and the ID.
         this.el = $(element).find('.video');
+        this.elVideoWrapper = this.el.find('.video-wrapper');
         this.id = this.el.attr('id').replace(/video_/, '');
 
         console.log(
