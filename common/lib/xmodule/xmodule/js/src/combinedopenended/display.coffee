@@ -576,12 +576,12 @@ class @CombinedOpenEnded
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "Hide Prompt"
-      new_text = "Show Prompt"
+    if @question_header.text() == "Hide Question"
+      new_text = "Show Question"
       Logger.log 'oe_hide_question', {location: @location}
     else
       Logger.log 'oe_show_question', {location: @location}
-      new_text = "Hide Prompt"
+      new_text = "Hide Question"
     @question_header.text(new_text)
     return false
 
@@ -621,13 +621,13 @@ class @CombinedOpenEnded
     if @prompt_container.is(":hidden")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Hide Prompt")
+      @question_header.text("Hide Question")
 
   prompt_hide: () =>
     if @prompt_container.is(":visible")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Show Prompt")
+      @question_header.text("Show Question")
 
   log_feedback_click: (event) ->
     link_text = @$(event.target).html()

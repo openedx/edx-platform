@@ -1,4 +1,5 @@
-Feature: Create Course
+@shard_2
+Feature: CMS.Create Course
   In order offer a course on the edX platform
   As a course author
   I want to create courses

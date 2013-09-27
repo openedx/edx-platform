@@ -48,6 +48,7 @@
 
 // base - specific views
 @import 'views/verification';
+@import 'views/shoppingcart';
 
 // shared - course
 @import 'shared/forms';

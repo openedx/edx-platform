@@ -97,6 +97,13 @@ MODULESTORE = {
     }
 }
 
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'xcontent',
+    }
+}
 
 DATABASES = {
     'default': {
@@ -158,7 +165,6 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 ###################### Payment ##############################3
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
-
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee

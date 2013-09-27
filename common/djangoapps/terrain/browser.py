@@ -119,6 +119,7 @@ def initial_setup(server):
         if not success:
             raise IOError("Could not acquire valid {driver} browser session.".format(driver=browser_driver))
 
+        world.absorb(0, 'IMPLICIT_WAIT')
         world.browser.driver.set_window_size(1280, 1024)
 
     elif world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
@@ -128,7 +129,7 @@ def initial_setup(server):
             url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'], config['access-key']),
             **make_saucelabs_desired_capabilities()
         )
-        world.browser.driver.implicitly_wait(30)
+        world.absorb(30, 'IMPLICIT_WAIT')
 
     elif world.LETTUCE_SELENIUM_CLIENT == 'grid':
         world.browser = Browser(
@@ -136,11 +137,12 @@ def initial_setup(server):
             url=settings.SELENIUM_GRID.get('URL'),
             browser=settings.SELENIUM_GRID.get('BROWSER'),
         )
-        world.browser.driver.implicitly_wait(30)
+        world.absorb(30, 'IMPLICIT_WAIT')
 
     else:
         raise Exception("Unknown selenium client '{}'".format(world.LETTUCE_SELENIUM_CLIENT))
 
+    world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
     world.absorb(world.browser.driver.session_id, 'jobid')
 
 

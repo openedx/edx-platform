@@ -23,6 +23,17 @@ nav.course-material {
       list-style: none;
       margin-right: 6px;
 
+      &.prominent {
+        margin-right: 16px;
+        background: rgba(255, 255, 255, .5);
+        border-radius: 3px; 
+      }
+
+      &.prominent + li {
+          padding-left: 15px;
+          border-left: 1px solid #333;
+      }
+
       a {
         border-radius: 3px;
         color: #555;

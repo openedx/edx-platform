@@ -1,4 +1,5 @@
-Feature: HTML Editor
+@shard_3
+Feature: CMS.HTML Editor
   As a course author, I want to be able to create HTML blocks.
 
   Scenario: User can view metadata

@@ -26,12 +26,11 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from model_utils.models import StatusModel
 from model_utils import Choices
 
 from verify_student.ssencrypt import (
-    random_aes_key, decode_and_decrypt, encrypt_and_encode,
+    random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
 )
 
@@ -57,15 +56,18 @@ def status_before_must_be(*valid_start_statuses):
     distracting boilerplate when looking at a Model that needs to go through a
     workflow process.
     """
-    def decorator_func(fn):
-        @functools.wraps(fn)
+    def decorator_func(func):
+        """
+        Decorator function that gets returned
+        """
+        @functools.wraps(func)
         def with_status_check(obj, *args, **kwargs):
             if obj.status not in valid_start_statuses:
                 exception_msg = (
                     u"Error calling {} {}: status is '{}', must be one of: {}"
-                ).format(fn, obj, obj.status, valid_start_statuses)
+                ).format(func, obj, obj.status, valid_start_statuses)
                 raise VerificationException(exception_msg)
-            return fn(obj, *args, **kwargs)
+            return func(obj, *args, **kwargs)
 
         return with_status_check
 
@@ -367,7 +369,7 @@ class PhotoVerification(StatusModel):
         Status should be moved to `must_retry`.
         """
         if self.status in ["approved", "denied"]:
-            return # If we were already approved or denied, just leave it.
+            return  # If we were already approved or denied, just leave it.
 
         self.error_msg = error_msg
         self.error_code = error_code
@@ -408,7 +410,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     # encode that. The result is saved here. Actual expected length is 344.
     photo_id_key = models.TextField(max_length=1024)
 
-    IMAGE_LINK_DURATION = 5 * 60 * 60 * 24 # 5 days in seconds
+    IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
 
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
@@ -444,8 +446,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.status = "must_retry"
                 self.error_msg = response.text
                 self.save()
-        except Exception as e:
-            log.exception(e)
+        except Exception as error:
+            log.exception(error)
 
     def image_url(self, name):
         """
@@ -466,7 +468,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         bucket = conn.get_bucket(settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["S3_BUCKET"])
 
         key = Key(bucket)
-        key.key = "{}/{}".format(prefix, self.receipt_id);
+        key.key = "{}/{}".format(prefix, self.receipt_id)
 
         return key
 
@@ -507,7 +509,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             "Content-Type": "application/json",
             "Date": formatdate(timeval=None, localtime=False, usegmt=True)
         }
-        message, _, authorization = generate_signed_message(
+        _message, _sig, authorization = generate_signed_message(
             "POST", headers, body, access_key, secret_key
         )
         headers['Authorization'] = authorization
@@ -515,16 +517,18 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return headers, body
 
     def request_message_txt(self):
+        """ This is the body of the request we send across """
         headers, body = self.create_request()
 
         header_txt = "\n".join(
-            "{}: {}".format(h, v) for h,v in sorted(headers.items())
+            "{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
         return header_txt + "\n\n" + body_txt
 
     def send_request(self):
+        """ sends the request across to the endpoint """
         headers, body = self.create_request()
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
