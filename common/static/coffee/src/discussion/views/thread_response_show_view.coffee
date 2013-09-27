@@ -52,11 +52,11 @@ if Backbone?
         @$(".vote-btn span.sr").html("votes (click to remove your vote)")
       else
         @unvote()
-        @$(".vote-btn span.sr").html("votes (click vote)")
+        @$(".vote-btn span.sr").html("votes (click to vote)")
 
     vote: ->
       url = @model.urlFor("upvote")
-      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) + 1 ) + '<span class="sr"></span>')
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) + 1) + '<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
@@ -67,7 +67,7 @@ if Backbone?
 
     unvote: ->
       url = @model.urlFor("unvote")
-      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) - 1 )+'<span class="sr"></span>')
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) - 1)+'<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
@@ -75,7 +75,6 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             @model.set(response)
-            
             
 
     edit: (event) ->
