@@ -59,6 +59,7 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if user.is_authenticated():
 
+    <div style="float:right">
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
         % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
@@ -85,6 +86,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
+    </div>
       % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
@@ -121,7 +123,6 @@ site_status_msg = get_site_status_msg(course_id)
           % endif
       % endif
     </ol>
-
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
