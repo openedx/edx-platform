@@ -249,7 +249,7 @@ header.global {
 
       a {
         display:block;
-        @include green-button(); 
+        @include button(shiny, $green); 
 
         padding: ($baseline/4);
         color: $lighter-base-font-color;
