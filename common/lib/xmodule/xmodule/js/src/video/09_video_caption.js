@@ -500,11 +500,11 @@ function () {
                 // Total play time changes with speed change. Also there is
                 // a 250 ms delay we have to take into account.
                 time = Math.round(
-                    Time.convert(time, this.speed, '1.0') * 1000 + 150
+                    Time.convert(time, this.speed, '1.0') * 1000 + 100
                 );
             } else {
                 // Total play time remains constant when speed changes.
-                time = Math.round(parseInt(time, 10) * 1000 + 150);
+                time = Math.round(time * 1000 + 100);
             }
 
             newIndex = this.videoCaption.search(time);
