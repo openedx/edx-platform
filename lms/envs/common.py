@@ -36,6 +36,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
+CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -171,6 +172,9 @@ MITX_FEATURES = {
 
     # Toggle storing detailed billing information
     'STORE_BILLING_INFO': False,
+
+    # Enable flow for payments for course registration (DIFFERENT from verified student flow)
+    'ENABLE_PAID_COURSE_REGISTRATION': False,
 }
 
 # Used for A/B testing
@@ -500,7 +504,8 @@ CC_PROCESSOR = {
         'PURCHASE_ENDPOINT': '',
     }
 }
-
+# Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
+PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,

@@ -9,6 +9,8 @@ from django.utils.translation import ugettext as _
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
+# shopping cart
+import shoppingcart
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -79,7 +81,17 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
-
+      % if settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and \
+           settings.MITX_FEATURES['ENABLE_SHOPPING_CART'] and \
+           shoppingcart.models.Order.user_cart_has_items(user):
+        <ol class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <i class="icon-shopping-cart"></i> Shopping Cart
+            </a>
+          </li>
+        </ol>
+      % endif
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
