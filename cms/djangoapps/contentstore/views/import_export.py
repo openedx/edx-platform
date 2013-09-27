@@ -42,6 +42,92 @@ log = logging.getLogger(__name__)
 # Regex to capture Content-Range header ranges.
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
+class ImportError(Exception):
+    def __init__(self, error):
+        self.error = error
+
+@contextmanager
+def wfile(dirname):
+    """
+    A with-context which will wipe the directory tree on exit. 
+    """
+    try:
+        yield
+    finally:
+        shutil.rmtree(dirname)
+
+def import_course_from_directory(data_root, course_subdir, location, user):
+    # find the 'course.xml' file
+    dirpath = None
+    course_dir = data_root / course_subdir
+
+    def get_all_files(directory):
+        """
+        For each file in the directory, yield a 2-tuple of (file-name,
+        directory-path)
+        """
+        for dirpath, _dirnames, filenames in os.walk(directory):
+            for filename in filenames:
+                yield (filename, dirpath)
+
+    def get_dir_for_fname(directory, filename):
+        """
+        Returns the dirpath for the first file found in the directory
+        with the given name.  If there is no file in the directory with
+        the specified name, return None.
+        """
+        for fname, dirpath in get_all_files(directory):
+            if fname == filename:
+                return dirpath
+        return None
+
+    fname = "course.xml"
+
+    dirpath = get_dir_for_fname(course_dir, fname)
+
+    if not dirpath:
+        raise ImportError('Could not find the course.xml file in the package.')
+
+    logging.debug('found course.xml at {0}'.format(dirpath))
+
+    if dirpath != course_dir:
+        for fname in os.listdir(dirpath):
+            shutil.move(dirpath / fname, course_dir)
+
+    _module_store, course_items = import_from_xml(
+        modulestore('direct'),
+        settings.GITHUB_REPO_ROOT,
+        [course_subdir],
+        load_error_modules=False,
+        static_content_store=contentstore(),
+        target_location_namespace=location,
+        draft_store=modulestore()
+    )
+
+    logging.debug('new course at {0}'.format(course_items[0].location))
+
+    create_all_course_groups(user, course_items[0].location)
+    logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
+def import_course_from_file(data_root, course_tarball_path, course_subdir, location, user):
+    ''' Import a course from a tar file. 
+
+    course_tarball_path is where the course tarball resides. 
+    course_subdir is where we can extract the file. 
+    location is the course (org,name,...)
+    user is the person uploading the course
+    
+    ''' 
+    # 'Lock' with status info.
+    course_dir = data_root / course_subdir
+    # status_file = course_dir + ".lock"
+
+    # Do everything from now on in a with-context, to be sure we've
+    # properly cleaned up.
+    with wfile(course_dir):
+        tar_file = tarfile.open(course_tarball_path)
+        tar_file.extractall((course_dir + '/').encode('utf-8'))
+        import_course_from_directory(data_root, course_subdir, location, user)
 
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
@@ -53,33 +139,18 @@ def import_course(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    @contextmanager
-    def wfile(filename, dirname):
-        """
-        A with-context that creates `filename` on entry and removes it on exit.
-        `filename` is truncted on creation. Additionally removes dirname on
-        exit.
-        """
-        open(filename, "w").close()
-        try:
-            yield filename
-        finally:
-            os.remove(filename)
-            shutil.rmtree(dirname)
-
     if request.method == 'POST':
+        data_root = path(settings.GITHUB_REPO_ROOT) # E.g. /var/data 
+        course_subdir = "{0}-{1}-{2}".format(org, course, name) # E.g. mitx-6.00x-phys
+        course_dir = data_root / course_subdir # E.g. /var/data/mitx-6.00x-phys
 
-        data_root = path(settings.GITHUB_REPO_ROOT)
-        course_subdir = "{0}-{1}-{2}".format(org, course, name)
-        course_dir = data_root / course_subdir
-
-        filename = request.FILES['course-data'].name
-        if not filename.endswith('.tar.gz'):
+        filename = request.FILES['course-data'].name # Name of uploaded file
+        if not filename.endswith('.tar.gz') and not filename.endswith('.tgz'):
             return JsonResponse(
                 {'ErrMsg': 'We only support uploading a .tar.gz file.'},
                 status=415
             )
-        temp_filepath = course_dir / filename
+        temp_filepath = course_dir / "course"+".tar.gz" # Where we put the tarball on the filesystem. 
 
         if not course_dir.isdir():
             os.mkdir(course_dir)
@@ -142,81 +213,11 @@ def import_course(request, org, course, name):
             })
 
         else:   # This was the last chunk.
-
-            # 'Lock' with status info.
-            status_file = data_root / (course + filename + ".lock")
-
-            # Do everything from now on in a with-context, to be sure we've
-            # properly cleaned up.
-            with wfile(status_file, course_dir):
-
-                with open(status_file, 'w+') as sf:
-                    sf.write("Extracting")
-
-                tar_file = tarfile.open(temp_filepath)
-                tar_file.extractall((course_dir + '/').encode('utf-8'))
-
-                with open(status_file, 'w+') as sf:
-                    sf.write("Verifying")
-
-                # find the 'course.xml' file
-                dirpath = None
-
-                def get_all_files(directory):
-                    """
-                    For each file in the directory, yield a 2-tuple of (file-name,
-                    directory-path)
-                    """
-                    for dirpath, _dirnames, filenames in os.walk(directory):
-                        for filename in filenames:
-                            yield (filename, dirpath)
-
-                def get_dir_for_fname(directory, filename):
-                    """
-                    Returns the dirpath for the first file found in the directory
-                    with the given name.  If there is no file in the directory with
-                    the specified name, return None.
-                    """
-                    for fname, dirpath in get_all_files(directory):
-                        if fname == filename:
-                            return dirpath
-                    return None
-
-                fname = "course.xml"
-
-                dirpath = get_dir_for_fname(course_dir, fname)
-
-                if not dirpath:
-                    return JsonResponse(
-                        {'ErrMsg': 'Could not find the course.xml file in the package.'},
-                        status=415
-                    )
-
-                logging.debug('found course.xml at {0}'.format(dirpath))
-
-                if dirpath != course_dir:
-                    for fname in os.listdir(dirpath):
-                        shutil.move(dirpath / fname, course_dir)
-
-                _module_store, course_items = import_from_xml(
-                    modulestore('direct'),
-                    settings.GITHUB_REPO_ROOT,
-                    [course_subdir],
-                    load_error_modules=False,
-                    static_content_store=contentstore(),
-                    target_location_namespace=location,
-                    draft_store=modulestore()
-                )
-
-                logging.debug('new course at {0}'.format(course_items[0].location))
-
-                with open(status_file, 'w') as sf:
-                    sf.write("Updating course")
-
-                create_all_course_groups(request.user, course_items[0].location)
-                logging.debug('created all course groups at {0}'.format(course_items[0].location))
-
-            return JsonResponse({'Status': 'OK'})
+            try: 
+                import_course_from_file(data_root, temp_filepath, course_subdir, location, request.user)
+                return JsonResponse({'Status': 'OK'})
+            except ImportError as e: 
+                return JsonResponse({'ErrMsg': e.error}, status=415)
     else:
         course_module = modulestore().get_item(location)
 
