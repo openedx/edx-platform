@@ -15,7 +15,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.http import ('HttpResponse'), HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
@@ -41,6 +41,8 @@ import analytics.csvs
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
+
+from pudb import set_trace
 
 log = logging.getLogger(__name__)
 
@@ -681,11 +683,13 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
+    set_trace()
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, course, 'instructor')
     send_to = request.GET.get("send_to")
     subject = request.GET.get("subject")
     message = request.GET.get("message")
+    text_message = html_to_text(message)
     if subject == "":
         return HttpResponseBadRequest("Operation requires instructor access.")
     email = CourseEmail(
@@ -694,7 +698,7 @@ def send_email(request, course_id):
         to_option=send_to,
         subject=subject,
         html_message=message,
-        text_message=message
+        text_message=text_message
     )
     email.save()
     tasks.delegate_email_batches.delay(
