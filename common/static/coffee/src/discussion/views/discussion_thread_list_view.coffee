@@ -144,6 +144,18 @@ if Backbone?
             options.group_id = @group_id
         
     
+      lastThread = @collection.last()?.get('id')
+      if lastThread
+        # Pagination; focus the first thread after what was previously the last thread
+        @once("threads:rendered", ->
+          $(".post-list li:has(a[data-id='#{lastThread}']) + li a").focus()
+        )
+      else
+        # Totally refreshing the list (e.g. from clicking a sort button); focus the first thread
+        @once("threads:rendered", ->
+          $(".post-list a").first()?.focus()
+        )
+
       @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
