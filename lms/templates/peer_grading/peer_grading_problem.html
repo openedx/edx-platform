@@ -55,8 +55,8 @@
                                 <span class="del">${_("This is a deletion.")}</span>&nbsp;
                                 <span class="ins">${_("[This is a comment.]")}</span>&nbsp;
                                 <span class="ice-controls">
+                                    <a href="#" class="undo-change"><i class="icon-undo"></i> Undo Change</a>&nbsp;&nbsp;
                                     <a href="#" class="reset-changes"><i class="icon-refresh"></i> Reset Changes</a>
-                                    <a href="#" class="undo-change"><i class="icon-undo"></i> Undo Change</a>
                                 </span>
                             </p>
                             <div name="feedback" class="feedback-area track-changes" contenteditable="true"></div>
@@ -65,8 +65,9 @@
                             <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
                         % endif
                         <div class="flag-student-container">
+                            <br />
                             <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 
-                            ${_("This submission has explicit, offensive, or (I suspect) plagiarized content: ")}
+                            ${_("This submission has explicit, offensive, or (I suspect) plagiarized content. ")}
                         </div>
                     </div>
                     <hr />
