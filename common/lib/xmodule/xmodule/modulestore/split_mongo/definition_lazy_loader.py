@@ -1,4 +1,4 @@
-from xmodule.modulestore.locator import DescriptionLocator
+from xmodule.modulestore.locator import DefinitionLocator
 
 
 class DefinitionLazyLoader(object):
@@ -15,7 +15,7 @@ class DefinitionLazyLoader(object):
         :param definition_locator: the id of the record in the above to fetch
         """
         self.modulestore = modulestore
-        self.definition_locator = DescriptionLocator(definition_id)
+        self.definition_locator = DefinitionLocator(definition_id)
 
     def fetch(self):
         """

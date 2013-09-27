@@ -13,7 +13,7 @@ from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError, \
     DuplicateItemError
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DefinitionLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from pytz import UTC
@@ -562,7 +562,7 @@ class TestItemCrud(SplitModuleTest):
         new_module = modulestore().create_item(
             locator, category, 'user123',
             fields={'display_name': 'new chapter'},
-            definition_locator=DescriptionLocator("chapter12345_2")
+            definition_locator=DefinitionLocator("chapter12345_2")
         )
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
@@ -588,7 +588,7 @@ class TestItemCrud(SplitModuleTest):
         another_module = modulestore().create_item(
             locator, category, 'anotheruser',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DescriptionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("problem12345_3_1"),
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
@@ -789,7 +789,7 @@ class TestItemCrud(SplitModuleTest):
         modulestore().create_item(
             locator, category, 'test_update_manifold',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DescriptionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("problem12345_3_1"),
         )
         # pylint: disable=W0212
         modulestore()._clear_cache()

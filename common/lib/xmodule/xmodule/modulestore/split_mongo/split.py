@@ -11,7 +11,7 @@ from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree, LocalId
+from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
 from xmodule.modulestore import inheritance, ModuleStoreBase, Location
 
@@ -563,7 +563,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 }
             }
         new_id = self.definitions.insert(document)
-        definition_locator = DescriptionLocator(new_id)
+        definition_locator = DefinitionLocator(new_id)
         document['edit_info']['original_version'] = new_id
         self.definitions.update({'_id': new_id}, {'$set': {"edit_info.original_version": new_id}})
         return definition_locator
@@ -597,7 +597,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             old_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
             new_id = self.definitions.insert(old_definition)
-            return DescriptionLocator(new_id), True
+            return DefinitionLocator(new_id), True
         else:
             return definition_locator, False
 
@@ -1252,7 +1252,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         elif '_id' not in definition:
             return None
         else:
-            return DescriptionLocator(definition['_id'])
+            return DefinitionLocator(definition['_id'])
 
     def internal_clean_children(self, course_locator):
         """
