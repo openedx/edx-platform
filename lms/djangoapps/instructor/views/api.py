@@ -6,6 +6,8 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
+from pudb import set_trace
+
 import re
 import logging
 import requests
@@ -210,6 +212,7 @@ def students_update_enrollment(request, course_id):
         'results': results,
         'auto_enroll': auto_enroll,
     }
+    #return HttpResponse('HELLO WORLD')
     return JsonResponse(response_payload)
 
 
@@ -668,6 +671,47 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
+""" todo add that security nonsense in """
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params(send_to="sending to whom", subject="subject line", message="message text")
+def send_email(request, course_id):
+    """
+    Send an email to self, staff, or everyone involved in a course.
+    Query Paramaters:
+    - action 'send_email'
+    - email_to_option specifies to whom the email should be student
+    - email_subject is a string containing the email subject
+    - html_message is a TODO 
+    - text_message is TODO 
+
+    """
+    # todo actually distinguish between html messages and text messages
+    course = get_course_by_id(course_id)
+    has_instructor_access = has_access(request.user, course, 'instructor')
+    send_to = request.GET.get("send_to")
+    subject = request.GET.get("subject")
+    message = request.GET.get("message")
+    if subject == "":
+        return HttpResponseBadRequest("Operation requires instructor access.")
+    email = CourseEmail(
+        course_id = course_id,
+        sender=request.user,
+        to_option=send_to,
+        subject=subject,
+        html_message=message,
+        text_message=message
+    )
+    email.save()
+    tasks.delegate_email_batches.delay(
+        email.id,
+        request.user.id
+    )
+    response_payload = {
+        'course_id': course_id,
+    }
+    return JsonResponse(response_payload)
+    #TODO send back a response
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -734,47 +778,12 @@ def update_forum_role_membership(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff') """ todo determine if this is correct """
 @require_query_params(
         email_to_option="group to send email to",
         email_subject="the email's subject",
         html_message="the html-formatted email",
         text_message="the text version of the email"
     )
-def send_bulk_email(request, course_id):
-    """
-    Send a bulk email.
-
-    todo add more description
-
-    Query paramaters:
-    todo fill this in
-    """
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
-    email_to_option = request.POST.get("to_option")
-    email_subject = request.POST.get("subject")
-    html_message = request.POST.get("message")
-    text_message = html_to_text(html_message)
-
-    email = CourseEmail(
-        course_id = course_id,
-        sender=request.user,
-        to_option=email_to_option,
-        subject=email_subject,
-        html_message=html_message,
-        text_message=text_message
-    )
-    email.save()
-    tasks.delegate_email_batches.delay(
-        email.id,
-        request.user.id
-    )
-
-    if email_to_option = "all":
-        email_msg = 'SUCCESS todo fill this in'
-    else:
-        mail_msg = 'SUCCESS todo fill this in'
 
 
 @ensure_csrf_cookie

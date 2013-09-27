@@ -57,10 +57,11 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
+
+from pudb import set_trace
 
 
 log = logging.getLogger(__name__)
@@ -803,6 +804,7 @@ def instructor_dashboard(request, course_id):
 
     email_editor = None
     # HTML editor for email
+
     if idash_mode == 'Email' and is_studio_course:
         html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
         email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()

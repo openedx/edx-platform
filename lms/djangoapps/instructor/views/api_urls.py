@@ -2,7 +2,6 @@
 Instructor API endpoint urls.
 """
 
-
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',  # nopep8

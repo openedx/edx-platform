@@ -2,6 +2,7 @@
 Instructor Dashboard Views
 """
 
+from pudb import set_trace
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -10,12 +11,18 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
 
+from xmodule_modifiers import wrap_xmodule
+from xmodule.html_module import HtmlDescriptor
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
+from courseware.courses import get_course_with_access
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
+from pudb import set_trace
 
 
 @ensure_csrf_cookie
@@ -24,6 +31,7 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
 
     course = get_course_by_id(course_id, depth=None)
+    funky_course = get_course_with_access(request.user,course_id,'staff',depth=None)
 
     access = {
         'admin': request.user.is_staff,
@@ -42,13 +50,15 @@ def instructor_dashboard_2(request, course_id):
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
-        _section_analytics(course_id),
+        _section_send_email(course_id, access,course),
+        _section_analytics(course_id)
     ]
 
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
         'sections': sections,
+        'user': request.user,
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -129,10 +139,22 @@ def _section_student_admin(course_id, access):
 def _section_data_download(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'section_key': 'data_download',
+        'section_key': 'data_download', 
         'section_display_name': _('Data Download'),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+def _section_send_email(course_id, access,course):
+    """ Provide data for the corresponding bulk email section """
+    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    section_data = {
+        'section_key': 'send_email',
+        'section_display_name': _('Email'),
+        'access': access,
+        'send_email': reverse('send_email',kwargs={'course_id': course_id}),
+        'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
     }
     return section_data
 
