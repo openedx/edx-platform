@@ -27,6 +27,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
 
+from django.utils.translation import ugettext as _
+
 log = logging.getLogger(__name__)
 
 system = ModuleSystem(
@@ -60,16 +62,16 @@ def _reverse_without_slash(url_name, course_id):
 
 
 DESCRIPTION_DICT = {
-    'Peer Grading': "View all problems that require peer assessment in this particular course.",
-    'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-    'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
-    'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
+    'Peer Grading': _("View all problems that require peer assessment in this particular course."),
+    'Staff Grading': _("View ungraded submissions submitted by students for the open ended problems in the course."),
+    'Problems you have submitted': _("View open ended problems that you have previously submitted for grading."),
+    'Flagged Submissions': _("View submissions that have been flagged by students as inappropriate.")
 }
 ALERT_DICT = {
-    'Peer Grading': "New submissions to grade",
-    'Staff Grading': "New submissions to grade",
-    'Problems you have submitted': "New grades have been returned",
-    'Flagged Submissions': "Submissions have been flagged for review"
+    'Peer Grading': _("New submissions to grade"),
+    'Staff Grading': _("New submissions to grade"),
+    'Problems you have submitted': _("New grades have been returned"),
+    'Flagged Submissions': _("Submissions have been flagged for review")
 }
 
 STUDENT_ERROR_MESSAGE = "Error occurred while contacting the grading service.  Please notify course staff."
