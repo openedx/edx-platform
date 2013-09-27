@@ -18,8 +18,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xblock.fields import ScopeIds
 
-from open_ended_grading import staff_grading_service, views
+from open_ended_grading import staff_grading_service, views, utils
 from courseware.access import _course_staff_group_name
+from student.models import unique_id_for_user
 
 import logging
 
@@ -46,6 +47,57 @@ class EmptyStaffGradingService(object):
         """
         return json.dumps({'success': True, 'error': 'No problems found.'})
 
+def make_instructor(course, user_email):
+    """
+    Makes a given user an instructor in a course.
+    """
+    group_name = _course_staff_group_name(course.location)
+    group = Group.objects.create(name=group_name)
+    group.user_set.add(User.objects.get(email=user_email))
+
+class StudentProblemListMockQuery(object):
+    """
+    Mock controller query service for testing student problem list functionality.
+    """
+    def get_grading_status_list(self, *args, **kwargs):
+        """
+        Get a mock grading status list with locations from the open_ended test course.
+        @returns: json formatted grading status message.
+        """
+        grading_status_list = json.dumps(
+            {
+                "version": 1,
+                "problem_list": [
+                    {
+                        "problem_name": "Test1",
+                        "grader_type": "IN",
+                        "eta_available": True,
+                        "state": "Finished",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion1Attempt"
+                    },
+                    {
+                        "problem_name": "Test2",
+                        "grader_type": "NA",
+                        "eta_available": True,
+                        "state": "Waiting to be Graded",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion"
+                    },
+                    {
+                        "problem_name": "Test3",
+                        "grader_type": "PE",
+                        "eta_available": True,
+                        "state": "Waiting to be Graded",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion454"
+                    },
+                ],
+                "success": True
+            }
+        )
+        return grading_status_list
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
@@ -67,12 +119,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
 
-        def make_instructor(course):
-            group_name = _course_staff_group_name(course.location)
-            group = Group.objects.create(name=group_name)
-            group.user_set.add(User.objects.get(email=self.instructor))
-
-        make_instructor(self.toy)
+        make_instructor(self.toy, self.instructor)
 
         self.mock_service = staff_grading_service.staff_grading_service()
 
@@ -324,7 +371,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestPanel(ModuleStoreTestCase):
     """
     Run tests on the open ended panel
     """
@@ -343,7 +390,15 @@ class TestPanel(ModuleStoreTestCase, LoginEnrollmentTestCase):
         found_module, peer_grading_module = views.find_peer_grading_module(self.course)
         self.assertTrue(found_module)
 
-    @patch('open_ended_grading.views.controller_qs', controller_query_service.MockControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, views.system))
+    @patch(
+        'open_ended_grading.utils.create_controller_query_service',
+        Mock(
+            return_value=controller_query_service.MockControllerQueryService(
+                settings.OPEN_ENDED_GRADING_INTERFACE,
+                utils.system
+            )
+        )
+    )
     def test_problem_list(self):
         """
         Ensure that the problem list from the grading controller server can be rendered properly locally
@@ -371,3 +426,43 @@ class TestPeerGradingFound(ModuleStoreTestCase):
 
         found, url = views.find_peer_grading_module(self.course)
         self.assertEqual(found, False)
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStudentProblemList(ModuleStoreTestCase):
+    """
+    Test if the student problem list correctly fetches and parses problems.
+    """
+
+    def setUp(self):
+        # Load an open ended course with several problems.
+        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+        self.user = factories.UserFactory()
+        # Enroll our user in our course and make them an instructor.
+        make_instructor(self.course, self.user.email)
+
+    @patch(
+        'open_ended_grading.utils.create_controller_query_service',
+        Mock(return_value=StudentProblemListMockQuery())
+    )
+    def test_get_problem_list(self):
+        """
+        Test to see if the StudentProblemList class can get and parse a problem list from ORA.
+        Mock the get_grading_status_list function using StudentProblemListMockQuery.
+        """
+        # Initialize a StudentProblemList object.
+        student_problem_list = utils.StudentProblemList(self.course.id, unique_id_for_user(self.user))
+        # Get the initial problem list from ORA.
+        success = student_problem_list.fetch_from_grading_service()
+        # Should be successful, and we should have three problems.  See mock class for details.
+        self.assertTrue(success)
+        self.assertEqual(len(student_problem_list.problem_list), 3)
+
+        # See if the problem locations are valid.
+        valid_problems = student_problem_list.add_problem_data(reverse('courses'))
+        # One location is invalid, so we should now have two.
+        self.assertEqual(len(valid_problems), 2)
+        # Ensure that human names are being set properly.
+        self.assertEqual(valid_problems[0]['grader_type_display_name'], "Instructor Assessment")
+
+
