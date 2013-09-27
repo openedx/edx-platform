@@ -327,11 +327,11 @@ PDFJS.disableWorker = true;
             loadUrl(chapterUrl, pageVal);
         }
 
-        $(".last").on('click','#previous',function(){
+        $("#previous").click(function(event) {
             prevPage();
         });
 
-        $(".next").on('click','#next',function(){
+        $("#next").click(function(event) {
             nextPage();
         });
 
