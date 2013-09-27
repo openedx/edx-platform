@@ -267,7 +267,7 @@ def combined_notifications(request, course_id):
 
             notification_item = {
                 'url': url,
-                'name': human_name,
+                'name': _(human_name),
                 'alert': has_img,
                 'description': description,
                 'alert_message': alert_message
