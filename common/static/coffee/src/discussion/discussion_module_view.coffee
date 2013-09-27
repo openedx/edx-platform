@@ -28,7 +28,7 @@ if Backbone?
       else
         @newPostForm.show()
       @toggleDiscussionBtn.addClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
       @$("section.discussion").slideDown()
       @showed = true
 
@@ -40,11 +40,11 @@ if Backbone?
       if @showed
         @$("section.discussion").slideUp()
         @toggleDiscussionBtn.removeClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
+        @toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"))
         @showed = false
       else
         @toggleDiscussionBtn.addClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+        @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
 
         if @retrieved
           @$("section.discussion").slideDown()
