@@ -306,7 +306,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         # Construct the key for the module
         key = KeyValueStore.Key(
             scope=Scope.user_state,
-            student_id=user.id,
+            user_id=user.id,
             block_scope_id=descriptor.location,
             field_name='grade'
         )

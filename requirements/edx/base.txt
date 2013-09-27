@@ -47,7 +47,7 @@ Pillow==1.7.8
 pip>=1.4
 polib==1.0.3
 pycrypto>=2.6
-pygments==1.5
+pygments==1.6
 pygraphviz==1.1
 pymongo==2.4.1
 pyparsing==1.5.6
