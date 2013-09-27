@@ -1,245 +1,46 @@
-# edX translation file
-# This English source file is machine-generated. Do not check it into github.
-# Copyright (C) 2013 EdX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
-# Translators:
-# viktoria <viktoria@cde.ifmo.ru>, 2013
-# Nichik <dmi.nichik@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-08-16 13:50-0400\n"
-"PO-Revision-Date: 2013-09-23 20:26+0400\n"
+"POT-Creation-Date: 2013-09-24 16:43+0400\n"
+"PO-Revision-Date: 2013-09-24 16:51+0400\n"
 "Last-Translator: yushchenko <pavelyushchenko@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/edx-"
-"platform/language/ru/)\n"
+"Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
+"language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-POOTLE-MTIME: 1379953606.0\n"
 
-#: cms/static/coffee/src/main.js:38
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s из %(cnt)s выбранного"
+msgstr[1] "%(sel)s из %(cnt)s выбранных"
+msgstr[2] "%(sel)s из %(cnt)s выбранных"
 
-#: cms/static/coffee/src/main.js:41
-msgid "Studio's having trouble saving your work"
-msgstr ""
+msgid "%s point possible"
+msgid_plural "%s points possible"
+msgstr[0] "%s балл"
+msgstr[1] "%s балла"
+msgstr[2] "%s баллов"
 
-#: cms/static/coffee/src/views/module_edit.js:77
-#, c-format
+msgid "6 a.m."
+msgstr "6 часов утра"
+
 msgid "<em>Editing:</em> %s"
-msgstr ""
+msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:131
-#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:842
-#: cms/static/js/models/section.js:26
-#: cms/static/js/views/course_info_edit.js:121
-#: cms/static/js/views/course_info_edit.js:330
-#: cms/static/js/views/grader-select-view.js:85
-#: cms/static/js/views/overview.js:229 cms/static/js/views/textbook.js:125
-msgid "Saving&hellip;"
-msgstr "Сохранение&hellip;"
-
-#: cms/static/coffee/src/views/module_edit.js:140
-msgid "There was an error saving your changes. Please try again."
-msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
-
-#: cms/static/coffee/src/views/tabs.js:96
-#, fuzzy
-msgid "Delete Component Confirmation"
-msgstr "Удалить файл подтверждения"
-
-#: cms/static/coffee/src/views/tabs.js:97
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
-msgstr ""
+msgstr "Вы уверены, что хотите удалить этот компонент? Операция необратима."
 
-#: cms/static/coffee/src/views/tabs.js:100
-#: cms/static/js/views/course_info_edit.js:178
-msgid "OK"
-msgstr "ОК"
+msgid "Are you sure you want to delete this update?"
+msgstr "Вы уверены, что хотите удалить это обновление?"
 
-#: cms/static/coffee/src/views/tabs.js:111
-#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:402
-#: cms/static/js/views/course_info_edit.js:186
-#: cms/static/js/views/textbook.js:38
-msgid "Deleting&hellip;"
-msgstr "Удаление&hellip;"
-
-#: cms/static/coffee/src/views/tabs.js:124
-#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:418
-#: cms/static/js/views/asset_view.js:48
-#: cms/static/js/views/course_info_edit.js:204
-#: cms/static/js/views/textbook.js:48
-#: cms/static/js/views/validating_view.js:112
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:92
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Отмена"
-
-#: cms/static/coffee/src/views/unit.js:177
-msgid "Delete this component?"
-msgstr "Удалить этот компонент?"
-
-#: cms/static/coffee/src/views/unit.js:178
-msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
-
-#: cms/static/coffee/src/views/unit.js:181
-msgid "Yes, delete this component"
-msgstr "Да, удалить"
-
-#: cms/static/js/base.js:85 lms/static/js/verify_student/photocapture.js:300
-msgid "This link will open in a new browser window/tab"
-msgstr "Эта ссылка откроется в новом окне или в новой вкладке браузера."
-
-#: cms/static/js/base.js:88
-msgid "This link will open in a modal window"
-msgstr "Эта ссылка откроется в новом модальном окне."
-
-#: cms/static/js/base.js:208
-msgid "Collapse All Sections"
-msgstr "Свернуть все разделы"
-
-#: cms/static/js/base.js:210
-msgid "Expand All Sections"
-msgstr "Развернуть все разделы"
-
-#: cms/static/js/base.js:249
-msgid ""
-"File format not supported. Please upload a file with a <code>tar.gz</code> "
-"extension."
-msgstr ""
-"Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением "
-"<code>tar.gz</code>."
-
-#: cms/static/js/base.js:339
-msgid "There has been an error while saving your changes."
-msgstr "Произошла ошибка при сохранении изменений."
-
-#: cms/static/js/base.js:386
-msgid "Delete this "
-msgstr "Удалить"
-
-#: cms/static/js/base.js:387
-msgid "Deleting this "
-msgstr "Удаление"
-
-#: cms/static/js/base.js:390
-msgid "Yes, delete this "
-msgstr "Да, удалить"
-
-#: cms/static/js/base.js:461
-msgid "Hide Studio Help"
-msgstr "Скрытая помощь студии"
-
-#: cms/static/js/base.js:463
-msgid "Looking for Help with Studio?"
-msgstr "Нужна помощь со студией?"
-
-#: cms/static/js/base.js:625
-msgid "Please do not use any spaces or special characters in this field."
-msgstr ""
-
-#: cms/static/js/base.js:640
-msgid ""
-"The combined length of the organization, course number, and course run "
-"fields cannot be more than 65 characters."
-msgstr ""
-
-#: cms/static/js/base.js:675
-msgid "Required field."
-msgstr "Обязательное поле."
-
-#: cms/static/js/base.js:867
-msgid "Will Release:"
-msgstr "Будет начат:"
-
-#: cms/static/js/base.js:868
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{month}/{day}/{year} в {hour}:{minute} UTC"
-
-#: cms/static/js/base.js:871
-msgid "Edit"
-msgstr "Редактировать"
-
-#: cms/static/js/models/course.js:7 cms/static/js/models/section.js:7
-msgid "You must specify a name"
-msgstr "Вы должны указать имя"
-
-#: cms/static/js/models/uploads.js:16
-msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in <"
-"%= fileExtensions %> to upload."
-msgstr ""
-
-#: cms/static/js/models/uploads.js:41
-msgid "or"
-msgstr "или"
-
-#: cms/static/js/models/settings/course_details.js:43
-msgid "The course must have an assigned start date."
-msgstr "Для курса должна быть указана дата начала."
-
-#: cms/static/js/models/settings/course_details.js:46
-msgid "The course end date cannot be before the course start date."
-msgstr "Конец курса не может предшествовать началу курса. "
-
-#: cms/static/js/models/settings/course_details.js:49
-msgid "The course start date cannot be before the enrollment start date."
-msgstr ""
-"Дата начала курса не может предшествовать дате начала регистрации на курс."
-
-#: cms/static/js/models/settings/course_details.js:52
-msgid "The enrollment start date cannot be after the enrollment end date."
-msgstr ""
-"Дата конца регистрации на курс не может предшествовать дате начала "
-"регистрации на курс."
-
-#: cms/static/js/models/settings/course_details.js:55
-msgid "The enrollment end date cannot be after the course end date."
-msgstr ""
-"Дата конца курса не может предшествовать дате конца регистрации на курс."
-
-#: cms/static/js/models/settings/course_details.js:59
-msgid "Key should only contain letters, numbers, _, or -"
-msgstr "Ключ должен содержать только буквы, цифры, _ или -"
-
-#: cms/static/js/models/settings/course_grading_policy.js:70
-msgid "Grace period must be specified in HH:MM format."
-msgstr ""
-
-#: cms/static/js/models/settings/course_grading_policy.js:107
-msgid "There's already another assignment type with this name."
-msgstr "Задание с таким именем уже существует."
-
-#: cms/static/js/models/settings/course_grading_policy.js:114
-msgid "Please enter an integer between 0 and 100."
-msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
-
-#: cms/static/js/models/settings/course_grading_policy.js:128
-#: cms/static/js/models/settings/course_grading_policy.js:134
-msgid "Please enter an integer."
-msgstr "Пожалуйста, введите целое число."
-
-#: cms/static/js/models/settings/course_grading_policy.js:140
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
-
-#: cms/static/js/views/asset_view.js:26
-msgid "Delete File Confirmation"
-msgstr "Удалить файл подтверждения"
-
-#: cms/static/js/views/asset_view.js:27
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
@@ -252,35 +53,66 @@ msgstr ""
 "Кроме того, любой контент, который ссылается на данный элемент, больше не "
 "будет работать (например, поломка изображения и/или ссылки)"
 
-#: cms/static/js/views/asset_view.js:30 cms/static/js/views/textbook.js:34
+msgid "Available %s"
+msgstr "Доступно %s"
+
+msgid "Available to Grade"
+msgstr "Доступно для оценивания"
+
+msgid "Calendar"
+msgstr "Календарь"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
+
+msgid "Caption will be displayed when "
+msgstr "Заголовки будут отображаться, когда"
+
+msgid "Choose"
+msgstr "Выбрать "
+
+msgid "Choose a time"
+msgstr "Выбрать время"
+
+msgid "Choose all"
+msgstr "Выбрать все"
+
+msgid "Chosen %s"
+msgstr "Выбрано %s"
+
+msgid "Click to choose all %s at once."
+msgstr "Кликните, чтобы выбрать все %s один раз."
+
+msgid "Click to remove all chosen %s at once."
+msgstr "Кликните, чтобы удалить все выбранные %s один раз."
+
+msgid "Clock"
+msgstr "Часы"
+
+msgid "Collapse All Sections"
+msgstr "Свернуть все разделы"
+
 msgid "Delete"
 msgstr "Удалить"
 
-#: cms/static/js/views/asset_view.js:37
-msgid "Your file has been deleted."
-msgstr "Ваш файл был удален."
+msgid "Delete Component Confirmation"
+msgstr "Подверждение удаления компонента"
 
-#: cms/static/js/views/course_info_edit.js:174
-msgid "Are you sure you want to delete this update?"
-msgstr ""
+msgid "Delete File Confirmation"
+msgstr "Удалить файл подтверждения"
 
-#: cms/static/js/views/course_info_edit.js:175
-msgid "This action cannot be undone."
-msgstr ""
+msgid "Delete this "
+msgstr "Удалить"
 
-#: cms/static/js/views/section.js:71
-msgid "Your change could not be saved"
-msgstr "Ваши изменения не были сохранены"
+msgid "Delete this component?"
+msgstr "Удалить этот компонент?"
 
-#: cms/static/js/views/section.js:75
-msgid "Return and resolve this issue"
-msgstr "Вернитесь и решите эту проблему"
-
-#: cms/static/js/views/textbook.js:29
-msgid "Delete <%= name %>?"
+msgid "Delete “<%= name %>”?"
 msgstr "Удалить “<%= name %>”?"
 
-#: cms/static/js/views/textbook.js:31
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in "
 "your courseware's navigation will also be removed."
@@ -288,52 +120,104 @@ msgstr ""
 "Удаление учебника не может быть отменено, и после удаления какие-либо ссылки "
 "на него в вашей навигации курсов также будут удалены."
 
-#: cms/static/js/views/textbook.js:240
-msgid "Upload a new PDF to <%= name %>"
-msgstr "Загрузить новый PDF в <%= name %>"
+msgid "Deleting this "
+msgstr "Удаление"
 
-#: cms/static/js/views/uploads.js:102
-msgid "We're sorry, there was an error"
-msgstr "Извините, произошла ошибка"
+msgid "Deleting this component is permanent and cannot be undone."
+msgstr "Удаление этого компонента необратимо."
 
-#: cms/static/js/views/validating_view.js:12
-msgid "You've made some changes"
-msgstr "Вы сделали некоторые изменения"
+msgid "Deleting&hellip;"
+msgstr "Удаление&hellip;"
 
-#: cms/static/js/views/validating_view.js:13
-msgid "Your changes will not take effect until you save your progress."
-msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
+msgid "Edit"
+msgstr "Редактировать"
 
-#: cms/static/js/views/validating_view.js:14
-msgid "You've made some changes, but there are some errors"
-msgstr "Вы сделали некоторые изменения, но возникли ошибки"
+msgid "Exit fullscreen"
+msgstr "Выйти из полноэкранного режима"
 
-#: cms/static/js/views/validating_view.js:15
+msgid "Expand All Sections"
+msgstr "Развернуть все разделы"
+
+msgid ""
+"File format not supported. Please upload a file with a <code>tar.gz</code> "
+"extension."
+msgstr ""
+"Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением "
+"<code>tar.gz</code>."
+
+msgid "Files must be in JPEG or PNG format."
+msgstr "Файлы должны быть в формате PNG или JPEG."
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Fullscreen"
+msgstr "Полный экран"
+
+msgid "Graded"
+msgstr "Оценено"
+
+msgid "Hide"
+msgstr "Спрятать"
+
+msgid "Hide Prompt"
+msgstr "Скрыть задание"
+
+msgid "Hide Studio Help"
+msgstr "Скрытая помощь студии"
+
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
+"Декабрь"
+
+msgid "Key should only contain letters, numbers, _, or -"
+msgstr "Ключ должен содержать только буквы, цифры, _ или -"
+
+msgid "Looking for Help with Studio?"
+msgstr "Нужна помощь со студией?"
+
+msgid "Midnight"
+msgstr "Полночь"
+
+msgid "Noon"
+msgstr "Полдень"
+
+msgid "Now"
+msgstr "Сейчас"
+
+msgid "OK"
+msgstr "ОК"
+
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in <"
+"%= fileExtensions %> to upload."
+msgstr ""
+"Только файлы типов <%= fileTypes %> могут быть загружены. Пожалуйста, "
+"выберите для загрузки файл с расширением <%= fileExtensions %>."
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Play"
+msgstr "Воспроизвести"
+
 msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr "Пожалуйста, присылайте ошибки на эту страницу, а затем сохраните."
 
-#: cms/static/js/views/validating_view.js:103
-msgid "Save Changes"
-msgstr "Сохранить изменения"
-
-#: cms/static/js/views/validating_view.js:131
-msgid "Your changes have been saved."
-msgstr "Ваши изменения были сохранены."
-
-#: cms/static/js/views/settings/advanced_view.js:55
-msgid ""
-"Your changes will not take effect until you save your progress. Take care "
-"with key and value formatting, as validation is not implemented."
+msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
-"Ваши изменения не вступят в силу, пока вы не сохраните их. Будьте осторожны "
-"с редактированием ключей и значений, так как проверка не реализована."
+"Пожалуйста, в этом поле не используйте пробелов или специальных символов."
 
-#: cms/static/js/views/settings/advanced_view.js:104
-msgid "Your policy changes have been saved."
-msgstr "Ваши политические изменения были сохранены."
+msgid "Please enter an integer between 0 and 100."
+msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
 
-#: cms/static/js/views/settings/advanced_view.js:105
+msgid "Please enter an integer."
+msgstr "Пожалуйста, введите целое число."
+
 msgid ""
 "Please note that validation of your policy key and value pairs is not "
 "currently in place yet. If you are having difficulties, please review your "
@@ -343,93 +227,92 @@ msgstr ""
 "настоящее время еще нет. Если у вас возникли трудности, пожалуйста, "
 "пересмотрите политику пар."
 
-#: cms/static/js/views/settings/main_settings_view.js:256
-msgid "Upload your course image."
-msgstr ""
+msgid "Problem Name"
+msgstr "Имя задачи"
 
-#: cms/static/js/views/settings/main_settings_view.js:257
-msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgid "Progress"
+msgstr "Прогресс"
 
-#: common/lib/xmodule/xmodule/js/spec/combinedopenended/display_spec.js:132
-msgid "Submit"
-msgstr "Отправить"
+msgid "Remove"
+msgstr "Удалить"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:110
-#: common/static/xmodule/modules/js/001-3672f099210e44e01697980afacd41b4.js:110
-#, c-format
-msgid "%s point possible"
-msgid_plural "%s points possible"
-msgstr[0] "%s балл"
-msgstr[1] "%s балла"
-msgstr[2] "%s баллов"
+msgid "Remove all"
+msgstr "Удалить все"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:554
-#: common/static/xmodule/modules/js/001-3672f099210e44e01697980afacd41b4.js:554
-msgid "unanswered"
-msgstr ""
+msgid "Required"
+msgstr "Требуется"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:584
-#: common/static/xmodule/modules/js/001-3672f099210e44e01697980afacd41b4.js:584
-msgid "Status: unsubmitted"
-msgstr ""
+msgid "Required field."
+msgstr "Обязательное поле."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:829
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:622
-#: common/static/xmodule/modules/js/001-c0dc0499034ff57919ffc4599501192a.js:829
-#: common/static/xmodule/modules/js/002-1b16c4473df84e2a74bdefd1c039f25f.js:622
+msgid "Return and resolve this issue"
+msgstr "Вернитесь и решите эту проблему"
+
+msgid "S M T W T F S"
+msgstr "Пн Вт Ср Чт Пт Сб Вс"
+
+msgid "Save Changes"
+msgstr "Сохранить изменения"
+
+msgid "Saving&hellip;"
+msgstr "Сохранение&hellip;"
+
+msgid "Show"
+msgstr "Показать"
+
 msgid "Show Prompt"
 msgstr "Показать задание"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:837
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:630
-#: common/static/xmodule/modules/js/001-c0dc0499034ff57919ffc4599501192a.js:837
-#: common/static/xmodule/modules/js/002-1b16c4473df84e2a74bdefd1c039f25f.js:630
-msgid "Hide Prompt"
-msgstr "Скрыть задание"
+msgid "Status: unsubmitted"
+msgstr "Статус: не сдан"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:144
-#: common/static/xmodule/modules/js/004-b08334e66b9845d9028a272fb0d071c9.js:144
-msgid "Pause"
-msgstr "Пауза"
+msgid "Studio's having trouble saving your work"
+msgstr "Студия не может сохранить Вашу работу"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:149
-#: common/static/xmodule/modules/js/004-b08334e66b9845d9028a272fb0d071c9.js:149
-msgid "Play"
-msgstr "Воспроизвести"
+msgid "Submit"
+msgstr "Отправить"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:171
-#: common/static/xmodule/modules/js/004-b08334e66b9845d9028a272fb0d071c9.js:171
-msgid "Fullscreen"
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
+
+msgid ""
+"The combined length of the organization, course number, and course run "
+"fields cannot be more than 65 characters."
 msgstr ""
+"Совокупная длина названия организации, номера курса и учебного года не может "
+"превышать 65 символов."
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:176
-#: common/static/xmodule/modules/js/004-b08334e66b9845d9028a272fb0d071c9.js:176
-msgid "Exit fullscreen"
+msgid "The course end date cannot be before the course start date."
+msgstr "Конец курса не может предшествовать началу курса. "
+
+msgid "The course must have an assigned start date."
+msgstr "Для курса должна быть указана дата начала."
+
+msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
+"Дата начала курса не может предшествовать дате начала регистрации на курс."
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:189
-#: common/static/xmodule/modules/js/009-da4a061b4162d4cdee0971d45a962225.js:189
-msgid "Caption will be displayed when "
+msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
+"Дата конца курса не может предшествовать дате конца регистрации на курс."
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:587
-#: common/static/xmodule/modules/js/009-da4a061b4162d4cdee0971d45a962225.js:587
-msgid "Turn on captions"
+msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
+"Дата конца регистрации на курс не может предшествовать дате начала "
+"регистрации на курс."
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:592
-#: common/static/xmodule/modules/js/009-da4a061b4162d4cdee0971d45a962225.js:592
-msgid "Turn off captions"
-msgstr ""
+msgid "There has been an error while saving your changes."
+msgstr "Произошла ошибка при сохранении изменений."
 
-#: lms/static/admin/js/SelectFilter2.js:45
-#, c-format
-msgid "Available %s"
-msgstr "Доступно %s"
+msgid "There was an error saving your changes. Please try again."
+msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
 
-#: lms/static/admin/js/SelectFilter2.js:46
-#, c-format
+msgid "There's already another assignment type with this name."
+msgstr "Задание с таким именем уже существует."
+
+msgid "This action cannot be undone."
+msgstr "Действие необратимо."
+
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -437,39 +320,6 @@ msgstr ""
 "Это список доступных  %s. Вы можете выбрать некоторые выделенные темы в поле "
 "ниже, а затем кликнуть стрелку \"Выбрать\" между двумя полями. "
 
-#: lms/static/admin/js/SelectFilter2.js:53
-#, c-format
-msgid "Type into this box to filter down the list of available %s."
-msgstr "Введите значение в это поле, чтобы внизу появился фильтр доступных %s."
-
-#: lms/static/admin/js/SelectFilter2.js:57
-msgid "Filter"
-msgstr "Фильтр"
-
-#: lms/static/admin/js/SelectFilter2.js:61
-msgid "Choose all"
-msgstr "Выбрать все"
-
-#: lms/static/admin/js/SelectFilter2.js:61
-#, c-format
-msgid "Click to choose all %s at once."
-msgstr "Кликните, чтобы выбрать все %s один раз."
-
-#: lms/static/admin/js/SelectFilter2.js:67
-msgid "Choose"
-msgstr "Выбрать "
-
-#: lms/static/admin/js/SelectFilter2.js:69
-msgid "Remove"
-msgstr "Удалить"
-
-#: lms/static/admin/js/SelectFilter2.js:75
-#, c-format
-msgid "Chosen %s"
-msgstr "Выбрано %s"
-
-#: lms/static/admin/js/SelectFilter2.js:76
-#, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -477,31 +327,64 @@ msgstr ""
 "Это список выбранных %s.  Вы можете удалить некоторые выбранные темы в поле "
 "ниже, кликните стрелку \"Удалить\" между двумя полями."
 
-#: lms/static/admin/js/SelectFilter2.js:80
-msgid "Remove all"
-msgstr "Удалить все"
+msgid "This link will open in a modal window"
+msgstr "Эта ссылка откроется в новом модальном окне."
 
-#: lms/static/admin/js/SelectFilter2.js:80
-#, c-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Кликните, чтобы удалить все выбранные %s один раз."
+msgid "This link will open in a new browser window/tab"
+msgstr "Эта ссылка откроется в новом окне или в новой вкладке браузера."
 
-#: lms/static/admin/js/actions.js:18 lms/static/admin/js/actions.min.js:1
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s из %(cnt)s выбранного"
-msgstr[1] "%(sel)s из %(cnt)s выбранных"
-msgstr[2] "%(sel)s из %(cnt)s выбранных"
-
-#: lms/static/admin/js/actions.js:109 lms/static/admin/js/actions.min.js:5
 msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
 msgstr ""
-"Вы не сохранили изменения в отдельных полях. Если вы начнете действовать, "
-"ваши несохраненные изменения будут утеряны. "
+"Это может происходить из-за ошибки на нашем сервере или сбое Вашего "
+"подключения к Интернет. Попробуйте обновить страницу или убедитесь, что Вы "
+"подключены к Интернету."
 
-#: lms/static/admin/js/actions.js:121 lms/static/admin/js/actions.min.js:6
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "Tomorrow"
+msgstr "Завтра"
+
+msgid "Turn off captions"
+msgstr "Отключить заголовки"
+
+msgid "Turn on captions"
+msgstr "Включить заголовки"
+
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Введите значение в это поле, чтобы внизу появился фильтр доступных %s."
+
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "Загрузить новый PDF в <%= name %>"
+
+msgid "Upload your course image."
+msgstr "Загрузить образ курса."
+
+msgid "We're sorry, there was an error"
+msgstr "Извините, произошла ошибка"
+
+msgid "Will Release:"
+msgstr "Будет начат:"
+
+msgid "Yes, delete this "
+msgstr "Да, удалить"
+
+msgid "Yes, delete this component"
+msgstr "Да, удалить"
+
+msgid "Yesterday"
+msgstr "Вчера"
+
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Вы выбрали действие, и не сделали никаких изменений в отдельных полях. ВЫ, "
+"вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
+
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -511,85 +394,49 @@ msgstr ""
 "полях. Пожалуйста, кликните ОК для сохранения. Тогда вам понадобится "
 "перезапустить действие."
 
-#: lms/static/admin/js/actions.js:123 lms/static/admin/js/actions.min.js:6
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
 msgstr ""
-"Вы выбрали действие, и не сделали никаких изменений в отдельных полях. ВЫ, "
-"вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
+"Вы не сохранили изменения в отдельных полях. Если вы начнете действовать, "
+"ваши несохраненные изменения будут утеряны. "
 
-#: lms/static/admin/js/calendar.js:26 lms/static/admin/js/dateparse.js:32
+msgid "You must specify a name"
+msgstr "Вы должны указать имя"
+
+msgid "You've made some changes"
+msgstr "Вы сделали некоторые изменения"
+
+msgid "You've made some changes, but there are some errors"
+msgstr "Вы сделали некоторые изменения, но возникли ошибки"
+
+msgid "Your change could not be saved"
+msgstr "Ваши изменения не были сохранены"
+
+msgid "Your changes have been saved."
+msgstr "Ваши изменения были сохранены."
+
+msgid "Your changes will not take effect until you save your progress."
+msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
+
 msgid ""
-"January February March April May June July August September October November "
-"December"
+"Your changes will not take effect until you save your progress. Take care "
+"with key and value formatting, as validation is not implemented."
 msgstr ""
-"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
-"Декабрь"
+"Ваши изменения не вступят в силу, пока вы не сохраните их. Будьте осторожны "
+"с редактированием ключей и значений, так как проверка не реализована."
 
-#: lms/static/admin/js/calendar.js:27
-msgid "S M T W T F S"
-msgstr "Пн Вт Ср Чт Пт Сб Вс"
+msgid "Your file has been deleted."
+msgstr "Ваш файл был удален."
 
-#: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js.c:19
-#: lms/static/admin/js/collapse.min.js:1
-msgid "Show"
-msgstr "Показать"
+msgid "Your policy changes have been saved."
+msgstr "Ваши политические изменения были сохранены."
 
-#: lms/static/admin/js/collapse.js:15 lms/static/admin/js/collapse.min.js:1
-msgid "Hide"
-msgstr "Спрятать"
+msgid "or"
+msgstr "или"
 
-#: lms/static/admin/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
+msgid "unanswered"
+msgstr "не отвечен"
 
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:49
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Сейчас"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Часы"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Выбрать время"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Полночь"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 часов утра"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "Полдень"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:144
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Сегодня"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Календарь"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Вчера"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Завтра"
-
-#, fuzzy
-#~ msgid "Uploading"
-#~ msgstr "Загрузка..."
-
-#~ msgid "Load Another File"
-#~ msgstr "Загрузить другой файл"
+msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
+msgstr "{month}/{day}/{year} в {hour}:{minute} UTC"
