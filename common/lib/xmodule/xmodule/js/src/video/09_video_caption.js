@@ -105,6 +105,9 @@ function () {
             this.videoCaption.hideCaptions(true);
             this.videoCaption.hideSubtitlesEl.hide();
         }
+        // ARIA
+        // Let screen readers know this anchor behaves like a button.
+        this.videoCaption.hideSubtitlesEl.attr('role', gettext('button'));
     }
 
     // function bindHandlers()

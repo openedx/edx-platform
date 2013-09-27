@@ -62,6 +62,9 @@ function () {
         });
 
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
+        // ARIA
+        // Let screen readers know this anchor behaves like a button.
+        state.videoVolumeControl.buttonEl.attr('role', gettext('button'));
     }
 
     /**

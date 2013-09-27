@@ -43,6 +43,9 @@ function () {
 
         state.videoQualityControl.el.show();
         state.videoQualityControl.quality = null;
+        // ARIA
+        // Let screen readers know this anchor behaves like a button.
+        state.videoQualityControl.el.attr('role', gettext('button'));
     }
 
     // function _bindHandlers(state)

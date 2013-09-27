@@ -79,6 +79,9 @@ function () {
         });
 
         state.videoSpeedControl.setSpeed(state.speed);
+        // ARIA
+        // Let screen readers know this anchor behaves like a button.
+        state.videoSpeedControl.el.children('a').attr('role', gettext('button'));
     }
 
     /**

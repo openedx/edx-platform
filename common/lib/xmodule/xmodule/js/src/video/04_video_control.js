@@ -63,6 +63,10 @@ function () {
             state.videoControl.el.addClass('html5');
             state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
         }
+        // ARIA
+        // Let screen readers know these anchors behaves like a button.
+        state.videoControl.playPauseEl.attr('role', gettext('button'));
+        state.videoControl.fullScreenEl.attr('role', gettext('button'));
     }
 
     // function _bindHandlers(state)
