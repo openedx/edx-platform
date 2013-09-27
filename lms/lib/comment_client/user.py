@@ -24,7 +24,7 @@ class User(models.Model):
     def from_django_user(cls, user):
         return cls(id=str(user.id),
                    external_id=str(user.id),
-                   username=user.username,
+                   username=user.profile.firstname + ' ' + user.profile.lastname,
                    email=user.email)
 
     def follow(self, source):
