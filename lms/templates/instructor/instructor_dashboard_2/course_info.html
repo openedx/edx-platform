@@ -38,8 +38,21 @@
 ##   ${ section_data['offline_grades'] }
 ## </div>
 
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("The status for any active tasks appears in a table below.")} </p>
+
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+
+%endif
+
 %if len(section_data['course_errors']):
   <div class="course-errors-wrapper">
+    <hr>
+    <p>
     <div class="toggle-wrapper">
       <h2 class="title">${_("Course Warnings")}:</h2>
       <div class="triangle"></div>
@@ -52,5 +65,10 @@
         </div>
       %endfor
     </div>
+    <p>
   </div>
+<br>
 %endif
+
+
+
