@@ -64,5 +64,5 @@ DEBUG_TOOLBAR_PANELS += (
    )
 
 MONGO_DEFAULT_CONFIG_MAPPINGS = {
-    'preview.localhost': 'draft'
+    '^preview.$': 'draft'
 }

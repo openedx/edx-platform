@@ -3,7 +3,7 @@ This middleware will inspect the incoming request and allow for mapping of a hos
 to a particular modulestore class
 """
 import threading
-import logging
+import re
 from django.conf import settings
 
 import xmodule.modulestore.django
@@ -15,7 +15,7 @@ _request_default_modulestore_mapping_local.default_modulestore = 'default'
 # Monkey patch the function to return the default modulestore name
 # this is how to hook into the modulestore factory
 xmodule.modulestore.django.get_default_modulestore_name = lambda: _request_default_modulestore_mapping_local.default_modulestore
-    
+
 class DefaultModulestoreMapper(object):
 
     def reset_default_modulestore(self):
@@ -35,10 +35,13 @@ class DefaultModulestoreMapper(object):
         mappings = getattr(settings, 'MONGO_DEFAULT_CONFIG_MAPPINGS', None)
 
         domain = request.META.get('HTTP_HOST')
+        # remove any port specifier
         domain = domain.split(':')[0]
         if domain and mappings:
-            if domain in mappings:
-                _request_default_modulestore_mapping_local.default_modulestore = mappings[domain]
+            for key in mappings.keys():
+                if re.match(r'{0}'.format(key), domain):
+                    _request_default_modulestore_mapping_local.default_modulestore = mappings[key]
+                    break
 
         return None
 
