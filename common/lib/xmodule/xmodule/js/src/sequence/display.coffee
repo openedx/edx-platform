@@ -103,6 +103,7 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
+    @$("a.active").blur()
 
   goto: (event) =>
     event.preventDefault()
