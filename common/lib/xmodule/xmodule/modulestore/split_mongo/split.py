@@ -43,8 +43,6 @@ log = logging.getLogger(__name__)
 #==============================================================================
 
 
-
-
 class SplitMongoModuleStore(ModuleStoreBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,

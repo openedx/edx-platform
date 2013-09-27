@@ -11,15 +11,11 @@ import json
 import os
 import unittest
 
-import fs
-import fs.osfs
-import numpy
 from mock import Mock
 from path import path
 
-import calc
 from xblock.field_data import DictFieldData
-from xmodule.x_module import ModuleSystem, XModuleDescriptor, DescriptorSystem
+from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.mako_module import MakoDescriptorSystem
 
@@ -81,7 +77,7 @@ def get_test_descriptor_system():
         resources_fs=Mock(),
         error_tracker=Mock(),
         render_template=lambda template, context: repr(context),
-        mixins=(InheritanceMixin,),
+        mixins=(InheritanceMixin, XModuleMixin),
     )
 
 

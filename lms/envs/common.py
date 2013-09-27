@@ -32,6 +32,7 @@ from .discussionsettings import *
 
 from lms.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -363,7 +364,7 @@ CONTENTSTORE = None
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 #################### Python sandbox ############################################
 
