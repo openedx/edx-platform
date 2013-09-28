@@ -609,7 +609,8 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
+    if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
+        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
         registration_price = CourseMode.min_course_price_for_currency(course_id,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
