@@ -62,9 +62,18 @@ function () {
         });
 
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
+
         // ARIA
-        // Let screen readers know this anchor behaves like a button.
+        // Let screen readers know that:
+
+        // this anchor behaves like a button
         state.videoVolumeControl.buttonEl.attr('role', gettext('button'));
+
+        // what its name is: (title attribute is set in video.html template):
+        state.videoVolumeControl.buttonEl.attr('aria-label', gettext('Volume'));
+
+        // what its state is:
+        state.videoVolumeControl.buttonEl.attr('aria-disabled', 'false');
     }
 
     /**

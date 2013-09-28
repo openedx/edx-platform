@@ -63,10 +63,21 @@ function () {
             state.videoControl.el.addClass('html5');
             state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
         }
+
         // ARIA
-        // Let screen readers know these anchors behaves like a button.
+        // Let screen readers know that:
+
+        // these anchors behaves like buttons
         state.videoControl.playPauseEl.attr('role', gettext('button'));
         state.videoControl.fullScreenEl.attr('role', gettext('button'));
+
+        // what their names are: (title attribute are set in video.html template):
+        // Play, Pause
+        // Fill browser
+        
+        // what their states are:
+        state.videoControl.playPauseEl.attr('aria-disabled', 'false');
+        state.videoControl.fullScreenEl.attr('aria-disabled', 'false');
     }
 
     // function _bindHandlers(state)
