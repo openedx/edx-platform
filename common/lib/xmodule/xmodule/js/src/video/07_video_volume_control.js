@@ -74,6 +74,18 @@ function () {
 
         // what its state is:
         state.videoVolumeControl.buttonEl.attr('aria-disabled', 'false');
+
+        // Volume slider
+        state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl.volumeSliderEl.find('.ui-slider-handle');
+        state.videoVolumeControl.volumeSliderHandleEl.attr({
+            'role': gettext('slider'),
+            'title': 'volume',
+            'aria-disabled': 'false',
+            'aria-valuetext': getVolumeDescription(state.videoVolumeControl.slider.slider('option', 'value')),
+            'aria-valuenow': state.videoVolumeControl.slider.slider('option', 'value'),
+            'aria-valuemin': state.videoVolumeControl.slider.slider('option', 'min'),
+            'aria-valuemax': state.videoVolumeControl.slider.slider('option', 'max')
+        });
     }
 
     /**
@@ -159,6 +171,9 @@ function () {
         });
 
         this.trigger('videoPlayer.onVolumeChange', ui.value);
+        // ARIA
+        this.videoVolumeControl.volumeSliderHandleEl.attr('aria-valuenow', ui.value);
+        this.videoVolumeControl.volumeSliderHandleEl.attr('aria-valuetext', getVolumeDescription(ui.value));
     }
 
     function toggleMute(event) {
@@ -167,8 +182,43 @@ function () {
         if (this.videoVolumeControl.currentVolume > 0) {
             this.videoVolumeControl.previousVolume = this.videoVolumeControl.currentVolume;
             this.videoVolumeControl.slider.slider('option', 'value', 0);
+            // ARIA
+            state.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuetext': getVolumeDescription(0),
+                'aria-valuenow': 0
+            });
         } else {
             this.videoVolumeControl.slider.slider('option', 'value', this.videoVolumeControl.previousVolume);
+            // ARIA
+            state.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuetext': getVolumeDescription(this.videoVolumeControl.previousVolume),
+                'aria-valuenow': this.videoVolumeControl.previousVolume
+            });
+        }
+    }
+
+    // ARIA
+    function getVolumeDescription(vol) {
+        if (vol === 0) {
+            return 'silent';
+        }
+        else if (vol <= 20) {
+            return 'very low';
+        }
+        else if (vol <= 40) {
+            return 'low';
+        }
+        else if (vol <= 60) {
+            return 'average';
+        }
+        else if (vol <= 80) {
+            return 'loud';
+        }
+        else if (vol <= 99) {
+            return 'very loud';
+        }
+        else {
+            return 'maximum';
         }
     }
 

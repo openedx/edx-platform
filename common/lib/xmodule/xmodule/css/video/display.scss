@@ -109,6 +109,7 @@ div.video {
         -webkit-transition: -webkit-transform 0.7s ease-in-out;
         -moz-transition: -moz-transform 0.7s ease-in-out;
         -ms-transition: -ms-transform 0.7s ease-in-out;
+        tabindex: -1;
         transition: transform 0.7s ease-in-out;
         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
 

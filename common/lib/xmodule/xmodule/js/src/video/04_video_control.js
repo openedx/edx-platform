@@ -70,10 +70,13 @@ function () {
         // these anchors behaves like buttons
         state.videoControl.playPauseEl.attr('role', gettext('button'));
         state.videoControl.fullScreenEl.attr('role', gettext('button'));
+        // and this one as a slider
+        state.videoControl.sliderEl.find('.ui-slider-handle').attr('role', gettext('slider'));
 
         // what their names are: (title attribute are set in video.html template):
         // Play, Pause
         // Fill browser
+         state.videoControl.sliderEl.find('.ui-slider-handle').attr('title', gettext('video slider')); 
         
         // what their states are:
         state.videoControl.playPauseEl.attr('aria-disabled', 'false');
