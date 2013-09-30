@@ -136,7 +136,7 @@ div.video {
 
           &:focus, &:hover {
             background-color: lighten($pink, 10%);
-            outline: none;
+            outline: 0;
           }
         }
       }
@@ -162,9 +162,16 @@ div.video {
             text-indent: -9999px;
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
-            outline: 0;
 
             &:focus {
+              position: relative;
+              z-index: 10000;
+              outline: #fff dotted thin;
+              outline-offset: -2px;
+              background: #333;
+            }
+
+            &:hover {
               outline: 0;
             }
 
@@ -176,7 +183,7 @@ div.video {
             &.play {
               background-position: 17px -114px;
 
-              &:hover, &:focus {
+              &:hover {
                 background-color: #444;
               }
             }
@@ -184,7 +191,7 @@ div.video {
             &.pause {
               background-position: 16px -50px;
 
-              &:hover, &:focus {
+              &:hover {
                 background-color: #444;
               }
             }
@@ -202,6 +209,19 @@ div.video {
 
       div.secondary-controls {
         float: right;
+
+        div.speeds>a, div.volume>a, a.add-fullscreen, a.quality_control,
+        a.hide-subtitles {
+          // overflow is used to bypass Firefox CSS :focus outline bug
+          // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
+          &:focus {
+            position: relative;
+            z-index: 10000;
+            outline: #fff dotted thin;
+            outline-offset: -2px;
+            overflow: auto;
+          }
+        }
 
         div.speeds {
           float: left;
@@ -250,10 +270,15 @@ div.video {
               }
             }
 
-            outline: 0;
-
-            &:focus {
+            &:hover {
               outline: 0;
+              opacity: 1.0;
+              background-color: #444;
+            }
+
+            &:active {
+              opacity: 1.0;
+              background-color: #444;
             }
 
             h3 {
@@ -279,11 +304,6 @@ div.video {
 
               line-height: 46px;
               color: #fff;
-            }
-
-            &:hover, &:active, &:focus {
-              opacity: 1.0;
-              background-color: #444;
             }
           }
 
@@ -320,6 +340,7 @@ div.video {
                 &:hover {
                   background-color: #666;
                   color: #aaa;
+                  outline-offset: -4px;
                 }
               }
 
@@ -371,9 +392,12 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
-
-            &:hover, &:active, &:focus {
+          
+            &:hover, &:active {
               background-color: #444;
+              color: #fff;
+              text-decoration: none;
+              outline: 0;
             }
           }
 
@@ -433,13 +457,15 @@ div.video {
           text-indent: -9999px;
           @include transition(none);
           width: 30px;
-
-          &:hover, &:active, &:focus {
+          
+          &:hover, &:active {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
         }
+
 
         a.quality_control {
           background: url(../images/hd.png) center no-repeat;
@@ -455,16 +481,18 @@ div.video {
           @include transition(none);
           width: 30px;
 
-          &:hover, &:focus {
+          &:hover {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
 
           &.active {
             background-color: #F44;
             color: #0ff;
             text-decoration: none;
+            outline: 0;
           }
         }
 
@@ -483,10 +511,11 @@ div.video {
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
-          &:hover, &:focus {
+          &:hover {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
 
           &.off {
@@ -530,8 +559,7 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
-      outline-width: 0px;
-      outline-style: none;
+      outline: 0;
 
       &.current {
         color: #333;
@@ -539,8 +567,8 @@ div.video {
       }
 
       &.focused {
-        outline-width: 1px;
-        outline-style: dotted;
+        outline: #000 dotted thin;
+        outline-offset: -1px;
       }
 
       &:hover {
