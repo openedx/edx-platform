@@ -113,7 +113,7 @@ def upload_transcripts(request):
                 video_name = video_dict['video']
                 # creating transcripts for every video source
                 # in case that some of them would be deleted
-                statuses[video_name] = _rename_transcript(video_name, sub_attr, item)
+                statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item)
 
             # name to write to sub field
             selected_name = video_list[0]['video']
@@ -455,7 +455,7 @@ def rename_transcripts(request):
 
     # copy subtitles for every html5 source
     for new_name in videos['html5'].keys():
-        statuses[new_name] = _rename_transcript(new_name, old_name, item)
+        statuses[new_name] = copy_or_rename_transcript(new_name, old_name, item)
 
     if any(statuses):
         response['status'] = 'Success'

@@ -510,6 +510,7 @@ Feature: Video Component Editor
     Scenario: Upload button for youtube id with html5 ids.
         Given I have created a Video component
         And I edit the component
+
         And I enter a http://youtu.be/t_not_exist source to field number 1
         Then I see not found status message
         And I see upload_new_timed_transcripts button
@@ -528,4 +529,24 @@ Feature: Video Component Editor
         Then when I view the video it does show the captions
         And I edit the component
         Then I see found status message
+
+    # 29
+    Scenario: Change transcripts field in Advanced tab
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a video_name_1.mp4 source to field number 1
+        Then I see not found status message
+        And I see upload_new_timed_transcripts button
+
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see uploaded_successfully status message
+        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I set "video_name_2" value to the "HTML5 Timed Transcript" field
+
+        And I save changes
+        And I edit the component
+
+        Then I see found status message
+        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
 

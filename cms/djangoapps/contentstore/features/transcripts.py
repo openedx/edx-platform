@@ -202,3 +202,19 @@ def save_changes(_step):
     save_css = 'a.save-button'
     world.css_click(save_css)
 
+
+@step('I open tab "([^"]*)"$')
+def open_tab(_step, tab_name):
+    world.click_link_by_text(tab_name.strip())
+
+
+@step('I set "([^"]*)" value to the "([^"]*)" field$')
+def set_value_transcripts_field(_step, value, field_name):
+    world.wait(DELAY)
+    world.click_link_by_text('Advanced')
+
+    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
+    world.css_fill(field_id, value.strip())
+
+    world.click_link_by_text('Basic')
+
