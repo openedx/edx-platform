@@ -46,6 +46,12 @@ def _reverse_without_slash(url_name, course_id):
     return ajax_url
 
 
+HUMAN_NAME_DICT = {
+    'Peer Grading': _("Peer Grading"),
+    'Staff Grading': _("Staff Grading"),
+    'Problems you have submitted': _("Problems you have submitted"),
+    'Flagged Submissions': _("Flagged Submissions")
+}
 DESCRIPTION_DICT = {
     'Peer Grading': _("View all problems that require peer assessment in this particular course."),
     'Staff Grading': _("View ungraded submissions submitted by students for the open ended problems in the course."),
@@ -254,6 +260,10 @@ def combined_notifications(request, course_id):
             url = _reverse_without_slash(url_name, course_id)
             has_img = response[tag]
 
+            if human_name in HUMAN_NAME_DICT:
+                name = HUMAN_NAME_DICT[human_name]
+            else:
+                name = human_name
             # check to make sure we have descriptions and alert messages
             if human_name in DESCRIPTION_DICT:
                 description = DESCRIPTION_DICT[human_name]
