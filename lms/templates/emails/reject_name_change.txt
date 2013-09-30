@@ -12,3 +12,8 @@
   your name from ${old_name} to ${new_name}. If you need further
   assistance, please e-mail the course staff at ta@edx.org.
 % endif
+
+Внимание!
+Это письмо было сформировано и отправлено автоматической системой информирования.
+Пожалуйста не отвечайте на него, так как ваш ответ не будет доставлен.
+В случае необходимости связаться со службой технической поддержки напишите на адрес edu.olimpiada@yandex.ru
