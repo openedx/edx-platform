@@ -138,6 +138,26 @@
           expect(videoSpeedControl.currentSpeed).toEqual(0.75);
         });
       });
+
+      describe('make sure the speed control gets the focus afterwards', function() {
+        var anchor;
+        beforeEach(function() {
+          initialize();
+          anchor= $('.speeds > a').first();
+          videoSpeedControl.setSpeed(1.0);
+          spyOnEvent(anchor, 'focus');
+        });
+
+        it('when the speed is the same', function() {
+          $('li[data-speed="1.0"] a').click();
+          expect('focus').toHaveBeenTriggeredOn(anchor);
+        });
+
+        it('when the speed is not the same', function() {
+          $('li[data-speed="0.75"] a').click();
+          expect('focus').toHaveBeenTriggeredOn(anchor);
+        });
+      });
     });
 
     describe('onSpeedChange', function() {

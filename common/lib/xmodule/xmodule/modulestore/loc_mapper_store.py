@@ -28,7 +28,10 @@ class LocMapperStore(object):
 
     # C0103: varnames and attrs must be >= 3 chars, but db defined by long time usage
     # pylint: disable = C0103
-    def __init__(self, host, db, collection, port=27017, user=None, password=None, **kwargs):
+    def __init__(
+        self, host, db, collection, port=27017, user=None, password=None,
+        **kwargs
+    ):
         '''
         Constructor
         '''
@@ -100,6 +103,7 @@ class LocMapperStore(object):
             'prod_branch': prod_branch,
             'block_map': block_map or {},
         })
+        return course_id
 
     def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
         """
@@ -150,7 +154,7 @@ class LocMapperStore(object):
             if add_entry_if_missing:
                 usage_id = self._add_to_block_map(location, location_id, entry['block_map'])
             else:
-                raise ItemNotFoundError()
+                raise ItemNotFoundError(location)
         elif isinstance(usage_id, dict):
             # name is not unique, look through for the right category
             if location.category in usage_id:
@@ -244,7 +248,7 @@ class LocMapperStore(object):
                 if usage_id is None:
                     usage_id = map_entry['block_map'][location.name][location.category]
                 elif usage_id != map_entry['block_map'][location.name][location.category]:
-                    raise DuplicateItemError()
+                    raise DuplicateItemError(usage_id, self, 'location_map')
 
         computed_usage_id = usage_id
 
@@ -257,7 +261,7 @@ class LocMapperStore(object):
                 alt_usage_id = self._verify_uniqueness(computed_usage_id, map_entry['block_map'])
                 if alt_usage_id != computed_usage_id:
                     if usage_id is not None:
-                        raise DuplicateItemError()
+                        raise DuplicateItemError(usage_id, self, 'location_map')
                     else:
                         # revise already set ones and add to remaining ones
                         computed_usage_id = self.update_block_location_translator(
@@ -301,7 +305,7 @@ class LocMapperStore(object):
                     usage_id = self.update_block_location_translator(location, alt_usage_id, old_course_id, True)
                     return usage_id
                 else:
-                    raise DuplicateItemError()
+                    raise DuplicateItemError(usage_id, self, 'location_map')
 
             if location.category in map_entry['block_map'].setdefault(location.name, {}):
                 map_entry['block_map'][location.name][location.category] = usage_id
@@ -335,6 +339,8 @@ class LocMapperStore(object):
             # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
             # if there are few == org/course roots or their content is unrelated, this will work well.
             usage_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
+        else:
+            usage_id = location.name
         block_map.setdefault(location.name, {})[location.category] = usage_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
         return usage_id

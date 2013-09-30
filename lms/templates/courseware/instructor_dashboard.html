@@ -240,7 +240,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
   %endif
 
-    <H2>${_("Student-specific grade inspection and adjustment")}</h2>
+    <h2>${_("Student-specific grade inspection and adjustment")}</h2>
     <p>
       ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
       <input type="text" name="unique_student_identifier">
@@ -415,6 +415,9 @@ function goto( mode)
     <p> ${_("Problem urlname:")}
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Download CSV of all responses to problem">
+    </p>
+    <p>
+    <input type="submit" name="action" value="Download CSV of all student anonymized IDs">
     </p>
     <hr width="40%" style="align:left">
 %endif

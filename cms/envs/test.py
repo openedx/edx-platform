@@ -42,14 +42,17 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'test_xmodule',
     'collection': 'test_modulestore',
+}
+
+MODULESTORE_OPTIONS = dict({
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}
+}, **DOC_STORE_CONFIG)
 
 MODULESTORE = {
     'default': {

@@ -4,8 +4,6 @@ CLOBBER.include(REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles')
 # Create the directory to hold coverage reports, if it doesn't already exist.
 directory REPORT_DIR
 
-ACCEPTANCE_DB = 'test_root/db/test_edx.db'
-
 def test_id_dir(path)
     return File.join(".testids", path.to_s)
 end
@@ -30,38 +28,6 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
         "--id-file=#{test_id_file}",
         test_id)
     test_sh(run_under_coverage(cmd, system))
-end
-
-def create_acceptance_db(system)
-    # HACK: Since now the CMS depends on the existence of some database tables
-    # that used to be in LMS (Role/Permissions for Forums) we need to make
-    # sure the acceptance tests create/migrate the database tables
-    # that are represented in the LMS. We might be able to address this by moving
-    # out the migrations from lms/django_comment_client, but then we'd have to
-    # repair all the existing migrations from the upgrade tables in the DB.
-    if system == :cms
-        sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
-        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
-    end
-    sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
-    sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
-end
-
-def setup_acceptance_db(system, fasttest=false)
-    # If running under fasttest mode and the database already
-    # exists, skip the migrations.
-    if File.exists?(ACCEPTANCE_DB)
-        if not fasttest
-            File.delete(ACCEPTANCE_DB)
-            create_acceptance_db(system)
-        end
-    else
-        create_acceptance_db(system)
-    end
-end
-
-def run_acceptance_tests(system, report_dir, harvest_args)
-    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--verbosity 2', '--tag -skip', harvest_args))
 end
 
 # Run documentation tests
@@ -109,26 +75,6 @@ TEST_TASK_DIRS = []
         args.with_defaults(:test_id => nil)
         run_tests(system, report_dir, args.test_id)
     end
-
-    # Run acceptance tests
-    desc "Run acceptance tests"
-    task "test_acceptance_#{system}", [:harvest_args] => [
-        :clean_test_files, :install_prereqs,
-        "#{system}:gather_assets:acceptance"
-    ] do |t, args|
-        setup_acceptance_db(system)
-        Rake::Task["fasttest_acceptance_#{system}"].invoke(args.harvest_args)
-    end
-
-    desc "Run acceptance tests without collectstatic or database migrations"
-    task "fasttest_acceptance_#{system}", [:harvest_args] => [
-        report_dir, :clean_reports_dir
-    ] do |t, args|
-        args.with_defaults(:harvest_args => '')
-        setup_acceptance_db(system, fasttest=true)
-        run_acceptance_tests(system, report_dir, args.harvest_args)
-    end
-
 
     task :fasttest => "fasttest_#{system}"
 

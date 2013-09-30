@@ -6,8 +6,6 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 
 
-############### ACTIONS ####################
-
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
     world.create_component_instance(
@@ -19,7 +17,7 @@ def i_created_a_video_component(step):
 
 
 @step('I have created a Video component with subtitles$')
-def i_created_a_video_component(step):
+def i_created_a_video_component_subtitles(step):
     step.given('I have created a Video component')
 
     # Store the current URL so we can return here
@@ -46,9 +44,11 @@ def does_not_autoplay(_step, video_type):
 
 @step('creating a video takes a single click$')
 def video_takes_a_single_click(_step):
-    assert(not world.is_css_present('.xmodule_VideoModule'))
+    component_css = '.xmodule_VideoModule'
+    assert world.is_css_not_present(component_css)
+
     world.css_click("a[data-category='video']")
-    assert(world.is_css_present('.xmodule_VideoModule'))
+    assert world.is_css_present(component_css)
 
 
 @step('I edit the component$')
@@ -93,7 +93,7 @@ def xml_only_video(step):
     # Create a new Video component, but ensure that it doesn't have
     # metadata. This allows us to test that we are correctly parsing
     # out XML
-    video = world.ItemFactory.create(
+    world.ItemFactory.create(
         parent_location=parent_location,
         category='video',
         data='<video youtube="1.00:%s"></video>' % youtube_id

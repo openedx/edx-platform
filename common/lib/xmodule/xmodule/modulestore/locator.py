@@ -377,7 +377,7 @@ class BlockUsageLocator(CourseLocator):
 
         :param block_locator:
         """
-        if self.course_id and self.version_guid:
+        if self.version_guid:
             return BlockUsageLocator(version_guid=self.version_guid,
                                      branch=self.branch,
                                      usage_id=self.usage_id)

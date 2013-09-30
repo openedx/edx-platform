@@ -324,16 +324,14 @@ class MongoModuleStore(ModuleStoreBase):
         for result in resultset:
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
-            # i.e. draft verticals can have children which are not in non-draft versions
+            # i.e. draft verticals will have draft children but will have non-draft parents currently
             location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
-                if 'definition' not in results_by_url[location_url]:
-                    results_by_url[location_url]['definition'] = {}
-                results_by_url[location_url]['definition']['children'] = total_children
+                results_by_url[location_url].setdefault('definition', {})['children'] = total_children
             results_by_url[location.url()] = result
             if location.category == 'course':
                 root = location.url()
@@ -643,12 +641,11 @@ class MongoModuleStore(ModuleStoreBase):
         """
         # Save any changes to the xmodule to the MongoKeyValueStore
         xmodule.save()
-        # split mongo's persist_dag is more general and useful.
         self.collection.save({
                 '_id': xmodule.location.dict(),
                 'metadata': own_metadata(xmodule),
                 'definition': {
-                    'data': xmodule.xblock_kvs._data,
+                    'data': xmodule.get_explicitly_set_fields_by_scope(Scope.content),
                     'children': xmodule.children if xmodule.has_children else []
                 }
             })

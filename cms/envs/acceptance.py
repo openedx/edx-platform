@@ -24,14 +24,17 @@ from random import choice, randint
 def seed():
     return os.getppid()
 
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'acceptance_xmodule',
     'collection': 'acceptance_modulestore_%s' % seed(),
+}
+
+MODULESTORE_OPTIONS = dict({
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}
+}, **DOC_STORE_CONFIG)
 
 MODULESTORE = {
     'default': {
@@ -97,7 +100,7 @@ SELENIUM_GRID = {
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
 
