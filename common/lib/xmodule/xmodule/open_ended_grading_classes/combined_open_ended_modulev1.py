@@ -11,6 +11,8 @@ from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 
+from django.utils.translation import ugettext as _
+
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -627,11 +629,11 @@ class CombinedOpenEndedV1Module():
             log.error("Could not contact external open ended graders for location {0} and student {1}".format(
                 self.location, student_id))
             # This is a student_facing_error
-            error_message = "Could not contact the graders.  Please notify course staff."
+            error_message = _("Could not contact the graders.  Please notify course staff.")
             return success, allowed_to_submit, error_message
         except KeyError:
             log.error("Invalid response from grading server for location {0} and student {1}".format(self.location, student_id))
-            error_message = "Received invalid response from the graders.  Please notify course staff."
+            error_message = _("Received invalid response from the graders.  Please notify course staff.")
             return success, allowed_to_submit, error_message
         if count_graded >= count_required or count_available==0:
             error_message = ""
@@ -639,12 +641,12 @@ class CombinedOpenEndedV1Module():
         else:
             allowed_to_submit = False
             # This is a student_facing_error
-            error_string = ("<h4>Feedback not available yet</h4>"
-                            "<p>You need to peer grade {0} more submissions in order to see your feedback.</p>"
-                            "<p>You have graded responses from {1} students, and {2} students have graded your submissions. </p>"
-                            "<p>You have made {3} submissions.</p>")
-            error_message = error_string.format(count_required - count_graded, count_graded, count_required,
-                                                student_sub_count)
+            error_string = ("<h4>" + _("Feedback not available yet") + "</h4>"
+                            "<p>" + _("You need to peer grade {moresub} more submissions in order to see your feedback.") + "</p>"
+                            "<p>" + _("You have graded responses from {graded} students, and {beengraded} students have graded your submissions.") + "</p>"
+                            "<p>" + _("You have made {sub} submissions.") + "</p>")
+            error_message = error_string.format(moresub = count_required - count_graded, graded = count_graded, beengraded = count_required,
+                                                sub = student_sub_count)
             return success, allowed_to_submit, error_message
 
     def get_rubric(self, _data):
@@ -775,10 +777,9 @@ class CombinedOpenEndedV1Module():
             return {
                 'success': False,
                 # This is a student_facing_error
-                'error': (
-                    'You have attempted this question {0} times.  '
-                    'You are only allowed to attempt it {1} times.'
-                ).format(self.student_attempts, self.max_attempts)
+                'error': 
+                    _('You have attempted this question {your} times. You are only allowed to attempt it {allowed} times.')
+                .format(your = self.student_attempts, allowed = self.max_attempts)
             }
         self.student_attempts +=1
         self.state = self.INITIAL
@@ -947,7 +948,7 @@ class CombinedOpenEndedV1Module():
                     self.state, data, msg)
         #This is a student_facing_error
         return {'success': False,
-                'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
+                'error': _('The problem state got out-of-sync.  Please try reloading the page.')}
 
 
 class CombinedOpenEndedV1Descriptor():

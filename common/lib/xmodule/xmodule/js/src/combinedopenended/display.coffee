@@ -195,7 +195,7 @@ class @CombinedOpenEnded
     @can_upload_files = false
     @open_ended_child= @$(@oe).find(@open_ended_child_sel)
 
-    @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
+    @out_of_sync_message = gettext('The problem state got out of sync.  Try reloading the page.')
 
     if @task_number>1
       @prompt_hide()
@@ -249,7 +249,7 @@ class @CombinedOpenEnded
     fd.append('submission_id', submission_id)
     fd.append('grader_id', grader_id)
     if(!score)
-      @gentle_alert "You need to pick a rating before you can submit."
+      @gentle_alert gettext("You need to pick a rating before you can submit.")
       return
     else
       fd.append('score', score)
@@ -293,10 +293,10 @@ class @CombinedOpenEnded
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
       if @task_number<@task_count
-        @gentle_alert "Your score did not meet the criteria to move to the next step."
+        @gentle_alert gettext("Your score did not meet the criteria to move to the next step.")
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
-      @submit_button.prop('value', 'Submit')
+      @submit_button.prop('value', gettext('Submit'))
       @submit_button.click @confirm_save_answer
       @setup_file_upload()
       @save_button.click @store_answer
@@ -305,14 +305,14 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hide_file_upload()
-      @submit_button.prop('value', 'Submit assessment')
+      @submit_button.prop('value', gettext('Submit assessment'))
       @submit_button.click @save_assessment
       @submit_button.attr("disabled",true)
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
         @grader_status = @$(@grader_status_sel)
-        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span>")
+        @grader_status.html("<span class='grading'>" + gettext('Your response has been submitted.  Please check back later for your grade.') + "</span>")
       else if @child_type == "selfassessment"
         @setup_score_selection()
     else if @child_state == 'post_assessment'
@@ -321,7 +321,7 @@ class @CombinedOpenEnded
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
-      @submit_button.prop('value', 'Submit post-assessment')
+      @submit_button.prop('value', gettext('Submit post-assessment'))
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
       else
@@ -353,7 +353,7 @@ class @CombinedOpenEnded
       @save_button.attr("disabled",true)
       $.postWithPrefix "#{@ajax_url}/store_answer", data, (response) =>
         if response.success
-          @gentle_alert("Answer saved.")
+          @gentle_alert(gettext("Answer saved."))
         else
           @errors_area.html(response.error)
         @save_button.attr("disabled",false)
@@ -376,7 +376,7 @@ class @CombinedOpenEnded
       @gentle_alert response.error
 
   confirm_save_answer: (event) =>
-    @save_answer(event) if confirm('Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.')
+    @save_answer(event) if confirm(gettext('Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.'))
 
   save_answer: (event) =>
     @$el.find(@oe_alert_sel).remove()
@@ -479,7 +479,7 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   confirm_reset: (event) =>
-    @reset(event) if confirm('Are you sure you want to remove your previous response to this question?')
+    @reset(event) if confirm(gettext('Are you sure you want to remove your previous response to this question?'))
 
   reset: (event) =>
     event.preventDefault()
@@ -516,9 +516,9 @@ class @CombinedOpenEnded
           @rebind()
           @next_problem_button.hide()
           if !response.allow_reset
-            @gentle_alert "Moved to next step."
+            @gentle_alert gettext("Moved to next step.")
           else
-            @gentle_alert "Your score did not meet the criteria to move to the next step."
+            @gentle_alert gettext("Your score did not meet the criteria to move to the next step.")
             @show_combined_rubric_current()
         else
           @errors_area.html(response.error)
@@ -555,7 +555,7 @@ class @CombinedOpenEnded
         @$(@file_upload_preview_sel).hide()
         @$(@file_upload_box_sel).change @preview_image
       else
-        @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
+        @gentle_alert gettext('File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.')
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
@@ -576,7 +576,7 @@ class @CombinedOpenEnded
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "Hide Prompt"
+    if @question_header.text() == gettext("Hide Prompt")
       new_text = gettext("Show Prompt")
       Logger.log 'oe_hide_question', {location: @location}
     else
@@ -621,19 +621,19 @@ class @CombinedOpenEnded
     if @prompt_container.is(":hidden")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Hide Prompt")
+      @question_header.text(gettext("Hide Prompt"))
 
   prompt_hide: () =>
     if @prompt_container.is(":visible")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Show Prompt")
+      @question_header.text(gettext("Show Prompt"))
 
   log_feedback_click: (event) ->
     link_text = @$(event.target).html()
-    if link_text == 'See full feedback'
+    if link_text == gettext('See full feedback')
       Logger.log 'oe_show_full_feedback', {}
-    else if link_text == 'Respond to Feedback'
+    else if link_text == gettext('Respond to Feedback')
       Logger.log 'oe_show_respond_to_feedback', {}
     else
       generated_event_type = link_text.toLowerCase().replace(" ","_")

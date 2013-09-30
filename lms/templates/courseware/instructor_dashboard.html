@@ -227,8 +227,8 @@ function goto( mode)
     </p>
     <p>
       ${_("Then select an action:")}
-      <input type="submit" name="action" onclick='this.value="Reset ALL students' attempts"' value='${_("Reset ALL students' attempts")}'>
-      <input type="submit" name="action" onclick='this.value="Rescore ALL students' problem submissions"' value='${_("Rescore ALL students' problem submissions")}'>
+      <input type="submit" name="action" onclick='this.value="Reset ALL students\' attempts"' value='${_("Reset ALL students\' attempts")}'>
+      <input type="submit" name="action" onclick='this.value="Rescore ALL students\' problem submissions"' value='${_("Rescore ALL students\' problem submissions")}'>
     </p>
     <p>
     <p>${_("These actions run in the background, and status for active tasks will appear in a table below. To see status for all tasks submitted for this problem, click on this button:")}
@@ -247,7 +247,7 @@ function goto( mode)
     </p>
     <p>
       ${_("Click this, and a link to student's progress page will appear below:")}
-      <input type="submit" name="action" onclick='this.value="Get link to student's progress page"' value='${_("Get link to student's progress page")}'>
+      <input type="submit" name="action" onclick='this.value="Get link to student\'s progress page"' value='${_("Get link to student\'s progress page")}'>
     </p>
     <p>
       ${_("Specify a particular problem in the course here by its url:")}
@@ -262,9 +262,9 @@ function goto( mode)
     </p>
     <p>
       ${_("Then select an action:")}
-      <input type="submit" name="action" onclick='this.value="Reset student's attempts"' value='${_("Reset student's attempts")}'>
+      <input type="submit" name="action" onclick='this.value="Reset student\'s attempts"' value='${_("Reset student\'s attempts")}'>
       %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-      <input type="submit" name="action" onclick='this.value="Rescore student's problem submission"' value='${_("Rescore student's problem submission")}'>
+      <input type="submit" name="action" onclick='this.value="Rescore student\'s problem submission"' value='${_("Rescore student\'s problem submission")}'>
       %endif
     </p>
 
@@ -370,8 +370,8 @@ function goto( mode)
 
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List enrolled students">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
+    <input type="submit" name="action" onclick='this.value="List enrolled students"' value='${_("List enrolled students")}'>
+    <input type="submit" name="action" onclick='this.value="List students who may enroll but may not have yet signed up"' value='${_("List students who may enroll but may not have yet signed up")}'>
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
