@@ -418,7 +418,7 @@ class @StaffGrading
       
 
     if @state == state_error
-      @set_button_text(gettext('Try loading again')
+      @set_button_text(gettext('Try loading again'))
       show_action_button = true
 
     else if @state == state_grading
