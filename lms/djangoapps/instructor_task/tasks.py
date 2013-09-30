@@ -32,7 +32,7 @@ from instructor_task.tasks_helper import (
 from bulk_email.tasks import perform_delegate_email_batches
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -55,13 +55,14 @@ def rescore_problem(entry_id, xmodule_instance_args):
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
 
     def filter_fcn(modules_to_update):
+        """Filter that matches problems which are marked as being done"""
         return modules_to_update.filter(state__contains='"done": true')
 
     visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -82,7 +83,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -103,18 +104,20 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
-def send_bulk_course_email(entry_id, xmodule_instance_args):
-    """Sends emails to in a course.
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
+def send_bulk_course_email(entry_id, _xmodule_instance_args):
+    """Sends emails to recipients enrolled in a course.
 
     `entry_id` is the id value of the InstructorTask entry that corresponds to this task.
     The entry contains the `course_id` that identifies the course, as well as the
     `task_input`, which contains task-specific input.
 
-    The task_input should be a dict with no entries.
+    The task_input should be a dict with the following entries:
 
-    `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
-    to instantiate an xmodule instance.
+      'email_id': the full URL to the problem to be rescored.  (required)
+
+    `_xmodule_instance_args` provides information needed by _get_module_instance_for_task()
+    to instantiate an xmodule instance.  This is unused here.
     """
     action_name = 'emailed'
     visit_fcn = perform_delegate_email_batches

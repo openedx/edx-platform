@@ -14,50 +14,75 @@ from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 TASK_LOG = get_task_logger(__name__)
 
 
-def create_subtask_status(succeeded=0, failed=0, pending=0, skipped=0, retriedA=0, retriedB=0, state=None):
+def create_subtask_status(task_id, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
     """
-    Create a dict for tracking the status of a subtask.
+    Create and return a dict for tracking the status of a subtask.
 
-    Keys are:  'attempted', 'succeeded', 'skipped', 'failed', 'retried'.
-TODO: update
+    Subtask status keys are:
+
+      'task_id' : id of subtask.  This is used to pass task information across retries.
+      'attempted' : number of attempts -- should equal succeeded plus failed
+      'succeeded' : number that succeeded in processing
+      'skipped' : number that were not processed.
+      'failed' : number that failed during processing
+      'retried_nomax' : number of times the subtask has been retried for conditions that
+          should not have a maximum count applied
+      'retried_withmax' : number of times the subtask has been retried for conditions that
+          should have a maximum count applied
+      'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
+
     Object must be JSON-serializable, so that it can be passed as an argument
     to tasks.
 
-    TODO: decide if in future we want to include specific error information
+    In future, we may want to include specific error information
     indicating the reason for failure.
-    Also, we should count up "not attempted" separately from
-    attempted/failed.
+    Also, we should count up "not attempted" separately from attempted/failed.
     """
     attempted = succeeded + failed
     current_result = {
+        'task_id': task_id,
         'attempted': attempted,
         'succeeded': succeeded,
-        'pending': pending,
         'skipped': skipped,
         'failed': failed,
-        'retriedA': retriedA,
-        'retriedB': retriedB,
+        'retried_nomax': retried_nomax,
+        'retried_withmax': retried_withmax,
         'state': state if state is not None else QUEUING,
     }
     return current_result
 
 
-def increment_subtask_status(subtask_result, succeeded=0, failed=0, pending=0, skipped=0, retriedA=0, retriedB=0, state=None):
+def increment_subtask_status(subtask_result, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
     """
     Update the result of a subtask with additional results.
 
-    Keys are:  'attempted', 'succeeded', 'skipped', 'failed', 'retried'.
+    Create and return a dict for tracking the status of a subtask.
+
+    Keys for input `subtask_result` and returned subtask_status are:
+
+      'task_id' : id of subtask.  This is used to pass task information across retries.
+      'attempted' : number of attempts -- should equal succeeded plus failed
+      'succeeded' : number that succeeded in processing
+      'skipped' : number that were not processed.
+      'failed' : number that failed during processing
+      'retried_nomax' : number of times the subtask has been retried for conditions that
+          should not have a maximum count applied
+      'retried_withmax' : number of times the subtask has been retried for conditions that
+          should have a maximum count applied
+      'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
+
+    Kwarg arguments are incremented to the corresponding key in `subtask_result`.
+    The exception is for `state`, which if specified is used to override the existing value.
     """
-    # TODO: rewrite this if we have additional fields added to original subtask_result,
-    # that are not part of the increment.  Tradeoff on duplicating the 'attempts' logic.
-    new_result = create_subtask_status(succeeded, failed, pending, skipped, retriedA, retriedB, state)
-    for keyname in new_result:
-        if keyname == 'state':
-            # does not get incremented.  If no new value, copy old value:
-            if state is None:
-                new_result[keyname] = subtask_result[keyname]
-        elif keyname in subtask_result:
-            new_result[keyname] += subtask_result[keyname]
+    new_result = dict(subtask_result)
+    new_result['attempted'] += (succeeded + failed)
+    new_result['succeeded'] += succeeded
+    new_result['failed'] += failed
+    new_result['skipped'] += skipped
+    new_result['retried_nomax'] += retried_nomax
+    new_result['retried_withmax'] += retried_withmax
+    if state is not None:
+        new_result['state'] = state
 
     return new_result
 
@@ -70,7 +95,7 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
     Counters for 'attempted', 'succeeded', 'failed', 'skipped' keys are initialized to zero,
     as is the 'duration_ms' value.  A 'start_time' is stored for later duration calculations,
     and the total number of "things to do" is set, so the user can be told how much needs to be
-    done overall.  The `action_name` is also stored, to also help with constructing more readable
+    done overall.  The `action_name` is also stored, to help with constructing more readable
     task_progress messages.
 
     The InstructorTask's "subtasks" field is also initialized.  This is also a JSON-serialized dict.
@@ -80,8 +105,8 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
     the InstructorTask's "status" will be changed to SUCCESS.
 
     The "subtasks" field also contains a 'status' key, that contains a dict that stores status
-    information for each subtask.  At the moment, the value for each subtask (keyed by its task_id)
-    is the value of `status`, which is initialized here to QUEUING.
+    information for each subtask.  The value for each subtask (keyed by its task_id)
+    is its subtask status, as defined by create_subtask_status().
 
     This information needs to be set up in the InstructorTask before any of the subtasks start
     running.  If not, there is a chance that the subtasks could complete before the parent task
@@ -92,7 +117,6 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
     rely on the status stored in the InstructorTask object, rather than status stored in the
     corresponding AsyncResult.
     """
-    # TODO: also add 'pending' count here?  (Even though it's total-attempted-skipped
     task_progress = {
         'action_name': action_name,
         'attempted': 0,
@@ -108,12 +132,8 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
 
     # Write out the subtasks information.
     num_subtasks = len(subtask_id_list)
-    # using fromkeys to initialize uses a single value.  we need the value
-    # to be distinct, since it's now a dict:
-    # subtask_status = dict.fromkeys(subtask_id_list, QUEUING)
-    # TODO: may not be necessary to store initial value with all those zeroes!
-    # Instead, use a placemarker....
-    subtask_status = {subtask_id: create_subtask_status() for subtask_id in subtask_id_list}
+    # Note that may not be necessary to store initial value with all those zeroes!
+    subtask_status = {subtask_id: create_subtask_status(subtask_id) for subtask_id in subtask_id_list}
     subtask_dict = {
         'total': num_subtasks,
         'succeeded': 0,
@@ -129,7 +149,7 @@ def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_i
 
 
 @transaction.commit_manually
-def update_subtask_status(entry_id, current_task_id, subtask_status):
+def update_subtask_status(entry_id, current_task_id, new_subtask_status):
     """
     Update the status of the subtask in the parent InstructorTask object tracking its progress.
 
@@ -138,9 +158,11 @@ def update_subtask_status(entry_id, current_task_id, subtask_status):
     committed on completion, or rolled back on error.
 
     The InstructorTask's "task_output" field is updated.  This is a JSON-serialized dict.
-    Accumulates values for 'attempted', 'succeeded', 'failed', 'skipped' from `subtask_progress`
+    Accumulates values for 'attempted', 'succeeded', 'failed', 'skipped' from `new_subtask_status`
     into the corresponding values in the InstructorTask's task_output.  Also updates the 'duration_ms'
-    value with the current interval since the original InstructorTask started.
+    value with the current interval since the original InstructorTask started.  Note that this
+    value is only approximate, since the subtask may be running on a different server than the
+    original task, so is subject to clock skew.
 
     The InstructorTask's "subtasks" field is also updated.  This is also a JSON-serialized dict.
     Keys include 'total', 'succeeded', 'retried', 'failed', which are counters for the number of
@@ -155,13 +177,13 @@ def update_subtask_status(entry_id, current_task_id, subtask_status):
     messages, progress made, etc.
     """
     TASK_LOG.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
-                  current_task_id, entry_id, subtask_status)
+                  current_task_id, entry_id, new_subtask_status)
 
     try:
         entry = InstructorTask.objects.select_for_update().get(pk=entry_id)
         subtask_dict = json.loads(entry.subtasks)
-        subtask_status = subtask_dict['status']
-        if current_task_id not in subtask_status:
+        subtask_status_info = subtask_dict['status']
+        if current_task_id not in subtask_status_info:
             # unexpected error -- raise an exception
             format_str = "Unexpected task_id '{}': unable to update status for email subtask of instructor task '{}'"
             msg = format_str.format(current_task_id, entry_id)
@@ -173,39 +195,45 @@ def update_subtask_status(entry_id, current_task_id, subtask_status):
         # will be updating before the original call, and we don't want their
         # ultimate status to be clobbered by the "earlier" updates.  This
         # should not be a problem in normal (non-eager) processing.
-        old_status = subtask_status[current_task_id]
-        # TODO: check this logic...
-        state = subtask_status['state']
-#        if state != RETRY or old_status['status'] == QUEUING:
-        # instead replace the status only if it's 'newer'
-        # i.e. has fewer pending
-        if subtask_status['pending'] <= old_status['pending']:
-            subtask_status[current_task_id] = subtask_status
+        current_subtask_status = subtask_status_info[current_task_id]
+        current_state = current_subtask_status['state']
+        new_state = new_subtask_status['state']
+        if new_state != RETRY or current_state == QUEUING or current_state in READY_STATES:
+            subtask_status_info[current_task_id] = new_subtask_status
 
         # Update the parent task progress
+        # Set the estimate of duration, but only if it
+        # increases.  Clock skew between time() returned by different machines
+        # may result in non-monotonic values for duration.
         task_progress = json.loads(entry.task_output)
         start_time = task_progress['start_time']
-        task_progress['duration_ms'] = int((time() - start_time) * 1000)
-        # change  behavior so we don't update on progress now:
-        # TODO: figure out if we can make this more responsive later,
-        # by figuring out how to handle retries better.
-        if subtask_status is not None and state in READY_STATES:
+        prev_duration = task_progress['duration_ms']
+        new_duration = int((time() - start_time) * 1000)
+        task_progress['duration_ms'] = max(prev_duration, new_duration)
+
+        # Update counts only when subtask is done.
+        # In future, we can make this more responsive by updating status
+        # between retries, by comparing counts that change from previous
+        # retry.
+        if new_subtask_status is not None and new_state in READY_STATES:
             for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
-                task_progress[statname] += subtask_status[statname]
+                task_progress[statname] += new_subtask_status[statname]
 
         # Figure out if we're actually done (i.e. this is the last task to complete).
         # This is easier if we just maintain a counter, rather than scanning the
-        # entire subtask_status dict.
-        if state == SUCCESS:
+        # entire new_subtask_status dict.
+        if new_state == SUCCESS:
             subtask_dict['succeeded'] += 1
-        elif state == RETRY:
+        elif new_state == RETRY:
             subtask_dict['retried'] += 1
         else:
             subtask_dict['failed'] += 1
         num_remaining = subtask_dict['total'] - subtask_dict['succeeded'] - subtask_dict['failed']
-        # If we're done with the last task, update the parent status to indicate that:
-        # TODO: see if there was a catastrophic failure that occurred, and figure out
-        # how to report that here.
+
+        # If we're done with the last task, update the parent status to indicate that.
+        # At present, we mark the task as having succeeded.  In future, we should see
+        # if there was a catastrophic failure that occurred, and figure out how to
+        # report that here.
         if num_remaining <= 0:
             entry.task_state = SUCCESS
         entry.subtasks = json.dumps(subtask_dict)

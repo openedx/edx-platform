@@ -152,15 +152,16 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
 
     def _define_course_email(self):
+        """Create CourseEmail object for testing."""
         course_email = CourseEmail.create(self.course.id, self.instructor, SEND_TO_ALL, "Test Subject", "<p>This is a test message</p>")
-        return course_email.id
+        return course_email.id  # pylint: disable=E1101
 
     def test_submit_bulk_email_all(self):
         email_id = self._define_course_email()
         instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)
 
         # test resubmitting, by updating the existing record:
-        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=E1101
         instructor_task.task_state = PROGRESS
         instructor_task.save()
 

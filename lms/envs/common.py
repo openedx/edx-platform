@@ -812,6 +812,17 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+# let logging work as configured:
+CELERYD_HIJACK_ROOT_LOGGER = False
+
+################################ Bulk Email ###################################
+
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it.  At the moment, the name is the same.
+BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+BULK_EMAIL_DEFAULT_RETRY_DELAY = 15
+BULK_EMAIL_MAX_RETRIES = 5
+
 ################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...

@@ -42,6 +42,12 @@ class BaseInstructorTask(Task):
     Permits updating information about task in corresponding InstructorTask for monitoring purposes.
 
     Assumes that the entry_id of the InstructorTask model is the first argument to the task.
+
+    The `entry_id` is the primary key for the InstructorTask entry representing the task.  This class
+    updates the entry on success and failure of the task it wraps.  It is setting the entry's value
+    for task_state based on what Celery would set it to once the task returns to Celery:
+    FAILURE if an exception is encountered, and SUCCESS if it returns normally.
+    Other arguments are pass-throughs to perform_module_state_update, and documented there.
     """
     abstract = True
 
@@ -51,8 +57,22 @@ class BaseInstructorTask(Task):
 
         Updates task_output and task_state.  But it shouldn't actually do anything
         if the task is only creating subtasks to actually do the work.
+
+        Assumes `task_progress` is a dict containing the task's result, with the following keys:
+
+          'attempted': number of attempts made
+          'succeeded': number of attempts that "succeeded"
+          'skipped': number of attempts that "skipped"
+          'failed': number of attempts that "failed"
+          'total': number of possible subtasks to attempt
+          'action_name': user-visible verb to use in status messages.  Should be past-tense.
+              Pass-through of input `action_name`.
+          'duration_ms': how long the task has (or had) been running.
+
+        This is JSON-serialized and stored in the task_output column of the InstructorTask entry.
+
         """
-        TASK_LOG.info('Task success returned: %r' % (self.request, ))
+        TASK_LOG.debug('Task %s: success returned with progress: %s', task_id, task_progress)
         # We should be able to find the InstructorTask object to update
         # based on the task_id here, without having to dig into the
         # original args to the task.  On the other hand, the entry_id
@@ -72,9 +92,20 @@ class BaseInstructorTask(Task):
         """
         Update InstructorTask object corresponding to this task with info about failure.
 
-        Fetches and updates  exception and traceback information on failure.
+        Fetches and updates exception and traceback information on failure.
+
+        If an exception is raised internal to the task, it is caught by celery and provided here.
+        The information is recorded in the InstructorTask object as a JSON-serialized dict
+        stored in the task_output column.  It contains the following keys:
+
+               'exception':  type of exception object
+               'message': error message from exception object
+               'traceback': traceback information (truncated if necessary)
+
+        Note that there is no way to record progress made within the task (e.g. attempted,
+        succeeded, etc.) when such failures occur.
         """
-        TASK_LOG.info('Task failure returned: %r' % (self.request, ))
+        TASK_LOG.debug('Task %s: failure returned', task_id)
         entry_id = args[0]
         try:
             entry = InstructorTask.objects.get(pk=entry_id)
@@ -87,12 +118,6 @@ class BaseInstructorTask(Task):
             entry.task_output = InstructorTask.create_output_for_failure(einfo.exception, einfo.traceback)
             entry.task_state = FAILURE
             entry.save_now()
-
-    def on_retry(self, exc, task_id, args, kwargs, einfo):
-        # We don't expect this to be called for top-level tasks, at the moment....
-        # If it were, not sure what kind of status to report for it.
-        # But it would be good to know that it's being called, so at least log it.
-        TASK_LOG.info('Task retry returned: %r' % (self.request, ))
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -108,6 +133,67 @@ class UpdateProblemModuleStateError(Exception):
 def _get_current_task():
     """Stub to make it easier to test without actually running Celery"""
     return current_task
+
+
+def run_main_task(entry_id, task_fcn, action_name):
+    """
+    Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
+
+    Arguments passed to `task_fcn` are:
+
+     `entry_id` : the primary key for the InstructorTask entry representing the task.
+     `course_id` : the id for the course.
+     `task_input` : dict containing task-specific arguments, JSON-decoded from InstructorTask's task_input.
+     `action_name` : past-tense verb to use for constructing status messages.
+
+    If no exceptions are raised, the `task_fcn` should return a dict containing
+    the task's result with the following keys:
+
+          'attempted': number of attempts made
+          'succeeded': number of attempts that "succeeded"
+          'skipped': number of attempts that "skipped"
+          'failed': number of attempts that "failed"
+          'total': number of possible subtasks to attempt
+          'action_name': user-visible verb to use in status messages.
+              Should be past-tense.  Pass-through of input `action_name`.
+          'duration_ms': how long the task has (or had) been running.
+
+    """
+
+    # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
+    # There's no point in catching it here.
+    entry = InstructorTask.objects.get(pk=entry_id)
+
+    # get inputs to use in this task from the entry:
+    task_id = entry.task_id
+    course_id = entry.course_id
+    task_input = json.loads(entry.task_input)
+
+    # construct log message:
+    fmt = 'task "{task_id}": course "{course_id}" input "{task_input}"'
+    task_info_string = fmt.format(task_id=task_id, course_id=course_id, task_input=task_input)
+
+    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
+
+    # Check that the task_id submitted in the InstructorTask matches the current task
+    # that is running.
+    request_task_id = _get_current_task().request.id
+    if task_id != request_task_id:
+        fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
+        message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
+        TASK_LOG.error(message)
+        raise ValueError(message)
+
+    # Now do the work:
+    with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
+        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+
+    # Release any queries that the connection has been hanging onto:
+    reset_queries()
+
+    # log and exit, returning task_progress info as task result:
+    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
+    return task_progress
 
 
 def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, task_input, action_name):
@@ -220,92 +306,13 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     return task_progress
 
 
-def run_main_task(entry_id, task_fcn, action_name):
-    """
-    Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
-
-    TODO: UPDATE THIS DOCSTRING
-    (IT's not just visiting StudentModule instances....)
-
-    Performs generic update by visiting StudentModule instances with the update_fcn provided.
-
-    The `entry_id` is the primary key for the InstructorTask entry representing the task.  This function
-    updates the entry on success and failure of the perform_module_state_update function it
-    wraps.  It is setting the entry's value for task_state based on what Celery would set it to once
-    the task returns to Celery:  FAILURE if an exception is encountered, and SUCCESS if it returns normally.
-    Other arguments are pass-throughs to perform_module_state_update, and documented there.
-
-    If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
-
-          'attempted': number of attempts made
-          'succeeded': number of attempts that "succeeded"
-          'skipped': number of attempts that "skipped"
-          'failed': number of attempts that "failed"
-          'total': number of possible subtasks to attempt
-          'action_name': user-visible verb to use in status messages.  Should be past-tense.
-              Pass-through of input `action_name`.
-          'duration_ms': how long the task has (or had) been running.
-
-    Before returning, this is also JSON-serialized and stored in the task_output column of the InstructorTask entry.
-
-    If an exception is raised internally, it is caught and recorded in the InstructorTask entry.
-    This is also a JSON-serialized dict, stored in the task_output column, containing the following keys:
-
-           'exception':  type of exception object
-           'message': error message from exception object
-           'traceback': traceback information (truncated if necessary)
-
-    Once the exception is caught, it is raised again and allowed to pass up to the
-    task-running level, so that it can also set the failure modes and capture the error trace in the
-    result object that Celery creates.
-
-    """
-
-    # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
-    # There's no point in catching it here.
-    entry = InstructorTask.objects.get(pk=entry_id)
-
-    # get inputs to use in this task from the entry:
-    task_id = entry.task_id
-    course_id = entry.course_id
-    task_input = json.loads(entry.task_input)
-
-    # construct log message:
-    fmt = 'task "{task_id}": course "{course_id}" input "{task_input}"'
-    task_info_string = fmt.format(task_id=task_id, course_id=course_id, task_input=task_input)
-
-    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
-
-    # Check that the task_id submitted in the InstructorTask matches the current task
-    # that is running.
-    request_task_id = _get_current_task().request.id
-    if task_id != request_task_id:
-        fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
-        message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
-        TASK_LOG.error(message)
-        raise UpdateProblemModuleStateError(message)
-
-    # Now do the work:
-    with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
-        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
-
-    # Release any queries that the connection has been hanging onto:
-    reset_queries()
-
-    # log and exit, returning task_progress info as task result:
-    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
-    return task_progress
-
-
 def _get_task_id_from_xmodule_args(xmodule_instance_args):
     """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
     return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID) if xmodule_instance_args is not None else UNKNOWN_TASK_ID
 
 
 def _get_xqueue_callback_url_prefix(xmodule_instance_args):
-    """
-
-    """
+    """Gets prefix to use when constructing xqueue_callback_url."""
     return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
 
 
