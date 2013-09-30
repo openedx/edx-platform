@@ -42,8 +42,6 @@ from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
 
-from pudb import set_trace
-
 log = logging.getLogger(__name__)
 
 
@@ -670,9 +668,8 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
+@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-# todo check if staff is the desired access level
-# todo do html and plaintext messages
 @require_level('staff')
 @require_query_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
@@ -683,7 +680,6 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
-    set_trace()
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, course, 'instructor')
     send_to = request.GET.get("send_to")
