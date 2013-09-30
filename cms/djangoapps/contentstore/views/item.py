@@ -23,6 +23,8 @@ from .transcripts_ajax import (
     rename_transcripts,
 )
 
+from .transcripts_utils import manage_video_subtitles_save
+
 from ..utils import get_modulestore
 
 from .access import has_access
@@ -129,6 +131,9 @@ def save_item(request):
     except (ItemNotFoundError, InvalidLocationError):
         log.error("Can't find item by location.")
         return JsonResponse()
+
+    if new_item.category == 'video':
+        manage_video_transcripts(old_item, new_item)
 
     return JsonResponse()
 

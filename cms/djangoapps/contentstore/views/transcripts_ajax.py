@@ -28,6 +28,8 @@ from ..transcripts_utils import (
     download_youtube_subs, get_transcripts_from_youtube,
     YOUTUBE_API,
     save_subs_to_store,
+    _rename_transcripts,
+    save_module
 )
 
 from ..utils import get_modulestore
@@ -36,14 +38,7 @@ from .access import has_access
 log = logging.getLogger(__name__)
 
 
-def save_module(item):
-    """
-    Proceed with additional save operations.
-    """
-    item.save()
-    store = get_modulestore(Location(item.id))
-    store.update_metadata(item.id, own_metadata(item))
-    return item
+
 
 
 def upload_transcripts(request):
@@ -438,25 +433,6 @@ def validate_transcripts_data(request):
     return True, data, videos, item
 
 
-def _rename_transcript(new_name, old_name, item, delete_old=False):
-    """
-    Renames old_name to new_name transcripts files in storage.
-    """
-    filename = 'subs_{0}.srt.sjson'.format(old_name)
-    content_location = StaticContent.compute_location(
-        item.location.org, item.location.course, filename)
-    try:
-        transcripts = contentstore().find(content_location).data
-        save_subs_to_store(json.loads(transcripts), new_name, item)
-        item.sub = new_name
-        item = save_module(item)
-    except NotFoundError:
-        log.debug("Can't find transcripts in storage for id: {}".format(old_name))
-        return False
-    else:
-        if delete_old:
-            remove_subs_from_store(old_name, item)
-        return True
 
 
 def rename_transcripts(request):

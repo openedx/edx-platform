@@ -15,6 +15,10 @@ from django.conf import settings
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.modulestore.inheritance import own_metadata
+
+from .utils import get_modulestore
 
 log = logging.getLogger(__name__)
 
@@ -267,3 +271,52 @@ def generate_srt_from_sjson(sjson_subs, speed):
     output.seek(0)
 
     return output.read()
+
+
+def save_module(item):
+    """
+    Proceed with additional save operations.
+    """
+    item.save()
+    store = get_modulestore(Location(item.id))
+    store.update_metadata(item.id, own_metadata(item))
+    return item
+
+
+def _rename_transcript(new_name, old_name, item, delete_old=False):
+    """
+    Renames old_name to new_name transcripts files in storage.
+    """
+    filename = 'subs_{0}.srt.sjson'.format(old_name)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename)
+    try:
+        transcripts = contentstore().find(content_location).data
+        save_subs_to_store(json.loads(transcripts), new_name, item)
+        item.sub = new_name
+        item = save_module(item)
+    except NotFoundError:
+        log.debug("Can't find transcripts in storage for id: {}".format(old_name))
+        return False
+    else:
+        if delete_old:
+            remove_subs_from_store(old_name, item)
+        return True
+
+
+def manage_video_subtitles_save(old_item, new_item):
+    """
+    Does some spesific thins, that can be done only on save.
+
+    List of things::
+
+    1. If value of new_item.sub field is different from values of video fields,
+    and new_item.sub file is present,
+    cretes copies of new_item.sub file with new names, equal to video names.
+    """
+
+    # 1.
+    possible_video_id_list = [new_item.youtube_id_1_0].extend(new_item.html5_sources)
+    for video_id in [x for x in possible_video_id_list if x]:
+        status = _rename_transcript(video_id, new_item.sub, new_item)
+        log.debug("Copying {} file content to {} name is {}".format(new_item.sub, video_id, status))
