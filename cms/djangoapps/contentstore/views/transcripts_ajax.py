@@ -28,7 +28,7 @@ from ..transcripts_utils import (
     download_youtube_subs, get_transcripts_from_youtube,
     YOUTUBE_API,
     save_subs_to_store,
-    _rename_transcripts,
+    copy_or_rename_transcript,
     save_module
 )
 

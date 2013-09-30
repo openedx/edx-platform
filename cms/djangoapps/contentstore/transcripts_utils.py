@@ -283,7 +283,7 @@ def save_module(item):
     return item
 
 
-def _rename_transcript(new_name, old_name, item, delete_old=False):
+def copy_or_rename_transcript(new_name, old_name, item, delete_old=False):
     """
     Renames old_name to new_name transcripts files in storage.
     """
@@ -318,5 +318,5 @@ def manage_video_subtitles_save(old_item, new_item):
     # 1.
     possible_video_id_list = [new_item.youtube_id_1_0].extend(new_item.html5_sources)
     for video_id in [x for x in possible_video_id_list if x]:
-        status = _rename_transcript(video_id, new_item.sub, new_item)
+        status = copy_or_rename_transcript(video_id, new_item.sub, new_item)
         log.debug("Copying {} file content to {} name is {}".format(new_item.sub, video_id, status))

@@ -23,7 +23,7 @@ from .transcripts_ajax import (
     rename_transcripts,
 )
 
-from .transcripts_utils import manage_video_subtitles_save
+from ..transcripts_utils import manage_video_subtitles_save
 
 from ..utils import get_modulestore
 
