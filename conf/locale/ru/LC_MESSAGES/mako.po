@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-09-30 15:31+0400\n"
+"POT-Creation-Date: 2013-09-30 16:56+0400\n"
 "PO-Revision-Date: 2013-09-25 16:19+0400\n"
 "Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -3557,14 +3557,193 @@ msgstr "Проверка"
 msgid "Error: {msg}"
 msgstr "Ошибка: {msg}"
 
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:194
+msgid "Display Name"
+msgstr "Отображаемое имя:"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:195
+msgid "This name appears in the horizontal navigation at the top of the page."
+msgstr "Данное имя появится в горизонтальной навигации сверху страницы"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:196
+msgid "Open Response Assessment"
+msgstr "Открытый ответ"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:200
+msgid "Current task that the student is on."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:205
+msgid ""
+"A list of lists of state dictionaries for student states that are saved.This "
+"field is only populated if the instructor changes tasks afterthe module is "
+"created and students have attempted it (for example changes a self assessed "
+"problem to self and peer assessed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:212
+msgid "List of state dictionaries of each task within this module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:216
+msgid "Which step within the current task that the student is on."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:217
+msgid "initial"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:221
+#: lms/templates/peer_grading/peer_grading.html:33
+msgid "Graded"
+msgstr "Оценено"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:222
+msgid "Defines whether the student gets credit for grading this problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:227
+#, fuzzy
+msgid "Number of attempts taken by the student on this problem"
+msgstr "Количество попыток,  <br />разрешенных на задание:"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:232
+msgid "If the problem is ready to be reset or not."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:237
+msgid "Maximum Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
+msgid "The number of times the student can try to answer this problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:244
+#, fuzzy
+msgid "Allow File Uploads"
+msgstr "Файлы &amp; Загрузки"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:245
+msgid "Whether or not the student can submit files as a response."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:250
+msgid "Disable Quality Filter"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:251
+msgid ""
+"If False, the Quality Filter is enabled and submissions with poor spelling, "
+"short length, or poor grammar will not be peer reviewed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:256
+#, fuzzy
+msgid "Peer Track Changes"
+msgstr "Сохранить изменения"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:257
+msgid ""
+"EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  If set to 'True', peer graders "
+"will be able to make changes to the student submission and those changes "
+"will be tracked and shown along with the graded feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:264
+msgid "Date that this problem is due by"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:268
+msgid "Amount of time after the due date that submissions will be accepted"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:271
+msgid "Current version number"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:272
+msgid "XML data for the problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:275
+#, fuzzy
+msgid "Problem Weight"
+msgstr "Список задач"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
+msgid ""
+"Defines the number of points each problem is worth. If the value is not set, "
+"each problem is worth one point."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:282
+msgid "Minimum Peer Grading Calibrations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:283
+msgid ""
+"The minimum number of calibration essays each student will need to complete "
+"for peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:289
+msgid "Maximum Peer Grading Calibrations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:290
+msgid ""
+"The maximum number of calibration essays each student will need to complete "
+"for peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:296
+msgid "Peer Graders per Response"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:297
+msgid "The number of peers who will grade each submission."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:303
+#, fuzzy
+msgid "Required Peer Grading"
+msgstr "Перекрестная проверка"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:304
+msgid ""
+"The number of other students each student making a submission will have to "
+"grade."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:310
+msgid "Allow \"overgrading\" of peer submissions"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:311
+msgid ""
+"Allow students to peer grade submissions that already have the requisite "
+"number of graders, but ONLY WHEN all submissions they are eligible to grade "
+"already have enough graders.  This is intended for use when settings for "
+"`Required Peer Grading` > `Peer Graders per Response`"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:318
+msgid "Markdown source of this module"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:632
 msgid "Could not contact the graders.  Please notify course staff."
-msgstr "Невозможно связаться с системой оценивания.  Пожалуйста сообщите о случившемся администраторам курса."
+msgstr ""
+"Невозможно связаться с системой оценивания.  Пожалуйста сообщите о "
+"случившемся администраторам курса."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:636
 msgid ""
 "Received invalid response from the graders.  Please notify course staff."
-msgstr "Получен некоректный ответ от системы оценивания.  Пожалуйста сообщите о случившемся администраторам курса."
+msgstr ""
+"Получен некоректный ответ от системы оценивания.  Пожалуйста сообщите о "
+"случившемся администраторам курса."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:644
 msgid "Feedback not available yet"
@@ -7787,10 +7966,6 @@ msgstr "Вот список задач, требующих перекрестн�
 #: lms/templates/peer_grading/peer_grading.html:32
 msgid "Due date"
 msgstr "Дата сдачи"
-
-#: lms/templates/peer_grading/peer_grading.html:33
-msgid "Graded"
-msgstr "Оценено"
 
 #: lms/templates/peer_grading/peer_grading.html:34
 msgid "Available"
