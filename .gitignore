@@ -31,6 +31,7 @@ conf/locale/en/LC_MESSAGES/*.po
 
 ### Testing artifacts
 .testids/
+.noseids
 nosetests.xml
 .coverage
 coverage.xml
