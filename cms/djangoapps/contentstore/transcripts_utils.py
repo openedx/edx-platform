@@ -316,7 +316,11 @@ def manage_video_subtitles_save(old_item, new_item):
     """
 
     # 1.
-    possible_video_id_list = [new_item.youtube_id_1_0].extend(new_item.html5_sources)
+    # assume '.' and '/' are not in filenames
+    html5_ids = [x.split('/')[-1].split('.')[0] for x in new_item.html5_sources]
+    possible_video_id_list = [new_item.youtube_id_1_0] + html5_ids
+    sub_name = new_item.sub
     for video_id in [x for x in possible_video_id_list if x]:
-        status = copy_or_rename_transcript(video_id, new_item.sub, new_item)
-        log.debug("Copying {} file content to {} name is {}".format(new_item.sub, video_id, status))
+        # copy_or_rename_transcript changes item.sub of module
+        status = copy_or_rename_transcript(video_id, sub_name, new_item)
+        log.debug("Copying {} file content to {} name is {}".format(sub_name, video_id, status))
