@@ -20,11 +20,11 @@
   // UI: import form
   .import-form {
     @include box-sizing(border-box);
-    @extend .ui-window;
+    @extend %ui-window;
     padding: $baseline ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
 
     > .title {
-      @extend .t-title4;
+      @extend %t-title4;
     }
 
     .file-name-block,
@@ -46,8 +46,8 @@
 
   // UI: default
   .action-choose-file {
-    @extend .btn-primary-blue;
-    @extend .t-action1;
+    @extend %btn-primary-blue;
+    @extend %t-action1;
     display: block;
     margin: $baseline 0;
     padding: ($baseline*0.75) $baseline;
@@ -57,13 +57,13 @@
 
   // UI: elem - file selection
   .wrapper-file-name {
-    @extend .ui-well;
+    @extend %ui-well;
     margin: $baseline 0;
     padding: $baseline ($baseline*1.5);
     background-color: $gray-l4;
 
     .title {
-      @extend .t-copy-lead1;
+      @extend %t-copy-lead1;
       margin-bottom: ($baseline*0.75);
       overflow-x: hidden;
       text-overflow: ellipsis;
@@ -79,8 +79,8 @@
 
     // artifact styling needed for current page behavior logic
     .submit-button {
-      @extend .btn-primary-green;
-      @extend .t-action1;
+      @extend %btn-primary-green;
+      @extend %t-action1;
       display: none;
       width: 100%;
       padding: ($baseline*0.75) $baseline;
@@ -101,7 +101,7 @@
     }
 
     > .title {
-      @extend .t-title4;
+      @extend %t-title4;
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
       padding-bottom: ($baseline/2);
@@ -130,12 +130,12 @@
         margin-left: ($baseline*3);
 
         .title {
-          @extend .t-title5;
+          @extend %t-title5;
           font-weight: 600;
         }
 
         .copy {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
           color: $gray-l2;
         }
       }
