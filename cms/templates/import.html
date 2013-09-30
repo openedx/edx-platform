@@ -179,6 +179,7 @@ $('#fileupload').fileupload({
     autoUpload: false,
 
     add: function(e, data) {
+        clearImportDisplay();
         submitBtn.unbind('click');
         file = data.files[0];
         if (file.name.match(/tar\.gz$/)) {
@@ -198,10 +199,8 @@ $('#fileupload').fileupload({
                         else {
                             alert('${_("Your import has failed.")}\n\n' + errMsg);
                         }
-                        submitBtn.show();
                         bar.hide();
                         chooseBtn.html('${_("Choose new file")}').show();
-                        bar.hide();
                     }
                 });
             });
@@ -235,15 +234,14 @@ $('#fileupload').fileupload({
         bar.hide();
         window.onbeforeunload = null;
         displayFinishedImport();
-        alert('${_("Your import was successful.")}');
-        window.location = '${successful_import_redirect_url}';
     },
     start: function(e) {
         window.onbeforeunload = function() {
             return '${_("Your import is in progress; navigating away will abort it.")}';
         }
     },
-    sequentialUploads: true
+    sequentialUploads: true,
+    notifyOnError: false
 
 });
 
