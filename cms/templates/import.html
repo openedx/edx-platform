@@ -101,6 +101,16 @@
                 <p class="copy">${_("Replacing previous course content with imported content")}</p>
               </div>
             </li>
+            <li class="item-progresspoint item-progresspoint-success is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-check"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Success")}</h3>
+                <p class="copy">${_("Your imported content has now replaced all other course content")}</p>
+              </div>
+            </li>
           </ol>
         </div>
       </form>
@@ -144,6 +154,12 @@ var allStats = $('#status-infos');
 
 var feedbackUrl = "${reverse('import_status', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name='fillerName'))}"
 
+var defaults = [
+    '${_("There was an error during the upload process.")}\n',
+    '${_("There was an error while unpacking the file.")}\n',
+    '${_("There was an error while verifying the file you submitted.")}\n',
+    '${_("There was an error while importing the new course to our database.")}\n'
+];
 
 $('#fileupload').fileupload({
 
@@ -163,8 +179,17 @@ $('#fileupload').fileupload({
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
                     if (xhr.status != 200) {
-                        var errMsg = result.hasOwnProperty("ErrMsg") ? result["ErrMsg"] : "" ;
-                        alert('${_("Your import has failed.")}\n\n' + errMsg);
+                        window.stopGetStatus = true;
+                        window.onbeforeunload = null;
+                        var serverMsg = JSON.parse(result["responseText"]);
+                        var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg["ErrMsg"] : "" ;
+                        if (serverMsg.hasOwnProperty("Stage")) {
+                            var stage = serverMsg["Stage"]
+                            stageError(stage, defaults[stage] + errMsg);
+                        }
+                        else {
+                            alert('${_("Your import has failed.")}\n\n' + errMsg);
+                        }
                         submitBtn.show();
                         bar.hide();
                     }
@@ -199,6 +224,7 @@ $('#fileupload').fileupload({
     done: function(e, data){
         bar.hide();
         window.onbeforeunload = null;
+        displayFinishedImport();
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
     },
