@@ -23,6 +23,8 @@ from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
+from django.utils.translation import ugettext as _
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -690,7 +692,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = "Your response has been submitted.  Please check back later for your grade."
+                eta_string = _("Your response has been submitted.  Please check back later for your grade.")
         else:
             post_assessment = ""
             correct = ""
