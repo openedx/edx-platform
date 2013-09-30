@@ -64,9 +64,9 @@
 
     .title {
       @extend %t-copy-lead1;
-      margin-bottom: ($baseline*0.75);
       overflow-x: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 0;
 
       .label {
         margin-right: ($baseline/2);
@@ -82,6 +82,7 @@
       @extend %btn-primary-green;
       @extend %t-action1;
       display: none;
+      margin-top: ($baseline*0.75);
       width: 100%;
       padding: ($baseline*0.75) $baseline;
     }
