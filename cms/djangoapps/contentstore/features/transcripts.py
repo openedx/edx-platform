@@ -213,6 +213,7 @@ def set_value_transcripts_field(_step, value, field_name):
     world.wait(DELAY)
     world.click_link_by_text('Advanced')
 
+    world.wait(0.5*DELAY)
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     world.css_fill(field_id, value.strip())
 
