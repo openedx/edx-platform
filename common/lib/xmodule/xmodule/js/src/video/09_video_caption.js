@@ -152,7 +152,7 @@ function () {
                 this.videoCaption.onMovement
             );
 
-        if (this.videoType === 'html5') {
+        if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
             this.el.on('mousemove', this.videoCaption.autoShowCaptions);
             this.el.on('keydown', this.videoCaption.autoShowCaptions);
 
@@ -335,7 +335,7 @@ function () {
 
         this.videoCaption.setSubtitlesHeight();
 
-        if (this.videoType === 'html5') {
+        if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
             this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
 
             this.videoCaption.subtitlesEl.addClass('html5');
@@ -722,7 +722,7 @@ function () {
 
     function setSubtitlesHeight() {
         var height = 0;
-        if (this.videoType === 'html5'){
+        if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
             // on page load captionHidden = undefined
             if  (
                 (

@@ -295,6 +295,11 @@ function (VideoPlayer) {
                                 ),
             youtubeStreams:     this.el.data('streams'),
 
+            autohideHtml5:      (
+                                    this.el.data('autohide-html5')
+                                        .toString().toLowerCase() === 'true'
+                                ),
+
             sub:                this.el.data('sub'),
             mp4Source:          this.el.data('mp4-source'),
             webmSource:         this.el.data('webm-source'),
@@ -306,6 +311,8 @@ function (VideoPlayer) {
 
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
+
+        console.log('this.config.autohideHtml5 = ' + this.config.autohideHtml5);
 
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
