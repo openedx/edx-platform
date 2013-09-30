@@ -548,7 +548,7 @@ Feature: Video Component Editor
         And I see "video_name_1" value in the "HTML5 Timed Transcript" field
 
     # 30
-    Scenario: Change transcripts field in Advanced tab
+    Scenario: Check non-ascii (chinise) transcripts
         Given I have created a Video component
         And I edit the component
 
@@ -556,7 +556,6 @@ Feature: Video Component Editor
         Then I see not found status message
         And I upload the transcripts file "chinese_transcripts.srt"
 
-        And I set "t_not_exist" value to the "HTML5 Timed Transcript" field
         Then I see uploaded_successfully status message
 
         And I save changes
