@@ -864,7 +864,7 @@ class NumericalResponse(LoncapaResponse):
             except Exception:
                 log.debug("Content error--answer '%s' is not a valid number", self.correct_answer)
                 raise StudentInputError(
-                    "There was a problem with the staff answer to this problem"
+                    _("There was a problem with the staff answer to this problem")
                 )
 
         return correct_ans
@@ -876,7 +876,7 @@ class NumericalResponse(LoncapaResponse):
         correct_float = self.get_staff_ans()
 
         general_exception = StudentInputError(
-            u"Could not interpret '{0}' as a number".format(cgi.escape(student_answer))
+            _("Could not interpret '{0}' as a number").format(cgi.escape(student_answer))
         )
 
         # Begin `evaluator` block
@@ -885,7 +885,7 @@ class NumericalResponse(LoncapaResponse):
             student_float = evaluator({}, {}, student_answer)
         except UndefinedVariable as undef_var:
             raise StudentInputError(
-                u"You may not use variables ({0}) in numerical problems".format(undef_var.message)
+                _("You may not use variables ({text}) in numerical problems").format(text = undef_var.message)
             )
         except ValueError as val_err:
             if 'factorial' in val_err.message:
@@ -894,14 +894,13 @@ class NumericalResponse(LoncapaResponse):
                 # ve.message will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(
-                    ("factorial function evaluated outside its domain:"
-                     "'{0}'").format(cgi.escape(student_answer))
+                    _("factorial function evaluated outside its domain: '{0}'").format(cgi.escape(student_answer))
                 )
             else:
                 raise general_exception
         except ParseException:
             raise StudentInputError(
-                u"Invalid math syntax: '{0}'".format(cgi.escape(student_answer))
+                _("Invalid math syntax: '{0}'").format(cgi.escape(student_answer))
             )
         except Exception:
             raise general_exception
@@ -1236,7 +1235,7 @@ class CustomResponse(LoncapaResponse):
                 else:
                     log.error(traceback.format_exc())
                     raise ResponseError(
-                        "CustomResponse: check function returned an invalid dict")
+                        _("CustomResponse: check function returned an invalid dict"))
 
             else:
                 correct = ['correct' if ret else 'incorrect'] * len(idset)
