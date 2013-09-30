@@ -133,7 +133,7 @@ def save_item(request):
         return JsonResponse()
 
     if new_item.category == 'video':
-        manage_video_transcripts(old_item, new_item)
+        manage_video_subtitles_save(old_item, new_item)
 
     return JsonResponse()
 
