@@ -179,6 +179,9 @@ MITX_FEATURES = {
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Automatically approve student identity verification attempts
+    'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 }
 
 # Used for A/B testing
@@ -587,7 +590,7 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-    
+
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
 )
