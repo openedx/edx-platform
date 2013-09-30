@@ -25,6 +25,7 @@
         <p>${_("You may import existing course structure and content into Studio.")}</p>
 
           <p>${_("Importing is not something to take lightly as the course content you successfully upload will replace your current content and cannot be reversed. Please be certain you want to replace your course's content.")}</p>
+          <p>${_("During the import process, please do not navigate away from this page.")}</p>
       </div>
 
       <form id="fileupload" method="post" enctype="multipart/form-data"
@@ -97,7 +98,7 @@
               </span>
 
               <div class="status-detail">
-                <h3 class="title">${_("Import Complete")}</h3>
+                <h3 class="title">${_("Updating Course")}</h3>
                 <p class="copy">${_("Replacing previous course content with imported content")}</p>
               </div>
             </li>
@@ -143,12 +144,12 @@
 require(["jquery", "jquery.fileupload"], function($) {
 
 var file;
-var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
 var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
+var chooseBtn = $('.choose-file-button');
 
 var allStats = $('#status-infos');
 
@@ -192,7 +193,8 @@ $('#fileupload').fileupload({
                         }
                         submitBtn.show();
                         bar.hide();
-                    }
+                        chooseBtn.html('${_("Choose new file")}').show();
+                    } 
                 });
             });
         } else {
@@ -203,7 +205,6 @@ $('#fileupload').fileupload({
     progressall: function(e, data){
         var doneAt;
         var percentInt = data.loaded / data.total * 100
-        var percentVal = parseInt(percentInt, 10) + "%";
         // Firefox makes ProgressEvent.loaded equal ProgressEvent.total only
         // after receiving a response from the server (see Mozilla bug 637002),
         // so for Firefox we jump the gun a little.
@@ -213,16 +214,10 @@ $('#fileupload').fileupload({
             doneAt = 99;
         }
         if (percentInt >= doneAt) {
-            bar.hide();
             startServerFeedback(feedbackUrl.replace("fillerName", file.name));
-        } else {
-            bar.show();
-            fill.width(percentVal);
-            percent.html(percentVal);
-        }
+        } 
     },
     done: function(e, data){
-        bar.hide();
         window.onbeforeunload = null;
         displayFinishedImport();
         alert('${_("Your import was successful.")}');
