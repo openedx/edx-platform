@@ -1,0 +1,18 @@
+
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">register verification-process step-photos</%block>
+<%block name="title"><title>${_("Verification Submission Confirmation")}</title></%block>
+
+<%block name="js_extra">
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
+</%block>
+<%block name="content">
+<p>Successfully reverified!</p>
+
+<p><a href="${reverse('dashboard')}">Return to Dashboard</a></p>
+</%block>
