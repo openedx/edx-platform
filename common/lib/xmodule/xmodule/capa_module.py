@@ -943,7 +943,7 @@ class CapaModule(CapaFields, XModule):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = u"Error: {msg}".format(msg=inst.message)
+                msg = _("Error: {msg}").format(msg=inst.message)
 
             return {'success': msg}
 
@@ -1095,8 +1095,9 @@ class CapaModule(CapaFields, XModule):
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
+        msg_long = "Your answers have been saved but not graded. Hit 'Check' to grade them."
         if not self.max_attempts == 0:
-            msg += " but not graded. Hit 'Check' to grade them."
+            msg = msg_long
         return {'success': True,
                 'msg': msg}
 
