@@ -54,6 +54,19 @@ function () {
 
     function _buildHandle(state) {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
+
+        // ARIA
+        // Let screen readers know that this anchor behaves like a slider, is
+        // named 'video position' and give its state
+        state.videoProgressSlider.handle.attr({
+            'role': gettext('slider'),
+            'title': 'video position',
+            'aria-disabled': 'false',
+            'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
+            //'aria-valuenow': state.videoProgressSlider.slider.slider('option', 'value'),
+            //'aria-valuemin': state.videoProgressSlider.slider.slider('option', 'min'),
+            //'aria-valuemax': state.videoProgressSlider.slider.slider('option', 'max')
+        });
     }
 
     // ***************************************************************
@@ -74,6 +87,10 @@ function () {
         this.videoProgressSlider.frozen = true;
 
         this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+
+        // ARIA
+        this.videoProgressSlider.handle.attr('aria-valuetext', 
+                                             getTimeDescription(this.videoPlayer.currentTime));
     }
 
     function onStop(event, ui) {
@@ -82,6 +99,10 @@ function () {
         this.videoProgressSlider.frozen = true;
 
         this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+
+        // ARIA
+        this.videoProgressSlider.handle.attr('aria-valuetext',
+                                             getTimeDescription(this.videoPlayer.currentTime));
 
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;
@@ -97,6 +118,53 @@ function () {
             this.videoProgressSlider.slider.slider('option', 'max', params.duration);
             this.videoProgressSlider.slider.slider('option', 'value', params.time);
         }
+    }
+
+    function getTimeDescription(time) {
+        var seconds = Math.floor(time),
+            minutes = Math.floor(seconds / 60),
+            hours = Math.floor(minutes / 60),
+            hrStr, minStr, secStr;
+      seconds = seconds % 60;
+      minutes = minutes % 60;
+
+      hrStr = hours.toString(10);
+      minStr = minutes.toString(10);
+      secStr = seconds.toString(10);
+
+      if (hours) {
+        hrStr += (hours < 2 ? ' hour ' : ' hours ');
+        if (minutes) {  
+            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+        }
+        else {
+            minStr += ' 0 minutes ';
+        }
+        if (seconds) {   
+            secStr += (seconds < 2 ? ' second ' : ' seconds ');
+        }
+        else {
+            secStr += ' 0 seconds ';
+        }    
+        return hrStr + minStr + secStr;
+      }
+      else if (minutes) {
+        minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+        if (seconds) {   
+            secStr += (seconds < 2 ? ' second ' : ' seconds ');
+        }
+        else {
+            secStr += ' 0 seconds ';
+        }
+        return minStr + secStr;
+      }
+      else if (seconds) {
+        secStr += (seconds < 2 ? ' second ' : ' seconds ');
+        return secStr;
+      }
+      else {
+        return '0 seconds';
+      }
     }
 
 });
