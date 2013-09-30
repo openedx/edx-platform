@@ -313,6 +313,7 @@ def manage_video_subtitles_save(old_item, new_item):
     1. If value of new_item.sub field is different from values of video fields,
     and new_item.sub file is present,
     cretes copies of new_item.sub file with new names, equal to video names.
+    Also changes sub field of module.
     """
 
     # 1.
