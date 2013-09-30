@@ -668,6 +668,7 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')

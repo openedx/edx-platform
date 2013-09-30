@@ -45,7 +45,7 @@ def instructor_dashboard_2(request, course_id):
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
-        _section_send_email(course_id, access,course),
+        _section_send_email(course_id, access,course), 
         _section_analytics(course_id)
     ]
 
