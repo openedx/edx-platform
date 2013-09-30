@@ -345,8 +345,8 @@ function () {
         // Keeps track of where the focus is situated in the array of captions.
         // Used to implement the automatic scrolling behavior and decide if the
         // outline around a caption has to be hidden or shown on a mouseenter or
-        // mouseleave.
-        this.videoCaption.currentCaptionIndex = 0;
+        // mouseleave. Initially, no caption has the focus, set the index to -1.
+        this.videoCaption.currentCaptionIndex = -1;
         // Used to track if the focus is coming from a click or tabbing. This 
         // has to be known to decide if, when a caption gets the focus, an 
         // outline has to be drawn (tabbing) or not (mouse click).
