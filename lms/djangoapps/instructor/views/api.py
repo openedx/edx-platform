@@ -687,8 +687,8 @@ def send_email(request, course_id):
     subject = request.GET.get("subject")
     message = request.GET.get("message")
     text_message = html_to_text(message)
-    if subject == "":
-        return HttpResponseBadRequest("Operation requires instructor access.")
+    if not has_instructor_access:
+        return HttpResponseForbidden("Operation requires instructor access.")
     email = CourseEmail(
         course_id = course_id,
         sender=request.user,
