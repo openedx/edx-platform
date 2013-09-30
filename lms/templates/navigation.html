@@ -84,7 +84,7 @@ site_status_msg = get_site_status_msg(course_id)
       </li>
     </ol>
       % if settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and \
-           settings.MITX_FEATURES['ENABLE_SHOPPING_CART'] and \
+           settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and \
            shoppingcart.models.Order.user_cart_has_items(user):
         <ol class="user">
           <li class="primary">
