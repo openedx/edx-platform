@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Add PaidCourseRegistration mode, where payment is required before course registration.
+
 LMS: Add split testing functionality for internal use.
 
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered for class).
