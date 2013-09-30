@@ -71,7 +71,7 @@ def upload_transcripts(request):
         return JsonResponse(response)
 
     video_list = json.loads(video_list)
-    source_subs_filedata = request.FILES['file'].read()
+    source_subs_filedata = request.FILES['file'].read().decode('utf8')
     source_subs_filename = request.FILES['file'].name
 
     if '.' not in source_subs_filename:
