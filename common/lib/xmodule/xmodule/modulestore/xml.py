@@ -17,13 +17,12 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+from xmodule.x_module import XMLParsingSystem
 
 from xmodule.html_module import HtmlDescriptor
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
-from xblock.plugin import PluginMissingError
 
 from . import ModuleStoreBase, Location, XML_MODULESTORE_TYPE
 
@@ -65,7 +64,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.load_error_modules = load_error_modules
 
         def process_xml(xml):
-            """Takes an xml string, and returns a XModuleDescriptor created from
+            """Takes an xml string, and returns a XBlock created from
             that xml.
             """
 
@@ -312,8 +311,8 @@ class XMLModuleStore(ModuleStoreBase):
         super(XMLModuleStore, self).__init__(**kwargs)
 
         self.data_dir = path(data_dir)
-        self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
-        self.courses = {}  # course_dir -> XModuleDescriptor for the course
+        self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
+        self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         self.load_error_modules = load_error_modules
@@ -534,7 +533,7 @@ class XMLModuleStore(ModuleStoreBase):
 
     def get_instance(self, course_id, location, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at
+        Returns an XBlock instance for the item at
         location, with the policy for course_id.  (In case two xml
         dirs have different content at the same location, return the
         one for this course_id.)
@@ -562,7 +561,7 @@ class XMLModuleStore(ModuleStoreBase):
 
     def get_item(self, location, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at location.
+        Returns an XBlock instance for the item at location.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
