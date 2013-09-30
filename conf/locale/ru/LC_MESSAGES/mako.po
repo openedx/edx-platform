@@ -1840,7 +1840,7 @@ msgid "Hide Annotations"
 msgstr "Скрыть аннотации"
 
 msgid "Hide Prompt"
-msgstr "Скрыть приглашение"
+msgstr "Скрыть задание"
 
 msgid "Hide Studio Help"
 msgstr "Спрятать Помощь Студии"
