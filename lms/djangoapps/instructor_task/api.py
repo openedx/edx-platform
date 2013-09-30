@@ -178,8 +178,8 @@ def submit_bulk_course_email(request, course_id, email_id):
     The specified CourseEmail object will be sent be updated for all students who have enrolled
     in a course.  Parameters are the `course_id` and the `email_id`, the id of the CourseEmail object.
 
-    AlreadyRunningError is raised if the course's students are already being emailed.
-    TODO: is this the right behavior?  Or should multiple emails be allowed in the pipeline at the same time?
+    AlreadyRunningError is raised if the same recipients are already being emailed with the same
+    CourseEmail object.
 
     This method makes sure the InstructorTask entry is committed.
     When called from any view that is wrapped by TransactionMiddleware,
@@ -188,11 +188,9 @@ def submit_bulk_course_email(request, course_id, email_id):
     save here.  Any future database operations will take place in a
     separate transaction.
     """
-    # check arguments:  make sure that the course is defined?
-    # TODO: what is the right test here?
-
-    # This should also make sure that the email exists.
-    # We can also pull out the To argument here, so that is displayed in
+    # Assume that the course is defined, and that the user has already been verified to have
+    # appropriate access to the course. But make sure that the email exists.
+    # We also pull out the To argument here, so that is displayed in
     # the InstructorTask status.
     email_obj = CourseEmail.objects.get(id=email_id)
     to_option = email_obj.to_option

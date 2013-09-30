@@ -268,7 +268,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     # submit task:
     task_id = instructor_task.task_id
-    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
+    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]  # pylint: disable=E1101
     task_class.apply_async(task_args, task_id=task_id)
 
     return instructor_task

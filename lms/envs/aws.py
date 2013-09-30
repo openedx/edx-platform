@@ -93,6 +93,10 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it.  At the moment, the name is the same.
+BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
 ########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
 
@@ -128,7 +132,7 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-#Email overrides
+# Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 DEFAULT_BULK_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_BULK_FROM_EMAIL', DEFAULT_BULK_FROM_EMAIL)
@@ -140,8 +144,10 @@ BUGS_EMAIL = ENV_TOKENS.get('BUGS_EMAIL', BUGS_EMAIL)
 PAYMENT_SUPPORT_EMAIL = ENV_TOKENS.get('PAYMENT_SUPPORT_EMAIL', PAYMENT_SUPPORT_EMAIL)
 PAID_COURSE_REGISTRATION_CURRENCY = ENV_TOKENS.get('PAID_COURSE_REGISTRATION_CURRENCY',
                                                    PAID_COURSE_REGISTRATION_CURRENCY)
+BULK_EMAIL_DEFAULT_RETRY_DELAY = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_RETRY_DELAY', BULK_EMAIL_DEFAULT_RETRY_DELAY)
+BULK_EMAIL_MAX_RETRIES = ENV_TOKENS.get('BULK_EMAIL_MAX_RETRIES', BULK_EMAIL_MAX_RETRIES)
 
-#Theme overrides
+# Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
@@ -150,10 +156,10 @@ if not THEME_NAME is None:
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
-#Timezone overrides
+# Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
-#Additional installed apps
+# Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
 

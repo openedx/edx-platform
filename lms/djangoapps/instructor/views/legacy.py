@@ -720,18 +720,13 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
-        # TODO: make sure this is committed before submitting it to the task.
-        # However, it should probably be enough to do the submit below, which
-        # will commit the transaction for the InstructorTask object.  Both should
-        # therefore be committed.  (Still, it might be clearer to do so here as well.)
-        # Actually, this should probably be moved out, so that all the validation logic
-        # we might want to add to it can be added.  There might also be something
-        # that would permit validation of the email beforehand.
+        # Create the CourseEmail object.  This is saved immediately, so that
+        # any transaction that has been pending up to this point will also be
+        # committed.
         email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
 
-        # TODO: make this into a task submission, so that the correct
-        # InstructorTask object gets created (for monitoring purposes)
-        submit_bulk_course_email(request, course_id, email.id)
+        # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+        submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
         if email_to_option == "all":
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
@@ -1535,7 +1530,6 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
     # (note that we don't have to check that the arguments are valid; it
     # just won't find any entries.)
     if (history_entries.count()) == 0:
-        # TODO: figure out how to deal with task_type better here...
         if problem_url is None:
             msg += '<font color="red">Failed to find any background tasks for course "{course}".</font>'.format(course=course_id)
         elif student is not None:
