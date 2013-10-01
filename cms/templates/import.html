@@ -24,8 +24,8 @@
       <div class="introduction">
         <p>${_("You may import existing course structure and content into Studio.")}</p>
 
-          <p>${_("Importing is not something to take lightly as the course content you successfully upload will replace your current content and cannot be reversed. Please be certain you want to replace your course's content.")}</p>
-          <p>${_("During the import process, please do not navigate away from this page.")}</p>
+          <p>${_("Importing is not something to take lightly as the course content you successfully upload will be integrated into your course content and cannot be reversed.")}</p>
+          <p>${_("During the initial stages of the import process, please do not navigate away from this page.")}</p>
       </div>
 
       <form id="fileupload" method="post" enctype="multipart/form-data"
@@ -99,7 +99,7 @@
 
               <div class="status-detail">
                 <h3 class="title">${_("Updating Course")}</h3>
-                <p class="copy">${_("Replacing previous course content with imported content. This may take a while with larger courses.")}</p>
+                <p class="copy">${_("Integrating your imported content into this course. This may take a while with larger courses.")}</p>
               </div>
             </li>
             <li class="item-progresspoint item-progresspoint-success has-actions is-not-started">
@@ -109,7 +109,7 @@
 
               <div class="status-detail">
                 <h3 class="title">${_("Success")}</h3>
-                <p class="copy">${_("Your imported content has now replaced all other course content")}</p>
+                <p class="copy">${_("Your imported content has now been integrated into this course")}</p>
               </div>
 
               <ul class="list-actions">
@@ -124,11 +124,6 @@
     </article>
 
     <aside class="content-supplementary" role="complimentary">
-      <div class="bit">
-        <h3 class="title-3">${_("Current Content & Importing")}</h3>
-        <p>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</p>
-      </div>
-
       <div class="bit">
         <h3 class="title-3">${_("Gzipped Tar Files (.tar.gz) Only")}</h3>
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
