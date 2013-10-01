@@ -128,11 +128,11 @@ other module level tests include
 
 To run a single django test class:
 
-    rake test_lms[courseware.tests.tests:testViewAuth]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest]
 
 To run a single django test:
 
-    rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login]
 
 To re-run all failing django tests from lms or cms:
 
