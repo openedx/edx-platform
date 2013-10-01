@@ -121,7 +121,6 @@ def _section_student_admin(course_id, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),

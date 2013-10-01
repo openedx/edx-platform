@@ -79,8 +79,6 @@ class StudentAdmin
     @$progress_link               = find_and_assert @$section, "a.progress-link"
     @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
     @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
-    @$btn_enroll                  = @$section.find "input[name='enroll']"
-    @$btn_unenroll                = @$section.find "input[name='unenroll']"
     @$btn_delete_state_single     = @$section.find "input[name='delete-state-single']"
     @$btn_rescore_problem_single  = @$section.find "input[name='rescore-problem-single']"
     @$btn_task_history_single     = @$section.find "input[name='task-history-single']"
@@ -126,33 +124,6 @@ class StudentAdmin
         success: @clear_errors_then (data) ->
           window.location = data.progress_url
         error: std_ajax_err => @$request_response_error_progress.text full_error_message
-
-    # enroll student
-    @$btn_enroll.click =>
-      send_data =
-        action: 'enroll'
-        emails: @$field_student_select_progress.val()
-        auto_enroll: false
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_enroll.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log "student #{send_data.emails} enrolled"
-        error: std_ajax_err => @$request_response_error_progress.text gettext("Error enrolling student '#{send_data.emails}'.")
-
-    # unenroll student
-    @$btn_unenroll.click =>
-      send_data =
-        action: 'unenroll'
-        emails: @$field_student_select_progress.val()
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_unenroll.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log "student #{send_data.emails} unenrolled"
-        error: std_ajax_err => @$request_response_error_progress.text gettext("Error unenrolling student '#{send_data.emails}'.")
 
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
