@@ -142,20 +142,10 @@
         *
         */
         getVideoObjectsList: function () {
-            var parseLink = Transcripts.Utils.parseLink,
-                values = this.getValueFromEditor(),
-                arr = [],
-                data;
+            var utils = Transcripts.Utils,
+                links = this.getValueFromEditor();
 
-            for (var i = 0, len = values.length; i < len; i += 1) {
-                data = parseLink(values[i]);
-
-                if (data.mode !== 'incorrect') {
-                    arr.push(data);
-                }
-            }
-
-            return arr;
+            return utils.getVideoList(links);
         },
 
         /**

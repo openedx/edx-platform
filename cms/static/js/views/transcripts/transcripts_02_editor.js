@@ -75,10 +75,19 @@
                 return false;
             }
 
+            // Get field that should be synchronized with `Advanced` tab fields.
+            videoUrl = getField(this.collection, 'video_url');
+
             modifiedValues = metadataView.getModifiedMetadataValues();
             metadata = $.extend(true, {}, modifiedValues);
             // Save module state
-            utils.command('save', component_id, null, { metadata: metadata });
+            utils.command('save', component_id, null, {
+                metadata: metadata,
+                current_subs: _.pluck(
+                    utils.getVideoList(videoUrl.getDisplayValue()),
+                    'video'
+                )
+            });
 
             // Get values from `Advanced` tab fields (`html5_sources`,
             // `youtube_id_1_0`) that should be synchronized.
@@ -87,9 +96,6 @@
 
             values.youtube = getField(metadataCollection, 'youtube_id_1_0')
                                     .getDisplayValue();
-
-            // Get field that should be synchronized with `Advanced` tab fields.
-            videoUrl = getField(this.collection, 'video_url');
 
             // The length of youtube video_id should be 11 characters.
             if (values.youtube.length === 11) {

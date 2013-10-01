@@ -224,6 +224,50 @@
             return 'http://youtu.be/' + video_id;
         };
 
+
+
+        /**
+        * @function
+        *
+        * Returns list of objects with information about the passed links.
+        *
+        * @param {array} links List of links that will be processed.
+        *
+        * @returns {array} List of objects.
+        *
+        * @examples
+        * var links = [
+        *      'http://youtu.be/OEoXaMPEzfM',
+        *      'video_name.mp4',
+        *      'video_name.webm'
+        * ]
+        *
+        * _getVideoList(links); // =>
+        *     [
+        *       {mode: `youtube`, type: `youtube`, ...},
+        *       {mode: `html5`, type: `mp4`, ...},
+        *       {mode: `html5`, type: `webm`, ...}
+        *     ]
+        *
+        */
+        var _getVideoList = function (links) {
+            if ($.isArray(links)) {
+                var arr = [],
+                    data;
+
+                for (var i = 0, len = links.length; i < len; i += 1) {
+                    data = _linkParser(links[i]);
+
+                    if (data.mode !== 'incorrect') {
+                        arr.push(data);
+                    }
+                }
+
+                return arr;
+            }
+        };
+
+
         /**
         * @function
         *
@@ -310,6 +354,7 @@
             getYoutubeLink: _getYoutubeLink,
             syncCollections: _syncCollections,
             command: _command,
+            getVideoList: _getVideoList,
             Storage: {
                 set: Storage.set,
                 get: Storage.get,

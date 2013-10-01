@@ -61,7 +61,7 @@ def clear_field(_step, index):
     world.css_fill(SELECTORS['url_inputs'], '', index)
     # In some reason chromeDriver doesn't trigger 'input' event after filling
     # field by an empty value. That's why we trigger it manually via jQuery.
-    world.browser.execute_script("$('{0}').eq({1}).trigger('input')".format(SELECTORS['url_inputs'], index))
+    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
 
 
 @step('I expect (.+) inputs are disabled$')
@@ -181,6 +181,11 @@ def upload_file(_step, file_name):
     world.browser.execute_script("$('form.file-chooser').show()")
     world.browser.attach_file('file', os.path.abspath(path))
     world.wait(DELAY)
+
+
+@step('I see "([^"]*)" text in the captions')
+def check_text_in_the_captions(_step, text):
+    assert world.browser.is_text_present(text.strip(), 5)
 
 
 @step('I see "([^"]*)" value in the "([^"]*)" field$')

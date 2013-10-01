@@ -509,7 +509,7 @@ Feature: Video Component Editor
         And I edit the component
         Then I see found status message
 
-    # 28
+    #28
     Scenario: Upload button for youtube id with html5 ids.
         Given I have created a Video component
         And I edit the component
@@ -533,7 +533,7 @@ Feature: Video Component Editor
         And I edit the component
         Then I see found status message
 
-    # 29
+    #29
     Scenario: Change transcripts field in Advanced tab
         Given I have created a Video component with t_not_exist subtitles
         And I edit the component
@@ -551,7 +551,7 @@ Feature: Video Component Editor
         Then I see found status message
         And I see "video_name_1" value in the "HTML5 Transcript" field
 
-    # 30
+    #30
     Scenario: Check non-ascii (chinise) transcripts
         Given I have created a Video component
         And I edit the component
@@ -566,8 +566,8 @@ Feature: Video Component Editor
         Then when I view the video it does show the captions
 
 
-    # 31
-    Scenario: Change transcripts field in Advanced tab
+    #31
+    Scenario: Check saving module metadata on switching between tabs
         Given I have created a Video component with t_not_exist subtitles
         And I edit the component
 
@@ -577,8 +577,7 @@ Feature: Video Component Editor
         And I open tab "Advanced"
         And I set "t_not_exist" value to the "HTML5 Transcript" field
         And I open tab "Basic"
-        Then I see use existing status message
-        And I click use_existing button
+        Then I see found status message
 
         And I save changes
         Then when I view the video it does show the captions
@@ -586,3 +585,71 @@ Feature: Video Component Editor
 
         Then I see found status message
         And I see "video_name_1" value in the "HTML5 Transcript" field
+
+    #32
+    Scenario: After clearing Transcripts field in the Advanced tab "not found" message should be visible w/o saving
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a t_not_exist.mp4 source to field number 1
+        Then I see found status message
+
+        And I open tab "Advanced"
+        And I set "" value to the "HTML5 Transcript" field
+        And I open tab "Basic"
+        Then I see not found status message
+
+        And I save changes
+        Then when I view the video it does not show the captions
+        And I edit the component
+
+        Then I see not found status message
+        And I see "" value in the "HTML5 Transcript" field
+
+    #33
+    Scenario: After clearing Transcripts field in the Advanced tab "not found" message should be visible with saving
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a t_not_exist.mp4 source to field number 1
+        Then I see found status message
+
+        And I save changes
+        And I edit the component
+
+        And I open tab "Advanced"
+        And I set "" value to the "HTML5 Transcript" field
+        And I open tab "Basic"
+        Then I see not found status message
+
+        And I save changes
+        Then when I view the video it does not show the captions
+        And I edit the component
+
+        Then I see not found status message
+        And I see "" value in the "HTML5 Transcript" field
+
+    #34
+    Scenario: Video with existing subs - Advanced tab - change to another one subs - Basic tab - Found message - Save - see correct subs
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a video_name_1.mp4 source to field number 1
+        Then I see not found status message
+
+        And I upload the transcripts file "chinese_transcripts.srt"
+        Then I see uploaded_successfully status message
+
+        And I save changes
+        Then when I view the video it does show the captions
+        And I edit the component
+
+        And I open tab "Advanced"
+        And I set "t_not_exist" value to the "HTML5 Transcript" field
+        And I open tab "Basic"
+        Then I see found status message
+
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "LILA FISHER: Hi, welcome to Edx." text in the captions
+

@@ -26,15 +26,13 @@ from ..transcripts_utils import (
     download_youtube_subs, get_transcripts_from_youtube,
     YOUTUBE_API,
     copy_or_rename_transcript,
-    save_module
+    save_module,
+    manage_video_subtitles_save
 )
 
 from .access import has_access
 
 log = logging.getLogger(__name__)
-
-
-
 
 
 def upload_transcripts(request):
@@ -464,31 +462,44 @@ def rename_transcripts(request):
 
 
 def save_transcripts(request):
-    validation_status = False
-    data = json.loads(request.GET['data'])
-    item_location = data.get('id')
+    response = {'status': 'Error'}
 
+    data = json.loads(request.GET.get('data', '{}'))
+    if not data:
+        log.error('Incoming video data is empty.')
+        return JsonResponse(response)
+
+    item_location = data.get('id')
     try:
-        existing_item = modulestore().get_item(item_location)
+        item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
         log.error("Can't find item by location.")
-        return validation_status, None, {}, None
+        return JsonResponse(response)
 
-    if data.get('metadata') is not None:
-        # update existing metadata with submitted metadata (which can be partial)
-        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
-        # the intent is to make it None, use the nullout field
-        for metadata_key, value in data.get('metadata', {}).items():
-            field = existing_item.fields[metadata_key]
+    metadata = data.get('metadata')
+    if metadata is not None:
+        new_sub = metadata.get('sub')
 
-            if value is None:
-                field.delete_from(existing_item)
-            else:
-                value = field.from_json(value)
-                field.write_to(existing_item, value)
+        for metadata_key, value in metadata.items():
+            setattr(item, metadata_key, value)
 
-    item = save_module(existing_item)
+        new_item = save_module(item)
 
-    response = {'status': 'Success', 'subs': item.sub}
+        if new_sub:
+            manage_video_subtitles_save(item, new_item)
+        else:
+            # If `new_sub` is empty, it means that user do not want to use
+            # transcripts for current video and we remove all
+            # of them.
+            current_subs = data.get('current_subs')
+            if current_subs is not None:
+                for sub in current_subs:
+                    remove_subs_from_store(sub, new_item)
+
+        response = {'status': 'Success'}
+
+    else:
+        log.error("Can't find metadata")
+
     return JsonResponse(response)
 
