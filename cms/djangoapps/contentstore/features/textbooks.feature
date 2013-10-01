@@ -1,4 +1,5 @@
-Feature: Textbooks
+@shard_3
+Feature: CMS.Textbooks
 
   Scenario: No textbooks
     Given I have opened a new course in Studio

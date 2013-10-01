@@ -1,4 +1,5 @@
-Feature: Course Overview
+@shard_1
+Feature: CMS.Course Overview
     In order to quickly view the details of a course's section and set release dates and grading
     As a course author
     I want to use the course overview page
@@ -68,7 +69,7 @@ Feature: Course Overview
     # Safari does not have moveMouseTo implemented
     @skip_internetexplorer
     @skip_safari
-   Scenario: Notification is shown on subsection reorder
+    Scenario: Notification is shown on subsection reorder
         Given I have opened a new course section in Studio
         And I have added a new subsection
         And I have added a new subsection

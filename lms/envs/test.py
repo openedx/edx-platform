@@ -17,6 +17,8 @@ import os
 from path import path
 from warnings import filterwarnings
 
+os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
+
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
@@ -42,6 +44,17 @@ SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+_system = 'lms'
+
+_report_dir = REPO_ROOT / 'reports' / _system
+_report_dir.makedirs_p()
+
+NOSE_ARGS = [
+    '--tests', PROJECT_ROOT / 'djangoapps', COMMON_ROOT / 'djangoapps',
+    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
+    '--xunit-file', _report_dir / 'nosetests.xml',
+]
 
 # Local Directories
 TEST_ROOT = path("test_root")
@@ -97,6 +110,13 @@ MODULESTORE = {
     }
 }
 
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'xcontent',
+    }
+}
 
 DATABASES = {
     'default': {
@@ -158,7 +178,6 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 ###################### Payment ##############################3
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
-
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee

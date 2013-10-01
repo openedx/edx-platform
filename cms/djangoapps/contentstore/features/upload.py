@@ -11,9 +11,10 @@ from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
 
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
+ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
 
 
-@step(u'I go to the files and uploads page')
+@step(u'I go to the files and uploads page$')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = 'li.nav-course-courseware-uploads a'
@@ -59,8 +60,7 @@ def check_not_there(_step, file_name):
     # the only file that was uploaded, our success criteria
     # will be that there are no files.
     # In the future we can refactor if necessary.
-    names_css = 'td.name-col > a.filename'
-    assert(world.is_css_not_present(names_css))
+    assert(world.is_css_not_present(ASSET_NAMES_CSS))
 
 
 @step(u'I should see the file "([^"]*)" was uploaded$')
@@ -88,11 +88,10 @@ def delete_file(_step, file_name):
 
 @step(u'I should see only one "([^"]*)"$')
 def no_duplicate(_step, file_name):
-    names_css = 'td.name-col > a.filename'
-    all_names = world.css_find(names_css)
+    all_names = world.css_find(ASSET_NAMES_CSS)
     only_one = False
     for i in range(len(all_names)):
-        if file_name == world.css_html(names_css, index=i):
+        if file_name == world.css_html(ASSET_NAMES_CSS, index=i):
             only_one = not only_one
     assert only_one
 
@@ -106,29 +105,96 @@ def check_download(_step, file_name):
         downloaded_text = r.text
         assert cur_text == downloaded_text
     #resetting the file back to its original state
+    _write_test_file(file_name, "This is an arbitrary file for testing uploads")
+
+
+def _write_test_file(file_name, text):
+    path = os.path.join(TEST_ROOT, 'uploads/', file_name)
+    #resetting the file back to its original state
     with open(os.path.abspath(path), 'w') as cur_file:
-        cur_file.write("This is an arbitrary file for testing uploads")
+        cur_file.write(text)
 
 
 @step(u'I modify "([^"]*)"$')
 def modify_upload(_step, file_name):
     new_text = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
-    path = os.path.join(TEST_ROOT, 'uploads/', file_name)
-    with open(os.path.abspath(path), 'w') as cur_file:
-        cur_file.write(new_text)
+    _write_test_file(file_name, new_text)
 
 
-@step('I see a confirmation that the file was deleted')
+@step(u'I (lock|unlock) "([^"]*)"$')
+def lock_unlock_file(_step, _lock_state, file_name):
+    index = get_index(file_name)
+    assert index != -1
+    lock_css = "input.lock-checkbox"
+    world.css_find(lock_css)[index].click()
+
+
+@step(u'Then "([^"]*)" is (locked|unlocked)$')
+def verify_lock_unlock_file(_step, file_name, lock_state):
+    index = get_index(file_name)
+    assert index != -1
+    lock_css = "input.lock-checkbox"
+    checked = world.css_find(lock_css)[index]._element.get_attribute('checked')
+    assert_equal(lock_state == "locked", bool(checked))
+
+
+@step(u'I have opened a course with a (locked|unlocked) asset "([^"]*)"$')
+def open_course_with_locked(step, lock_state, file_name):
+    step.given('I have opened a new course in studio')
+    step.given('I go to the files and uploads page')
+    _write_test_file(file_name, "test file")
+    step.given('I upload the file "' + file_name + '"')
+    if lock_state == "locked":
+        step.given('I lock "' + file_name + '"')
+        step.given('I reload the page')
+
+
+@step(u'Then the asset "([^"]*)" is (viewable|protected)$')
+def view_asset(_step, file_name, status):
+    url = '/c4x/MITx/999/asset/' + file_name
+    if status == 'viewable':
+        world.visit(url)
+        _verify_body_text()
+    else:
+        error_thrown = False
+        try:
+            world.visit(url)
+        except Exception as e:
+            assert e.status_code == 403
+            error_thrown = True
+        assert error_thrown
+
+
+@step(u'Then the asset "([^"]*)" can be clicked from the asset index$')
+def click_asset_from_index(step, file_name):
+    # This is not ideal, but I'm having trouble with the middleware not having
+    # the same user in the request when I hit the URL directly.
+    course_link_css = 'a.course-link'
+    world.css_click(course_link_css)
+    step.given("I go to the files and uploads page")
+    index = get_index(file_name)
+    assert index != -1
+    world.css_click('a.filename', index=index)
+    _verify_body_text()
+
+
+def _verify_body_text():
+    def verify_text(driver):
+        return world.css_text('body') == 'test file'
+
+    world.wait_for(verify_text)
+
+
+@step('I see a confirmation that the file was deleted$')
 def i_see_a_delete_confirmation(_step):
     alert_css = '#notification-confirmation'
     assert world.is_css_present(alert_css)
 
 
 def get_index(file_name):
-    names_css = 'td.name-col > a.filename'
-    all_names = world.css_find(names_css)
+    all_names = world.css_find(ASSET_NAMES_CSS)
     for i in range(len(all_names)):
-        if file_name == world.css_html(names_css, index=i):
+        if file_name == world.css_html(ASSET_NAMES_CSS, index=i):
             return i
     return -1
 

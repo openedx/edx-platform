@@ -133,7 +133,7 @@ class SelfAssessmentTest(unittest.TestCase):
         self.assertEqual(test_module.get_display_answer(), saved_response)
 
         # Submit a student response to the question.
-        test_module.handle_ajax("save_answer", {"student_answer": submitted_response, "can_upload_files": False, "student_file": None}, get_test_system())
+        test_module.handle_ajax("save_answer", {"student_answer": submitted_response}, get_test_system())
         # Submitting an answer should clear the stored answer.
         self.assertEqual(test_module.stored_answer, None)
         # Confirm that the answer is stored properly.

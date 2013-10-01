@@ -10,7 +10,7 @@ div.peer-grading{
     div.feedback-area.track-changes {
         position: relative;
         margin: 0px;
-        height: 150px;
+        height: 400px;
         border: 1px solid lightgray;
         padding: 5px;
         resize: vertical;
@@ -18,7 +18,7 @@ div.peer-grading{
         overflow: auto;
     }
 
-    div.feedback-area.track-changes, p.legend {
+    div.feedback-area.track-changes, p.ice-legend {
         .ice-controls {
             float: right;
         }

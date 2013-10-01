@@ -22,7 +22,13 @@ def lti_is_not_rendered(_step):
     #inside iframe test content is not presented
     with world.browser.get_iframe('ltiLaunchFrame') as iframe:
         # iframe does not contain functions from terrain/ui_helpers.py
-        assert iframe.is_element_not_present_by_css('.result', wait_time=5)
+        world.browser.driver.implicitly_wait(1)
+        try:
+            assert iframe.is_element_not_present_by_css('.result', wait_time=1)
+        except:
+            raise
+        finally:
+            world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
 
 
 @step('I view the LTI and it is rendered$')

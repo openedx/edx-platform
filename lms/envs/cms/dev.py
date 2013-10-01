@@ -22,14 +22,17 @@ MITX_FEATURES['ENABLE_LMS_MIGRATION'] = False
 
 META_UNIVERSITIES = {}
 
-modulestore_options = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'xmodule',
     'collection': 'modulestore',
+}
+
+modulestore_options = dict({
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': DATA_DIR,
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}
+}, **DOC_STORE_CONFIG)
 
 MODULESTORE = {
     'default': {

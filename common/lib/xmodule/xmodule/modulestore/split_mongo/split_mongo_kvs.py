@@ -1,7 +1,6 @@
 import copy
 from xblock.fields import Scope
 from collections import namedtuple
-from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
@@ -25,7 +24,8 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             Note, local fields may override and disagree w/ this b/c this says what the value
             should be if the field is undefined.
         """
-        super(SplitMongoKVS, self).__init__(copy.copy(fields), inherited_settings)
+        # deepcopy so that manipulations of fields does not pollute the source
+        super(SplitMongoKVS, self).__init__(copy.deepcopy(fields), inherited_settings)
         self._definition = definition  # either a DefinitionLazyLoader or the db id of the definition.
         # if the db id, then the definition is presumed to be loaded into _fields
 

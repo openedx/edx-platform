@@ -64,6 +64,7 @@ from external_auth.models import ExternalAuthMap
 import external_auth.views
 
 from bulk_email.models import Optout
+import shoppingcart
 
 import track.views
 
@@ -395,6 +396,8 @@ def change_enrollment(request):
                 reverse("course_modes_choose", kwargs={'course_id': course_id})
             )
 
+        current_mode = available_modes[0]
+
         org, course_num, run = course_id.split("/")
         dog_stats_api.increment(
             "common.student.enrollment",
@@ -403,9 +406,22 @@ def change_enrollment(request):
                   "run:{0}".format(run)]
         )
 
-        CourseEnrollment.enroll(user, course.id)
+        CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
+
+    elif action == "add_to_cart":
+        # Pass the request handling to shoppingcart.views
+        # The view in shoppingcart.views performs error handling and logs different errors.  But this elif clause
+        # is only used in the "auto-add after user reg/login" case, i.e. it's always wrapped in try_change_enrollment.
+        # This means there's no good way to display error messages to the user.  So we log the errors and send
+        # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
+        # whether things got added, etc
+
+        shoppingcart.views.add_course_to_cart(request, course_id)
+        return HttpResponse(
+            reverse("shoppingcart.views.show_cart")
+        )
 
     elif action == "unenroll":
         try:

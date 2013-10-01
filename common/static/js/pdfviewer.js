@@ -200,6 +200,18 @@ PDFJS.disableWorker = true;
             document.getElementById('numPages').textContent = 'of ' + pdfDocument.numPages;
             $("#pageNumber").max = pdfDocument.numPages;
             $("#pageNumber").val(pageNum);
+
+            // Enable/disable the previous/next buttons
+            if (pageNum <= 1) {
+              $("#previous").addClass("is-disabled");
+            } else {
+              $("#previous").removeClass("is-disabled");
+            }
+            if (pageNum >= pdfDocument.numPages) {
+              $("#next").addClass("is-disabled");
+            } else {
+              $("#next").removeClass("is-disabled");
+            }
         }
 
         // Go to previous page

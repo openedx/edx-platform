@@ -1,4 +1,4 @@
-﻿<%! from django.utils.translation import ugettext as _ %>
+﻿﻿<%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from datetime import datetime %>
@@ -60,7 +60,7 @@ discussion_link = get_discussion_link(course) if course else None
       <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
       <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
-      <input name="name" type="text" id="feedback_form_email" aria-required="true">
+      <input name="name" type="text" id="feedback_form_name" aria-required="true">
       <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
       <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
@@ -79,8 +79,8 @@ discussion_link = get_discussion_link(course) if course else None
     </form>
   </div>
 
-  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="-1">
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
+  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}" tabindex="0">&#10005;</a>
 
     <header>
       <h2>${_('Thank You!')}</h2>
@@ -101,7 +101,7 @@ discussion_link = get_discussion_link(course) if course else None
         'Спасибо за сообщение. Обычно мы отвечаем в течении одного рабочего дня.'.format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="{}" target="_blank" id="feedback-faq-link">'.format(marketing_link('FAQ')),
+        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
         link_end='</a>'
     )}
     </p>
@@ -114,7 +114,8 @@ discussion_link = get_discussion_link(course) if course else None
             $(".help-modal .close-modal").off("click");
             $("#lean_overlay").off("click");
             $("#help-modal").attr("aria-hidden", "true");
-            $(".help-tab").focus();
+            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $(".help-tab a").focus();
         },
         cycle_modal_tab = function(from_element_name, to_element_name) {
             $(from_element_name).on('keydown', function(e) {
@@ -151,7 +152,7 @@ discussion_link = get_discussion_link(course) if course else None
     };
     cycle_modal_tab("#feedback_link_question", "#help_wrapper .close-modal");
     cycle_modal_tab("#feedback_submit", "#feedback_form_wrapper .close-modal");
-    cycle_modal_tab("#feedback_faq_link", "#feedback_success_wrapper .close-modal");
+    cycle_modal_tab("#feedback-faq-link", "#feedback_success_wrapper .close-modal");
     $("#help-modal").on("keydown", function(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 27) {
@@ -189,6 +190,8 @@ discussion_link = get_discussion_link(course) if course else None
     });
     $("#feedback_form").submit(function() {
         $("input[type='submit']", this).attr("disabled", "disabled");
+        $('area,input,select,textarea,button').attr('tabindex', -1);
+        $("#feedback_form_wrapper .close-modal").focus();
     });
     $("#feedback_form").on("ajax:complete", function() {
         $("input[type='submit']", this).removeAttr("disabled");

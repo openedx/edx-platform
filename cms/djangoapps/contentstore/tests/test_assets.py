@@ -18,6 +18,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
+import json
 
 class AssetsTestCase(CourseTestCase):
     def setUp(self):
@@ -92,7 +93,7 @@ class AssetToJsonTestCase(TestCase):
         location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
         thumbnail_location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name_thumb.jpg'])
 
-        output = assets._get_asset_json("my_file", upload_date, location, thumbnail_location)
+        output = assets._get_asset_json("my_file", upload_date, location, thumbnail_location, True)
 
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
@@ -100,6 +101,48 @@ class AssetToJsonTestCase(TestCase):
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEquals(output["thumbnail"], "/i4x/foo/bar/asset/my_file_name_thumb.jpg")
         self.assertEquals(output["id"], output["url"])
+        self.assertEquals(output['locked'], True)
 
-        output = assets._get_asset_json("name", upload_date, location, None)
+        output = assets._get_asset_json("name", upload_date, location, None, False)
         self.assertIsNone(output["thumbnail"])
+
+
+class LockAssetTestCase(CourseTestCase):
+    """
+    Unit test for locking and unlocking an asset.
+    """
+
+    def test_locking(self):
+        """
+        Tests a simple locking and unlocking of an asset in the toy course.
+        """
+        def verify_asset_locked_state(locked):
+            """ Helper method to verify lock state in the contentstore """
+            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+            content = contentstore().find(asset_location)
+            self.assertEqual(content.locked, locked)
+
+        def post_asset_update(lock):
+            """ Helper method for posting asset update. """
+            upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
+            location = Location(['c4x', 'edX', 'toy', 'asset', 'sample_static.txt'])
+            url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+
+            resp = self.client.post(url, json.dumps(assets._get_asset_json("sample_static.txt", upload_date, location, None, lock)), "application/json")
+            self.assertEqual(resp.status_code, 201)
+            return json.loads(resp.content)
+
+        # Load the toy course.
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=contentstore(), verbose=True)
+        verify_asset_locked_state(False)
+
+        # Lock the asset
+        resp_asset = post_asset_update(True)
+        self.assertTrue(resp_asset['locked'])
+        verify_asset_locked_state(True)
+
+        # Unlock the asset
+        resp_asset = post_asset_update(False)
+        self.assertFalse(resp_asset['locked'])
+        verify_asset_locked_state(False)

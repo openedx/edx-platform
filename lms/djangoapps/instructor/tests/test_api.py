@@ -446,6 +446,19 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    def test_get_anon_ids(self):
+        """
+        Test the CSV output for the anonymized user ids.
+        """
+        url = reverse('get_anon_ids', kwargs={'course_id': self.course.id})
+        with patch('instructor.views.api.unique_id_for_user') as mock_unique:
+            mock_unique.return_value = '42'
+            response = self.client.get(url, {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
+        self.assertTrue(body.endswith('"7","42"\n'))
+
     def test_get_students_features_csv(self):
         """
         Test that some minimum of information is formatted
