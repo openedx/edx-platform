@@ -16,7 +16,6 @@ from uuid import uuid4
 from pymongo import MongoClient
 
 from .utils import CourseTestCase
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.conf import settings
