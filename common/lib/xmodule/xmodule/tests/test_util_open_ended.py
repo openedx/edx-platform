@@ -2,6 +2,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_system
 
+from StringIO import StringIO
+
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'blah/',
     'username': 'incorrect',
@@ -12,10 +14,60 @@ OPEN_ENDED_GRADING_INTERFACE = {
 }
 
 S3_INTERFACE = {
-    'aws_access_key': "",
-    'aws_secret_key': "",
-    "aws_bucket_name": "",
+    'access_key': "",
+    'secret_access_key': "",
+    "storage_bucket_name": "",
 }
+
+class MockS3Key(object):
+    """
+    Mock an S3 Key object from boto.  Used for file upload testing.
+    """
+    def __init__(self, bucket):
+        pass
+
+    def set_metadata(self, key, value):
+        setattr(self, key, value)
+
+    def set_contents_from_file(self, fileobject):
+        self.data = fileobject.read()
+
+    def set_acl(self, acl):
+        self.set_metadata("acl", acl)
+
+    def generate_url(self, timeout):
+        return "http://www.edx.org/sample_url"
+
+
+class MockS3Connection(object):
+    """
+    Mock boto S3Connection for testing image uploads.
+    """
+    def __init__(self, access_key, secret_key, **kwargs):
+        """
+        Mock the init call.  S3Connection has a lot of arguments, but we don't need them.
+        """
+        pass
+
+    def create_bucket(self, bucket_name, **kwargs):
+        return "edX Bucket"
+
+class MockUploadedFile(object):
+    """
+    Create a mock uploaded file for image submission tests.
+    value - String data to place into the mock file.
+    return - A StringIO object that behaves like a file.
+    """
+    def __init__(self, name, value):
+        self.mock_file = StringIO()
+        self.mock_file.write(value)
+        self.name = name
+
+    def seek(self, index):
+        return self.mock_file.seek(index)
+
+    def read(self):
+        return self.mock_file.read()
 
 
 class MockQueryDict(dict):

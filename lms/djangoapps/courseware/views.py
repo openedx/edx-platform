@@ -36,6 +36,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
+import shoppingcart
 
 import comment_client
 
@@ -604,10 +605,28 @@ def course_about(request, course_id):
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
+    # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
+    registration_price = 0
+    in_cart = False
+    reg_then_add_to_cart_link = ""
+    if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
+        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+        registration_price = CourseMode.min_course_price_for_currency(course_id,
+                                                                      settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
+        if request.user.is_authenticated():
+            cart = shoppingcart.models.Order.get_cart_for_user(request.user)
+            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_id)
+
+        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
+            reg_url=reverse('register_user'), course_id=course.id)
+
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
+                               'registration_price': registration_price,
+                               'in_cart': in_cart,
+                               'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
                                'show_courseware_link': show_courseware_link})
 
 
@@ -728,6 +747,7 @@ def submission_history(request, course_id, student_username, location):
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 

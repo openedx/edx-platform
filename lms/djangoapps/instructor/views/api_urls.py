@@ -16,6 +16,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
+    url(r'^get_anon_ids$',
+        'instructor.views.api.get_anon_ids', name="get_anon_ids"),
     url(r'^get_distribution$',
         'instructor.views.api.get_distribution', name="get_distribution"),
     url(r'^get_student_progress_url$',

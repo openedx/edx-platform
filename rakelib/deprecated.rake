@@ -24,6 +24,8 @@ end
     deprecated("jasmine:#{system}:phantomjs", "test:js:run", system)
     deprecated("#{system}:check_settings:jasmine", "")
     deprecated("#{system}:gather_assets:jasmine", "")
+    deprecated("test_acceptance_#{system}", "test:acceptance:#{system}")
+    deprecated("fasttest_acceptance_#{system}", "test:acceptance:#{system}:fast")
 end
 
 Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
@@ -49,3 +51,4 @@ deprecated("jasmine:common/static/coffee:phantomjs", "test:js:run", "common")
 deprecated("jasmine", "test:js")
 deprecated("jasmine:phantomjs", "test:js:run")
 deprecated("jasmine:browser", "test:js:dev")
+deprecated("test_acceptance", "test:acceptance")

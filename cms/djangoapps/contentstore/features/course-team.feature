@@ -1,4 +1,5 @@
-Feature: Course Team
+@shard_2
+Feature: CMS.Course Team
     As a course author, I want to be able to add others to my team
 
     Scenario: Admins can add other users

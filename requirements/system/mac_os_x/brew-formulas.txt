@@ -11,3 +11,5 @@ mysql
 geos
 mongodb
 lynx
+libjpeg
+libtiff

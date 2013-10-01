@@ -32,10 +32,12 @@ from .discussionsettings import *
 
 from lms.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = ""
+CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -102,6 +104,9 @@ MITX_FEATURES = {
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
+
+    # Can be turned off if course lists need to be hidden. Effects views and templates.
+    'COURSES_ARE_BROWSABLE': True,
 
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
@@ -171,6 +176,9 @@ MITX_FEATURES = {
 
     # Toggle storing detailed billing information
     'STORE_BILLING_INFO': False,
+
+    # Enable flow for payments for course registration (DIFFERENT from verified student flow)
+    'ENABLE_PAID_COURSE_REGISTRATION': False,
 }
 
 # Used for A/B testing
@@ -363,7 +371,7 @@ CONTENTSTORE = None
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 #################### Python sandbox ############################################
 
@@ -504,7 +512,8 @@ CC_PROCESSOR = {
         'PURCHASE_ENDPOINT': '',
     }
 }
-
+# Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
+PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
@@ -527,6 +536,14 @@ MOCK_STAFF_GRADING = False
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
+################################# Waffle ###################################
+
+# Name prepended to cookies set by Waffle
+WAFFLE_COOKIE = "waffle_flag_%s"
+
+# Two weeks (in sec)
+WAFFLE_MAX_AGE = 1209600
+
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.
@@ -546,7 +563,6 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'contentserver.middleware.StaticContentServer',
     'request_cache.middleware.RequestCache',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -555,6 +571,7 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -574,6 +591,9 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+    
+    # For A/B testing
+    'waffle.middleware.WaffleMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -838,6 +858,9 @@ INSTALLED_APPS = (
 
     # Foldit integration
     'foldit',
+
+    # For A/B testing
+    'waffle',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode

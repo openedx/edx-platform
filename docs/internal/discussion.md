@@ -22,11 +22,11 @@ For debugging, it's often more convenient to have elasticsearch running in a ter
 
 ## Setting up the discussion service
 
-First, make sure that you have access to the [github repository](https://github.com/rll/cs_comments_service). If this were not the case, send an email to dementrock@gmail.com.
+You can retrieve the source code from the [github repository](https://github.com/edx/cs_comments_service).
 
-First go into the mitx_all directory. Then type
+First go into the edx_all directory. Then type
 
-    git clone git@github.com:rll/cs_comments_service.git
+    git clone https://github.com/edx/cs_comments_service.git
     cd cs_comments_service/
 
 If you see a prompt asking "Do you wish to trust this .rvmrc file?", type "y"
@@ -51,6 +51,13 @@ Now use the following command to generate seeds (basically some random comments 
 It's done! Launch the app now:
 
     ruby app.rb
+
+## Integrating with the edx platform
+
+The API key must match on both sides. It is configured here:
+* edx-platform: COMMENTS_SERVICE_KEY in your dev.py file (dev environment) or ENV_TOKENS (prod environment)
+* cs_comments_service: api_key in the application.yml file (dev environment) or ENV variable (prod environment)
+
 
 ## Running the delayed job worker
 

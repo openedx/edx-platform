@@ -33,8 +33,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             $(this).show();
         });
 
-        var dateIntrospect = new Date();
-        this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
+        this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);

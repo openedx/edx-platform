@@ -28,6 +28,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 
 from courseware.models import StudentModule
+from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 import instructor.enrollment as enrollment
@@ -37,6 +38,7 @@ import instructor.access as access
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
+import csv
 
 log = logging.getLogger(__name__)
 
@@ -366,6 +368,38 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     else:
         header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
         return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_anon_ids(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with 2-column CSV output of user-id, anonymized-user-id
+    """
+    # TODO: the User.objects query and CSV generation here could be
+    # centralized into analytics. Currently analytics has similar functionality
+    # but not quite what's needed.
+    def csv_response(filename, header, rows):
+        """Returns a CSV http response for the given header and rows (excel/utf-8)."""
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+        # In practice, there should not be non-ascii data in this query,
+        # but trying to do the right thing anyway.
+        encoded = [unicode(s).encode('utf-8') for s in header]
+        writer.writerow(encoded)
+        for row in rows:
+            encoded = [unicode(s).encode('utf-8') for s in row]
+            writer.writerow(encoded)
+        return response
+
+    students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+    ).order_by('id')
+    header =['User ID', 'Anonymized user ID']
+    rows = [[s.id, unique_id_for_user(s)] for s in students]
+    return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @ensure_csrf_cookie

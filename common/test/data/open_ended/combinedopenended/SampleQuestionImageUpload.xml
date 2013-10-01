@@ -1,0 +1,24 @@
+<combinedopenended attempts="1" display_name = "Humanities Question -- Machine Assessed" accept_file_upload="True">
+    <rubric>
+        <rubric>
+            <category>
+                <description>Writing Applications</description>
+                <option> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option>
+                <option> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option>
+            </category>
+            <category>
+                <description> Language Conventions </description>
+                <option> The essay demonstrates a reasonable command of proper spelling and grammar. </option>
+                <option> The essay demonstrates superior command of proper spelling and grammar.</option>
+            </category>
+        </rubric>
+    </rubric>
+    <prompt>
+        <h4>Censorship in the Libraries</h4>
+        <p>"All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us." --Katherine Paterson, Author</p>
+        <p>Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.</p>
+    </prompt>
+    <task>
+        <selfassessment/>
+    </task>
+</combinedopenended>

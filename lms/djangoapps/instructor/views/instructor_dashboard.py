@@ -76,7 +76,7 @@ def _section_course_info(course_id):
     section_data['section_display_name'] = _('Course Info')
     section_data['course_id'] = course_id
     section_data['course_display_name'] = course.display_name
-    section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
+    section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
 
@@ -133,6 +133,7 @@ def _section_data_download(course_id):
         'section_display_name': _('Data Download'),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
+        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
     }
     return section_data
 

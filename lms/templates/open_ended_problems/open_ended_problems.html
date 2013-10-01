@@ -17,7 +17,7 @@
         <div class="error-container">${error_text}</div>
         <h1>${_("Open Ended Problems")}</h1>
         <h2>${_("Instructions")}</h2>
-        <p>${_("Here are a list of open ended problems for this course.")}</p>
+        <p>${_("Here is a list of open ended problems for this course.")}</p>
         % if success:
         % if len(problem_list) == 0:
         <div class="message-container">
@@ -29,7 +29,6 @@
                 <th>${_("Problem Name")}</th>
                 <th>${_("Status")}</th>
                 <th>${_("Grader Type")}</th>
-                <th>${_("ETA")}</th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -40,10 +39,7 @@
                     ${problem['state']}
                 </td>
                 <td>
-                    ${problem['grader_type']}
-                </td>
-                <td>
-                    ${problem['eta_string']}
+                    ${problem['grader_type_display_name']}
                 </td>
             </tr>
             %endfor

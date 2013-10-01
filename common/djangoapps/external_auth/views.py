@@ -12,7 +12,7 @@ from external_auth.models import ExternalAuthMap
 from external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login, logout
+from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -45,9 +45,6 @@ from openid.extensions import ax, sreg
 from ratelimitbackend.exceptions import RateLimitException
 
 import student.views
-# Required for Pearson
-from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import FieldDataCache
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
@@ -237,6 +234,7 @@ def _flatten_to_ascii(txt):
         return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
     else:
         return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
+
 
 @ensure_csrf_cookie
 def _signup(request, eamap):
@@ -896,12 +894,17 @@ def test_center_login(request):
     ''' Log in students taking exams via Pearson
 
     Takes a POST request that contains the following keys:
-        - code - a security code provided by  Pearson
+        - code - a security code provided by Pearson
         - clientCandidateID
         - registrationID
         - exitURL - the url that we redirect to once we're done
         - vueExamSeriesCode - a code that indicates the exam that we're using
     '''
+    # Imports from lms/djangoapps/courseware -- these should not be
+    # in a common djangoapps.
+    from courseware.views import get_module_for_descriptor, jump_to
+    from courseware.model_data import FieldDataCache
+
     # errors are returned by navigating to the error_url, adding a query parameter named "code"
     # which contains the error code describing the exceptional condition.
     def makeErrorURL(error_url, error_code):
