@@ -10,6 +10,7 @@ from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import Comb
 from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
