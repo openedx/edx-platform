@@ -157,12 +157,24 @@ function () {
             this.el.on('keydown', this.videoCaption.autoShowCaptions);
 
             // Moving slider on subtitles is not a mouse move,
-            // but captions and controls should be showed.
+            // but captions and controls should be shown.
             this.videoCaption.subtitlesEl.on(
                 'scroll', this.videoCaption.autoShowCaptions
             );
             this.videoCaption.subtitlesEl.on(
                 'scroll', this.videoControl.showControls
+            );
+        } else if (!this.config.autohideHtml5) {
+            // this.videoCaption.subtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
+            this.videoCaption.subtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+
+            this.videoCaption.hideSubtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
+            this.videoCaption.hideSubtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+
+            // Moving slider on subtitles is not a mouse move,
+            // but captions should not be auto-hidden.
+            this.videoCaption.subtitlesEl.on(
+                'scroll', this.videoCaption.autoShowCaptions
             );
         }
     }
@@ -322,6 +334,10 @@ function () {
     }
 
     function onMovement() {
+        if (!this.config.autohideHtml5) {
+            this.videoCaption.autoShowCaptions();
+        }
+
         this.videoCaption.onMouseEnter();
     }
 
@@ -342,6 +358,14 @@ function () {
             this.captionHideTimeout = setTimeout(
                 this.videoCaption.autoHideCaptions,
                 this.videoCaption.fadeOutTimeout
+            );
+        } else if (!this.config.autohideHtml5) {
+            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
+            this.videoCaption.subtitlesEl.addClass('html5');
+
+            this.captionHideTimeout = setTimeout(
+                this.videoCaption.autoHideCaptions,
+                0
             );
         }
 
@@ -656,6 +680,21 @@ function () {
             this.videoCaption.hideCaptions(false);
         } else {
             this.videoCaption.hideCaptions(true);
+
+            // In the case when captions are not auto-hidden based on mouse
+            // movement anywhere on the video, we must hide them explicitly
+            // after the "CC" button has been clicked (to hide captions).
+            //
+            // Otherwise, in order for the captions to disappear again, the
+            // user must move the mouse button over the "CC" button, or over
+            // the captions themselves. In this case, an "autoShow" will be
+            // triggered, and after a timeout, an "autoHide".
+            if (!this.config.autohideHtml5) {
+                this.captionHideTimeout = setTimeout(
+                    this.videoCaption.autoHideCaptions(),
+                    0
+                );
+            }
         }
     }
 
@@ -722,7 +761,10 @@ function () {
 
     function setSubtitlesHeight() {
         var height = 0;
-        if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
+        if (
+            ((this.videoType === 'html5') && (this.config.autohideHtml5)) ||
+            (!this.config.autohideHtml5)
+        ){
             // on page load captionHidden = undefined
             if  (
                 (
