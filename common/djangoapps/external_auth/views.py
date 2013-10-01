@@ -250,6 +250,19 @@ def _signup(request, eamap):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP',''):
+        # do signin immediately, by calling create_account, instead of asking
+        # student to fill in form.  MIT students already have information filed.
+        username = eamap.external_email.split('@',1)[0]
+	username = username.replace('.','_')
+        post_vars = dict(username = username,
+                         honor_code = u'true',
+                         terms_of_service = u'true',
+                         )
+        log.info('doing immediate signup for %s, params=%s' % (username, post_vars))
+        student.views.create_account(request, post_vars)
+        return redirect('/')
+
     # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
     # but this only affects username, not fullname
     username = re.sub(r'\s', '', _flatten_to_ascii(eamap.external_name), flags=re.UNICODE)
