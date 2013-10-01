@@ -34,6 +34,7 @@ from xblock.fields import Scope, ScopeIds
 from xmodule.modulestore import ModuleStoreBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+import re
 
 log = logging.getLogger(__name__)
 
@@ -697,7 +698,7 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = existing_tabs
             # Save any changes to the course to the MongoKeyValueStore
             course.save()
-            self.update_metadata(course.location, course.xblock_kvs._metadata)
+            self.update_metadata(course.location, course.get_explicitly_set_fields_by_scope(Scope.settings))
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -853,6 +854,38 @@ class MongoModuleStore(ModuleStoreBase):
         course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
         """
         return MONGO_MODULESTORE_TYPE
+
+    COURSE_ID_RE = re.compile(r'(?P<org>[^.]+)\.(?P<course_id>.+)')
+    def parse_course_id(self, course_id):
+        """
+        Parse a Locator style course_id into a dict w/ the org and course_id
+        :param course_id: a string looking like 'org.course.id.part'
+        """
+        match = self.COURSE_ID_RE.match(course_id)
+        if match is None:
+            raise ValueError(course_id)
+        return match.groupdict()
+
+    def get_orphans(self, course_id, detached_categories, _branch):
+        """
+        Return a dict of all of the orphans in the course.
+
+        :param course_id:
+        """
+        locator_dict = self.parse_course_id(course_id)
+        all_items = self.collection.find({
+            '_id.org': locator_dict['org'],
+            '_id.course': locator_dict['course_id'],
+            '_id.category': {'$nin': detached_categories}
+        })
+        all_reachable = set()
+        item_locs = set()
+        for item in all_items:
+            if item['_id']['category'] != 'course':
+                item_locs.add(Location(item['_id']).replace(revision=None).url())
+            all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
+        item_locs -= all_reachable
+        return list(item_locs)
 
     def _create_new_field_data(self, category, location, definition_data, metadata):
         """

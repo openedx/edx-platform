@@ -9,6 +9,14 @@ Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
 be played.
 
+Studio: added restful interface for finding orphans in courses. 
+An orphan is an xblock to which no children relation points and whose type is not 
+in the set contentstore.views.item.DETACHED_CATEGORIES nor 'course'.
+    GET http://host/orphan/org.course returns json array of ids. 
+        Requires course author access.
+    DELETE http://orphan/org.course deletes all the orphans in that course. 
+        Requires is_staff access
+
 Studio: Bug fix for text loss in Course Updates when the text exists
 before the first tag.
 

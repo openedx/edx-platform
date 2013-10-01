@@ -130,6 +130,8 @@ urlpatterns += patterns(
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+
+    url(r'^(?P<course_id>[^/]+)/orphan', 'contentstore.views.orphan', name='orphan')
 )
 
 # restful api

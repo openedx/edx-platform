@@ -21,7 +21,7 @@ from .access import has_access
 from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'create_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
 
 log = logging.getLogger(__name__)
 
@@ -200,3 +200,20 @@ def delete_item(request):
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return JsonResponse()
+
+
+@login_required
+def orphan(request, course_id):
+    """
+    View for handling orphan related requests. A get gets all of the current orphans.
+    DELETE, PUT and POST are meaningless for now.
+
+    An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
+    from the root via children
+
+    :param request:
+    :param course_id: Locator syntax course_id
+    """
+    # dhm: I'd add DELETE but I'm not sure what type of authentication/authorization we'd need
+    if request.method == 'GET':
+        return JsonResponse(modulestore().get_orphans(course_id, DETACHED_CATEGORIES, 'draft'))
