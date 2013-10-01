@@ -195,8 +195,8 @@ function () {
             this.videoControl.fullScreenState = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', gettext('Exit fullscreen'));
-            this.videoControl.fullScreenEl.text(gettext('Exit fullscreen'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Exit full browser'));
+            this.videoControl.fullScreenEl.text(gettext('Exit full browser'));
         }
 
         this.trigger('videoCaption.resize', null);
