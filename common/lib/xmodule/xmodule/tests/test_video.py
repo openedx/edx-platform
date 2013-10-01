@@ -133,8 +133,8 @@ class VideoDescriptorTest(unittest.TestCase):
         system = get_test_descriptor_system()
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
-            field_data=DictFieldData({}),
             scope_ids=ScopeIds(None, None, None, None),
+            field_data=DictFieldData({}),
         )
 
     def test_get_context(self):

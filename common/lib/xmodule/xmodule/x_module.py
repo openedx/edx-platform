@@ -502,8 +502,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         module = system.construct_xblock_from_class(
             self.module_class,
             descriptor=self,
-            field_data=system.xmodule_field_data(self),
             scope_ids=self.scope_ids,
+            field_data=system.xmodule_field_data(self),
         )
         module.save()
         return module
@@ -524,38 +524,21 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
-    @staticmethod
-    def load_from_xml(xml_data,
-                      system,
-                      org=None,
-                      course=None,
-                      default_class=None):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of xml_data.
-
-        xml_data must be a string containing valid xml
-
-        system is an XMLParsingSystem
-
-        org and course are optional strings that will be used in the generated
-            module's url identifiers
+        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        class_ = system.mixologist.mix(XModuleDescriptor.load_class(
-            etree.fromstring(xml_data).tag,
-            default_class
-        ))
-        # leave next line, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-        #        etree.fromstring(xml_data).tag,class_))
-
-        return class_.from_xml(xml_data, system, org, course)
+        xml = etree.tostring(node)
+        # TODO: change from_xml to not take org and course, it can use self.system.
+        block = cls.from_xml(xml, runtime, runtime.org, runtime.course)
+        return block
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses
+        This may be overridden by subclasses.
 
         xml_data: A string of xml that will be translated into data and children
             for this module
@@ -565,13 +548,12 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        raise NotImplementedError(
-            'Modules must implement from_xml to be parsable from xml')
+        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
-        underneath it.  May also write required resources out to resource_fs
+        underneath it.  May also write required resources out to resource_fs.
 
         Assumes that modules have single parentage (that no module appears twice
         in the same course), and that it is thus safe to nest modules as xml
@@ -581,8 +563,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         XModuleDescriptor using the from_xml method with the same system, org,
         and course
         """
-        raise NotImplementedError(
-            'Modules must implement export_to_xml to enable xml export')
+        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
@@ -715,7 +696,9 @@ class DescriptorSystem(Runtime):
                that you're about to re-raise---let the caller track them.
         """
 
-        super(DescriptorSystem, self).__init__(**kwargs)
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(DescriptorSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
 
         self.load_item = load_item
         self.resources_fs = resources_fs
@@ -756,8 +739,6 @@ class DescriptorSystem(Runtime):
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, process_xml, policy, **kwargs):
         """
-        load_item, resources_fs, error_tracker: see DescriptorSystem
-
         policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
@@ -839,7 +820,10 @@ class ModuleSystem(Runtime):
             not to allow the execution of unsafe, unsandboxed code.
 
         """
-        super(ModuleSystem, self).__init__(**kwargs)
+
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(ModuleSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
 
         self.ajax_url = ajax_url
         self.xqueue = xqueue
