@@ -68,12 +68,12 @@ function () {
 
         // This anchor behaves as a button named 'Volume'.
         // (the title attribute is set in video.html template).
+        var buttonStr = state.videoVolumeControl.currentVolume === 0 ? gettext('Volume muted') : gettext('Volume');
         state.videoVolumeControl.buttonEl.attr({
             'role': gettext('button'),
-            'aria-label': gettext('Volume'), // Doesn't read the title attribute, why? 
-            'aria-disabled': 'false'
+            'aria-label': buttonStr, // Doesn't read the title attribute, why? 
+            'aria-disabled': false
         });
-        //state.videoVolumeControl.buttonEl.attr();
 
         // The anchor representing the slider handle behaves as a slider named
         // volume.
@@ -81,7 +81,7 @@ function () {
         state.videoVolumeControl.volumeSliderHandleEl.attr({
             'role': gettext('slider'),
             'title': 'volume',
-            'aria-disabled': 'false',
+            'aria-disabled': false,
             'aria-valuemin': state.videoVolumeControl.slider.slider('option', 'min'),
             'aria-valuemax': state.videoVolumeControl.slider.slider('option', 'max'),
             'aria-valuenow': state.videoVolumeControl.slider.slider('option', 'value'),
@@ -178,6 +178,10 @@ function () {
             'aria-valuenow': ui.value,
             'aria-valuetext': getVolumeDescription(ui.value)
         });
+       
+        this.videoVolumeControl.buttonEl.attr(
+            'aria-label', this.videoVolumeControl.currentVolume === 0 ? gettext('Volume muted') : gettext('Volume')
+        );
     }
 
     function toggleMute(event) {
@@ -205,7 +209,7 @@ function () {
     // Returns a string describing the level of volume.
     function getVolumeDescription(vol) {
         if (vol === 0) {
-            return 'silent';
+            return 'muted';
         }
         else if (vol <= 20) {
             return 'very low';

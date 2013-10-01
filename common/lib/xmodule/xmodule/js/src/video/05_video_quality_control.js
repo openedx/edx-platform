@@ -51,7 +51,7 @@ function () {
         // (the title attribute is set in video.html template).
         state.videoQualityControl.el.attr({
             'role': gettext('button'),
-            'aria-disabled': 'false'
+            'aria-disabled': false
         });
     }
 

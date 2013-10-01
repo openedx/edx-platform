@@ -87,7 +87,7 @@ function () {
         // (the title attribute is set in video.html template).
         state.videoSpeedControl.el.children('a').attr({
             'role': gettext('button'),
-            'aria-disabled': 'false'
+            'aria-disabled': false
         });
     }
 

@@ -62,7 +62,7 @@ function () {
         state.videoProgressSlider.handle.attr({
             'role': gettext('slider'),
             'title': 'video position',
-            'aria-disabled': 'false',
+            'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
         });
     }
@@ -120,6 +120,7 @@ function () {
         }
     }
 
+    // Returns a string describing the current time of video in hh:mm:ss format.
     function getTimeDescription(time) {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),

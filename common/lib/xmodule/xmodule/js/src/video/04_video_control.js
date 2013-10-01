@@ -71,12 +71,12 @@ function () {
         // 'Fill screen' (the title attribute is set in video.html template).
         state.videoControl.playPauseEl.attr({
             'role': gettext('button'),
-            'aria-disabled': 'false'
+            'aria-disabled': false
         });
 
         state.videoControl.fullScreenEl.attr({
             'role': gettext('button'),
-            'aria-disabled': 'false'
+            'aria-disabled': false
         });
         
         // This anchor behaves as a slider named 'video slider'.
@@ -189,12 +189,14 @@ function () {
             this.videoControl.fullScreenState = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', gettext('Fullscreen'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Fill browser'));
+            this.videoControl.fullScreenEl.text(gettext('Fill browser'));
         } else {
             this.videoControl.fullScreenState = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
             this.videoControl.fullScreenEl.attr('title', gettext('Exit fullscreen'));
+            this.videoControl.fullScreenEl.text(gettext('Exit fullscreen'));
         }
 
         this.trigger('videoCaption.resize', null);
