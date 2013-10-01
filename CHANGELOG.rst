@@ -19,6 +19,8 @@ registration.
 
 Studio: Switched to loading Javascript using require.js
 
+Studio: Better feedback during the course import process
+
 LMS: Add split testing functionality for internal use.
 
 CMS: Add edit_course_tabs management command, providing a primitive
