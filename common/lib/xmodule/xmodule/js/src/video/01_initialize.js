@@ -312,8 +312,6 @@ function (VideoPlayer) {
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
-        console.log('this.config.autohideHtml5 = ' + this.config.autohideHtml5);
-
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
         tempYtTestTimeout = parseInt(this.el.data('yt-test-timeout'), 10);
