@@ -56,6 +56,9 @@
 @import 'views/checklists';
 @import 'views/textbooks';
 
+// base - contexts
+@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+
 // temp - inherited
 @import 'assets/content-types';
 
