@@ -450,13 +450,16 @@ Feature: Video Component Editor
     Scenario: File name and name of subs are different
         Given I have created a Video component
         And I edit the component
+
         And I enter a video_name_1.mp4 source to field number 1
         And I see not found status message
         And I upload the transcripts file "test_transcripts.srt"
         Then I see uploaded_successfully status message
         And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+
         And I save changes
         Then when I view the video it does show the captions
+
         And I edit the component
         Then I see found status message
 
@@ -538,6 +541,7 @@ Feature: Video Component Editor
         And I enter a video_name_1.mp4 source to field number 1
         Then I see not found status message
 
+        And I open tab "Advanced"
         And I set "t_not_exist" value to the "HTML5 Timed Transcript" field
 
         And I save changes
@@ -561,3 +565,24 @@ Feature: Video Component Editor
         And I save changes
         Then when I view the video it does show the captions
 
+
+    # 31
+    Scenario: Change transcripts field in Advanced tab
+        Given I have created a Video component with t_not_exist subtitles
+        And I edit the component
+
+        And I enter a video_name_1.mp4 source to field number 1
+        Then I see not found status message
+
+        And I open tab "Advanced"
+        And I set "t_not_exist" value to the "HTML5 Timed Transcript" field
+        And I open tab "Basic"
+        Then I see use existing status message
+        And I click use_existing button
+
+        And I save changes
+        Then when I view the video it does show the captions
+        And I edit the component
+
+        Then I see found status message
+        And I see "video_name_1" value in the "HTML5 Timed Transcript" field

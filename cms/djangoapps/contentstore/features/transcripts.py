@@ -212,10 +212,7 @@ def open_tab(_step, tab_name):
 @step('I set "([^"]*)" value to the "([^"]*)" field$')
 def set_value_transcripts_field(_step, value, field_name):
     world.wait(DELAY)
-    world.click_link_by_text('Advanced')
 
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     world.css_fill(field_id, value.strip())
-
-    world.click_link_by_text('Basic')
 

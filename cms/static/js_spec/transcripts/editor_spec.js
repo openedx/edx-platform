@@ -116,11 +116,13 @@
                     type: CMS.Models.Metadata.GENERIC_TYPE,
                     value: 'OEoXaMPEzfM'
                 },
-                metadataCollection;
+                metadataCollection,
+                metadataView;
 
 
             beforeEach(function () {
                 spyOn(CMS.Views.Metadata, 'Editor');
+
                 transcripts = new Transcripts.Editor({
                     el: container
                 });
@@ -133,11 +135,18 @@
                         youtubeEntry
                     ]
                 );
+
+                metadataView = jasmine.createSpyObj(
+                    'CMS.Views.Metadata.Editor',
+                    [
+                        'getModifiedMetadataValues'
+                    ]
+                );
             });
 
             describe('Test Advanced to Basic synchronization', function () {
                 it('Correct data', function () {
-                    transcripts.syncBasicTab(metadataCollection);
+                    transcripts.syncBasicTab(metadataCollection, metadataView);
 
                     var collection = transcripts.collection.models,
                         displayNameValue = collection[0].getValue(),
@@ -175,7 +184,7 @@
                         'default.webm'
                     ]);
 
-                    transcripts.syncBasicTab(metadataCollection);
+                    transcripts.syncBasicTab(metadataCollection, metadataView);
 
                     var collection = transcripts.collection.models,
                         videoUrlValue = collection[1].getValue();
