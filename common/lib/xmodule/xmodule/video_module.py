@@ -35,6 +35,43 @@ from xblock.runtime import DbModel
 log = logging.getLogger(__name__)
 
 
+def parse_time_from_str_to_float(str_time):
+    """
+    Converts s in '12:34:45' format to seconds.
+
+    If s is None, returns 0"""
+    if not str_time:
+        return 0
+    else:
+        obj_time = time.strptime(str_time, '%H:%M:%S')
+        return datetime.timedelta(
+            hours=obj_time.tm_hour,
+            minutes=obj_time.tm_min,
+            seconds=obj_time.tm_sec
+        ).total_seconds()
+
+
+def parse_time_from_float_to_str(s):
+    """
+    Converts s from seconds to  '12:34:45' format.
+
+    If s is None, returns "00:00:00"
+    """
+    if not s:
+        return "00:00:00"
+    else:
+        return str(datetime.timedelta(seconds=s))
+
+
+class StringThatWasFloat(String):
+
+    def from_json(self, value):
+        if isinstance(value, float):
+            return parse_time_from_float_to_str(value)
+        else:
+            return super(StringThatWasFloat, self).from_json(value)
+
+
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
@@ -79,17 +116,17 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-    start_time = Float(
+    start_time = StringThatWasFloat(
         help="Start time for the video.",
         display_name="Start Time",
         scope=Scope.settings,
-        default=0.0
+        default="00:00:00"
     )
-    end_time = Float(
+    end_time = StringThatWasFloat(
         help="End time for the video.",
         display_name="End Time",
         scope=Scope.settings,
-        default=0.0
+        default="00:00:00"
     )
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
@@ -182,8 +219,8 @@ class VideoModule(VideoFields, XModule):
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': json.dumps(self.show_captions),
-            'start': self.start_time,
-            'end': self.end_time,
+            'start': parse_time_from_str_to_float(self.start_time),
+            'end': parse_time_from_str_to_float(self.end_time),
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
@@ -265,8 +302,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         attrs = {
             'display_name': self.display_name,
             'show_captions': json.dumps(self.show_captions),
-            'start_time': datetime.timedelta(seconds=self.start_time),
-            'end_time': datetime.timedelta(seconds=self.end_time),
+            'start_time': self.start_time,
+            'end_time': self.end_time,
             'sub': self.sub,
         }
         for key, value in attrs.items():
@@ -360,8 +397,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         field_data = {}
 
         conversions = {
-            'start_time': cls._parse_time,
-            'end_time': cls._parse_time
+            # 'start_time': cls._parse_time,
+            # 'end_time': cls._parse_time
         }
 
         # Convert between key names for certain attributes --
