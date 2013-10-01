@@ -166,8 +166,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         runtime = get_test_descriptor_system()
         return runtime.construct_xblock_from_class(
             XmlDescriptor,
+            scope_ids=Mock(),
             field_data=field_data,
-            scope_ids=Mock()
         ).editable_metadata_fields
 
     def get_descriptor(self, field_data):
