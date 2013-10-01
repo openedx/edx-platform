@@ -36,6 +36,10 @@ MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
 MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
 
+# Don't actually send any requests to Software Secure for student identity
+# verification.
+MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 

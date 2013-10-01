@@ -91,10 +91,6 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
-# Don't actually send any requests to Software Secure for student identity
-# verification.
-MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
