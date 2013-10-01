@@ -65,8 +65,21 @@ class TestMongoModuleStore(object):
         #
         draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
+        courses = ['toy', 'simple', 'simple_with_draft']
+
         import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+
+        # Temporarily silence logger since we're about to import something
+        # we expect to have lots of errors.
+        logging.disable(logging.ERROR)
+        import_from_xml(
+            store,
+            DATA_DIR,
+            ['test_unicode'],
+            draft_store=draft_store,
+            static_content_store=content_store
+        )
+        logging.disable(logging.NOTSET)
 
         # also test a course with no importing of static content
         import_from_xml(
@@ -77,6 +90,7 @@ class TestMongoModuleStore(object):
             do_import_static=False,
             verbose=True
         )
+
 
         return store, content_store, draft_store
 
