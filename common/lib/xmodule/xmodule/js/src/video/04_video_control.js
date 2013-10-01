@@ -67,20 +67,23 @@ function () {
         // ARIA
         // Let screen readers know that:
 
-        // these anchors behaves like buttons
-        state.videoControl.playPauseEl.attr('role', gettext('button'));
-        state.videoControl.fullScreenEl.attr('role', gettext('button'));
-        // and this one as a slider
-        state.videoControl.sliderEl.find('.ui-slider-handle').attr('role', gettext('slider'));
+        // These anchors behaves like buttons, named 'Play' or 'Pause', and 
+        // 'Fill screen' (the title attribute is set in video.html template).
+        state.videoControl.playPauseEl.attr({
+            'role': gettext('button'),
+            'aria-disabled': 'false'
+        });
 
-        // what their names are: (title attribute are set in video.html template):
-        // Play, Pause
-        // Fill browser
-         state.videoControl.sliderEl.find('.ui-slider-handle').attr('title', gettext('video slider')); 
+        state.videoControl.fullScreenEl.attr({
+            'role': gettext('button'),
+            'aria-disabled': 'false'
+        });
         
-        // what their states are:
-        state.videoControl.playPauseEl.attr('aria-disabled', 'false');
-        state.videoControl.fullScreenEl.attr('aria-disabled', 'false');
+        // This anchor behaves as a slider named 'video slider'.
+        state.videoControl.sliderEl.find('.ui-slider-handle').attr({
+            'role': gettext('slider'),
+            'title': gettext('video slider')
+        });
     }
 
     // function _bindHandlers(state)

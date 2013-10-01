@@ -54,18 +54,16 @@ function () {
 
     function _buildHandle(state) {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
-
+        
         // ARIA
-        // Let screen readers know that this anchor behaves like a slider, is
-        // named 'video position' and give its state
+        // Let screen readers know that:
+
+        // This anchor behaves as a button named 'video position'.
         state.videoProgressSlider.handle.attr({
             'role': gettext('slider'),
             'title': 'video position',
             'aria-disabled': 'false',
             'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
-            //'aria-valuenow': state.videoProgressSlider.slider.slider('option', 'value'),
-            //'aria-valuemin': state.videoProgressSlider.slider.slider('option', 'min'),
-            //'aria-valuemax': state.videoProgressSlider.slider.slider('option', 'max')
         });
     }
 
@@ -89,8 +87,9 @@ function () {
         this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
 
         // ARIA
-        this.videoProgressSlider.handle.attr('aria-valuetext', 
-                                             getTimeDescription(this.videoPlayer.currentTime));
+        this.videoProgressSlider.handle.attr(
+            'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+        );
     }
 
     function onStop(event, ui) {
@@ -101,8 +100,9 @@ function () {
         this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
 
         // ARIA
-        this.videoProgressSlider.handle.attr('aria-valuetext',
-                                             getTimeDescription(this.videoPlayer.currentTime));
+        this.videoProgressSlider.handle.attr(
+            'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+        );
 
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;

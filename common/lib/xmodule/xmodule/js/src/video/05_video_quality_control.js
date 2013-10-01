@@ -47,14 +47,12 @@ function () {
         // ARIA
         // Let screen readers know that:
 
-        // this anchor behaves like a button
-        state.videoQualityControl.el.attr('role', gettext('button'));
-
-        // what its name is: (title attribute is set in video.html template):
-        // HD
-        
-        // what its state is:
-        state.videoQualityControl.el.attr('aria-disabled', 'false');
+        // This anchor behaves as a button named 'HD'.
+        // (the title attribute is set in video.html template).
+        state.videoQualityControl.el.attr({
+            'role': gettext('button'),
+            'aria-disabled': 'false'
+        });
     }
 
     // function _bindHandlers(state)

@@ -80,17 +80,15 @@ function () {
 
         state.videoSpeedControl.setSpeed(state.speed);
 
-        // ARIA
+         // ARIA
         // Let screen readers know that:
 
-        // this anchor behaves like a button
-        state.videoSpeedControl.el.children('a').attr('role', gettext('button'));
-
-        // what its name is: (title attribute is set in video.html template):
-        state.videoSpeedControl.el.children('a').attr('aria-label', 'Speeds');
-        
-        // what its state is:
-        state.videoSpeedControl.el.children('a').attr('aria-disabled', 'false');
+        // This anchor behaves as a button named 'Speeds'.
+        // (the title attribute is set in video.html template).
+        state.videoSpeedControl.el.children('a').attr({
+            'role': gettext('button'),
+            'aria-disabled': 'false'
+        });
     }
 
     /**

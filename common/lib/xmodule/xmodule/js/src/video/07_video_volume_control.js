@@ -66,25 +66,26 @@ function () {
         // ARIA
         // Let screen readers know that:
 
-        // this anchor behaves like a button
-        state.videoVolumeControl.buttonEl.attr('role', gettext('button'));
+        // This anchor behaves as a button named 'Volume'.
+        // (the title attribute is set in video.html template).
+        state.videoVolumeControl.buttonEl.attr({
+            'role': gettext('button'),
+            'aria-label': gettext('Volume'), // Doesn't read the title attribute, why? 
+            'aria-disabled': 'false'
+        });
+        //state.videoVolumeControl.buttonEl.attr();
 
-        // what its name is: (title attribute is set in video.html template):
-        state.videoVolumeControl.buttonEl.attr('aria-label', gettext('Volume'));
-
-        // what its state is:
-        state.videoVolumeControl.buttonEl.attr('aria-disabled', 'false');
-
-        // Volume slider
+        // The anchor representing the slider handle behaves as a slider named
+        // volume.
         state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl.volumeSliderEl.find('.ui-slider-handle');
         state.videoVolumeControl.volumeSliderHandleEl.attr({
             'role': gettext('slider'),
             'title': 'volume',
             'aria-disabled': 'false',
-            'aria-valuetext': getVolumeDescription(state.videoVolumeControl.slider.slider('option', 'value')),
-            'aria-valuenow': state.videoVolumeControl.slider.slider('option', 'value'),
             'aria-valuemin': state.videoVolumeControl.slider.slider('option', 'min'),
-            'aria-valuemax': state.videoVolumeControl.slider.slider('option', 'max')
+            'aria-valuemax': state.videoVolumeControl.slider.slider('option', 'max'),
+            'aria-valuenow': state.videoVolumeControl.slider.slider('option', 'value'),
+            'aria-valuetext': getVolumeDescription(state.videoVolumeControl.slider.slider('option', 'value'))
         });
     }
 
@@ -171,9 +172,12 @@ function () {
         });
 
         this.trigger('videoPlayer.onVolumeChange', ui.value);
+        
         // ARIA
-        this.videoVolumeControl.volumeSliderHandleEl.attr('aria-valuenow', ui.value);
-        this.videoVolumeControl.volumeSliderHandleEl.attr('aria-valuetext', getVolumeDescription(ui.value));
+        this.videoVolumeControl.volumeSliderHandleEl.attr({
+            'aria-valuenow': ui.value,
+            'aria-valuetext': getVolumeDescription(ui.value)
+        });
     }
 
     function toggleMute(event) {
@@ -183,21 +187,22 @@ function () {
             this.videoVolumeControl.previousVolume = this.videoVolumeControl.currentVolume;
             this.videoVolumeControl.slider.slider('option', 'value', 0);
             // ARIA
-            state.videoVolumeControl.volumeSliderHandleEl.attr({
+            this.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuenow': 0,
                 'aria-valuetext': getVolumeDescription(0),
-                'aria-valuenow': 0
             });
         } else {
             this.videoVolumeControl.slider.slider('option', 'value', this.videoVolumeControl.previousVolume);
             // ARIA
-            state.videoVolumeControl.volumeSliderHandleEl.attr({
-                'aria-valuetext': getVolumeDescription(this.videoVolumeControl.previousVolume),
-                'aria-valuenow': this.videoVolumeControl.previousVolume
+            this.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuenow': this.videoVolumeControl.previousVolume,
+                'aria-valuetext': getVolumeDescription(this.videoVolumeControl.previousVolume)
             });
         }
     }
 
     // ARIA
+    // Returns a string describing the level of volume.
     function getVolumeDescription(vol) {
         if (vol === 0) {
             return 'silent';

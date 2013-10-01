@@ -109,14 +109,12 @@ function () {
         // ARIA
         // Let screen readers know that:
 
-        // this anchor behaves like a button
-         this.videoCaption.hideSubtitlesEl.attr('role', gettext('button'));
-        // what its name is:
-        // what its name is: (title attribute is set in video.html template):
-        // Speeds
-        
-        // what its state is:
-        this.videoCaption.hideSubtitlesEl.attr('aria-disabled', 'false');
+        // This anchor behaves as a button named 'CC'.
+        // (the title attribute is set in video.html template).
+        this.videoCaption.hideSubtitlesEl.attr({
+            'role': gettext('button'),
+            'aria-disabled': 'false'
+        });
     }
 
     // function bindHandlers()
