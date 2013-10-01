@@ -23,21 +23,31 @@ class SendEmail
 
     @$btn_send.click =>
 
-      success_message = gettext('Your email was successfully queued for sending.')
-      
-      send_data =
-        action: 'send'
-        send_to: @$send_to.val()
-        subject: @$subject.val()
-        message: @$emailEditor.save()['data']
+      if @$subject.val() == ""
+        alert gettext("Your message must have a subject.")
+      else if @$emailEditor.save()['data'] == ""
+        alert gettext("Your message cannot be blank.")
+      else
+        send_to = @$send_to.val().toLowerCase()
+        if send_to == "myself"
+          send_to = gettext("yourself")
+        subject = gettext(@$subject.val())
+        confirm_message = gettext("You are about to send an email titled \"#{subject}\" to #{send_to}.  Is this OK?")
+        if confirm confirm_message
 
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: @$btn_send.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response ("<div class=\"msg msg-confirm\"><p class=\"copy\">" + success_message + "</p></div>")
-        error: std_ajax_err => @fail_with_error gettext('Error sending email.')
+          send_data =
+            action: 'send'
+            send_to: @$send_to.val()
+            subject: @$subject.val()
+            message: @$emailEditor.save()['data']
+
+          $.ajax
+            type: 'POST'
+            dataType: 'json'
+            url: @$btn_send.data 'endpoint'
+            data: send_data
+            success: (data) => @display_response gettext('Your email was successfully queued for sending.')
+            error: std_ajax_err => @fail_with_error gettext('Error sending email.')
 
   fail_with_error: (msg) ->
     console.warn msg
