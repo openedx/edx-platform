@@ -11,7 +11,7 @@ from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-from django.utils.translation import ugettext as _
+def _(s): return s
 
 log = logging.getLogger("mitx.courseware")
 
