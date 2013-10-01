@@ -2,15 +2,18 @@
 These views handle all actions in Studio related to import and exporting of
 courses
 """
+
 import logging
 import os
-import tarfile
-import shutil
 import re
+import shutil
+import subprocess
+import tarfile
 from tempfile import mkdtemp
 from path import path
 from contextlib import contextmanager
 
+import django.core.exceptions
 from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -38,6 +41,11 @@ __all__ = ['import_course', 'generate_export_course', 'export_course']
 
 log = logging.getLogger(__name__)
 
+def safe_escape(s):
+    ''' Unique, safe encoding for string. Output string will only have
+    alphanumerics and underscores. 
+    '''
+    return "".join([x if x.isalnum() else "_"+str(ord(x))+"_" for x in s])
 
 # Regex to capture Content-Range header ranges.
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
@@ -45,6 +53,15 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 class ImportError(Exception):
     def __init__(self, error):
         self.error = error
+
+@contextmanager
+def working_directory(path):
+    current_dir = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(current_dir)
 
 @contextmanager
 def wfile(dirname):
@@ -59,7 +76,7 @@ def wfile(dirname):
 def import_course_from_directory(data_root, course_subdir, location, user):
     # find the 'course.xml' file
     dirpath = None
-    course_dir = data_root / course_subdir
+    course_dir = os.path.join(data_root, course_subdir)
 
     def get_all_files(directory):
         """
@@ -92,11 +109,11 @@ def import_course_from_directory(data_root, course_subdir, location, user):
 
     if dirpath != course_dir:
         for fname in os.listdir(dirpath):
-            shutil.move(dirpath / fname, course_dir)
+            shutil.move(os.path.join(dirpath,fname), course_dir)
 
     _module_store, course_items = import_from_xml(
         modulestore('direct'),
-        settings.GITHUB_REPO_ROOT,
+        data_root, 
         [course_subdir],
         load_error_modules=False,
         static_content_store=contentstore(),
@@ -108,6 +125,26 @@ def import_course_from_directory(data_root, course_subdir, location, user):
 
     create_all_course_groups(user, course_items[0].location)
     logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
+def import_course_from_git(repo_path, git, location, user, ssh_deploy_key=None):
+    os.makedirs(repo_path)
+    with wfile(repo_path):
+        with working_directory(repo_path):
+            if not ssh_deploy_key: 
+                os.system("git clone "+git)
+            else: 
+                # We use popen so we never write have to the deploy key to disk
+                process = subprocess.Popen(["ssh-agent bash -c 'ssh-add -; git clone {git}'".format(git=git)], stdin=subprocess.PIPE, shell=True)
+                process.stdin.write(ssh_deploy_key)
+                process.stdin.close()
+                process.wait()
+            dirs = []
+            for d in os.listdir(repo_path):
+                if os.path.isdir(d):
+                    dirs.append(d)
+            if len(dirs) != 1:
+                raise ImportError("git repo must have exactly one course directory")
+            import_course_from_directory(repo_path, dirs[0], location, user)
 
 def import_course_from_file(data_root, course_tarball_path, course_subdir, location, user):
     ''' Import a course from a tar file. 
@@ -139,10 +176,13 @@ def import_course(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    if request.method == 'POST':
-        data_root = path(settings.GITHUB_REPO_ROOT) # E.g. /var/data 
-        course_subdir = "{0}-{1}-{2}".format(org, course, name) # E.g. mitx-6.00x-phys
-        course_dir = data_root / course_subdir # E.g. /var/data/mitx-6.00x-phys
+    # This path is for users who are sending a tarball of course data. 
+    # Example command to test this with: 
+    # curl http://localhost:9001/EDX/EDX201/import/2013_Winter --cookie "edxloggedin=true; sessionid=887329812981878491abc18970fd52a7; csrftoken=CSJWODSJIer90834uofjh890439hfdjs" -X POST --form "course-data=@2013_Winter.tar.gz" -H "X-CSRFToken: CSJWODSJIer90834uofjh890439hfdjs"
+    if request.method == 'POST' and 'course-data' in request.FILES: 
+        data_root = path(settings.GITHUB_REPO_ROOT) # E.g. /opt/edx/data
+        course_subdir = safe_escape(location.url()) # E.g. i4x_58__47__47_AAPT_47_PHYS101_47_course_47_2013_95_Winter
+        course_dir = data_root / course_subdir # E.g. /opt/edx/data/i4x_58__47__47_AAPT_47_PHYS101_47_course_47_2013_95_Winter
 
         filename = request.FILES['course-data'].name # Name of uploaded file
         if not filename.endswith('.tar.gz') and not filename.endswith('.tgz'):
@@ -218,7 +258,27 @@ def import_course(request, org, course, name):
                 return JsonResponse({'Status': 'OK'})
             except ImportError as e: 
                 return JsonResponse({'ErrMsg': e.error}, status=415)
-    else:
+    elif request.method == 'POST' and request.POST['source'] == 'git': 
+        # This path is for importing from a git repository 
+        # Sample command to test this with: 
+        # curl http://localhost:9001/EDX/EDX201/import/2013_Winter --cookie "edxloggedin=true; sessionid=3897yiudy78346y78edy8237yd78237y; csrftoken=Cisujou2389udw89yu2398dy723yd78y" -X POST --form "server=git@github.com" --form "account=sample" --form "repo=edx201" --form "source=git" --form "deploy_key=@/home/deploy/id_rsa_deploy" -H "X-CSRFToken: Cisujou2389udw89yu2398dy723yd78y"
+        if not request.POST['account'].isalnum() or not request.POST['repo'].isalnum(): 
+            raise django.core.exceptions.ValidationError("github repo and account must be alphanumeric")
+        if not request.POST['server'] == 'git@github.com':
+            ## Supporting only alphanumeric repos on github makes it
+            ## easy to guarantee we're safely escaping everything
+            raise NotImplementedError('Source other than github are not supported at this time')
+
+        repo_path = os.path.join(settings.GITHUB_REPO_ROOT, safe_escape(location.url()))
+        git = 'git@github.com:{account}/{repo}.git'.format(account = request.POST['account'], 
+                                                             repo = request.POST['repo'])
+        if 'deploy_key' in request.FILES:
+            ssh_deploy_key = request.FILES['deploy_key'].read()
+        else:
+            ssh_deploy_key = None
+        import_course_from_git(repo_path, git, location, request.user, ssh_deploy_key=ssh_deploy_key)
+        return JsonResponse({'Status': 'OK'})
+    elif request.method == 'GET': # Should this be a seperate view? 
         course_module = modulestore().get_item(location)
 
         return render_to_response('import.html', {
@@ -229,6 +289,8 @@ def import_course(request, org, course, name):
                 'name': location.name,
             })
         })
+    else:
+        raise django.core.exceptions.ValidationError("Invalid arguments to import/export")
 
 
 @ensure_csrf_cookie
