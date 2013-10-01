@@ -170,6 +170,8 @@ var require = {
   <%static:include path="js/system-feedback.underscore" />
 </script>
 
+
+    <script src="${static.url('js/vendor/jquery.ajaxQueue.js')}"></script>
     % if context_course:
     <script type="text/javascript">
 require(['js/models/course'], function(Course) {

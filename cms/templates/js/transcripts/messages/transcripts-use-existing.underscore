@@ -4,7 +4,7 @@
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("You changed a video source, but did not update the timed transcripts file. Do youwant to upload new timed transcripts?") %>
+    <%= gettext("You changed a video source, but did not update the timed transcripts file. Do you want to upload new timed transcripts?") %>
 </p>
 
 <div class="transcripts-file-uploader"></div>

@@ -16,8 +16,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 
 from util.json_request import JsonResponse
 
@@ -27,12 +25,10 @@ from ..transcripts_utils import (
     requests as rqsts,
     download_youtube_subs, get_transcripts_from_youtube,
     YOUTUBE_API,
-    save_subs_to_store,
     copy_or_rename_transcript,
     save_module
 )
 
-from ..utils import get_modulestore
 from .access import has_access
 
 log = logging.getLogger(__name__)
@@ -433,8 +429,6 @@ def validate_transcripts_data(request):
     return True, data, videos, item
 
 
-
-
 def rename_transcripts(request):
     """
     Renames html5 subtitles
@@ -462,3 +456,34 @@ def rename_transcripts(request):
         response['subs'] = item.sub
         log.debug("Updated item.sub to {}".format(item.sub))
     return JsonResponse(response)
+
+
+def save_transcripts(request):
+    validation_status = False
+    data = json.loads(request.GET['data'])
+    item_location = data.get('id')
+
+    try:
+        existing_item = modulestore().get_item(item_location)
+    except (ItemNotFoundError, InvalidLocationError):
+        log.error("Can't find item by location.")
+        return validation_status, None, {}, None
+
+    if data.get('metadata') is not None:
+        # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
+        # the intent is to make it None, use the nullout field
+        for metadata_key, value in data.get('metadata', {}).items():
+            field = existing_item.fields[metadata_key]
+
+            if value is None:
+                field.delete_from(existing_item)
+            else:
+                value = field.from_json(value)
+                field.write_to(existing_item, value)
+
+    item = save_module(existing_item)
+
+    response = {'status': 'Success', 'subs': item.sub}
+    return JsonResponse(response)
+

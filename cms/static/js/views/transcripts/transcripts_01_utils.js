@@ -291,11 +291,7 @@
                     params
                 );
 
-                if (xhr && xhr.abort) {
-                    xhr.abort();
-                }
-
-                xhr = $.ajax({
+                xhr = $.ajaxQueue({
                     url: '/transcripts/' + action,
                     data: { data: JSON.stringify(data) },
                     notifyOnError: false,

@@ -119,6 +119,7 @@
                 display: inline-block;
                 vertical-align: top;
                 min-width: ($baseline*5);
+                margin-top: 10px;
 
                 .transcripts-message{
                     @include font-size(12);

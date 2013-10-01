@@ -21,6 +21,7 @@ from .transcripts_ajax import (
     choose_transcripts,
     replace_transcripts,
     rename_transcripts,
+    save_transcripts,
 )
 
 from ..transcripts_utils import manage_video_subtitles_save
@@ -233,5 +234,6 @@ def process_transcripts(request, action):
         'choose': choose_transcripts,
         'replace': replace_transcripts,
         'rename': rename_transcripts,
+        'save': save_transcripts,
     }
     return allowed_actions.get(action, lambda x: JsonResponse())(request)

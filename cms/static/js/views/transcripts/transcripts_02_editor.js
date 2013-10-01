@@ -61,17 +61,24 @@
         *                                    setting editors in `Advanced` tab.
         *
         */
-        syncBasicTab: function (metadataCollection) {
+        syncBasicTab: function (metadataCollection, metadataView) {
             var result = [],
                 utils = Transcripts.Utils,
                 getField = utils.getField,
+                component_id = this.$el.closest('.component').data('id'),
+                subs = getField(metadataCollection, 'sub'),
                 values = {},
-                videoUrl;
+                videoUrl, metadata, modifiedValues;
 
             // If metadataCollection is not passed, just exit.
-            if (!metadataCollection) {
+            if (!metadataCollection || !metadataView) {
                 return false;
             }
+
+            modifiedValues = metadataView.getModifiedMetadataValues();
+            metadata = $.extend(true, {}, modifiedValues);
+            // Save module state
+            utils.command('save', component_id, null, { metadata: metadata });
 
             // Get values from `Advanced` tab fields (`html5_sources`,
             // `youtube_id_1_0`) that should be synchronized.
@@ -101,6 +108,17 @@
 
             // Synchronize other fields that has the same `field_name` property.
             utils.syncCollections(metadataCollection, this.collection);
+
+            if (subs.hasChanged()){
+                // When `sub` field is changed, clean Storage to avoid overwriting.
+                utils.Storage.remove('sub');
+
+                // Trigger `change` event manually if `video_url` model
+                // isn't changed.
+                if (!videoUrl.hasChanged()) {
+                    videoUrl.trigger('change');
+                }
+            }
         },
 
         /**
@@ -114,7 +132,7 @@
         *                                    setting editors in `Advanced` tab.
         *
         */
-        syncAdvancedTab: function (metadataCollection) {
+        syncAdvancedTab: function (metadataCollection, metadataView) {
             var utils = Transcripts.Utils,
                 getField = utils.getField,
                 subsValue = utils.Storage.get('sub'),
