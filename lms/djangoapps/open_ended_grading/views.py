@@ -131,11 +131,7 @@ def peer_grading(request, course_id):
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
-        error_message = _("""
-        Error with initializing peer grading.
-        There has not been a peer grading module created in the courseware that would allow you to grade others.
-        Please check back later for this.
-        """)
+        error_message = _("Error with initializing peer grading. There has not been a peer grading module created in the courseware that would allow you to grade others. Please check back later for this.")
         log.exception(error_message + u"Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
