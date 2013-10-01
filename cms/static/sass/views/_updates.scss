@@ -167,6 +167,7 @@
 }
 
 .course-handouts {
+	@extend %ui-window;
 	width: 30%;
 	padding: 20px 30px;
 	margin: 0;
