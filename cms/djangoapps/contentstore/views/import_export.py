@@ -74,6 +74,11 @@ def wfile(dirname):
         shutil.rmtree(dirname)
 
 def import_course_from_directory(data_root, course_subdir, location, user):
+    ''' Import a course from a directory defined by data_root/course_subdir 
+    Place it in the location specified. 
+
+    This function assumes the permissions have been verified by the caller. 
+    '''
     # find the 'course.xml' file
     dirpath = None
     course_dir = os.path.join(data_root, course_subdir)
@@ -127,6 +132,16 @@ def import_course_from_directory(data_root, course_subdir, location, user):
     logging.debug('created all course groups at {0}'.format(course_items[0].location))
 
 def import_course_from_git(repo_path, git, location, user, ssh_deploy_key=None):
+    ''' Load a course from a git repo. 
+
+    repo_path is a local directory we can clone to. 
+    git is the git repository. 
+    location is the course to be overridden. 
+
+    ssh_deploy_key is an optional key to use when cloning through git
+    via ssh. This is a private key which should have read-only access
+    to the repo. 
+    '''
     os.makedirs(repo_path)
     with wfile(repo_path):
         with working_directory(repo_path):
@@ -134,6 +149,10 @@ def import_course_from_git(repo_path, git, location, user, ssh_deploy_key=None):
                 os.system("git clone "+git)
             else: 
                 # We use popen so we never write have to the deploy key to disk
+                #
+                # The shell=True is typically bad form, but in this case, it does
+                # not matter, since all user input is inside ssh-agent, which needs
+                # bash -c regardless. 
                 process = subprocess.Popen(["ssh-agent bash -c 'ssh-add -; git clone {git}'".format(git=git)], stdin=subprocess.PIPE, shell=True)
                 process.stdin.write(ssh_deploy_key)
                 process.stdin.close()
@@ -171,8 +190,15 @@ def import_course_from_file(data_root, course_tarball_path, course_subdir, locat
 @login_required
 def import_course(request, org, course, name):
     """
-    This method will handle a POST request to upload and import a .tar.gz file
-    into a specified course
+    This method will:
+    * Handle a POST request to upload and import a .tar.gz file into a
+      specified course
+    * Handle a POST request to import a course from github. This
+      currently only supports github, but could easily be modified to
+      support other aservices. Only supporting alphanumeric repos on
+      github avoids issues with proper escaping of arbitrary git
+      sources.
+
     """
     location = get_location_and_verify_access(request, org, course, name)
 
