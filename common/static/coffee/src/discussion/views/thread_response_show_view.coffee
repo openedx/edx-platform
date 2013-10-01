@@ -23,6 +23,7 @@ if Backbone?
       @delegateEvents()
       if window.user.voted(@model)
         @$(".vote-btn").addClass("is-cast")
+        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
       @renderAttrs()
       @renderFlagged()
       @$el.find(".posted-details").timeago()
@@ -48,12 +49,14 @@ if Backbone?
       @$(".vote-btn").toggleClass("is-cast")
       if @$(".vote-btn").hasClass("is-cast")
         @vote()
+        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
       else
         @unvote()
+        @$(".vote-btn span.sr").html("votes (click to vote)")
 
     vote: ->
       url = @model.urlFor("upvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) + 1)
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) + 1) + '<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
@@ -64,7 +67,7 @@ if Backbone?
 
     unvote: ->
       url = @model.urlFor("unvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) - 1)
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) - 1)+'<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
