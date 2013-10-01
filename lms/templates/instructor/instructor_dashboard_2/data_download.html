@@ -4,7 +4,9 @@
 
 <h2>${_("Data Download")}</h2>
 % if disable_buttons:
-	<p><font color="red">
+<div class="msg msg-warning">
+	<div class="copy">
+		<p>
 	    ${_("Note: some of these buttons are known to time out for larger "
 			"courses. We have temporarily disabled those features for courses "
 			"with more than {max_enrollment} students. We are urgently working on "
@@ -12,7 +14,9 @@
 			"working to improve the platform!").format(
 	        max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
 	      )}
-	</font></p>
+		</p>
+	</div>
+</div>
 	<br>
 % endif
 
