@@ -343,6 +343,14 @@ if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
+TRACKING_ENABLED = True
+TRACKING_HTTP_REQUEST_EVENT_TYPE = 'edx.http.request'
+TRACKING_BACKENDS = {
+    'shim': {
+        'ENGINE': 'events.backends.shim.LegacyShimBackend'
+    }
+}
+
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
@@ -566,8 +574,12 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'contentserver.middleware.StaticContentServer',
 
+    # For Event Tracking
+    'eventtracking.django.middleware.TrackRequestContextMiddleware',
+    'events.middleware.EventRequestContextMiddleware',
+    'eventtracking.django.middleware.TrackRequestMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
@@ -820,7 +832,6 @@ INSTALLED_APPS = (
     'student',
     'static_template_view',
     'staticbook',
-    'track',
     'util',
     'certificates',
     'instructor',
@@ -880,6 +891,11 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
+    # Tracking
+    'track',
+    'eventtracking.django',
+    'events',
 )
 
 ######################### MARKETING SITE ###############################

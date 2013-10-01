@@ -61,6 +61,8 @@ from bulk_email.models import Optout
 import shoppingcart
 
 import track.views
+from eventtracking import tracker
+from events import contexts
 
 from dogapi import dog_stats_api
 from pytz import UTC
@@ -394,13 +396,7 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
 
-        org, course_num, run = course_id.split("/")
-        dog_stats_api.increment(
-            "common.student.enrollment",
-            tags=["org:{0}".format(org),
-                  "course:{0}".format(course_num),
-                  "run:{0}".format(run)]
-        )
+        _emit_enrollment_change_event(course_id, True)
 
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
@@ -423,19 +419,29 @@ def change_enrollment(request):
         try:
             CourseEnrollment.unenroll(user, course_id)
 
-            org, course_num, run = course_id.split("/")
-            dog_stats_api.increment(
-                "common.student.unenrollment",
-                tags=["org:{0}".format(org),
-                      "course:{0}".format(course_num),
-                      "run:{0}".format(run)]
-            )
+            _emit_enrollment_change_event(course_id, False)
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
+
+
+def _emit_enrollment_change_event(course_id, is_enrolled):
+    context = contexts.course_context_from_id(course_id)
+    dog_stat = "common.student.enrollment" if is_enrolled else "common.student.unenrollment"
+    dog_stats_api.increment(
+        dog_stat,
+        tags=["org:{0}".format(context['organization']),
+              "course:{0}".format(context['course_name']),
+              "run:{0}".format(context['course_run'])]
+    )
+    tracker.get_tracker().enter_context('edx.enrollment.changed', context)
+    try:
+        tracker.emit('edx.enrollment.changed', {'is_enrolled': is_enrolled})
+    finally:
+        tracker.get_tracker().exit_context('edx.enrollment.changed')
 
 
 def _parse_course_id_from_string(input_str):

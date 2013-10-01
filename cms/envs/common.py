@@ -152,8 +152,12 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'contentserver.middleware.StaticContentServer',
 
+    # For Event Tracking
+    'eventtracking.django.middleware.TrackRequestContextMiddleware',
+    'events.middleware.EventRequestContextMiddleware',
+    'eventtracking.django.middleware.TrackRequestMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
@@ -358,6 +362,8 @@ INSTALLED_APPS = (
 
     # Tracking
     'track',
+    'eventtracking.django',
+    'events',
 
     # Monitoring
     'datadog',
@@ -412,3 +418,11 @@ LEGACY_TRACKING_BACKENDS = {
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+
+TRACKING_ENABLED = True
+TRACKING_HTTP_REQUEST_EVENT_TYPE = 'edx.http.request'
+TRACKING_BACKENDS = {
+    'shim': {
+        'ENGINE': 'events.backends.shim.LegacyShimBackend'
+    }
+}

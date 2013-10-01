@@ -23,3 +23,9 @@ MODULESTORE = {
         }
     }
 }
+
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'eventtracking.backends.mongodb.MongoBackend'
+    }
+})
