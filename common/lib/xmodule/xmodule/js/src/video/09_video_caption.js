@@ -200,7 +200,7 @@ function () {
                     'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
                 );
 
-                _this.videoCaption.hideCaptions(true);
+                _this.videoCaption.hideCaptions(true, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
@@ -337,18 +337,18 @@ function () {
         // Enables or disables automatic scrolling of the captions when the
         // video is playing. This feature has to be disabled when tabbing
         // through them as it interferes with that action. Initially, have this
-        // flag enabled as we assume mouse use. Then, if the first caption 
+        // flag enabled as we assume mouse use. Then, if the first caption
         // (through forward tabbing) or the last caption (through backwards
         // tabbing) gets the focus, disable that feature. Renable it if tabbing
-        // then cycles out of the the captions. 
+        // then cycles out of the the captions.
         this.videoCaption.autoScrolling = true;
         // Keeps track of where the focus is situated in the array of captions.
         // Used to implement the automatic scrolling behavior and decide if the
         // outline around a caption has to be hidden or shown on a mouseenter or
         // mouseleave. Initially, no caption has the focus, set the index to -1.
         this.videoCaption.currentCaptionIndex = -1;
-        // Used to track if the focus is coming from a click or tabbing. This 
-        // has to be known to decide if, when a caption gets the focus, an 
+        // Used to track if the focus is coming from a click or tabbing. This
+        // has to be known to decide if, when a caption gets the focus, an
         // outline has to be drawn (tabbing) or not (mouse click).
         this.videoCaption.isMouseFocus = false;
 
@@ -362,7 +362,7 @@ function () {
     // On mouseOut, show the outline of a caption that has been tabbed to.
     function captionMouseOverOut(event) {
         var caption = $(event.target),
-            captionIndex = parseInt(caption.attr('data-index'), 10); 
+            captionIndex = parseInt(caption.attr('data-index'), 10);
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
             if (event.type === 'mouseover') {
                 caption.removeClass('focused');
@@ -370,7 +370,7 @@ function () {
             else { // mouseout
                 caption.addClass('focused');
             }
-        } 
+        }
     }
 
     function captionMouseDown(event) {
@@ -390,19 +390,19 @@ function () {
             captionIndex = parseInt(caption.attr('data-index'), 10);
         // If the focus comes from a mouse click, hide the outline, turn on
         // automatic scrolling and set currentCaptionIndex to point outside of
-        // caption list (ie -1) to disable mouseenter, mouseleave behavior. 
+        // caption list (ie -1) to disable mouseenter, mouseleave behavior.
         if (this.videoCaption.isMouseFocus) {
             this.videoCaption.autoScrolling = true;
             caption.removeClass('focused');
             this.videoCaption.currentCaptionIndex = -1;
         }
-        // If the focus comes from tabbing, show the outline and turn off 
+        // If the focus comes from tabbing, show the outline and turn off
         // automatic scrolling.
         else {
             this.videoCaption.currentCaptionIndex = captionIndex;
             caption.addClass('focused');
             // The second and second to last elements turn automatic scrolling
-            // off again as it may have been enabled in captionBlur.    
+            // off again as it may have been enabled in captionBlur.
             if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
                 this.videoCaption.autoScrolling = false;
             }
@@ -410,7 +410,7 @@ function () {
     }
 
     function captionBlur(event) {
-        var caption = $(event.target), 
+        var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
         caption.removeClass('focused');
         // If we are on first or last index, we have to turn automatic scroll on
@@ -418,7 +418,7 @@ function () {
         // are tabbing. So we could be on the first element and tabbing back out
         // of the captions or on the last element and tabbing forward out of the
         // captions.
-        if (captionIndex === 0 || 
+        if (captionIndex === 0 ||
             captionIndex === this.videoCaption.captions.length-1) {
             this.videoCaption.autoScrolling = true;
         }
@@ -434,8 +434,8 @@ function () {
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-        // Automatic scrolling gets disabled if one of the captions has received 
-        // focus through tabbing. 
+        // Automatic scrolling gets disabled if one of the captions has received
+        // focus through tabbing.
         if (!this.videoCaption.frozen && el.length && this.videoCaption.autoScrolling) {
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
@@ -582,8 +582,12 @@ function () {
         }
     }
 
-    function hideCaptions(hide_captions) {
+    function hideCaptions(hide_captions, update_cookie) {
         var type;
+
+        if (typeof update_cookie === 'undefined') {
+            update_cookie = true;
+        }
 
         if (hide_captions) {
             type = 'hide_transcript';
@@ -606,10 +610,12 @@ function () {
 
         this.videoCaption.setSubtitlesHeight();
 
-        $.cookie('hide_captions', hide_captions, {
-            expires: 3650,
-            path: '/'
-        });
+        if (update_cookie) {
+            $.cookie('hide_captions', hide_captions, {
+                expires: 3650,
+                path: '/'
+            });
+        }
     }
 
     function captionHeight() {

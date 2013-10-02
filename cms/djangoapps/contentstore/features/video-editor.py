@@ -23,6 +23,10 @@ def shows_captions(_step, show_captions):
     else:
         assert world.is_css_not_present('div.video.closed')
 
+    # Prevent cookies from overriding course settings
+    world.browser.cookies.delete('hide_captions')
+    world.browser.cookies.delete('current_player_mode')
+
 
 @step('I see the correct video settings and default values$')
 def correct_video_settings(_step):
