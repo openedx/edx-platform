@@ -148,6 +148,11 @@ if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
+if settings.MITX_FEATURES.get("COURSE_SEARCH", False):
+    urlpatterns += (
+        url(r'^index_courseware$', 'search.views.index_course', name="index_course"),
+    )
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns

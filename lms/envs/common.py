@@ -179,6 +179,9 @@ MITX_FEATURES = {
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Toggle search availability
+    'COURSE_SEARCH': False,
 }
 
 # Used for A/B testing
@@ -428,6 +431,16 @@ BUGS_EMAIL = 'bugs@edx.org'
 ADMINS = ()
 MANAGERS = ADMINS
 
+# Search
+ES_DATABASE = "http://localhost:9200"
+# Tokenizer is for english here, but there are a number of alternate tokenizers for other languages
+SENTENCE_TOKENIZER = "tokenizers/punkt/english.pickle"
+# Same as SENTENCE_TOKENIZER, STEMMER is also currently for English, but allows for a detect value
+STEMMER = "english"
+# Settings file for Elastic Search with relevant analyzers and tokenizers
+current_directory = os.path.dirname(os.path.realpath(__file__))
+settings_file = os.path.join(current_directory, "es_settings.json")
+ES_SETTINGS = open(settings_file).read()
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
@@ -883,6 +896,9 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
+    # Search
+    'search',
 )
 
 ######################### MARKETING SITE ###############################

@@ -1,4 +1,10 @@
 ## mako
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/search.js')}"></script>
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/animate-custom.css')}"></link>
+<link rel="stylesheet" type="text/css" href="${static.url('css/search.css')}"></link>
 <%page args="active_page=None" />
 
 <%
@@ -11,10 +17,11 @@ def url_class(is_active):
     return "active"
   return ""
 %>
+
 <%! from courseware.tabs import get_course_tabs %>
 <%! from django.utils.translation import ugettext as _ %>
 <% import waffle %>
-
+<%! from courseware.tabs import get_course_tabs, check_search_enable %>
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
@@ -35,11 +42,18 @@ def url_class(is_active):
              </a>
           </li>
       % endfor
-    <%block name="extratabs" />
+        <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
           <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
+        % endif
+        % if check_search_enable(course):
+            <li style="float:right">
+                <div class="search-icon">
+                  <a class="search-bar">${_("Search this Course")}</a>
+                </div>
+            </li>
         % endif
     </ol>
   </div>

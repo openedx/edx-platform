@@ -166,6 +166,10 @@ if settings.WIKI_ENABLED:
 
 
 if settings.COURSEWARE_ENABLED:
+    if settings.MITX_FEATURES.get("COURSE_SEARCH", False):
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/search$', 'search.views.search', name="search"),
+        )
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),

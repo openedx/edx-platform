@@ -101,8 +101,10 @@ def _discussion(tab, user, course, active_page, request):
     This tab format only supports the new Berkeley discussion forums.
     """
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                              args=[course.id])
+        link = reverse(
+            'django_comment_client.forum.views.forum_form_discussion',
+            args=[course.id]
+        )
         return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
 
@@ -137,7 +139,7 @@ def _textbooks(tab, user, course, active_page, request):
     return []
 
 
-def _pdf_textbooks(tab, user, course, active_page, request):
+def _pdf_textbooks(tab, user, course, active_page):
     """
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
@@ -149,7 +151,7 @@ def _pdf_textbooks(tab, user, course, active_page, request):
     return []
 
 
-def _html_textbooks(tab, user, course, active_page, request):
+def _html_textbooks(tab, user, course, active_page):
     """
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
@@ -167,7 +169,7 @@ def _staff_grading(tab, user, course, active_page, request):
 
         tab_name = "Staff grading"
 
-        notifications  = open_ended_notifications.staff_grading_notifications(course, user)
+        notifications = open_ended_notifications.staff_grading_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -201,7 +203,7 @@ def _combined_open_ended_grading(tab, user, course, active_page, request):
         link = reverse('open_ended_notifications', args=[course.id])
         tab_name = "Open Ended Panel"
 
-        notifications  = open_ended_notifications.combined_notifications(course, user)
+        notifications = open_ended_notifications.combined_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -259,7 +261,7 @@ VALID_TAB_TYPES = {
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab),
     'syllabus': TabImpl(null_validator, _syllabus)
-    }
+}
 
 
 ### External interface below this.
@@ -325,7 +327,7 @@ def get_course_tabs(user, course, active_page, request):
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
         gen = VALID_TAB_TYPES[tab['type']].generator
-        tabs.extend(gen(tab, user, course, active_page, request))
+        tabs.extend(gen(tab, user, course, active_page))
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
@@ -335,6 +337,12 @@ def get_course_tabs(user, course, active_page, request):
 
     return tabs
 
+
+def check_search_enable(course):
+    """
+    Returns a boolean representing whether or not search is enabled for the given course
+    """
+    return True
 
 def get_discussion_link(course):
     """

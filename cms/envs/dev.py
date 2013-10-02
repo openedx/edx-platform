@@ -69,6 +69,7 @@ DATABASES = {
 
 LMS_BASE = "localhost:8000"
 MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
+MITX_FEATURES['COURSE_SEARCH'] = False
 
 REPOS = {
     'edx4edx': {

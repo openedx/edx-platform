@@ -1,0 +1,121 @@
+{
+	"mappings": {
+		"properties": {
+			"searchable_text": {
+				"type": "multi_field",
+				"fields": {
+					"full_words": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "transcript_analyzer",
+						"boost": 2.0,
+						"similarity": "BM25"
+					},
+
+					"ngrams": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "ngram_analyzer",
+						"boost": 1.0,
+						"similarity": "BM25"
+					}
+				}
+			},
+
+			"display_name": {
+				"type": "multi_field",
+				"fields": {
+
+					"depth_search": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "depth_analyzer",
+						"boost": 1.0,
+						"similarity": "BM25"
+					},
+
+					"breadth_search": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "breadth_analyzer",
+						"boost": 2.0,
+						"similarity": "BM25"
+					}
+				},
+
+				"id": {
+					"type": "string",
+					"store": "true"
+				},
+
+				"hash": {
+					"type": "string",
+					"store": "true"
+				},
+				
+				"thumbnail": {
+					"type": "binary"
+				},
+
+                "course_id": {
+                    "type": "string",
+                    "store": "true"
+                }
+			}
+		}
+	},
+
+	"settings": {
+		"analysis":{
+		    "analyzer": {
+
+		        "transcript_analyzer": {
+		            "type": "custom",
+		            "tokenizer": "standard",
+		            "filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "shingle",
+		            		    "custom_phonetic"]
+		        },
+
+		        "ngram_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "standard",
+		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
+		        },
+
+		        "depth_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "standard",
+		        	"filter": ["word_delimiter", "lowercase", "shingle", "custom_phonetic"]
+		        },
+
+		        "breadth_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "standard",
+		        	"filter": ["asciifolding", "lowercase", "custom_phonetic"]
+		        }
+		    },
+
+		    "filter" : {
+
+		    	"custom_phonetic": {
+		    		"type": "phonetic",
+		    		"encoder": "doublemetaphone",
+		    		"replace": false
+		    	},
+
+		        "custom_stemmer": {
+		            "type": "stemmer",
+		            "name": "minimal_english"
+		        }
+		    }
+		}
+	}
+}

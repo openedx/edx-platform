@@ -76,22 +76,26 @@ def course_index(request, org, course, name):
         'coursename': name
     })
 
-    course = modulestore().get_item(location, depth=3)
-    sections = course.get_children()
+    course_title = course
+    course_module = modulestore().get_item(location, depth=3)
+    sections = course_module.get_children()
 
     return render_to_response('overview.html', {
-        'context_course': course,
+        'context_course': course_module,
         'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(
-            CourseGradingModel.fetch(course.location).graders
+            CourseGradingModel.fetch(course_module.location).graders
         ),
-        'parent_location': course.location,
+        'parent_location': course_module.location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
-        'category': 'vertical'
+        'category': 'vertical',
+        "course_title": course_title,
+        "course_id": "/".join([org, course, name]),
+        "enable_search": settings.MITX_FEATURES.get("COURSE_SEARCH", False)
     })
 
 
