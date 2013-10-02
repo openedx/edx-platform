@@ -1,49 +1,73 @@
-*.pyc
-*~
-*.scssc
-*.swp
-*.orig
-*.DS_Store
-*.mo
-:2e_*
-:2e#
-.AppleDouble
-database.sqlite
+# .gitignore for edx-platform.
+# There's a lot here, please try to keep it organized.
+
+### Files private to developers
+
 requirements/private.txt
 lms/envs/private.py
 cms/envs/private.py
-courseware/static/js/mathjax/*
-flushdb.sh
-build
+
+### Python artifacts
+*.pyc
+
+### Editor and IDE artifacts
+*~
+*.swp
+*.orig
+/nbproject
+.idea/
+.redcar/
+
+### OS X artifacts
+*.DS_Store
+.AppleDouble
+:2e_*
+:2e#
+
+### Internationalization artifacts
+*.mo
+conf/locale/en/LC_MESSAGES/*.po
+!messages.po
+
+### Testing artifacts
+.testids/
+.noseids
+nosetests.xml
 .coverage
 coverage.xml
 cover/
-log/
+cover_html/
 reports/
-/src/
-\#*\#
+
+### Installation artifacts
 *.egg-info
 Gemfile.lock
-.env/
-conf/locale/en/LC_MESSAGES/*.po
-!messages.po
+.pip_download_cache/
+.prereqs_cache
+.vagrant/
+node_modules
+
+### Static assets pipeline artifacts
+*.scssc
 lms/static/sass/*.css
 lms/static/sass/application.scss
 lms/static/sass/course.scss
 cms/static/sass/*.css
-lms/lib/comment_client/python
-nosetests.xml
-cover_html/
-.idea/
-.redcar/
+
+### Logging artifacts
+log/
+logs
 chromedriver.log
-/nbproject
 ghostdriver.log
-node_modules
-.pip_download_cache/
-.prereqs_cache
+
+### Unknown artifacts
+database.sqlite
+courseware/static/js/mathjax/*
+flushdb.sh
+build
+/src/
+\#*\#
+.env/
+lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
-.vagrant/
-logs
-.testids/

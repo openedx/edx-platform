@@ -547,7 +547,7 @@
         });
 
         it('replace the full screen button tooltip', function() {
-          expect($('.add-fullscreen')).toHaveAttr('title', 'Exit fullscreen');
+          expect($('.add-fullscreen')).toHaveAttr('title', 'Exit full browser');
         });
 
         it('add the video-fullscreen class', function() {
@@ -573,7 +573,7 @@
         });
 
         it('replace the full screen button tooltip', function() {
-          expect($('.add-fullscreen')).toHaveAttr('title', 'Fullscreen');
+          expect($('.add-fullscreen')).toHaveAttr('title', 'Fill browser');
         });
 
         it('remove the video-fullscreen class', function() {

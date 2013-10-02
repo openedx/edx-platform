@@ -31,6 +31,7 @@ from path import path
 from lms.xblock.mixin import LmsBlockMixin
 from cms.xmodule_namespace import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -168,7 +169,7 @@ MIDDLEWARE_CLASSES = (
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 
 ############################ SIGNAL HANDLERS ################################

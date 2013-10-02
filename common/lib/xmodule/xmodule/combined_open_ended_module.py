@@ -306,7 +306,7 @@ class CombinedOpenEndedFields(object):
     )
     peer_grade_finished_submissions_when_none_pending = Boolean(
         display_name='Allow "overgrading" of peer submissions',
-        help=("Allow students to peer grade submissions that already have the requisite number of graders, "
+        help=("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
               "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
               "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"),
         default=False,

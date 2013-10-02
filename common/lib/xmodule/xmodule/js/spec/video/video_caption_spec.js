@@ -261,7 +261,7 @@
 
     describe('search', function() {
       it('return a correct caption index', function() {
-        expect(videoCaption.search(0)).toEqual(0);
+        expect(videoCaption.search(0)).toEqual(-1);
         expect(videoCaption.search(3120)).toEqual(1);
         expect(videoCaption.search(6270)).toEqual(2);
         expect(videoCaption.search(8490)).toEqual(2);

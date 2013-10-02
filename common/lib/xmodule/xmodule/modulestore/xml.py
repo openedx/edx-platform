@@ -17,9 +17,10 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 
 from xmodule.html_module import HtmlDescriptor
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 
@@ -63,7 +64,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.load_error_modules = load_error_modules
 
         def process_xml(xml):
-            """Takes an xml string, and returns a XModuleDescriptor created from
+            """Takes an xml string, and returns a XBlock created from
             that xml.
             """
 
@@ -163,7 +164,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 make_name_unique(xml_data)
 
-                descriptor = XModuleDescriptor.load_from_xml(
+                descriptor = create_block_from_xml(
                     etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
@@ -217,6 +218,38 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             process_xml=process_xml,
             **kwargs
         )
+
+
+def create_block_from_xml(xml_data, system, org=None, course=None, default_class=None):
+    """
+    Create an XBlock instance from XML data.
+
+    `xml_data' is a string containing valid xml.
+
+    `system` is an XMLParsingSystem.
+
+    `org` and `course` are optional strings that will be used in the generated
+    block's url identifiers.
+
+    `default_class` is the class to instantiate of the XML indicates a class
+    that can't be loaded.
+
+    Returns the fully instantiated XBlock.
+
+    """
+    node = etree.fromstring(xml_data)
+    raw_class = XModuleDescriptor.load_class(node.tag, default_class)
+    xblock_class = system.mixologist.mix(raw_class)
+
+    # leave next line commented out - useful for low-level debugging
+    # log.debug('[create_block_from_xml] tag=%s, class=%s' % (node.tag, xblock_class))
+
+    url_name = node.get('url_name', node.get('slug'))
+    location = Location('i4x', org, course, node.tag, url_name)
+
+    scope_ids = ScopeIds(None, location.category, location, location)
+    xblock = xblock_class.parse_xml(node, system, scope_ids)
+    return xblock
 
 
 class ParentTracker(object):
@@ -278,8 +311,8 @@ class XMLModuleStore(ModuleStoreBase):
         super(XMLModuleStore, self).__init__(**kwargs)
 
         self.data_dir = path(data_dir)
-        self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
-        self.courses = {}  # course_dir -> XModuleDescriptor for the course
+        self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
+        self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         self.load_error_modules = load_error_modules
@@ -477,11 +510,11 @@ class XMLModuleStore(ModuleStoreBase):
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
                     module = system.construct_xblock_from_class(
                         HtmlDescriptor,
-                        DictFieldData({'data': html, 'location': loc, 'category': category}),
                         # We're loading a descriptor, so student_id is meaningless
                         # We also don't have separate notions of definition and usage ids yet,
                         # so we use the location for both
                         ScopeIds(None, category, loc, loc),
+                        DictFieldData({'data': html, 'location': loc, 'category': category}),
                     )
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
@@ -500,7 +533,7 @@ class XMLModuleStore(ModuleStoreBase):
 
     def get_instance(self, course_id, location, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at
+        Returns an XBlock instance for the item at
         location, with the policy for course_id.  (In case two xml
         dirs have different content at the same location, return the
         one for this course_id.)
@@ -528,7 +561,7 @@ class XMLModuleStore(ModuleStoreBase):
 
     def get_item(self, location, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at location.
+        Returns an XBlock instance for the item at location.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
