@@ -87,8 +87,8 @@ class TestXBlockWrapper(object):
         runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime.construct_xblock_from_class(
             descriptor_cls,
+            ScopeIds(None, descriptor_cls.__name__, location, location),
             DictFieldData({}),
-            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def leaf_module(self, descriptor_cls):
@@ -109,10 +109,10 @@ class TestXBlockWrapper(object):
         runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime.construct_xblock_from_class(
             descriptor_cls,
+            ScopeIds(None, descriptor_cls.__name__, location, location),
             DictFieldData({
                 'children': range(3)
             }),
-            ScopeIds(None, descriptor_cls.__name__, location, location)
         )
 
     def container_module(self, descriptor_cls, depth):

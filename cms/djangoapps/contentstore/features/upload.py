@@ -2,13 +2,16 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
+from lettuce.django import django_url
 from django.conf import settings
 import requests
 import string
 import random
 import os
+from django.contrib.auth.models import User
+from student.models import CourseEnrollment
+from splinter.request_handler.status_code import HttpResponseError
 from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
-
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
@@ -26,7 +29,10 @@ def go_to_uploads(_step):
 def upload_file(_step, file_name):
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
-    #uploading the file itself
+
+    _write_test_file(file_name, "test file")
+
+    # uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
     world.browser.attach_file('file', os.path.abspath(path))
@@ -34,19 +40,20 @@ def upload_file(_step, file_name):
     world.css_click(close_css)
 
 
-@step(u'I upload the files (".*")$')
+@step(u'I upload the files "([^"]*)"$')
 def upload_files(_step, files_string):
-    # Turn files_string to a list of file names
+    # files_string should be comma separated with no spaces.
     files = files_string.split(",")
-    files = map(lambda x: string.strip(x, ' "\''), files)
-
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
-    #uploading the files
-    for f in files:
-        path = os.path.join(TEST_ROOT, 'uploads/', f)
+
+    # uploading the files
+    for filename in files:
+        _write_test_file(filename, "test file")
+        path = os.path.join(TEST_ROOT, 'uploads/', filename)
         world.browser.execute_script("$('input.file-input').css('display', 'block')")
         world.browser.attach_file('file', os.path.abspath(path))
+
     close_css = 'a.close-button'
     world.css_click(close_css)
 
@@ -104,13 +111,13 @@ def check_download(_step, file_name):
         r = get_file(file_name)
         downloaded_text = r.text
         assert cur_text == downloaded_text
-    #resetting the file back to its original state
+    # resetting the file back to its original state
     _write_test_file(file_name, "This is an arbitrary file for testing uploads")
 
 
 def _write_test_file(file_name, text):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
-    #resetting the file back to its original state
+    # resetting the file back to its original state
     with open(os.path.abspath(path), 'w') as cur_file:
         cur_file.write(text)
 
@@ -121,68 +128,68 @@ def modify_upload(_step, file_name):
     _write_test_file(file_name, new_text)
 
 
-@step(u'I (lock|unlock) "([^"]*)"$')
-def lock_unlock_file(_step, _lock_state, file_name):
-    index = get_index(file_name)
-    assert index != -1
+@step(u'I upload an asset$')
+def upload_an_asset(step):
+    step.given('I upload the file "asset.html"')
+
+
+@step(u'I (lock|unlock) the asset$')
+def lock_unlock_file(_step, _lock_state):
+    index = get_index('asset.html')
+    assert index != -1, 'Expected to find an asset but could not.'
+
+    # Warning: this is a misnomer, it really only toggles the
+    # lock state. TODO: fix it.
     lock_css = "input.lock-checkbox"
     world.css_find(lock_css)[index].click()
 
 
-@step(u'Then "([^"]*)" is (locked|unlocked)$')
-def verify_lock_unlock_file(_step, file_name, lock_state):
-    index = get_index(file_name)
-    assert index != -1
+@step(u'the user "([^"]*)" is enrolled in the course$')
+def user_foo_is_enrolled_in_the_course(step, name):
+    world.create_user(name, 'test')
+    user = User.objects.get(username=name)
+
+    course_id = world.scenario_dict['COURSE'].location.course_id
+    CourseEnrollment.enroll(user, course_id)
+
+
+@step(u'Then the asset is (locked|unlocked)$')
+def verify_lock_unlock_file(_step, lock_state):
+    index = get_index('asset.html')
+    assert index != -1, 'Expected to find an asset but could not.'
     lock_css = "input.lock-checkbox"
     checked = world.css_find(lock_css)[index]._element.get_attribute('checked')
     assert_equal(lock_state == "locked", bool(checked))
 
 
-@step(u'I have opened a course with a (locked|unlocked) asset "([^"]*)"$')
-def open_course_with_locked(step, lock_state, file_name):
+@step(u'I am at the files and upload page of a Studio course')
+def at_upload_page(step):
     step.given('I have opened a new course in studio')
     step.given('I go to the files and uploads page')
-    _write_test_file(file_name, "test file")
-    step.given('I upload the file "' + file_name + '"')
+
+
+@step(u'I have created a course with a (locked|unlocked) asset$')
+def open_course_with_locked(step, lock_state):
+    step.given('I am at the files and upload page of a Studio course')
+    step.given('I upload the file "asset.html"')
+
     if lock_state == "locked":
-        step.given('I lock "' + file_name + '"')
+        step.given('I lock the asset')
         step.given('I reload the page')
 
 
-@step(u'Then the asset "([^"]*)" is (viewable|protected)$')
-def view_asset(_step, file_name, status):
-    url = '/c4x/MITx/999/asset/' + file_name
+@step(u'Then the asset is (viewable|protected)$')
+def view_asset(_step, status):
+    url = django_url('/c4x/MITx/999/asset/asset.html')
     if status == 'viewable':
-        world.visit(url)
-        _verify_body_text()
+        expected_text = 'test file'
     else:
-        error_thrown = False
-        try:
-            world.visit(url)
-        except Exception as e:
-            assert e.status_code == 403
-            error_thrown = True
-        assert error_thrown
+        expected_text = 'Unauthorized'
 
-
-@step(u'Then the asset "([^"]*)" can be clicked from the asset index$')
-def click_asset_from_index(step, file_name):
-    # This is not ideal, but I'm having trouble with the middleware not having
-    # the same user in the request when I hit the URL directly.
-    course_link_css = 'a.course-link'
-    world.css_click(course_link_css)
-    step.given("I go to the files and uploads page")
-    index = get_index(file_name)
-    assert index != -1
-    world.css_click('a.filename', index=index)
-    _verify_body_text()
-
-
-def _verify_body_text():
-    def verify_text(driver):
-        return world.css_text('body') == 'test file'
-
-    world.wait_for(verify_text)
+    # Note that world.visit would trigger a 403 error instead of displaying "Unauthorized"
+    # Instead, we can drop back into the selenium driver get command.
+    world.browser.driver.get(url)
+    assert_equal(world.css_text('body'),expected_text)
 
 
 @step('I see a confirmation that the file was deleted$')

@@ -353,7 +353,7 @@ class @CombinedOpenEnded
       @save_button.attr("disabled",true)
       $.postWithPrefix "#{@ajax_url}/store_answer", data, (response) =>
         if response.success
-          @gentle_alert("Answer saved.")
+          @gentle_alert("Answer saved, but not yet submitted.")
         else
           @errors_area.html(response.error)
         @save_button.attr("disabled",false)
@@ -372,7 +372,8 @@ class @CombinedOpenEnded
       answer_area_div = @$(@answer_area_div_sel)
       answer_area_div.html(response.student_response)
     else
-      @can_upload_files = pre_can_upload_files
+      @submit_button.show()
+      @submit_button.attr('disabled', false)
       @gentle_alert response.error
 
   confirm_save_answer: (event) =>
@@ -385,23 +386,27 @@ class @CombinedOpenEnded
     event.preventDefault()
     @answer_area.attr("disabled", true)
     max_filesize = 2*1000*1000 #2MB
-    pre_can_upload_files = @can_upload_files
     if @child_state == 'initial'
       files = ""
+      valid_files_attached = false
       if @can_upload_files == true
         files = @$(@file_upload_box_sel)[0].files[0]
         if files != undefined
+          valid_files_attached = true
           if files.size > max_filesize
-            @can_upload_files = false
             files = ""
-        else
-          @can_upload_files = false
+            # Don't submit the file in the case of it being too large, deal with the error locally.
+            @submit_button.show()
+            @submit_button.attr('disabled', false)
+            @gentle_alert "You are trying to upload a file that is too large for our system.  Please choose a file under 2MB or paste a link to it into the answer box."
+            return
 
       fd = new FormData()
       fd.append('student_answer', @answer_area.val())
       fd.append('student_file', files)
-      fd.append('can_upload_files', @can_upload_files)
+      fd.append('valid_files_attached', valid_files_attached)
 
+      that=this
       settings =
         type: "POST"
         data: fd
