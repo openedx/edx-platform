@@ -67,25 +67,29 @@ function () {
         // Let screen readers know that:
 
         // This anchor behaves as a button named 'Volume'.
-        // (the title attribute is set in video.html template).
-        var buttonStr = state.videoVolumeControl.currentVolume === 0 ? gettext('Volume muted') : gettext('Volume');
-        state.videoVolumeControl.buttonEl.attr({
-            'role': gettext('button'),
-            'aria-label': buttonStr, // Doesn't read the title attribute, why? 
-            'aria-disabled': false
-        });
+        var buttonStr = gettext(
+                state.videoVolumeControl.currentVolume === 0
+                ? 'Volume muted'
+                : 'Volume'
+            );
+        // We add the aria-label attribute because the title attribute cannot be
+        // read. 
+        state.videoVolumeControl.buttonEl.attr('aria-label', buttonStr);
 
-        // The anchor representing the slider handle behaves as a slider named
-        // volume.
-        state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl.volumeSliderEl.find('.ui-slider-handle');
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'volume'.
+        var volumeSlider = state.videoVolumeControl.slider;
+        state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl
+                                                             .volumeSliderEl
+                                                             .find('.ui-slider-handle');
         state.videoVolumeControl.volumeSliderHandleEl.attr({
-            'role': gettext('slider'),
+            'role': 'slider',
             'title': 'volume',
             'aria-disabled': false,
-            'aria-valuemin': state.videoVolumeControl.slider.slider('option', 'min'),
-            'aria-valuemax': state.videoVolumeControl.slider.slider('option', 'max'),
-            'aria-valuenow': state.videoVolumeControl.slider.slider('option', 'value'),
-            'aria-valuetext': getVolumeDescription(state.videoVolumeControl.slider.slider('option', 'value'))
+            'aria-valuemin': volumeSlider.slider('option', 'min'),
+            'aria-valuemax': volumeSlider.slider('option', 'max'),
+            'aria-valuenow': volumeSlider.slider('option', 'value'),
+            'aria-valuetext': getVolumeDescription(volumeSlider.slider('option', 'value'))
         });
     }
 
@@ -180,7 +184,9 @@ function () {
         });
        
         this.videoVolumeControl.buttonEl.attr(
-            'aria-label', this.videoVolumeControl.currentVolume === 0 ? gettext('Volume muted') : gettext('Volume')
+            'aria-label', this.videoVolumeControl.currentVolume === 0
+                          ? gettext('Volume muted')
+                          : gettext('Volume')
         );
     }
 

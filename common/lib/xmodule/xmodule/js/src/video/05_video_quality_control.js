@@ -43,16 +43,6 @@ function () {
 
         state.videoQualityControl.el.show();
         state.videoQualityControl.quality = null;
-
-        // ARIA
-        // Let screen readers know that:
-
-        // This anchor behaves as a button named 'HD'.
-        // (the title attribute is set in video.html template).
-        state.videoQualityControl.el.attr({
-            'role': gettext('button'),
-            'aria-disabled': false
-        });
     }
 
     // function _bindHandlers(state)

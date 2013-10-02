@@ -105,16 +105,6 @@ function () {
             this.videoCaption.hideCaptions(true);
             this.videoCaption.hideSubtitlesEl.hide();
         }
-
-        // ARIA
-        // Let screen readers know that:
-
-        // This anchor behaves as a button named 'CC'.
-        // (the title attribute is set in video.html template).
-        this.videoCaption.hideSubtitlesEl.attr({
-            'role': gettext('button'),
-            'aria-disabled': 'false'
-        });
     }
 
     // function bindHandlers()

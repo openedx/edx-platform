@@ -56,11 +56,12 @@ function () {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
         
         // ARIA
-        // Let screen readers know that:
-
-        // This anchor behaves as a button named 'video position'.
+        // We just want the knob to be selectable with keyboard
+        state.videoProgressSlider.el.attr('tabindex', -1);
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'video position'.
         state.videoProgressSlider.handle.attr({
-            'role': gettext('slider'),
+            'role': 'slider',
             'title': 'video position',
             'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
@@ -126,46 +127,46 @@ function () {
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
             hrStr, minStr, secStr;
-      seconds = seconds % 60;
-      minutes = minutes % 60;
+        seconds = seconds % 60;
+        minutes = minutes % 60;
 
-      hrStr = hours.toString(10);
-      minStr = minutes.toString(10);
-      secStr = seconds.toString(10);
+        hrStr = hours.toString(10);
+        minStr = minutes.toString(10);
+        secStr = seconds.toString(10);
 
-      if (hours) {
-        hrStr += (hours < 2 ? ' hour ' : ' hours ');
-        if (minutes) {  
+        if (hours) {
+            hrStr += (hours < 2 ? ' hour ' : ' hours ');
+            if (minutes) {  
+                minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+            }
+            else {
+                minStr += ' 0 minutes ';
+            }
+            if (seconds) {   
+                secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            }
+            else {
+                secStr += ' 0 seconds ';
+            }    
+            return hrStr + minStr + secStr;
+        }
+        else if (minutes) {
             minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+            if (seconds) {   
+                secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            }
+            else {
+                secStr += ' 0 seconds ';
+            }
+            return minStr + secStr;
         }
-        else {
-            minStr += ' 0 minutes ';
-        }
-        if (seconds) {   
+        else if (seconds) {
             secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            return secStr;
         }
         else {
-            secStr += ' 0 seconds ';
-        }    
-        return hrStr + minStr + secStr;
-      }
-      else if (minutes) {
-        minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-        if (seconds) {   
-            secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            return '0 seconds';
         }
-        else {
-            secStr += ' 0 seconds ';
-        }
-        return minStr + secStr;
-      }
-      else if (seconds) {
-        secStr += (seconds < 2 ? ' second ' : ' seconds ');
-        return secStr;
-      }
-      else {
-        return '0 seconds';
-      }
     }
 
 });

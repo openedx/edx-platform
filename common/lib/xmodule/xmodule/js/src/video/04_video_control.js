@@ -65,23 +65,10 @@ function () {
         }
 
         // ARIA
-        // Let screen readers know that:
-
-        // These anchors behaves like buttons, named 'Play' or 'Pause', and 
-        // 'Fill screen' (the title attribute is set in video.html template).
-        state.videoControl.playPauseEl.attr({
-            'role': gettext('button'),
-            'aria-disabled': false
-        });
-
-        state.videoControl.fullScreenEl.attr({
-            'role': gettext('button'),
-            'aria-disabled': false
-        });
-        
-        // This anchor behaves as a slider named 'video slider'.
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'video slider'.
         state.videoControl.sliderEl.find('.ui-slider-handle').attr({
-            'role': gettext('slider'),
+            'role': 'slider',
             'title': gettext('video slider')
         });
     }
@@ -189,14 +176,14 @@ function () {
             this.videoControl.fullScreenState = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', gettext('Fill browser'));
-            this.videoControl.fullScreenEl.text(gettext('Fill browser'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Fill browser'))
+                                          .text(gettext('Fill browser'));
         } else {
             this.videoControl.fullScreenState = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', gettext('Exit full browser'));
-            this.videoControl.fullScreenEl.text(gettext('Exit full browser'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Exit full browser'))
+                                          .text(gettext('Exit full browser'));
         }
 
         this.trigger('videoCaption.resize', null);

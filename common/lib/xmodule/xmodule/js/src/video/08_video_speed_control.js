@@ -79,16 +79,6 @@ function () {
         });
 
         state.videoSpeedControl.setSpeed(state.speed);
-
-         // ARIA
-        // Let screen readers know that:
-
-        // This anchor behaves as a button named 'Speeds'.
-        // (the title attribute is set in video.html template).
-        state.videoSpeedControl.el.children('a').attr({
-            'role': gettext('button'),
-            'aria-disabled': false
-        });
     }
 
     /**
