@@ -56,3 +56,5 @@ Feature: CMS.Video Component
     Then Captions become visible
     And Hover over CC button
     Then Captions become visible
+    And Hover over volume button
+    Then Captions become visible
