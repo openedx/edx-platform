@@ -13,6 +13,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
     protocol = "HTTP/1.0"
 
+    def log_request(self, *args, **kwargs):
+        """Don't log requests, this is just test code."""
+        pass
+
     def do_HEAD(self):
         self._send_head()
 
