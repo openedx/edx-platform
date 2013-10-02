@@ -22,42 +22,16 @@ files.sort()
 
 ## js templates
 
-<script id="metadata-videolist-entry" type="text/template">
-    <%static:include path="js/transcripts/metadata-videolist-entry.underscore" />
+% for template_name in ["metadata-videolist-entry", "file-upload"]:
+<script type="text/template" id="${template_name}">
+  <%static:include path="js/transcripts/${template_name}.underscore" />
 </script>
-
-<script id="transcripts-file-upload" type="text/template">
-    <%static:include path="js/transcripts/file-upload.underscore" />
+% endfor
+% for template_name in ["transcripts-found", "transcripts-uploaded", "transcripts-use-existing", "transcripts-not-found", "transcripts-replace", "transcripts-import", "transcripts-choose"]:
+<script type="text/template" id="${template_name}">
+  <%static:include path="js/transcripts/messages/${template_name}.underscore" />
 </script>
-
-<script id="transcripts-found" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-found.underscore" />
-</script>
-
-<script id="transcripts-uploaded" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-uploaded.underscore" />
-</script>
-
-<script id="transcripts-use-existing" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-use-existing.underscore" />
-</script>
-
-<script id="transcripts-not-found" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-not-found.underscore" />
-</script>
-
-<script id="transcripts-replace" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-replace.underscore" />
-</script>
-
-<script id="transcripts-import" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-import.underscore" />
-</script>
-
-<script id="transcripts-choose" type="text/template">
-    <%static:include path="js/transcripts/messages/transcripts-choose.underscore" />
-</script>
-
+% endfor
 <% metadata_fields = copy.deepcopy(editable_metadata_fields) %>
 <%
     display_name = metadata_fields['display_name']

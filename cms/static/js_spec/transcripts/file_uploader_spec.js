@@ -17,7 +17,7 @@
             appendSetFixtures(
                 $("<script>",
                     {
-                        id: "transcripts-file-upload",
+                        id: "file-upload",
                         type: "text/template"
                     }
                 ).text(fileUploadTemplate)

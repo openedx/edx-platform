@@ -10,7 +10,7 @@
             'click .setting-upload': 'clickHandler'
         },
 
-        uploadTpl: '#transcripts-file-upload',
+        uploadTpl: '#file-upload',
 
         initialize: function () {
             _.bindAll(this);
