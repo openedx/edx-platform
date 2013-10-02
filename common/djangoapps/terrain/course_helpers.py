@@ -2,17 +2,10 @@
 # pylint: disable=W0621
 
 from lettuce import world
-from .factories import *
-from django.conf import settings
-from django.http import HttpRequest
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import editable_modulestore
 from xmodule.contentstore.django import contentstore
-from urllib import quote_plus
 
 
 @world.absorb
@@ -22,7 +15,7 @@ def create_user(uname, password):
     if len(User.objects.filter(username=uname)) > 0:
         return
 
-    portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
+    portal_user = world.UserFactory.build(username=uname, email=uname + '@edx.org')
     portal_user.set_password(password)
     portal_user.save()
 
@@ -30,7 +23,7 @@ def create_user(uname, password):
     registration.register(portal_user)
     registration.activate()
 
-    user_profile = world.UserProfileFactory(user=portal_user)
+    world.UserProfileFactory(user=portal_user)
 
 
 @world.absorb
