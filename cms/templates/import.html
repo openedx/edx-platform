@@ -4,7 +4,7 @@
 
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">${_("Course Import")}</%block>
-<%block name="bodyclass">is-signedin course tools import</%block>
+<%block name="bodyclass">is-signedin course tools view-import</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
@@ -82,7 +82,7 @@ $('#fileupload').fileupload({
                         alert('${_("Your import has failed.")}\n\n' + errMsg);
                         submitBtn.show();
                         bar.hide();
-                    } 
+                    }
                 });
             });
         } else {
