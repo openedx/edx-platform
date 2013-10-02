@@ -138,35 +138,29 @@ function () {
             hrStr += (hours < 2 ? ' hour ' : ' hours ');
             if (minutes) {  
                 minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-            }
-            else {
+            } else {
                 minStr += ' 0 minutes ';
             }
             if (seconds) {   
                 secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            }
-            else {
+            } else {
                 secStr += ' 0 seconds ';
             }    
             return hrStr + minStr + secStr;
-        }
-        else if (minutes) {
+        } else if (minutes) {
             minStr += (minutes < 2 ? ' minute ' : ' minutes ');
             if (seconds) {   
                 secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            }
-            else {
+            } else {
                 secStr += ' 0 seconds ';
             }
             return minStr + secStr;
-        }
-        else if (seconds) {
+        } else if (seconds) {
             secStr += (seconds < 2 ? ' second ' : ' seconds ');
             return secStr;
         }
-        else {
-            return '0 seconds';
-        }
+        
+        return '0 seconds';
     }
 
 });

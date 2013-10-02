@@ -216,25 +216,19 @@ function () {
     function getVolumeDescription(vol) {
         if (vol === 0) {
             return 'muted';
-        }
-        else if (vol <= 20) {
+        } else if (vol <= 20) {
             return 'very low';
-        }
-        else if (vol <= 40) {
+        } else if (vol <= 40) {
             return 'low';
-        }
-        else if (vol <= 60) {
+        } else if (vol <= 60) {
             return 'average';
-        }
-        else if (vol <= 80) {
+        } else if (vol <= 80) {
             return 'loud';
-        }
-        else if (vol <= 99) {
+        } else if (vol <= 99) {
             return 'very loud';
         }
-        else {
-            return 'maximum';
-        }
+        
+        return 'maximum';
     }
 
 });
