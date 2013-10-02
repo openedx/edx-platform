@@ -131,7 +131,7 @@ from django.conf import settings
   </script>
 </%block>
 
-<section class="container dashboard" id="dashboard-main" aria-hidden="false">
+<section class="container dashboard" id="dashboard-main" aria-hidden="false" style="padding-top: 10px">
 
   %if message:
     <section class="dashboard-banner">
@@ -150,9 +150,11 @@ margin-bottom: 1em;
 }
 div.announcements-wrapper section.announcements > ol > li h2 {
 font-size: 0.875em;
-font-weight: bold;
+font-weight: bold !important;
 background: url("/static/images/calendar-icon.png") 0 center no-repeat;
 padding-left: 20px;
+margin-bottom: 0px;
+text-transform: capitalize;
 }
 </style>
 % if site_wide_announcements:
@@ -162,7 +164,7 @@ padding-left: 20px;
                 % for announcement in site_wide_announcements:
                 % if announcement.members_only:
                 <li class="announcement">
-                    <h2 class="title"><span class="date">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y H:i")} - <span>${announcement}</h2>
+                    <h2 class="title">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y H:i")}</h2>
                     ${announcement.content}
                     <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">РЈР±СЂР°С‚СЊ</a> -->
                 </li>
