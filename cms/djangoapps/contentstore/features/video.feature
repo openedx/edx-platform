@@ -45,16 +45,26 @@ Feature: CMS.Video Component
   Scenario: Closed captions become visible when the mouse hovers over CC button
     Given I have created a Video component with subtitles
     And Make sure captions are closed
-    Then Captions become invisible
+    Then Captions become invisible after 3 seconds
     And Hover over CC button
-    Then Captions become visible
+    Then Captions become visible after 0 seconds
+    And Hover over volume button
+    Then Captions become invisible after 3 seconds
 
   # 8
   Scenario: Open captions never become invisible
     Given I have created a Video component with subtitles
     And Make sure captions are open
-    Then Captions become visible
+    Then Captions are visible after 0 seconds
     And Hover over CC button
-    Then Captions become visible
+    Then Captions are visible after 3 seconds
     And Hover over volume button
-    Then Captions become visible
+    Then Captions are visible after 3 seconds
+
+  # 9
+  Scenario: Closed captions are invisible when mouse doesn't hover on CC button
+    Given I have created a Video component with subtitles
+    And Make sure captions are closed
+    Then Captions become invisible after 3 seconds
+    And Hover over volume button
+    Then Captions are invisible after 0 seconds

@@ -127,13 +127,21 @@ def hover_over_button(_step, button):
         world.browser.find_by_css('.volume').mouse_over()
 
 
-@step('Captions become (.+)$')
-def captions_become_visible(_step, visibility_state):
-    # Captions become invisible by fading out. We must wait.
-    world.wait(2)
+@step('Captions become (.+) after (.+) seconds$')
+def check_captions_visibility_state(_step, visibility_state, timeout):
+    timeout = int(timeout.strip())
+
+    # Captions become invisible by fading out. We must wait by a specified
+    # time.
+    world.wait(timeout)
 
     if visibility_state == 'visible':
         assert world.css_visible('.subtitles')
     else:
         assert not world.css_visible('.subtitles')
+
+
+@step('Captions are (.+) after (.+) seconds$')
+def check_captions_visibility_state2(_step, visibility_state, timeout):
+    check_captions_visibility_state(_step, visibility_state, timeout)
 
