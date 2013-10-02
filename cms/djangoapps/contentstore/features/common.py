@@ -168,6 +168,18 @@ def log_into_studio(
     assert_in(uname, world.css_text('h2.title', timeout=10))
 
 
+def add_course_author(user, course):
+    """
+    Add the user to the instructor group of the course
+    so they will have the permissions to see it in studio
+    """
+    for role in ("staff", "instructor"):
+        groupname = get_course_groupname_for_role(course.location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        user.groups.add(group)
+    user.save()
+
+
 def create_a_course():
     course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
     world.scenario_dict['COURSE'] = course
@@ -176,13 +188,7 @@ def create_a_course():
     if not user:
         user = get_user_by_email('robot+studio@edx.org')
 
-    # Add the user to the instructor group of the course
-    # so they will have the permissions to see it in studio
-    for role in ("staff", "instructor"):
-        groupname = get_course_groupname_for_role(course.location, role)
-        group, __ = Group.objects.get_or_create(name=groupname)
-        user.groups.add(group)
-    user.save()
+    add_course_author(user, course)
 
     # Navigate to the studio dashboard
     world.visit('/')
