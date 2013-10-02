@@ -108,3 +108,29 @@ def the_youtube_video_is_shown(_step):
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
 
+
+@step('Make sure captions are (.+)$')
+def make_sure_captions_are_closed(_step, captions_state):
+    if captions_state == 'closed':
+        if world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+    else:
+        if not world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+
+
+@step('Hover over CC button$')
+def hover_over_cc_button(_step):
+    world.browser.find_by_css('.hide-subtitles').mouse_over()
+
+
+@step('Captions become (.+)$')
+def captions_become_visible(_step, visibility_state):
+    # Captions become invisible by fading out. We must wait.
+    world.wait(2)
+
+    if visibility_state == 'visible':
+        assert world.css_visible('.subtitles')
+    else:
+        assert not world.css_visible('.subtitles')
+
