@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-01 19:32+0400\n"
-"PO-Revision-Date: 2013-10-02 13:33+0400\n"
+"PO-Revision-Date: 2013-10-02 18:18+0400\n"
 "Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -657,9 +657,8 @@ msgid "Page Actions"
 msgstr "Actions-страница"
 
 #: cms/templates/asset_index.html:53
-#, fuzzy
 msgid "List of uploaded files and assets in this course"
-msgstr "Оценки всех студентов этого курса"
+msgstr "Список загруженных файлов и ресурсов данного курса"
 
 #: cms/templates/asset_index.html:63 cms/templates/unit.html:166
 msgid "Preview"
@@ -679,9 +678,8 @@ msgid "URL"
 msgstr "URL"
 
 #: cms/templates/asset_index.html:67
-#, fuzzy
 msgid "Actions"
-msgstr "Actions-страница"
+msgstr "Действия"
 
 #: cms/templates/asset_index.html:78
 msgid "What files are included here?"
@@ -3594,7 +3592,7 @@ msgstr "Вы не можете использовать слова ({text}) в �
 
 #: common/lib/capa/capa/responsetypes.py:897
 msgid "factorial function evaluated outside its domain: '{0}'"
-msgstr ""
+msgstr "выход за пределы допустимых значений функции факториал: '{0}'"
 
 #: common/lib/capa/capa/responsetypes.py:903
 msgid "Invalid math syntax: '{0}'"
@@ -3602,7 +3600,7 @@ msgstr "Неправильный синтаксис формулы '{0}'"
 
 #: common/lib/capa/capa/responsetypes.py:1238
 msgid "CustomResponse: check function returned an invalid dict"
-msgstr ""
+msgstr "CustomResponse: функция проверки вернула недопустимый словарь"
 
 #: common/lib/xmodule/xmodule/capa_module.py:353
 msgid "Final Check"
@@ -3638,7 +3636,7 @@ msgid ""
 "field is only populated if the instructor changes tasks afterthe module is "
 "created and students have attempted it (for example changes a self assessed "
 "problem to self and peer assessed."
-msgstr ""
+msgstr "Список списков словарей сохраненных состояний студентов. Это поле заполняется только в случае, если инструктор меняет задания после того, как модуль был создан и студенты начали сдавать задания (например, задание было изменено с задания на самостоятельную проверку на задание на перекрестную проверку)."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:212
 msgid "List of state dictionaries of each task within this module."
@@ -3662,9 +3660,8 @@ msgid "Defines whether the student gets credit for grading this problem."
 msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:227
-#, fuzzy
 msgid "Number of attempts taken by the student on this problem"
-msgstr "Количество попыток,  <br />разрешенных на задание:"
+msgstr "Количество попыток, использованных студентом по этой задаче"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:232
 msgid "If the problem is ready to be reset or not."
@@ -3679,9 +3676,8 @@ msgid "The number of times the student can try to answer this problem."
 msgstr "Число попыток студента ответить на эту задачу."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:244
-#, fuzzy
 msgid "Allow File Uploads"
-msgstr "Файлы &amp; Загрузки"
+msgstr "Разрешить загрузку файлов на сервер"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:245
 msgid "Whether or not the student can submit files as a response."
@@ -3698,16 +3694,15 @@ msgid ""
 msgstr "Если значение False, фильтр качества включен и сдаваемые работы с грамматическими ошибками или слишком короткие не будут проверены."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:256
-#, fuzzy
 msgid "Peer Track Changes"
-msgstr "Сохранить изменения"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:257
 msgid ""
 "EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  If set to 'True', peer graders "
 "will be able to make changes to the student submission and those changes "
 "will be tracked and shown along with the graded feedback."
-msgstr ""
+msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ОСОБЕННОСТЬ ПЕРЕКРЕСТНОЙ ПРОВЕРКИ: если установлено в 'True', проверяющие смогут вносить изменения в посылку студента. Эти изменения будут сохранены и отображены вместе с оцененной обратной связью."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:264
 msgid "Date that this problem is due by"
@@ -3726,9 +3721,8 @@ msgid "XML data for the problem"
 msgstr "XML данные для задачи"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:275
-#, fuzzy
 msgid "Problem Weight"
-msgstr "Список задач"
+msgstr "Вес задачи"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
 msgid ""
@@ -3740,46 +3734,47 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:282
 msgid "Minimum Peer Grading Calibrations"
-msgstr ""
+msgstr "Минимальное число работ калибровки перекрестной проверки"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:283
 msgid ""
 "The minimum number of calibration essays each student will need to complete "
 "for peer grading."
 msgstr ""
+"Минимальное число калибровочных работ, которые должны быть выполнены перед\n"
+"получением права на перекрестную проверку."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:289
 msgid "Maximum Peer Grading Calibrations"
-msgstr ""
+msgstr "Максимальное число работ калибровки перекрестной проверки"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:290
 msgid ""
 "The maximum number of calibration essays each student will need to complete "
 "for peer grading."
-msgstr ""
+msgstr "Максимальное число калибровочных работ, которые должны быть выполнены перед получением права на перекрестную проверку."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:296
 msgid "Peer Graders per Response"
-msgstr ""
+msgstr "Число проверяющих"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:297
 msgid "The number of peers who will grade each submission."
-msgstr ""
+msgstr "Число проверяющих на одну работу"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:303
-#, fuzzy
 msgid "Required Peer Grading"
-msgstr "Перекрестная проверка"
+msgstr "Требуемая перекрестная проверка"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:304
 msgid ""
 "The number of other students each student making a submission will have to "
 "grade."
-msgstr ""
+msgstr "Число работ других студентов, которые должен проверить каждый студент."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:310
 msgid "Allow \"overgrading\" of peer submissions"
-msgstr ""
+msgstr "Разрешить \"перепроверку\" работ"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:311
 msgid ""
@@ -3787,7 +3782,7 @@ msgid ""
 "have the requisite number of graders, but ONLY WHEN all submissions they are "
 "eligible to grade already have enough graders.  This is intended for use "
 "when settings for `Required Peer Grading` > `Peer Graders per Response`"
-msgstr ""
+msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ВОЗМОЖНОСТЬ. Разрешить студентам выполнять перекрестную проверку работ, которые уже проверены достаточным количеством студентов, но только тогда, когда все работы уже проверены достаточным количеством студентов. Эта возможность предназначена для использования, когда 'Требуемая перекрестная проверка' > 'Число проверяющих'"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:318
 msgid "Markdown source of this module"
@@ -3823,15 +3818,14 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:647
-#, fuzzy
 msgid "You have made {sub} submissions."
-msgstr "Вы использовали {num_used} попыток из {num_total}"
+msgstr "Вы сделали {sub} попыток."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:781
 msgid ""
 "You have attempted this question {your} times. You are only allowed to "
 "attempt it {allowed} times."
-msgstr ""
+msgstr "Вы пытались ответить на этот вопрос {your} раз. Вы можете это сделать только {allowed} раз."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:951
 msgid "The problem state got out-of-sync.  Please try reloading the page."
@@ -4111,29 +4105,24 @@ msgid "Analytics"
 msgstr "Аналитика"
 
 #: lms/djangoapps/open_ended_grading/utils.py:22
-#, fuzzy
 msgid "AI Assessment"
-msgstr "Оценки:"
+msgstr "Проверка ИИ"
 
 #: lms/djangoapps/open_ended_grading/utils.py:23
-#, fuzzy
 msgid "Peer Assessment"
-msgstr "Оценки:"
+msgstr "Перекрестная проверка"
 
 #: lms/djangoapps/open_ended_grading/utils.py:24
-#, fuzzy
 msgid "Not yet available"
-msgstr "Нет доступных"
+msgstr "Еще не доступно"
 
 #: lms/djangoapps/open_ended_grading/utils.py:25
-#, fuzzy
 msgid "Automatic Checker"
-msgstr "Автоматический масштаб"
+msgstr "Автоматическая проверка"
 
 #: lms/djangoapps/open_ended_grading/utils.py:26
-#, fuzzy
 msgid "Instructor Assessment"
-msgstr "Инструктор"
+msgstr "Проверка инструктором"
 
 #: lms/djangoapps/open_ended_grading/utils.py:29
 msgid ""
@@ -4142,13 +4131,10 @@ msgid ""
 msgstr "При обращении к сервису проверки работ возникла ошибка. Пожалуйста, уведомите преподавателей."
 
 #: lms/djangoapps/open_ended_grading/utils.py:30
-#, fuzzy
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX "
 "point of contact."
 msgstr ""
-"Невозможно связаться с системой оценивания.  Пожалуйста сообщите о "
-"случившемся администраторам курса."
 
 #: lms/djangoapps/open_ended_grading/utils.py:98
 msgid "for course {0} and student {1}."
@@ -4218,7 +4204,7 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py:316
 msgid "Missing key {0} from submission.  Please reload and try again."
-msgstr ""
+msgstr "Отсутствует ключ {0} проверяемой работы. Пожалуйста, перезагрузите работу."
 
 #: lms/djangoapps/open_ended_grading/views.py:338
 msgid ""
@@ -4227,9 +4213,8 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:159
-#, fuzzy
 msgid "Order Payment Confirmation"
-msgstr "Подтверждение удаления компонента"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:227
 msgid "Trying to add a different currency into the cart"
@@ -4246,9 +4231,8 @@ msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:444
-#, fuzzy
 msgid "Certificate of Achievement, {mode_name} for course {course}"
-msgstr "Сертификат о достижении (для проверенных пользователей)"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:489
 msgid ""
@@ -4287,9 +4271,8 @@ msgstr "Обработчик платежа не вернул требуемый
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:153
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:168
-#, fuzzy
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr "Обработчик платежа не вернул требуемый параметр: {0}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:159
 msgid ""
@@ -4315,11 +4298,10 @@ msgid "One or more fields in the request contains invalid data."
 msgstr "Одно или несколько полей запроса содержат некорректные данные."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:316
-#, fuzzy
 msgid ""
 "Error: General system failure. Possible fix: retry the payment after a few "
 "minutes."
-msgstr "Банк-эмитент недоступен. Повторите операцию через несколько минут"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:328
 msgid ""
@@ -4343,31 +4325,27 @@ msgid "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr "Банк-эмитент недоступен. Повторите операцию через несколько минут"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
-#, fuzzy
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form "
 "of payment"
-msgstr "Банк-эмитент не подтвердил запрос. Попробуйте другие формы платежа"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:350
-#, fuzzy
 msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
-msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:354
-#, fuzzy
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
-msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:360
-#, fuzzy
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
-msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:366
 msgid "The requested amount exceeds the originally authorized amount."
@@ -4387,14 +4365,12 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:380
-#, fuzzy
 msgid "The request ID is invalid."
-msgstr "Id курса некорректен"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:390
-#, fuzzy
 msgid "The transaction has already been settled or reversed."
-msgstr "Авторизация уже была получена"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:398
 msgid "You requested a credit for a capture that was previously voided"
@@ -4606,9 +4582,8 @@ msgstr "Скрыть аннотации"
 #: lms/templates/static_templates/contact.html:11
 #: lms/templates/static_templates/faq.html:11
 #: lms/templates/static_templates/press.html:11
-#, fuzzy
 msgid "Vision"
-msgstr "Дискуссии"
+msgstr ""
 
 #: lms/templates/contact.html:10 lms/templates/static_templates/about.html:12
 #: lms/templates/static_templates/contact.html:12
@@ -7430,7 +7405,7 @@ msgstr "Моя когорта"
 #: lms/templates/discussion/_inline_new_post.html:38
 #: lms/templates/discussion/_new_post.html:69
 msgid "new post title"
-msgstr ""
+msgstr "заголовок нового сообщения"
 
 #: lms/templates/discussion/_inline_new_post.html:50
 #: lms/templates/discussion/_new_post.html:81
@@ -7468,7 +7443,7 @@ msgstr "Темы дискуссий"
 
 #: lms/templates/discussion/_thread_list_template.html:16
 msgid "Discussion topics; current selection is: "
-msgstr ""
+msgstr "Темы дискуссий; текущий набор тем:"
 
 #: lms/templates/discussion/_thread_list_template.html:30
 msgid "Sort by:"
@@ -7588,7 +7563,7 @@ msgstr "Получать обновления"
 
 #: lms/templates/discussion/_underscore_templates.html:222
 msgid "Toggle Notifications Setting"
-msgstr ""
+msgstr "Изменить настройку уведомлений"
 
 #: lms/templates/discussion/_underscore_templates.html:225
 msgid ""
@@ -7763,7 +7738,7 @@ msgstr "Конфигурация оценивания"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html:13
 msgid "Get Student Anonymized IDs CSV"
-msgstr ""
+msgstr "Получить CSV обезличенной информации о студентах"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html:45
 msgid "Back to Standard Dashboard"
@@ -8137,7 +8112,7 @@ msgstr "Обучение оцениванию"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:47
 msgid "I am unsure about the scores I have given above: "
-msgstr ""
+msgstr "Я не уверен насчет баллов, которые я выставил выше:"
 
 #: lms/templates/peer_grading/peer_grading_problem.html:52
 #, fuzzy
