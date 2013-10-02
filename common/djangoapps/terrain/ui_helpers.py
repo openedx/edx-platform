@@ -45,8 +45,29 @@ def is_css_not_present(css_selector, wait_time=5):
         world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
 
 @world.absorb
-def css_has_text(css_selector, text, index=0):
-    return world.css_text(css_selector, index=index) == text
+def css_has_text(css_selector, text, index=0, strip=False):
+    """
+    Return a boolean indicating whether the element with `css_selector`
+    has `text`.
+
+    If `strip` is True, strip whitespace at beginning/end of both
+    strings before comparing.
+
+    If there are multiple elements matching the css selector,
+    use `index` to indicate which one.
+    """
+    # If we're expecting a non-empty string, give the page
+    # a chance to fill in text fields.
+    if text:
+        world.wait_for(lambda _: world.css_text(css_selector, index=index))
+
+    actual_text = world.css_text(css_selector, index=index)
+
+    if strip:
+        actual_text = actual_text.strip()
+        text = text.strip()
+
+    return actual_text == text
 
 
 @world.absorb
