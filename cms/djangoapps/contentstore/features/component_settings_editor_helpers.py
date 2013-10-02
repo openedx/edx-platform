@@ -99,9 +99,11 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
     else:
         assert_equal(value, setting.find_by_css('.setting-input')[0].value)
 
-    settingClearButton = setting.find_by_css('.setting-clear')[0]
-    assert_equal(explicitly_set, settingClearButton.has_class('active'))
-    assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
+    # VideoList doesn't have clear button
+    if not setting.has_class('metadata-videolist-enum'):
+        settingClearButton = setting.find_by_css('.setting-clear')[0]
+        assert_equal(explicitly_set, settingClearButton.has_class('active'))
+        assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
 
 
 @world.absorb

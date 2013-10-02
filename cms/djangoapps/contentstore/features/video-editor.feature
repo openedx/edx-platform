@@ -15,21 +15,16 @@ Feature: CMS.Video Component Editor
     Then I can modify the display name
     And my video display name change is persisted on save
 
-  # Disabling this 10/7/13 due to nondeterministic behavior
-  # in master.  The failure seems to occur when YouTube does
-  # not respond quickly enough, so that the video player
-  # doesn't load.
-  #
   # Sauce Labs cannot delete cookies
-  #  @skip_sauce
-  #Scenario: Captions are hidden when "show captions" is false
-  #  Given I have created a Video component with subtitles
-  #  And I have set "show captions" to False
-  #  Then when I view the video it does not show the captions
+  @skip_sauce
+  Scenario: Captions are hidden when "show captions" is false
+    Given I have created a Video component with subtitles
+    And I have set "show transcript" to False
+    Then when I view the video it does not show the captions
 
   # Sauce Labs cannot delete cookies
   @skip_sauce
   Scenario: Captions are shown when "show captions" is true
     Given I have created a Video component with subtitles
-    And I have set "show captions" to True
+    And I have set "show transcript" to True
     Then when I view the video it does show the captions

@@ -52,7 +52,7 @@ class VideoFields(object):
     )
     show_captions = Boolean(
         help="This controls whether or not captions are shown by default.",
-        display_name="Show Captions",
+        display_name="Show Transcript",
         scope=Scope.settings,
         default=True
     )
@@ -107,13 +107,13 @@ class VideoFields(object):
     )
     track = String(
         help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
-        display_name="Download Track",
+        display_name="Download Transcript",
         scope=Scope.settings,
         default=""
     )
     sub = String(
         help="The name of the timed transcript track (for non-Youtube videos).",
-        display_name="HTML5 Timed Transcript",
+        display_name="HTML5 Transcript",
         scope=Scope.settings,
         default=""
     )

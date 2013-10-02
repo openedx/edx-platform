@@ -5,7 +5,7 @@ from lettuce import world, step
 from terrain.steps import reload_the_page
 
 
-@step('I have set "show captions" to (.*)$')
+@step('I have set "show transcript" to (.*)$')
 def set_show_captions(step, setting):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
@@ -13,7 +13,7 @@ def set_show_captions(step, setting):
     world.css_click('a.edit-button')
     world.wait_for(lambda _driver: world.css_visible('a.save-button'))
     world.click_link_by_text('Advanced')
-    world.browser.select('Show Captions', setting)
+    world.browser.select('Show Transcript', setting)
     world.css_click('a.save-button')
 
 
@@ -40,11 +40,11 @@ def correct_video_settings(_step):
 
         # advanced
         ['Display Name', 'Video', False],
-        ['Download Track', '', False],
+        ['Download Transcript', '', False],
         ['Download Video', '', False],
         ['End Time', '0', False],
-        ['HTML5 Timed Transcript', '', False],
-        ['Show Captions', 'True', False],
+        ['HTML5 Transcript', '', False],
+        ['Show Transcript', 'True', False],
         ['Start Time', '0', False],
         ['Video Sources', '', False],
         ['Youtube ID', 'OEoXaMPEzfM', False],

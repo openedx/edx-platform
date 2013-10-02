@@ -71,7 +71,7 @@ Feature: Video Component Editor
         And I remove t_not_exist transcripts id from store
         And I enter a http://youtu.be/t_not_exist source to field number 1
         Then I see not found status message
-        And I see "" value in the "HTML5 Timed Transcript" field
+        And I see "" value in the "HTML5 Transcript" field
 
         # Import: w/o local but with server subs
         And I remove t__eq_exist transcripts id from store
@@ -82,7 +82,7 @@ Feature: Video Component Editor
         Then I see found status message
         And I see upload_new_timed_transcripts button
         And I see download_to_edit button
-        And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t__eq_exist" value in the "HTML5 Transcript" field
 
     #4
     Scenario: Youtube id only: check "Found" state
@@ -91,7 +91,7 @@ Feature: Video Component Editor
 
         And I enter a http://youtu.be/t_not_exist source to field number 1
         Then I see found status message
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_not_exist" value in the "HTML5 Transcript" field
 
     #5
     Scenario: Youtube id only: check "Found" state when user sets youtube_id with local and server subs and they are equal
@@ -101,7 +101,7 @@ Feature: Video Component Editor
 
         And I enter a http://youtu.be/t__eq_exist source to field number 1
         And I see found status message
-        And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t__eq_exist" value in the "HTML5 Transcript" field
 
     #6
     Scenario: Youtube id only: check "Found" state when user sets youtube_id with local and server subs and they are not  equal
@@ -113,7 +113,7 @@ Feature: Video Component Editor
         And I see replace button
         And I click replace button
         And I see found status message
-        And I see "t_neq_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_neq_exist" value in the "HTML5 Transcript" field
 
     #7
     Scenario: html5 source only: check "Not Found" state
@@ -122,7 +122,7 @@ Feature: Video Component Editor
 
         And I enter a t_not_exist.mp4 source to field number 1
         Then I see not found status message
-        And I see "" value in the "HTML5 Timed Transcript" field
+        And I see "" value in the "HTML5 Transcript" field
 
     #8
     Scenario: html5 source only: check "Found" state
@@ -131,7 +131,7 @@ Feature: Video Component Editor
 
         And I enter a t_not_exist.mp4 source to field number 1
         Then I see found status message
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_not_exist" value in the "HTML5 Transcript" field
 
     #9
     Scenario: User sets youtube_id w/o server but with local subs and one html5 link w/o subs
@@ -143,7 +143,7 @@ Feature: Video Component Editor
 
         And I enter a test_video_name.mp4 source to field number 2
         Then I see found status message
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_not_exist" value in the "HTML5 Transcript" field
 
     #10
     Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o subs
@@ -158,7 +158,7 @@ Feature: Video Component Editor
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see found status message
-        And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t__eq_exist" value in the "HTML5 Transcript" field
 
     #11
     Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o transcripts w/o import action, then another one html5 link w/o transcripts
@@ -336,7 +336,7 @@ Feature: Video Component Editor
         Then I see uploaded_successfully status message
         And I see download_to_edit button
         And I see upload_new_timed_transcripts button
-        And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t__eq_exist" value in the "HTML5 Transcript" field
 
         And I enter a http://youtu.be/t_not_exist source to field number 2
         Then I see found status message
@@ -357,7 +357,7 @@ Feature: Video Component Editor
         And I see upload_new_timed_transcripts button
         And I upload the transcripts file "test_transcripts.srt"
         Then I see uploaded_successfully status message
-        And I see "test_transcripts" value in the "HTML5 Timed Transcript" field
+        And I see "test_transcripts" value in the "HTML5 Transcript" field
 
         And I enter a t_not_exist.webm source to field number 2
         Then I see replace status message
@@ -365,7 +365,7 @@ Feature: Video Component Editor
         And I see choose button test_transcripts.mp4 number 1
         And I see choose button t_not_exist.webm number 2
         And I click choose button number 2
-        And I see "test_transcripts|t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "test_transcripts|t_not_exist" value in the "HTML5 Transcript" field
 
     #21
     Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save - > change it to another one HTML5 source w/o transcripts - click on use existing - >  change it to another one HTML5 source w/o transcripts - click on use existing
@@ -376,7 +376,7 @@ Feature: Video Component Editor
         Then I see found status message
         And I see download_to_edit button
         And I see upload_new_timed_transcripts button
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_not_exist" value in the "HTML5 Transcript" field
 
         And I save changes
         And I edit the component
@@ -385,13 +385,13 @@ Feature: Video Component Editor
         Then I see use existing status message
         And I see use_existing button
         And I click use_existing button
-        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_2" value in the "HTML5 Transcript" field
 
         And I enter a video_name_3.mp4 source to field number 1
         Then I see use existing status message
         And I see use_existing button
         And I click use_existing button
-        And I see "video_name_3" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_3" value in the "HTML5 Transcript" field
 
     #22
     Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save -> change it to another one HTML5 source w/o transcripts - click on use existing ->  change it to another one HTML5 source w/o transcripts - do not click on use existing -> change it to another one HTML5 source w/o transcripts - click on use existing
@@ -402,7 +402,7 @@ Feature: Video Component Editor
         Then I see found status message
         And I see download_to_edit button
         And I see upload_new_timed_transcripts button
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "t_not_exist" value in the "HTML5 Transcript" field
 
         And I save changes
         And I edit the component
@@ -411,7 +411,7 @@ Feature: Video Component Editor
         Then I see use existing status message
         And I see use_existing button
         And I click use_existing button
-        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_2" value in the "HTML5 Transcript" field
 
         And I enter a video_name_3.mp4 source to field number 1
         Then I see use existing status message
@@ -421,7 +421,7 @@ Feature: Video Component Editor
         Then I see use existing status message
         And I see use_existing button
         And I click use_existing button
-        And I see "video_name_4" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_4" value in the "HTML5 Transcript" field
 
     #23
     Scenario: Work with 2 fields: Enter HTML5 source with transcripts - save -> change it to another one HTML5 source w/o transcripts - do not click on use existing ->  add another one HTML5 source w/o transcripts - click on use existing
@@ -444,7 +444,7 @@ Feature: Video Component Editor
         Then I see use existing status message
         And I see use_existing button
         And I click use_existing button
-        And I see "video_name_2|video_name_3" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_2|video_name_3" value in the "HTML5 Transcript" field
 
     #24 Uploading subtitles with different file name than file
     Scenario: File name and name of subs are different
@@ -455,7 +455,7 @@ Feature: Video Component Editor
         And I see not found status message
         And I upload the transcripts file "test_transcripts.srt"
         Then I see uploaded_successfully status message
-        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_1" value in the "HTML5 Transcript" field
 
         And I save changes
         Then when I view the video it does show the captions
@@ -486,11 +486,11 @@ Feature: Video Component Editor
         And I see not found status message
         And I upload the transcripts file "test_transcripts.srt"
         Then I see uploaded_successfully status message
-        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_1" value in the "HTML5 Transcript" field
 
         And I clear field number 1
         Then I see found status message
-        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_2" value in the "HTML5 Transcript" field
 
     #27
     Scenario: Upload button for single youtube id.
@@ -526,7 +526,7 @@ Feature: Video Component Editor
         Then I see uploaded_successfully status message
         And I clear field number 1
         Then I see found status message
-        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_1" value in the "HTML5 Transcript" field
 
         And I save changes
         Then when I view the video it does show the captions
@@ -542,14 +542,14 @@ Feature: Video Component Editor
         Then I see not found status message
 
         And I open tab "Advanced"
-        And I set "t_not_exist" value to the "HTML5 Timed Transcript" field
+        And I set "t_not_exist" value to the "HTML5 Transcript" field
 
         And I save changes
         Then when I view the video it does show the captions
         And I edit the component
 
         Then I see found status message
-        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_1" value in the "HTML5 Transcript" field
 
     # 30
     Scenario: Check non-ascii (chinise) transcripts
@@ -575,7 +575,7 @@ Feature: Video Component Editor
         Then I see not found status message
 
         And I open tab "Advanced"
-        And I set "t_not_exist" value to the "HTML5 Timed Transcript" field
+        And I set "t_not_exist" value to the "HTML5 Transcript" field
         And I open tab "Basic"
         Then I see use existing status message
         And I click use_existing button
@@ -585,4 +585,4 @@ Feature: Video Component Editor
         And I edit the component
 
         Then I see found status message
-        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I see "video_name_1" value in the "HTML5 Transcript" field
