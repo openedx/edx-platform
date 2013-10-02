@@ -25,16 +25,48 @@
  */
 
 (function () {
-    var element, form, frame, link;
+    var element, container, form, link,
+        IN_NEW_WINDOW = 'true',
+        IN_IFRAME = 'false',
+        EMPTY_URL = '',
+        DEFAULT_URL = 'http://www.example.com',
+        NEW_URL = 'http://www.example.com/some_book';
 
-    function initialize(fixture, hasLink) {
-        loadFixtures(fixture);
+    function initialize(target, action) {
+        var tempEl;
+
+        loadFixtures('lti.html');
 
         element = $('.lti-wrapper');
-        if (hasLink) {
-            link = element.find('a.link_lti_new_window');
+        container = element.find('.lti');
+        form = container.find('.ltiLaunchForm');
+
+        if (target === IN_IFRAME) {
+            container.data('open_in_a_new_page', 'false');
+            form.attr('target', 'ltiLaunchFrame');
         }
-        form = element.find('.ltiLaunchForm');
+
+        form.attr('action', action);
+
+        // If we have a new proper action (non-default), we create either
+        // a link that will submit the form, or an iframe that will contain
+        // the answer of auto submitted form.
+        if (action !== EMPTY_URL && action !== DEFAULT_URL) {
+            if (target === IN_NEW_WINDOW) {
+                $('<a />', {
+                    href: '#',
+                    class: 'link_lti_new_window'
+                }).appendTo(container);
+
+                link = container.find('.link_lti_new_window');
+            } else {
+                $('<iframe />', {
+                    name: 'ltiLaunchFrame',
+                    class: 'ltiLaunchFrame',
+                    src: ''
+                }).appendTo(container);
+            }
+        }
 
         spyOnEvent(form, 'submit');
 
@@ -48,7 +80,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_newpage_url_empty.html');
+                    initialize(IN_NEW_WINDOW, EMPTY_URL);
                 });
 
                 it('form is not submitted', function () {
@@ -61,7 +93,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_newpage_url_default.html');
+                    initialize(IN_NEW_WINDOW, DEFAULT_URL);
                 });
 
                 it('form is not submitted', function () {
@@ -75,7 +107,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_newpage_url_new.html', true);
+                    initialize(IN_NEW_WINDOW, NEW_URL);
                 });
 
                 it('form is not submitted', function () {
@@ -94,7 +126,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_iframe_url_empty.html');
+                    initialize(IN_IFRAME, EMPTY_URL);
                 });
 
                 it('form is not submitted', function () {
@@ -107,7 +139,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_iframe_url_default.html');
+                    initialize(IN_IFRAME, DEFAULT_URL);
                 });
 
                 it('form is not submitted', function () {
@@ -121,7 +153,7 @@
                 function () {
 
                 beforeEach(function () {
-                    initialize('lti_iframe_url_new.html');
+                    initialize(IN_IFRAME, NEW_URL);
                 });
 
                 it('form is submitted', function () {
