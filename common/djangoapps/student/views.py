@@ -391,7 +391,7 @@ def change_enrollment(request):
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
         available_modes = CourseMode.modes_for_course(course_id)
-        if len(available_modes) > 1:
+        if available_modes.count() > 1:
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': course_id})
             )
@@ -637,12 +637,12 @@ def _do_create_account(post_vars):
     except IntegrityError:
         js = {'success': False}
         # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
+        if User.objects.filter(username=post_vars['username']).count() > 0:
             js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
+        if User.objects.filter(email=post_vars['email']).count() > 0:
             js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
@@ -1068,16 +1068,16 @@ def auto_auth(request):
 @ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
-    r = Registration.objects.filter(activation_key=key)
-    if len(r) == 1:
+    registrations = Registration.objects.filter(activation_key=key)
+    if registrations.count() == 1:
         user_logged_in = request.user.is_authenticated()
         already_active = True
-        if not r[0].user.is_active:
-            r[0].activate()
+        if not registrations[0].user.is_active:
+            registrations[0].activate()
             already_active = False
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=r[0].user_id)
+        student = User.objects.filter(id=registrations[0].user_id)
         if student:
             ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
             for cea in ceas:
@@ -1092,7 +1092,7 @@ def activate_account(request, key):
             }
         )
         return resp
-    if len(r) == 0:
+    if registrations.count() == 0:
         return render_to_response(
             "registration/activation_invalid.html",
             {'csrf': csrf(request)['csrf_token']}
@@ -1193,7 +1193,7 @@ def change_email_request(request):
                                         'error': _('An account with this e-mail already exists.')}))
 
     pec_list = PendingEmailChange.objects.filter(user=request.user)
-    if len(pec_list) == 0:
+    if pec_list.count() == 0:
         pec = PendingEmailChange()
         pec.user = user
     else:
@@ -1240,7 +1240,7 @@ def confirm_email_change(request, key):
             'new_email': pec.new_email
         }
 
-        if len(User.objects.filter(email=pec.new_email)) != 0:
+        if User.objects.filter(email=pec.new_email).count() != 0:
             transaction.rollback()
             return render_to_response("email_exists.html", {})
 
@@ -1274,11 +1274,12 @@ def confirm_email_change(request, key):
             return render_to_response("email_change_failed.html", {'email': pec.new_email})
 
         transaction.commit()
-        return render_to_response("email_change_successful.html", address_context)
     except Exception:
         # If we get an unexpected exception, be sure to rollback the transaction
         transaction.rollback()
         raise
+    else:
+        return render_to_response("email_change_successful.html", address_context)
 
 
 @ensure_csrf_cookie
