@@ -99,16 +99,18 @@ def initial_setup(server):
         success = False
         num_attempts = 0
         while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
-            world.browser = Browser(browser_driver)
 
-            # Try to visit the main page
-            # If the browser session is invalid, this will
+            # Load the browser and try to visit the main page
+            # If the browser couldn't be reached or
+            # the browser session is invalid, this will
             # raise a WebDriverException
             try:
+                world.browser = Browser(browser_driver)
                 world.visit('/')
 
             except WebDriverException:
-                world.browser.quit()
+                if hasattr(world, 'browser'):
+                    world.browser.quit()
                 num_attempts += 1
 
             else:
