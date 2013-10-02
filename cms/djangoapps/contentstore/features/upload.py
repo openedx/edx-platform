@@ -10,7 +10,6 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from splinter.request_handler.status_code import HttpResponseError
 from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
@@ -25,12 +24,13 @@ def go_to_uploads(_step):
     world.css_click(uploads_css)
 
 
-@step(u'I upload the file "([^"]*)"$')
-def upload_file(_step, file_name):
+@step(u'I upload the( test?) file "([^"]*)"$')
+def upload_file(_step, is_test_file, file_name):
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
 
-    _write_test_file(file_name, "test file")
+    if not is_test_file:
+        _write_test_file(file_name, "test file")
 
     # uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)

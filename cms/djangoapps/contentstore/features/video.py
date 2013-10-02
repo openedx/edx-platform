@@ -17,23 +17,31 @@ def i_created_a_video_component(step):
 
 
 @step('I have created a Video component with subtitles$')
-def i_created_a_video_component_subtitles(step):
-    step.given('I have created a Video component')
+def i_created_a_video_with_subs(_step):
+    _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
+@step('I have created a Video component with subtitles "([^"]*)"$')
+def i_created_a_video_with_subs_with_name(_step, sub_id):
+    _step.given('I have created a Video component')
 
     # Store the current URL so we can return here
     video_url = world.browser.url
 
     # Upload subtitles for the video using the upload interface
-    step.given('I have uploaded subtitles')
+    _step.given('I have uploaded subtitles "{}"'.format(sub_id))
 
     # Return to the video
     world.visit(video_url)
 
 
-@step('I have uploaded subtitles')
-def i_have_uploaded_subtitles(step):
-    step.given('I go to the files and uploads page')
-    step.given('I upload the file "subs_OEoXaMPEzfM.srt.sjson"')
+@step('I have uploaded subtitles "([^"]*)"$')
+def i_have_uploaded_subtitles(_step, sub_id):
+    _step.given('I go to the files and uploads page')
+
+    sub_id = sub_id.strip()
+    if not sub_id:
+        sub_id = 'OEoXaMPEzfM'
+    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id))
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
