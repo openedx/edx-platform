@@ -63,6 +63,14 @@ function () {
             state.videoControl.el.addClass('html5');
             state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
         }
+
+        // ARIA
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'video slider'.
+        state.videoControl.sliderEl.find('.ui-slider-handle').attr({
+            'role': 'slider',
+            'title': gettext('video slider')
+        });
     }
 
     // function _bindHandlers(state)
@@ -168,12 +176,14 @@ function () {
             this.videoControl.fullScreenState = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', gettext('Fullscreen'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Fill browser'))
+                                          .text(gettext('Fill browser'));
         } else {
             this.videoControl.fullScreenState = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', gettext('Exit fullscreen'));
+            this.videoControl.fullScreenEl.attr('title', gettext('Exit full browser'))
+                                          .text(gettext('Exit full browser'));
         }
 
         this.trigger('videoCaption.resize', null);

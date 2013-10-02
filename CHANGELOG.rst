@@ -316,3 +316,6 @@ Common: Updated CodeJail.
 Common: Allow setting of authentication session cookie name.
 
 LMS: Option to email students when enroll/un-enroll them.
+
+Blades: Added WAI-ARIA markup to the video player controls. These are now fully
+accessible by screen readers. 
