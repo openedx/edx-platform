@@ -30,7 +30,7 @@ def i_created_a_video_with_subs(_step, sub_id):
     world.visit(video_url)
 
 
-@step('I have uploaded (.*) subtitles')
+@step('I have uploaded (.*) subtitles$')
 def i_have_uploaded_subtitles(_step, sub_id):
     _step.given('I go to the files and uploads page')
 
