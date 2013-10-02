@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-01 19:32+0400\n"
-"PO-Revision-Date: 2013-09-25 16:19+0400\n"
+"PO-Revision-Date: 2013-10-02 13:33+0400\n"
 "Last-Translator: cher <blackav@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -419,7 +419,7 @@ msgstr "Файл был удален."
 
 #: cms/static/js/views/assets.js:48
 msgid "Uploading…"
-msgstr ""
+msgstr "Загружаю на сервер…"
 
 #: cms/static/js/views/assets.js:66 cms/templates/asset_index.html:103
 #: cms/templates/import.html:32
@@ -672,11 +672,11 @@ msgstr "Имя"
 
 #: cms/templates/asset_index.html:65
 msgid "Date Added"
-msgstr ""
+msgstr "Дата добавления"
 
 #: cms/templates/asset_index.html:66
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: cms/templates/asset_index.html:67
 #, fuzzy
@@ -685,17 +685,19 @@ msgstr "Actions-страница"
 
 #: cms/templates/asset_index.html:78
 msgid "What files are included here?"
-msgstr ""
+msgstr "Какие файлы включены?"
 
 #: cms/templates/asset_index.html:79
 msgid ""
 "Any file you upload to the course will be listed here, including your course "
 "image, textbook chapters, and any files you add directly to this page."
 msgstr ""
+"Все файлы, которые Вы загружаете на сервер в курс будут показаны здесь,\n"
+"включая изображения, главы учебников и прочие файлы. "
 
 #: cms/templates/asset_index.html:82
 msgid "What can I do on this page?"
-msgstr ""
+msgstr "Что я могу делать на этой странице?"
 
 #: cms/templates/asset_index.html:83
 msgid ""
@@ -704,6 +706,8 @@ msgid ""
 "accessing that specific file. You can also copy the location (URL) of a file "
 "to use elsewhere in your course."
 msgstr ""
+"Вы можете нажать на имя файла для его просмотра или загрузки, загрузить\n"
+"на сервер новый файл, удались файл, защитить файл от тех, кто не зачислен на курс. Вы также можете скопировать URL файла для использования в курсе в виде ссылки. "
 
 #: cms/templates/asset_index.html:90
 #: lms/templates/courseware/courseware.html:176
@@ -1298,7 +1302,7 @@ msgstr "Импорт выполнен успешно."
 
 #: cms/templates/import.html:107
 msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
+msgstr "Выполняется импорт. Уход со страницы прервет операцию."
 
 #: cms/templates/index.html:5 cms/templates/index.html:42
 #: cms/templates/widgets/header.html:130
@@ -3578,7 +3582,7 @@ msgstr "Пожалуйста, укажите корректный e-mail."
 
 #: common/lib/capa/capa/responsetypes.py:867
 msgid "There was a problem with the staff answer to this problem"
-msgstr ""
+msgstr "При обработке ответа преподавателей на данную задачу возникла ошибка"
 
 #: common/lib/capa/capa/responsetypes.py:879
 msgid "Could not interpret '{0}' as a number"
@@ -3626,7 +3630,7 @@ msgstr "Открытый ответ"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:200
 msgid "Current task that the student is on."
-msgstr ""
+msgstr "Текущее задание, которое выполняется студентом."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:205
 msgid ""
@@ -3638,15 +3642,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:212
 msgid "List of state dictionaries of each task within this module."
-msgstr ""
+msgstr "Список словарей состояния каждой задачи в данном модуле."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:216
 msgid "Which step within the current task that the student is on."
-msgstr ""
+msgstr "На каком шаге в текущей задаче сейчас находится студент."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:217
 msgid "initial"
-msgstr ""
+msgstr "начальный"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:221
 #: lms/templates/peer_grading/peer_grading.html:33
@@ -3655,7 +3659,7 @@ msgstr "Оценено"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:222
 msgid "Defines whether the student gets credit for grading this problem."
-msgstr ""
+msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:227
 #, fuzzy
@@ -3664,15 +3668,15 @@ msgstr "Количество попыток,  <br />разрешенных на 
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:232
 msgid "If the problem is ready to be reset or not."
-msgstr ""
+msgstr "Готова ли задача к очистке или нет."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:237
 msgid "Maximum Attempts"
-msgstr ""
+msgstr "Максимальное число попыток"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
 msgid "The number of times the student can try to answer this problem."
-msgstr ""
+msgstr "Число попыток студента ответить на эту задачу."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:244
 #, fuzzy
@@ -3681,17 +3685,17 @@ msgstr "Файлы &amp; Загрузки"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:245
 msgid "Whether or not the student can submit files as a response."
-msgstr ""
+msgstr "Может ли студент сдавать файлы в качестве ответа."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:250
 msgid "Disable Quality Filter"
-msgstr ""
+msgstr "Отключить фильтр качества"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:251
 msgid ""
 "If False, the Quality Filter is enabled and submissions with poor spelling, "
 "short length, or poor grammar will not be peer reviewed."
-msgstr ""
+msgstr "Если значение False, фильтр качества включен и сдаваемые работы с грамматическими ошибками или слишком короткие не будут проверены."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:256
 #, fuzzy
@@ -3707,19 +3711,19 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:264
 msgid "Date that this problem is due by"
-msgstr ""
+msgstr "Срок, до которого можно сдавать эту задачу"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:268
 msgid "Amount of time after the due date that submissions will be accepted"
-msgstr ""
+msgstr "Промежуток времени после даты сдачи, в течение которого задачу еще можно сдавать"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:271
 msgid "Current version number"
-msgstr ""
+msgstr "Номер текущей версии"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:272
 msgid "XML data for the problem"
-msgstr ""
+msgstr "XML данные для задачи"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:275
 #, fuzzy
@@ -3731,6 +3735,8 @@ msgid ""
 "Defines the number of points each problem is worth. If the value is not set, "
 "each problem is worth one point."
 msgstr ""
+"Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
+"оценивается в 1 балл."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:282
 msgid "Minimum Peer Grading Calibrations"
@@ -3802,7 +3808,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:644
 msgid "Feedback not available yet"
-msgstr ""
+msgstr "Обратная связь пока недоступна"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:645
 msgid ""
@@ -3829,7 +3835,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:951
 msgid "The problem state got out-of-sync.  Please try reloading the page."
-msgstr ""
+msgstr "Произошла рассинхронизация состояния задачи. Пожалуйста, перезагрузите страницу."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:695
 msgid ""
@@ -3879,7 +3885,7 @@ msgid ""
 "It depends on the type of problem you ran into. For stupid errors -- an "
 "arithmetic error or similar -- simply letting the student you'll be helping "
 "to check their signs is sufficient."
-msgstr ""
+msgstr "Это зависит от типа задачи, с которым Вы столкнетесь. Для глупых ошибок, например, арифметических или аналогичных, просто позволить студенту, которому Вы будете помогать, проверить свои вычисления будет достаточно."
 
 #: common/templates/hinter_display.html:104
 msgid ""
@@ -3888,25 +3894,25 @@ msgid ""
 "example that clearly demonstrates inconsistency or <a href=\"http://en."
 "wikipedia.org/wiki/Cognitive_dissonance\" target=\"_blank\"> cognitive "
 "dissonace </a>is ideal, although in most cases, not possible."
-msgstr ""
+msgstr "Для более глубоких ошибок понимания, лучшие подсказки помогают студентам найти противоречия в том, как они решают задачу. Идеальным будет пример, который явно демонстрирует нецелостность или когнитивный диссонанс, хотя в большинстве ситуаций это невозможно."
 
 #: common/templates/hinter_display.html:107
 msgid "Good hints either:"
-msgstr ""
+msgstr "Другие хорошие подсказки:"
 
 #: common/templates/hinter_display.html:109
 msgid "Point out the specific misunderstanding your classmate might have"
-msgstr ""
+msgstr "Укажите на типичные ошибки в понимании, возникшие у Ваших одногруппников"
 
 #: common/templates/hinter_display.html:110
 msgid ""
 "Point to concepts or theories where your classmates might have a "
 "misunderstanding"
-msgstr ""
+msgstr "Укажите концепции или теории, в которых возникает непонимание у Ваших одногруппников"
 
 #: common/templates/hinter_display.html:111
 msgid "Show simpler, analogous examples."
-msgstr ""
+msgstr "Покажите более простые аналогичные примеры."
 
 #: common/templates/hinter_display.html:112
 msgid "Provide references to relevant parts of the text"
@@ -4133,7 +4139,7 @@ msgstr "Инструктор"
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
-msgstr ""
+msgstr "При обращении к сервису проверки работ возникла ошибка. Пожалуйста, уведомите преподавателей."
 
 #: lms/djangoapps/open_ended_grading/utils.py:30
 #, fuzzy
@@ -4146,7 +4152,7 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py:98
 msgid "for course {0} and student {1}."
-msgstr ""
+msgstr "для курса {0} и студента {1}."
 
 #: lms/djangoapps/open_ended_grading/views.py:50
 #: lms/templates/peer_grading/peer_grading.html:19
@@ -5238,12 +5244,11 @@ msgstr "Мои курсы"
 
 #: lms/templates/login.html:98
 msgid "Please log in"
-msgstr ""
+msgstr "Пожалуйста, войдите в систему"
 
 #: lms/templates/login.html:99
-#, fuzzy
 msgid "to access your account and courses"
-msgstr "Пожалуйста, войдите, чтобы получить доступ к вашему аккаунту и курсам"
+msgstr "чтобы получить доступ к вашему аккаунту и курсам"
 
 #: lms/templates/login.html:110
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
