@@ -103,22 +103,6 @@
         /**
         * @function
         *
-        * Clears the value currently set in the model (reverting to the default).
-        *
-        */
-        clear: function () {
-            CMS.Views.Metadata.AbstractEditor.prototype.clear
-                .apply(this, arguments);
-
-            // Enable inputs.
-            this.$el.find('.input')
-                .prop('disabled', false)
-                .removeClass('is-disabled');
-        },
-
-        /**
-        * @function
-        *
         * Returns the values currently displayed in the editor/view.
         *
         * @returns {array} List of non-empty values.

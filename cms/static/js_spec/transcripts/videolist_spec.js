@@ -69,7 +69,6 @@
             spyOn(utils, 'command').andCallThrough();
             spyOn(abstractEditor, 'initialize').andCallThrough();
             spyOn(abstractEditor, 'render').andCallThrough();
-            spyOn(abstractEditor, 'clear').andCallThrough();
 
             Transcripts.MessageManager = function () {
                 messenger.initialize();
@@ -361,7 +360,7 @@
 
 
             it('On filling less than 3 fields, remaining fields should have \
-                placeholders for video types that were not filled yet',
+placeholders for video types that were not filled yet',
                 function () {
                     var dataDict = {
                         youtube: {
@@ -428,7 +427,7 @@
 
             it('Field has invalid value - nothing should happen',
                 function () {
-                    $.fn.hasClass.andReturn(false)
+                    $.fn.hasClass.andReturn(false);
                     view.checkValidity.andReturn(false);
                     view.inputHandler(eventObject);
 
@@ -442,7 +441,7 @@
 
             it('Main field has invalid value - extra Videos Bar should be closed',
                 function () {
-                    $.fn.hasClass.andReturn(true)
+                    $.fn.hasClass.andReturn(true);
                     view.checkValidity.andReturn(false);
                     view.inputHandler(eventObject);
 
@@ -482,18 +481,6 @@
                 }
             );
 
-        });
-
-
-        it('Inputs are enabled on clear', function () {
-            spyOn($.fn, 'removeClass');
-            spyOn($.fn, 'prop').andCallThrough();
-
-            view.clear();
-
-            expect(abstractEditor.clear).toHaveBeenCalled();
-            expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
-            expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
         });
 
     });

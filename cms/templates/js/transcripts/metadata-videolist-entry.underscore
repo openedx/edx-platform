@@ -20,10 +20,6 @@
       </div>
     </div>
   </div>
-  <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
-    <i class="icon-undo"></i>
-    <span class="sr">"<%= gettext("Clear Value") %>"</span>
-  </button>
 </div>
 <div class="transcripts-status is-invisible">
     <label class="label setting-label transcripts-label"><%= gettext("Timed Transcripts") %></label>

@@ -45,7 +45,9 @@ BUTTONS = {
 
 @step('I clear fields$')
 def clear_fields(_step):
-    world.css_click('.metadata-videolist-enum .setting-clear')
+    for index in range(1, 4):
+        world.browser.execute_script("$('{0}').eq({1}).prop('disabled', false).removeClass('is-disabled')".format(SELECTORS['url_inputs'], index - 1))
+        _step.given('I clear field number {0}'.format(index))
 
 
 @step('I clear field number (.+)$')
