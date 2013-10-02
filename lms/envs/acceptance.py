@@ -74,6 +74,12 @@ DATABASES = {
     }
 }
 
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'track.backends.mongodb.MongoBackend'
+    }
+})
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
