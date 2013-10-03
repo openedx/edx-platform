@@ -165,11 +165,16 @@ function () {
                 'scroll', this.videoControl.showControls
             );
         } else if (!this.config.autohideHtml5) {
-            // this.videoCaption.subtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
-            this.videoCaption.subtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+            this.videoCaption.subtitlesEl.on(
+                'keydown', this.videoCaption.autoShowCaptions
+            );
 
-            this.videoCaption.hideSubtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
-            this.videoCaption.hideSubtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+            this.videoCaption.hideSubtitlesEl.on(
+                'mousemove', this.videoCaption.autoShowCaptions
+            );
+            this.videoCaption.hideSubtitlesEl.on(
+                'keydown', this.videoCaption.autoShowCaptions
+            );
 
             // Moving slider on subtitles is not a mouse move,
             // but captions should not be auto-hidden.
@@ -475,14 +480,10 @@ function () {
             caption.addClass('focused');
             // The second and second to last elements turn automatic scrolling
             // off again as it may have been enabled in captionBlur.
-<<<<<<< HEAD
-            if (captionIndex <= 1 || captionIndex >= this.videoCaption.captions.length-2) {
-=======
             if (
                 captionIndex <= 1 ||
-                captionIndex >= this.videoCaption.captions.length-2
+                captionIndex >= this.videoCaption.captions.length - 2
             ) {
->>>>>>> Work in progress.
                 this.videoCaption.autoScrolling = false;
             }
         }
@@ -492,19 +493,11 @@ function () {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
         caption.removeClass('focused');
-<<<<<<< HEAD
-        // If we are on first or last index, we have to turn automatic scroll on
-        // again when losing focus. There is no way to know in what direction we
-        // are tabbing. So we could be on the first element and tabbing back out
-        // of the captions or on the last element and tabbing forward out of the
-        // captions.
-=======
         // If we are on first or last index, we have to turn automatic scroll
         // on again when losing focus. There is no way to know in what
         // direction we are tabbing. So we could be on the first element and
         // tabbing back out of the captions or on the last element and tabbing
         // forward out of the captions.
->>>>>>> Work in progress.
         if (captionIndex === 0 ||
             captionIndex === this.videoCaption.captions.length-1) {
             this.videoCaption.autoScrolling = true;
@@ -521,11 +514,6 @@ function () {
     function scrollCaption() {
         var el = this.videoCaption.subtitlesEl.find('.current:first');
 
-<<<<<<< HEAD
-        // Automatic scrolling gets disabled if one of the captions has received
-        // focus through tabbing.
-        if (!this.videoCaption.frozen && el.length && this.videoCaption.autoScrolling) {
-=======
         // Automatic scrolling gets disabled if one of the captions has
         // received focus through tabbing.
         if (
@@ -533,7 +521,6 @@ function () {
             el.length &&
             this.videoCaption.autoScrolling
         ) {
->>>>>>> Work in progress.
             this.videoCaption.subtitlesEl.scrollTo(
                 el,
                 {
