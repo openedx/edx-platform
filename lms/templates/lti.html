@@ -1,14 +1,18 @@
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div id="${element_id}" class="${element_class}" data-open_in_a_new_page="${json.dumps(open_in_a_new_page)}">
+<div
+    id="${element_id}"
+    class="${element_class}"
+    data-open_in_a_new_page="${json.dumps(open_in_a_new_page)}"
+>
 
     ## This form will be hidden.
-    ## If open_in_a_new_page is false then, once available on the client, the LTI
-    ## module JavaScript will trigget a "submit" on the form, and the
+    ## If open_in_a_new_page is false then, once available on the client, the
+    ## LTI module JavaScript will trigger a "submit" on the form, and the
     ## result will be rendered to the below iFrame.
-    ## If open_in_a_new_page is true, then link will be shown, and by clicking on it,
-    ## LTI will pop up in new window.
+    ## If open_in_a_new_page is true, then link will be shown, and by clicking
+    ## on it, LTI will pop up in new window.
     <form
         action="${launch_url}"
         name="ltiLaunchForm-${element_id}"
@@ -28,7 +32,15 @@
 
 % if launch_url and launch_url !=  'http://www.example.com':
     % if open_in_a_new_page:
-        <a href="#" class='link_lti_new_window'>${_(u'Click to view LTI in new window')}</a>
+        <p>
+            <span class="description">
+                [LTI Display Name] (External resource)
+            </span>
+            <a href="#" class='link_lti_new_window'>
+                <i class="icon-external-link"></i>
+                ${_('View resource in a new window')}
+            </a>
+        </p>
     % else:
         ## The result of the form submit will be rendered here.
         <iframe
