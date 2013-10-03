@@ -174,12 +174,17 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                msg = "Error loading from xml. " + unicode(err)[:200]
-                log.warning(msg)
-                # Normally, we don't want lots of exception traces in our logs from common
-                # content problems.  But if you're debugging the xml loading code itself,
-                # uncomment the next line.
-                #   log.exception(msg)
+                msg = "Error loading from xml. %s"
+                log.warning(
+                    msg,
+                    unicode(err)[:200],
+                    # Normally, we don't want lots of exception traces in our logs from common
+                    # content problems.  But if you're debugging the xml loading code itself,
+                    # uncomment the next line.
+                    # exc_info=True
+                )
+
+                msg = msg % (unicode(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -195,7 +200,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
-            if hasattr(descriptor, 'children'):
+            if descriptor.has_children:
                 for child in descriptor.get_children():
                     parent_tracker.add_parent(child.location, descriptor.location)
 
@@ -368,7 +373,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         String representation - for debugging
         '''
         return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
-            self.data_dir, len(self.courses), len(self.modules))
+            self.data_dir, len(self.courses), len(self.modules)
+        )
 
     def load_policy(self, policy_path, tracker):
         """

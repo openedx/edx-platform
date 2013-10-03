@@ -119,13 +119,10 @@ class ImportTestCase(BaseCourseTestCase):
         tag_xml = descriptor.export_to_xml(resource_fs)
         re_import_descriptor = system.process_xml(tag_xml)
 
-        self.assertEqual(re_import_descriptor.__class__.__name__,
-                         'ErrorDescriptorWithMixins')
+        self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
 
-        self.assertEqual(descriptor.contents,
-                         re_import_descriptor.contents)
-        self.assertEqual(descriptor.error_msg,
-                         re_import_descriptor.error_msg)
+        self.assertEqual(descriptor.contents, re_import_descriptor.contents)
+        self.assertEqual(descriptor.error_msg, re_import_descriptor.error_msg)
 
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""

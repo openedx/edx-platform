@@ -163,8 +163,8 @@ class Location(_LocationBase):
         def check_list(list_):
             def check(val, regexp):
                 if val is not None and regexp.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
+                    log.debug('invalid characters val=%r, list_=%r', val, list_)
+                    raise InvalidLocationError("Invalid characters in {!r}.".format(val))
 
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:

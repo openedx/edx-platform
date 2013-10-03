@@ -660,8 +660,8 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     metadata_translations = {
         'is_graded': 'graded',
         'attempts': 'max_attempts',
-        'due_data' : 'due'
-        }
+        'due_data': 'due'
+    }
 
     @property
     def non_editable_metadata_fields(self):

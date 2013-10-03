@@ -6,7 +6,7 @@
       <video name="S0V1: Video Resources" youtube_id_0_75="EuzkdzfR0i8" youtube_id_1_0="1bK-WdDi6Qw" youtube_id_1_25="0v1VzoDVUTM" youtube_id_1_5="Bxk_-ZJb240"/>
     </videosequence>
     <section name="Lecture 2">
-    <sequential>
+      <sequential>
         <video youtube_id_1_0="TBvX7HzxexQ"/>
         <problem name="L1 Problem 1" points="1" type="lecture" showanswer="attempted" filename="L1_Problem_1" rerandomize="never"/>
       </sequential>
@@ -20,12 +20,11 @@
     </section>
     <video name="Lost Video" youtube_id_1_0="TBvX7HzxexQ"/>
     <sequential format="Lecture Sequence" url_name='test_sequence'>
-        <vertical url_name='test_vertical'>
-            <html url_name='test_html'>
-                Foobar
-            </html>
-        </vertical>
+      <vertical url_name='test_vertical'>
+        <html url_name='test_html'>
+          Foobar
+        </html>
+      </vertical>
     </sequential>
   </chapter>
-
 </course>

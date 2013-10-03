@@ -221,8 +221,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                location = ConditionalDescriptor.parse_sources(
-                    child, system)
+                location = ConditionalDescriptor.parse_sources(child, system)
                 children.extend(location)
                 show_tag_list.extend(location)
             else:

@@ -485,7 +485,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         }
         """
         course = self._lookup_course(course_locator)['structure']
-        return {'original_version': course['original_version'],
+        return {
+            'original_version': course['original_version'],
             'previous_version': course['previous_version'],
             'edited_by': course['edited_by'],
             'edited_on': course['edited_on']
@@ -1328,8 +1329,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if depth is None or depth > 0:
             depth = depth - 1 if depth is not None else None
             for child in block_map[block_id]['fields'].get('children', []):
-                descendent_map = self.descendants(block_map, child, depth,
-                    descendent_map)
+                descendent_map = self.descendants(block_map, child, depth, descendent_map)
 
         return descendent_map
 

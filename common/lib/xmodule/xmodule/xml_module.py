@@ -6,7 +6,7 @@ import sys
 from lxml import etree
 
 from xblock.fields import Dict, Scope, ScopeIds
-from xmodule.x_module import (XModuleDescriptor, policy_key)
+from xmodule.x_module import XModuleDescriptor, policy_key
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml_exporter import EdxJSONEncoder
@@ -153,8 +153,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_object: An etree Element
         """
-        raise NotImplementedError(
-            "%s does not implement definition_from_xml" % cls.__name__)
+        raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
     def clean_metadata_from_xml(cls, xml_object):

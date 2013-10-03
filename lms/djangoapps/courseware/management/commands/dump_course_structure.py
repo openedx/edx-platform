@@ -110,7 +110,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
                 return False
             elif field.scope != Scope.settings:
                 return False
-            elif defaults == True:
+            elif defaults:
                 return True
             else:
                 return field.values != field.default
