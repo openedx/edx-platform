@@ -24,7 +24,7 @@ def go_to_uploads(_step):
     world.css_click(uploads_css)
 
 
-@step(u'I upload the( test?) file "([^"]*)"$')
+@step(u'I upload the( test)? file "([^"]*)"$')
 def upload_file(_step, is_test_file, file_name):
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
