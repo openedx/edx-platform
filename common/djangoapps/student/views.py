@@ -295,8 +295,6 @@ def dashboard(request):
 
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
-
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -312,7 +310,6 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
-               'exam_registrations': exam_registrations,
                }
 
     return render_to_response('dashboard.html', context)
