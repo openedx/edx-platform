@@ -15,6 +15,8 @@ log = logging.getLogger(__name__)
 
 
 class TimeLimitFields(object):
+    has_children = True
+
     beginning_at = Float(help="The time this timer was started", scope=Scope.user_state)
     ending_at = Float(help="The time this timer will end", scope=Scope.user_state)
     accomodation_code = String(help="A code indicating accommodations to be given the student", scope=Scope.user_state)
@@ -30,8 +32,6 @@ class TimeLimitModule(TimeLimitFields, XModule):
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
-
-        self.rendered = False
 
     # For a timed activity, we are only interested here
     # in time-related accommodations, and these should be disjoint.
@@ -85,8 +85,13 @@ class TimeLimitModule(TimeLimitFields, XModule):
         return int((self.ending_at - time()) * 1000)
 
     def get_html(self):
-        self.render()
-        return self.content
+        # assumes there is one and only one child, so it only renders the first child
+        children = self.get_display_items()
+        if children:
+            child = children[0]
+            return self.runtime.render_child(child, None, 'student_view').content
+        else:
+            return u""
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -100,16 +105,6 @@ class TimeLimitModule(TimeLimitFields, XModule):
 
     def handle_ajax(self, _dispatch, _data):
         raise NotFoundError('Unexpected dispatch type')
-
-    def render(self):
-        if self.rendered:
-            return
-        # assumes there is one and only one child, so it only renders the first child
-        children = self.get_display_items()
-        if children:
-            child = children[0]
-            self.content = child.get_html()
-        self.rendered = True
 
     def get_icon_class(self):
         children = self.get_children()
