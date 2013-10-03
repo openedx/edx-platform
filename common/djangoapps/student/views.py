@@ -1273,12 +1273,17 @@ def confirm_email_change(request, key):
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             return render_to_response("email_change_failed.html", {'email': pec.new_email})
 
+        log.debug("Pre transaction commit")
         transaction.commit()
+        log.debug("Post transaction commit")
     except Exception:
+        log.exception("transaction.commit() threw an exception")
         # If we get an unexpected exception, be sure to rollback the transaction
         transaction.rollback()
+        log.debug("transaction successfully completed rollback")
         raise
     else:
+        log.debug("about to render email change template to response")
         return render_to_response("email_change_successful.html", address_context)
 
 
