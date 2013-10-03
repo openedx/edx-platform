@@ -135,7 +135,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(
             len(course.children), 3,
             "children")
-        self.assertEqual(course.definition_locator.definition_id, "head12345_12")
+        self.assertEqual(str(course.definition_locator.definition_id), "ad00000000000000dddd0000")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertEqual(str(course.previous_version), self.GUID_D1)
@@ -195,7 +195,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.graceperiod, datetime.timedelta(hours=2))
         self.assertIsNone(course.advertised_start)
         self.assertEqual(len(course.children), 0)
-        self.assertEqual(course.definition_locator.definition_id, "head12345_11")
+        self.assertEqual(str(course.definition_locator.definition_id), "ad00000000000000dddd0001")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.55})
@@ -345,7 +345,7 @@ class SplitModuleItemTests(SplitModuleTest):
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
             self.assertEqual(block.advertised_start, "Fall 2013")
             self.assertEqual(len(block.children), 3)
-            self.assertEqual(block.definition_locator.definition_id, "head12345_12")
+            self.assertEqual(str(block.definition_locator.definition_id), "ad00000000000000dddd0000")
             # check dates and graders--forces loading of descriptor
             self.assertEqual(block.edited_by, "testassist@edx.org")
             self.assertDictEqual(
@@ -375,7 +375,7 @@ class SplitModuleItemTests(SplitModuleTest):
         block = modulestore().get_item(locator)
         self.assertEqual(block.location.course_id, "GreekHero")
         self.assertEqual(block.category, 'chapter')
-        self.assertEqual(block.definition_locator.definition_id, "chapter12345_1")
+        self.assertEqual(str(block.definition_locator.definition_id), "cd00000000000000dddd0020")
         self.assertEqual(block.display_name, "Hercules")
         self.assertEqual(block.edited_by, "testassist@edx.org")
 
@@ -562,13 +562,13 @@ class TestItemCrud(SplitModuleTest):
         new_module = modulestore().create_item(
             locator, category, 'user123',
             fields={'display_name': 'new chapter'},
-            definition_locator=DefinitionLocator("chapter12345_2")
+            definition_locator=DefinitionLocator("cd00000000000000dddd0022")
         )
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         parent = modulestore().get_item(locator)
         self.assertIn(new_module.location.usage_id, parent.children)
-        self.assertEqual(new_module.definition_locator.definition_id, "chapter12345_2")
+        self.assertEqual(str(new_module.definition_locator.definition_id), "cd00000000000000dddd0022")
 
     def test_unique_naming(self):
         """
@@ -588,7 +588,7 @@ class TestItemCrud(SplitModuleTest):
         another_module = modulestore().create_item(
             locator, category, 'anotheruser',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DefinitionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("0d00000040000000dddd0031"),
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
@@ -605,7 +605,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertLessEqual(new_history['edited_on'], datetime.datetime.now(UTC))
         self.assertGreaterEqual(new_history['edited_on'], premod_time)
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
-        self.assertEqual(another_history['previous_version'], 'problem12345_3_1')
+        self.assertEqual(str(another_history['previous_version']), '0d00000040000000dddd0031')
 
     def test_create_continue_version(self):
         """
@@ -789,7 +789,7 @@ class TestItemCrud(SplitModuleTest):
         modulestore().create_item(
             locator, category, 'test_update_manifold',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DefinitionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("0d00000040000000dddd0031"),
         )
         # pylint: disable=W0212
         modulestore()._clear_cache()

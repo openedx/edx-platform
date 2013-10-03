@@ -11,7 +11,7 @@ from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 from django.core.context_processors import csrf
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore import Location
 from xmodule.error_module import ErrorDescriptor
 from contentstore.utils import get_lms_link_for_item
@@ -46,13 +46,13 @@ def index(request):
     courses = filter(course_filter, courses)
 
     def format_course_for_view(course):
+        # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
+        course_url = loc_mapper().translate_location(
+            course.location.course_id, course.location, published=False, add_entry_if_missing=True
+        )
         return (
             course.display_name,
-            reverse("course_index", kwargs={
-                'org': course.location.org,
-                'course': course.location.course,
-                'name': course.location.name,
-            }),
+            reverse("contentstore.views.course_handler", kwargs={'course_url': course_url}),
             get_lms_link_for_item(
                 course.location
             ),
