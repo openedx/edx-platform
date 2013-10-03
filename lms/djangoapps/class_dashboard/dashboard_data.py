@@ -4,7 +4,7 @@ Computes the data to display on the Instructor Dashboard
 
 from courseware import models
 from django.db.models import Count
-from queryable_student_module.models import StudentModuleExpand, Log
+#from queryable_student_module.models import StudentModuleExpand, Log
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -47,36 +47,36 @@ def get_problem_grade_distribution(course_id):
     return prob_grade_distrib
 
 
-def get_problem_attempt_distrib(course_id, max_attempts=10):
-    """
-    Returns the attempt distribution per problem for the course.
-
-    `course_id` the course ID for the course interested in
-
-    `max_attempts` any students with more attempts than this are grouped together (default 10)
-    Output is a dicts, where the key is the problem `module_id` and the value is an array where the first index is
-    the number of students that only attempted once, second is two times, etc. The last index is all students that
-    attempted more than `max_attempts` times.
-    """
-
-    db_query = StudentModuleExpand.objects.filter(
-        course_id__exact=course_id,
-        attempts__isnull=False,
-        module_type__exact="problem",
-    ).values('module_state_key', 'attempts').annotate(count_attempts=Count('attempts'))
-
-    prob_attempts_distrib = {}
-    for row in db_query:
-        curr_problem = row['module_state_key']
-        if curr_problem not in prob_attempts_distrib:
-            prob_attempts_distrib[curr_problem] = [0] * (max_attempts + 1)
-
-        if row['attempts'] > max_attempts:
-            prob_attempts_distrib[curr_problem][max_attempts] += row['count_attempts']
-        else:
-            prob_attempts_distrib[curr_problem][row['attempts'] - 1] = row['count_attempts']
-
-    return prob_attempts_distrib
+# def get_problem_attempt_distrib(course_id, max_attempts=10):
+#     """
+#     Returns the attempt distribution per problem for the course.
+# 
+#     `course_id` the course ID for the course interested in
+# 
+#     `max_attempts` any students with more attempts than this are grouped together (default 10)
+#     Output is a dicts, where the key is the problem `module_id` and the value is an array where the first index is
+#     the number of students that only attempted once, second is two times, etc. The last index is all students that
+#     attempted more than `max_attempts` times.
+#     """
+# 
+#     db_query = StudentModuleExpand.objects.filter(
+#         course_id__exact=course_id,
+#         attempts__isnull=False,
+#         module_type__exact="problem",
+#     ).values('module_state_key', 'attempts').annotate(count_attempts=Count('attempts'))
+# 
+#     prob_attempts_distrib = {}
+#     for row in db_query:
+#         curr_problem = row['module_state_key']
+#         if curr_problem not in prob_attempts_distrib:
+#             prob_attempts_distrib[curr_problem] = [0] * (max_attempts + 1)
+# 
+#         if row['attempts'] > max_attempts:
+#             prob_attempts_distrib[curr_problem][max_attempts] += row['count_attempts']
+#         else:
+#             prob_attempts_distrib[curr_problem][row['attempts'] - 1] = row['count_attempts']
+# 
+#     return prob_attempts_distrib
 
 
 def get_sequential_open_distrib(course_id):
@@ -100,23 +100,23 @@ def get_sequential_open_distrib(course_id):
     return sequential_open_distrib
 
 
-def get_last_populate(course_id, script_id):
-    """
-    Returns the timestamp when a script was last run for a course.
-
-    `course_id` the course ID for the course interested in
-
-    `script_id` string identifying the populate script interested in
-
-    Returns None if there is no known time the script was last run for that course.
-    """
-
-    db_query = Log.objects.filter(course_id__exact=course_id, script_id__exact=script_id)
-
-    if len(db_query) > 0:
-        return db_query[0].created  # Model is sorted last first
-    else:
-        return None
+# def get_last_populate(course_id, script_id):
+#     """
+#     Returns the timestamp when a script was last run for a course.
+# 
+#     `course_id` the course ID for the course interested in
+# 
+#     `script_id` string identifying the populate script interested in
+# 
+#     Returns None if there is no known time the script was last run for that course.
+#     """
+# 
+#     db_query = Log.objects.filter(course_id__exact=course_id, script_id__exact=script_id)
+# 
+#     if len(db_query) > 0:
+#         return db_query[0].created  # Model is sorted last first
+#     else:
+#         return None
 
 
 def get_problem_set_grade_distribution(course_id, problem_set):

@@ -708,12 +708,6 @@ function goto( mode)
             <p>${_("There are no problems in this section.")}</p>
           %endif
         </div>
-        <div class="metrics-right" id="metric_attempts_${i}">
-          <h3>Attempt Distribution per Problem (Last update: ${metrics_results['attempts_timestamp']})</h3>
-          %if not metrics_results['section_has_problem'][i]:
-            <p>${_("There are no problems in this section.")}</p>
-          %endif
-        </div>
       </div>
     %endfor
       <script>

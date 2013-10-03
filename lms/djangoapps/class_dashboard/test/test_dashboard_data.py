@@ -15,12 +15,12 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.models import StudentModule
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from xmodule.modulestore import Location
-from queryable_student_module.management.commands import populate_studentmoduleexpand
+#from queryable_student_module.management.commands import populate_studentmoduleexpand
 
 from xmodule.course_module import CourseDescriptor
 
-from class_dashboard.dashboard_data import get_problem_grade_distribution, get_problem_attempt_distrib, get_sequential_open_distrib, \
-                                           get_last_populate, get_problem_set_grade_distribution, get_d3_problem_grade_distribution, \
+from class_dashboard.dashboard_data import get_problem_grade_distribution, get_sequential_open_distrib, \
+                                           get_problem_set_grade_distribution, get_d3_problem_grade_distribution, \
                                            get_d3_problem_attempt_distribution, get_d3_sequential_open_distribution, \
                                            get_d3_section_grade_distribution, get_section_display_name, get_array_section_has_problem
 
