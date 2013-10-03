@@ -165,11 +165,16 @@ function () {
                 'scroll', this.videoControl.showControls
             );
         } else if (!this.config.autohideHtml5) {
-            // this.videoCaption.subtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
-            this.videoCaption.subtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+            this.videoCaption.subtitlesEl.on(
+                'keydown', this.videoCaption.autoShowCaptions
+            );
 
-            this.videoCaption.hideSubtitlesEl.on('mousemove', this.videoCaption.autoShowCaptions);
-            this.videoCaption.hideSubtitlesEl.on('keydown', this.videoCaption.autoShowCaptions);
+            this.videoCaption.hideSubtitlesEl.on(
+                'mousemove', this.videoCaption.autoShowCaptions
+            );
+            this.videoCaption.hideSubtitlesEl.on(
+                'keydown', this.videoCaption.autoShowCaptions
+            );
 
             // Moving slider on subtitles is not a mouse move,
             // but captions should not be auto-hidden.
