@@ -43,6 +43,8 @@
 
                 appendSetFixtures(tpl);
                 container = $('.basic_metadata_edit');
+
+            spyOn(Transcripts.Utils, 'command');
         });
 
         describe('Test initialization', function () {

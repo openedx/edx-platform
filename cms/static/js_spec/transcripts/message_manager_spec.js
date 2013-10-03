@@ -6,7 +6,7 @@
                 chooseHandler: ['choose', 'Error: Choosing failed.', 'video_id']
             },
             utils = Transcripts.Utils,
-            view, fileUploader;
+            view, fileUploader, sinonXhr;
 
         beforeEach(function () {
 
@@ -71,7 +71,8 @@
 
                 expect(console.error).toHaveBeenCalled();
                 expect(_.template).not.toHaveBeenCalled();
-                expect(view.$el.find('.transcripts-status')).toHaveClass('is-invisible');
+                expect(view.$el.find('.transcripts-status'))
+                    .toHaveClass('is-invisible');
                 expect(fileUploader.render).not.toHaveBeenCalled();
             });
 
@@ -160,65 +161,149 @@
                 spyOn(utils, 'command').andCallThrough();
                 spyOn(view, 'render');
                 spyOn(view, 'showError');
-                jasmine.stubRequests();
+
+                sinonXhr =  sinon.fakeServer.create();
+                sinonXhr.autoRespond = true;
             });
 
-            it('Invoke without extraParamas', function () {
-                view.processCommand(action, errorMessage);
+            afterEach(function () {
+                sinonXhr.restore();
+            });
 
-                expect(utils.command).toHaveBeenCalledWith(
-                    action,
-                    view.component_id,
-                    videoList,
-                    void(0)
+            var assertCommand = function (config, expectFunc) {
+                var flag = false,
+                    defaults = {
+                        action: 'replace',
+                        errorMessage: 'errorMessage',
+                        extraParamas: void(0)
+                    };
+                    args = $.extend({}, defaults, config);
+
+                runs(function() {
+                    view
+                        .processCommand(
+                            args.action,
+                            args.errorMessage,
+                            args.extraParamas
+                        )
+                        .always(function () { flag = true; });
+                });
+
+                waitsFor(function() {
+                    return flag;
+                }, "Ajax Timeout", 750);
+
+
+                runs(expectFunc);
+            };
+
+            it('Invoke without extraParamas', function () {
+
+                sinonXhr.respondWith([
+                    200,
+                    { "Content-Type": "application/json"},
+                    JSON.stringify({
+                      status: 'Success',
+                      subs: 'video_id'
+                    })
+                ]);
+
+                assertCommand(
+                    { },
+                    function() {
+                        expect(utils.command).toHaveBeenCalledWith(
+                            action,
+                            view.component_id,
+                            videoList,
+                            void(0)
+                        );
+                        expect(view.showError).not.toHaveBeenCalled();
+                        expect(view.render.mostRecentCall.args[0])
+                            .toEqual('found');
+                        expect(utils.Storage.set).toHaveBeenCalled();
+                    }
                 );
-                expect(view.showError).not.toHaveBeenCalled();
-                expect(view.render.mostRecentCall.args[0]).toEqual('found');
-                expect(utils.Storage.set).toHaveBeenCalled();
             });
 
             it('Invoke with extraParamas', function () {
+
+                sinonXhr.respondWith([
+                    200,
+                    { "Content-Type": "application/json"},
+                    JSON.stringify({
+                      status: 'Success',
+                      subs: 'video_id'
+                    })
+                ]);
+
                 view.processCommand(action, errorMessage, extraParamas);
 
-                expect(utils.command).toHaveBeenCalledWith(
-                    action,
-                    view.component_id,
-                    videoList,
-                    {
-                        html5_id: extraParamas
+                assertCommand(
+                    { extraParamas : extraParamas },
+                    function () {
+                        expect(utils.command).toHaveBeenCalledWith(
+                            action,
+                            view.component_id,
+                            videoList,
+                            {
+                                html5_id: extraParamas
+                            }
+                        );
+                        expect(view.showError).not.toHaveBeenCalled();
+                        expect(view.render.mostRecentCall.args[0])
+                            .toEqual('found');
+                        expect(utils.Storage.set).toHaveBeenCalled();
                     }
                 );
-                expect(view.showError).not.toHaveBeenCalled();
-                expect(view.render.mostRecentCall.args[0]).toEqual('found');
-                expect(utils.Storage.set).toHaveBeenCalled();
             });
 
             it('status `Error`', function () {
-                view.processCommand('errorStatus', errorMessage);
 
-                expect(utils.command).toHaveBeenCalledWith(
-                    'errorStatus',
-                    view.component_id,
-                    videoList,
-                    void(0)
+                sinonXhr.respondWith([
+                    200,
+                    { "Content-Type": "application/json"},
+                    JSON.stringify({
+                      status: 'Error',
+                      subs: ''
+                    })
+                ]);
+
+                assertCommand(
+                    { },
+                    function () {
+                        expect(utils.command).toHaveBeenCalledWith(
+                            action,
+                            view.component_id,
+                            videoList,
+                            void(0)
+                        );
+                        expect(view.showError).not.toHaveBeenCalled();
+                        expect(view.render.mostRecentCall.args[0])
+                            .toEqual('not_found');
+                        expect(utils.Storage.set).not.toHaveBeenCalled();
+                    }
                 );
-                expect(view.showError).not.toHaveBeenCalled();
-                expect(view.render.mostRecentCall.args[0]).toEqual('not_found');
-                expect(utils.Storage.set).not.toHaveBeenCalled();
+
             });
 
             it('Fail', function () {
-                view.processCommand('error', errorMessage);
 
-                expect(utils.command).toHaveBeenCalledWith(
-                    'error',
-                    view.component_id,
-                    videoList,
-                    void(0)
+                sinonXhr.respondWith([404, {}, '']);
+
+                assertCommand(
+                    { },
+                    function () {
+                        expect(utils.command).toHaveBeenCalledWith(
+                            action,
+                            view.component_id,
+                            videoList,
+                            void(0)
+                        );
+                        expect(view.showError).toHaveBeenCalled();
+                        expect(view.render).not.toHaveBeenCalled();
+                        expect(utils.Storage.set).not.toHaveBeenCalled();
+                    }
                 );
-                expect(view.showError).toHaveBeenCalled();
-                expect(view.render).not.toHaveBeenCalled();
-                expect(utils.Storage.set).not.toHaveBeenCalled();
             });
         });
 

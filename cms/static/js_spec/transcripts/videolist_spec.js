@@ -36,10 +36,21 @@
                     'video.webm'
                 ]
             },
-            view;
+            response = JSON.stringify({
+                command: 'found',
+                status: 'Success',
+                subs: 'video_id'
+            }),
+            view, sinonXhr;
 
         beforeEach(function () {
-            jasmine.stubRequests();
+            sinonXhr =  sinon.fakeServer.create();
+            sinonXhr.respondWith([
+                200,
+                { "Content-Type": "application/json"},
+                response
+            ]);
+            sinonXhr.autoRespond = true;
 
             var tpl = sandbox({
                     'class': 'component',
@@ -88,7 +99,30 @@
 
         afterEach(function () {
             Transcripts.MessageManager = correctMessanger;
+            sinonXhr.restore();
         });
+
+
+        var assertResponse = function (expectFunc, prep) {
+            var flag = false;
+
+            if (prep) {
+                runs(prep);
+            }
+
+            waitsFor(function() {
+                var req = sinonXhr.requests,
+                    len = req.length;
+
+                if (len && req[0].readyState === 4) {
+                    flag = true;
+                }
+                return flag;
+            }, "Ajax Timeout", 750);
+
+            runs(expectFunc);
+        };
+
 
         it('Initialize', function () {
             expect(abstractEditor.initialize).toHaveBeenCalled();
@@ -111,10 +145,13 @@
                     abstractEditor.render.reset();
                     utils.command.reset();
                     messenger.render.reset();
+                    sinonXhr.requests.length = 0;
                 };
 
             it('is rendered in correct way', function () {
-                assertRendering(videoList);
+                assertResponse(function () {
+                    assertRendering(videoList);
+                });
             });
 
             it('is rendered with opened extra videos bar', function () {
@@ -141,19 +178,31 @@
                 spyOn(view, 'getVideoObjectsList').andReturn(videoListLength);
                 spyOn(view, 'openExtraVideosBar');
 
-                resetSpies();
-                view.render();
+                assertResponse(
+                    function () {
+                        assertRendering(videoListLength);
+                        view.getVideoObjectsList.andReturn(videoListLength);
+                        expect(view.openExtraVideosBar).toHaveBeenCalled();
+                    },
+                    function () {
+                        resetSpies();
+                        view.render();
+                    }
+                );
 
-                assertRendering(videoListLength);
-                expect(view.openExtraVideosBar).toHaveBeenCalled();
+                assertResponse(
+                    function () {
+                        assertRendering(videoListHtml5mode);
+                        expect(view.openExtraVideosBar).toHaveBeenCalled();
+                    },
+                    function () {
+                        resetSpies();
+                        view.openExtraVideosBar.reset();
+                        view.getVideoObjectsList.andReturn(videoListHtml5mode);
+                        view.render();
+                    }
+                );
 
-                resetSpies();
-                view.openExtraVideosBar.reset();
-                view.getVideoObjectsList.andReturn(videoListHtml5mode);
-                view.render();
-
-                assertRendering(videoListHtml5mode);
-                expect(view.openExtraVideosBar).toHaveBeenCalled();
             });
 
             it('is rendered without opened extra videos bar', function () {
@@ -168,11 +217,16 @@
                 spyOn(view, 'getVideoObjectsList').andReturn(videoList);
                 spyOn(view, 'closeExtraVideosBar');
 
-                resetSpies();
-                view.render();
-
-                assertRendering(videoList);
-                expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                assertResponse(
+                    function () {
+                        assertRendering(videoList);
+                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                    },
+                    function () {
+                        resetSpies();
+                        view.render();
+                    }
+                );
             });
 
         });
@@ -359,8 +413,8 @@
             });
 
 
-            it('On filling less than 3 fields, remaining fields should have \
-placeholders for video types that were not filled yet',
+            it('On filling less than 3 fields, remaining fields should have ' +
+'placeholders for video types that were not filled yet',
                 function () {
                     var dataDict = {
                         youtube: {
@@ -394,9 +448,6 @@ placeholders for video types that were not filled yet',
 
                         expect(result).toEqual(val.expectedResult);
                     });
-
-
-
                 }
             );
         });

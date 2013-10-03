@@ -207,7 +207,7 @@
                 extraParam = { html5_id: videoId };
             }
 
-            utils.command(action, component_id, videoList, extraParam)
+            return utils.command(action, component_id, videoList, extraParam)
                 .done(function (resp) {
                     if (resp.status && resp.status === 'Success') {
                         var sub = resp.subs;
