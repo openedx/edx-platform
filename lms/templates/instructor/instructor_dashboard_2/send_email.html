@@ -3,6 +3,7 @@
 
 <script language="JavaScript" type="text/javascript">
 </script>
+<script type="text/javascript" src="jsi18n/"></script>
 <div class="vert-left send-email">
   <h2> ${_("Send Email")} </h2>
   <label for="id_to">${_("Send to:")}</label>
@@ -29,6 +30,13 @@
   </div>
   <input type="hidden" name="message" value="">
   <br/>
+ <div class="submit-email-action">
+  ${_("Please try not to email students more than once a day. Before sending your email, consider:")}
+  <ul>
+   <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
+   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+  </ul>
+ </div>
   <input type="button" name="send" value="${_("Send")}" data-endpoint="${ section_data['send_email'] }" >
   <div class="request-response"></div>
   <div class="request-response-error"></div>

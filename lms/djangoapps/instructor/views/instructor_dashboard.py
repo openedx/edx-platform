@@ -13,13 +13,14 @@ from django.conf import settings
 
 from xmodule_modifiers import wrap_xmodule
 from xmodule.html_module import HtmlDescriptor
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
 @ensure_csrf_cookie
@@ -28,6 +29,7 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
 
     course = get_course_by_id(course_id, depth=None)
+    is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
 
     access = {
         'admin': request.user.is_staff,
@@ -46,7 +48,6 @@ def instructor_dashboard_2(request, course_id):
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
-        _section_send_email(course_id, access,course),
         _section_analytics(course_id)
     ]
 
@@ -57,6 +58,8 @@ def instructor_dashboard_2(request, course_id):
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
+        sections.append(_section_send_email(course_id, access, course))
 
     context = {
         'course': course,
@@ -153,13 +156,14 @@ def _section_data_download(course_id):
     }
     return section_data
 
-def _section_send_email(course_id, access,course):
+
+def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
-        'access': access,
+        'access': access, 
         'send_email': reverse('send_email',kwargs={'course_id': course_id}),
         'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
     }

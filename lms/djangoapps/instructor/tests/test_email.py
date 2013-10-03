@@ -17,6 +17,16 @@ from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from mock import patch
 
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestNewInstructorDashboardEmailView(ModuleStoreTestCase):
+    """
+    Check for email view displayed with flag
+    """
+    # will need to check for Mongo vs XML, ENABLED vs not enabled,
+    # is studio course vs not studio course
+    # section_data
+    # what is html_module?
+    # which are API lines
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorDashboardEmailView(ModuleStoreTestCase):
@@ -43,6 +53,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_email_flag_true(self):
+        from nose.tools import set_trace; set_trace()
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertTrue(self.email_link in response.content)
