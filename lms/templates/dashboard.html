@@ -212,55 +212,6 @@
               </hgroup>
 
               <%
-                  testcenter_exam_info = course.current_test_center_exam
-                  registration = exam_registrations.get(course.id)
-                  testcenter_register_target = reverse('begin_exam_registration', args=[course.id])
-              %>
-              % if testcenter_exam_info is not None:
-
-                  % if registration is None and testcenter_exam_info.is_registering():
-                  <div class="message message-status is-shown exam-register">
-                    <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">${_("Register for Pearson exam")}</a>
-                    <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on {end_date}").format(end_date="<strong>{}</strong>".format(testcenter_exam_info.registration_end_date_text))}</p>
-                  </div>
-                  % endif
-                  <!-- display a registration for a current exam, even if the registration period is over -->
-                  % if registration is not None:
-                      % if registration.is_accepted:
-                  <div class="message message-status is-shown exam-schedule">
-                     <a href="${registration.registration_signup_url}" class="button exam-button">${_("Schedule Pearson exam")}</a>
-                     <p class="exam-registration-number">${_("{link_start}Registration{link_end} number: {number}").format(
-                        link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
-                        link_end='</a>',
-                        number=registration.client_candidate_id,
-                      )}</p>
-                     <p class="message-copy">${_("Write this down! You'll need it to schedule your exam.")}</p>
-                  </div>
-                      % endif
-                      % if  registration.is_rejected:
-                  <div class="message message-status is-shown exam-schedule">
-                    <p class="message-copy">
-                      <strong>${_("Your registration for the Pearson exam has been rejected. Please {link_start}see your registration status details{link_end}.").format(
-                        link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
-                        link_end='</a>')}</strong>
-                      ${_("Otherwise {link_start}contact edX at {email}{link_end} for further help.").format(
-                        link_start='<a class="contact-link" href="mailto:{email}?subject=Pearson VUE Exam - {about} {number}">'.format(email="exam-help@edx.org", about=get_course_about_section(course, 'university'), number=course.display_number_with_default),
-                        link_end='</a>',
-                        email="exam-help@edx.org",
-                       )}
-                  </div>
-                      % endif
-                     	% if not registration.is_accepted and not registration.is_rejected:
-  	            <div class="message message-status is-shown">
-                    <p class="message-copy"><strong>${_("Your {link_start}registration for the Pearson exam{link_end} is pending.").format(link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target), link_end='</a>')}</strong>
-                    ${_("Within a few days, you should see a confirmation number here, which can be used to schedule your exam.")}
-                    </p>
-                  </div>
-                      % endif
-                  % endif
-              % endif
-
-              <%
               cert_status = cert_statuses.get(course.id)
               %>
               % if course.has_ended() and cert_status:
