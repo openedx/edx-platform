@@ -187,7 +187,7 @@ def high_level_source_persisted(step):
         css_sel = '.problem div>span'
         return world.css_text(css_sel) == 'hi'
 
-    world.wait_for(verify_text)
+    world.wait_for(verify_text, timeout=10)
 
 
 @step('I view the High Level Source I see my changes')
