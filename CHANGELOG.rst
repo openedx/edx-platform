@@ -8,6 +8,10 @@ the top.  Include a label indicating the component affected.
 
 LMS: Fix issue with CourseMode expiration dates
 
+CMS: Add text_customization Dict to advanced settings which can support
+string customization at particular spots in the UI.  At first just customizing
+the Check/Final Check buttons with keys: custom_check and custom_final_check
+
 LMS: Add PaidCourseRegistration mode, where payment is required before course
 registration.
 
