@@ -644,18 +644,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app.css',
     },
-    'style-app-extend1': {
-        'source_filenames': [
-            'sass/application-extend1.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend1.css',
-    },
-    'style-app-extend2': {
-        'source_filenames': [
-            'sass/application-extend2.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend2.css',
-    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
