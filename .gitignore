@@ -5,9 +5,12 @@
 *.orig
 *.DS_Store
 *.mo
+*.nfs*
 :2e_*
 :2e#
 .AppleDouble
+.noseids
+.testids
 database.sqlite
 requirements/private.txt
 lms/envs/private.py
