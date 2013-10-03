@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
 
@@ -61,7 +61,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_in('Course Outline', world.css_text('.outline .page-header'))
+    assert world.is_css_present('body.view-outline')
     assert_equal(1, len(world.browser.windows))
 
 
