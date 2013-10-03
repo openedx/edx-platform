@@ -11,13 +11,16 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 
+from xmodule_modifiers import wrap_xmodule
+from xmodule.html_module import HtmlDescriptor
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -43,7 +46,8 @@ def instructor_dashboard_2(request, course_id):
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
-        _section_analytics(course_id),
+        _section_send_email(course_id, access,course),
+        _section_analytics(course_id)
     ]
 
     enrollment_count = sections[0]['enrollment_count']
@@ -146,6 +150,18 @@ def _section_data_download(course_id):
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+def _section_send_email(course_id, access,course):
+    """ Provide data for the corresponding bulk email section """
+    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    section_data = {
+        'section_key': 'send_email',
+        'section_display_name': _('Email'),
+        'access': access,
+        'send_email': reverse('send_email',kwargs={'course_id': course_id}),
+        'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
     }
     return section_data
 
