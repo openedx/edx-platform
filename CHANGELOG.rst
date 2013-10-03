@@ -19,6 +19,9 @@ editing capability for a course's list of tabs.
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
 
+LMS: First round of improvements to New (beta) Instructor Dash:
+improvements, fixes, and internationalization to the Student Info section.
+
 LMS: Improved accessibility of parts of forum navigation sidebar.
 
 LMS: enhanced accessibility labeling and aria support for the discussion forum
