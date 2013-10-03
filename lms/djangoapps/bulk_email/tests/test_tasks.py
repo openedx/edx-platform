@@ -11,7 +11,7 @@ from itertools import cycle
 from mock import patch, Mock
 from smtplib import SMTPDataError, SMTPServerDisconnected
 
-from celery.states import SUCCESS
+from celery.states import SUCCESS, FAILURE
 
 # from django.test.utils import override_settings
 from django.conf import settings
@@ -91,14 +91,40 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         ]
         return students
 
-    def _test_run_with_task(self, task_class, action_name, total, succeeded, failed=0, skipped=0):
+    def _assert_single_subtask_status(self, entry, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
+        """Compare counts with 'subtasks' entry in InstructorTask table."""
+        subtask_info = json.loads(entry.subtasks)
+        # verify subtask-level counts:
+        self.assertEquals(subtask_info.get('total'), 1)
+        self.assertEquals(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
+        self.assertEquals(subtask_info['failed'], 0 if succeeded > 0 else 1)
+        # self.assertEquals(subtask_info['retried'], retried_nomax + retried_withmax)
+        # verify individual subtask status:
+        subtask_status_info = subtask_info['status']
+        task_id_list = subtask_status_info.keys()
+        self.assertEquals(len(task_id_list), 1)
+        task_id = task_id_list[0]
+        subtask_status = subtask_status_info.get(task_id)
+        print("Testing subtask status: {}".format(subtask_status))
+        self.assertEquals(subtask_status['task_id'], task_id)
+        self.assertEquals(subtask_status['attempted'], succeeded + failed)
+        self.assertEquals(subtask_status['succeeded'], succeeded)
+        self.assertEquals(subtask_status['skipped'], skipped)
+        self.assertEquals(subtask_status['failed'], failed)
+        self.assertEquals(subtask_status['retried_nomax'], retried_nomax)
+        self.assertEquals(subtask_status['retried_withmax'], retried_withmax)
+        self.assertEquals(subtask_status['state'], SUCCESS if succeeded > 0 else FAILURE)
+
+    def _test_run_with_task(self, task_class, action_name, total, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Run a task and check the number of emails processed."""
         task_entry = self._create_input_entry()
         parent_status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
+
         # check return value
         self.assertEquals(parent_status.get('total'), total)
         self.assertEquals(parent_status.get('action_name'), action_name)
-        # compare with entry in table:
+
+        # compare with task_output entry in InstructorTask table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         status = json.loads(entry.task_output)
         self.assertEquals(status.get('attempted'), succeeded + failed)
@@ -109,9 +135,10 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(status.get('action_name'), action_name)
         self.assertGreater(status.get('duration_ms'), 0)
         self.assertEquals(entry.task_state, SUCCESS)
+        self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
 
     def test_successful(self):
-        num_students = settings.EMAILS_PER_TASK
+        num_students = settings.EMAILS_PER_TASK - 1
         self._create_students(num_students)
         # we also send email to the instructor:
         num_emails = num_students + 1
@@ -119,9 +146,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
 
-    def test_data_err_fail(self):
+    def test_smtp_blacklisted_user(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-        num_students = settings.EMAILS_PER_TASK
+        num_students = settings.EMAILS_PER_TASK - 1
         self._create_students(num_students)
         # we also send email to the instructor:
         num_emails = num_students + 1
@@ -144,19 +171,31 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # have every other mail attempt fail due to disconnection:
             get_conn.return_value.send_messages.side_effect = cycle([SMTPServerDisconnected(425, "Disconnecting"), None])
-            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, failed=expected_fails)
+            self._test_run_with_task(
+                send_bulk_course_email,
+                'emailed',
+                num_emails,
+                expected_succeeds,
+                failed=expected_fails,
+                retried_withmax=num_emails
+            )
 
-    def test_max_retry(self):
+    def test_max_retry_limit_causes_failure(self):
         # Test that celery can hit a maximum number of retries.
         num_students = 1
         self._create_students(num_students)
         # we also send email to the instructor:
         num_emails = num_students + 1
-        # This is an ugly hack:  the failures that are reported by the EAGER version of retry
-        # are multiplied by the attempted number of retries (equals max plus one).
-        expected_fails = num_emails * (settings.BULK_EMAIL_MAX_RETRIES + 1)
+        expected_fails = num_emails
         expected_succeeds = 0
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # always fail to connect, triggering repeated retries until limit is hit:
             get_conn.return_value.send_messages.side_effect = cycle([SMTPServerDisconnected(425, "Disconnecting")])
-            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, failed=expected_fails)
+            self._test_run_with_task(
+                send_bulk_course_email,
+                'emailed',
+                num_emails,
+                expected_succeeds,
+                failed=expected_fails,
+                retried_withmax=(settings.BULK_EMAIL_MAX_RETRIES + 1)
+            )
