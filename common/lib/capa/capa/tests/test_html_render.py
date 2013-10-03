@@ -252,6 +252,26 @@ class CapaHtmlRenderTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegexpMatches(the_html, r"<div>\s+</div>")
 
+    def test_shuffle(self):
+        xml_str = textwrap.dedent("""
+            <problem>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" shuffle="true">
+                <choice correct="false">The iPad</choice>
+                <choice correct="false">Napster</choice>
+                <choice correct="false">The iPod</choice>
+                <choice correct ="true" fixed="true">All of the above!</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            </problem>
+        """)
+        # Create the problem
+        problem = new_loncapa_problem(xml_str)
+
+        # Render the HTML
+        the_html = problem.get_html()
+        #self.assertRegexpMatches(the_html, r"<div>\s+</div>")
+        
     def _create_test_file(self, path, content_str):
         test_fp = self.system.filestore.open(path, "w")
         test_fp.write(content_str)

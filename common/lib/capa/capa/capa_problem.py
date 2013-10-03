@@ -34,6 +34,9 @@ from capa.safe_exec import safe_exec
 
 from pytz import UTC
 
+from random import Random
+import ipdb
+
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
@@ -381,11 +384,75 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
+    def shuffle_choices(self, choices):
+        """
+        Returns a list of choice nodes with the shuffling done.
+        Uses the self.seed for the randomness of the shuffle.
+        Choices with 'fixed'='true' are held back from the shuffle.
+        """
+        # Separate the list with the middle of stuff to be shuffled
+        # and the head/tail the choices to be held back from the shuffle.
+        # We're not supporting that an element "island" in the middle
+        # can be held back from the shuffle, only at the head and tail ends.
+        # Slightly tricky implementation using a state machine
+        head = []
+        middle = []  # only this one gets shuffled
+        tail = []
+        at_head = True
+        for choice in choices:
+            if at_head and choice.get('fixed') == 'true':
+                head.append(choice)
+                continue
+            at_head = False
+            if choice.get('fixed') == 'true':
+                tail.append(choice)
+            else:
+                middle.append(choice)
+        
+        rng = Random(self.seed)  # we'll make our own vs. messing with the global one
+        print 'Shuffling with seed:', self.seed
+        rng.shuffle(middle)
+        return head + middle + tail
+    
+    def shuffled_tree(self, tree):
+        """
+        Returns a tree modified to reflect multiple-choice shuffling.
+        """
+        # TBD: logic to decide if we shuffle
+        # TBD: integrate with the "seed" .. maybe need to fix that to change sometimes
+        # Q: not sure about multiple choicegroups in the tree .. what is that?
+        # Q: could take tree param, or use self.tree as starting point
+        shuffled = deepcopy(tree)
+        for choicegroup in shuffled.xpath('//choicegroup'):
+            #ipdb.set_trace()
+            if choicegroup.get('shuffle') == 'true':
+                #print(choicegroup.getchildren())
+                # grab out to python list for general manipulation
+                ordering = list(choicegroup.getchildren())
+                # remove all from parent
+                for choice in ordering:
+                    choicegroup.remove(choice)
+                # the last shall be first .. our test shuffle
+                #last = ordering.pop(-1)
+                #ordering.insert(0, last)
+                #print(ordering)
+                ordering = self.shuffle_choices(ordering)
+                for choice in ordering:
+                    choicegroup.append(choice)
+                
+            #print(choicegroup.getchildren())
+            #ipdb.set_trace()
+        return shuffled
+
     def get_html(self):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        #import ipdb
+        #ipdb.set_trace()
+        shuffled = self.tree
+        shuffled = self.shuffled_tree(self.tree)
+        html = contextualize_text(etree.tostring(self._extract_html(shuffled)), self.context)
         return html
 
     def handle_input_ajax(self, data):
