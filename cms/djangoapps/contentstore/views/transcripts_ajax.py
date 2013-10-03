@@ -66,7 +66,12 @@ def upload_transcripts(request):
         log.error('POST data without video names.')
         return JsonResponse(response)
 
-    video_list = json.loads(video_list)
+    try:
+        video_list = json.loads(video_list)
+    except ValueError:
+        log.error("Invalid JSON.")
+        return JsonResponse(response)
+
     source_subs_filedata = request.FILES['file'].read().decode('utf8')
     source_subs_filename = request.FILES['file'].name
 

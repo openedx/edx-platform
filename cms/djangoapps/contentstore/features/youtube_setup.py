@@ -11,7 +11,6 @@ logger = getLogger(__name__)
 
 @before.all
 def setup_mock_youtube_server():
-    # import ipdb; ipdb.set_trace()
     server_host = '127.0.0.1'
 
     server_port = settings.VIDEO_PORT

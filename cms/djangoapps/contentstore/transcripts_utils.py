@@ -107,7 +107,7 @@ def get_transcripts_from_youtube(youtube_id):
     for element in xmltree:
         if element.tag == "text":
             start = float(element.get("start"))
-            duration = float(element.get("dur", 0))  # dur is no mandatory
+            duration = float(element.get("dur", 0))  # dur is not mandatory
             text = element.text
             end = start + duration
 
@@ -252,8 +252,9 @@ def generate_srt_from_sjson(sjson_subs, speed):
     :param speed: speed of `sjson_subs`.
     :returns: "srt" subs.
     """
-    if len(sjson_subs['start']) != len(sjson_subs['end']) or \
-       len(sjson_subs['start']) != len(sjson_subs['text']):
+
+    equal_len = len(sjson_subs['start']) == len(sjson_subs['end']) == len(sjson_subs['text'])
+    if not equal_len:
         return None
 
     sjson_speed_1 = generate_subs(speed, 1, sjson_subs)

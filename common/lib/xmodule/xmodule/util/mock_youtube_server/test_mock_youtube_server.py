@@ -4,11 +4,7 @@ Test for Mock_Youtube_Server
 import unittest
 import threading
 import urllib
-import json
 from mock_youtube_server import MockYoutubeServer
-
-from nose.plugins.skip import SkipTest
-
 
 class MockYoutubeServerTest(unittest.TestCase):
     '''
@@ -19,11 +15,6 @@ class MockYoutubeServerTest(unittest.TestCase):
     '''
 
     def setUp(self):
-
-        # This is a test of the test setup,
-        # so it does not need to run as part of the unit test suite
-        # You can re-enable it by commenting out the line below
-        # raise SkipTest
 
         # Create the server
         server_port = 8034
