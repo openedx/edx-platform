@@ -158,8 +158,8 @@ function () {
                 keydown, this.videoCaption.autoShowCaptions
             });
 
-            // Moving slider on subtitles is not a mouse move,
-            // but captions and controls should be shown.
+            // Moving slider on subtitles is not a mouse move, but captions and
+            // controls should be shown.
             this.videoCaption.subtitlesEl
                 .on(
                     'scroll', this.videoCaption.autoShowCaptions
@@ -171,8 +171,8 @@ function () {
             this.videoCaption.subtitlesEl.on({
                 keydown: this.videoCaption.autoShowCaptions,
 
-                // Moving slider on subtitles is not a mouse move,
-                // but captions should not be auto-hidden.
+                // Moving slider on subtitles is not a mouse move, but captions
+                // should not be auto-hidden.
                 scroll: this.videoCaption.autoShowCaptions
             });
 
