@@ -8,6 +8,7 @@ import capa.xqueue_interface as xqueue_interface
 from capa.util import *
 from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
+import uuid
 
 from datetime import datetime
 from pytz import UTC
@@ -437,7 +438,10 @@ class OpenEndedChild(object):
             and len(data['student_file']) > 0):
                 has_file_to_upload = True
                 student_file = data['student_file'][0]
-
+                log.error("Trying to upload \"%s\"" % student_file)
+                new_filename = str(uuid.uuid4()) + '.' +  student_file.name.split(".")[-1]
+                log.error("New file name \"%s\"" % new_filename)
+                student_file.name = new_filename
                 # Upload the file to S3 and generate html to embed a link.
                 s3_public_url = self.upload_file_to_s3(student_file)
                 image_tag = self.generate_file_link_html_from_url(s3_public_url, student_file.name)
