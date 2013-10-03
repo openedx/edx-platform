@@ -9,7 +9,6 @@ Many of these GETs may become PUTs in the future.
 import re
 import logging
 import requests
-from collections import OrderedDict
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -43,10 +42,6 @@ import csv
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
-
-from pudb import set_trace
-
-log = logging.getLogger(__name__)
 
 
 def common_exceptions_400(func):
@@ -403,7 +398,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
-    header =['User ID', 'Anonymized user ID']
+    header = ['User ID', 'Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s)] for s in students]
     return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
 
@@ -754,6 +749,42 @@ def send_email(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+@require_query_params(send_to="sending to whom", subject="subject line", message="message text")
+def send_email(request, course_id):
+    """
+    Send an email to self, staff, or everyone involved in a course.
+    Query Paramaters:
+    - 'send_to' specifies what group the email should be sent to
+    - 'subject' specifies email's subject
+    - 'message' specifies email's content
+    """
+    course = get_course_by_id(course_id)
+    send_to = request.GET.get("send_to")
+    subject = request.GET.get("subject")
+    message = request.GET.get("message")
+    text_message = html_to_text(message)
+    email = CourseEmail(
+        course_id=course_id,
+        sender=request.user,
+        to_option=send_to,
+        subject=subject,
+        html_message=message,
+        text_message=text_message
+    )
+    email.save()
+    tasks.delegate_email_batches.delay(
+        email.id,
+        request.user.id
+    )
+    response_payload = {
+        'course_id': course_id,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_query_params(
     email="the target users email",
     rolename="the forum role",
@@ -813,6 +844,7 @@ def update_forum_role_membership(request, course_id):
         'action': action,
     }
     return JsonResponse(response_payload)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
