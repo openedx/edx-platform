@@ -103,6 +103,7 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
+    @$("a.active").blur()
 
   goto: (event) =>
     event.preventDefault()
@@ -132,34 +133,38 @@ class @Sequence
     else
       alert 'Sequence error! Cannot navigate to tab ' + new_position + 'in the current SequenceModule. Please contact the course staff.'
 
-  next: (event) =>
+  next: (event) => @_change_sequential 'seq_next', event
+  previous: (event) => @_change_sequential 'seq_prev', event
+
+  # `direction` can be 'seq_prev' or 'seq_next'
+  _change_sequential: (direction, event) =>
+    # silently abort if direction is invalid.
+    return unless direction in ['seq_prev', 'seq_next']
+
     event.preventDefault()
-    new_position = @position + 1
-    Logger.log "seq_next", old: @position, new: new_position, id: @id
+    offset =
+      seq_next: 1
+      seq_prev: -1
+    new_position = @position + offset[direction]
+    Logger.log direction,
+      old: @position
+      new: new_position
+      id: @id
 
     analytics.pageview @id
 
-    # navigation using the next arrow
-    analytics.track "Accessed Next Sequential",
+    # navigation using the next or previous arrow button.
+    tracking_messages =
+      seq_prev: "Accessed Previous Sequential"
+      seq_next: "Accessed Next Sequential"
+    analytics.track tracking_messages[direction],
       sequence_id: @id
       current_sequential: @position
       target_sequential: new_position
 
-    @render new_position
-
-  previous: (event) =>
-    event.preventDefault()
-    new_position = @position - 1
-    Logger.log "seq_prev", old: @position, new: new_position, id: @id
-
-    analytics.pageview @id
-
-    # navigation using the previous arrow
-    analytics.track "Accessed Previous Sequential",
-      sequence_id: @id
-      current_sequential: @position
-      target_sequential: new_position
-
+    # If the bottom nav is used, scroll to the top of the page on change.
+    if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+      $.scrollTo 0, 150
     @render new_position
 
   link_for: (position) ->

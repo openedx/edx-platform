@@ -62,23 +62,6 @@ def get_metadata_from_xml(xml_object, remove=True):
         xml_object.remove(meta)
     return dmdata
 
-_AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
-
-
-class AttrMap(_AttrMapBase):
-    """
-    A class that specifies two functions:
-
-        from_xml: convert value from the xml representation into
-            an internal python representation
-
-        to_xml: convert the internal python representation into
-            the value to store in the xml.
-    """
-    def __new__(_cls, from_xml=lambda x: x,
-                to_xml=lambda x: x):
-        return _AttrMapBase.__new__(_cls, from_xml, to_xml)
-
 
 def serialize_field(value):
     """
@@ -167,20 +150,6 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_to_export_to_policy = ('discussion_topics', 'checklists')
 
     @classmethod
-    def get_map_for_field(cls, attr):
-        """
-        Returns a serialize/deserialize AttrMap for the given field of a class.
-
-        Searches through fields defined by cls to find one named attr.
-        """
-        if attr in cls.fields:
-            from_xml = lambda val: deserialize_field(cls.fields[attr], val)
-            to_xml = lambda val: serialize_field(val)
-            return AttrMap(from_xml, to_xml)
-        else:
-            return AttrMap()
-
-    @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
         Return the definition to be passed to the newly created descriptor
@@ -248,8 +217,7 @@ class XmlDescriptor(XModuleDescriptor):
             # give the class a chance to fix it up. The file will be written out
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
-            if not system.resources_fs.exists(filepath) and hasattr(
-                    cls, 'backcompat_paths'):
+            if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -274,19 +242,19 @@ class XmlDescriptor(XModuleDescriptor):
 
         Returns a dictionary {key: value}.
         """
-        metadata = {}
-        for attr in xml_object.attrib:
-            val = xml_object.get(attr)
-            if val is not None:
-                # VS[compat].  Remove after all key translations done
-                attr = cls._translate(attr)
+        metadata = {'xml_attributes': {}}
+        for attr, val in xml_object.attrib.iteritems():
+            # VS[compat].  Remove after all key translations done
+            attr = cls._translate(attr)
 
-                if attr in cls.metadata_to_strip:
-                    # don't load these
-                    continue
+            if attr in cls.metadata_to_strip:
+                # don't load these
+                continue
 
-                attr_map = cls.get_map_for_field(attr)
-                metadata[attr] = attr_map.from_xml(val)
+            if attr not in cls.fields:
+                metadata['xml_attributes'][attr] = val
+            else:
+                metadata[attr] = deserialize_field(cls.fields[attr], val)
         return metadata
 
     @classmethod
@@ -295,9 +263,14 @@ class XmlDescriptor(XModuleDescriptor):
         Add the keys in policy to metadata, after processing them
         through the attrmap.  Updates the metadata dict in place.
         """
-        for attr in policy:
-            attr_map = cls.get_map_for_field(attr)
-            metadata[cls._translate(attr)] = attr_map.from_xml(policy[attr])
+        for attr, value in policy.iteritems():
+            attr = cls._translate(attr)
+            if attr not in cls.fields:
+                # Store unknown attributes coming from policy.json
+                # in such a way that they will export to xml unchanged
+                metadata['xml_attributes'][attr] = value
+            else:
+                metadata[attr] = value
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -357,11 +330,7 @@ class XmlDescriptor(XModuleDescriptor):
         field_data.update(definition)
         field_data['children'] = children
 
-        field_data['xml_attributes'] = {}
         field_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
-        for key, value in metadata.items():
-            if key not in cls.fields:
-                field_data['xml_attributes'][key] = value
         field_data['location'] = location
         field_data['category'] = xml_object.tag
         kvs = InheritanceKeyValueStore(initial_values=field_data)
@@ -369,12 +338,11 @@ class XmlDescriptor(XModuleDescriptor):
 
         return system.construct_xblock_from_class(
             cls,
-            field_data,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            field_data,
         )
 
     @classmethod
@@ -415,18 +383,11 @@ class XmlDescriptor(XModuleDescriptor):
         # Set the tag so we get the file path right
         xml_object.tag = self.category
 
-        def val_for_xml(attr):
-            """Get the value for this attribute that we want to store.
-            (Possible format conversion through an AttrMap).
-             """
-            attr_map = self.get_map_for_field(attr)
-            return attr_map.to_xml(self._field_data.get(self, attr))
-
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
-                val = val_for_xml(attr)
+                val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:

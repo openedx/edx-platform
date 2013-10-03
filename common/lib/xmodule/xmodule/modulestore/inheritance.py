@@ -56,8 +56,7 @@ def compute_inherited_metadata(descriptor):
         parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
         # add any of descriptor's explicitly set fields to the inheriting list
         for field in InheritanceMixin.fields.values():
-            # pylint: disable = W0212
-            if descriptor._field_data.has(descriptor, field.name):
+            if field.is_set_on(descriptor):
                 # inherited_settings values are json repr
                 parent_metadata[field.name] = field.read_json(descriptor)
 

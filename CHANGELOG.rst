@@ -5,6 +5,15 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Add PaidCourseRegistration mode, where payment is required before course registration.
+
+LMS: Add split testing functionality for internal use.
+
+CMS: Add edit_course_tabs management command, providing a primitive
+editing capability for a course's list of tabs.
+
+Studio and LMS: add ability to lock assets (cannot be viewed unless registered for class).
+
 LMS: Improved accessibility of parts of forum navigation sidebar.
 
 LMS: enhanced accessibility labeling and aria support for the discussion forum new post dropdown as well as response and comment area labeling.
@@ -307,3 +316,6 @@ Common: Updated CodeJail.
 Common: Allow setting of authentication session cookie name.
 
 LMS: Option to email students when enroll/un-enroll them.
+
+Blades: Added WAI-ARIA markup to the video player controls. These are now fully
+accessible by screen readers. 

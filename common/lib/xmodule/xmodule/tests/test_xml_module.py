@@ -1,17 +1,25 @@
 # disable missing docstring
 #pylint: disable=C0111
 
-from xmodule.x_module import XModuleFields
-from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
-from xblock.field_data import DictFieldData
-from xmodule.fields import Date, Timedelta
-from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
-from nose.tools import assert_equals  # pylint: disable=E0611
+
 from mock import Mock
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
+from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=E0611
+
+from xblock.field_data import DictFieldData
+from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xblock.runtime import DbModel
+
+from xmodule.fields import Date, Timedelta
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
+from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
+from xmodule.course_module import CourseDescriptor
+from xmodule.seq_module import SequenceDescriptor
+from xmodule.x_module import XModuleMixin
+
 from xmodule.tests import get_test_descriptor_system
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory
 
 
 class CrazyJsonString(String):
@@ -57,7 +65,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # Also tests that xml_attributes is filtered out of XmlDescriptor.
         self.assertEqual(1, len(editable_fields), editable_fields)
         self.assert_field_values(
-            editable_fields, 'display_name', XModuleFields.display_name,
+            editable_fields, 'display_name', XModuleMixin.display_name,
             explicitly_set=False, value=None, default_value=None
         )
 
@@ -65,7 +73,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # Tests that explicitly_set is correct when a value overrides the default (not inheritable).
         editable_fields = self.get_xml_editable_fields(DictFieldData({'display_name': 'foo'}))
         self.assert_field_values(
-            editable_fields, 'display_name', XModuleFields.display_name,
+            editable_fields, 'display_name', XModuleMixin.display_name,
             explicitly_set=True, value='foo', default_value=None
         )
 
@@ -158,8 +166,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         runtime = get_test_descriptor_system()
         return runtime.construct_xblock_from_class(
             XmlDescriptor,
+            scope_ids=Mock(),
             field_data=field_data,
-            scope_ids=Mock()
         ).editable_metadata_fields
 
     def get_descriptor(self, field_data):
@@ -379,3 +387,78 @@ class TestDeserializeTimedelta(TestDeserialize):
         self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
             '"1 day 12 hours 59 minutes 59 seconds"')
         self.assertDeserializeNonString()
+
+
+class TestXmlAttributes(XModuleXmlImportTest):
+
+    def test_unknown_attribute(self):
+        assert_false(hasattr(CourseDescriptor, 'unknown_attr'))
+        course = self.process_xml(CourseFactory.build(unknown_attr='value'))
+        assert_false(hasattr(course, 'unknown_attr'))
+        assert_equals('value', course.xml_attributes['unknown_attr'])
+
+    def test_known_attribute(self):
+        assert_true(hasattr(CourseDescriptor, 'show_chat'))
+        course = self.process_xml(CourseFactory.build(show_chat='true'))
+        assert_true(course.show_chat)
+        assert_not_in('show_chat', course.xml_attributes)
+
+    def test_rerandomize_in_policy(self):
+        # Rerandomize isn't a basic attribute of Sequence
+        assert_false(hasattr(SequenceDescriptor, 'rerandomize'))
+
+        root = SequenceFactory.build(policy={'rerandomize': 'never'})
+        ProblemFactory.build(parent=root)
+
+        seq = self.process_xml(root)
+
+        # Rerandomize is added to the constructed sequence via the InheritanceMixin
+        assert_equals('never', seq.rerandomize)
+
+        # Rerandomize is a known value coming from policy, and shouldn't appear
+        # in xml_attributes
+        assert_not_in('rerandomize', seq.xml_attributes)
+
+    def test_attempts_in_policy(self):
+        # attempts isn't a basic attribute of Sequence
+        assert_false(hasattr(SequenceDescriptor, 'attempts'))
+
+        root = SequenceFactory.build(policy={'attempts': '1'})
+        ProblemFactory.build(parent=root)
+
+        seq = self.process_xml(root)
+
+        # attempts isn't added to the constructed sequence, because
+        # it's not in the InheritanceMixin
+        assert_false(hasattr(seq, 'attempts'))
+
+        # attempts is an unknown attribute, so we should include it
+        # in xml_attributes so that it gets written out (despite the misleading
+        # name)
+        assert_in('attempts', seq.xml_attributes)
+
+    def test_inheritable_attribute(self):
+        # days_early_for_beta isn't a basic attribute of Sequence
+        assert_false(hasattr(SequenceDescriptor, 'days_early_for_beta'))
+
+        # days_early_for_beta is added by InheritanceMixin
+        assert_true(hasattr(InheritanceMixin, 'days_early_for_beta'))
+
+        root = SequenceFactory.build(policy={'days_early_for_beta': '2'})
+        ProblemFactory.build(parent=root)
+
+        # InheritanceMixin will be used when processing the XML
+        assert_in(InheritanceMixin, root.xblock_mixins)
+
+        seq = self.process_xml(root)
+
+        assert_equals(seq.unmixed_class, SequenceDescriptor)
+        assert_not_equals(type(seq), SequenceDescriptor)
+
+        # days_early_for_beta is added to the constructed sequence, because
+        # it's in the InheritanceMixin
+        assert_equals(2, seq.days_early_for_beta)
+
+        # days_early_for_beta is a known attribute, so we shouldn't include it
+        # in xml_attributes
+        assert_not_in('days_early_for_beta', seq.xml_attributes)

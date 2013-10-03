@@ -6,10 +6,10 @@ from path import path  # NOTE (THK): Only used for detecting presence of syllabu
 import requests
 from datetime import datetime
 import dateutil.parser
+from lazy import lazy
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
 import json
 
@@ -62,17 +62,22 @@ class Textbook(object):
     def __init__(self, title, book_url):
         self.title = title
         self.book_url = book_url
-        self.start_page = int(self.table_of_contents[0].attrib['page'])
 
+    @lazy
+    def start_page(self):
+        return int(self.table_of_contents[0].attrib['page'])
+
+    @lazy
+    def end_page(self):
         # The last page should be the last element in the table of contents,
         # but it may be nested. So recurse all the way down the last element
         last_el = self.table_of_contents[-1]
         while last_el.getchildren():
             last_el = last_el[-1]
 
-        self.end_page = int(last_el.attrib['page'])
+        return int(last_el.attrib['page'])
 
-    @lazyproperty
+    @lazy
     def table_of_contents(self):
         """
         Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
@@ -738,7 +743,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         return announcement, start, now
 
-    @lazyproperty
+    @lazy
     def grading_context(self):
         """
         This returns a dictionary with keys necessary for quickly grading

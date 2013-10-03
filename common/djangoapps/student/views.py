@@ -59,6 +59,7 @@ import external_auth.views
 
 from bulk_email.models import Optout
 from cme_registration.views import cme_register_user, cme_create_account
+
 import shoppingcart
 
 import track.views

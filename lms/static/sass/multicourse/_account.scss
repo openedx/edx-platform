@@ -117,11 +117,43 @@
   .introduction {
     padding: ($baseline*2) $baseline 0 $baseline;
 
-    header h1 {
-      @extend %heading-2;
-      margin-bottom: $baseline;
-      padding-bottom: $baseline;
-      text-align: left;
+    header {
+      position: relative;
+
+      // CASE: normal typographical headings
+      h1 {
+        @extend %heading-2;
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+        text-align: left;
+      }
+
+      // CASE: marketing/imageery-based headings
+      .title {
+        position: absolute;
+        top: ($baseline*2.5);
+        left:($baseline*1.5);
+
+        .title-super, .title-sub {
+          @extend %t-weight1;
+          display: block;
+          letter-spacing: 0;
+        }
+
+        .title-super {
+          @include font-size(26);
+          @include line-height(18);
+          text-transform: uppercase;
+          color: $header-graphic-super-color;
+        }
+
+        .title-sub {
+          @include font-size(20);
+          margin-left: ($baseline*2);
+          text-transform: lowercase;
+          color: $header-graphic-sub-color;
+        }
+      }
     }
   }
 }

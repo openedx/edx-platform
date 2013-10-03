@@ -24,7 +24,7 @@ from django.conf import settings
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.xml_module import is_pointer_tag, name_to_pathname
+from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
@@ -217,7 +217,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         # For backwards compatibility -- if we've got XML data, parse
         # it out and set the metadata fields
         if self.data:
-            field_data = VideoDescriptor._parse_video_xml(self.data)
+            field_data = self._parse_video_xml(self.data)
             self._field_data.set_many(self, field_data)
             del self.data
 
@@ -241,18 +241,17 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         if is_pointer_tag(xml_object):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, location))
-        field_data = VideoDescriptor._parse_video_xml(xml_data)
+        field_data = cls._parse_video_xml(xml_data)
         field_data['location'] = location
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = DbModel(kvs)
         video = system.construct_xblock_from_class(
             cls,
-            field_data,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            field_data,
         )
         return video
 
@@ -292,8 +291,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             xml.append(ele)
         return xml
 
-    @staticmethod
-    def _parse_youtube(data):
+    @classmethod
+    def _parse_youtube(cls, data):
         """
         Parses a string of Youtube IDs such as "1.0:AXdE34_U,1.5:VO3SxfeD"
         into a dictionary. Necessary for backwards compatibility with
@@ -310,14 +309,14 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 # Handle the fact that youtube IDs got double-quoted for a period of time.
                 # Note: we pass in "VideoFields.youtube_id_1_0" so we deserialize as a String--
                 # it doesn't matter what the actual speed is for the purposes of deserializing.
-                youtube_id = VideoDescriptor._deserialize(VideoFields.youtube_id_1_0.name, pieces[1])
+                youtube_id = deserialize_field(cls.youtube_id_1_0, pieces[1])
                 ret[speed] = youtube_id
             except (ValueError, IndexError):
                 log.warning('Invalid YouTube ID: %s' % video)
         return ret
 
-    @staticmethod
-    def _parse_video_xml(xml_data):
+    @classmethod
+    def _parse_video_xml(cls, xml_data):
         """
         Parse video fields out of xml_data. The fields are set if they are
         present in the XML.
@@ -326,8 +325,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         field_data = {}
 
         conversions = {
-            'start_time': VideoDescriptor._parse_time,
-            'end_time': VideoDescriptor._parse_time
+            'start_time': cls._parse_time,
+            'end_time': cls._parse_time
         }
 
         # Convert between key names for certain attributes --
@@ -349,10 +348,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         for attr, value in xml.items():
             if attr in compat_keys:
                 attr = compat_keys[attr]
-            if attr in VideoDescriptor.metadata_to_strip + ('url_name', 'name'):
+            if attr in cls.metadata_to_strip + ('url_name', 'name'):
                 continue
             if attr == 'youtube':
-                speeds = VideoDescriptor._parse_youtube(value)
+                speeds = cls._parse_youtube(value)
                 for speed, youtube_id in speeds.items():
                     # should have made these youtube_id_1_00 for
                     # cleanliness, but hindsight doesn't need glasses
@@ -367,20 +366,13 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 else:
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
-                    value = VideoDescriptor._deserialize(attr, value)
+                    value = deserialize_field(cls.fields[attr], value)
                 field_data[attr] = value
 
         return field_data
 
     @classmethod
-    def _deserialize(cls, attr, value):
-        """
-        Handles deserializing values that may have been encoded with json.dumps.
-        """
-        return cls.get_map_for_field(attr).from_xml(value)
-
-    @staticmethod
-    def _parse_time(str_time):
+    def _parse_time(cls, str_time):
         """Converts s in '12:34:45' format to seconds. If s is
         None, returns empty string"""
         if not str_time:

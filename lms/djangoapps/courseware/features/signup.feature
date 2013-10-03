@@ -1,4 +1,5 @@
-Feature: Sign in
+@shard_2
+Feature: LMS.Sign in
   In order to use the edX content
   As a new user
   I want to signup for a student account

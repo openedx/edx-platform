@@ -193,7 +193,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                 field_data = DbModel(kvs)
                 scope_ids = ScopeIds(None, category, location, location)
-                module = self.construct_xblock_from_class(class_, field_data, scope_ids)
+                module = self.construct_xblock_from_class(class_, scope_ids, field_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
@@ -324,16 +324,14 @@ class MongoModuleStore(ModuleStoreBase):
         for result in resultset:
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
-            # i.e. draft verticals can have children which are not in non-draft versions
+            # i.e. draft verticals will have draft children but will have non-draft parents currently
             location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
-                if 'definition' not in results_by_url[location_url]:
-                    results_by_url[location_url]['definition'] = {}
-                results_by_url[location_url]['definition']['children'] = total_children
+                results_by_url[location_url].setdefault('definition', {})['children'] = total_children
             results_by_url[location.url()] = result
             if location.category == 'course':
                 root = location.url()
@@ -623,12 +621,11 @@ class MongoModuleStore(ModuleStoreBase):
         dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
         xmodule = system.construct_xblock_from_class(
             xblock_class,
-            dbmodel,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both.
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            dbmodel,
         )
         # decache any pending field settings from init
         xmodule.save()
@@ -643,12 +640,11 @@ class MongoModuleStore(ModuleStoreBase):
         """
         # Save any changes to the xmodule to the MongoKeyValueStore
         xmodule.save()
-        # split mongo's persist_dag is more general and useful.
         self.collection.save({
                 '_id': xmodule.location.dict(),
                 'metadata': own_metadata(xmodule),
                 'definition': {
-                    'data': xmodule.xblock_kvs._data,
+                    'data': xmodule.get_explicitly_set_fields_by_scope(Scope.content),
                     'children': xmodule.children if xmodule.has_children else []
                 }
             })

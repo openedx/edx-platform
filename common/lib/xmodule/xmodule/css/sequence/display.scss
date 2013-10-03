@@ -111,7 +111,7 @@ nav.sequence-nav {
           outline: 0;
         }
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #fff;
           background-repeat: no-repeat;
           background-position: center 14px;
@@ -235,7 +235,7 @@ nav.sequence-nav {
           }
         }
 
-        &:hover {
+        &:hover, &:focus {
           p {
             display: block;
             margin-top: 4px;

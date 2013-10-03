@@ -8,6 +8,6 @@ CMS.Models.Asset = Backbone.Model.extend({
         date_added: "",
         url: "",
         portable_url: "",
-        is_locked: false
+        locked: false
     }
 });

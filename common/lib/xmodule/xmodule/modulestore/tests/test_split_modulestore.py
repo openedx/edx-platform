@@ -11,12 +11,15 @@ from importlib import import_module
 
 from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError, \
+    DuplicateItemError
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DefinitionLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 from pytz import UTC
 from path import path
 import re
+import random
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -32,7 +35,7 @@ class SplitModuleTest(unittest.TestCase):
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
         'fs_root': '',
-        'xblock_mixins': (InheritanceMixin,)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin)
     }
 
     MODULESTORE = {
@@ -249,7 +252,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(result.children), 1)
         self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
         self.assertEqual(len(result.children[0].children), 1)
-
 
 class SplitModuleItemTests(SplitModuleTest):
     '''
@@ -492,7 +494,7 @@ class TestItemCrud(SplitModuleTest):
     """
     Test create update and delete of items
     """
-    # TODO do I need to test this case which I believe won't work:
+    # DHM do I need to test this case which I believe won't work:
     #  1) fetch a course and some of its blocks
     #  2) do a series of CRUD operations on those previously fetched elements
     # The problem here will be that the version_guid of the items will be the version at time of fetch.
@@ -560,7 +562,7 @@ class TestItemCrud(SplitModuleTest):
         new_module = modulestore().create_item(
             locator, category, 'user123',
             fields={'display_name': 'new chapter'},
-            definition_locator=DescriptionLocator("chapter12345_2")
+            definition_locator=DefinitionLocator("chapter12345_2")
         )
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
@@ -586,7 +588,7 @@ class TestItemCrud(SplitModuleTest):
         another_module = modulestore().create_item(
             locator, category, 'anotheruser',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DescriptionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("problem12345_3_1"),
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
@@ -604,7 +606,91 @@ class TestItemCrud(SplitModuleTest):
         self.assertGreaterEqual(new_history['edited_on'], premod_time)
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
         self.assertEqual(another_history['previous_version'], 'problem12345_3_1')
-    # TODO check that default fields are set
+
+    def test_create_continue_version(self):
+        """
+        Test create_item using the continue_version flag
+        """
+        # start transaction w/ simple creation
+        user = random.getrandbits(32)
+        new_course = modulestore().create_course('test_org', 'test_transaction', user)
+        new_course_locator = new_course.location.as_course_locator()
+        index_history_info = modulestore().get_course_history_info(new_course.location)
+        course_block_prev_version = new_course.previous_version
+        course_block_update_version = new_course.update_version
+        self.assertIsNotNone(new_course_locator.version_guid, "Want to test a definite version")
+        versionless_course_locator = CourseLocator(
+            course_id=new_course_locator.course_id, branch=new_course_locator.branch
+        )
+
+        # positive simple case: no force, add chapter
+        new_ele = modulestore().create_item(
+            new_course.location, 'chapter', user,
+            fields={'display_name': 'chapter 1'},
+            continue_version=True
+        )
+        # version info shouldn't change
+        self.assertEqual(new_ele.update_version, course_block_update_version)
+        self.assertEqual(new_ele.update_version, new_ele.location.version_guid)
+        refetch_course = modulestore().get_course(versionless_course_locator)
+        self.assertEqual(refetch_course.location.version_guid, new_course.location.version_guid)
+        self.assertEqual(refetch_course.previous_version, course_block_prev_version)
+        self.assertEqual(refetch_course.update_version, course_block_update_version)
+        refetch_index_history_info = modulestore().get_course_history_info(refetch_course.location)
+        self.assertEqual(refetch_index_history_info, index_history_info)
+        self.assertIn(new_ele.location.usage_id, refetch_course.children)
+
+        # try to create existing item
+        with self.assertRaises(DuplicateItemError):
+            _fail = modulestore().create_item(
+                new_course.location, 'chapter', user,
+                usage_id=new_ele.location.usage_id,
+                fields={'display_name': 'chapter 2'},
+                continue_version=True
+            )
+
+        # start a new transaction
+        new_ele = modulestore().create_item(
+            new_course.location, 'chapter', user,
+            fields={'display_name': 'chapter 2'},
+            continue_version=False
+        )
+        transaction_guid = new_ele.location.version_guid
+        # ensure force w/ continue gives exception
+        with self.assertRaises(VersionConflictError):
+            _fail = modulestore().create_item(
+                new_course.location, 'chapter', user,
+                fields={'display_name': 'chapter 2'},
+                force=True, continue_version=True
+            )
+
+        # ensure trying to continue the old one gives exception
+        with self.assertRaises(VersionConflictError):
+            _fail = modulestore().create_item(
+                new_course.location, 'chapter', user,
+                fields={'display_name': 'chapter 3'},
+                continue_version=True
+            )
+
+        # add new child to old parent in continued (leave off version_guid)
+        course_module_locator = BlockUsageLocator(
+            course_id=new_course.location.course_id,
+            usage_id=new_course.location.usage_id,
+            branch=new_course.location.branch
+        )
+        new_ele = modulestore().create_item(
+            course_module_locator, 'chapter', user,
+            fields={'display_name': 'chapter 4'},
+            continue_version=True
+        )
+        self.assertNotEqual(new_ele.update_version, course_block_update_version)
+        self.assertEqual(new_ele.location.version_guid, transaction_guid)
+
+        # check children, previous_version
+        refetch_course = modulestore().get_course(versionless_course_locator)
+        self.assertIn(new_ele.location.usage_id, refetch_course.children)
+        self.assertEqual(refetch_course.previous_version, course_block_update_version)
+        self.assertEqual(refetch_course.update_version, transaction_guid)
 
     def test_update_metadata(self):
         """
@@ -703,7 +789,7 @@ class TestItemCrud(SplitModuleTest):
         modulestore().create_item(
             locator, category, 'test_update_manifold',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DescriptionLocator("problem12345_3_1"),
+            definition_locator=DefinitionLocator("problem12345_3_1"),
         )
         # pylint: disable=W0212
         modulestore()._clear_cache()
@@ -966,6 +1052,27 @@ class TestCourseCreation(SplitModuleTest):
         modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
         course = modulestore().get_course(CourseLocator(course_id=locator.course_id, branch="published"))
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
+
+    def test_create_with_root(self):
+        """
+        Test create_course with a specified root id and category
+        """
+        user = random.getrandbits(32)
+        new_course = modulestore().create_course(
+            'test_org', 'test_transaction', user,
+            root_usage_id='top', root_category='chapter'
+        )
+        self.assertEqual(new_course.location.usage_id, 'top')
+        self.assertEqual(new_course.category, 'chapter')
+        # look at db to verify
+        db_structure = modulestore().structures.find_one({
+            '_id': new_course.location.as_object_id(new_course.location.version_guid)
+        })
+        self.assertIsNotNone(db_structure, "Didn't find course")
+        self.assertNotIn('course', db_structure['blocks'])
+        self.assertIn('top', db_structure['blocks'])
+        self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
+
 
 
 class TestInheritance(SplitModuleTest):

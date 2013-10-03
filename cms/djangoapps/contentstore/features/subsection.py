@@ -109,7 +109,7 @@ def i_see_my_subsection_name_with_quote_on_the_courseware_page(step):
 @step('the subsection does not exist$')
 def the_subsection_does_not_exist(step):
     css = 'span.subsection-name'
-    assert world.browser.is_element_not_present_by_css(css)
+    assert world.is_css_not_present(css)
 
 
 @step('I see the subsection release date is ([0-9/-]+)( [0-9:]+)?')

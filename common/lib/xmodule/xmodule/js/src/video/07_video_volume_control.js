@@ -62,6 +62,35 @@ function () {
         });
 
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
+
+        // ARIA
+        // Let screen readers know that:
+
+        // This anchor behaves as a button named 'Volume'.
+        var buttonStr = gettext(
+                state.videoVolumeControl.currentVolume === 0
+                ? 'Volume muted'
+                : 'Volume'
+            );
+        // We add the aria-label attribute because the title attribute cannot be
+        // read. 
+        state.videoVolumeControl.buttonEl.attr('aria-label', buttonStr);
+
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'volume'.
+        var volumeSlider = state.videoVolumeControl.slider;
+        state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl
+                                                             .volumeSliderEl
+                                                             .find('.ui-slider-handle');
+        state.videoVolumeControl.volumeSliderHandleEl.attr({
+            'role': 'slider',
+            'title': 'volume',
+            'aria-disabled': false,
+            'aria-valuemin': volumeSlider.slider('option', 'min'),
+            'aria-valuemax': volumeSlider.slider('option', 'max'),
+            'aria-valuenow': volumeSlider.slider('option', 'value'),
+            'aria-valuetext': getVolumeDescription(volumeSlider.slider('option', 'value'))
+        });
     }
 
     /**
@@ -147,6 +176,18 @@ function () {
         });
 
         this.trigger('videoPlayer.onVolumeChange', ui.value);
+        
+        // ARIA
+        this.videoVolumeControl.volumeSliderHandleEl.attr({
+            'aria-valuenow': ui.value,
+            'aria-valuetext': getVolumeDescription(ui.value)
+        });
+       
+        this.videoVolumeControl.buttonEl.attr(
+            'aria-label', this.videoVolumeControl.currentVolume === 0
+                          ? gettext('Volume muted')
+                          : gettext('Volume')
+        );
     }
 
     function toggleMute(event) {
@@ -155,9 +196,39 @@ function () {
         if (this.videoVolumeControl.currentVolume > 0) {
             this.videoVolumeControl.previousVolume = this.videoVolumeControl.currentVolume;
             this.videoVolumeControl.slider.slider('option', 'value', 0);
+            // ARIA
+            this.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuenow': 0,
+                'aria-valuetext': getVolumeDescription(0),
+            });
         } else {
             this.videoVolumeControl.slider.slider('option', 'value', this.videoVolumeControl.previousVolume);
+            // ARIA
+            this.videoVolumeControl.volumeSliderHandleEl.attr({
+                'aria-valuenow': this.videoVolumeControl.previousVolume,
+                'aria-valuetext': getVolumeDescription(this.videoVolumeControl.previousVolume)
+            });
         }
+    }
+
+    // ARIA
+    // Returns a string describing the level of volume.
+    function getVolumeDescription(vol) {
+        if (vol === 0) {
+            return 'muted';
+        } else if (vol <= 20) {
+            return 'very low';
+        } else if (vol <= 40) {
+            return 'low';
+        } else if (vol <= 60) {
+            return 'average';
+        } else if (vol <= 80) {
+            return 'loud';
+        } else if (vol <= 99) {
+            return 'very loud';
+        }
+        
+        return 'maximum';
     }
 
 });

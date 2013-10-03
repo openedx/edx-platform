@@ -345,8 +345,8 @@ function () {
         // Keeps track of where the focus is situated in the array of captions.
         // Used to implement the automatic scrolling behavior and decide if the
         // outline around a caption has to be hidden or shown on a mouseenter or
-        // mouseleave.
-        this.videoCaption.currentCaptionIndex = 0;
+        // mouseleave. Initially, no caption has the focus, set the index to -1.
+        this.videoCaption.currentCaptionIndex = -1;
         // Used to track if the focus is coming from a click or tabbing. This 
         // has to be known to decide if, when a caption gets the focus, an 
         // outline has to be drawn (tabbing) or not (mouse click).
@@ -453,6 +453,9 @@ function () {
             min = 0;
             max = this.videoCaption.start.length - 1;
 
+            if (time < this.videoCaption.start[min]) {
+                return -1;
+            }
             while (min < max) {
                 index = Math.ceil((max + min) / 2);
 
@@ -497,20 +500,21 @@ function () {
                 // Total play time changes with speed change. Also there is
                 // a 250 ms delay we have to take into account.
                 time = Math.round(
-                    Time.convert(time, this.speed, '1.0') * 1000 + 250
+                    Time.convert(time, this.speed, '1.0') * 1000 + 100
                 );
             } else {
                 // Total play time remains constant when speed changes.
-                time = Math.round(parseInt(time, 10) * 1000);
+                time = Math.round(time * 1000 + 100);
             }
 
             newIndex = this.videoCaption.search(time);
 
             if (
-                newIndex !== void 0 &&
+                typeof newIndex !== 'undefined' &&
+                newIndex !== -1 &&
                 this.videoCaption.currentIndex !== newIndex
             ) {
-                if (this.videoCaption.currentIndex) {
+                if (typeof this.videoCaption.currentIndex !== 'undefined') {
                     this.videoCaption.subtitlesEl
                         .find('li.current')
                         .removeClass('current');
@@ -585,11 +589,13 @@ function () {
             type = 'hide_transcript';
             this.captionsHidden = true;
             this.videoCaption.hideSubtitlesEl.attr('title', gettext('Turn on captions'));
+            this.videoCaption.hideSubtitlesEl.text(gettext('Turn on captions'));
             this.el.addClass('closed');
         } else {
             type = 'show_transcript';
             this.captionsHidden = false;
             this.videoCaption.hideSubtitlesEl.attr('title', gettext('Turn off captions'));
+            this.videoCaption.hideSubtitlesEl.text(gettext('Turn off captions'));
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
         }
