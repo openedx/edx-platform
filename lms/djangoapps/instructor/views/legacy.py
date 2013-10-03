@@ -1017,7 +1017,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         else:
             user = User.objects.get(username=username_or_email)
     except User.DoesNotExist:
-        msg = '<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
+        msg = u'<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
         user = None
 
     if user is not None:
