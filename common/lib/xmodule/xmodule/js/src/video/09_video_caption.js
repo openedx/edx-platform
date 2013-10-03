@@ -153,34 +153,33 @@ function () {
             );
 
         if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
-            this.el.on('mousemove', this.videoCaption.autoShowCaptions);
-            this.el.on('keydown', this.videoCaption.autoShowCaptions);
+            this.el.on({
+                mousemove, this.videoCaption.autoShowCaptions,
+                keydown, this.videoCaption.autoShowCaptions
+            });
 
             // Moving slider on subtitles is not a mouse move,
             // but captions and controls should be shown.
-            this.videoCaption.subtitlesEl.on(
-                'scroll', this.videoCaption.autoShowCaptions
-            );
-            this.videoCaption.subtitlesEl.on(
-                'scroll', this.videoControl.showControls
-            );
+            this.videoCaption.subtitlesEl
+                .on(
+                    'scroll', this.videoCaption.autoShowCaptions
+                )
+                .on(
+                    'scroll', this.videoControl.showControls
+                );
         } else if (!this.config.autohideHtml5) {
-            this.videoCaption.subtitlesEl.on(
-                'keydown', this.videoCaption.autoShowCaptions
-            );
+            this.videoCaption.subtitlesEl.on({
+                keydown: this.videoCaption.autoShowCaptions,
 
-            this.videoCaption.hideSubtitlesEl.on(
-                'mousemove', this.videoCaption.autoShowCaptions
-            );
-            this.videoCaption.hideSubtitlesEl.on(
-                'keydown', this.videoCaption.autoShowCaptions
-            );
+                // Moving slider on subtitles is not a mouse move,
+                // but captions should not be auto-hidden.
+                scroll: this.videoCaption.autoShowCaptions
+            });
 
-            // Moving slider on subtitles is not a mouse move,
-            // but captions should not be auto-hidden.
-            this.videoCaption.subtitlesEl.on(
-                'scroll', this.videoCaption.autoShowCaptions
-            );
+            this.videoCaption.hideSubtitlesEl.on({
+                mousemove: this.videoCaption.autoShowCaptions,
+                keydown: this.videoCaption.autoShowCaptions
+            });
         }
     }
 
