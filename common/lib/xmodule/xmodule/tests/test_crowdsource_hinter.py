@@ -9,6 +9,7 @@ import copy
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
 from xblock.field_data import DictFieldData
+from xblock.fragment import Fragment
 
 from . import get_test_system
 
@@ -209,14 +210,16 @@ class FakeChild(object):
     A fake Xmodule.
     """
     def __init__(self):
-        self.system = Mock()
-        self.system.ajax_url = 'this/is/a/fake/ajax/url'
+        self.runtime = get_test_system()
+        self.runtime.ajax_url = 'this/is/a/fake/ajax/url'
+        self.student_view = Mock(return_value=Fragment(self.get_html()))
+        self.save = Mock()
 
     def get_html(self):
         """
         Return a fake html string.
         """
-        return 'This is supposed to be test html.'
+        return u'This is supposed to be test html.'
 
 
 class CrowdsourceHinterTest(unittest.TestCase):
@@ -238,7 +241,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return [FakeChild()]
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.get_html()
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('This is supposed to be test html.' in out_html)
         self.assertTrue('this/is/a/fake/ajax/url' in out_html)
 
@@ -255,7 +258,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return []
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.get_html()
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('Error in loading crowdsourced hinter' in out_html)
 
     @unittest.skip("Needs to be finished.")
@@ -266,8 +269,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         NOT WORKING RIGHT NOW
         """
         mock_module = VerticalWithModulesFactory.create()
-        out_html = mock_module.get_html()
-        print out_html
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('Test numerical problem.' in out_html)
         self.assertTrue('Another test numerical problem.' in out_html)
 

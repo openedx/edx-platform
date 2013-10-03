@@ -74,7 +74,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # get the rendered HTML output which should have the rewritten link
-        html = module.get_html()
+        html = module.system.render(module, None, 'student_view').content
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break

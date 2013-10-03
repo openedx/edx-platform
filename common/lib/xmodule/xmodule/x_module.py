@@ -657,7 +657,38 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         return Fragment(self.get_html())
 
 
-class DescriptorSystem(Runtime):
+class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
+    """
+    Runtime mixin that allows for composition of many `wrap_child` wrappers
+    """
+    def __init__(self, wrappers=None, **kwargs):
+        """
+        :param wrappers: A list of wrappers, where each wrapper is:
+
+            def wrapper(block, view, frag, context):
+                ...
+                return wrapped_frag
+        """
+        super(ConfigurableFragmentWrapper, self).__init__(**kwargs)
+        if wrappers is not None:
+            self.wrappers = wrappers
+        else:
+            self.wrappers = []
+
+    def wrap_child(self, block, view, frag, context):
+        """
+        See :func:`Runtime.wrap_child`
+        """
+        for wrapper in self.wrappers:
+            frag = wrapper(block, view, frag, context)
+
+        return frag
+
+
+class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+    """
+    Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
+    """
 
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
@@ -750,7 +781,7 @@ class XMLParsingSystem(DescriptorSystem):
         self.policy = policy
 
 
-class ModuleSystem(Runtime):
+class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,

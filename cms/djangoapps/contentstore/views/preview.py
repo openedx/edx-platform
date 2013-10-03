@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
 
-from xmodule_modifiers import replace_static_urls, wrap_xmodule, save_module  # pylint: disable=F0401
+from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -75,12 +75,10 @@ def preview_component(request, location):
         return HttpResponseForbidden()
 
     component = modulestore().get_item(location)
+    # Wrap the generated fragment in the xmodule_editor div so that the javascript
+    # can bind to it correctly
+    component.runtime.wrappers.append(partial(wrap_xmodule, 'xmodule_edit.html'))
 
-    component.get_html = wrap_xmodule(
-        component.get_html,
-        component,
-        'xmodule_edit.html'
-    )
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
         'editor': component.runtime.render(component, None, 'studio_view').content,
@@ -103,6 +101,12 @@ def preview_module_system(request, preview_id, descriptor):
         return lms_field_data(descriptor._field_data, student_data)
 
     course_id = get_course_for_item(descriptor.location).location.course_id
+
+    if descriptor.location.category == 'static_tab':
+        wrapper_template = 'xmodule_tab_display.html'
+    else:
+        wrapper_template = 'xmodule_display.html'
+
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -117,7 +121,21 @@ def preview_module_system(request, preview_id, descriptor):
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
-        anonymous_student_id='student'
+        anonymous_student_id='student',
+
+        # Set up functions to modify the fragment produced by student_view
+        wrappers=(
+            # This wrapper wraps the module in the template specified above
+            partial(wrap_xmodule, wrapper_template),
+
+            # This wrapper replaces urls in the output that start with /static
+            # with the correct course-specific url for the static content
+            partial(
+                replace_static_urls,
+                getattr(descriptor, 'data_dir', descriptor.location.course),
+                course_id=descriptor.location.org + '/' + descriptor.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE',
+            ),
+        )
     )
 
 
@@ -138,33 +156,6 @@ def load_preview_module(request, preview_id, descriptor):
             descriptor,
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule(system)
-
-    # cdodge: Special case
-    if module.location.category == 'static_tab':
-        module.get_html = wrap_xmodule(
-            module.get_html,
-            module,
-            "xmodule_tab_display.html",
-        )
-    else:
-        module.get_html = wrap_xmodule(
-            module.get_html,
-            module,
-            "xmodule_display.html",
-        )
-
-    # we pass a partially bogus course_id as we don't have the RUN information passed yet
-    # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
-    module.get_html = replace_static_urls(
-        module.get_html,
-        getattr(module, 'data_dir', module.location.course),
-        course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
-    )
-
-    module.get_html = save_module(
-        module.get_html,
-        module
-    )
 
     return module
 

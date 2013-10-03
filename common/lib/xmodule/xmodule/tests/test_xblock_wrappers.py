@@ -131,7 +131,7 @@ class TestStudentView(TestXBlockWrapper):
     # it generates the same thing from student_view that it does from get_html
     def check_student_view_leaf_node(self, descriptor_cls):
         xmodule = self.leaf_module(descriptor_cls)
-        assert_equal(xmodule.get_html(), xmodule.student_view(None).content)
+        assert_equal(xmodule.get_html(), xmodule.runtime.render(xmodule, None, 'student_view').content)
 
 
     # Test that for all container XModule Descriptors,
@@ -152,7 +152,7 @@ class TestStudentView(TestXBlockWrapper):
     # as it does using get_html
     def check_student_view_container_node_xmodules_only(self, descriptor_cls):
         xmodule = self.container_module(descriptor_cls, 2)
-        assert_equal(xmodule.get_html(), xmodule.student_view(None).content)
+        assert_equal(xmodule.get_html(), xmodule.runtime.render(xmodule, None, 'student_view').content)
 
     # Check that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, it generates the same html from student_view
@@ -183,7 +183,7 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.leaf_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
 
 
     # Test that for all of the Descriptors listed in CONTAINER_XMODULES
@@ -206,7 +206,7 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.container_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
 
     # Check that when a descriptor is generated from descriptor_cls
     # with mixed xmodule and xblock children, it generates the same html from studio_view
