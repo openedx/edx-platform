@@ -154,8 +154,8 @@ function () {
 
         if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
             this.el.on({
-                mousemove, this.videoCaption.autoShowCaptions,
-                keydown, this.videoCaption.autoShowCaptions
+                mousemove: this.videoCaption.autoShowCaptions,
+                keydown: this.videoCaption.autoShowCaptions
             });
 
             // Moving slider on subtitles is not a mouse move, but captions and
