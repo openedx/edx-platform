@@ -81,9 +81,14 @@ def preview_component(request, location):
         component,
         'xmodule_edit.html'
     )
+
+    fragment = component.runtime.render(component, None, 'studio_view')
+
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': component.runtime.render(component, None, 'studio_view').content,
+        'editor': fragment.content,
+        'resources': fragment.resources_to_html("head") + fragment.resources_to_html("foot"),
+        'initialize_js': fragment.js_init[0],
     })
 
 
