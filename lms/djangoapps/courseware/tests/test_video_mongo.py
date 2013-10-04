@@ -32,7 +32,7 @@ class TestVideo(BaseTestXmodule):
     def test_video_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
 
-        context = self.item_module.runtime.render(self.item_module, None, 'student_view').content
+        context = self.item_module.render('student_view').content
 
         sources = {
             'main': u'example.mp4',
@@ -93,7 +93,7 @@ class TestVideoNonYouTube(TestVideo):
             u'ogv': u'example.ogv'
         }
 
-        context = self.item_module.runtime.render(self.item_module, None, 'student_view').content
+        context = self.item_module.render('student_view').content
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),

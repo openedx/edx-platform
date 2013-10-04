@@ -95,7 +95,7 @@ class VideoModuleUnitTest(unittest.TestCase):
         }
 
         self.assertEqual(
-            module.runtime.render(module, None, 'student_view').content,
+            module.render('student_view').content,
             module.runtime.render_template('video.html', expected_context)
         )
 

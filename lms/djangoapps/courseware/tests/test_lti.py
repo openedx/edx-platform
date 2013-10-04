@@ -69,7 +69,7 @@ class TestLTI(BaseTestXmodule):
         """
         Makes sure that all parameters extracted.
         """
-        generated_context = self.item_module.runtime.render(self.item_module, None, 'student_view').content
+        generated_context = self.item_module.render('student_view').content
         expected_context = {
             'input_fields': self.correct_headers,
             'element_class': self.item_module.location.category,

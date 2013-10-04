@@ -861,12 +861,12 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
             result['default_value'] = field.to_json(field.default)
         return result
 
-    def render(self, block, context, view_name):
+    def render(self, block, view_name, context=None):
         if isinstance(block, (XModule, XModuleDescriptor)) and view_name == 'student_view':
             assert block.xmodule_runtime is not None
-            return block.xmodule_runtime.render(block._xmodule, context, view_name)
+            return block.xmodule_runtime.render(block._xmodule, view_name, context)
         else:
-            return super(DescriptorSystem, self).render(block, context, view_name)
+            return super(DescriptorSystem, self).render(block, view_name, context)
 
 
 class XMLParsingSystem(DescriptorSystem):

@@ -146,7 +146,7 @@ class TestStudentView(TestXBlockWrapper):
         descriptor = self.leaf_module(descriptor_cls)
         assert_equal(
             descriptor._xmodule.get_html(),
-            descriptor.runtime.render(descriptor, None, 'student_view').content
+            descriptor.render('student_view').content
         )
 
     # Test that for all container XModule Descriptors,
@@ -168,7 +168,7 @@ class TestStudentView(TestXBlockWrapper):
         descriptor = self.container_module(descriptor_cls, 2)
         assert_equal(
             descriptor._xmodule.get_html(),
-            descriptor.runtime.render(descriptor, None, 'student_view').content
+            descriptor.render('student_view').content
         )
 
     # Check that when an xmodule is generated from descriptor_cls
@@ -200,7 +200,7 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.leaf_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
+        assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)
 
 
     # Test that for all of the Descriptors listed in CONTAINER_XMODULES
@@ -223,7 +223,7 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.container_descriptor(descriptor_cls, 2)
-        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
+        assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)
 
     # Check that when a descriptor is generated from descriptor_cls
     # with mixed xmodule and xblock children, it generates the same html from studio_view

@@ -113,7 +113,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         try:
             child = self.get_display_items()[0]
-            out = self.runtime.render_child(child, None, 'student_view').content
+            out = child.render('student_view').content
             # The event listener uses the ajax url to find the child.
             child_id = child.id
         except IndexError:

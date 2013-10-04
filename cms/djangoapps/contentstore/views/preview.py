@@ -81,7 +81,7 @@ def preview_component(request, location):
 
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': component.runtime.render(component, None, 'studio_view').content,
+        'editor': component.render('studio_view').content,
     })
 
 
@@ -157,4 +157,4 @@ def get_preview_html(request, descriptor, idx):
     specified by the descriptor and idx.
     """
     module = load_preview_module(request, str(idx), descriptor)
-    return module.runtime.render(module, None, "student_view").content
+    return module.render("student_view").content

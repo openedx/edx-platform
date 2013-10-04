@@ -519,7 +519,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         """
         See if we can get the max score from the actual xmodule
         """
-        #The progress view requires that this function be exposed
+        # The progress view requires that this function be exposed
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
 
@@ -751,7 +751,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         assessment = [0, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
         module.save()
         module.handle_ajax("save_answer", {"student_answer": self.answer})
@@ -759,7 +759,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         html = module.handle_ajax("get_html", {})
         module.save()
 
-        #Mock a student submitting an assessment
+        # Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
@@ -769,12 +769,12 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         rubric = module.handle_ajax("get_combined_rubric", {})
         module.save()
 
-        #Move to the next step in the problem
+        # Move to the next step in the problem
         module.handle_ajax("next_problem", {})
         module.save()
         self.assertEqual(module.current_task_number, 0)
 
-        html = module.runtime.render(module, None, 'student_view').content
+        html = module.render('student_view').content
         self.assertIsInstance(html, basestring)
 
         rubric = module.handle_ajax("get_combined_rubric", {})
@@ -792,17 +792,17 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         assessment = [1, 1]
-        #Load the module
+        # Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         module.save()
         status = module.handle_ajax("get_status", {})
         module.save()
         self.assertIsInstance(status, basestring)
 
-        #Mock a student submitting an assessment
+        # Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
@@ -810,25 +810,25 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
-        #Move to the next step in the problem
+        # Move to the next step in the problem
         try:
             module.handle_ajax("next_problem", {})
             module.save()
         except GradingServiceError:
-            #This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect to!
             pass
         self.assertEqual(module.current_task_number, 1)
         try:
-            module.runtime.render(module, None, 'student_view')
+            module.render('student_view')
         except GradingServiceError:
-            #This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect to!
             pass
 
-        #Try to get the rubric from the module
+        # Try to get the rubric from the module
         module.handle_ajax("get_combined_rubric", {})
         module.save()
 
-        #Make a fake reply from the queue
+        # Make a fake reply from the queue
         queue_reply = {
             'queuekey': "",
             'xqueue_body': json.dumps({
@@ -847,23 +847,23 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("check_for_score", {})
         module.save()
 
-        #Update the module with the fake queue reply
+        # Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
         module.save()
         self.assertFalse(module.ready_to_reset)
         self.assertEqual(module.current_task_number, 1)
 
-        #Get html and other data client will request
-        module.runtime.render(module, None, 'student_view')
+        # Get html and other data client will request
+        module.render('student_view')
 
         module.handle_ajax("skip_post_assessment", {})
         module.save()
 
-        #Get all results
+        # Get all results
         module.handle_ajax("get_combined_rubric", {})
         module.save()
 
-        #reset the problem
+        # reset the problem
         module.handle_ajax("reset", {})
         module.save()
         self.assertEqual(module.state, "initial")
@@ -896,11 +896,11 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         module = self.get_module_from_location(self.problem_location, COURSE)
         module.save()
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         module.save()
 
-        #Mock a student submitting an assessment
+        # Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
@@ -908,21 +908,21 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
-        #Move to the next step in the problem
+        # Move to the next step in the problem
         module.handle_ajax("next_problem", {})
         module.save()
         self.assertEqual(module.current_task_number, 0)
 
-        html = module.runtime.render(module, None, 'student_view').content
+        html = module.render('student_view').content
         self.assertIsInstance(html, basestring)
 
-        #Module should now be done
+        # Module should now be done
         rubric = module.handle_ajax("get_combined_rubric", {})
         module.save()
         self.assertIsInstance(rubric, basestring)
         self.assertEqual(module.state, "done")
 
-        #Try to reset, should fail because only 1 attempt is allowed
+        # Try to reset, should fail because only 1 attempt is allowed
         reset_data = json.loads(module.handle_ajax("reset", {}))
         module.save()
         self.assertEqual(reset_data['success'], False)
@@ -953,7 +953,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
         response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
         response = json.loads(response)
         self.assertFalse(response['success'])
@@ -973,7 +973,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer with a file
+        # Simulate a student saving an answer with a file
         response = module.handle_ajax("save_answer", {
             "student_answer": self.answer_text,
             "valid_files_attached": True,

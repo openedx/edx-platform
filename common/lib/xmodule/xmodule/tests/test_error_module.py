@@ -31,7 +31,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
             self.valid_xml, self.system, self.org, self.course, self.error_msg)
         self.assertIsInstance(descriptor, error_module.ErrorDescriptor)
         descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(descriptor, None, 'student_view').content
+        context_repr = self.system.render(descriptor, 'student_view').content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(self.valid_xml), context_repr)
 
@@ -45,7 +45,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
             descriptor, self.error_msg)
         self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
         error_descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(error_descriptor, None, 'student_view').content
+        context_repr = self.system.render(error_descriptor, 'student_view').content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(descriptor), context_repr)
 
@@ -66,7 +66,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course)
         descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(descriptor, None, 'student_view').content
+        context_repr = self.system.render(descriptor, 'student_view').content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(repr(self.valid_xml), context_repr)
 
@@ -80,6 +80,6 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
             descriptor, self.error_msg)
         self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
         error_descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(error_descriptor, None, 'student_view').content
+        context_repr = self.system.render(error_descriptor, 'student_view').content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(str(descriptor), context_repr)

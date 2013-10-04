@@ -70,13 +70,16 @@ class ConditionalFactory(object):
             source_descriptor.location = source_location
 
         source_descriptor.runtime = descriptor_system
+        source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
         child_descriptor = Mock()
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
+        child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
         child_descriptor.xmodule_runtime = get_test_system()
+        child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
 
         descriptor_system.load_item = {'child': child_descriptor, 'source': source_descriptor}.get
 
@@ -125,7 +128,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules = ConditionalFactory.create(self.test_system)
         # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
-        html = modules['cond_module'].runtime.render(modules['cond_module'], None, 'student_view').content
+        html = modules['cond_module'].render('student_view').content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
             'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
@@ -216,7 +219,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
-        html = module.runtime.render(module, None, 'student_view').content
+        html = module.render('student_view').content
         print "html type: ", type(html)
         print "html: ", html
         html_expect = module.xmodule_runtime.render_template(
