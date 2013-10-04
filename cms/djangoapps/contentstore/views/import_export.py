@@ -19,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import SuspiciousOperation
 
 from mitxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
@@ -32,6 +33,7 @@ from xmodule.exceptions import SerializationError
 
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
+from extract_tar import safetar_extractall
 
 
 __all__ = ['import_course', 'generate_export_course', 'export_course']
@@ -154,7 +156,16 @@ def import_course(request, org, course, name):
                     sf.write("Extracting")
 
                 tar_file = tarfile.open(temp_filepath)
-                tar_file.extractall((course_dir + '/').encode('utf-8'))
+                try:
+                    safetar_extractall(tar_file, (course_dir + '/').encode('utf-8'))
+                except SuspiciousOperation as exc:
+                    return JsonResponse(
+                        {
+                            'ErrMsg': 'Unsafe tar file. Aborting import.',
+                            'SuspiciousFileOperationMsg': exc.args[0]
+                        },
+                        status=400
+                    )
 
                 with open(status_file, 'w+') as sf:
                     sf.write("Verifying")
