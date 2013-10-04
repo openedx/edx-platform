@@ -1,9 +1,14 @@
 # disable missing docstring
 # pylint: disable=C0111
 
-from lettuce import world, step
-from django.conf import settings
 import os
+from lettuce import world, step
+
+from django.conf import settings
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
@@ -144,9 +149,6 @@ def click_button_index(_step, button_type, index):
 @step('I remove (.*)transcripts id from store')
 def remove_transcripts_from_store(_step, subs_id):
     """Remove from store, if transcripts content exists."""
-    from xmodule.contentstore.content import StaticContent
-    from xmodule.contentstore.django import contentstore
-    from xmodule.exceptions import NotFoundError
     filename = 'subs_{0}.srt.sjson'.format(subs_id.strip())
     content_location = StaticContent.compute_location(
         world.scenario_dict['COURSE'].org,
@@ -209,4 +211,3 @@ def set_value_transcripts_field(_step, value, field_name):
 
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     world.css_fill(field_id, value.strip())
-
