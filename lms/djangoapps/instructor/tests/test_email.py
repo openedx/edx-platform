@@ -53,7 +53,6 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_email_flag_true(self):
-        from nose.tools import set_trace; set_trace()
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertTrue(self.email_link in response.content)

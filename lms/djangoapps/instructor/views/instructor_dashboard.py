@@ -160,12 +160,15 @@ def _section_data_download(course_id):
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    fragment = course.system.render(html_module, None, 'studio_view')
+    fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
+    email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access, 
         'send_email': reverse('send_email',kwargs={'course_id': course_id}),
-        'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+        'editor': email_editor
     }
     return section_data
 

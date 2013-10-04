@@ -22,6 +22,8 @@ class SendEmail
     # attach click handlers
 
     @$btn_send.click =>
+
+      success_message = gettext('Your email was successfully queued for sending.')
       
       send_data =
         action: 'send'
@@ -30,10 +32,11 @@ class SendEmail
         message: @$emailEditor.save()['data']
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_send.data 'endpoint'
         data: send_data
-        success: (data) => @display_response gettext('Your email was successfully queued for sending.')
+        success: (data) => @display_response ("<div class=\"msg msg-confirm\"><p class=\"copy\">" + success_message + "</p></div>")
         error: std_ajax_err => @fail_with_error gettext('Error sending email.')
 
   fail_with_error: (msg) ->
