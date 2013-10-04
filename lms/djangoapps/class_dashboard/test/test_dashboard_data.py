@@ -39,7 +39,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def setUp(self):
 
         self.instructor = AdminFactory.create()
-        self.client.login(username=instructor.username, password='test')
+        self.client.login(username=self.instructor.username, password='test')
 
 #        self.command = 'populate_studentmoduleexpand'
 #        self.script_id = "studentmoduleexpand"
