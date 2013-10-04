@@ -376,7 +376,6 @@ if settings.MITX_FEATURES.get('CLASS_DASHBOARD'):
             'class_dashboard.views.section_problem_grade_distribution', name="section_problem_grade_distribution"),
     )
 
-
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
