@@ -1190,5 +1190,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
+                                    CapaDescriptor.text_customization])
         return non_editable_fields

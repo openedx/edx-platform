@@ -10,7 +10,6 @@ MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
-TEXT_CUSTOMIZATION = "text_customization"
 
 
 @step('I have created a Blank Common Problem$')
@@ -38,7 +37,6 @@ def i_see_advanced_settings_with_values(step):
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
             [SHOW_ANSWER, "Finished", False],
-            [TEXT_CUSTOMIZATION, "[object Object]", False]
         ])
 
 
