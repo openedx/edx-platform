@@ -47,19 +47,19 @@ Feature: CMS.Video Component
     Given I have created a Video component with subtitles
     And Make sure captions are closed
     Then Captions become invisible after 3 seconds
-    And Hover over CC button
-    Then Captions become visible after 0 seconds
-    And Hover over volume button
+    And I hover over button "CC"
+    Then Captions become visible
+    And I hover over button "volume"
     Then Captions become invisible after 3 seconds
 
   # 8
   Scenario: Open captions never become invisible
     Given I have created a Video component with subtitles
     And Make sure captions are open
-    Then Captions are visible after 0 seconds
-    And Hover over CC button
+    Then Captions are visible
+    And I hover over button "CC"
     Then Captions are visible after 3 seconds
-    And Hover over volume button
+    And I hover over button "volume"
     Then Captions are visible after 3 seconds
 
   # 9
@@ -67,5 +67,5 @@ Feature: CMS.Video Component
     Given I have created a Video component with subtitles
     And Make sure captions are closed
     Then Captions become invisible after 3 seconds
-    And Hover over volume button
-    Then Captions are invisible after 0 seconds
+    And I hover over button "volume"
+    Then Captions are invisible
