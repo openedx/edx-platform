@@ -6,6 +6,9 @@
   from courseware.courses import course_image_url, get_course_about_section
   import waffle
 %>
+
+<%namespace name='static' file='../static_content.html'/>
+
 <li class="course-item">
   <article class="course ${enrollment.mode}">
     <%
