@@ -17,7 +17,19 @@ def run_under_coverage(cmd, root)
 end
 
 def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
-    test_id = '' if test_id.nil?
+
+    # If no test id is provided, we need to limit the test runner
+    # to the Djangoapps we want to test.  Otherwise, it will
+    # run tests on all installed packages.
+    if test_id.nil?
+        test_id = "#{system}/djangoapps common/djangoapps"
+
+    # Handle "--failed" as a special case: we want to re-run only
+    # the tests that failed within our Django apps
+    elsif test_id == '--failed'
+        test_id = "#{system}/djangoapps common/djangoapps --failed"
+    end
+
     cmd = django_admin(system, :test, 'test', test_id)
     test_sh(run_under_coverage(cmd, system))
 end
