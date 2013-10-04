@@ -265,10 +265,13 @@ section.instructor-dashboard-content-2 {
     margin-bottom: 20px;
     font-weight: 600;
     color: green;
+
+    .copy {
+      font-weight: 600;
+    }
   }
 
   .msg-confirm {
-    border-top: 2px solid green;
     background: tint(green,90%);
     display: none;
   }

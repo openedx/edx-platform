@@ -63,6 +63,20 @@ def add_to_course_staff(username, course_num):
     user = User.objects.get(username=username)
     user.groups.add(group)
 
+@world.absorb
+def add_to_course_staff(username, course_num):
+    """
+    Add the user with `username` to the course staff group
+    for `course_num`.
+    """
+    # Based on code in lms/djangoapps/courseware/access.py
+    group_name = "instructor_{}".format(course_num)
+    group, _ = Group.objects.get_or_create(name=group_name)
+    group.save()
+
+    user = User.objects.get(username=username)
+    user.groups.add(group)
+
 
 @world.absorb
 def clear_courses():
