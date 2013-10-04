@@ -106,6 +106,43 @@ def require_query_params(*args, **kwargs):
         return wrapped
     return decorator
 
+def require_post_params(*args, **kwargs):
+    """
+    Checks for required paremters or renders a 400 error.
+    (decorator with arguments)
+
+    `args` is a *list of required GET parameter names.
+    `kwargs` is a **dict of required GET parameter names
+        to string explanations of the parameter
+    """
+    required_params = []
+    required_params += [(arg, None) for arg in args]
+    required_params += [(key, kwargs[key]) for key in kwargs]
+    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
+
+    def decorator(func):  # pylint: disable=C0111
+        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+            request = args[0]
+
+            error_response_data = {
+                'error': 'Missing required query parameter(s)',
+                'parameters': [],
+                'info': {},
+            }
+
+            for (param, extra) in required_params:
+                default = object()
+                if request.POST.get(param, default) == default:
+                    error_response_data['parameters'] += [param]
+                    error_response_data['info'][param] = extra
+
+            if len(error_response_data['parameters']) > 0:
+                return JsonResponse(error_response_data, status=400)
+            else:
+                return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
 
 def require_level(level):
     """
@@ -749,19 +786,19 @@ def send_email(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(send_to="sending to whom", subject="subject line", message="message text")
+@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
     """
     Send an email to self, staff, or everyone involved in a course.
-    Query Paramaters:
+    Query Parameters:
     - 'send_to' specifies what group the email should be sent to
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
     course = get_course_by_id(course_id)
-    send_to = request.GET.get("send_to")
-    subject = request.GET.get("subject")
-    message = request.GET.get("message")
+    send_to = request.POST.get("send_to")
+    subject = request.POST.get("subject")
+    message = request.POST.get("message")
     text_message = html_to_text(message)
     email = CourseEmail(
         course_id=course_id,

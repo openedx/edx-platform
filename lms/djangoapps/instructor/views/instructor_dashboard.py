@@ -138,6 +138,7 @@ def _section_student_admin(course_id, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
+        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
@@ -160,12 +161,15 @@ def _section_data_download(course_id):
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    fragment = course.system.render(html_module, None, 'studio_view')
+    fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
+    email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access, 
         'send_email': reverse('send_email',kwargs={'course_id': course_id}),
-        'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+        'editor': email_editor
     }
     return section_data
 

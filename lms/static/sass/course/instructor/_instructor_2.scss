@@ -241,6 +241,60 @@ section.instructor-dashboard-content-2 {
   }
 }
 
+.instructor-dashboard-wrapper-2 section.idash-section#send_email {
+  // form fields
+  .list-fields {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .field {
+      margin-bottom: 20px;
+      padding: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // system feedback - messages
+  .msg {
+
+
+    .copy {
+      font-weight: 600;
+    }
+  }
+
+  .msg-confirm {
+    background: tint(green,90%);
+
+    .copy {
+      color: green;
+    }
+  }
+
+  .list-advice {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+
+    .item {
+      font-weight: 600;
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  .msg .copy {
+      font-weight: 600; }
+  .msg-confirm {
+    background: #e5f2e5; }
+}
+
 
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
   $half_width: $baseline * 20;
@@ -537,4 +591,8 @@ section.instructor-dashboard-content-2 {
     position: absolute;
     right: $baseline;
   }
+}
+
+input[name="subject"] {
+  width:600px;
 }
