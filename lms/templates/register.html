@@ -138,7 +138,13 @@
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
+            <span class="tip tip-input" id="name-tip">
+              % if self.stanford_theme_enabled():
+                ${_("Needed for any Statements of Accomplishment you may earn <strong>(cannot be changed later)</strong>")}
+              % else:
+                ${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")} 
+              % endif
+            </span>
           </li>
         </ol>
 
