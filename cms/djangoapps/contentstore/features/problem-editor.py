@@ -10,9 +10,9 @@ MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
+TEXT_CUSTOMIZATION = "text_customization"
 
 
-############### ACTIONS ####################
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
     world.create_component_instance(
@@ -29,15 +29,16 @@ def i_edit_and_select_settings(step):
     world.edit_component_and_select_settings()
 
 
-@step('I see five alphabetized settings and their expected values$')
-def i_see_five_settings_with_values(step):
+@step('I see the advanced settings and their expected values$')
+def i_see_advanced_settings_with_values(step):
     world.verify_all_setting_entries(
         [
             [DISPLAY_NAME, "Blank Common Problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
-            [SHOW_ANSWER, "Finished", False]
+            [SHOW_ANSWER, "Finished", False],
+            [TEXT_CUSTOMIZATION, "[object Object]", False]
         ])
 
 
@@ -159,7 +160,7 @@ def edit_high_level_source_links_visible(step):
 def cancel_does_not_save_changes(step):
     world.cancel_component(step)
     step.given("I edit and select Settings")
-    step.given("I see five alphabetized settings and their expected values")
+    step.given("I see the advanced settings and their expected values")
 
 
 @step('I have created a LaTeX Problem')

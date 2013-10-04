@@ -65,13 +65,29 @@ def edit_component():
 
 @world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
+    """
+    Verify the capa module fields are set as expected in the
+    Advanced Settings editor.
+
+    Parameters
+    ----------
+    setting: the WebDriverElement object found in the browser
+    display_name: the string expected as the label
+    value: the expected field value
+    explicitly_set: True if the value is expected to have been explicitly set
+        for the problem, rather than derived from the defaults. This is verified
+        by the existence of a "Clear" button next to the field value.
+    """
     assert_equal(display_name, setting.find_by_css('.setting-label')[0].value)
-    # Check specifically for the list type; it has a different structure
+
+    # Check if the web object is a list type
+    # If so, we use a slightly different mechanism for determining its value
     if setting.has_class('metadata-list-enum'):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
     else:
         assert_equal(value, setting.find_by_css('.setting-input')[0].value)
+
     settingClearButton = setting.find_by_css('.setting-clear')[0]
     assert_equal(explicitly_set, settingClearButton.has_class('active'))
     assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
