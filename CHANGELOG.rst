@@ -9,6 +9,8 @@ LMS: Disable data download buttons on the instructor dashboard for large courses
 
 LMS: Ported bulk emailing to the beta instructor dashboard.
 
+LMS: Ported bulk emailing to the beta instructor dashboard.
+
 LMS: Refactor and clean student dashboard templates.
 
 LMS: Fix issue with CourseMode expiration dates
