@@ -4,13 +4,10 @@
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
 
-// VENDOR + REBASE *referenced/used vendor presentation and reset*
+// RESET
 // ====================
 
 @import 'base/reset';
-@import 'vendor/font-awesome';
-@import 'vendor/responsive-carousel/responsive-carousel';
-@import 'vendor/responsive-carousel/responsive-carousel.slide';
 
 // BASE  *default edX offerings*
 // ====================

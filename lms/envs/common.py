@@ -634,25 +634,37 @@ open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_end
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
-    'application': {
-        'source_filenames': ['sass/application.css'],
-        'output_filename': 'css/lms-application.css',
+    'style-vendor': {
+        'source_filenames': [
+            'css/vendor/font-awesome.css',
+            'css/vendor/jquery.qtip.min.css',
+            'css/vendor/responsive-carousel/responsive-carousel',
+            'css/vendor/responsive-carousel/responsive-carousel.slide',
+        ],
+        'output_filename': 'css/lms-style-vendor.css',
     },
-    'course': {
+    'style-app': {
+        'source_filenames': [
+            'sass/application.css',
+            'sass/ie.css'
+        ],
+        'output_filename': 'css/lms-style-app.css',
+    },
+    'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/jquery.qtip.min.css',
             'css/vendor/annotator.min.css',
+        ],
+        'output_filename': 'css/lms-style-course-vendor.css',
+    },
+    'style-course': {
+        'source_filenames': [
             'sass/course.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-course.css',
-    },
-    'ie-fixes': {
-        'source_filenames': ['sass/ie.css'],
-        'output_filename': 'css/lms-ie.css',
+        'output_filename': 'css/lms-style-course.css',
     },
 }
 
