@@ -294,12 +294,13 @@ function () {
 
         _this = this;
 
-        this.videoCaption.subtitlesEl.fadeOut(
-            this.videoCaption.fadeOutTimeout,
-            function () {
-
-            _this.captionState = 'invisible';
-        });
+        this.videoCaption.subtitlesEl
+            .fadeOut(
+                this.videoCaption.fadeOutTimeout,
+                function () {
+                    _this.captionState = 'invisible';
+                }
+            );
     }
 
     function resize() {
@@ -321,7 +322,7 @@ function () {
 
         this.videoCaption.frozen = setTimeout(
             this.videoCaption.onMouseLeave,
-            10000
+            this.config.captionsFreezeTime
         );
     }
 
@@ -391,17 +392,18 @@ function () {
             container.append(liEl);
         });
 
-        this.videoCaption.subtitlesEl.html(container.html());
-
-        this.videoCaption.subtitlesEl.find('li[data-index]').on({
-            mouseover:  this.videoCaption.captionMouseOverOut,
-            mouseout:   this.videoCaption.captionMouseOverOut,
-            mousedown:  this.videoCaption.captionMouseDown,
-            click:      this.videoCaption.captionClick,
-            focus:      this.videoCaption.captionFocus,
-            blur:       this.videoCaption.captionBlur,
-            keydown:    this.videoCaption.captionKeyDown
-        });
+        this.videoCaption.subtitlesEl
+            .html(container.html())
+            .find('li[data-index]')
+            .on({
+                mouseover:  this.videoCaption.captionMouseOverOut,
+                mouseout:   this.videoCaption.captionMouseOverOut,
+                mousedown:  this.videoCaption.captionMouseDown,
+                click:      this.videoCaption.captionClick,
+                focus:      this.videoCaption.captionFocus,
+                blur:       this.videoCaption.captionBlur,
+                keydown:    this.videoCaption.captionKeyDown
+            });
 
         // Enables or disables automatic scrolling of the captions when the
         // video is playing. This feature has to be disabled when tabbing
@@ -422,14 +424,15 @@ function () {
         // outline has to be drawn (tabbing) or not (mouse click).
         this.videoCaption.isMouseFocus = false;
 
-        this.videoCaption.subtitlesEl.prepend(
-            $('<li class="spacing">')
-                .height(this.videoCaption.topSpacingHeight())
-        );
-        this.videoCaption.subtitlesEl.append(
-            $('<li class="spacing">')
-            .height(this.videoCaption.bottomSpacingHeight())
-        );
+        this.videoCaption.subtitlesEl
+            .prepend(
+                $('<li class="spacing">')
+                    .height(this.videoCaption.topSpacingHeight())
+            )
+            .append(
+                $('<li class="spacing">')
+                    .height(this.videoCaption.bottomSpacingHeight())
+            );
 
         this.videoCaption.rendered = true;
     }
@@ -684,26 +687,27 @@ function () {
         }
     }
 
-    function hideCaptions(hide_captions) {
-        var type;
+    function hideCaptions(hide_captions, update_cookie) {
+        var hideSubtitlesEl = this.videoCaption.hideSubtitlesEl,
+            type;
 
         if (hide_captions) {
             type = 'hide_transcript';
             this.captionsHidden = true;
-            this.videoCaption.hideSubtitlesEl.attr(
-                'title', gettext('Turn on captions')
-            );
-            this.videoCaption.hideSubtitlesEl
+
+            hideSubtitlesEl
+                .attr('title', gettext('Turn on captions'))
                 .text(gettext('Turn on captions'));
+
             this.el.addClass('closed');
         } else {
             type = 'show_transcript';
             this.captionsHidden = false;
-            this.videoCaption.hideSubtitlesEl.attr(
-                'title', gettext('Turn off captions')
-            );
-            this.videoCaption.hideSubtitlesEl
+
+            hideSubtitlesEl
+                .attr('title', gettext('Turn off captions'))
                 .text(gettext('Turn off captions'));
+
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
         }

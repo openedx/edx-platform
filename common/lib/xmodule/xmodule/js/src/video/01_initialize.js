@@ -264,7 +264,9 @@ function (VideoPlayer) {
     // The function set initial configuration and preparation.
 
     function initialize(element) {
-        var _this = this, tempYtTestTimeout;
+        var _this = this,
+            regExp = /^true$/i,
+            data, tempYtTestTimeout;
         // This is used in places where we instead would have to check if an
         // element has a CSS class 'fullscreen'.
         this.isFullScreen = false;
@@ -273,6 +275,9 @@ function (VideoPlayer) {
         this.el = $(element).find('.video');
         this.elVideoWrapper = this.el.find('.video-wrapper');
         this.id = this.el.attr('id').replace(/video_/, '');
+
+        // jQuery .data() return object with keys in lower camelCase format.
+        data = this.el.data();
 
         console.log(
             '[Video info]: Initializing video with id "' + this.id + '".'
@@ -284,37 +289,26 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
-            start:              this.el.data('start'),
-            end:                this.el.data('end'),
-
-            caption_data_dir:   this.el.data('caption-data-dir'),
-            caption_asset_path: this.el.data('caption-asset-path'),
-            show_captions:      (
-                                    this.el.data('show-captions')
-                                        .toString().toLowerCase() === 'true'
-                                ),
-            youtubeStreams:     this.el.data('streams'),
-
-            autohideHtml5:      (
-                                    this.el.data('autohide-html5')
-                                        .toString().toLowerCase() === 'true'
-                                ),
-
-            sub:                this.el.data('sub'),
-            mp4Source:          this.el.data('mp4-source'),
-            webmSource:         this.el.data('webm-source'),
-            oggSource:          this.el.data('ogg-source'),
-
-            ytTestUrl:   this.el.data('yt-test-url'),
-
+            start:              data['start'],
+            end:                data['end'],
+            caption_data_dir:   data['captionDataDir'],
+            caption_asset_path: data['captionAssetPath'],
+            show_captions:      regExp.test(data['showCaptions'].toString()),
+            youtubeStreams:     data['streams'],
+            autohideHtml5:      regExp.test(data['autohideHtml5'].toString()),
+            sub:                data['sub'],
+            mp4Source:          data['mp4Source'],
+            webmSource:         data['webmSource'],
+            oggSource:          data['oggSource'],
+            ytTestUrl:          data['ytTestUrl'],
             fadeOutTimeout:     1400,
-
+            captionsFreezeTime: 10000,
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
-        tempYtTestTimeout = parseInt(this.el.data('yt-test-timeout'), 10);
+        tempYtTestTimeout = parseInt(data['ytTestTimeout'], 10);
         if (!isFinite(tempYtTestTimeout)) {
             tempYtTestTimeout = 1500;
         }
