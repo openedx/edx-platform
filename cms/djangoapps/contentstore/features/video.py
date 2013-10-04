@@ -135,15 +135,15 @@ def set_captions_visibility_state(_step, captions_state):
 
 @step('I hover over button "([^"]*)"$')
 def hover_over_button(_step, button):
-    world.browser.find_by_css(BUTTONS[button.strip()]).mouse_over()
+    world.css_find(BUTTONS[button.strip()]).mouse_over()
 
 
-@step('Captions (?:are|become) (.+)$')
+@step('Captions (?:are|become) "([^"]*)"$')
 def are_captions_visibile(_step, visibility_state):
-    _step.given('Captions are {0} after 0 seconds'.format(visibility_state))
+    _step.given('Captions become "{0}" after 0 seconds'.format(visibility_state))
 
 
-@step('Captions (?:are|become) (.+) after (.+) seconds$')
+@step('Captions (?:are|become) "([^"]*)" after (.+) seconds$')
 def check_captions_visibility_state(_step, visibility_state, timeout):
     timeout = int(timeout.strip())
 
