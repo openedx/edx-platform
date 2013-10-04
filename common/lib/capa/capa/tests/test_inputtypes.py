@@ -808,6 +808,7 @@ class FormulaEquationTest(unittest.TestCase):
             'msg': '',
             'size': self.size,
             'previewer': '/static/js/capa/src/formula_equation_preview.js',
+            'inline': False,
         }
         self.assertEqual(context, expected)
 
