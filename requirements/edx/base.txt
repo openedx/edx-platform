@@ -85,7 +85,6 @@ transifex-client==0.9.1
 # Used for testing
 coverage==3.6
 factory_boy==2.0.2
-lettuce==0.2.16
 mock==1.0.1
 nosexcover==1.0.7
 pep8==1.4.5
