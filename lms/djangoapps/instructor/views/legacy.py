@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from xmodule_modifiers import wrap_xmodule
+from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
@@ -812,8 +812,8 @@ def instructor_dashboard(request, course_id):
     # HTML editor for email
     if idash_mode == 'Email' and is_studio_course:
         html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
-        fragment = course.system.render(html_module, 'studio_view')
-        fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
+        fragment = html_module.render('studio_view')
+        fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:

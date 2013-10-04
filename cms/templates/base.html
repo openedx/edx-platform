@@ -54,6 +54,7 @@ var require = {
         "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
         "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
+        "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
         "tzAbbr": "js/vendor/tzAbbr",
@@ -66,6 +67,7 @@ var require = {
         "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
         "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
         "xmodule": "/xmodule/xmodule",
+        "xblock": "coffee/src/xblock",
         "utility": "js/src/utility",
         "draggabilly": "js/vendor/draggabilly.pkgd"
     },
@@ -149,6 +151,14 @@ var require = {
         },
         "mathjax": {
             exports: "MathJax"
+        },
+        "xblock/core": {
+            exports: "XBlock",
+            deps: ["jquery", "jquery.immediateDescendents"]
+        },
+        "xblock/runtime.v1": {
+            exports: "XBlock",
+            deps: ["xblock/core"]
         },
 
         "coffee/src/main": {

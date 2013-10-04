@@ -16,6 +16,7 @@ requirejs.config({
         "jquery.fileupload": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload",
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
+        "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
@@ -27,6 +28,7 @@ requirejs.config({
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
         "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
         "xmodule": "xmodule_js/src/xmodule",
+        "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
@@ -121,6 +123,14 @@ requirejs.config({
         "jasmine.async": {
             deps: ["jasmine"],
             exports: "AsyncSpec"
+        },
+        "xblock/core": {
+            exports: "XBlock",
+            deps: ["jquery", "jquery.immediateDescendents"]
+        },
+        "xblock/runtime.v1": {
+            exports: "XBlock",
+            deps: ["xblock/core"]
         },
 
         "coffee/src/main": {

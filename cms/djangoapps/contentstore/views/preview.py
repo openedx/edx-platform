@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
+from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -77,7 +77,7 @@ def preview_component(request, location):
     component = modulestore().get_item(location)
     # Wrap the generated fragment in the xmodule_editor div so that the javascript
     # can bind to it correctly
-    component.runtime.wrappers.append(partial(wrap_xmodule, 'xmodule_edit.html'))
+    component.runtime.wrappers.append(wrap_xblock)
 
     try:
         content = component.render('studio_view').content
@@ -105,11 +105,6 @@ def preview_module_system(request, preview_id, descriptor):
 
     course_id = get_course_for_item(descriptor.location).location.course_id
 
-    if descriptor.location.category == 'static_tab':
-        wrapper_template = 'xmodule_tab_display.html'
-    else:
-        wrapper_template = 'xmodule_display.html'
-
     return ModuleSystem(
         static_url=settings.STATIC_URL,
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
@@ -129,7 +124,7 @@ def preview_module_system(request, preview_id, descriptor):
         # Set up functions to modify the fragment produced by student_view
         wrappers=(
             # This wrapper wraps the module in the template specified above
-            partial(wrap_xmodule, wrapper_template),
+            partial(wrap_xblock, display_name_only=descriptor.location.category == 'static_tab'),
 
             # This wrapper replaces urls in the output that start with /static
             # with the correct course-specific url for the static content

@@ -70,6 +70,7 @@ def wait_for_js_variable_truthy(variable):
 def wait_for_xmodule():
     "Wait until the XModule Javascript has loaded on the page."
     world.wait_for_js_variable_truthy("XModule")
+    world.wait_for_js_variable_truthy("XBlock")
 
 
 @world.absorb

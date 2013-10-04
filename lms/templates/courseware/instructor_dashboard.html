@@ -544,7 +544,7 @@ function goto( mode)
       <input type="submit" name="action" value="Send email">
     </div>
     <script type="text/javascript">
-      var emailEditor = XModule.loadModule($('.xmodule_edit'));
+      var emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
       document.idashform.onsubmit = function() {
         this.message.value = emailEditor.save()['data'];
         return true;
