@@ -1,7 +1,6 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from terrain.steps import reload_the_page
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 
@@ -32,6 +31,7 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
 
     # Return to the video
     world.visit(video_url)
+    world.wait_for_xmodule()
 
 
 @step('I have uploaded subtitles "([^"]*)"$')
@@ -46,6 +46,7 @@ def i_have_uploaded_subtitles(_step, sub_id):
 
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
+    world.wait_for_xmodule()
     assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
@@ -66,6 +67,7 @@ def i_edit_the_component(_step):
 
 @step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
+    world.wait_for_xmodule()
     button_css = 'a.hide-subtitles'
     if shown == 'hidden':
         world.css_click(button_css)
@@ -107,12 +109,9 @@ def xml_only_video(step):
         data='<video youtube="1.00:%s"></video>' % youtube_id
     )
 
-    # Refresh to see the new video
-    reload_the_page(step)
-
 
 @step('The correct Youtube video is shown$')
 def the_youtube_video_is_shown(_step):
+    world.wait_for_xmodule()
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
-

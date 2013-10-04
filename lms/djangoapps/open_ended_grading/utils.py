@@ -24,19 +24,21 @@ GRADER_DISPLAY_NAMES = {
     'NA': _("Not yet available"),
     'BC': _("Automatic Checker"),
     'IN': _("Instructor Assessment"),
-    }
+}
 
 STUDENT_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify course staff.")
 STAFF_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify your edX point of contact.")
 
 system = ModuleSystem(
+    static_url='/static',
     ajax_url=None,
     track_function=None,
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
     xmodule_field_data=DictFieldData({}),
-    )
+)
+
 
 def generate_problem_url(problem_url_parts, base_course_url):
     """
@@ -52,6 +54,7 @@ def generate_problem_url(problem_url_parts, base_course_url):
                 problem_url += "courseware/"
             problem_url += part + "/"
     return problem_url
+
 
 def does_location_exist(course_id, location):
     """
@@ -74,12 +77,14 @@ def does_location_exist(course_id, location):
                       "Ensure that the location is valid.").format(location))
         return False
 
+
 def create_controller_query_service():
     """
     Return an instance of a service that can query edX ORA.
     """
 
     return ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
+
 
 class StudentProblemList(object):
     """

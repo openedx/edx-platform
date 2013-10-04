@@ -98,45 +98,39 @@
 
 <%block name="jsextra">
   <script type="text/javascript">
-    (function() {
+require(["jquery", "jquery.cookie"], function($) {
+  $("form :input").focus(function() {
+    $("label[for='" + this.id + "']").addClass("is-focused");
+  }).blur(function() {
+    $("label").removeClass("is-focused");
+  });
 
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
+  // form validation
+  function postJSON(url, data, callback) {
+    $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken': $.cookie('csrftoken')}
+    });
+  }
 
+  $('form#register_form').submit(function(e) {
+    e.preventDefault();
+    var submit_data = $('#register_form').serialize();
 
-      function getCookie(name) {
-        return $.cookie(name);
+    postJSON('/create_account',
+      submit_data,
+      function(json) {
+        if(json.success) {
+          location.href = "${reverse('index')}";
+        } else {
+          $('#register_error').html(json.value).stop().addClass('is-shown');
+        }
       }
-
-      // form validation
-      function postJSON(url, data, callback) {
-        $.ajax({type:'POST',
-          url: url,
-          dataType: 'json',
-          data: data,
-          success: callback,
-          headers : {'X-CSRFToken':getCookie('csrftoken')}
-        });
-      }
-
-      $('form#register_form').submit(function(e) {
-        e.preventDefault();
-        var submit_data = $('#register_form').serialize();
-
-        postJSON('/create_account',
-          submit_data,
-          function(json) {
-            if(json.success) {
-              location.href = "${reverse('index')}";
-            } else {
-              $('#register_error').html(json.value).stop().addClass('is-shown');
-            }
-          }
-        );
-      });
-    })(this)
+    );
+  });
+});
   </script>
 </%block>

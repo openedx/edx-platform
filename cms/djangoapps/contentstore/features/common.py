@@ -90,6 +90,7 @@ def press_the_notification_button(_step, name):
         world.browser.execute_script("$('{}').click()".format(btn_css))
     else:
         world.css_click(btn_css)
+    world.wait_for_ajax_complete()
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -244,7 +245,9 @@ def open_new_unit(step):
     step.given('I have opened a new course section in Studio')
     step.given('I have added a new subsection')
     step.given('I expand the first section')
+    old_url = world.browser.url
     world.css_click('a.new-unit-item')
+    world.wait_for(lambda x: world.browser.url != old_url)
 
 
 @step('the save notification button is disabled')
@@ -298,6 +301,7 @@ def type_in_codemirror(index, text):
     g._element.send_keys(text)
     if world.is_firefox():
         world.trigger_event('div.CodeMirror', index=index, event='blur')
+    world.wait_for_ajax_complete()
 
 
 def upload_file(filename):

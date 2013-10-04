@@ -28,25 +28,12 @@ prepend_path: common/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - coffee/src/ajax_prefix.js
-    - coffee/src/logger.js
-    - js/vendor/jasmine-jquery.js
-    - js/vendor/RequireJS.js
     - js/vendor/jquery.min.js
-    - js/vendor/jquery-ui.min.js
-    - js/vendor/jquery.ui.draggable.js
-    - js/vendor/jquery.cookie.js
-    - js/vendor/json2.js
+    - js/vendor/jasmine-jquery.js
     - js/vendor/underscore-min.js
     - js/vendor/backbone-min.js
-    - js/vendor/jquery.leanModal.min.js
-    - js/vendor/CodeMirror/codemirror.js
-    - js/vendor/tiny_mce/jquery.tinymce.js
-    - js/vendor/tiny_mce/tiny_mce.js
-    - js/vendor/mathjax-MathJax-c9db6ac/MathJax.js
     - js/vendor/jquery.timeago.js
-    - js/vendor/sinon-1.7.1.js
-    - js/vendor/analytics.js
+    - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
 
 # Paths to source JavaScript files
@@ -63,10 +50,10 @@ spec_paths:
 # appearing in the test runner page.
 # Files are included by default, which means that they
 # are loaded using a <script> tag in the test runner page.
-# When loading many files, this can be slow, so 
+# When loading many files, this can be slow, so
 # exclude any files you don't need.
 #exclude_from_page:
-#    - path/to/lib/exclude/*
+#    - path/to/lib/include/exception_*.js
 
 # Regular expression used to guarantee that a *.js file
 # is included in the test runner page.

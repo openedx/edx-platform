@@ -18,13 +18,22 @@ def add_unit(step):
     user = create_studio_user(is_staff=False)
     add_course_author(user, course)
     log_into_studio()
-    css_selectors = ['a.course-link', 'div.section-item a.expand-collapse-icon', 'a.new-unit-item']
+    world.wait_for_requirejs([
+        "jquery", "js/models/course", "coffee/src/models/module",
+        "coffee/src/views/unit", "jquery.ui",
+    ])
+    world.wait_for_mathjax()
+    css_selectors = [
+        'a.course-link', 'div.section-item a.expand-collapse-icon',
+        'a.new-unit-item',
+    ]
     for selector in css_selectors:
         world.css_click(selector)
 
 
 @step(u'I add this type of single step component:$')
 def add_a_single_step_component(step):
+    world.wait_for_xmodule()
     for step_hash in step.hashes:
         component = step_hash['Component']
         assert_in(component, ['Discussion', 'Video'])
@@ -67,6 +76,7 @@ def add_a_multi_step_component(step, is_advanced, category):
     def click_link():
         link.click()
 
+    world.wait_for_xmodule()
     category = category.lower()
     for step_hash in step.hashes:
         css_selector = 'a[data-type="{}"]'.format(category)
@@ -103,7 +113,7 @@ def see_a_multi_step_component(step, category):
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
-def add_component_catetory(step, component, category):
+def add_component_category(step, component, category):
     assert category in ('single step', 'HTML', 'Problem', 'Advanced Problem')
     given_string = 'I add this type of {} component:'.format(category)
     step.given('{}\n{}\n{}'.format(given_string, '|Component|', '|{}|'.format(component)))
@@ -111,6 +121,7 @@ def add_component_catetory(step, component, category):
 
 @step(u'I delete all components$')
 def delete_all_components(step):
+    world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
     btn_css = '{} a.button.action-primary'.format(prompt_css)
@@ -118,7 +129,8 @@ def delete_all_components(step):
     count = len(world.css_find('ol.components li.component'))
     for _ in range(int(count)):
         world.css_click(delete_btn_css)
-        assert_true(world.is_css_present('{}.is-shown'.format(prompt_css)),
+        assert_true(
+            world.is_css_present('{}.is-shown'.format(prompt_css)),
             msg='Waiting for the confirmation prompt to be shown')
 
         # Pressing the button via css was not working reliably for the last component

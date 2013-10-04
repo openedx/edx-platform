@@ -35,6 +35,7 @@ from courseware.tests import factories
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 
+
 class EmptyStaffGradingService(object):
     """
     A staff grading service that does not return a problem list from get_problem_list.
@@ -47,6 +48,7 @@ class EmptyStaffGradingService(object):
         """
         return json.dumps({'success': True, 'error': 'No problems found.'})
 
+
 def make_instructor(course, user_email):
     """
     Makes a given user an instructor in a course.
@@ -54,6 +56,7 @@ def make_instructor(course, user_email):
     group_name = _course_staff_group_name(course.location)
     group = Group.objects.create(name=group_name)
     group.user_set.add(User.objects.get(email=user_email))
+
 
 class StudentProblemListMockQuery(object):
     """
@@ -97,6 +100,7 @@ class StudentProblemListMockQuery(object):
             }
         )
         return grading_status_list
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -241,6 +245,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
+            static_url=settings.STATIC_URL,
             ajax_url=location,
             track_function=None,
             get_module=None,
@@ -408,6 +413,7 @@ class TestPanel(ModuleStoreTestCase):
         response = views.student_problem_list(request, self.course.id)
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestPeerGradingFound(ModuleStoreTestCase):
     """
@@ -426,6 +432,7 @@ class TestPeerGradingFound(ModuleStoreTestCase):
 
         found, url = views.find_peer_grading_module(self.course)
         self.assertEqual(found, False)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStudentProblemList(ModuleStoreTestCase):
@@ -464,5 +471,3 @@ class TestStudentProblemList(ModuleStoreTestCase):
         self.assertEqual(len(valid_problems), 2)
         # Ensure that human names are being set properly.
         self.assertEqual(valid_problems[0]['grader_type_display_name'], "Instructor Assessment")
-
-

@@ -99,6 +99,7 @@ def click_on_sequence(step, sequence):
 
 @step(u'I should see the content of (?:sub)?section "([^"]*)"$')
 def see_section_content(step, section):
+    world.wait(0.5)
     if section == "2":
         text = 'The correct answer is Option 2'
     elif section == "1":

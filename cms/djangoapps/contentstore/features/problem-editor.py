@@ -142,8 +142,9 @@ def set_the_max_attempts(step, max_attempts_set):
     if world.is_firefox():
         world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.save_component_and_reopen(step)
-    value =  int(world.css_value('input.setting-input', index=index))
-    assert value >= 0
+    value = world.css_value('input.setting-input', index=index)
+    assert value != "", "max attempts is blank"
+    assert int(value) >= 0
 
 
 @step('Edit High Level Source is not visible')

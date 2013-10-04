@@ -20,16 +20,21 @@ def create_component_instance(step, component_button_css, category,
     if has_multiple_templates:
         click_component_from_menu(category, boilerplate, expected_css)
 
+    if category in ('video',):
+        world.wait_for_xmodule()
+
     assert_equal(
         1,
         len(world.css_find(expected_css)),
         "Component instance with css {css} was not created successfully".format(css=expected_css))
 
 
-
 @world.absorb
 def click_new_component_button(step, component_button_css):
     step.given('I have clicked the new unit button')
+    world.wait_for_requirejs(
+        ["jquery", "js/models/course", "coffee/src/models/module",
+         "coffee/src/views/unit", "jquery.ui"])
     world.css_click(component_button_css)
 
 
@@ -49,6 +54,7 @@ def click_component_from_menu(category, boilerplate, expected_css):
     elements = world.css_find(elem_css)
     assert_equal(len(elements), 1)
     world.css_click(elem_css)
+
 
 @world.absorb
 def edit_component_and_select_settings():
@@ -107,6 +113,7 @@ def verify_all_setting_entries(expected_entries):
 @world.absorb
 def save_component_and_reopen(step):
     world.css_click("a.save-button")
+    world.wait_for_ajax_complete()
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
     # they are not persisted. Refresh the browser to make sure the changes WERE persisted after Save.
     reload_the_page(step)
@@ -135,6 +142,7 @@ def get_setting_entry(label):
                 return setting
         return None
     return world.retry_on_exception(get_setting)
+
 
 @world.absorb
 def get_setting_entry_index(label):

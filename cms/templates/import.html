@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
-
-<%! from django.core.urlresolvers import reverse %>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 <%block name="title">${_("Course Import")}</%block>
 <%block name="bodyclass">is-signedin course tools view-import</%block>
 
@@ -46,11 +47,8 @@
 </%block>
 
 <%block name="jsextra">
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
-<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
-
 <script>
-(function() {
+require(["jquery", "jquery.fileupload"], function($) {
 
 var bar = $('.progress-bar');
 var fill = $('.progress-fill');
@@ -111,6 +109,6 @@ $('#fileupload').fileupload({
 
 });
 
-})();
+}); // end define()
 </script>
 </%block>

@@ -17,6 +17,8 @@ the Check/Final Check buttons with keys: custom_check and custom_final_check
 LMS: Add PaidCourseRegistration mode, where payment is required before course
 registration.
 
+Studio: Switched to loading Javascript using require.js
+
 LMS: Add split testing functionality for internal use.
 
 CMS: Add edit_course_tabs management command, providing a primitive
@@ -36,7 +38,7 @@ new post dropdown as well as response and comment area labeling.
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
 
-LMS: Experimental feature using the ICE change tracker JS pkg to allow peer 
+LMS: Experimental feature using the ICE change tracker JS pkg to allow peer
 assessors to edit the original submitter's work.
 
 LMS: Fixed a bug that caused links from forum user profile pages to
@@ -341,4 +343,4 @@ Common: Allow setting of authentication session cookie name.
 LMS: Option to email students when enroll/un-enroll them.
 
 Blades: Added WAI-ARIA markup to the video player controls. These are now fully
-accessible by screen readers. 
+accessible by screen readers.
