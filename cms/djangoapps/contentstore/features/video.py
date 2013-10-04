@@ -5,6 +5,11 @@ from terrain.steps import reload_the_page
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 
+BUTTONS = {
+    'CC': '.hide-subtitles',
+    'volume': '.volume',
+}
+
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
@@ -19,6 +24,7 @@ def i_created_a_video_component(step):
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
     _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
 
 @step('I have created a Video component with subtitles "([^"]*)"$')
 def i_created_a_video_with_subs_with_name(_step, sub_id):
@@ -127,15 +133,17 @@ def set_captions_visibility_state(_step, captions_state):
             world.browser.find_by_css('.hide-subtitles').click()
 
 
-@step('Hover over (.+) button$')
+@step('I hover over button "([^"]*)"$')
 def hover_over_button(_step, button):
-    if button.strip() == 'CC':
-        world.browser.find_by_css('.hide-subtitles').mouse_over()
-    else:
-        world.browser.find_by_css('.volume').mouse_over()
+    world.browser.find_by_css(BUTTONS[button.strip()]).mouse_over()
 
 
-@step('Captions become (.+) after (.+) seconds$')
+@step('Captions (?:are|become) (.+)$')
+def are_captions_visibile(_step, visibility_state):
+    _step.given('Captions are {0} after 0 seconds'.format(visibility_state))
+
+
+@step('Captions (?:are|become) (.+) after (.+) seconds$')
 def check_captions_visibility_state(_step, visibility_state, timeout):
     timeout = int(timeout.strip())
 
@@ -147,9 +155,4 @@ def check_captions_visibility_state(_step, visibility_state, timeout):
         assert world.css_visible('.subtitles')
     else:
         assert not world.css_visible('.subtitles')
-
-
-@step('Captions are (.+) after (.+) seconds$')
-def check_captions_visibility_state2(_step, visibility_state, timeout):
-    check_captions_visibility_state(_step, visibility_state, timeout)
 
