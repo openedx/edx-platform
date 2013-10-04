@@ -551,6 +551,7 @@ div.video {
     margin: 0;
     font-size: 14px;
     list-style: none;
+    visibility: visible;
 
     li {
       border: 0;
@@ -610,6 +611,7 @@ div.video {
     ol.subtitles {
         width: 0;
         height: 0;
+        visibility: hidden;
     }
 
     ol.subtitles.html5 {
@@ -643,6 +645,7 @@ div.video {
       ol.subtitles {
         right: -(flex-grid(4));
         width: auto;
+        visibility: hidden;
       }
     }
 
@@ -703,6 +706,7 @@ div.video {
       position: fixed;
       right: 0;
       top: 0;
+      visibility: visible;
       @include transition(none);
 
       li {
