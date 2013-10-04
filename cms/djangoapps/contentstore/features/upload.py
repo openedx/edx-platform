@@ -10,7 +10,7 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
+from nose.tools import assert_equal, assert_not_equal  # pylint: disable=E0611
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
@@ -79,7 +79,7 @@ def check_upload(_step, file_name):
 @step(u'The url for the file "([^"]*)" is valid$')
 def check_url(_step, file_name):
     r = get_file(file_name)
-    assert_equal(r.status_code , 200)
+    assert_equal(r.status_code, 200)
 
 
 @step(u'I delete the file "([^"]*)"$')
@@ -89,6 +89,8 @@ def delete_file(_step, file_name):
     delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
 
+    world.wait_for_present(".wrapper-prompt.is-shown")
+    world.wait(0.2)  # wait for css animation
     prompt_confirm_css = 'li.nav-item > a.action-primary'
     world.css_click(prompt_confirm_css)
 

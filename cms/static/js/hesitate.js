@@ -12,37 +12,41 @@
  *   NOTE: if something outside of this wants to cancel the event, invoke cachedhesitation.untrigger(null | anything);
  */
 
-CMS.HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce) {
-	this.executeOnTimeOut = executeOnTimeOut;
-	this.cancelSelector = cancelSelector;
-	this.timeoutEventId = null;
-	this.originalEvent = null;
-	this.onlyOnce = (onlyOnce === true);
-};
+define(["jquery"], function($) {
+    var HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce) {
+        this.executeOnTimeOut = executeOnTimeOut;
+        this.cancelSelector = cancelSelector;
+        this.timeoutEventId = null;
+        this.originalEvent = null;
+        this.onlyOnce = (onlyOnce === true);
+    };
 
-CMS.HesitateEvent.DURATION = 800;
+    HesitateEvent.DURATION = 800;
 
-CMS.HesitateEvent.prototype.trigger = function(event) {
-	if (event.data.timeoutEventId == null) {
-		event.data.timeoutEventId = window.setTimeout(
-				function() { event.data.fireEvent(event); },
-				CMS.HesitateEvent.DURATION);
-		event.data.originalEvent = event;
-		$(event.data.originalEvent.delegateTarget).on(event.data.cancelSelector, event.data, event.data.untrigger);
-	}
-};
+    HesitateEvent.prototype.trigger = function(event) {
+        if (event.data.timeoutEventId == null) {
+            event.data.timeoutEventId = window.setTimeout(
+                    function() { event.data.fireEvent(event); },
+                    HesitateEvent.DURATION);
+            event.data.originalEvent = event;
+            $(event.data.originalEvent.delegateTarget).on(event.data.cancelSelector, event.data, event.data.untrigger);
+        }
+    };
 
-CMS.HesitateEvent.prototype.fireEvent = function(event) {
-	event.data.timeoutEventId = null;
-	$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
-	if (event.data.onlyOnce) $(event.data.originalEvent.delegateTarget).off(event.data.originalEvent.type, event.data.trigger);
-	event.data.executeOnTimeOut(event.data.originalEvent);
-};
+    HesitateEvent.prototype.fireEvent = function(event) {
+        event.data.timeoutEventId = null;
+        $(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
+        if (event.data.onlyOnce) $(event.data.originalEvent.delegateTarget).off(event.data.originalEvent.type, event.data.trigger);
+        event.data.executeOnTimeOut(event.data.originalEvent);
+    };
 
-CMS.HesitateEvent.prototype.untrigger = function(event) {
-	if (event.data.timeoutEventId) {
-		window.clearTimeout(event.data.timeoutEventId);
-		$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
-	}
-	event.data.timeoutEventId = null;
-};
+    HesitateEvent.prototype.untrigger = function(event) {
+        if (event.data.timeoutEventId) {
+            window.clearTimeout(event.data.timeoutEventId);
+            $(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
+        }
+        event.data.timeoutEventId = null;
+    };
+
+    return HesitateEvent;
+});

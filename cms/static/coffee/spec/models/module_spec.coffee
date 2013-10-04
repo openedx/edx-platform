@@ -1,6 +1,7 @@
-describe "CMS.Models.Module", ->
-  it "set the correct URL", ->
-    expect(new CMS.Models.Module().url).toEqual("/save_item")
+define ["coffee/src/models/module"], (Module) ->
+    describe "Module", ->
+        it "set the correct URL", ->
+            expect(new Module().url).toEqual("/save_item")
 
-  it "set the correct default", ->
-    expect(new CMS.Models.Module().defaults).toEqual(undefined)
+        it "set the correct default", ->
+            expect(new Module().defaults).toEqual(undefined)

@@ -90,7 +90,10 @@ def save_item(request):
             if value is None:
                 field.delete_from(existing_item)
             else:
-                value = field.from_json(value)
+                try:
+                    value = field.from_json(value)
+                except ValueError:
+                    return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.

@@ -97,40 +97,33 @@
 
 <%block name="jsextra">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-<script src="${static.url('js/vendor/date.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
-
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        // expand the due-date area if the values are set
-        if ($('#due_date').val() != '') {
-            var $block = $('.set-date').closest('.due-date-input');
-            $('.set-date').hide();
-            $block.find('.date-setter').show();
-        }
-        // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
-        // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
-        // but we really should change that behavior.
-      if (!window.graderTypes) {
-          window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-          window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-          window.graderTypes.reset(${course_graders|n});
-      }
+require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignment_grader",
+  "js/collections/course_grader", "js/views/overview"],
+  function(doc, $, Location, OverviewAssignmentGrader, CourseGraderCollection) {
+    // expand the due-date area if the values are set
+    if ($('#due_date').val() != '') {
+      var $block = $('.set-date').closest('.due-date-input');
+      $('.set-date').hide();
+      $block.find('.date-setter').show();
+    }
+    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+    // but we really should change that behavior.
+    if (!window.graderTypes) {
+        window.graderTypes = new CourseGraderCollection();
+        window.graderTypes.course_location = new Location('${parent_location}');
+        window.graderTypes.reset(${course_graders|n});
+    }
 
-      $(".gradable-status").each(function(index, ele) {
-          var gradeView = new CMS.Views.OverviewAssignmentGrader({
-              el : ele,
-              graders : window.graderTypes,
-              hideSymbol : true
-          });
+    $(".gradable-status").each(function(index, ele) {
+      var gradeView = new OverviewAssignmentGrader({
+        el : ele,
+        graders : window.graderTypes,
+        hideSymbol : true
       });
-    })
-
+    });
+});
 </script>
 </%block>

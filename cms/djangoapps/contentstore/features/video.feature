@@ -33,4 +33,5 @@ Feature: CMS.Video Component
 
   Scenario: Video data is shown correctly
     Given I have created a video with only XML data
+    And I reload the page
     Then the correct Youtube video is shown

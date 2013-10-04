@@ -13,47 +13,38 @@
 
 <%block name="jsextra">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-  <script src="${static.url('js/vendor/date.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/html5-input-polyfills/number-polyfill.css')}" />
   <script type="text/template" id="section-name-edit-tpl">
     <%static:include path="js/section-name-edit.underscore" />
   </script>
-  <script type="text/javascript" src="${static.url('js/models/section.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/section.js')}"></script>
 
   <script type="text/javascript">
-  $(document).ready(function(){
-    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
-    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
-    // but we really should change that behavior.
-    if (!window.graderTypes) {
-      window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-      window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-      window.graderTypes.reset(${course_graders|n});
-    }
+require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/views/section_show", "js/views/overview_assignment_grader", "js/collections/course_grader", "js/views/overview", "jquery.inputnumber"],
+    function(doc, $, Location, SectionModel, SectionShowView, OverviewAssignmentGrader, CourseGraderCollection){
+  // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+  // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+  // but we really should change that behavior.
+  if (!window.graderTypes) {
+    window.graderTypes = new CourseGraderCollection();
+    window.graderTypes.course_location = new Location('${parent_location}');
+    window.graderTypes.reset(${course_graders|n});
+  }
 
-    $(".gradable-status").each(function(index, ele) {
-        var gradeView = new CMS.Views.OverviewAssignmentGrader({
-            el : ele,
-            graders : window.graderTypes
-        });
-    });
-
-    $(".section-name").each(function() {
-        var model = new CMS.Models.Section({
-            id: $(this).parent(".item-details").data("id"),
-            name: $(this).data("name")
-        });
-        new CMS.Views.SectionShow({model: model, el: this}).render();
-    })
+  $(".gradable-status").each(function(index, ele) {
+      var gradeView = new OverviewAssignmentGrader({
+          el : ele,
+          graders : window.graderTypes
+      });
   });
 
+  $(".section-name").each(function() {
+      var model = new SectionModel({
+          id: $(this).parent(".item-details").data("id"),
+          name: $(this).data("name")
+      });
+      new SectionShowView({model: model, el: this}).render();
+  })
+});
   </script>
 </%block>
 

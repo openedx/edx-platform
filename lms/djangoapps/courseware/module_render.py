@@ -377,6 +377,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     system = ModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
+        static_url=settings.STATIC_URL,
         ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
