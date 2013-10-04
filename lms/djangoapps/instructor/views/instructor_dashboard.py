@@ -23,6 +23,8 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
+from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -50,6 +52,7 @@ def instructor_dashboard_2(request, course_id):
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
         _section_analytics(course_id),
+        _section_metrics(course_id),
     ]
 
     enrollment_count = sections[0]['enrollment_count']
@@ -183,5 +186,16 @@ def _section_analytics(course_id):
         'section_display_name': _('Analytics'),
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_id}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_metrics(course_id):
+    """Provide data for the corresponding dashboard section """
+    section_data = {
+        'section_key': 'metrics',
+        'section_display_name': ('Metrics'),
+        'sub_section_display_name': get_section_display_name(course_id),
+        'section_has_problem': get_array_section_has_problem(course_id)
     }
     return section_data
