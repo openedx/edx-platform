@@ -50,8 +50,10 @@ BUTTONS = {
 
 @step('I clear fields$')
 def clear_fields(_step):
+    js_str = "$('{selector}').eq({index}).prop('disabled', false).removeClass('is-disabled')"
     for index in range(1, 4):
-        world.browser.execute_script("$('{0}').eq({1}).prop('disabled', false).removeClass('is-disabled')".format(SELECTORS['url_inputs'], index - 1))
+        js = js_str.format(selector=SELECTORS['url_inputs'], index=index - 1)
+        world.browser.execute_script(js)
         _step.given('I clear field number {0}'.format(index))
 
 
