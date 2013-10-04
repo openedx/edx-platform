@@ -56,13 +56,16 @@ SINGLE_EMAIL_FAILURE_ERRORS = (SESAddressBlacklistedError, SESIllegalAddressErro
 
 # Exceptions that, if caught, should cause the task to be re-tried.
 # These errors will be caught a limited number of times before the task fails.
-LIMITED_RETRY_ERRORS = (SMTPDataError, SMTPConnectError, SMTPServerDisconnected, AWSConnectionError)
+LIMITED_RETRY_ERRORS = (SMTPConnectError, SMTPServerDisconnected, AWSConnectionError)
 
 # Errors that indicate that a mailing task should be retried without limit.
 # An example is if email is being sent too quickly, but may succeed if sent
 # more slowly.  When caught by a task, it triggers an exponential backoff and retry.
 # Retries happen continuously until the email is sent.
-INFINITE_RETRY_ERRORS = (SESMaxSendingRateExceededError, )
+# Note that the SMTPDataErrors here are only those within the 4xx range.
+# Those not in this range (i.e. in the 5xx range) are treated as hard failures
+# and thus like SINGLE_EMAIL_FAILURE_ERRORS.
+INFINITE_RETRY_ERRORS = (SESMaxSendingRateExceededError, SMTPDataError)
 
 # Errors that are known to indicate an inability to send any more emails,
 # and should therefore not be retried.  For example, exceeding a quota for emails.
@@ -72,9 +75,12 @@ BULK_EMAIL_FAILURE_ERRORS = (SESDailyQuotaExceededError, SMTPException)
 
 def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     """
-    Generates a query set corresponding to the requested category.
+    Returns a query set of email recipients corresponding to the requested to_option category.
 
     `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
+
+    Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
+    will be properly deduped.
     """
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
@@ -130,11 +136,11 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     Returns the number of batches (workers) kicked off.
     """
     entry = InstructorTask.objects.get(pk=entry_id)
-    # get inputs to use in this task from the entry:
+    # Get inputs to use in this task from the entry.
     user_id = entry.requester.id
     task_id = entry.task_id
 
-    # perfunctory check, since expansion is made for convenience of other task
+    # Perfunctory check, since expansion is made for convenience of other task
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
         format_msg = "Course id conflict: explicit value %s does not match task value %s"
@@ -145,15 +151,13 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         email_obj = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
         # The CourseEmail object should be committed in the view function before the task
-        # is submitted and reaches this point.  It is possible to add retry behavior here,
-        # to keep trying until the object is actually committed by the view function's return,
-        # but it's cleaner to just expect to be done.
+        # is submitted and reaches this point.
         log.warning("Task %s: Failed to get CourseEmail with id %s", task_id, email_id)
         raise
 
     to_option = email_obj.to_option
 
-    # sanity check that course for email_obj matches that of the task referencing it:
+    # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
         format_msg = "Course id conflict: explicit value %s does not match email value %s"
         raise ValueError(format_msg.format(course_id, email_obj.course_id))
@@ -177,9 +181,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     task_list = []
     subtask_id_list = []
     for _ in range(num_queries):
-        # Note that if we were doing this for regrading we probably only need 'pk', and not
-        # either profile__name or email.  That's because we'll have to do
-        # a lot more work in the individual regrade for each user, but using user_id as a key.
         recipient_sublist = list(recipient_qset.order_by('pk').filter(pk__gt=last_pk)
                                  .values('profile__name', 'email', 'pk')[:settings.EMAILS_PER_QUERY])
         last_pk = recipient_sublist[-1]['pk']
@@ -196,7 +197,10 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
             subtask_id = str(uuid4())
             subtask_id_list.append(subtask_id)
             subtask_status = create_subtask_status(subtask_id)
-            # create subtask, passing args and kwargs:
+            # Create subtask, passing args and kwargs.
+            # This includes specifying the task_id to use, so we can track it.
+            # Specify the routing key as part of it, which is used by
+            # Celery to route the task request to the right worker.
             new_subtask = send_course_email.subtask(
                 (
                     entry_id,
@@ -225,7 +229,8 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     log.info("Preparing to queue %d email tasks (%d emails) for course %s, email %s, to %s",
              num_subtasks, total_num_emails, course_id, email_id, to_option)
 
-    # now group the subtasks, and start them running:
+    # Now group the subtasks, and start them running.  This allows all the subtasks
+    # in the list to be submitted at the same time.
     task_group = group(task_list)
     task_group.apply_async(routing_key=settings.BULK_EMAIL_ROUTING_KEY)
 
@@ -249,10 +254,24 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         - 'profile__name': full name of User.
         - 'email': email address of User.
         - 'pk': primary key of User model.
-      * `global_email_context`: dict containing values to be used to fill in slots in email
+      * `global_email_context`: dict containing values that are unique for this email but the same
+        for all recipients of this email.  This dict is to be used to fill in slots in email
         template.  It does not include 'name' and 'email', which will be provided by the to_list.
-      * retry_index: counter indicating how many times this task has been retried.  Set to zero
-        on initial call.
+      * `subtask_status` : dict containing values representing current status.  Keys are:
+
+        'task_id' : id of subtask.  This is used to pass task information across retries.
+        'attempted' : number of attempts -- should equal succeeded plus failed
+        'succeeded' : number that succeeded in processing
+        'skipped' : number that were not processed.
+        'failed' : number that failed during processing
+        'retried_nomax' : number of times the subtask has been retried for conditions that
+            should not have a maximum count applied
+        'retried_withmax' : number of times the subtask has been retried for conditions that
+            should have a maximum count applied
+        'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
+
+        Most values will be zero on initial call, but may be different when the task is
+        invoked as part of a retry.
 
     Sends to all addresses contained in to_list that are not also in the Optout table.
     Emails are sent multi-part, in both plain text and html.  Updates InstructorTask object
@@ -280,10 +299,10 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
                 subtask_status,
             )
     except Exception:
-        # Unexpected exception. Try to write out the failure to the entry before failing
+        # Unexpected exception. Try to write out the failure to the entry before failing.
         _, send_exception, traceback = exc_info()
         traceback_string = format_exc(traceback) if traceback is not None else ''
-        log.error("background task (%s) failed unexpectedly: %s %s", current_task_id, send_exception, traceback_string)
+        log.error("Send-email task %s: failed unexpectedly: %s %s", current_task_id, send_exception, traceback_string)
         # We got here for really unexpected reasons.  Since we don't know how far
         # the task got in emailing, we count all recipients as having failed.
         # It at least keeps the counts consistent.
@@ -293,21 +312,21 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
 
     if send_exception is None:
         # Update the InstructorTask object that is storing its progress.
-        log.info("background task (%s) succeeded", current_task_id)
+        log.info("Send-email task %s: succeeded", current_task_id)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
     elif isinstance(send_exception, RetryTaskError):
         # If retrying, record the progress made before the retry condition
         # was encountered.  Once the retry is running, it will be only processing
         # what wasn't already accomplished.
-        log.warning("background task (%s) being retried", current_task_id)
+        log.warning("Send-email task %s: being retried", current_task_id)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
         raise send_exception
     else:
-        log.error("background task (%s) failed: %s", current_task_id, send_exception)
+        log.error("Send-email task %s: failed: %s", current_task_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
         raise send_exception
 
-    log.info("background task (%s) returning status %s", current_task_id, new_subtask_status)
+    log.info("Send-email task %s: returning status %s", current_task_id, new_subtask_status)
     return new_subtask_status
 
 
@@ -324,32 +343,37 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         - 'profile__name': full name of User.
         - 'email': email address of User.
         - 'pk': primary key of User model.
-      * `global_email_context`: dict containing values to be used to fill in slots in email
+      * `global_email_context`: dict containing values that are unique for this email but the same
+        for all recipients of this email.  This dict is to be used to fill in slots in email
         template.  It does not include 'name' and 'email', which will be provided by the to_list.
+      * `subtask_status` : dict containing values representing current status.  Keys are:
+
+        'task_id' : id of subtask.  This is used to pass task information across retries.
+        'attempted' : number of attempts -- should equal succeeded plus failed
+        'succeeded' : number that succeeded in processing
+        'skipped' : number that were not processed.
+        'failed' : number that failed during processing
+        'retried_nomax' : number of times the subtask has been retried for conditions that
+            should not have a maximum count applied
+        'retried_withmax' : number of times the subtask has been retried for conditions that
+            should have a maximum count applied
+        'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
 
     Sends to all addresses contained in to_list that are not also in the Optout table.
     Emails are sent multi-part, in both plain text and html.
 
     Returns a tuple of two values:
-      * First value is a dict which represents current progress.  Keys are:
-
-        'attempted': number of emails attempted
-        'succeeded': number of emails succeeded
-        'skipped': number of emails skipped (due to optout)
-        'failed': number of emails not sent because of some failure
-
-        The dict may also contain information about retries.
+      * First value is a dict which represents current progress at the end of this call.  Keys are
+        the same as for the input subtask_status.
 
       * Second value is an exception returned by the innards of the method, indicating a fatal error.
         In this case, the number of recipients that were not sent have already been added to the
         'failed' count above.
     """
     # Get information from current task's request:
-    #task_id = _get_current_task().request.id
-    #retry_index = _get_current_task().request.retries
     task_id = subtask_status['task_id']
 
-    # If this is a second attempt, then throttle the speed at which mail is sent:
+    # If this is a second attempt due to rate-limits, then throttle the speed at which mail is sent:
     throttle = subtask_status['retried_nomax'] > 0
 
     # collect stats on progress:
@@ -423,7 +447,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                 sleep(0.2)
 
             try:
-                log.info('Email with id %s to be sent to %s', email_id, email)
+                log.debug('Email with id %s to be sent to %s', email_id, email)
 
                 with dog_stats_api.timer('course_email.single_send.time.overall', tags=[_statsd_tag(course_title)]):
                     connection.send_messages([email_msg])
@@ -431,16 +455,16 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.
                 if exc.smtp_code >= 400 and exc.smtp_code < 500:
-                    # This will cause the outer handler to catch the exception and retry the entire task
+                    # This will cause the outer handler to catch the exception and retry the entire task.
                     raise exc
                 else:
-                    # This will fall through and not retry the message, since it will be popped
+                    # This will fall through and not retry the message.
                     log.warning('Task %s: email with id %s not delivered to %s due to error %s', task_id, email_id, email, exc.smtp_error)
                     dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
                     num_error += 1
 
             except SINGLE_EMAIL_FAILURE_ERRORS as exc:
-                # This will fall through and not retry the message, since it will be popped
+                # This will fall through and not retry the message.
                 log.warning('Task %s: email with id %s not delivered to %s due to error %s', task_id, email_id, email, exc)
                 dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
                 num_error += 1
@@ -448,7 +472,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             else:
                 dog_stats_api.increment('course_email.sent', tags=[_statsd_tag(course_title)])
 
-                log.info('Email with id %s sent to %s', email_id, email)
+                log.debug('Email with id %s sent to %s', email_id, email)
                 num_sent += 1
 
             # Pop the user that was emailed off the end of the list:
@@ -465,7 +489,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             state=RETRY
         )
         return _submit_for_retry(
-            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, True
+            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, skip_retry_max=True
         )
 
     except LIMITED_RETRY_ERRORS as exc:
@@ -482,18 +506,18 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             state=RETRY
         )
         return _submit_for_retry(
-            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, False
+            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, skip_retry_max=False
         )
 
     except BULK_EMAIL_FAILURE_ERRORS as exc:
         dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
-        log.exception('Task %s: email with id %d caused send_course_email task to fail with "fatal" exception. To list: %s',
-                      task_id, email_id, [i['email'] for i in to_list])
-        num_error += len(to_list)
+        num_pending = len(to_list)
+        log.exception('Task %s: email with id %d caused send_course_email task to fail with "fatal" exception.  %d emails unsent.',
+                      task_id, email_id, num_pending)
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
-            failed=num_error,
+            failed=(num_error + num_pending),
             skipped=num_optout,
             state=FAILURE
         )
@@ -516,11 +540,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             state=RETRY
         )
         return _submit_for_retry(
-            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, False
+            entry_id, email_id, to_list, global_email_context, exc, subtask_progress, skip_retry_max=False
         )
 
     else:
-        # Successful completion is marked by an exception value of None:
+        # Successful completion is marked by an exception value of None.
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -530,7 +554,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         )
         return subtask_progress, None
     finally:
-        # clean up at the end
+        # Clean up at the end.
         connection.close()
 
 
@@ -539,27 +563,33 @@ def _get_current_task():
     return current_task
 
 
-def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current_exception, subtask_status, is_sending_rate_error):
+def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current_exception, subtask_status, skip_retry_max=False):
     """
     Helper function to requeue a task for retry, using the new version of arguments provided.
 
     Inputs are the same as for running a task, plus two extra indicating the state at the time of retry.
     These include the `current_exception` that the task encountered that is causing the retry attempt,
-    and the `subtask_status` that is to be returned.
+    and the `subtask_status` that is to be returned.  A third extra argument `skip_retry_max`
+    indicates whether the current retry should be subject to a maximum test.
 
     Returns a tuple of two values:
       * First value is a dict which represents current progress.  Keys are:
 
-        'attempted': number of emails attempted
-        'succeeded': number of emails succeeded
-        'skipped': number of emails skipped (due to optout)
-        'failed': number of emails not sent because of some failure
+        'task_id' : id of subtask.  This is used to pass task information across retries.
+        'attempted' : number of attempts -- should equal succeeded plus failed
+        'succeeded' : number that succeeded in processing
+        'skipped' : number that were not processed.
+        'failed' : number that failed during processing
+        'retried_nomax' : number of times the subtask has been retried for conditions that
+            should not have a maximum count applied
+        'retried_withmax' : number of times the subtask has been retried for conditions that
+            should have a maximum count applied
+        'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
 
       * Second value is an exception returned by the innards of the method.  If the retry was
         successfully submitted, this value will be the RetryTaskError that retry() returns.
         Otherwise, it (ought to be) the current_exception passed in.
     """
-    # task_id = _get_current_task().request.id
     task_id = subtask_status['task_id']
     log.info("Task %s: Successfully sent to %s users; failed to send to %s users (and skipped %s users)",
              task_id, subtask_status['succeeded'], subtask_status['failed'], subtask_status['skipped'])
@@ -567,7 +597,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
     # Calculate time until we retry this task (in seconds):
     max_retries = _get_current_task().max_retries + subtask_status['retried_nomax']
     base_delay = _get_current_task().default_retry_delay
-    if is_sending_rate_error:
+    if skip_retry_max:
         retry_index = subtask_status['retried_nomax']
         exp = min(retry_index, 5)
         countdown = ((2 ** exp) * base_delay) * random.uniform(.5, 1.25)

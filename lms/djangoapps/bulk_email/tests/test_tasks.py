@@ -7,9 +7,17 @@ paths actually work.
 """
 import json
 from uuid import uuid4
-from itertools import cycle
+from itertools import cycle, chain, repeat
 from mock import patch, Mock
-from smtplib import SMTPDataError, SMTPServerDisconnected
+from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
+from boto.ses.exceptions import (
+    SESDailyQuotaExceededError,
+    SESMaxSendingRateExceededError,
+    SESAddressBlacklistedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+)
+from boto.exception import AWSConnectionError
 
 from celery.states import SUCCESS, FAILURE
 
@@ -17,7 +25,7 @@ from celery.states import SUCCESS, FAILURE
 from django.conf import settings
 from django.core.management import call_command
 
-from bulk_email.models import CourseEmail, SEND_TO_ALL
+from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
 
 # from instructor_task.tests.test_tasks import TestInstructorTasks
 from instructor_task.tasks import send_bulk_course_email
@@ -62,7 +70,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         )
         return instructor_task
 
-    def _run_task_with_mock_celery(self, task_class, entry_id, task_id, expected_failure_message=None):
+    def _run_task_with_mock_celery(self, task_class, entry_id, task_id):
         """Submit a task and mock how celery provides a current_task."""
         self.current_task = Mock()
         self.current_task.max_retries = settings.BULK_EMAIL_MAX_RETRIES
@@ -138,39 +146,70 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
 
     def test_successful(self):
-        num_students = settings.EMAILS_PER_TASK - 1
-        self._create_students(num_students)
-        # we also send email to the instructor:
-        num_emails = num_students + 1
+        # Select number of emails to fit into a single subtask.
+        num_emails = settings.EMAILS_PER_TASK
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
 
-    def test_smtp_blacklisted_user(self):
-        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-        num_students = settings.EMAILS_PER_TASK - 1
-        self._create_students(num_students)
-        # we also send email to the instructor:
-        num_emails = num_students + 1
+    def test_skipped(self):
+        # Select number of emails to fit into a single subtask.
+        num_emails = settings.EMAILS_PER_TASK
+        # We also send email to the instructor:
+        students = self._create_students(num_emails - 1)
+        # have every fourth student optout:
+        expected_skipped = int((num_emails + 3) / 4.0)
+        expected_succeeds = num_emails - expected_skipped
+        for index in range(0, num_emails, 4):
+            Optout.objects.create(user=students[index], course_id=self.course.id)
+        # mark some students as opting out
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, skipped=expected_skipped)
+
+    def _test_email_address_failures(self, exception):
+        """Test that celery handles bad address errors by failing and not retrying."""
+        # Select number of emails to fit into a single subtask.
+        num_emails = settings.EMAILS_PER_TASK
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
         expected_fails = int((num_emails + 3) / 4.0)
         expected_succeeds = num_emails - expected_fails
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
-            # have every fourth email fail due to blacklisting:
-            get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
-                                                                     None, None, None])
+            # have every fourth email fail due to some address failure:
+            get_conn.return_value.send_messages.side_effect = cycle([exception, None, None, None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, failed=expected_fails)
 
-    def test_retry_after_limited_retry_error(self):
-        # Test that celery handles connection failures by retrying.
-        num_students = 1
-        self._create_students(num_students)
-        # we also send email to the instructor:
-        num_emails = num_students + 1
+    def test_smtp_blacklisted_user(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SMTPDataError(554, "Email address is blacklisted"))
+
+    def test_ses_blacklisted_user(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SESAddressBlacklistedError(554, "Email address is blacklisted"))
+
+    def test_ses_illegal_address(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SESIllegalAddressError(554, "Email address is illegal"))
+
+    def test_ses_local_address_character_error(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SESLocalAddressCharacterError(554, "Email address contains a bad character"))
+
+    def _test_retry_after_limited_retry_error(self, exception):
+        """Test that celery handles connection failures by retrying."""
+        # If we want the batch to succeed, we need to send fewer emails
+        # than the max retries, so that the max is not triggered.
+        num_emails = settings.BULK_EMAIL_MAX_RETRIES
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
         expected_fails = 0
         expected_succeeds = num_emails
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
-            # have every other mail attempt fail due to disconnection:
-            get_conn.return_value.send_messages.side_effect = cycle([SMTPServerDisconnected(425, "Disconnecting"), None])
+            # Have every other mail attempt fail due to disconnection.
+            get_conn.return_value.send_messages.side_effect = cycle([exception, None])
             self._test_run_with_task(
                 send_bulk_course_email,
                 'emailed',
@@ -180,17 +219,18 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
                 retried_withmax=num_emails
             )
 
-    def test_max_retry_limit_causes_failure(self):
-        # Test that celery can hit a maximum number of retries.
-        num_students = 1
-        self._create_students(num_students)
-        # we also send email to the instructor:
-        num_emails = num_students + 1
+    def _test_max_retry_limit_causes_failure(self, exception):
+        """Test that celery can hit a maximum number of retries."""
+        # Doesn't really matter how many recipients, since we expect
+        # to fail on the first.
+        num_emails = 10
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
         expected_fails = num_emails
         expected_succeeds = 0
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # always fail to connect, triggering repeated retries until limit is hit:
-            get_conn.return_value.send_messages.side_effect = cycle([SMTPServerDisconnected(425, "Disconnecting")])
+            get_conn.return_value.send_messages.side_effect = cycle([exception])
             self._test_run_with_task(
                 send_bulk_course_email,
                 'emailed',
@@ -199,3 +239,86 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
                 failed=expected_fails,
                 retried_withmax=(settings.BULK_EMAIL_MAX_RETRIES + 1)
             )
+
+    def test_retry_after_smtp_disconnect(self):
+        self._test_retry_after_limited_retry_error(SMTPServerDisconnected(425, "Disconnecting"))
+
+    def test_max_retry_after_smtp_disconnect(self):
+        self._test_max_retry_limit_causes_failure(SMTPServerDisconnected(425, "Disconnecting"))
+
+    def test_retry_after_smtp_connect_error(self):
+        self._test_retry_after_limited_retry_error(SMTPConnectError(424, "Bad Connection"))
+
+    def test_max_retry_after_smtp_connect_error(self):
+        self._test_max_retry_limit_causes_failure(SMTPConnectError(424, "Bad Connection"))
+
+    def test_retry_after_aws_connect_error(self):
+        self._test_retry_after_limited_retry_error(AWSConnectionError("Unable to provide secure connection through proxy"))
+
+    def test_max_retry_after_aws_connect_error(self):
+        self._test_max_retry_limit_causes_failure(AWSConnectionError("Unable to provide secure connection through proxy"))
+
+    def test_retry_after_general_error(self):
+        self._test_retry_after_limited_retry_error(Exception("This is some random exception."))
+
+    def test_max_retry_after_general_error(self):
+        self._test_max_retry_limit_causes_failure(Exception("This is some random exception."))
+
+    def _test_retry_after_unlimited_retry_error(self, exception):
+        """Test that celery handles throttling failures by retrying."""
+        num_emails = 8
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
+        expected_fails = 0
+        expected_succeeds = num_emails
+        # Note that because celery in eager mode will call retries synchronously,
+        # each retry will increase the stack depth.  It turns out that there is a
+        # maximum depth at which a RuntimeError is raised ("maximum recursion depth
+        # exceeded").  The maximum recursion depth is 90, so
+        # num_emails * expected_retries < 90.
+        expected_retries = 10
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            # Cycle through N throttling errors followed by a success.
+            get_conn.return_value.send_messages.side_effect = cycle(
+                chain(repeat(exception, expected_retries), [None])
+            )
+            self._test_run_with_task(
+                send_bulk_course_email,
+                'emailed',
+                num_emails,
+                expected_succeeds,
+                failed=expected_fails,
+                retried_nomax=(expected_retries * num_emails)
+            )
+
+    def test_retry_after_smtp_throttling_error(self):
+        self._test_retry_after_unlimited_retry_error(SMTPDataError(455, "Throttling: Sending rate exceeded"))
+
+    def test_retry_after_ses_throttling_error(self):
+        self._test_retry_after_unlimited_retry_error(SESMaxSendingRateExceededError(455, "Throttling: Sending rate exceeded"))
+
+    def _test_immediate_failure(self, exception):
+        """Test that celery can hit a maximum number of retries."""
+        # Doesn't really matter how many recipients, since we expect
+        # to fail on the first.
+        num_emails = 10
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
+        expected_fails = num_emails
+        expected_succeeds = 0
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            # always fail to connect, triggering repeated retries until limit is hit:
+            get_conn.return_value.send_messages.side_effect = cycle([exception])
+            self._test_run_with_task(
+                send_bulk_course_email,
+                'emailed',
+                num_emails,
+                expected_succeeds,
+                failed=expected_fails,
+            )
+
+    def test_failure_on_unhandled_smtp(self):
+        self._test_immediate_failure(SMTPAuthenticationError(403, "That password doesn't work!"))
+
+    def test_failure_on_ses_quota_exceeded(self):
+        self._test_immediate_failure(SESDailyQuotaExceededError(403, "You're done for the day!"))
