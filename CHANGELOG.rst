@@ -6,6 +6,8 @@ in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
 
+LMS: Refactor and clean student dashboard templates.
+
 LMS: Fix issue with CourseMode expiration dates
 
 CMS: Add text_customization Dict to advanced settings which can support
