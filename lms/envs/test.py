@@ -51,7 +51,6 @@ _report_dir = REPO_ROOT / 'reports' / _system
 _report_dir.makedirs_p()
 
 NOSE_ARGS = [
-    '--tests', PROJECT_ROOT / 'djangoapps', COMMON_ROOT / 'djangoapps',
     '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
     '--xunit-file', _report_dir / 'nosetests.xml',
 ]
