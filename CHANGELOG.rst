@@ -6,6 +6,8 @@ in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
 
+LMS: Refactor and clean student dashboard templates.
+
 LMS: Fix issue with CourseMode expiration dates
 
 LMS: Add PaidCourseRegistration mode, where payment is required before course registration.
