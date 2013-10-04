@@ -141,14 +141,6 @@ def click_button_index(_step, button_type, index):
         assert False  # not implemented
 
 
-@step('I run ipdb')
-def run_ipdb(_step):
-    """Run ipdb as step for easy debugging"""
-    import ipdb
-    ipdb.set_trace()
-    assert True
-
-
 @step('I remove (.*)transcripts id from store')
 def remove_transcripts_from_store(_step, subs_id):
     """Remove from store, if transcripts content exists."""
