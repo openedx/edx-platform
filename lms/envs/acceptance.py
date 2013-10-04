@@ -98,6 +98,9 @@ MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
+# Don't actually send any requests to Software Secure for student identity
+# verification.
+MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using

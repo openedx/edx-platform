@@ -14,6 +14,7 @@ from mock import patch, Mock, ANY
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -98,6 +99,7 @@ class TestReverifyView(TestCase):
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
 
+    @patch.dict(settings.MITX_FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_reverify_post_success(self):
         url = reverse('verify_student_reverify')
         response = self.client.post(url, {'face_image': ',',

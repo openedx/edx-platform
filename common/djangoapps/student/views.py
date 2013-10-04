@@ -47,6 +47,8 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 
+from verify_student.models import SoftwareSecurePhotoVerification
+
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
@@ -334,6 +336,8 @@ def dashboard(request):
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
+    # Verification Attempts
+    verification_status = SoftwareSecurePhotoVerification.user_status(user)
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -351,6 +355,8 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
+               'verification_status': verification_status[0],
+               'verification_msg': verification_status[1],
                }
 
     return render_to_response('dashboard.html', context)
