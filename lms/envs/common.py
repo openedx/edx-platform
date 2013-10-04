@@ -169,7 +169,7 @@ MITX_FEATURES = {
     'ENABLE_CHAT': False,
 
     # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES' : False,
+    'MULTIPLE_ENROLLMENT_ROLES': False,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
@@ -906,7 +906,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy_edx',
 
     # Verified Certificates
-    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
 
@@ -939,7 +939,7 @@ def enable_theme(theme_name):
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
-    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
 ########################## CLASS DASHBOARD ########################

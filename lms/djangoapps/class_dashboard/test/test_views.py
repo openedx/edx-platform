@@ -5,11 +5,16 @@ from django.test.client import RequestFactory
 from django.utils import simplejson
 
 from class_dashboard import views
+from student.tests.factories import AdminFactory
 
 
 class TestViews(TestCase):
 
     def setUp(self):
+        
+        self.instructor = AdminFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+        
         self.request_factory = RequestFactory()
         self.request = self.request_factory.get('')
         self.request.user = None

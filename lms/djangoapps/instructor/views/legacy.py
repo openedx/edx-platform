@@ -799,7 +799,8 @@ def instructor_dashboard(request, course_id):
     # Metrics
 
     metrics_results = {}
-    if settings.MITX_FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
+#    if settings.MITX_FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
+    if idash_mode == 'Metrics':
 #        metrics_results['attempts_timestamp'] = dashboard_data.get_last_populate(course_id, "studentmoduleexpand")
         metrics_results['section_display_name'] = dashboard_data.get_section_display_name(course_id)
         metrics_results['section_has_problem'] = dashboard_data.get_array_section_has_problem(course_id)
