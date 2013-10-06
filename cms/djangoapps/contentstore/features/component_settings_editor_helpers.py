@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world
-from nose.tools import assert_equal  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 
 
@@ -12,9 +12,13 @@ def create_component_instance(step, component_button_css, category,
                               has_multiple_templates=True):
 
     click_new_component_button(step, component_button_css)
+
     if category in ('problem', 'html'):
+
         def animation_done(_driver):
-            return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
+            script = "$('div.new-component').css('display')"
+            return world.browser.evaluate_script(script) == 'none'
+
         world.wait_for(animation_done)
 
     if has_multiple_templates:
@@ -23,10 +27,7 @@ def create_component_instance(step, component_button_css, category,
     if category in ('video',):
         world.wait_for_xmodule()
 
-    assert_equal(
-        1,
-        len(world.css_find(expected_css)),
-        "Component instance with css {css} was not created successfully".format(css=expected_css))
+    assert_true(world.is_css_present(expected_css))
 
 
 @world.absorb
@@ -34,7 +35,8 @@ def click_new_component_button(step, component_button_css):
     step.given('I have clicked the new unit button')
     world.wait_for_requirejs(
         ["jquery", "js/models/course", "coffee/src/models/module",
-         "coffee/src/views/unit", "jquery.ui"])
+         "coffee/src/views/unit", "jquery.ui"]
+    )
     world.css_click(component_button_css)
 
 
