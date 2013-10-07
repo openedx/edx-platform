@@ -28,11 +28,13 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
-from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
+from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
+from xmodule.fields import IsoTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
 log = logging.getLogger(__name__)
+
 
 
 def parse_time_from_str_to_float(str_time):
@@ -61,16 +63,6 @@ def parse_time_from_float_to_str(s):
         return "00:00:00"
     else:
         return str(datetime.timedelta(seconds=s))
-
-
-class StringThatWasFloat(String):
-
-    def from_json(self, value):
-        if isinstance(value, float):
-            return parse_time_from_float_to_str(value)
-        else:
-            return super(StringThatWasFloat, self).from_json(value)
-
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
@@ -116,13 +108,13 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-    start_time = StringThatWasFloat(
+    start_time = IsoTime(
         help="Start time for the video.",
         display_name="Start Time",
         scope=Scope.settings,
         default="00:00:00"
     )
-    end_time = StringThatWasFloat(
+    end_time = IsoTime(
         help="End time for the video.",
         display_name="End Time",
         scope=Scope.settings,

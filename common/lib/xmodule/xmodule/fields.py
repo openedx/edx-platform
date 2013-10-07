@@ -2,7 +2,7 @@ import time
 import logging
 import re
 
-from xblock.fields import Field
+from xblock.fields import Field, String
 import datetime
 import dateutil.parser
 
@@ -116,3 +116,16 @@ class Timedelta(Field):
             if cur_value > 0:
                 values.append("%d %s" % (cur_value, attr))
         return ' '.join(values)
+
+
+class IsoTime(String):
+
+    def from_json(self, value):
+        if isinstance(value, float):
+            if not value:
+                return "00:00:00"
+            else:
+                return str(datetime.timedelta(seconds=value))
+        else:
+            return super(IsoTime, self).from_json(value)
+
