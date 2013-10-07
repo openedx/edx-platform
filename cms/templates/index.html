@@ -61,7 +61,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <h2 class="title">${_("Welcome, {0}!".format(user.username))}</h2>
+        <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
 
         %if len(courses) > 0:
         <div class="copy">
