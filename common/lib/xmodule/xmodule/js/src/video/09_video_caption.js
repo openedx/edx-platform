@@ -170,15 +170,22 @@ function () {
         } else if (!this.config.autohideHtml5) {
             this.videoCaption.subtitlesEl.on({
                 keydown: this.videoCaption.autoShowCaptions,
+                focus: this.videoCaption.autoShowCaptions,
 
                 // Moving slider on subtitles is not a mouse move, but captions
                 // should not be auto-hidden.
-                scroll: this.videoCaption.autoShowCaptions
+                scroll: this.videoCaption.autoShowCaptions,
+
+                mouseout: this.videoCaption.autoHideCaptions,
+                blur: this.videoCaption.autoHideCaptions
             });
 
             this.videoCaption.hideSubtitlesEl.on({
                 mousemove: this.videoCaption.autoShowCaptions,
-                keydown: this.videoCaption.autoShowCaptions
+                focus: this.videoCaption.autoShowCaptions,
+
+                mouseout: this.videoCaption.autoHideCaptions,
+                blur: this.videoCaption.autoHideCaptions
             });
         }
     }
@@ -272,10 +279,12 @@ function () {
                 clearTimeout(this.captionHideTimeout);
             }
 
-            this.captionHideTimeout = setTimeout(
-                this.videoCaption.autoHideCaptions,
-                this.videoCaption.fadeOutTimeout
-            );
+            if (this.config.autohideHtml5) {
+                this.captionHideTimeout = setTimeout(
+                    this.videoCaption.autoHideCaptions,
+                    this.videoCaption.fadeOutTimeout
+                );
+            }
 
             this.captionsShowLock = false;
         }
@@ -502,6 +511,8 @@ function () {
         // forward out of the captions.
         if (captionIndex === 0 ||
             captionIndex === this.videoCaption.captions.length-1) {
+            this.videoCaption.autoHideCaptions();
+
             this.videoCaption.autoScrolling = true;
         }
     }
