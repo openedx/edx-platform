@@ -165,7 +165,7 @@ def download_transcripts(request):
         sjson_transcripts = contentstore().find(content_location)
         log.debug("Downloading subs for {} id".format(subs_id))
         str_subs = generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed=1.0)
-        if str_subs is None:
+        if not str_subs:
             log.error('generate_srt_from_sjson produces no subtitles')
             raise Http404
         response = HttpResponse(str_subs, content_type='application/x-subrip')

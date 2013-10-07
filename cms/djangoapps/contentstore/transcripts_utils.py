@@ -253,12 +253,13 @@ def generate_srt_from_sjson(sjson_subs, speed):
     :returns: "srt" subs.
     """
 
+    output = ''
+
     equal_len = len(sjson_subs['start']) == len(sjson_subs['end']) == len(sjson_subs['text'])
     if not equal_len:
-        return None
+        return output
 
     sjson_speed_1 = generate_subs(speed, 1, sjson_subs)
-    output = StringIO.StringIO()
 
     for i in range(len(sjson_speed_1['start'])):
         item = SubRipItem(
@@ -266,12 +267,9 @@ def generate_srt_from_sjson(sjson_subs, speed):
             start=SubRipTime(milliseconds=sjson_speed_1['start'][i]),
             end=SubRipTime(milliseconds=sjson_speed_1['end'][i]),
             text=sjson_speed_1['text'][i])
-        output.write(unicode(item))
-        output.write('\n')
-
-    output.seek(0)
-
-    return output.read()
+        output += (unicode(item))
+        output += '\n'
+    return output
 
 
 def save_module(item):

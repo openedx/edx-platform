@@ -287,7 +287,7 @@ class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
             ]
         }
         srt_subs = transcripts_utils.generate_srt_from_sjson(sjson_subs, 1)
-        self.assertIsNotNone(srt_subs)
+        self.assertTrue(srt_subs)
         expected_subs = [
             '00:00:00,100 --> 00:00:00,200\nsubs #1',
             '00:00:00,200 --> 00:00:00,240\nsubs #2',
@@ -312,7 +312,7 @@ class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
             ]
         }
         srt_subs = transcripts_utils.generate_srt_from_sjson(sjson_subs, 0.5)
-        self.assertIsNotNone(srt_subs)
+        self.assertTrue(srt_subs)
         expected_subs = [
             '00:00:00,050 --> 00:00:00,100\nsubs #1',
             '00:00:00,100 --> 00:00:00,120\nsubs #2',
@@ -336,7 +336,7 @@ class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
             ]
         }
         srt_subs = transcripts_utils.generate_srt_from_sjson(sjson_subs, 2)
-        self.assertIsNotNone(srt_subs)
+        self.assertTrue(srt_subs)
 
 
         expected_subs = [
@@ -359,4 +359,4 @@ class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
             ]
         }
         srt_subs = transcripts_utils.generate_srt_from_sjson(sjson_subs, 1)
-        self.assertIsNone(srt_subs)
+        self.assertFalse(srt_subs)
