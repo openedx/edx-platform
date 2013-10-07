@@ -45,6 +45,7 @@ def log_and_return_response(response, message, status_code=400):
     response['status'] = message
     return JsonResponse(response, status_code)
 
+
 def upload_transcripts(request):
     """
     Upload transcripts for current module.
@@ -82,7 +83,6 @@ def upload_transcripts(request):
     if '.' not in source_subs_filename:
         return log_and_return_response(response, "Undefined file extension.")
 
-
     basename = os.path.basename(source_subs_filename)
     source_subs_name = os.path.splitext(basename)[0]
     source_subs_ext = os.path.splitext(basename)[1][1:]
@@ -97,7 +97,7 @@ def upload_transcripts(request):
         raise PermissionDenied()
 
     if item.category != 'video':
-        return log_and_return_response(response, 'Yranscripts are supported only for "video" modules.')
+        return log_and_return_response(response, 'Transcripts are supported only for "video" modules.')
 
     # Allow upload only if any video link is presented
     if video_list:
@@ -126,7 +126,8 @@ def upload_transcripts(request):
                 item = save_module(item)
                 response['subs'] = item.sub
                 response['status'] = 'Success'
-
+        else:
+            return log_and_return_response(response, 'Generation of subtitles from file is failed.')
     else:
         return log_and_return_response(response, 'Empty video sources.')
 
