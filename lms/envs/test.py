@@ -241,6 +241,9 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
+########################## CLASS DASHBOARD ########################
+MITX_FEATURES['CLASS_DASHBOARD'] = True
+
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:
