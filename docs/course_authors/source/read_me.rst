@@ -1,11 +1,18 @@
 *******
 Read Me
 *******
- 
-This version of the edX "Getting Started with Studio" help and pdf documentation is created using Sphinx 1.2b1 and LaTex. You, the user community, can help update and revise this documentation project in GitHub at ::
 
-  edx\edX-platform\userdocs\source
+The edX "Getting Started with Studio" help and PDF documentation is created
+using Sphinx_ and LaTeX_. You, the user community, can help update and revise
+this documentation project on GitHub::
 
-with a pull request that will need approval from an engineering contact at edX. 
+  https://github.com/edx/edx-platform/tree/master/docs/course_authors/source
 
-The edX contact for this documenation is mchang@edx.org 
+To suggest a revision, fork the project, make changes in your fork, and submit
+a pull request back to the original project: this is known as the `GitHub Flow`_.
+All pull requests will need approval from an engineering contact at edX. For
+more information, contact edX at docs@edx.org.
+
+.. _Sphinx: http://sphinx-doc.org/
+.. _LaTeX: http://www.latex-project.org/
+.. _`GitHub Flow`: https://github.com/blog/1557-github-flow-in-the-browser
