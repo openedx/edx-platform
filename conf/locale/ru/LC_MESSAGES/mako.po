@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-01 19:32+0400\n"
+"POT-Creation-Date: 2013-10-07 19:40+0400\n"
 "PO-Revision-Date: 2013-10-07 18:33+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -4095,6 +4095,10 @@ msgstr ""
 "Зарегистрируйтесь для бесплатного аудита данного курса и отслеживания вашего "
 "прогресса."
 
+#: lms/djangoapps/bulk_email/tasks.py:147
+msgid "\"{title}\" Course Staff <{email}>"
+msgstr ""
+
 #: lms/djangoapps/courseware/features/video.py:114 lms/templates/video.html:39
 msgid "ERROR: No playable video sources found!"
 msgstr ""
@@ -4138,6 +4142,315 @@ msgstr "Загрузка данных"
 #: lms/templates/courseware/instructor_dashboard.html:136
 msgid "Analytics"
 msgstr "Аналитика"
+
+#: lms/djangoapps/instructor/views/legacy.py:111
+msgid "Course Statistics At A Glance"
+msgstr "Обзор статистики курса"
+
+#: lms/djangoapps/instructor/views/legacy.py:202
+msgid "Couldn't find student with that email or username."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:240
+#, fuzzy
+msgid "List of students enrolled in {0}"
+msgstr "Последний день регистрации студентов"
+
+#: lms/djangoapps/instructor/views/legacy.py:246
+msgid "Summary Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:253
+msgid "Raw Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:281
+msgid "Failed to create a background task for rescoring \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:285
+msgid ""
+"Failed to create a background task for rescoring \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:288
+msgid "Failed to create a background task for rescoring \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:296
+msgid "Failed to create a background task for resetting \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:301
+msgid ""
+"Failed to create a background task for resetting \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:304
+msgid "Failed to create a background task for resetting \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:345
+msgid "Found module.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:347
+msgid "Couldn't find module with that urlname: {0}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:358
+#, fuzzy
+msgid "Deleted student module state for {0}!"
+msgstr "Удалить состояние студента для модуля"
+
+#: lms/djangoapps/instructor/views/legacy.py:371
+msgid "Failed to delete module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:394
+msgid "Module state successfully reset!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:396
+msgid "Couldn't reset module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:406
+msgid ""
+"Failed to create a background task for rescoring \"{key}\" for student {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:410
+msgid "Failed to create a background task for rescoring \"{key}\": {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:424
+msgid "Progress page for username: {1} with email address: {2}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:438
+#, fuzzy
+msgid "Assignment Name"
+msgstr "Название задания:"
+
+#: lms/djangoapps/instructor/views/legacy.py:462
+#, fuzzy
+msgid "Please enter an assignment name"
+msgstr "Введите целое число."
+
+#: lms/djangoapps/instructor/views/legacy.py:466
+#, fuzzy, python-format
+msgid "Invalid assignment name '%s'"
+msgstr "Название задания:"
+
+#: lms/djangoapps/instructor/views/legacy.py:469
+#: lms/djangoapps/instructor/views/legacy.py:1092
+#, fuzzy
+msgid "External email"
+msgstr "Отослать письмо"
+
+#: lms/djangoapps/instructor/views/legacy.py:471
+#, fuzzy, python-format
+msgid "Grades for assignment \"%s\""
+msgstr "Вывести оценки для задания"
+
+#: lms/djangoapps/instructor/views/legacy.py:490
+msgid "Staff group = {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:491
+msgid "List of Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:496
+#, fuzzy
+msgid "Instructor group = {0}"
+msgstr "Инструктор по труду"
+
+#: lms/djangoapps/instructor/views/legacy.py:499
+#: lms/djangoapps/instructor/views/legacy.py:925
+#: lms/djangoapps/instructor/views/legacy.py:999
+#: lms/djangoapps/instructor/views/legacy.py:1092
+#, fuzzy
+msgid "Username"
+msgstr "Публичное имя пользователя"
+
+#: lms/djangoapps/instructor/views/legacy.py:499
+#: lms/djangoapps/instructor/views/legacy.py:925
+#: lms/djangoapps/instructor/views/legacy.py:999
+#, fuzzy
+msgid "Full name"
+msgstr "Полное имя"
+
+#: lms/djangoapps/instructor/views/legacy.py:501
+#, fuzzy
+msgid "List of Instructors in course {0}"
+msgstr "Инструкторы курса"
+
+#: lms/djangoapps/instructor/views/legacy.py:514
+#: lms/djangoapps/instructor/views/legacy.py:533
+#: lms/djangoapps/instructor/views/legacy.py:955
+msgid "Error: unknown username \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:518
+msgid "Added {user} to instructor group = {group}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:537
+msgid "Removed {user} from instructor group = {group}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:559
+#, python-format
+msgid "Student profile data for course %s"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:573
+#, python-format
+msgid "Found %d records to dump "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:575
+msgid "Couldn't find module with that urlname."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:582
+#, fuzzy, python-format
+msgid "Student state for problem %s"
+msgstr "Удалить состояние студента для модуля"
+
+#: lms/djangoapps/instructor/views/legacy.py:599
+msgid "Beta test group = {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:600
+#, fuzzy
+msgid "List of beta_testers"
+msgstr "Список бета-тестеров"
+
+#: lms/djangoapps/instructor/views/legacy.py:738
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"public classes (~10k), it may take 1-2 hours to send all emails."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:740
+msgid "Your email was successfully queued for sending."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:872
+msgid "No remote gradebook defined in course metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:877
+msgid "No remote gradebook url defined in settings.MITX_FEATURES"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:882
+msgid "No gradebook name defined in course remote_gradebook metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:894
+#, python-format
+msgid "Failed to communicate with gradebook server at %s<br/>"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:895
+#, fuzzy, python-format
+msgid "Error: %s"
+msgstr "Ошибка:"
+
+#: lms/djangoapps/instructor/views/legacy.py:906
+#, python-format
+msgid "Remote gradebook response for %s"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:925
+msgid "Roles"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:926
+msgid "List of Forum {name}s in course {id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:931
+#: lms/djangoapps/instructor/views/legacy.py:959
+msgid "Error: unknown rolename \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:967
+msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:970
+msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:973
+msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:976
+msgid ""
+"Error: user \"{0}\" should first be added as staff before adding as a forum "
+"administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:979
+msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1001
+msgid "{0} in course {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1018
+msgid "Error: unknown username or email \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1024
+msgid "{action} {user} {prep} {title} group = {group}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1092
+msgid "ID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/templates/dashboard.html:172 lms/templates/register-shib.html:139
+#: lms/templates/register.html:161
+#: lms/templates/verify_student/_modal_editname.html:19
+#: lms/templates/verify_student/face_upload.html:309
+msgid "Full Name"
+msgstr "Полное имя"
+
+#: lms/djangoapps/instructor/views/legacy.py:1092
+#, fuzzy
+msgid "edX email"
+msgstr "Отослать письмо"
+
+#: lms/djangoapps/instructor/views/legacy.py:1275
+#, fuzzy
+msgid "Enrollment of students"
+msgstr "Зачислить несколько студентов"
+
+#: lms/djangoapps/instructor/views/legacy.py:1348
+#, fuzzy
+msgid "Un-enrollment of students"
+msgstr "Отчислить несколько студентов"
+
+#: lms/djangoapps/instructor/views/legacy.py:1534
+msgid ""
+"Failed to find any background tasks for course \"{course}\", module "
+"\"{problem}\" and student \"{student}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1537
+msgid ""
+"Failed to find any background tasks for course \"{course}\" and module "
+"\"{problem}\"."
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py:22
 msgid "AI Assessment"
@@ -4749,18 +5062,11 @@ msgstr ""
 "Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
 "ссылке указанной в письме для смены почтового адреса."
 
-#: lms/templates/dashboard.html:170 lms/templates/register-shib.html:139
-#: lms/templates/register.html:161
-#: lms/templates/verify_student/_modal_editname.html:19
-#: lms/templates/verify_student/face_upload.html:309
-msgid "Full Name"
-msgstr "Полное имя"
-
-#: lms/templates/dashboard.html:170 lms/templates/dashboard.html:175
+#: lms/templates/dashboard.html:172 lms/templates/dashboard.html:177
 msgid "edit"
 msgstr "изменить"
 
-#: lms/templates/dashboard.html:173
+#: lms/templates/dashboard.html:175
 #: lms/templates/courseware/instructor_dashboard.html:133
 #: lms/templates/university_profile/edge.html:175
 #: lms/templates/university_profile/edge.html.BACKUP.21781.html:124
@@ -4770,102 +5076,102 @@ msgstr "изменить"
 msgid "Email"
 msgstr "Эл. почта"
 
-#: lms/templates/dashboard.html:182 lms/templates/dashboard.html:185
+#: lms/templates/dashboard.html:184 lms/templates/dashboard.html:187
 msgid "Reset Password"
 msgstr "Восстановить/изменить пароль"
 
-#: lms/templates/dashboard.html:197
+#: lms/templates/dashboard.html:199
 msgid "Current Courses"
 msgstr "Текущие курсы"
 
-#: lms/templates/dashboard.html:214 lms/templates/dashboard.html:218
+#: lms/templates/dashboard.html:216 lms/templates/dashboard.html:220
 msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} Изображение на обложке"
 
-#: lms/templates/dashboard.html:224
+#: lms/templates/dashboard.html:226
 msgid "Enrolled as: "
 msgstr "Зачислен как:"
 
-#: lms/templates/dashboard.html:226
+#: lms/templates/dashboard.html:228
 #: lms/templates/shoppingcart/verified_cert_receipt.html:33
 #: lms/templates/verify_student/_verification_header.html:16
 msgid "ID Verified"
 msgstr "Документально подтвержден"
 
-#: lms/templates/dashboard.html:234
+#: lms/templates/dashboard.html:236
 msgid "Course Completed - {end_date}"
 msgstr "Курс выполнен - {end_date}"
 
-#: lms/templates/dashboard.html:236
+#: lms/templates/dashboard.html:238
 msgid "Course Started - {start_date}"
 msgstr "Курс начат - {start_date}"
 
-#: lms/templates/dashboard.html:238
+#: lms/templates/dashboard.html:240
 msgid "Course Starts - {start_date}"
 msgstr "Курс начинается - {start_date}"
 
-#: lms/templates/dashboard.html:260
+#: lms/templates/dashboard.html:262
 msgid "Register for Pearson exam"
 msgstr "Зарегистрироваться на личный экзамен"
 
-#: lms/templates/dashboard.html:261
+#: lms/templates/dashboard.html:263
 msgid ""
 "Registration for the Pearson exam is now open and will close on {end_date}"
 msgstr ""
 
-#: lms/templates/dashboard.html:268
+#: lms/templates/dashboard.html:270
 #: lms/templates/test_center_register.html:120
 #, fuzzy
 msgid "Schedule Pearson exam"
 msgstr "Расписание и детали"
 
-#: lms/templates/dashboard.html:269
+#: lms/templates/dashboard.html:271
 msgid "{link_start}Registration{link_end} number: {number}"
 msgstr ""
 
-#: lms/templates/dashboard.html:274
+#: lms/templates/dashboard.html:276
 msgid "Write this down! You'll need it to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:280
+#: lms/templates/dashboard.html:282
 msgid ""
 "Your registration for the Pearson exam has been rejected. Please {link_start}"
 "see your registration status details{link_end}."
 msgstr ""
 
-#: lms/templates/dashboard.html:283
+#: lms/templates/dashboard.html:285
 msgid ""
 "Otherwise {link_start}contact edX at {email}{link_end} for further help."
 msgstr ""
 "В противном случае {link_start}свяжитесь с edX по адресу {email}{link_end} "
 "для получения помощи."
 
-#: lms/templates/dashboard.html:292
+#: lms/templates/dashboard.html:294
 msgid ""
 "Your {link_start}registration for the Pearson exam{link_end} is pending."
 msgstr ""
 
-#: lms/templates/dashboard.html:293
+#: lms/templates/dashboard.html:295
 msgid ""
 "Within a few days, you should see a confirmation number here, which can be "
 "used to schedule your exam."
 msgstr ""
 
-#: lms/templates/dashboard.html:317
+#: lms/templates/dashboard.html:319
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
 
-#: lms/templates/dashboard.html:319
+#: lms/templates/dashboard.html:321
 msgid "Your final grade:"
 msgstr "Ваша финальная оценка:"
 
-#: lms/templates/dashboard.html:322
+#: lms/templates/dashboard.html:324
 msgid "Grade required for a certificate:"
 msgstr "Оценка, требуемая для сертификата:"
 
-#: lms/templates/dashboard.html:326
+#: lms/templates/dashboard.html:328
 msgid ""
 "Your certificate is being held pending confirmation that the issuance of "
 "your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
@@ -4874,66 +5180,66 @@ msgid ""
 "contacting {email}."
 msgstr ""
 
-#: lms/templates/dashboard.html:336
+#: lms/templates/dashboard.html:338
 msgid "Your Certificate is Generating"
 msgstr "Ваш сертификат генерируется"
 
-#: lms/templates/dashboard.html:340
+#: lms/templates/dashboard.html:342
 msgid "This link will open/download a PDF document"
 msgstr "По этой ссылке доступен для открытия/загрузки документ PDF"
 
-#: lms/templates/dashboard.html:346
+#: lms/templates/dashboard.html:348
 msgid "Complete our course feedback survey"
 msgstr "Заполните нашу форму обратной связи по курсу"
 
-#: lms/templates/dashboard.html:356
+#: lms/templates/dashboard.html:358
 msgid "View Archived Course"
 msgstr "Просмотр архивных курсов"
 
-#: lms/templates/dashboard.html:358
+#: lms/templates/dashboard.html:360
 msgid "View Course"
 msgstr "Просмотр курса"
 
-#: lms/templates/dashboard.html:364 lms/templates/dashboard.html:446
+#: lms/templates/dashboard.html:366 lms/templates/dashboard.html:448
 msgid "Unregister"
 msgstr "Удалить регистрацию"
 
-#: lms/templates/dashboard.html:368
+#: lms/templates/dashboard.html:370
 msgid "Email Settings"
 msgstr "Настройки электронной почты"
 
-#: lms/templates/dashboard.html:379 lms/templates/dashboard.html:388
+#: lms/templates/dashboard.html:381 lms/templates/dashboard.html:390
 msgid "Find courses now!"
 msgstr "Найти курсы!"
 
-#: lms/templates/dashboard.html:386
+#: lms/templates/dashboard.html:388
 msgid "Looks like you haven't registered for any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:391
+#: lms/templates/dashboard.html:393
 #, fuzzy
 msgid "Looks like you haven't been enrolled in any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:398
+#: lms/templates/dashboard.html:400
 msgid "Course-loading errors"
 msgstr "Ошибка при загрузке курсов"
 
-#: lms/templates/dashboard.html:417
+#: lms/templates/dashboard.html:419
 msgid "Email Settings for {course_number}"
 msgstr "Настройки email для {course_number}"
 
-#: lms/templates/dashboard.html:423
+#: lms/templates/dashboard.html:425
 msgid "Receive course emails"
 msgstr "Получать рассылку курса"
 
-#: lms/templates/dashboard.html:425
+#: lms/templates/dashboard.html:427
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
-#: lms/templates/dashboard.html:429 lms/templates/dashboard.html:450
-#: lms/templates/dashboard.html:467 lms/templates/dashboard.html:496
-#: lms/templates/dashboard.html:524
+#: lms/templates/dashboard.html:431 lms/templates/dashboard.html:452
+#: lms/templates/dashboard.html:469 lms/templates/dashboard.html:498
+#: lms/templates/dashboard.html:526
 #: lms/templates/forgot_password_modal.html:33
 #: lms/templates/help_modal.html:18 lms/templates/help_modal.html:55
 #: lms/templates/help_modal.html:83 lms/templates/login_modal.html:42
@@ -4941,15 +5247,15 @@ msgstr "Сохранить настройки"
 msgid "Close Modal"
 msgstr "Закрыть"
 
-#: lms/templates/dashboard.html:436
+#: lms/templates/dashboard.html:438
 msgid "Are you sure you want to unregister from {course_number}?"
 msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
 
-#: lms/templates/dashboard.html:457
+#: lms/templates/dashboard.html:459
 msgid "Password Reset Email Sent"
 msgstr "Письмо с инструкциями по восстановлению пароля выслано"
 
-#: lms/templates/dashboard.html:463
+#: lms/templates/dashboard.html:465
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
@@ -4957,29 +5263,29 @@ msgstr ""
 "Письмо было выслано по адресу {email}. Перейдите по ссылке в письме для "
 "изменения пароля."
 
-#: lms/templates/dashboard.html:474 lms/templates/dashboard.html:491
+#: lms/templates/dashboard.html:476 lms/templates/dashboard.html:493
 msgid "Change Email"
 msgstr "Изменить Email"
 
-#: lms/templates/dashboard.html:482
+#: lms/templates/dashboard.html:484
 msgid "Please enter your new email address:"
 msgstr "Введите новый адрес электронной почты:"
 
-#: lms/templates/dashboard.html:484
+#: lms/templates/dashboard.html:486
 msgid "Please confirm your password:"
 msgstr "Подтвердите ваш пароль:"
 
-#: lms/templates/dashboard.html:488
+#: lms/templates/dashboard.html:490
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr "Мы вышлем подтверждения и на адрес {email}, и на новый адрес."
 
-#: lms/templates/dashboard.html:503
+#: lms/templates/dashboard.html:505
 msgid "Change your name"
 msgstr "Изменение отображаемого имени"
 
-#: lms/templates/dashboard.html:509
+#: lms/templates/dashboard.html:511
 #: lms/templates/verify_student/_modal_editname.html:16
 msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
@@ -4988,19 +5294,19 @@ msgstr ""
 "Для сохранения доверия к сертификатам {platform} все изменения имени "
 "сохраняются в истории."
 
-#: lms/templates/dashboard.html:513
+#: lms/templates/dashboard.html:515
 msgid ""
 "Enter your desired full name, as it will appear on the {platform} "
 "certificates:"
 msgstr ""
 "Введите Ваше полное имя, как оно будет напечатано на сертификате {platform}:"
 
-#: lms/templates/dashboard.html:515
+#: lms/templates/dashboard.html:517
 #: lms/templates/verify_student/_modal_editname.html:21
 msgid "Reason for name change:"
 msgstr "Причина изменения имени:"
 
-#: lms/templates/dashboard.html:519
+#: lms/templates/dashboard.html:521
 msgid "Change My Name"
 msgstr "Изменить имя"
 
@@ -11334,9 +11640,6 @@ msgstr ""
 
 #~ msgid "I do not know how to grade this question : "
 #~ msgstr "Я не знаю, как оценить данный вопрос:"
-
-#~ msgid "Course Statistics At A Glance"
-#~ msgstr "Обзор статистики курса"
 
 #~ msgid "Please verify your new email"
 #~ msgstr "Проверьте Ваш новый адрес email"
