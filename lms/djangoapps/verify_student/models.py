@@ -177,7 +177,7 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None):
         """
-        Returns whether or not a user has satisfactorily proved their
+        Return whether or not a user has satisfactorily proved their
         identity. Depending on the policy, this can expire after some period of
         time, so a user might have to renew periodically.
         """
@@ -194,7 +194,11 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_has_valid_or_pending(cls, user, earliest_allowed_date=None):
         """
-        TODO: eliminate duplication with user_is_verified
+        Return whether the user has a complete verification attempt that is or
+        *might* be good. This means that it's approved, been submitted, or would
+        have been submitted but had an non-user error when it was being
+        submitted. It's basically any situation in which the user has signed off
+        on the contents of the attempt, and we have not yet received a denial.
         """
         valid_statuses = ['must_retry', 'submitted', 'approved']
         earliest_allowed_date = (
@@ -210,11 +214,8 @@ class PhotoVerification(StatusModel):
     @classmethod
     def active_for_user(cls, user):
         """
-        Return all PhotoVerifications that are still active (i.e. not
-        approved or denied).
-
-        Should there only be one active at any given time for a user? Enforced
-        at the DB level?
+        Return the most recent PhotoVerification that is marked ready (i.e. the
+        user has said they're set, but we haven't submitted anything yet).
         """
         # This should only be one at the most, but just in case we create more
         # by mistake, we'll grab the most recently created one.
@@ -361,7 +362,9 @@ class PhotoVerification(StatusModel):
                      reviewing_service=""):
         """
         Mark that this attempt could not be completed because of a system error.
-        Status should be moved to `must_retry`.
+        Status should be moved to `must_retry`. For example, if Software Secure
+        reported to us that they couldn't process our submission because they
+        couldn't decrypt the image we sent.
         """
         if self.status in ["approved", "denied"]:
             return  # If we were already approved or denied, just leave it.
@@ -480,6 +483,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.save()
         except Exception as error:
             log.exception(error)
+            self.status = "must_retry"
+            self.save()
 
     def image_url(self, name):
         """
@@ -549,7 +554,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return headers, body
 
     def request_message_txt(self):
-        """This is the body of the request we send across."""
+        """
+        This is the body of the request we send across. This is never actually
+        used in the code, but exists for debugging purposes -- you can call
+        `print attempt.request_message_txt()` on the console and get a readable
+        rendering of the request that would be sent across, without actually
+        sending anything.
+        """
         headers, body = self.create_request()
 
         header_txt = "\n".join(
