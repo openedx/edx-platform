@@ -1,23 +1,37 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
+from nose.tools import assert_equal
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
-    world.create_component_instance(
-        step, '.large-video-icon',
-        'video',
-        '.xmodule_VideoModule',
-        has_multiple_templates=False
-    )
+
+    success = False
+    attempts = 0
+
+    # Occassionally, the first click will not create a video
+    # This is not an ideal solution, but it should improve stability
+    while not success and attempts < 2:
+        world.create_component_instance(
+            step, '.large-video-icon',
+            'video',
+            '.xmodule_VideoModule',
+            has_multiple_templates=False
+        )
+        success = world.is_css_present('div.video', wait_time=30)
+        attempts += 1
+
+    if not success:
+        assert_true(False, msg="Could not create video")
 
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
     _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
 
 @step('I have created a Video component with subtitles "([^"]*)"$')
 def i_created_a_video_with_subs_with_name(_step, sub_id):
