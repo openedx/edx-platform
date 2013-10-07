@@ -24,6 +24,8 @@ from bulk_email.models import (
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
 from courseware.courses import get_course_by_id, course_image_url
 
+from django.utils.translation import ugettext as _
+
 log = get_task_logger(__name__)
 
 
