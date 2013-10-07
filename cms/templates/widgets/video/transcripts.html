@@ -16,9 +16,6 @@ files = [f for f in listdir(path) if isfile(join(path,f)) and f.endswith('.js')]
 files.sort()
 %>
 
-%for file in files:
-<script type="text/javascript" src="${static.url('js/views/transcripts/{0}'.format(file))}"></script>
-%endfor
 
 ## js templates
 
@@ -71,34 +68,44 @@ files.sort()
 <div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(metadata) | h}'></div>
 
 <script type="text/javascript">
-    var transcripts = new Transcripts.Editor({
-            el: $('#editor-tab-${html_id}').find('.basic_metadata_edit')
-        }),
-        storage = TabsEditingDescriptor.getStorage();
+    require(
+        [
+            "domReady!",
+            "jquery",
+            "js/views/transcripts/editor"
+        ],
 
-    TabsEditingDescriptor.Model.addModelUpdate(
-        '${html_id}',
-        '${tabName}',
-        function () {
-            // Advanced, Save
-            metadataEditor = storage.MetadataEditor;
+        function(doc, $, Editor) {
+            var transcripts = new Editor({
+                    el: $('#editor-tab-${html_id}').find('.basic_metadata_edit')
+                }),
+                storage = TabsEditingDescriptor.getStorage();
 
-            if (metadataEditor) {
-                transcripts.syncAdvancedTab(metadataEditor.collection, metadataEditor);
-            }
-        }
-    );
+            TabsEditingDescriptor.Model.addModelUpdate(
+                '${html_id}',
+                '${tabName}',
+                function () {
+                    // Advanced, Save
+                    metadataEditor = storage.MetadataEditor;
 
-    TabsEditingDescriptor.Model.addOnSwitch(
-        '${html_id}',
-        '${tabName}',
-        function () {
-            // Basic
-            metadataEditor = storage.MetadataEditor;
+                    if (metadataEditor) {
+                        transcripts.syncAdvancedTab(metadataEditor.collection, metadataEditor);
+                    }
+                }
+            );
 
-            if (metadataEditor) {
-                transcripts.syncBasicTab(metadataEditor.collection, metadataEditor);
-            }
+            TabsEditingDescriptor.Model.addOnSwitch(
+                '${html_id}',
+                '${tabName}',
+                function () {
+                    // Basic
+                    metadataEditor = storage.MetadataEditor;
+
+                    if (metadataEditor) {
+                        transcripts.syncBasicTab(metadataEditor.collection, metadataEditor);
+                    }
+                }
+            );
         }
     );
 </script>

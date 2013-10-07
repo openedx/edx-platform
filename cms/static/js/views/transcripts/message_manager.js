@@ -1,5 +1,11 @@
-(function (window, undefined) {
-    Transcripts.MessageManager = Backbone.View.extend({
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/file_uploader",
+        "gettext"
+    ],
+function($, Backbone, _, Utils, FileUploader, gettext) {
+    var MessageManager = Backbone.View.extend({
         tagName: 'div',
         elClass: '.wrapper-transcripts-message',
         invisibleClass: 'is-invisible',
@@ -27,7 +33,7 @@
 
             this.component_id = this.$el.closest('.component').data('id');
 
-            this.fileUploader = new Transcripts.FileUploader({
+            this.fileUploader = new FileUploader({
                 el: this.$el,
                 messenger: this,
                 component_id: this.component_id,
@@ -184,7 +190,7 @@
         /**
         * @function
         *
-        * Decorator for `command` function in the Transcripts.Utils.
+        * Decorator for `command` function in the Utils.
         *
         * @params {string} action Action that will be invoked on server. Is a part
         *                         of url.
@@ -198,22 +204,21 @@
         */
         processCommand: function (action, errorMessage, videoId) {
             var self = this,
-                utils = Transcripts.Utils,
                 component_id = this.component_id,
                 videoList = this.options.parent.getVideoObjectsList(),
-                extraParam;
+                extraParam, xhr;
 
             if (videoId) {
                 extraParam = { html5_id: videoId };
             }
 
-            return utils.command(action, component_id, videoList, extraParam)
+            xhr = Utils.command(action, component_id, videoList, extraParam)
                 .done(function (resp) {
                     if (resp.status && resp.status === 'Success') {
                         var sub = resp.subs;
 
                         self.render('found', resp);
-                        utils.Storage.set('sub', sub);
+                        Utils.Storage.set('sub', sub);
                         self.currentItemSubs = sub;
                     } else {
                         self.render('not_found', resp);
@@ -222,7 +227,11 @@
                 .fail(function (resp) {
                     self.showError(errorMessage);
                 });
+
+            return xhr;
         }
 
     });
-}(this));
+
+    return MessageManager;
+});

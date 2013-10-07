@@ -32,8 +32,8 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
                     else if(model.getType() === MetadataModel.LIST_TYPE) {
                         new Metadata.List(data);
                     }
-                    else if(model.getType() === CMS.Models.Metadata.VIDEO_LIST_TYPE) {
-                        new CMS.Views.Metadata.VideoList(data);
+                    else if(model.getType() === MetadataModel.VIDEO_LIST_TYPE) {
+                        new Metadata.VideoList(data);
                     }
                     else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.

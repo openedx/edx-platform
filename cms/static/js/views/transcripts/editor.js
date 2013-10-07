@@ -1,18 +1,26 @@
-(function (window, undefined) {
-    Transcripts.Editor = Backbone.View.extend({
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils",
+        "js/views/metadata", "js/collections/metadata",
+        "js/views/transcripts/metadata_videolist"
+    ],
+function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
+
+    var Editor = Backbone.View.extend({
 
         tagName: 'div',
 
         initialize: function () {
-            // prepare data for CMS.Views.Metadata.Editor
+            // prepare data for MetadataView.Editor
 
             var metadata = this.$el.data('metadata'),
                 models = this.toModels(metadata);
 
-            this.collection = new CMS.Models.MetadataCollection(models);
+            this.collection = new MetadataCollection(models);
 
-            // inititlaize CMS.Views.Metadata.Editor
-            this.metadataEditor = new CMS.Views.Metadata.Editor({
+            // inititlaize MetadataView.Editor
+            this.metadataEditor = new MetadataView.Editor({
                 el: this.$el,
                 collection: this.collection
             });
@@ -63,8 +71,7 @@
         */
         syncBasicTab: function (metadataCollection, metadataView) {
             var result = [],
-                utils = Transcripts.Utils,
-                getField = utils.getField,
+                getField = Utils.getField,
                 component_id = this.$el.closest('.component').data('id'),
                 subs = getField(metadataCollection, 'sub'),
                 values = {},
@@ -81,10 +88,10 @@
             modifiedValues = metadataView.getModifiedMetadataValues();
             metadata = $.extend(true, {}, modifiedValues);
             // Save module state
-            utils.command('save', component_id, null, {
+            Utils.command('save', component_id, null, {
                 metadata: metadata,
                 current_subs: _.pluck(
-                    utils.getVideoList(videoUrl.getDisplayValue()),
+                    Utils.getVideoList(videoUrl.getDisplayValue()),
                     'video'
                 )
             });
@@ -102,7 +109,7 @@
                 // Just video id is retrieved from `Advanced` tab field and
                 // it should be transformed to appropriate format.
                 // OEoXaMPEzfM => http://youtu.be/OEoXaMPEzfM
-                values.youtube = utils.getYoutubeLink(values.youtube);
+                values.youtube = Utils.getYoutubeLink(values.youtube);
             } else {
                 values.youtube = '';
             }
@@ -113,11 +120,11 @@
             videoUrl.setValue(result);
 
             // Synchronize other fields that has the same `field_name` property.
-            utils.syncCollections(metadataCollection, this.collection);
+            Utils.syncCollections(metadataCollection, this.collection);
 
             if (subs.hasChanged()){
                 // When `sub` field is changed, clean Storage to avoid overwriting.
-                utils.Storage.remove('sub');
+                Utils.Storage.remove('sub');
 
                 // Trigger `change` event manually if `video_url` model
                 // isn't changed.
@@ -139,9 +146,8 @@
         *
         */
         syncAdvancedTab: function (metadataCollection, metadataView) {
-            var utils = Transcripts.Utils,
-                getField = utils.getField,
-                subsValue = utils.Storage.get('sub'),
+            var getField = Utils.getField,
+                subsValue = Utils.Storage.get('sub'),
                 subs = getField(metadataCollection, 'sub'),
                 html5Sources, youtube, videoUrlValue, result;
 
@@ -180,7 +186,7 @@
             result = _.groupBy(
                 videoUrlValue,
                 function (value) {
-                    return utils.parseLink(value).mode;
+                    return Utils.parseLink(value).mode;
                 }
             );
 
@@ -190,7 +196,7 @@
 
             if (youtube) {
                 if (result.youtube) {
-                    result = utils.parseLink(result.youtube[0]).video;
+                    result = Utils.parseLink(result.youtube[0]).video;
                 } else {
                     result = '';
                 }
@@ -198,17 +204,19 @@
                 youtube.setValue(result);
             }
 
-            // If utils.Storage contain some subtitles, update them.
+            // If Utils.Storage contain some subtitles, update them.
             if (_.isString(subsValue)) {
                 subs.setValue(subsValue);
                 // After updating should be removed, because it might overwrite
                 // subtitles added by user manually.
-                utils.Storage.remove('sub');
+                Utils.Storage.remove('sub');
             }
 
             // Synchronize other fields that has the same `field_name` property.
-            utils.syncCollections(this.collection, metadataCollection);
+            Utils.syncCollections(this.collection, metadataCollection);
         }
 
     });
-}(this));
+
+    return Editor;
+});

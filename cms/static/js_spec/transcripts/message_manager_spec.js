@@ -1,11 +1,18 @@
-(function (window, undefined) {
+define(
+    [
+        "jquery", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/message_manager",
+        "js/views/transcripts/file_uploader", "sinon", "jasmine-jquery",
+        "xmodule"
+    ],
+function ($, _, Utils, MessageManager, FileUploader, sinon) {
+
     describe('Transcripts.MessageManager', function () {
         var handlers = {
                 importHandler: ['replace', 'Error: Import failed.'],
                 replaceHandler: ['replace', 'Error: Replacing failed.'],
                 chooseHandler: ['choose', 'Error: Choosing failed.', 'video_id']
             },
-            utils = Transcripts.Utils,
             view, fileUploader, sinonXhr;
 
         beforeEach(function () {
@@ -18,7 +25,7 @@
                 ),
                 videoList, $container;
 
-            fileUploader = Transcripts.FileUploader.prototype;
+            fileUploader = FileUploader.prototype;
 
             setFixtures(
                 $("<div>", {id: "metadata-videolist-entry"})
@@ -34,16 +41,16 @@
             );
 
             videoList = jasmine.createSpyObj(
-                'CMS.Views.Metadata.VideoList',
+                'MetadataView.VideoList',
                 ['getVideoObjectsList']
             );
             $container = $('#metadata-videolist-entry');
 
             spyOn(fileUploader, 'initialize');
             spyOn(console, 'error');
-            spyOn(utils.Storage, 'set');
+            spyOn(Utils.Storage, 'set');
 
-            view = new Transcripts.MessageManager({
+            view = new MessageManager({
                 el: $container,
                 parent: videoList,
                 component_id: 'component_id'
@@ -158,7 +165,7 @@
 
             beforeEach(function () {
                 view.render('found');
-                spyOn(utils, 'command').andCallThrough();
+                spyOn(Utils, 'command').andCallThrough();
                 spyOn(view, 'render');
                 spyOn(view, 'showError');
 
@@ -211,7 +218,7 @@
                 assertCommand(
                     { },
                     function() {
-                        expect(utils.command).toHaveBeenCalledWith(
+                        expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_id,
                             videoList,
@@ -220,7 +227,7 @@
                         expect(view.showError).not.toHaveBeenCalled();
                         expect(view.render.mostRecentCall.args[0])
                             .toEqual('found');
-                        expect(utils.Storage.set).toHaveBeenCalled();
+                        expect(Utils.Storage.set).toHaveBeenCalled();
                     }
                 );
             });
@@ -241,7 +248,7 @@
                 assertCommand(
                     { extraParamas : extraParamas },
                     function () {
-                        expect(utils.command).toHaveBeenCalledWith(
+                        expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_id,
                             videoList,
@@ -252,7 +259,7 @@
                         expect(view.showError).not.toHaveBeenCalled();
                         expect(view.render.mostRecentCall.args[0])
                             .toEqual('found');
-                        expect(utils.Storage.set).toHaveBeenCalled();
+                        expect(Utils.Storage.set).toHaveBeenCalled();
                     }
                 );
             });
@@ -271,7 +278,7 @@
                 assertCommand(
                     { },
                     function () {
-                        expect(utils.command).toHaveBeenCalledWith(
+                        expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_id,
                             videoList,
@@ -280,7 +287,7 @@
                         expect(view.showError).not.toHaveBeenCalled();
                         expect(view.render.mostRecentCall.args[0])
                             .toEqual('not_found');
-                        expect(utils.Storage.set).not.toHaveBeenCalled();
+                        expect(Utils.Storage.set).not.toHaveBeenCalled();
                     }
                 );
 
@@ -293,7 +300,7 @@
                 assertCommand(
                     { },
                     function () {
-                        expect(utils.command).toHaveBeenCalledWith(
+                        expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_id,
                             videoList,
@@ -301,11 +308,11 @@
                         );
                         expect(view.showError).toHaveBeenCalled();
                         expect(view.render).not.toHaveBeenCalled();
-                        expect(utils.Storage.set).not.toHaveBeenCalled();
+                        expect(Utils.Storage.set).not.toHaveBeenCalled();
                     }
                 );
             });
         });
 
     });
-}(window));
+});

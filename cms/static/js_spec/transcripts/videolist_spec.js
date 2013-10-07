@@ -1,9 +1,16 @@
-(function (window, undefined) {
+define(
+    [
+        "jquery", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/metadata_videolist",
+        "js/views/transcripts/message_manager",
+        "js/views/metadata", "js/models/metadata", "sinon", "js/collections/metadata",
+        "underscore.string", "xmodule", "jasmine-jquery"
+    ],
+function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, sinon) {
     describe('CMS.Views.Metadata.VideoList', function () {
-        var utils = Transcripts.Utils,
-            correctMessanger = Transcripts.MessageManager,
+        var correctMessanger = MessageManager,
             messenger = correctMessanger.prototype,
-            abstractEditor = CMS.Views.Metadata.AbstractEditor.prototype,
+            abstractEditor = MetadataView.AbstractEditor.prototype,
             component_id = 'component_id',
             videoList = [
                 {
@@ -29,7 +36,7 @@
                 field_name: 'video_url',
                 help: 'A list of things.',
                 options: [],
-                type: CMS.Models.Metadata.VIDEO_LIST_TYPE,
+                type: MetadataModel.VIDEO_LIST_TYPE,
                 value: [
                     'http://youtu.be/12345678901',
                     'video.mp4',
@@ -59,7 +66,7 @@
                 videoListEntryTemplate = readFixtures(
                     'transcripts/metadata-videolist-entry.underscore'
                 ),
-                model = new CMS.Models.Metadata(modelStub),
+                model = new MetadataModel(modelStub),
                 videoList, $el;
 
             setFixtures(tpl);
@@ -77,11 +84,11 @@
             spyOn(messenger, 'render').andReturn(messenger);
             spyOn(messenger, 'showError');
             spyOn(messenger, 'hideError');
-            spyOn(utils, 'command').andCallThrough();
+            spyOn(Utils, 'command').andCallThrough();
             spyOn(abstractEditor, 'initialize').andCallThrough();
             spyOn(abstractEditor, 'render').andCallThrough();
 
-            Transcripts.MessageManager = function () {
+            MessageManager = function () {
                 messenger.initialize();
 
                 return messenger;
@@ -91,14 +98,14 @@
 
             spyOn(console, 'error');
 
-            view = new CMS.Views.Metadata.VideoList({
+            view = new VideoList({
                 el: $el,
                 model: model
             });
         });
 
         afterEach(function () {
-            Transcripts.MessageManager = correctMessanger;
+            MessageManager = correctMessanger;
             sinonXhr.restore();
         });
 
@@ -134,16 +141,17 @@
         describe('Render', function () {
             var assertRendering = function (videoList) {
                     expect(abstractEditor.render).toHaveBeenCalled();
-                    expect(utils.command).toHaveBeenCalledWith(
+                    expect(Utils.command).toHaveBeenCalledWith(
                         'check',
                         component_id,
                         videoList
                     );
+
                     expect(messenger.render).toHaveBeenCalled();
                 },
                 resetSpies = function() {
                     abstractEditor.render.reset();
-                    utils.command.reset();
+                    Utils.command.reset();
                     messenger.render.reset();
                     sinonXhr.requests.length = 0;
                 };
@@ -290,7 +298,7 @@
                 expect(result).toBe(false);
             });
 
-            it('All works okay if arguments is not passed', function () {
+            it('All works okay if arguments are not passed', function () {
                 spyOn(view, 'getVideoObjectsList').andReturn(videoList);
                 var result = view.checkIsUniqVideoTypes();
 
@@ -535,4 +543,4 @@
         });
 
     });
-}(window));
+});

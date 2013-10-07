@@ -1,5 +1,11 @@
-(function (window, undefined) {
-    CMS.Views.Metadata.VideoList = CMS.Views.Metadata.AbstractEditor.extend({
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/message_manager",
+        "js/views/metadata"
+    ],
+function($, Backbone, _, Utils, MessageManager, MetadataView) {
+    MetadataView.VideoList = MetadataView.AbstractEditor.extend({
         // Time that we wait since the last time user typed.
         inputDelay: 300,
 
@@ -19,18 +25,18 @@
         },
 
         initialize: function () {
-            // Initialize Transcripts.MessageManager that is responsible for
+            // Initialize MessageManager that is responsible for
             // status messages and errors.
 
-            this.messenger = new Transcripts.MessageManager({
+            this.messenger = new MessageManager({
                 el: this.$el,
                 parent: this
             });
 
-            // Call it after Transcripts.MessageManager. This is because
-            // Transcripts.MessageManager is used in `render` method that
+            // Call it after MessageManager. This is because
+            // MessageManager is used in `render` method that
             // is called in `AbstractEditor.prototype.initialize`.
-            CMS.Views.Metadata.AbstractEditor.prototype.initialize
+            MetadataView.AbstractEditor.prototype.initialize
                 .apply(this, arguments);
 
             this.$el.on(
@@ -43,11 +49,10 @@
 
         render: function () {
             // Call inherited `render` method.
-            CMS.Views.Metadata.AbstractEditor.prototype.render
+            MetadataView.AbstractEditor.prototype.render
                 .apply(this, arguments);
 
             var self = this,
-                utils = Transcripts.Utils,
                 component_id =  this.$el.closest('.component').data('id'),
                 videoList = this.getVideoObjectsList(),
 
@@ -74,7 +79,7 @@
             }
 
             // Check current state of Timed Transcripts.
-            utils.command('check', component_id, videoList)
+            Utils.command('check', component_id, videoList)
                 .done(function (resp) {
                     if (resp.status === 'Success') {
                         var params = resp,
@@ -95,7 +100,7 @@
                         showServerError();
                     }
                     // Synchronize transcripts field in the `Advanced` tab.
-                    utils.Storage.set('sub', resp.subs);
+                    Utils.Storage.set('sub', resp.subs);
                 })
                 .fail(showServerError);
         },
@@ -142,10 +147,9 @@
         *
         */
         getVideoObjectsList: function () {
-            var utils = Transcripts.Utils,
-                links = this.getValueFromEditor();
+            var links = this.getValueFromEditor();
 
-            return utils.getVideoList(links);
+            return Utils.getVideoList(links);
         },
 
         /**
@@ -157,7 +161,7 @@
         *
         */
         setValueInEditor: function (value) {
-            var parseLink = Transcripts.Utils.parseLink,
+            var parseLink = Utils.parseLink,
                 list = this.$el.find('.input'),
                 val = value.filter(_.identity),
                 placeholders = this.getPlaceholders(val);
@@ -180,7 +184,7 @@
         *
         */
         getPlaceholders: function (value) {
-            var parseLink = Transcripts.Utils.parseLink,
+            var parseLink = Utils.parseLink,
                 placeholders = _.clone(this.placeholders),
                 result = [],
                 linkInfo, label, type;
@@ -274,7 +278,7 @@
             var $el = $(event.currentTarget),
                 $inputs = this.$el.find('.input'),
                 entry = $el.val(),
-                data = Transcripts.Utils.parseLink(entry),
+                data = Utils.parseLink(entry),
                 isNotEmpty = Boolean(entry);
 
             // Empty value should not be validated
@@ -384,7 +388,6 @@
         */
         checkValidity: function (data, showErrorModeMessage) {
             var self = this,
-                utils = Transcripts.Utils,
                 videoList = this.getVideoObjectsList();
 
              if (!this.checkIsUniqVideoTypes(videoList)) {
@@ -401,4 +404,6 @@
             return true;
         }
     });
-}(this));
+
+    return MetadataView.VideoList;
+});

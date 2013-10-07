@@ -1,4 +1,12 @@
-(function (window, undefined) {
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/editor",
+        "js/views/metadata", "js/models/metadata", "js/collections/metadata",
+        "underscore.string", "xmodule", "js/views/transcripts/metadata_videolist",
+        "jasmine-jquery"
+    ],
+function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
     describe('Transcripts.Editor', function () {
         var VideoListEntry = {
                 default_value: ['a thing', 'another thing'],
@@ -7,7 +15,7 @@
                 field_name: 'video_url',
                 help: 'A list of things.',
                 options: [],
-                type: CMS.Models.Metadata.VIDEO_LIST_TYPE,
+                type: MetadataModel.VIDEO_LIST_TYPE,
                 value: [
                     'http://youtu.be/12345678901',
                     'video.mp4',
@@ -21,7 +29,7 @@
                 field_name: 'display_name',
                 help: 'Specifies the name for this component.',
                 options: [],
-                type: CMS.Models.Metadata.GENERIC_TYPE,
+                type: MetadataModel.GENERIC_TYPE,
                 value: 'display value'
             },
             models = [DisplayNameEntry, VideoListEntry],
@@ -44,15 +52,19 @@
                 appendSetFixtures(tpl);
                 container = $('.basic_metadata_edit');
 
-            spyOn(Transcripts.Utils, 'command');
+            spyOn(Utils, 'command');
+        });
+
+        afterEach(function () {
+            Utils.Storage.remove('sub');
         });
 
         describe('Test initialization', function () {
-            beforeEach(function () {
-                spyOn(CMS.Models, 'MetadataCollection');
-                spyOn(CMS.Views.Metadata, 'Editor');
 
-                transcripts = new Transcripts.Editor({
+            beforeEach(function () {
+                spyOn(MetadataView, 'Editor');
+
+                transcripts = new Editor({
                     el: container
                 });
             });
@@ -64,10 +76,9 @@
                 });
             });
 
-            it('CMS.Views.Metadata.Editor is initialized', function () {
+            it('MetadataView.Editor is initialized', function () {
 
-                expect(CMS.Models.MetadataCollection).toHaveBeenCalledWith(models);
-                expect(CMS.Views.Metadata.Editor).toHaveBeenCalledWith({
+                expect(MetadataView.Editor).toHaveBeenCalledWith({
                     el: container,
                     collection: transcripts.collection
                 });
@@ -82,7 +93,7 @@
                     field_name: 'display_name',
                     help: 'Specifies the name for this component.',
                     options: [],
-                    type: CMS.Models.Metadata.GENERIC_TYPE,
+                    type: MetadataModel.GENERIC_TYPE,
                     value: 'default'
                 },
 
@@ -104,7 +115,7 @@
                     field_name: 'html5_sources',
                     help: 'A list of html5 sources.',
                     options: [],
-                    type: CMS.Models.Metadata.LIST_TYPE,
+                    type: MetadataModel.LIST_TYPE,
                     value: ['default.mp4', 'default.webm']
                 },
 
@@ -115,7 +126,7 @@
                     field_name: 'youtube_id_1_0',
                     help: 'Specifies the name for this component.',
                     options: [],
-                    type: CMS.Models.Metadata.GENERIC_TYPE,
+                    type: MetadataModel.GENERIC_TYPE,
                     value: 'OEoXaMPEzfM'
                 },
                 metadataCollection,
@@ -123,13 +134,13 @@
 
 
             beforeEach(function () {
-                spyOn(CMS.Views.Metadata, 'Editor');
+                spyOn(MetadataView, 'Editor');
 
-                transcripts = new Transcripts.Editor({
+                transcripts = new Editor({
                     el: container
                 });
 
-                metadataCollection = new CMS.Models.MetadataCollection(
+                metadataCollection = new MetadataCollection(
                     [
                         nameEntry,
                         subEntry,
@@ -139,7 +150,7 @@
                 );
 
                 metadataView = jasmine.createSpyObj(
-                    'CMS.Views.Metadata.Editor',
+                    'MetadataView.Editor',
                     [
                         'getModifiedMetadataValues'
                     ]
@@ -258,7 +269,7 @@
                 });
 
                 it('Timed Transcripts field is updated', function () {
-                    Transcripts.Utils.Storage.set('sub', 'test_value');
+                    Utils.Storage.set('sub', 'test_value');
 
                     transcripts.syncAdvancedTab(metadataCollection);
 
@@ -269,7 +280,7 @@
                 });
 
                 it('Timed Transcripts field is updated just once', function () {
-                    Transcripts.Utils.Storage.set('sub', 'test_value');
+                    Utils.Storage.set('sub', 'test_value');
 
                     var collection = metadataCollection.models,
                         subModel = collection[1];
@@ -286,4 +297,4 @@
             });
         });
     });
-}(window));
+});

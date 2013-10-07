@@ -33,10 +33,11 @@ def create_component_instance(step, component_button_css, category,
 @world.absorb
 def click_new_component_button(step, component_button_css):
     step.given('I have clicked the new unit button')
+
     world.wait_for_requirejs(
         ["jquery", "js/models/course", "coffee/src/models/module",
-         "coffee/src/views/unit", "jquery.ui"]
-    )
+        "coffee/src/views/unit", "jquery.ui", "domReady!"])
+
     world.css_click(component_button_css)
 
 

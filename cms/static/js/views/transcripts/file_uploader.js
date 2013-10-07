@@ -1,5 +1,10 @@
-(function (window, undefined) {
-    Transcripts.FileUploader = Backbone.View.extend({
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils"
+    ],
+function($, Backbone, _, Utils) {
+    var FileUploader = Backbone.View.extend({
         invisibleClass: 'is-invisible',
 
         // Pre-defined list of supported file formats.
@@ -176,8 +181,7 @@
         *
         */
         xhrCompleteHandler: function (xhr) {
-            var utils = Transcripts.Utils,
-                resp = JSON.parse(xhr.responseText),
+            var resp = JSON.parse(xhr.responseText),
                 err = (resp.error) ? resp.error : 'Error: Uploading failed.',
                 sub = resp.subs;
 
@@ -186,10 +190,12 @@
 
             if (xhr.status === 200 && resp.status === "Success") {
                 this.options.messenger.render('uploaded', resp);
-                utils.Storage.set('sub', sub);
+                Utils.Storage.set('sub', sub);
             } else {
                 this.options.messenger.showError(err);
             }
         }
     });
-}(this));
+
+    return FileUploader;
+});

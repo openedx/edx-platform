@@ -1,4 +1,10 @@
-(function (window, undefined) {
+define(
+    [
+        "jquery", "underscore",
+        "js/views/transcripts/utils", "js/views/transcripts/file_uploader",
+        "xmodule", "jquery.form", "jasmine-jquery"
+    ],
+function ($, _, Utils, FileUploader) {
     describe('Transcripts.FileUploader', function () {
         var view;
 
@@ -24,11 +30,11 @@
             );
 
             var messenger = jasmine.createSpyObj(
-                    'Transcripts.MessageManager',
+                    'MessageManager',
                     ['render', 'showError', 'hideError']
                 ),
                 videoListObject = jasmine.createSpyObj(
-                    'CMS.Views.Metadata.VideoList',
+                    'MetadataView.VideoList',
                     ['render', 'getVideoObjectsList']
                 ),
                 $container = $('.transcripts-status');
@@ -37,9 +43,9 @@
                 .append('<div class="transcripts-file-uploader" />')
                 .append('<a class="setting-upload" href="#">Upload</a>');
 
-            spyOn(Transcripts.FileUploader.prototype, 'render').andCallThrough();
+            spyOn(FileUploader.prototype, 'render').andCallThrough();
 
-            view = new Transcripts.FileUploader({
+            view = new FileUploader({
                 el: $container,
                 messenger: messenger,
                 videoListObject: videoListObject,
@@ -49,7 +55,7 @@
 
         it('Initialize', function () {
             expect(view.file).toBe(false);
-            expect(Transcripts.FileUploader.prototype.render).toHaveBeenCalled();
+            expect(FileUploader.prototype.render).toHaveBeenCalled();
         });
 
         describe('Render', function () {
@@ -199,28 +205,28 @@
                         subs: 'test'
                     })
                 };
-                spyOn(Transcripts.Utils.Storage, 'set');
+                spyOn(Utils.Storage, 'set');
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.$progress).toHaveClass('is-invisible');
                 expect(view.options.messenger.render.mostRecentCall.args[0])
-                                            .toEqual('uploaded');
-                expect(Transcripts.Utils.Storage.set)
-                                            .toHaveBeenCalledWith('sub', 'test');
+                    .toEqual('uploaded');
+                expect(Utils.Storage.set)
+                    .toHaveBeenCalledWith('sub', 'test');
             });
 
             var assertAjaxError = function (xhr) {
-                spyOn(Transcripts.Utils.Storage, 'set');
+                spyOn(Utils.Storage, 'set');
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.options.messenger.showError).toHaveBeenCalled();
                 expect(view.$progress).toHaveClass('is-invisible');
                 expect(view.options.messenger.render)
-                                            .not
-                                            .toHaveBeenCalled();
-                expect(Transcripts.Utils.Storage.set)
-                                            .not
-                                            .toHaveBeenCalledWith('sub', 'test');
+                    .not
+                    .toHaveBeenCalled();
+                expect(Utils.Storage.set)
+                    .not
+                    .toHaveBeenCalledWith('sub', 'test');
             };
 
             it('Ajax transport Error', function () {
@@ -244,4 +250,4 @@
             });
         });
     });
-}(window));
+});

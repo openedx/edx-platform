@@ -44,6 +44,7 @@ var require = {
         "jquery.form": "js/vendor/jquery.form",
         "jquery.markitup": "js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "js/vendor/jquery.leanModal.min",
+        "jquery.ajaxQueue": "js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "js/vendor/jquery.smooth-scroll.min",
         "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
         "jquery.cookie": "js/vendor/jquery.cookie",
@@ -90,6 +91,10 @@ var require = {
         "jquery.leanmodal": {
             deps: ["jquery"],
             exports: "jQuery.fn.leanModal"
+        },
+        "jquery.ajaxQueue": {
+            deps: ["jquery"],
+            exports: "jQuery.fn.ajaxQueue"
         },
         "jquery.smoothScroll": {
             deps: ["jquery"],
@@ -171,7 +176,6 @@ var require = {
 </script>
 
 
-    <script src="${static.url('js/vendor/jquery.ajaxQueue.js')}"></script>
     % if context_course:
     <script type="text/javascript">
 require(['js/models/course'], function(Course) {

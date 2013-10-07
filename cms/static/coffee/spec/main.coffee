@@ -8,6 +8,7 @@ requirejs.config({
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal.min",
+        "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
         "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
@@ -30,6 +31,7 @@ requirejs.config({
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
+        "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
@@ -63,6 +65,10 @@ requirejs.config({
         "jquery.smoothScroll": {
             deps: ["jquery"],
             exports: "jQuery.fn.smoothScroll"
+        },
+        "jquery.ajaxQueue": {
+            deps: ["jquery"],
+            exports: "jQuery.fn.ajaxQueue"
         },
         "jquery.scrollTo": {
             deps: ["jquery"],
@@ -117,6 +123,9 @@ requirejs.config({
         "sinon": {
             exports: "sinon"
         },
+        "jasmine-jquery": {
+            deps: ["jasmine"]
+        },
         "jasmine-stealth": {
             deps: ["jasmine"]
         },
@@ -132,7 +141,7 @@ requirejs.config({
             deps: ["jquery"]
         }
     }
-});
+);
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
@@ -149,6 +158,10 @@ define([
     "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
     "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
+
+    "js_spec/transcripts/utils_spec", "js_spec/transcripts/editor_spec",
+    "js_spec/transcripts/videolist_spec", "js_spec/transcripts/message_manager_spec",
+    "js_spec/transcripts/file_uploader_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

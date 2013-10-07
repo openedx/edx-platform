@@ -1,39 +1,52 @@
-(function () {
+define(
+    [
+        "jquery", "backbone", "underscore",
+        "js/views/transcripts/utils",
+        "underscore.string", "xmodule", "jasmine-jquery"
+    ],
+function ($, Backbone, _, Utils, _str) {
     describe('Transcripts.Utils', function () {
-        var utils = Transcripts.Utils,
-            videoId = 'OEoXaMPEzfM',
-            ytLinksList = [
-                'http://www.youtube.com/watch?v=' + videoId + '&feature=feedrec_grec_index',
-                'http://www.youtube.com/user/IngridMichaelsonVEVO#p/a/u/1/' + videoId,
-                'http://www.youtube.com/v/' + videoId + '?fs=1&amp;hl=en_US&amp;rel=0',
-                'http://www.youtube.com/watch?v=' + videoId + '#t=0m10s',
-                'http://www.youtube.com/embed/' + videoId + '?rel=0',
-                'http://www.youtube.com/watch?v=' + videoId,
-                'http://youtu.be/' + videoId,
-            ],
+        var videoId = 'OEoXaMPEzfM',
+            ytLinksList = (function (id) {
+                var links = [
+                    'http://www.youtube.com/watch?v=%s&feature=feedrec_grec_index',
+                    'http://www.youtube.com/user/IngridMichaelsonVEVO#p/a/u/1/%s',
+                    'http://www.youtube.com/v/%s?fs=1&amp;hl=en_US&amp;rel=0',
+                    'http://www.youtube.com/watch?v=%s#t=0m10s',
+                    'http://www.youtube.com/embed/%s?rel=0',
+                    'http://www.youtube.com/watch?v=%s',
+                    'http://youtu.be/%s'
+                ];
+
+                return $.map(links, function (link) {
+                    return _str.sprintf(link, id);
+                });
+
+            } (videoId)),
             html5FileName = 'file_name',
-            html5LinksList = {
-                'mp4': [
-                    'http://somelink.com/' + html5FileName + '.mp4?param=1&param=2#hash',
-                    'http://somelink.com/' + html5FileName + '.mp4#hash',
-                    'http://somelink.com/' + html5FileName + '.mp4?param=1&param=2',
-                    'http://somelink.com/' + html5FileName + '.mp4',
-                    'ftp://somelink.com/' + html5FileName + '.mp4',
-                    'https://somelink.com/' + html5FileName + '.mp4',
-                    'somelink.com/' + html5FileName + '.mp4',
-                     html5FileName + '.mp4',
-                ],
-                'webm': [
-                    'http://somelink.com/' + html5FileName + '.webm?param=1&param=2#hash',
-                    'http://somelink.com/' + html5FileName + '.webm#hash',
-                    'http://somelink.com/' + html5FileName + '.webm?param=1&param=2',
-                    'http://somelink.com/' + html5FileName + '.webm',
-                    'ftp://somelink.com/' + html5FileName + '.webm',
-                    'https://somelink.com/' + html5FileName + '.webm',
-                    'somelink.com/' + html5FileName + '.webm',
-                     html5FileName + '.webm',
-                ]
-            };
+            html5LinksList =  (function (videoName) {
+                var videoTypes = ['mp4', 'webm'],
+                    links = [
+                        'http://somelink.com/%s.%s?param=1&param=2#hash',
+                        'http://somelink.com/%s.%s#hash',
+                        'http://somelink.com/%s.%s?param=1&param=2',
+                        'http://somelink.com/%s.%s',
+                        'ftp://somelink.com/%s.%s',
+                        'https://somelink.com/%s.%s',
+                        'somelink.com/%s.%s',
+                         '%s.%s'
+                    ],
+                    data = {};
+
+                $.each(videoTypes, function (index, type) {
+                    data[type] = $.map(links, function (link) {
+                        return _str.sprintf(link, videoName, type);
+                    });
+                });
+
+                return data;
+
+            } (html5FileName));
 
         describe('Method: getField', function (){
             var collection,
@@ -49,7 +62,7 @@
             });
 
             it('All works okay if all arguments are passed', function () {
-                utils.getField(collection, testFieldName);
+                Utils.getField(collection, testFieldName);
 
                 expect(collection.findWhere).toHaveBeenCalledWith({
                     field_name: testFieldName
@@ -73,7 +86,7 @@
 
             $.each(wrongArgumentLists, function (index, element) {
                 it(element.argName + ' argument(s) is/are absent', function () {
-                    var result = utils.getField.apply(this, element.list);
+                    var result = Utils.getField.apply(this, element.list);
 
                     expect(result).toBeUndefined();
                 });
@@ -84,7 +97,7 @@
             describe('Supported urls', function () {
                 $.each(ytLinksList, function (index, link) {
                     it(link, function () {
-                        var result = utils.parseYoutubeLink(link);
+                        var result = Utils.parseYoutubeLink(link);
 
                         expect(result).toBe(videoId);
                     });
@@ -98,13 +111,13 @@
                 });
 
                 it('no arguments', function () {
-                    var result = utils.parseYoutubeLink();
+                    var result = Utils.parseYoutubeLink();
 
                     expect(result).toBeUndefined();
                 });
 
                 it('wrong data type', function () {
-                    var result = utils.parseYoutubeLink(1);
+                    var result = Utils.parseYoutubeLink(1);
 
                     expect(result).toBeUndefined();
                 });
@@ -112,7 +125,7 @@
                 it('videoId is wrong', function () {
                     var videoId = 'wrong_id',
                         link = 'http://youtu.be/' + videoId,
-                        result = utils.parseYoutubeLink(link);
+                        result = Utils.parseYoutubeLink(link);
 
                     expect(result).toBeUndefined();
                 });
@@ -126,7 +139,7 @@
 
                 $.each(wrongUrls, function (index, link) {
                     it(link, function () {
-                        var result = utils.parseYoutubeLink(link);
+                        var result = Utils.parseYoutubeLink(link);
 
                         expect(result).toBeUndefined();
                     });
@@ -139,7 +152,7 @@
                 $.each(html5LinksList, function (format, linksList) {
                     $.each(linksList, function (index, link) {
                         it(link, function () {
-                            var result = utils.parseHTML5Link(link);
+                            var result = Utils.parseHTML5Link(link);
 
                             expect(result).toEqual({
                                 video: html5FileName,
@@ -157,13 +170,13 @@
                 });
 
                 it('no arguments', function () {
-                    var result = utils.parseHTML5Link();
+                    var result = Utils.parseHTML5Link();
 
                     expect(result).toBeUndefined();
                 });
 
                 it('wrong data type', function () {
-                    var result = utils.parseHTML5Link(1);
+                    var result = Utils.parseHTML5Link(1);
 
                     expect(result).toBeUndefined();
                 });
@@ -182,7 +195,7 @@
 
                 $.each(html5WrongUrls, function (index, link) {
                     it(link, function () {
-                        var result = utils.parseHTML5Link(link);
+                        var result = Utils.parseHTML5Link(link);
 
                         expect(result).toBeUndefined();
                     });
@@ -192,7 +205,7 @@
 
         it('Method: getYoutubeLink', function () {
             var videoId = 'video_id',
-                result = utils.getYoutubeLink(videoId),
+                result = Utils.getYoutubeLink(videoId),
                 expectedResult = 'http://youtu.be/' + videoId;
 
             expect(result).toBe(expectedResult);
@@ -226,7 +239,7 @@
 
             $.each(resultDataDict, function (mode, data) {
                 it(mode, function () {
-                    var result = utils.parseLink(data.link);
+                    var result = Utils.parseLink(data.link);
 
                     expect(result).toEqual(data.resp);
                 });
@@ -234,23 +247,18 @@
 
             describe('Wrong arguments ', function () {
 
-                beforeEach(function(){
-                    spyOn(console, 'log');
-                });
-
                 it('no arguments', function () {
-                    var result = utils.parseLink();
+                    var result = Utils.parseLink();
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
 
                 it('wrong data type', function () {
-                    var result = utils.parseLink(1);
+                    var result = Utils.parseLink(1);
 
-                    expect(console.log).toHaveBeenCalled();
+                    expect(result).toBeUndefined();
                 });
             });
         });
     });
-
-}).call(this);
+});

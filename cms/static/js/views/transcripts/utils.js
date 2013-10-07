@@ -1,5 +1,5 @@
-(function (window, undefined) {
-    Transcripts.Utils = (function () {
+define(["jquery", "backbone", "underscore", "jquery.ajaxQueue"], function($, Backbone, _) {
+    var Utils = (function () {
         var Storage = {};
 
         /**
@@ -185,8 +185,6 @@
             var result;
 
             if (typeof url !== 'string') {
-                console.log('Transcripts.Utils.parseLink');
-                console.log('TypeError: Wrong argument type.');
 
                 return void(0);
             }
@@ -362,4 +360,6 @@
             }
         };
     }());
-}(this));
+
+    return Utils;
+});
