@@ -35,6 +35,16 @@ from .access import has_access
 log = logging.getLogger(__name__)
 
 
+def log_and_return_response(response, message, status_code=400):
+    """
+    Simplify similar actions: log message and return JsonResponse with message included in response.
+
+    By default return 400 (Bad Request) Response.
+    """
+    log.error(message)
+    response['status'] = message
+    return JsonResponse(response, status_code)
+
 def upload_transcripts(request):
     """
     Upload transcripts for current module.
@@ -46,36 +56,32 @@ def upload_transcripts(request):
     """
 
     response = {
-        'status': 'Error',
+        'status': 'Unknown Error',
         'subs': '',
     }
 
     item_location = request.POST.get('id')
     if not item_location:
-        log.error('POST data without "id" form data.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'POST data without "id" form data.')
 
     if 'file' not in request.FILES:
-        log.error('POST data without "file" form data.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'POST data without "file" form data.')
 
     video_list = request.POST.get('video_list')
     if not video_list:
-        log.error('POST data without video names.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'POST data without video names.')
 
     try:
         video_list = json.loads(video_list)
     except ValueError:
-        log.error("Invalid JSON.")
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Invalid video_list JSON.')
 
     source_subs_filedata = request.FILES['file'].read().decode('utf8')
     source_subs_filename = request.FILES['file'].name
 
     if '.' not in source_subs_filename:
-        log.error("Undefined file extension.")
-        return JsonResponse(response)
+        return log_and_return_response(response, "Undefined file extension.")
+
 
     basename = os.path.basename(source_subs_filename)
     source_subs_name = os.path.splitext(basename)[0]
@@ -84,16 +90,14 @@ def upload_transcripts(request):
     try:
         item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
-        log.error("Can't find item by location.")
-        return JsonResponse(response)
+        return log_and_return_response(response, "Can't find item by location.")
 
     # Check permissions for this user within this course.
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
     if item.category != 'video':
-        log.error('transcripts are supported only for "video" modules.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Yranscripts are supported only for "video" modules.')
 
     # Allow upload only if any video link is presented
     if video_list:
@@ -124,8 +128,7 @@ def upload_transcripts(request):
                 response['status'] = 'Success'
 
     else:
-        log.error('Empty video sources.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Empty video sources.')
 
     return JsonResponse(response)
 
@@ -214,7 +217,7 @@ def check_transcripts(request):
     }
     validation_status, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return JsonResponse(transcripts_presence)
+        return log_and_return_response(transcripts_presence, 'Validation is not passed.')
 
     transcripts_presence['status'] = 'Success'
 
@@ -348,7 +351,7 @@ def choose_transcripts(request):
 
     validation_status, data, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Validation is not passed.')
 
     html5_id = data.get('html5_id')
 
@@ -378,11 +381,11 @@ def replace_transcripts(request):
 
     validation_status, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Validation is not passed.')
 
     youtube_id = videos['youtube']
     if not youtube_id:
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Youtube id is not presented.')
 
     download_youtube_subs({1.0: youtube_id}, item)
     item.sub = youtube_id
@@ -444,7 +447,7 @@ def rename_transcripts(request):
 
     validation_status, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Validation is not passed.')
 
     old_name = item.sub
 
@@ -462,19 +465,17 @@ def rename_transcripts(request):
 
 
 def save_transcripts(request):
-    response = {'status': 'Error'}
+    response = {'status': 'Unknown Error'}
 
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
-        log.error('Incoming video data is empty.')
-        return JsonResponse(response)
+        return log_and_return_response(response, 'Incoming video data is empty.')
 
     item_location = data.get('id')
     try:
         item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
-        log.error("Can't find item by location.")
-        return JsonResponse(response)
+        return log_and_return_response(response, "Can't find item by location.")
 
     metadata = data.get('metadata')
     if metadata is not None:
@@ -488,18 +489,14 @@ def save_transcripts(request):
         if new_sub:
             manage_video_subtitles_save(item, new_item)
         else:
-            # If `new_sub` is empty, it means that user do not want to use
-            # transcripts for current video and we remove all
-            # of them.
+            # If `new_sub` is empty, it means that user explicitly does not want to use
+            # transcripts for current video and we remove all transcripts from storage.
             current_subs = data.get('current_subs')
             if current_subs is not None:
                 for sub in current_subs:
                     remove_subs_from_store(sub, new_item)
 
         response = {'status': 'Success'}
-
-    else:
-        log.error("Can't find metadata")
 
     return JsonResponse(response)
 
