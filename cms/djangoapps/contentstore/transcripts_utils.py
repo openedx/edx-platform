@@ -305,14 +305,18 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False):
 
 def manage_video_subtitles_save(old_item, new_item):
     """
-    Does some spesific thins, that can be done only on save.
+    Does some specific thins, that can be done only on save.
 
-    List of things::
+    Video player item has some video fields: HTML5 ones and Youtube one.
 
-    1. If value of new_item.sub field is different from values of video fields,
-    and new_item.sub file is present,
-    cretes copies of new_item.sub file with new names, equal to video names.
-    Also changes sub field of module.
+    1. If value of `sub` field of `new_item` is different from values of video fields of `new_item`,
+    and `new_item.sub` file is present, then code in this function creates copies of
+    `new_item.sub` file with new names. That names are equal to values of video fields of `new_item`
+    After that `sub` field of `new_item` is changed to one of values of video fields.
+    This whole action ensures that after user changes video fields, proper `sub` files, corresponding
+    to new values of video fields, will be presented in system.
+
+    old_item is not used here, but is added for future changes.
     """
 
     # 1.
