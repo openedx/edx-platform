@@ -14,12 +14,13 @@ from pytz import UTC
 class Command(BaseCommand):
 
     help = """
-    Find all students that need certificates
-    for courses that have finished and
-    put their cert requests on the queue
+    Find all students that need certificates for courses that have finished and
+    put their cert requests on the queue.
 
-    Use the --noop option to test without actually
-    putting certificates on the queue to be generated.
+    If --user is given, only grade and certify the requested username.
+
+    Use the --noop option to test without actually putting certificates on the
+    queue to be generated.
     """
 
     option_list = BaseCommand.option_list + (
@@ -42,6 +43,11 @@ class Command(BaseCommand):
                     'whose entry in the certificate table matches STATUS. '
                     'STATUS can be generating, unavailable, deleted, error '
                     'or notpassing.'),
+        make_option('-u', '--user',
+                    metavar='USERNAME',
+                    dest='username',
+                    default=False,
+                    help='Will generate new certificates for only one user.'),
     )
 
     def handle(self, *args, **options):
@@ -72,14 +78,29 @@ class Command(BaseCommand):
                 if course.has_ended():
                     ended_courses.append(course_id)
 
+        single_student = None
+        if options['username']:
+            user_str = options['username']
+            if '@' in user_str:
+                single_student = User.objects.get(email=user_str)
+            else:
+                single_student = User.objects.get(username=user_str)
+
         for course_id in ended_courses:
             # prefetch all chapters/sequentials by saying depth=2
             course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
 
-            print "Fetching enrolled students for {0}".format(course_id)
-            enrolled_students = User.objects.filter(
-                courseenrollment__course_id=course_id).prefetch_related(
-                    "groups").order_by('username')
+            if single_student:
+                print "Fetching enrollment for student {0} in {1}".format(single_student.username, course_id)
+                enrolled_students = User.objects.filter(
+                    courseenrollment__course_id=course_id, 
+                    id=single_student.id).prefetch_related("groups")
+            else:
+                print "Fetching enrolled students for {0}".format(course_id)
+                enrolled_students = User.objects.filter(
+                    courseenrollment__course_id=course_id).prefetch_related(
+                        "groups").order_by('username')
+
             xq = XQueueCertInterface()
             total = enrolled_students.count()
             count = 0
