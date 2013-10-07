@@ -1,10 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-<script language="JavaScript" type="text/javascript">
-</script>
-<script type="text/javascript" src="jsi18n/"></script>
-<div class="vert-left send-email">
+<div class="vert-left send-email" id="section-send-email">
   <h2> ${_("Send Email")} </h2>
   <div class="request-response msg msg-confirm copy" id="request-response"></div>
   <ul class="list-fields">

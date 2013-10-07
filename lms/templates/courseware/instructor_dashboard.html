@@ -201,11 +201,7 @@ function goto( mode)
 
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
-<<<<<<< HEAD
     <input type="submit" name="action" value="Dump description of graded assignments configuration">
-=======
-    <input type="submit" name="action" value="Dump description of graded assignments configuration" class="${'is-disabled' if disable_buttons else ''}">
->>>>>>> disable buttons for large courses on legacy and beta instr dash
     </p>
     <hr width="40%" style="align:left">
 
@@ -402,7 +398,6 @@ function goto( mode)
     <hr width="40%" style="align:left">
     <h2>${_("Enrollment Data")}</h2>
     % if disable_buttons:
-<<<<<<< HEAD
 
     <div class="msg msg-warning">
       <div class="copy">
@@ -417,18 +412,6 @@ function goto( mode)
         </p>
       </div>
     </div>
-=======
-    <p><font color="red">
-        ${_("Note: some of these buttons are known to time out for larger "
-            "courses. We have temporarily disabled those features for courses "
-            "with more than {max_enrollment} students. We are urgently working on "
-            "fixing this issue. Thank you for your patience as we continue "
-            "working to improve the platform!").format(
-            max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
-          )}
-      </font></p>
-      <br>
->>>>>>> disable buttons for large courses on legacy and beta instr dash
     % endif
 
     <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}">
