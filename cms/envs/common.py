@@ -193,7 +193,8 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'

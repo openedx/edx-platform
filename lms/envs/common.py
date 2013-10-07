@@ -426,7 +426,8 @@ ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
 EMAILS_PER_TASK = 100
