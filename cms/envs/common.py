@@ -250,6 +250,25 @@ PIPELINE_CSS = {
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
+    'main': {
+        'source_filenames': sorted(
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
+            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
+        ) + ['js/hesitate.js', 'js/base.js', 'js/views/feedback.js',
+             'js/models/course.js',
+             'js/models/section.js', 'js/views/section.js',
+             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
+             'js/models/uploads.js', 'js/views/uploads.js',
+             'js/models/textbook.js', 'js/views/textbook.js',
+             'js/src/utility.js',
+             'js/models/settings/course_grading_policy.js',
+             'js/models/asset.js', 'js/models/assets.js',
+             'js/views/assets.js',
+             'js/views/import.js',
+             'js/views/assets_view.js', 'js/views/asset_view.js'],
+        'output_filename': 'js/cms-application.js',
+        'test_order': 0
+    },
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
