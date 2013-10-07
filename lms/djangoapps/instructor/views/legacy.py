@@ -105,12 +105,15 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get('idash_mode', 'Grades')
 
+    enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
+
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
-        datatable = {'header': ['Statistic', 'Value'],
-                     'title': _u('Course Statistics At A Glance'),
-                     }
-        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
+        datatable = {
+            'header': ['Statistic', 'Value'],
+            'title': _u('Course Statistics At A Glance'),
+        }
+        data = [['# Enrolled', enrollment_number]]
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
@@ -832,35 +835,43 @@ def instructor_dashboard(request, course_id):
     if not datatable:
         course_stats = get_course_stats_table()
 
+    # disable buttons for large courses
+    disable_buttons = False
+    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    if max_enrollment_for_buttons is not None:
+        disable_buttons = enrollment_number > max_enrollment_for_buttons
+
     #----------------------------------------
     # context for rendering
 
-    context = {'course': course,
-               'staff_access': True,
-               'admin_access': request.user.is_staff,
-               'instructor_access': instructor_access,
-               'forum_admin_access': forum_admin_access,
-               'datatable': datatable,
-               'course_stats': course_stats,
-               'msg': msg,
-               'modeflag': {idash_mode: 'selectedmode'},
-               'studio_url': studio_url,
+    context = {
+        'course': course,
+        'staff_access': True,
+        'admin_access': request.user.is_staff,
+        'instructor_access': instructor_access,
+        'forum_admin_access': forum_admin_access,
+        'datatable': datatable,
+        'course_stats': course_stats,
+        'msg': msg,
+        'modeflag': {idash_mode: 'selectedmode'},
+        'studio_url': studio_url,
 
-               'to_option': email_to_option,      # email
-               'subject': email_subject,          # email
-               'editor': email_editor,            # email
-               'email_msg': email_msg,            # email
-               'show_email_tab': show_email_tab,  # email
+        'to_option': email_to_option,      # email
+        'subject': email_subject,          # email
+        'editor': email_editor,            # email
+        'email_msg': email_msg,            # email
+        'show_email_tab': show_email_tab,  # email
 
-               'problems': problems,		# psychometrics
-               'plots': plots,			# psychometrics
-               'course_errors': modulestore().get_item_errors(course.location),
-               'instructor_tasks': instructor_tasks,
-               'offline_grade_log': offline_grades_available(course_id),
-               'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+        'problems': problems,		# psychometrics
+        'plots': plots,			# psychometrics
+        'course_errors': modulestore().get_item_errors(course.location),
+        'instructor_tasks': instructor_tasks,
+        'offline_grade_log': offline_grades_available(course_id),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-               'analytics_results': analytics_results,
-               }
+        'analytics_results': analytics_results,
+        'disable_buttons': disable_buttons
+    }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})

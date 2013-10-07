@@ -18,6 +18,77 @@
     right: 15px;
     font-size: 11pt;
   }
+
+  // system feedback - messages
+  .msg {
+    border-radius: 1px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+
+    .copy {
+      font-weight: 600;
+    }
+  }
+
+  // TYPE: warning
+  .msg-warning {
+    border-top: 2px solid $warning-color;
+    background: tint($warning-color,95%);
+
+    .copy {
+      color: $warning-color;
+    }
+  }
+
+  // TYPE: confirm
+  .msg-confirm {
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+
+    .copy {
+      color: $confirm-color;
+    }
+  }
+
+  // TYPE: confirm
+  .msg-error {
+    border-top: 2px solid $error-color;
+    background: tint($error-color,95%);
+
+    .copy {
+      color: $error-color;
+    }
+  }
+
+  // ====================
+
+  // inline copy
+  .copy-confirm {
+    color: $confirm-color;
+  }
+
+  .copy-warning {
+    color: $warning-color;
+  }
+
+  .copy-error {
+    color: $error-color;
+  }
+
+  .list-advice {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+
+    .item {
+      font-weight: 600;
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 }
 
 section.instructor-dashboard-content-2 {
