@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-01 19:32+0400\n"
-"PO-Revision-Date: 2013-09-24 16:51+0400\n"
-"Last-Translator: yushchenko <pavelyushchenko@gmail.com>\n"
+"PO-Revision-Date: 2013-10-07 18:35+0400\n"
+"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
 "language/ru/)\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Poedit 1.5.7\n"
 "X-POOTLE-MTIME: 1379953606.0\n"
 
 #: cms/static/coffee/src/main.js:38
@@ -264,9 +264,8 @@ msgid "Uploading…"
 msgstr "Загрузка…"
 
 #: cms/static/js/views/assets.js:66
-#, fuzzy
 msgid "Choose File"
-msgstr "Выбрать все"
+msgstr "Выбрать файл"
 
 #: cms/static/js/views/assets.js:80
 msgid "Upload New File"
@@ -456,10 +455,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:699
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:699
-#, fuzzy
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr "Вы уверены, что хотите удалить это обновление?"
+msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:745
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:745
@@ -485,9 +483,8 @@ msgstr ""
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:897
 #: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:631
 #: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:640
-#, fuzzy
 msgid "Hide Question"
-msgstr "Скрыть дискуссии"
+msgstr "Скрыть задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:833
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:905
@@ -495,9 +492,8 @@ msgstr "Скрыть дискуссии"
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:833
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:905
 #: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:632
-#, fuzzy
 msgid "Show Question"
-msgstr "Показать дискуссии"
+msgstr "Показать задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:912
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:912
@@ -746,14 +742,12 @@ msgid "Try loading again"
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:455
-#, fuzzy
 msgid "available"
-msgstr "Доступно %s"
+msgstr "доступно"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:456
-#, fuzzy
 msgid "graded"
-msgstr "Оценено"
+msgstr "оценено"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:457
 msgid "more needed to start ML"
