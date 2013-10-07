@@ -127,10 +127,10 @@ $(document).ready(function() {
     $('.sync-date').bind('click', syncReleaseDate);
 
     // import form setup
-    $('.import .file-input').bind('change', showImportSubmit);
-    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
+    $('.view-import .file-input').bind('change', showImportSubmit);
+    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
-        $('.import .file-input').click();
+        $('.view-import .file-input').click();
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -227,7 +227,7 @@ function showImportSubmit(e) {
         $('.error-block').hide();
         $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
         $('.file-name-block').show();
-        $('.import .choose-file-button').hide();
+        $('.view-import .choose-file-button').hide();
         $('.submit-button').show();
         $('.progress').show();
     } else {

@@ -9,7 +9,6 @@ import shutil
 import re
 from tempfile import mkdtemp
 from path import path
-from contextlib import contextmanager
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -18,8 +17,9 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
-from django.views.decorators.http import require_http_methods
 from django.core.exceptions import SuspiciousOperation
+from django.views.decorators.http import require_http_methods, require_GET
+from django.utils.translation import ugettext as _
 
 from mitxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
@@ -36,7 +36,7 @@ from util.json_request import JsonResponse
 from extract_tar import safetar_extractall
 
 
-__all__ = ['import_course', 'generate_export_course', 'export_course']
+__all__ = ['import_course', 'import_status', 'generate_export_course', 'export_course']
 
 log = logging.getLogger(__name__)
 
@@ -55,20 +55,6 @@ def import_course(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    @contextmanager
-    def wfile(filename, dirname):
-        """
-        A with-context that creates `filename` on entry and removes it on exit.
-        `filename` is truncted on creation. Additionally removes dirname on
-        exit.
-        """
-        open(filename, "w").close()
-        try:
-            yield filename
-        finally:
-            os.remove(filename)
-            shutil.rmtree(dirname)
-
     if request.method == 'POST':
 
         data_root = path(settings.GITHUB_REPO_ROOT)
@@ -78,7 +64,10 @@ def import_course(request, org, course, name):
         filename = request.FILES['course-data'].name
         if not filename.endswith('.tar.gz'):
             return JsonResponse(
-                {'ErrMsg': 'We only support uploading a .tar.gz file.'},
+                {
+                    'ErrMsg': _('We only support uploading a .tar.gz file.'),
+                    'Stage': 1
+                },
                 status=415
             )
         temp_filepath = course_dir / filename
@@ -112,7 +101,10 @@ def import_course(request, org, course, name):
                     size
                 )
                 return JsonResponse(
-                    {'ErrMsg': 'File upload corrupted. Please try again'},
+                    {
+                        'ErrMsg': _('File upload corrupted. Please try again'),
+                        'Stage': 1
+                    },
                     status=409
                 )
             # The last request sometimes comes twice. This happens because
@@ -145,15 +137,15 @@ def import_course(request, org, course, name):
 
         else:   # This was the last chunk.
 
-            # 'Lock' with status info.
-            status_file = data_root / (course + filename + ".lock")
+            # Use sessions to keep info about import progress
+            session_status = request.session.setdefault("import_status", {})
+            key = org + course + filename
+            session_status[key] = 1
+            request.session.modified = True
 
-            # Do everything from now on in a with-context, to be sure we've
-            # properly cleaned up.
-            with wfile(status_file, course_dir):
-
-                with open(status_file, 'w+') as sf:
-                    sf.write("Extracting")
+            # Do everything from now on in a try-finally block to make sure
+            # everything is properly cleaned up.
+            try:
 
                 tar_file = tarfile.open(temp_filepath)
                 try:
@@ -162,17 +154,18 @@ def import_course(request, org, course, name):
                     return JsonResponse(
                         {
                             'ErrMsg': 'Unsafe tar file. Aborting import.',
-                            'SuspiciousFileOperationMsg': exc.args[0]
+                            'SuspiciousFileOperationMsg': exc.args[0],
+                            'Stage': 1
                         },
                         status=400
                     )
+                finally:
+                    tar_file.close()
 
-                with open(status_file, 'w+') as sf:
-                    sf.write("Verifying")
+                session_status[key] = 2
+                request.session.modified = True
 
                 # find the 'course.xml' file
-                dirpath = None
-
                 def get_all_files(directory):
                     """
                     For each file in the directory, yield a 2-tuple of (file-name,
@@ -199,7 +192,10 @@ def import_course(request, org, course, name):
 
                 if not dirpath:
                     return JsonResponse(
-                        {'ErrMsg': 'Could not find the course.xml file in the package.'},
+                        {
+                            'ErrMsg': _('Could not find the course.xml file in the package.'),
+                            'Stage': 2
+                        },
                         status=415
                     )
 
@@ -221,11 +217,24 @@ def import_course(request, org, course, name):
 
                 logging.debug('new course at {0}'.format(course_items[0].location))
 
-                with open(status_file, 'w') as sf:
-                    sf.write("Updating course")
+                session_status[key] = 3
+                request.session.modified = True
 
                 create_all_course_groups(request.user, course_items[0].location)
                 logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
+            # Send errors to client with stage at which error occured.
+            except Exception as exception:   # pylint: disable=W0703
+                return JsonResponse(
+                    {
+                        'ErrMsg': str(exception),
+                        'Stage': session_status[key]
+                    },
+                    status=400
+                )
+
+            finally:
+                shutil.rmtree(course_dir)
 
             return JsonResponse({'Status': 'OK'})
     else:
@@ -239,6 +248,29 @@ def import_course(request, org, course, name):
                 'name': location.name,
             })
         })
+
+
+@require_GET
+@ensure_csrf_cookie
+@login_required
+def import_status(request, org, course, name):
+    """
+    Returns an integer corresponding to the status of a file import. These are:
+
+        0 : No status info found (import done or upload still in progress)
+        1 : Extracting file
+        2 : Validating.
+        3 : Importing to mongo
+
+    """
+
+    try:
+        session_status = request.session["import_status"]
+        status = session_status[org + course + name]
+    except KeyError:
+        status = 0
+
+    return JsonResponse({"ImportStatus": status})
 
 
 @ensure_csrf_cookie
