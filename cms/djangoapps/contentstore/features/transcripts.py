@@ -13,6 +13,7 @@ from xmodule.exceptions import NotFoundError
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
+# We should wait 300 ms for event handler invocation + 200ms for safety.
 DELAY = 0.5
 
 ERROR_MESSAGES = {
