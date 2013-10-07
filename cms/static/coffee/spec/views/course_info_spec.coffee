@@ -10,6 +10,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                      </div>
                      <div class="sidebar window course-handouts" id="course-handouts-view"></div>
                      </div>
+                     <div class="modal-cover"></div>
                      """
 
     beforeEach ->
@@ -45,12 +46,55 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 preventDefault : () -> 'no op'
             }
 
-            @createNewUpdate = () ->
+            @createNewUpdate = (text) ->
                 # Edit button is not in the template under test (it is in parent HTML).
                 # Therefore call onNew directly.
                 @courseInfoEdit.onNew(@event)
-                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn(text)
                 @courseInfoEdit.$el.find('.save-button').click()
+
+            @cancelNewCourseInfo = (useCancelButton) ->
+                spyOn(@courseInfoEdit.$modalCover, 'show').andCallThrough()
+                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+
+                @courseInfoEdit.onNew(@event)
+                expect(@courseInfoEdit.$modalCover.show).toHaveBeenCalled()
+
+                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
+                model = @collection.at(0)
+                spyOn(model, "save").andCallThrough()
+
+                cancelEditingUpdate(useCancelButton)
+
+                expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
+                expect(model.save).not.toHaveBeenCalled()
+                previewContents = @courseInfoEdit.$el.find('.update-contents').html()
+                expect(previewContents).not.toEqual('unsaved changes')
+
+            @cancelExistingCourseInfo = (useCancelButton) ->
+                @createNewUpdate('existing update')
+
+                spyOn(@courseInfoEdit.$modalCover, 'show').andCallThrough()
+                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                @courseInfoEdit.$el.find('.edit-button').click()
+                expect(@courseInfoEdit.$modalCover.show).toHaveBeenCalled()
+
+                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('modification')
+                model = @collection.at(0)
+                spyOn(model, "save").andCallThrough()
+
+                cancelEditingUpdate(useCancelButton)
+
+                expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
+                expect(model.save).not.toHaveBeenCalled()
+                previewContents = @courseInfoEdit.$el.find('.update-contents').html()
+                expect(previewContents).toEqual('existing update')
+
+            cancelEditingUpdate = (update, useCancelButton) ->
+                if useCancelButton
+                    update.$el.find('.cancel-button').click()
+                else
+                    $('.modal-cover').click()
 
         afterEach ->
             @xhrRestore()
@@ -75,19 +119,30 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
         it "does rewrite links for preview", ->
             # Create a new update.
-            @createNewUpdate()
+            @createNewUpdate('/static/image.jpg')
 
             # Verify the link is rewritten for preview purposes.
             previewContents = @courseInfoEdit.$el.find('.update-contents').html()
             expect(previewContents).toEqual('base-asset-url/image.jpg')
 
         it "shows static links in edit mode", ->
-            @createNewUpdate()
+            @createNewUpdate('/static/image.jpg')
 
             # Click edit and verify CodeMirror contents.
             @courseInfoEdit.$el.find('.edit-button').click()
             expect(@courseInfoEdit.$codeMirror.getValue()).toEqual('/static/image.jpg')
 
+        it "removes newly created course info on cancel", ->
+            @cancelNewCourseInfo(true)
+
+        it "removes newly created course info on click outside modal", ->
+            @cancelNewCourseInfo(false)
+
+        it "does not remove existing course info on cancel", ->
+            @cancelExistingCourseInfo(true)
+
+        it "does not remove existing course info on click outside modal", ->
+            @cancelExistingCourseInfo(false)
 
     describe "Course Handouts", ->
         handoutsTemplate = readFixtures('course_info_handouts.underscore')
