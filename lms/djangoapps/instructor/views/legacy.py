@@ -58,7 +58,7 @@ import track.views
 from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _u
 
 log = logging.getLogger(__name__)
 
@@ -744,9 +744,9 @@ def instructor_dashboard(request, course_id):
         else:
             # If sending the task succeeds, deliver a success message to the user.
             if email_to_option == "all":
-                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _('Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.') + '</p></div>'
+                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.') + '</p></div>'
             else:
-                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _('Your email was successfully queued for sending.') + '</p></div>'
+                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending.') + '</p></div>'
 
     elif "Show Background Email Task History" in action:
         message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
