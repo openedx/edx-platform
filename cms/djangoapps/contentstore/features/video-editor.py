@@ -19,9 +19,14 @@ def set_show_captions(step, setting):
 @step('when I view the video it (.*) show the captions$')
 def shows_captions(_step, show_captions):
     world.wait_for_js_variable_truthy("Video")
-    world.wait(0.5)
+
     if show_captions == 'does not':
-        assert world.is_css_present('div.video.closed')
+
+        # 30 seconds is a long time to wait for the video to
+        # appear, but it seems to be necessary for this test to pass
+        # consistently.  If the video appears sooner, then this
+        # check won't wait the full 30 seconds.
+        assert world.is_css_present('div.video.closed', wait_time=30)
     else:
         assert world.is_css_not_present('div.video.closed')
 
