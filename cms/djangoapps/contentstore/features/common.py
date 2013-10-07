@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_false  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal, assert_in, assert_false  # pylint: disable=E0611
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
 from django.conf import settings
@@ -64,32 +64,16 @@ def select_new_course(_step, whom):
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
-    # TODO: fix up this code. Selenium is not dealing well with css transforms,
-    # as it thinks that the notification and the buttons are always visible
 
-    # First wait for the notification to pop up
-    notification_css = 'div#page-notification div.wrapper-notification'
-    world.wait_for_visible(notification_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    # Now make sure the button is there
+    # Because the notification uses a CSS transition,
+    # Selenium will always report it as being visible.
+    # This makes it very difficult to successfully click
+    # the "Save" button at the UI level.
+    # Instead, we use JavaScript to reliably click
+    # the button.
     btn_css = 'div#page-notification a.action-%s' % name.lower()
-    world.wait_for_visible(btn_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    if world.is_firefox():
-        # This is done to explicitly make the changes save on firefox.
-        # It will remove focus from the previously focused element
-        world.trigger_event(btn_css, event='focus')
-        world.browser.execute_script("$('{}').click()".format(btn_css))
-    else:
-        world.css_click(btn_css)
+    world.trigger_event(btn_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(btn_css))
     world.wait_for_ajax_complete()
 
 
