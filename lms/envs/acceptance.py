@@ -74,6 +74,14 @@ DATABASES = {
     }
 }
 
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'track.backends.mongodb.MongoBackend'
+    }
+})
+
+DEFAULT_BULK_FROM_EMAIL = "test@test.org"
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -111,7 +119,7 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware',)
+LETTUCE_APPS = ('courseware', 'instructor',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid

@@ -47,11 +47,10 @@ def instructor_dashboard_2(request, course_id):
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
         _section_data_download(course_id),
-        _section_analytics(course_id)
+        _section_analytics(course_id),
     ]
 
     enrollment_count = sections[0]['enrollment_count']
-
     disable_buttons = False
     max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
@@ -160,14 +159,14 @@ def _section_data_download(course_id):
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
-    fragment = course.system.render(html_module, None, 'studio_view')
+    fragment = course.system.render(html_module, 'studio_view')
     fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
-        'access': access, 
-        'send_email': reverse('send_email',kwargs={'course_id': course_id}),
+        'access': access,
+        'send_email': reverse('send_email', kwargs={'course_id': course_id}),
         'editor': email_editor
     }
     return section_data

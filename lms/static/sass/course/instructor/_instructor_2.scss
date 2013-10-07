@@ -22,8 +22,9 @@
   // system feedback - messages
   .msg {
     border-radius: 1px;
-    padding: 10px 15px;
-    margin-bottom: 20px;
+    padding: $baseline/2 $baseline*0.75;
+    margin-bottom: $baseline;
+    font-weight: 600;
 
     .copy {
       font-weight: 600;
@@ -44,10 +45,8 @@
   .msg-confirm {
     border-top: 2px solid $confirm-color;
     background: tint($confirm-color,95%);
-
-    .copy {
-      color: $confirm-color;
-    }
+    display: none;
+    color: $confirm-color;
   }
 
   // TYPE: confirm
@@ -76,7 +75,7 @@
   .list-advice {
     list-style: none;
     padding: 0;
-    margin: 20px 0;
+    margin: $baseline 0;
 
     .item {
       font-weight: 600;
@@ -249,7 +248,7 @@ section.instructor-dashboard-content-2 {
     padding: 0;
 
     .field {
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
       padding: 0;
 
       &:last-child {
@@ -257,43 +256,6 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
-
-  // system feedback - messages
-  .msg {
-    border-radius: 1px;
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    font-weight: 600;
-    color: green;
-
-    .copy {
-      font-weight: 600;
-    }
-  }
-
-  .msg-confirm {
-    background: tint(green,90%);
-    display: none;
-  }
-
-  .list-advice {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-
-    .item {
-      font-weight: 600;
-      margin-bottom: 10px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-   .copy {
-      font-weight: 600; }
-  .msg-confirm {
-    background: #e5f2e5; }
 }
 
 

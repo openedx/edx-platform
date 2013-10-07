@@ -98,7 +98,7 @@ def require_query_params(*args, **kwargs):
             for (param, extra) in required_params:
                 default = object()
                 if request.GET.get(param, default) == default:
-                    error_response_data['parameters'] += [param]
+                    error_response_data['parameters'].append(param)
                     error_response_data['info'][param] = extra
 
             if len(error_response_data['parameters']) > 0:
@@ -108,14 +108,14 @@ def require_query_params(*args, **kwargs):
         return wrapped
     return decorator
 
+
 def require_post_params(*args, **kwargs):
     """
-    Checks for required paremters or renders a 400 error.
+    Checks for required parameters or renders a 400 error.
     (decorator with arguments)
 
-    `args` is a *list of required GET parameter names.
-    `kwargs` is a **dict of required GET parameter names
-        to string explanations of the parameter
+    Functions like 'require_query_params', but checks for
+    POST parameters rather than GET parameters.
     """
     required_params = []
     required_params += [(arg, None) for arg in args]
@@ -135,7 +135,7 @@ def require_post_params(*args, **kwargs):
             for (param, extra) in required_params:
                 default = object()
                 if request.POST.get(param, default) == default:
-                    error_response_data['parameters'] += [param]
+                    error_response_data['parameters'].append(param)
                     error_response_data['info'][param] = extra
 
             if len(error_response_data['parameters']) > 0:
@@ -755,10 +755,11 @@ def send_email(request, course_id):
     Send an email to self, staff, or everyone involved in a course.
     Query Parameters:
     - 'send_to' specifies what group the email should be sent to
+       Options are defined by the Email model in
+       lms/djangoapps/bulk_email/models.py
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
-    course = get_course_by_id(course_id)
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
@@ -769,52 +770,11 @@ def send_email(request, course_id):
         to_option=send_to,
         subject=subject,
         html_message=message,
-        text_message=text_message
+        text_message=text_message,
     )
     email.save()
-    tasks.delegate_email_batches.delay(
-        email.id,
-        request.user.id
-    )
-    response_payload = {
-        'course_id': course_id,
-    }
-    return JsonResponse(response_payload)
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
-def send_email(request, course_id):
-    """
-    Send an email to self, staff, or everyone involved in a course.
-    Query Parameters:
-    - 'send_to' specifies what group the email should be sent to
-    - 'subject' specifies email's subject
-    - 'message' specifies email's content
-    """
-    course = get_course_by_id(course_id)
-    send_to = request.POST.get("send_to")
-    subject = request.POST.get("subject")
-    message = request.POST.get("message")
-    text_message = html_to_text(message)
-    email = CourseEmail(
-        course_id=course_id,
-        sender=request.user,
-        to_option=send_to,
-        subject=subject,
-        html_message=message,
-        text_message=text_message
-    )
-    email.save()
-    tasks.delegate_email_batches.delay(
-        email.id,
-        request.user.id
-    )
-    response_payload = {
-        'course_id': course_id,
-    }
+    tasks.delegate_email_batches.delay(email.id, request.user.id)  # pylint: disable=E1101
+    response_payload = {'course_id': course_id}
     return JsonResponse(response_payload)
 
 

@@ -2,24 +2,21 @@
 Define steps for bulk email acceptance test.
 """
 
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
 from lettuce.django import mail
-from nose.tools import assert_in, assert_true, assert_equal
+from nose.tools import assert_in, assert_true, assert_equal  # pylint: disable=E0611
 from django.core.management import call_command
+from django.conf import settings
 
 
 @step(u'I am an instructor for a course')
-def i_am_an_instructor(step):
+def i_am_an_instructor(step):  # pylint: disable=W0613
 
     # Clear existing courses to avoid conflicts
     world.clear_courses()
-
-    # Create a new course
-    course = world.CourseFactory.create(
-        org='edx',
-        number='999',
-        display_name='Test Course'
-    )
 
     # Register the instructor as staff for the course
     world.register_by_course_id(
@@ -59,14 +56,14 @@ def i_am_an_instructor(step):
 # Dictionary mapping a description of the email recipient
 # to the corresponding <option> value in the UI.
 SEND_TO_OPTIONS = {
-        'myself': 'myself',
-        'course staff': 'staff',
-        'students, staff, and instructors': 'all'
+    'myself': 'myself',
+    'course staff': 'staff',
+    'students, staff, and instructors': 'all'
 }
 
 
 @step(u'I send email to "([^"]*)"')
-def when_i_send_an_email(step, recipient):
+def when_i_send_an_email(recipient):
 
     # Check that the recipient is valid
     assert_in(
@@ -99,10 +96,9 @@ def when_i_send_an_email(step, recipient):
     world.css_click('input[name="send"]')
 
     # Expect to see a message that the email was sent
-    # TODO -- identify the message by CSS ID instead of index
     expected_msg = "Your email was successfully queued for sending."
     assert_true(
-        world.css_has_text('div.request-response', expected_msg, index=1, allow_blank=False),
+        world.css_has_text('div.request-response', expected_msg, '#request-response', allow_blank=False),
         msg="Could not find email success message."
     )
 
@@ -117,8 +113,9 @@ EXPECTED_ADDRESSES = {
 
 UNSUBSCRIBE_MSG = 'To stop receiving email like this'
 
+
 @step(u'Email is sent to "([^"]*)"')
-def then_the_email_is_sent(step, recipient):
+def then_the_email_is_sent(recipient):
 
     # Check that the recipient is valid
     assert_in(
@@ -129,8 +126,8 @@ def then_the_email_is_sent(step, recipient):
     # Retrieve messages.  Because we are using celery in "always eager"
     # mode, we expect all messages to be sent by this point.
     messages = []
-    while not mail.queue.empty():
-        messages.append(mail.queue.get())
+    while not mail.queue.empty():  # pylint: disable=E1101
+        messages.append(mail.queue.get())  # pylint: disable=E1101
 
     # Check that we got the right number of messages
     assert_equal(
@@ -143,8 +140,8 @@ def then_the_email_is_sent(step, recipient):
     # Check that the message properties were correct
     recipients = []
     for msg in messages:
-        assert_equal(msg.subject, u'[Test Course] Hello')
-        assert_equal(msg.from_email, u'"Test Course" Course Staff <course-updates@edx.org>')
+        assert_in('Hello', msg.subject)
+        assert_in(settings.DEFAULT_BULK_FROM_EMAIL, msg.from_email)
 
         # Message body should have the message we sent
         # and an unsubscribe message
@@ -153,7 +150,7 @@ def then_the_email_is_sent(step, recipient):
 
         # Should have alternative HTML form
         assert_equal(len(msg.alternatives), 1)
-        content, mime_type = msg.alternatives[0]
+        content = msg.alternatives[0]
         assert_in('test message', content)
         assert_in(UNSUBSCRIBE_MSG, content)
 

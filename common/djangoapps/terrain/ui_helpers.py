@@ -71,6 +71,23 @@ def css_has_text(css_selector, text, index=0, strip=False):
 
 
 @world.absorb
+def css_has_value(css_selector, value, index=0):
+    """
+    Return a boolean indicating whether the element with
+    `css_selector` has the specified `value`.
+
+    If there are multiple elements matching the css selector,
+    use `index` to indicate which one.
+    """
+    # If we're expecting a non-empty string, give the page
+    # a chance to fill in values
+    if value:
+        world.wait_for(lambda _: world.css_value(css_selector, index=index))
+
+    return world.css_value(css_selector, index=index) == value
+
+
+@world.absorb
 def wait_for(func, timeout=5):
         WebDriverWait(
             driver=world.browser.driver,
