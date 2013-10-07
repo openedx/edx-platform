@@ -19,7 +19,14 @@ def set_show_captions(step, setting):
 @step('when I view the video it (.*) show the captions$')
 def shows_captions(_step, show_captions):
     world.wait_for_js_variable_truthy("Video")
-    world.wait(0.5)
+
+    # In some cases, the video may not load
+    # because YouTube/S3 do not respond quickly enough.
+    # Reloading the page re-initiates the request.
+    if not world.is_css_present('div.video'):
+        world.browser.reload()
+        world.wait_for_js_variable_truthy("Video")
+
     if show_captions == 'does not':
         assert world.is_css_present('div.video.closed')
     else:
