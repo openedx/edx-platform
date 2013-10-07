@@ -3,25 +3,9 @@
 
 
 <h2>${_("Data Download")}</h2>
-% if disable_buttons:
-<div class="msg msg-warning">
-	<div class="copy">
-		<p>
-	    ${_("Note: some of these buttons are known to time out for larger "
-			"courses. We have temporarily disabled those features for courses "
-			"with more than {max_enrollment} students. We are urgently working on "
-			"fixing this issue. Thank you for your patience as we continue "
-			"working to improve the platform!").format(
-	        max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
-	      )}
-		</p>
-	</div>
-</div>
-	<br>
-% endif
 
-<input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }" class="${'is-disabled' if disable_buttons else ''}">
-<input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv ${'is-disabled' if disable_buttons else ''}" data-endpoint="${ section_data['get_students_features_url'] }" >
+<input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }">
+<input type="button" name="list-profiles" value="CSV" data-csv="true">
 <br>
 ## <input type="button" name="list-grades" value="Student grades">
 ## <input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv">
