@@ -769,10 +769,10 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(module.current_task_number, 0)
 
         html = module.get_html()
-        self.assertTrue(isinstance(html, basestring))
+        self.assertIsInstance(html, basestring)
 
         rubric = module.handle_ajax("get_combined_rubric", {})
-        self.assertTrue(isinstance(rubric, basestring))
+        self.assertIsInstance(rubric, basestring)
         self.assertEqual(module.state, "assessing")
         module.handle_ajax("reset", {})
         self.assertEqual(module.current_task_number, 0)
@@ -790,7 +790,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        self.assertIsInstance(status, basestring)
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
