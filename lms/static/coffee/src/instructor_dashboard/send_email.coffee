@@ -22,7 +22,6 @@ class SendEmail
     # attach click handlers
 
     @$btn_send.click =>
-
       if @$subject.val() == ""
         alert gettext("Your message must have a subject.")
       else if @$emailEditor.save()['data'] == ""
@@ -46,8 +45,11 @@ class SendEmail
             dataType: 'json'
             url: @$btn_send.data 'endpoint'
             data: send_data
-            success: (data) => @display_response gettext('Your email was successfully queued for sending.')
+            success: (data) => 
+              @display_response gettext('Your email was successfully queued for sending.')
+              $(".msg-confirm").css({"display":"block"})
             error: std_ajax_err => @fail_with_error gettext('Error sending email.')
+              $(".msg-confirm").css({"display":"none"})
 
   fail_with_error: (msg) ->
     console.warn msg

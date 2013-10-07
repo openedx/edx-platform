@@ -704,6 +704,80 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         
     def test_send_email_as_logged_in_instructor(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url,{
+            'send_to': 'staff',
+            'subject': 'test subject',
+            'message': 'test message',
+            })
+        self.assertEqual(response.status_code, 200)
+
+    def test_send_email_but_not_logged_in(self):
+        self.client.logout()
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+            'message': 'test message',
+            })
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_not_staff(self):
+        self.client.logout()
+        self.student = UserFactory()
+        self.client.login(username=self.student.username, password='test')
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+            'message': 'test message',
+            })
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_course_not_exist(self):
+        url = reverse('send_email', kwargs={'course_id': 'GarbageCourse/DNE/NoTerm'})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+            'message': 'test message',
+            })
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_send_email_no_sendto(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'subject': 'test subject',
+            'message': 'test message',
+            })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_subject(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'message': 'test message',
+            })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_message(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+            })
+        self.assertEqual(response.status_code, 400)
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    fill this out
+    """
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+        
+    def test_send_email_as_logged_in_instructor(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
         response = self.client.get(url,{
             'send_to': 'staff',
             'subject': 'test subject',
