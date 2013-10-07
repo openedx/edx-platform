@@ -10,6 +10,7 @@ import json
 
 from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -24,7 +25,6 @@ from ..transcripts_utils import (
     generate_srt_from_sjson, remove_subs_from_store,
     requests as rqsts,
     download_youtube_subs, get_transcripts_from_youtube,
-    YOUTUBE_API,
     copy_or_rename_transcript,
     save_module,
     manage_video_subtitles_save
@@ -245,10 +245,10 @@ def check_transcripts(request):
             log.debug("Can't find transcripts in storage for youtube id: {}".format(youtube_id))
 
         # youtube server
-        YOUTUBE_API['params']['v'] = youtube_id
+        settings.YOUTUBE_API['params']['v'] = youtube_id
         youtube_response = rqsts.get(
-            YOUTUBE_API['url'],
-            params=YOUTUBE_API['params']
+            settings.YOUTUBE_API['url'],
+            params=settings.YOUTUBE_API['params']
         )
         if youtube_response.status_code == 200 and youtube_response.text:
             transcripts_presence['youtube_server'] = True

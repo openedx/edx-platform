@@ -123,3 +123,6 @@ if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
 else:
     VIDEO_PORT = randint(1024, 65535)
 
+# for testing Youtube
+YOUTUBE_API['url'] = "http://127.0.0.1:" + str(VIDEO_PORT) + '/test_transcripts_youtube/'
+

@@ -438,3 +438,10 @@ TRACKING_BACKENDS = {
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+
+# Current youtube api for requesting transcripts.
+# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+YOUTUBE_API = {
+    'url': "http://video.google.com/timedtext",
+    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
+}

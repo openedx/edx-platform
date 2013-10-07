@@ -22,17 +22,6 @@ from .utils import get_modulestore
 
 log = logging.getLogger(__name__)
 
-# Current youtube api for requesting transcripts.
-# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-YOUTUBE_API = {
-    'url': "http://video.google.com/timedtext",
-    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
-}
-
-# for testing Youtube in acceptance tests
-if getattr(settings, 'VIDEO_PORT', None):
-    YOUTUBE_API['url'] = "http://127.0.0.1:" + str(settings.VIDEO_PORT) + '/test_transcripts_youtube/'
-
 
 def generate_subs(speed, source_speed, source_subs):
     """
@@ -93,10 +82,10 @@ def get_transcripts_from_youtube(youtube_id):
     """
     html_parser = HTMLParser.HTMLParser()
     utf8_parser = etree.XMLParser(encoding='utf-8')
-    YOUTUBE_API['params']['v'] = youtube_id
+    settings.YOUTUBE_API['params']['v'] = youtube_id
     data = requests.get(
-        YOUTUBE_API['url'],
-        params=YOUTUBE_API['params']
+        settings.YOUTUBE_API['url'],
+        params=settings.YOUTUBE_API['params']
     )
     if data.status_code != 200 or not data.text:
         log.debug("Can't receive correct transcripts from Youtube.")
