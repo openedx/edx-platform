@@ -138,7 +138,7 @@
             top: 0px;
 
             h2 {
-              color: $base-font-color;
+              color: $link-color;
               display: table-cell;
               font-family: $sans-serif;
               font-size: 0.8em;
@@ -153,6 +153,7 @@
               vertical-align: middle;
 
               .course-number {
+                color: $base-font-color;
                 font-weight: 700;
                 text-transform: none;
               }
