@@ -32,11 +32,11 @@ DOC_STORE_CONFIG = {
     'collection': 'acceptance_modulestore_%s' % seed(),
 }
 
-modulestore_options = dict({
+modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+}
 
 MODULESTORE = {
     'default': {
@@ -46,6 +46,7 @@ MODULESTORE = {
             'stores': {
                 'default': {
                     'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': modulestore_options
                 }
             }
@@ -57,7 +58,7 @@ MODULESTORE['direct'] = MODULESTORE['default']
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     }

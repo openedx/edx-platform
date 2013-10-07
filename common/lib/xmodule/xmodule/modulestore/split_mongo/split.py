@@ -48,37 +48,48 @@ class SplitMongoModuleStore(ModuleStoreBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
-    # pylint: disable=C0103
-    def __init__(self, host, db, collection, fs_root, render_template,
-                 port=27017, default_class=None,
+    # pylint: disable=W0201
+    def __init__(self, doc_store_config, fs_root, render_template,
+                 default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None,
-                 mongo_options=None,
                  loc_mapper=None,
                  **kwargs):
+        """
+        :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
+        """
 
         super(SplitMongoModuleStore, self).__init__(**kwargs)
         self.loc_mapper = loc_mapper
-        if mongo_options is None:
-            mongo_options = {}
 
-        self.db = pymongo.database.Database(pymongo.MongoClient(
-            host=host,
-            port=port,
-            tz_aware=True,
-            **mongo_options
-        ), db)
+        def do_connection(
+            db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+        ):
+            """
+            Create & open the connection, authenticate, and provide pointers to the collections
+            """
+            self.db = pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
+            )
 
-        self.course_index = self.db[collection + '.active_versions']
-        self.structures = self.db[collection + '.structures']
-        self.definitions = self.db[collection + '.definitions']
+            if user is not None and password is not None:
+                self.db.authenticate(user, password)
+
+            self.course_index = self.db[collection + '.active_versions']
+            self.structures = self.db[collection + '.structures']
+            self.definitions = self.db[collection + '.definitions']
+
+        do_connection(**doc_store_config)
 
         # Code review question: How should I expire entries?
         # _add_cache could use a lru mechanism to control the cache size?
         self.thread_cache = threading.local()
 
-        if user is not None and password is not None:
-            self.db.authenticate(user, password)
 
         # every app has write access to the db (v having a flag to indicate r/o v write)
         # Force mongo to report errors, at the expense of performance

@@ -29,7 +29,7 @@ class Command(BaseCommand):
         # use a user-specified database name, if present
         # this is useful for doing dumps from databases restored from prod backups
         if len(args) == 3:
-            settings.MODULESTORE['direct']['OPTIONS']['db'] = args[2]
+            settings.MODULESTORE['direct']['DOC_STORE_CONFIG']['db'] = args[2]
 
         loc = CourseDescriptor.id_to_location(course_id)
 

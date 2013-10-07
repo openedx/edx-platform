@@ -21,7 +21,7 @@ def contentstore(name='default'):
     if name not in _CONTENTSTORE:
         class_ = load_function(settings.CONTENTSTORE['ENGINE'])
         options = {}
-        options.update(settings.CONTENTSTORE['OPTIONS'])
+        options.update(settings.CONTENTSTORE['DOC_STORE_CONFIG'])
         if 'ADDITIONAL_OPTIONS' in settings.CONTENTSTORE:
             if name in settings.CONTENTSTORE['ADDITIONAL_OPTIONS']:
                 options.update(settings.CONTENTSTORE['ADDITIONAL_OPTIONS'][name])
