@@ -6,12 +6,9 @@ import shutil
 import tarfile
 import tempfile
 import copy
-<<<<<<< HEAD
 from path import path
-=======
 import json
 import logging
->>>>>>> Review fixes
 from uuid import uuid4
 from pymongo import MongoClient
 
@@ -25,10 +22,7 @@ from xmodule.contentstore.django import _CONTENTSTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
-<<<<<<< HEAD
-=======
 log = logging.getLogger(__name__)
->>>>>>> Review fixes
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
@@ -213,4 +207,4 @@ class ImportTestCase(CourseTestCase):
         })
         resp_status = self.client.get(status_url)
         import_status = json.loads(resp_status.content)["ImportStatus"]
-        self.assertTrue(import_status == 3 or import_status == 0)
+        self.assertIn(import_status, (0, 3))

@@ -33,6 +33,7 @@
 
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
 
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         <h2 class="title">${_("Select a File (.tar.gz format) to Replace Your Course Content")}</h2>
 
         <p class="error-block"></p>
@@ -41,7 +42,7 @@
 
         <div class="wrapper wrapper-file-name file-name-block">
             <h3 class="title">
-              <span class="label">File Chosen:</span>
+              <span class="label">${_("File Chosen:")}</span>
               <span class="file-name"></span>
             </h3>
 
@@ -142,7 +143,9 @@
 
 <%block name="jsextra">
 <script>
-require(["jquery", "jquery.fileupload"], function($) {
+require(
+        ["js/views/import", "jquery", "jquery.fileupload"],
+        function(CourseImport, $) {
 
 var file;
 var bar = $('.progress-bar');
@@ -174,7 +177,7 @@ $('#fileupload').fileupload({
     autoUpload: false,
 
     add: function(e, data) {
-        clearImportDisplay();
+        CourseImport.clearImportDisplay();
         submitBtn.unbind('click');
         file = data.files[0];
         if (file.name.match(/tar\.gz$/)) {
@@ -182,21 +185,23 @@ $('#fileupload').fileupload({
                 e.preventDefault();
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
+                    CourseImport.stopGetStatus = true;
+                    window.onbeforeunload = null;
                     if (xhr.status != 200) {
-                        window.stopGetStatus = true;
-                        window.onbeforeunload = null;
-                        var serverMsg = JSON.parse(result["responseText"]);
-                        var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg["ErrMsg"] : "" ;
+                        var serverMsg = $.parseJSON(result.responseText);
+                        var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg.ErrMsg : "" ;
                         if (serverMsg.hasOwnProperty("Stage")) {
-                            var stage = serverMsg["Stage"]
-                            stageError(stage, defaults[stage] + errMsg);
+                            var stage = serverMsg.Stage;
+                            CourseImport.stageError(stage, defaults[stage] + errMsg);
                         }
                         else {
                             alert('${_("Your import has failed.")}\n\n' + errMsg);
                         }
-                        bar.hide();
                         chooseBtn.html('${_("Choose new file")}').show();
+                        bar.hide();
                     }
+                    chooseBtn.html('${_("Choose new file")}').show();
+                    bar.hide();
                 });
             });
         } else {
@@ -218,7 +223,7 @@ $('#fileupload').fileupload({
         }
         if (percentInt >= doneAt) {
             bar.hide();
-            startServerFeedback(feedbackUrl.replace("fillerName", file.name));
+            CourseImport.startServerFeedback(feedbackUrl.replace("fillerName", file.name));
         } else {
             bar.show();
             fill.width(percentVal);
@@ -228,7 +233,7 @@ $('#fileupload').fileupload({
     done: function(e, data){
         bar.hide();
         window.onbeforeunload = null;
-        displayFinishedImport();
+        CourseImport.displayFinishedImport();
     },
     start: function(e) {
         window.onbeforeunload = function() {

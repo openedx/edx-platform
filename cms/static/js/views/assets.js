@@ -1,5 +1,4 @@
 define(["backbone", "js/views/asset"], function(Backbone, AssetView) {
-"use strict";
 
 var AssetsView = Backbone.View.extend({
     // takes AssetCollection as model
