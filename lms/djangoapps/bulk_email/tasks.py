@@ -49,6 +49,8 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
 )
 
+from django.utils.translation import ugettext as _
+
 log = get_task_logger(__name__)
 
 
