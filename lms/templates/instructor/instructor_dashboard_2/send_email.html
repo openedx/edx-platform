@@ -6,7 +6,7 @@
 <script type="text/javascript" src="jsi18n/"></script>
 <div class="vert-left send-email">
   <h2> ${_("Send Email")} </h2>
-  <div class="request-response msg msg-confirm" id="request-response"></div>
+  <div class="request-response msg msg-confirm copy" id="request-response"></div>
   <ul class="list-fields">
     <li class="field">
       <label for="id_to">${_("Send to:")}</label><br/>
@@ -45,5 +45,6 @@
   </ul>
  </div>
   <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
+  <input type="button" name="send" value="${_("Send")}" data-endpoint="${ section_data['send_email'] }" >
   <div class="request-response-error"></div>
 </div>
