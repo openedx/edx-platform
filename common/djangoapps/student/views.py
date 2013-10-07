@@ -16,6 +16,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
+from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -30,6 +31,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int, urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -40,7 +42,8 @@ from student.models import (Registration, UserProfile, TestCenterUser, TestCente
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registration, CourseEnrollmentAllowed)
+                            get_testcenter_registration, CourseEnrollmentAllowed,
+                            UserStanding)
 from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -65,6 +68,8 @@ import track.views
 
 from dogapi import dog_stats_api
 from pytz import UTC
+
+from util.json_request import JsonResponse
 
 log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -531,6 +536,29 @@ def login_user(request, error=""):
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Email or password is incorrect.')}))
 
+    if user is not None:
+        try:
+            user_account = UserStanding.objects.get(user=user)
+            if user_account.account_status == u'disabled':
+                return JsonResponse(
+                    {
+                        'success': False,
+                        'value': _(
+                            'Your account has been disabled. If you believe '
+                            'this was done in error, please contact us at '
+                            '{link_start}{support_email}{link_end}'
+                        ).format(
+                            support_email = settings.CONTACT_EMAIL,
+                            link_start = u'<a href="mailto:{}?subject=Disabled account">'.format(
+                                settings.CONTACT_EMAIL
+                            ),
+                            link_end = u'</a>'
+                        )
+                    }
+                )
+        except UserStanding.DoesNotExist:
+            pass
+
     if user is not None and user.is_active:
         try:
             # We do not log here, because we have a handler registered
@@ -600,6 +628,66 @@ def logout_user(request):
                            path='/',
                            domain=settings.SESSION_COOKIE_DOMAIN)
     return response
+
+@login_required
+@ensure_csrf_cookie
+def disable_account(request):
+    if not request.user.is_staff:
+        raise Http404
+
+    return render_to_response("disable_account.html")
+
+@require_POST
+@login_required
+@ensure_csrf_cookie
+def disable_account_ajax(request):
+    if not request.user.is_staff:
+        raise Http404
+    username = request.POST.get('username')
+    context = {}
+    if username is None or username.strip() == '':
+        context['message'] = _('Please enter a username')
+        return JsonResponse(context)
+
+    account_action = request.POST.get('account_action')
+    if account_action is None:
+        context['message'] = _('Please choose an option')
+        return JsonResponse(context)
+
+    username = username.strip()
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        context['message'] = _("User with username {} does not exist").format(username)
+    else:
+        user_account, created = UserStanding.objects.get_or_create(user=user)
+        if account_action == 'disable':
+            user_account.account_status = u'disabled'
+            context['message'] = _("Successfully disabled {}'s account").format(username)
+            _remove_user_sessions(user)
+            context['message'] += _(". Successfully deleted {}'s sessions.").format(username)
+        elif account_action == 'reenable':
+            user_account.account_status = ''
+            context['message'] = _("Successfully reenabled {}'s account").format(username)
+        print request.user
+        user_account.save()
+    return JsonResponse(context)
+
+
+def _remove_user_sessions(user):
+    """
+    hackish and expensive, but as far as I can tell the only way immediately to lock out
+    a user in django
+    """
+    all_sessions = Session.objects.filter(expire_date__gte=datetime.datetime.now(UTC))
+    user_sessions_pks = [
+        session.pk for session in all_sessions if session.get_decoded().get(
+            '_auth_user_id'
+        ) == user.id
+    ]
+    user_sessions_to_delete = Session.objects.filter(pk__in=user_sessions_pks)
+    user_sessions_to_delete.delete()
+
 
 
 @login_required

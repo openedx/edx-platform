@@ -34,6 +34,17 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
 
+class UserStanding(models.Model):
+    """
+    This table contains a student's account's status.
+    Currently, we're only disabling accounts; in the future we can imagine
+    taking away more specific privileges, like forums access, or adding
+    more specific karma levels or probationary stages.
+    """
+    user = models.ForeignKey(User, db_index=True, related_name='account_status', unique=True)
+    account_status = models.CharField(blank=True, max_length=255, default='')
+
+
 class UserProfile(models.Model):
     """This is where we store all the user demographic fields. We have a
     separate table for this rather than extending the built-in Django auth_user.
