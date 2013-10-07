@@ -153,89 +153,123 @@ At the left we can see...
     def test_fail_data_without_id(self):
         link = reverse('process_transcripts', args=('upload',))
         resp = self.client.post(link, {'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "id" form data.')
 
     def test_fail_data_without_file(self):
         link = reverse('process_transcripts', args=('upload',))
         resp = self.client.post(link, {'id': self.item_location})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "file" form data.')
 
     def test_fail_data_with_bad_location(self):
         # Test for raising `InvalidLocationError` exception.
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': 'BAD_LOCATION', 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': 'BAD_LOCATION',
+            'file': self.good_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
 
         # Test for raising `ItemNotFoundError` exception.
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': '{0}_{1}'.format(self.item_location, 'BAD_LOCATION'), 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': '{0}_{1}'.format(self.item_location, 'BAD_LOCATION'),
+            'file': self.good_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
 
     def test_fail_for_non_video_module(self):
-        # Videoalpha module: setup
+        # non_video module: setup
         data = {
             'parent_location': str(self.course_location),
-            'category': 'videoalpha',
-            'type': 'videoalpha'
+            'category': 'non_video',
+            'type': 'non_video'
         }
         resp = self.client.post(reverse('create_item'), data)
         item_location = json.loads(resp.content).get('id')
-        data = '<videoalpha youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
+        data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item_location, data)
 
-        # Videoalpha module: testing
+        # non_video module: testing
 
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': item_location, 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': item_location,
+            'file': self.good_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
 
     def test_fail_bad_xml(self):
         data = '<<<video youtube="0.75:JMD_ifUUfsU,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
         modulestore().update_item(self.item_location, data)
 
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': self.item_location,
+            'file': self.good_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
 
-    def test_fail_miss_youtube_and_source_attrs(self):
-        data = """
-<video youtube="">
-    <source src=""/>
-</video>
-"""
-        modulestore().update_item(self.item_location, data)
-
-        link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
-
-        data = '<video />'
-        modulestore().update_item(self.item_location, data)
-
-        link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        # incorrect xml produces incorrect item category error
+        self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
 
     def test_fail_bad_data_srt_file(self):
-
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.bad_data_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.bad_data_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': self.item_location,
+            'file': self.bad_data_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'Generation of transcripts from file is failed.')
 
     def test_fail_bad_name_srt_file(self):
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.bad_data_srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(self.bad_name_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': self.item_location,
+            'file': self.bad_name_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'Generation of transcripts from file is failed.')
 
     def test_undefined_file_extension(self):
         srt_file = tempfile.NamedTemporaryFile(suffix='')
@@ -251,9 +285,18 @@ At the left we can see...
         srt_file.seek(0)
 
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': srt_file})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        filename = os.path.splitext(os.path.basename(srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': self.item_location,
+            'file': srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'Undefined file extension.')
 
     def tearDown(self):
         super(TestUploadtranscripts, self).tearDown()
@@ -568,7 +611,7 @@ class TestChecktranscripts(Basetranscripts):
             }
         )
 
-    def test_fail_data_without_file(self):
+    def test_fail_data_without_id(self):
         link = reverse('process_transcripts', args=('check',))
         data = {
             'id': '',
@@ -579,8 +622,8 @@ class TestChecktranscripts(Basetranscripts):
             }]
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
 
     def test_fail_data_with_bad_location(self):
         # Test for raising `InvalidLocationError` exception.
@@ -594,8 +637,8 @@ class TestChecktranscripts(Basetranscripts):
             }]
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
@@ -607,8 +650,8 @@ class TestChecktranscripts(Basetranscripts):
             }]
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
 
     def test_fail_for_non_video_module(self):
         # Not video module: setup
@@ -650,6 +693,5 @@ class TestChecktranscripts(Basetranscripts):
         }
         link = reverse('process_transcripts', args=('check',))
         resp = self.client.get(link, {'data': json.dumps(data)})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Error')
-
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content).get('status'), 'transcripts are supported only for "video" modules.')

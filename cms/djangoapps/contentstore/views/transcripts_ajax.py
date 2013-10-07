@@ -60,7 +60,6 @@ def upload_transcripts(request):
         'status': 'Unknown Error',
         'subs': '',
     }
-
     item_location = request.POST.get('id')
     if not item_location:
         return log_and_return_response(response, 'POST data without "id" form data.')
@@ -91,7 +90,6 @@ def upload_transcripts(request):
         item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
         return log_and_return_response(response, "Can't find item by location.")
-
     # Check permissions for this user within this course.
     if not has_access(request.user, item_location):
         raise PermissionDenied()
@@ -127,7 +125,7 @@ def upload_transcripts(request):
                 response['subs'] = item.sub
                 response['status'] = 'Success'
         else:
-            return log_and_return_response(response, 'Generation of subtitles from file is failed.')
+            return log_and_return_response(response, 'Generation of transcripts from file is failed.')
     else:
         return log_and_return_response(response, 'Empty video sources.')
 
@@ -216,9 +214,9 @@ def check_transcripts(request):
         'current_item_subs': None,
         'status': 'Error',
     }
-    validation_status, __, videos, item = validate_transcripts_data(request)
+    validation_status, validation_message, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return log_and_return_response(transcripts_presence, 'Validation is not passed.')
+        return log_and_return_response(transcripts_presence, validation_message)
 
     transcripts_presence['status'] = 'Success'
 
@@ -350,9 +348,9 @@ def choose_transcripts(request):
         'subs': '',
     }
 
-    validation_status, data, videos, item = validate_transcripts_data(request)
+    validation_status, validation_message, data, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return log_and_return_response(response, 'Validation is not passed.')
+        return log_and_return_response(response, validation_message)
 
     html5_id = data.get('html5_id')
 
@@ -380,9 +378,9 @@ def replace_transcripts(request):
         'is_youtube_mode': True,
     }
 
-    validation_status, __, videos, item = validate_transcripts_data(request)
+    validation_status, validation_message, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return log_and_return_response(response, 'Validation is not passed.')
+        return log_and_return_response(response, validation_message)
 
     youtube_id = videos['youtube']
     if not youtube_id:
@@ -400,29 +398,34 @@ def validate_transcripts_data(request):
     """
     Validates, that request contains all proper data for transcripts processing.
 
-    Returns parsed data from request and video item from storage.
+    Returns tuple of 4 elements::
+
+    validations_status: bool,
+    data: dict, loaded json from request,
+    videos: parsed `data` to useful format,
+    item:  video item from storage
     """
     validation_status = False
 
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
-        log.error('Incoming video data is empty.')
-        return validation_status, None, {}, None
+        validation_message = 'Incoming video data is empty.'
+        return validation_status, validation_message, None, {}, None
 
     item_location = data.get('id')
     try:
         item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
-        log.error("Can't find item by location.")
-        return validation_status, None, {}, None
+        validation_message = "Can't find item by location."
+        return validation_status, validation_message, None, {}, None
 
     # Check permissions for this user within this course.
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
     if item.category != 'video':
-        log.error('transcripts are supported only for "video" modules.')
-        return validation_status, None, {}, None
+        validation_message = 'transcripts are supported only for "video" modules.'
+        return validation_status, validation_message, None, {}, None
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}
@@ -433,7 +436,7 @@ def validate_transcripts_data(request):
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
 
-    return True, data, videos, item
+    return True, 'Success', data, videos, item
 
 
 def rename_transcripts(request):
@@ -446,9 +449,9 @@ def rename_transcripts(request):
         'subs': '',
     }
 
-    validation_status, __, videos, item = validate_transcripts_data(request)
+    validation_status, validation_message, __, videos, item = validate_transcripts_data(request)
     if not validation_status:
-        return log_and_return_response(response, 'Validation is not passed.')
+        return log_and_return_response(response, validation_message)
 
     old_name = item.sub
 
