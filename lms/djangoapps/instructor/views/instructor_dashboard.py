@@ -9,6 +9,7 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
+from django.conf import settings
 
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
@@ -45,10 +46,19 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id),
     ]
 
+    enrollment_count = sections[0]['enrollment_count']
+
+    disable_buttons = False
+    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    if max_enrollment_for_buttons is not None:
+        disable_buttons = enrollment_count > max_enrollment_for_buttons
+
+
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
         'sections': sections,
+        'disable_buttons': disable_buttons,
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
