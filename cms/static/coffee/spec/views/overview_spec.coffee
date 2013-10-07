@@ -1,13 +1,8 @@
-define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base"],
+define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base", "date", "jquery.timepicker"],
 (OverviewDragger, Notification, sinon) ->
 
     describe "Course Overview", ->
         beforeEach ->
-            _.each ["/static/js/vendor/date.js", "/static/js/vendor/timepicker/jquery.timepicker.js", "/jsi18n/", "/static/js/vendor/draggabilly.pkgd.js"], (path) ->
-                appendSetFixtures """
-                                  <script type="text/javascript" src="#{path}"></script>
-                                  """
-    
             appendSetFixtures """
                               <div class="section-published-date">
                                   <span class="published-status">

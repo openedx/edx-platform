@@ -1,5 +1,5 @@
-define(["jquery", "jquery.ui", "gettext", "js/views/feedback_notification", "draggabilly"],
-    function ($, ui, gettext, NotificationView, Draggabilly) {
+define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notification", "draggabilly"],
+    function (domReady, $, ui, gettext, NotificationView, Draggabilly) {
 
         var overviewDragger = {
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
@@ -294,7 +294,7 @@ define(["jquery", "jquery.ui", "gettext", "js/views/feedback_notification", "dra
             }
         };
 
-        $(document).ready(function () {
+        domReady(function() {
             // Section
             overviewDragger.makeDraggable(
                 '.courseware-section',

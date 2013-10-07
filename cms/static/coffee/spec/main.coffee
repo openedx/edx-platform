@@ -33,6 +33,7 @@ requirejs.config({
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
+        "domReady": "xmodule_js/common_static/js/vendor/domReady",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix"
     }

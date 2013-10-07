@@ -52,6 +52,9 @@ lib_paths:
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
+    - xmodule_js/common_static/js/vendor/date.js
+    - xmodule_js/common_static/js/vendor/domReady.js
+    - xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min.js
 
 # Paths to source JavaScript files
 src_paths:
