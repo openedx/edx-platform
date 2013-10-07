@@ -392,7 +392,7 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
-          
+
             &:hover, &:active {
               background-color: #444;
               color: #fff;
@@ -457,7 +457,7 @@ div.video {
           text-indent: -9999px;
           @include transition(none);
           width: 30px;
-          
+
           &:hover, &:active {
             background-color: #444;
             color: #fff;
@@ -611,7 +611,6 @@ div.video {
     ol.subtitles {
         width: 0;
         height: 0;
-        visibility: hidden;
     }
 
     ol.subtitles.html5 {
@@ -645,7 +644,6 @@ div.video {
       ol.subtitles {
         right: -(flex-grid(4));
         width: auto;
-        visibility: hidden;
       }
     }
 
