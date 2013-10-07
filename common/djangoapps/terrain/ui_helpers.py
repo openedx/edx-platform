@@ -34,7 +34,7 @@ def wait(seconds):
 def wait_for_js_variable_truthy(variable):
     """
     Using Selenium's `execute_async_script` function, poll the Javascript
-    enviornment until the given variable is defined and truthy. This process
+    environment until the given variable is defined and truthy. This process
     guards against page reloads, and seamlessly retries on the next page.
     """
     js = """
@@ -194,8 +194,51 @@ def is_css_not_present(css_selector, wait_time=5):
 
 
 @world.absorb
-def css_has_text(css_selector, text, index=0):
-    return world.css_text(css_selector, index=index) == text
+def css_has_text(css_selector, text, index=0,
+        strip=False, allow_blank=True):
+    """
+    Return a boolean indicating whether the element with `css_selector`
+    has `text`.
+
+    If `strip` is True, strip whitespace at beginning/end of both
+    strings before comparing.
+
+    If `allow_blank` is False, wait for the element to have non-empty
+    text before making the assertion.  This is useful for elements
+    that are populated by JavaScript after the page loads.
+
+    If there are multiple elements matching the css selector,
+    use `index` to indicate which one.
+    """
+
+    if not allow_blank:
+        world.wait_for(lambda _: world.css_text(css_selector, index=index))
+
+    actual_text = world.css_text(css_selector, index=index)
+
+    if strip:
+        actual_text = actual_text.strip()
+        text = text.strip()
+
+    return actual_text == text
+
+
+@world.absorb
+def css_has_value(css_selector, value, index=0, allow_blank=False):
+    """
+    Return a boolean indicating whether the element with
+    `css_selector` has the specified `value`.
+
+    If `allow_blank` is False, wait for the element to have
+    a value that is a non-empty string.
+
+    If there are multiple elements matching the css selector,
+    use `index` to indicate which one.
+    """
+    if not allow_blank:
+        world.wait_for(lambda _: world.css_value(css_selector, index=index))
+
+    return world.css_value(css_selector, index=index) == value
 
 
 @world.absorb

@@ -32,18 +32,21 @@ def shows_captions(_step, show_captions):
 
 @step('I see the correct video settings and default values$')
 def correct_video_settings(_step):
-    world.verify_all_setting_entries([['Display Name', 'Video', False],
-                                      ['Download Track', '', False],
-                                      ['Download Video', '', False],
-                                      ['End Time', '0', False],
-                                      ['HTML5 Timed Transcript', '', False],
-                                      ['Show Captions', 'True', False],
-                                      ['Start Time', '0', False],
-                                      ['Video Sources', '', False],
-                                      ['Youtube ID', 'OEoXaMPEzfM', False],
-                                      ['Youtube ID for .75x speed', '', False],
-                                      ['Youtube ID for 1.25x speed', '', False],
-                                      ['Youtube ID for 1.5x speed', '', False]])
+    expected_entries = [
+        ['Display Name', 'Video', False],
+        ['Download Track', '', False],
+        ['Download Video', '', False],
+        ['End Time', '0', False],
+        ['HTML5 Timed Transcript', '', False],
+        ['Show Captions', 'True', False],
+        ['Start Time', '0', False],
+        ['Video Sources', '', False],
+        ['Youtube ID', 'OEoXaMPEzfM', False],
+        ['Youtube ID for .75x speed', '', False],
+        ['Youtube ID for 1.25x speed', '', False],
+        ['Youtube ID for 1.5x speed', '', False]
+    ]
+    world.verify_all_setting_entries(expected_entries)
 
 
 @step('my video display name change is persisted on save$')
@@ -52,4 +55,8 @@ def video_name_persisted(step):
     reload_the_page(step)
     world.wait_for_xmodule()
     world.edit_component()
-    world.verify_setting_entry(world.get_setting_entry('Display Name'), 'Display Name', '3.4', True)
+
+    world.verify_setting_entry(
+        world.get_setting_entry('Display Name'),
+        'Display Name', '3.4', True
+    )
