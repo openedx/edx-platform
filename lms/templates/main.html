@@ -36,6 +36,7 @@
           if (window.location !== window.top.location) {
             window.top.location = window.location;
           }
+          window.baseUrl = "${settings.STATIC_URL}";
         })(this);
       </script>
     % endif
