@@ -792,7 +792,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             source_location.tag, source_location.org, source_location.course, 'html', 'nonportable'])
         html_module = module_store.get_instance(source_location.course_id, html_module_location)
 
-        self.assertTrue(isinstance(html_module.data, basestring))
+        self.assertIsInstance(html_module.data, basestring)
         new_data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
             source_location.org, source_location.course))
         module_store.update_item(html_module_location, new_data)

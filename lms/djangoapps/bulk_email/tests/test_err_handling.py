@@ -61,7 +61,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertTrue(type(exc) == SMTPDataError)
+        self.assertIsInstance(exc, SMTPDataError)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email_result')
@@ -110,7 +110,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertTrue(type(exc) == SMTPServerDisconnected)
+        self.assertIsInstance(exc, SMTPServerDisconnected)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.course_email.retry')
@@ -131,7 +131,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertTrue(type(exc) == SMTPConnectError)
+        self.assertIsInstance(exc, SMTPConnectError)
 
     @patch('bulk_email.tasks.course_email_result')
     @patch('bulk_email.tasks.course_email.retry')
