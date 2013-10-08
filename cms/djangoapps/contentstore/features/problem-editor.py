@@ -9,8 +9,6 @@ from common import type_in_codemirror
 from time import sleep
 
 
-from pdb import set_trace
-
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
