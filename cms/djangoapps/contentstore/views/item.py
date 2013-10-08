@@ -20,6 +20,7 @@ from ..utils import get_modulestore
 from .access import has_access
 from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
+from django.views.decorators.http import require_http_methods
 
 __all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
 
@@ -203,6 +204,7 @@ def delete_item(request):
 
 
 @login_required
+@require_http_methods(("GET", "DELETE"))
 def orphan(request, course_id):
     """
     View for handling orphan related requests. A get gets all of the current orphans.
@@ -214,6 +216,10 @@ def orphan(request, course_id):
     :param request:
     :param course_id: Locator syntax course_id
     """
-    # dhm: I'd add DELETE but I'm not sure what type of authentication/authorization we'd need
     if request.method == 'GET':
         return JsonResponse(modulestore().get_orphans(course_id, DETACHED_CATEGORIES, 'draft'))
+    if request.method == 'DELETE' and request.user.is_staff:
+        items = modulestore().get_orphans(course_id, DETACHED_CATEGORIES, 'draft')
+        for item in items:
+            modulestore('draft').delete_item(item, True)
+        return JsonResponse({'deleted': items})

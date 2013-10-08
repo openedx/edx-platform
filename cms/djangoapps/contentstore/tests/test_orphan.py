@@ -56,3 +56,17 @@ class TestOrphan(CourseTestCase):
         self.assertIn(location.url(), orphans)
         location = self.course.location.replace(category='html', name='OrphanHtml')
         self.assertIn(location.url(), orphans)
+
+    def test_mongo_orphan_delete(self):
+        """
+        Test that old mongo deletes the orphans
+        """
+        url = reverse(
+            'orphan',
+            kwargs={'course_id': '{}.{}'.format(self.course.location.org, self.course.location.course)}
+        )
+        self.client.delete(url)
+        orphans = json.loads(
+            self.client.get(url, HTTP_ACCEPT='application/json').content
+        )
+        self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
