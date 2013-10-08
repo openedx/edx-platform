@@ -45,9 +45,6 @@ class SequenceModule(SequenceFields, XModule):
 
         self.rendered = False
 
-    def get_instance_state(self):
-        return json.dumps({'position': self.position})
-
     def get_html(self):
         self.render()
         return self.content
@@ -82,7 +79,7 @@ class SequenceModule(SequenceFields, XModule):
         for child in self.get_display_items():
             progress = child.get_progress()
             childinfo = {
-                'content': self.runtime.render_child(child, None, 'student_view').content,
+                'content': child.render('student_view').content,
                 'title': "\n".join(
                     grand_child.display_name
                     for grand_child in child.get_children()
