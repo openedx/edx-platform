@@ -98,7 +98,7 @@
           @include transition(all 0.15s linear 0s);
           width: flex-grid(12);
 
-          > a.find-courses, a.register {
+          > a.find-courses, a.register, a.add-to-cart {
             @include button(shiny, $button-color);
             @include box-sizing(border-box);
             border-radius: 3px;
@@ -139,7 +139,7 @@
             }
           }
 
-          span.register {
+          span.register, span.add-to-cart {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
             @include box-sizing(border-box);
@@ -242,7 +242,7 @@
       width: flex-grid(12);
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         content: "";
         display: none;
       }
@@ -390,7 +390,7 @@
       text-align: center;
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         content: "";
         display: block;
         height: 1px;

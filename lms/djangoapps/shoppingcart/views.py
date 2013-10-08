@@ -1,33 +1,38 @@
 import logging
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden, Http404
+from django.http import (HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
+    HttpResponseBadRequest, HttpResponseForbidden, Http404)
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from student.models import CourseEnrollment
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from mitxmako.shortcuts import render_to_response
-from .models import Order, PaidCourseRegistration, CertificateItem, OrderItem
+from .models import Order, PaidCourseRegistration, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
+from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException
 
 log = logging.getLogger("shoppingcart")
 
 
+@require_POST
 def add_course_to_cart(request, course_id):
+    """
+    Adds course specified by course_id to the cart.  The model function add_to_order does all the
+    heavy lifting (logging, error checking, etc)
+    """
     if not request.user.is_authenticated():
+        log.info("Anon user trying to add course {} to cart".format(course_id))
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
-    if PaidCourseRegistration.part_of_order(cart, course_id):
-        return HttpResponseNotFound(_('The course {0} is already in your cart.'.format(course_id)))
-    if CourseEnrollment.is_enrolled(user=request.user, course_id=course_id):
-        return HttpResponseNotFound(_('You are already registered in course {0}.'.format(course_id)))
+    # All logging from here handled by the model
     try:
         PaidCourseRegistration.add_to_order(cart, course_id)
-    except ItemNotFoundError:
+    except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
-    if request.method == 'GET':  # This is temporary for testing purposes and will go away before we pull
-        return HttpResponseRedirect(reverse('shoppingcart.views.show_cart'))
+    except ItemAlreadyInCartException:
+        return HttpResponseBadRequest(_('The course {0} is already in your cart.'.format(course_id)))
+    except AlreadyEnrolledInCourseException:
+        return HttpResponseBadRequest(_('You are already registered in course {0}.'.format(course_id)))
     return HttpResponse(_("Course added to cart."))
 
 
@@ -98,8 +103,21 @@ def show_receipt(request, ordernum):
     if order.user != request.user or order.status != 'purchased':
         raise Http404('Order not found!')
 
-    order_items = order.orderitem_set.all()
+    order_items = OrderItem.objects.filter(order=order).select_subclasses()
     any_refunds = any(i.status == "refunded" for i in order_items)
-    return render_to_response('shoppingcart/receipt.html', {'order': order,
-                                                            'order_items': order_items,
-                                                            'any_refunds': any_refunds})
+    receipt_template = 'shoppingcart/receipt.html'
+    __, instructions = order.generate_receipt_instructions()
+    # we want to have the ability to override the default receipt page when
+    # there is only one item in the order
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'any_refunds': any_refunds,
+        'instructions': instructions,
+    }
+
+    if order_items.count() == 1:
+        receipt_template = order_items[0].single_item_receipt_template
+        context.update(order_items[0].single_item_receipt_context)
+
+    return render_to_response(receipt_template, context)

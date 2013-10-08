@@ -23,43 +23,50 @@
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
     data-autoplay="${autoplay}"
+    data-yt-test-timeout="${yt_test_timeout}"
+    data-yt-test-url="${yt_test_url}"
+
+    tabindex="-1"
 >
+    <div class="focus_grabber first"></div>
+
     <div class="tc-wrapper">
         <article class="video-wrapper">
             <div class="video-player-pre"></div>
 
             <section class="video-player">
                 <div id="${id}"></div>
+                <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
             </section>
 
             <div class="video-player-post"></div>
 
             <section class="video-controls">
-                <div class="slider" tabindex="0" title="Video position"></div>
+                <div class="slider" title="Video position"></div>
 
                 <div>
                     <ul class="vcr">
-                        <li><a class="video_control" href="#" title="${_('Play')}"></a></li>
+                        <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
                         <li><div class="vidtime">0:00 / 0:00</div></li>
                     </ul>
                     <div class="secondary-controls">
                         <div class="speeds">
-                            <a href="#" title="Speeds">
+                            <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
                                 <h3>${_('Speed')}</h3>
                                 <p class="active"></p>
                             </a>
                             <ol class="video_speeds"></ol>
                         </div>
                         <div class="volume">
-                            <a href="#" title="Volume"></a>
+                            <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
                             <div class="volume-slider-container">
                                 <div class="volume-slider"></div>
                             </div>
                         </div>
-                        <a href="#" class="add-fullscreen" title="${_('Fill browser')}">${_('Fill browser')}</a>
-                        <a href="#" class="quality_control" title="${_('HD')}">${_('HD')}</a>
+                        <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
+                        <a href="#" class="quality_control" title="${_('HD')}" role="button" aria-disabled="false">${_('HD')}</a>
 
-                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}">${_('Captions')}</a>
+                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
                     </div>
                 </div>
             </section>
@@ -67,6 +74,8 @@
 
         <ol class="subtitles" tabindex="0" title="Captions"><li></li></ol>
     </div>
+
+    <div class="focus_grabber last"></div>
 </div>
 
 % if sources.get('main'):

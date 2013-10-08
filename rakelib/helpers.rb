@@ -1,6 +1,7 @@
 require 'digest/md5'
 require 'sys/proctable'
 require 'colorize'
+require 'timeout'
 
 def find_executable(exec)
     path = %x(which #{exec}).strip

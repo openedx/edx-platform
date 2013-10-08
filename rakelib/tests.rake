@@ -17,33 +17,21 @@ def run_under_coverage(cmd, root)
 end
 
 def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
-    ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-    test_id_file = File.join(test_id_dir(system), "noseids")
-    dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
-    test_id = dirs.join(' ') if test_id.nil? or test_id == ''
-    cmd = django_admin(
-        system, :test, 'test',
-        '--logging-clear-handlers',
-        '--liveserver=localhost:8000-9000',
-        "--id-file=#{test_id_file}",
-        test_id)
-    test_sh(run_under_coverage(cmd, system))
-end
 
-def run_acceptance_tests(system, report_dir, harvest_args)
-    # HACK: Since now the CMS depends on the existence of some database tables
-    # that used to be in LMS (Role/Permissions for Forums) we need to make
-    # sure the acceptance tests create/migrate the database tables
-    # that are represented in the LMS. We might be able to address this by moving
-    # out the migrations from lms/django_comment_client, but then we'd have to
-    # repair all the existing migrations from the upgrade tables in the DB.
-    if system == :cms
-        sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
-        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+    # If no test id is provided, we need to limit the test runner
+    # to the Djangoapps we want to test.  Otherwise, it will
+    # run tests on all installed packages.
+    if test_id.nil?
+        test_id = "#{system}/djangoapps common/djangoapps"
+
+    # Handle "--failed" as a special case: we want to re-run only
+    # the tests that failed within our Django apps
+    elsif test_id == '--failed'
+        test_id = "#{system}/djangoapps common/djangoapps --failed"
     end
-    sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
-    sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
-    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
+
+    cmd = django_admin(system, :test, 'test', test_id)
+    test_sh(run_under_coverage(cmd, system))
 end
 
 # Run documentation tests
@@ -57,8 +45,9 @@ task :test_docs do
 end
 
 task :clean_test_files do
-    desc "Clean fixture files used by tests"
-    sh("git clean -fqdx test_root")
+    desc "Clean fixture files used by tests and .pyc files"
+    sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
+    sh("find . -type f -name *.pyc -delete")
 end
 
 task :clean_reports_dir => REPORT_DIR do
@@ -68,7 +57,6 @@ task :clean_reports_dir => REPORT_DIR do
     # so that coverage.py has a place to put the reports.
     sh("find #{REPORT_DIR} -type f -delete")
 end
-
 
 TEST_TASK_DIRS = []
 
@@ -80,27 +68,17 @@ TEST_TASK_DIRS = []
 
     # Per System tasks/
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:test_id] => [:clean_test_files, :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:test_id] => [
+        :clean_test_files, :install_prereqs,
+        "#{system}:gather_assets:test", "fasttest_#{system}"
+    ]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir, :install_prereqs, :predjango] do |t, args|
+    task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
         args.with_defaults(:test_id => nil)
         run_tests(system, report_dir, args.test_id)
     end
-
-    # Run acceptance tests
-    desc "Run acceptance tests"
-    #gather_assets uses its own env because acceptance contains seeds to make the information unique
-    #acceptance_static is acceptance without the random seeding
-    task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance_static", "fasttest_acceptance_#{system}"]
-
-    desc "Run acceptance tests without collectstatic"
-    task "fasttest_acceptance_#{system}", [:harvest_args] => [report_dir, :clean_reports_dir, :predjango] do |t, args|
-        args.with_defaults(:harvest_args => '')
-        run_acceptance_tests(system, report_dir, args.harvest_args)
-    end
-
 
     task :fasttest => "fasttest_#{system}"
 
@@ -116,7 +94,10 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     directory test_id_dir
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
+    task "test_#{lib}", [:test_id] => [
+        test_id_dir, report_dir, :clean_test_files,
+        :clean_reports_dir, :install_prereqs
+    ] do |t, args|
         args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests --id-file=#{test_ids} #{args.test_id}"
@@ -139,11 +120,16 @@ TEST_TASK_DIRS.each do |dir|
     report_dir = report_dir_path(dir)
     directory report_dir
     task :report_dirs => [REPORT_DIR, report_dir]
-    task :test => "test_#{dir}"
+    task 'test:python' => "test_#{dir}"
+end
+
+namespace :test do
+    desc "Run all python tests"
+    task :python, [:test_id]
 end
 
 desc "Run all tests"
-task :test, [:test_id] => :test_docs
+task :test, [:test_id] => [:test_docs, 'test:python']
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
@@ -162,7 +148,7 @@ task :coverage => :report_dirs do
 
         end
     end
-    
+
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = FileList[File.join(REPORT_DIR, '**/coverage.xml')]
 

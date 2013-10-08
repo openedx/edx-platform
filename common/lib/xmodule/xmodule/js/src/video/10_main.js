@@ -4,6 +4,7 @@
 require(
 [
     'video/01_initialize.js',
+    'video/025_focus_grabber.js',
     'video/04_video_control.js',
     'video/05_video_quality_control.js',
     'video/06_video_progress_slider.js',
@@ -13,6 +14,7 @@ require(
 ],
 function (
     Initialize,
+    FocusGrabber,
     VideoControl,
     VideoQualityControl,
     VideoProgressSlider,
@@ -20,7 +22,8 @@ function (
     VideoSpeedControl,
     VideoCaption
 ) {
-    var previousState;
+    var previousState,
+        youtubeXhr = null;
 
     // Because this constructor can be called multiple times on a single page (when
     // the user switches verticals, the page doesn't reload, but the content changes), we must
@@ -53,8 +56,13 @@ function (
         state = {};
         previousState = state;
 
+        state.youtubeXhr = youtubeXhr;
         Initialize(state, element);
+        if (!youtubeXhr) {
+            youtubeXhr = state.youtubeXhr;
+        }
 
+        FocusGrabber(state);
         VideoControl(state);
         VideoQualityControl(state);
         VideoProgressSlider(state);
@@ -66,6 +74,10 @@ function (
         // it available to the caller by returning it. This is necessary so that we can test
         // Video with Jasmine.
         return state;
+    };
+
+    window.Video.clearYoutubeXhr = function () {
+        youtubeXhr = null;
     };
 });
 

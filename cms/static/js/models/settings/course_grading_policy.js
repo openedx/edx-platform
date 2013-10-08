@@ -1,6 +1,7 @@
-if (!CMS.Models['Settings']) CMS.Models.Settings = new Object();
+define(["backbone", "js/models/location", "js/collections/course_grader"],
+    function(Backbone, Location, CourseGraderCollection) {
 
-CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
+var CourseGradingPolicy = Backbone.Model.extend({
     defaults : {
         course_location : null,
         graders : null,  // CourseGraderCollection
@@ -9,7 +10,7 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
     },
     parse: function(attributes) {
         if (attributes['course_location']) {
-            attributes.course_location = new CMS.Models.Location(attributes.course_location, {parse:true});
+            attributes.course_location = new Location(attributes.course_location, {parse:true});
         }
         if (attributes['graders']) {
             var graderCollection;
@@ -19,7 +20,7 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
                 graderCollection.reset(attributes.graders);
             }
             else {
-                graderCollection = new CMS.Models.Settings.CourseGraderCollection(attributes.graders);
+                graderCollection = new CourseGraderCollection(attributes.graders);
                 graderCollection.course_location = attributes['course_location'] || this.get('course_location');
             }
             attributes.graders = graderCollection;
@@ -74,83 +75,5 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
     }
 });
 
-CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
-    defaults: {
-        "type" : "",	// must be unique w/in collection (ie. w/in course)
-        "min_count" : 1,
-        "drop_count" : 0,
-        "short_label" : "",	// what to use in place of type if space is an issue
-        "weight" : 0 // int 0..100
-    },
-    parse : function(attrs) {
-        if (attrs['weight']) {
-            if (!_.isNumber(attrs.weight)) attrs.weight = parseInt(attrs.weight);
-        }
-        if (attrs['min_count']) {
-            if (!_.isNumber(attrs.min_count)) attrs.min_count = parseInt(attrs.min_count);
-        }
-        if (attrs['drop_count']) {
-            if (!_.isNumber(attrs.drop_count)) attrs.drop_count = parseInt(attrs.drop_count);
-        }
-        return attrs;
-    },
-    validate : function(attrs) {
-        var errors = {};
-        if (_.has(attrs, 'type')) {
-            if (_.isEmpty(attrs['type'])) {
-                errors.type = "The assignment type must have a name.";
-            }
-            else {
-                // FIXME somehow this.collection is unbound sometimes. I can't track down when
-                var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs['type']);}, this);
-                if (existing) {
-                    errors.type = gettext("There's already another assignment type with this name.");
-                }
-            }
-        }
-        if (_.has(attrs, 'weight')) {
-            var intWeight = parseInt(attrs.weight); // see if this ensures value saved is int
-            if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
-                errors.weight = gettext("Please enter an integer between 0 and 100.");
-            }
-            else {
-                attrs.weight = intWeight;
-                if (this.collection && attrs.weight > 0) {
-                    // FIXME b/c saves don't update the models if validation fails, we should
-                    // either revert the field value to the one in the model and make them make room
-                    // or figure out a wholistic way to balance the vals across the whole
-//                  if ((this.collection.sumWeights() + attrs.weight - this.get('weight')) > 100)
-//                  errors.weight = "The weights cannot add to more than 100.";
-                }
-            }}
-        if (_.has(attrs, 'min_count')) {
-            if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
-                errors.min_count = gettext("Please enter an integer.");
-            }
-            else attrs.min_count = parseInt(attrs.min_count);
-        }
-        if (_.has(attrs, 'drop_count')) {
-            if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
-                errors.drop_count = gettext("Please enter an integer.");
-            }
-            else attrs.drop_count = parseInt(attrs.drop_count);
-        }
-        if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
-            errors.drop_count = _.template(
-                gettext("Cannot drop more <% attrs.types %> than will assigned."),
-                attrs, {variable: 'attrs'});
-        }
-        if (!_.isEmpty(errors)) return errors;
-    }
-});
-
-CMS.Models.Settings.CourseGraderCollection = Backbone.Collection.extend({
-    model : CMS.Models.Settings.CourseGrader,
-    course_location : null, // must be set to a Location object
-    url : function() {
-        return '/' + this.course_location.get('org') + "/" + this.course_location.get('course') + '/settings-grading/' + this.course_location.get('name') + '/';
-    },
-    sumWeights : function() {
-        return this.reduce(function(subtotal, grader) { return subtotal + grader.get('weight'); }, 0);
-    }
-});
+return CourseGradingPolicy;
+}); // end define()

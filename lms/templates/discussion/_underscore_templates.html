@@ -33,7 +33,7 @@
               ${"<% }  %>"}      
       
           <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote">
-          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
+          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}<span class="sr">votes (click to vote)</span></span></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -83,7 +83,8 @@
     <h1>${_("Editing post")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
-      <input type="text" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
+      <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
+      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
@@ -91,9 +92,10 @@
     ## TODO tags
     ## Until we decide what to do with tags, commenting them out.
     ##<div class="form-row">
-    ##  <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
+    ##  <label class="sr" for="edit-post-tags">${_("Edit post tags")}</label>
+    ##  <input type="text" id="edit-post-tags" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
     ##</div>
-    <input type="submit" class="post-update" value="${_("Update post")}">
+    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -105,7 +107,8 @@
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
-                <div class="comment-body" data-id="${'<%- wmdId %>'}"
+                <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
+                <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
                 data-placeholder="Add a comment..."></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
@@ -118,7 +121,7 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
+        <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}<span class="sr">votes (click to vote)</span></span></a>
         <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
@@ -143,7 +146,7 @@
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" class="post-update" value="${_("Update response")}">
+    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -165,11 +168,11 @@
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
-            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"}</span>
+            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"} <span class="sr">comments (${"<%- unread_comments_count %>"} unread comments)</span></span>
         ${"<% } else { %>"}
-            <span class="comments-count">${"<%- comments_count %>"}</span>
+            <span class="comments-count">${"<%- comments_count %>"}<span class="sr">comments</span></span>
         ${"<% } %>"}
-        <span class="votes-count">+${"<%- votes['up_count'] %>"}</span>
+        <span class="votes-count">+${"<%- votes['up_count'] %>"}<span class="sr">votes</span></span>
     </a>
 </script>
 <script type="text/template" id="discussion-home">
@@ -216,7 +219,8 @@
   <tr class="helpgrid-row helpgrid-row-notification">
   <td class="row-title">Receive updates</td>
   <td class="row-item-full" colspan="3">
-  <input type="checkbox" class="email-setting" name="email-notification"></input>
+  <label class="sr" for="email-setting-checkbox">${_("Toggle Notifications Setting")}</label>
+  <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
   <i class="icon icon-envelope"></i>
   <span class="row-description"> If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following. </span>
   </td>

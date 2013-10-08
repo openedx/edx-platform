@@ -7,12 +7,12 @@
   margin-bottom: $baseline;
 
   .title {
-    @extend .t-title4;
+    @extend %t-title4;
     font-weight: 600;
   }
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
   }
 
   strong {
@@ -30,14 +30,14 @@
     }
 
     .nav-introduction-supplementary {
-      @extend .t-copy-sub2;
+      @extend %t-copy-sub2;
       float: right;
       width: flex-grid(4,12);
       display: block;
       text-align: right;
 
       .icon {
-        @extend .t-action3;
+        @extend %t-action3;
         display: inline-block;
         vertical-align: middle;
         margin-right: ($baseline/4);
@@ -48,20 +48,20 @@
 
 // notices - in-context: to be used as notices to users within the context of a form/action
 .notice-incontext {
-  @extend .ui-well;
+  @extend %ui-well;
   border-radius: ($baseline/10);
   position: relative;
   overflow: hidden;
   margin-bottom: $baseline;
 
   .title {
-    @extend .t-title6;
+    @extend %t-title6;
     margin-bottom: ($baseline/2);
     font-weight: 700;
   }
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
     @include transition(opacity $tmg-f2 ease-in-out 0s);
     opacity: 0.75;
     margin-bottom: $baseline;
@@ -99,8 +99,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-blue;
-        @extend .t-action3;
+        @extend %btn-primary-blue;
+        @extend %t-action3;
       }
     }
   }
@@ -160,8 +160,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-blue;
-        @extend .t-action3;
+        @extend %btn-primary-blue;
+        @extend %t-action3;
       }
     }
   }
@@ -188,8 +188,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-green;
-        @extend .t-action3;
+        @extend %btn-primary-green;
+        @extend %t-action3;
       }
     }
   }

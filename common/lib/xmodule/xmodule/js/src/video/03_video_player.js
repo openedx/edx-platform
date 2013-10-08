@@ -21,35 +21,46 @@ function (HTML5Video) {
 
     // function _makeFunctionsPublic(state)
     //
-    //     Functions which will be accessible via 'state' object. When called, these functions will
-    //     get the 'state' object as a context.
+    //     Functions which will be accessible via 'state' object. When called,
+    //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoPlayer.pause                       = _.bind(pause, state);
-        state.videoPlayer.play                        = _.bind(play, state);
-        state.videoPlayer.update                      = _.bind(update, state);
-        state.videoPlayer.onSpeedChange               = _.bind(onSpeedChange, state);
-        state.videoPlayer.onCaptionSeek               = _.bind(onSeek, state);
-        state.videoPlayer.onSlideSeek                 = _.bind(onSeek, state);
-        state.videoPlayer.onEnded                     = _.bind(onEnded, state);
-        state.videoPlayer.onPause                     = _.bind(onPause, state);
-        state.videoPlayer.onPlay                      = _.bind(onPlay, state);
-        state.videoPlayer.onUnstarted                 = _.bind(onUnstarted, state);
-        state.videoPlayer.handlePlaybackQualityChange = _.bind(handlePlaybackQualityChange, state);
-        state.videoPlayer.onPlaybackQualityChange     = _.bind(onPlaybackQualityChange, state);
-        state.videoPlayer.onStateChange               = _.bind(onStateChange, state);
-        state.videoPlayer.onReady                     = _.bind(onReady, state);
-        state.videoPlayer.updatePlayTime              = _.bind(updatePlayTime, state);
-        state.videoPlayer.isPlaying                   = _.bind(isPlaying, state);
-        state.videoPlayer.log                         = _.bind(log, state);
-        state.videoPlayer.duration                    = _.bind(duration, state);
-        state.videoPlayer.onVolumeChange              = _.bind(onVolumeChange, state);
+        state.videoPlayer.pause         = _.bind(pause, state);
+        state.videoPlayer.play          = _.bind(play, state);
+        state.videoPlayer.update        = _.bind(update, state);
+        state.videoPlayer.onSpeedChange = _.bind(onSpeedChange, state);
+        state.videoPlayer.onCaptionSeek = _.bind(onSeek, state);
+        state.videoPlayer.onSlideSeek   = _.bind(onSeek, state);
+        state.videoPlayer.onEnded       = _.bind(onEnded, state);
+        state.videoPlayer.onPause       = _.bind(onPause, state);
+        state.videoPlayer.onPlay        = _.bind(onPlay, state);
+
+        state.videoPlayer.onUnstarted = _.bind(
+            onUnstarted, state
+        );
+
+        state.videoPlayer.handlePlaybackQualityChange = _.bind(
+            handlePlaybackQualityChange, state
+        );
+
+        state.videoPlayer.onPlaybackQualityChange = _.bind(
+            onPlaybackQualityChange, state
+        );
+
+        state.videoPlayer.onStateChange  = _.bind(onStateChange, state);
+        state.videoPlayer.onReady        = _.bind(onReady, state);
+        state.videoPlayer.updatePlayTime = _.bind(updatePlayTime, state);
+        state.videoPlayer.isPlaying      = _.bind(isPlaying, state);
+        state.videoPlayer.log            = _.bind(log, state);
+        state.videoPlayer.duration       = _.bind(duration, state);
+        state.videoPlayer.onVolumeChange = _.bind(onVolumeChange, state);
     }
 
     // function _initialize(state)
     //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+    //     Create any necessary DOM elements, attach them, and set their
+    //     initial configuration. Also make the created DOM elements available
+    //     via the 'state' object. Much easier to work this way - you don't
+    //     have to do repeated jQuery element selects.
     function _initialize(state) {
         var youTubeId;
 
@@ -92,9 +103,10 @@ function (HTML5Video) {
         //
         // TODO: Check the status of
         // http://code.google.com/p/gdata-issues/issues/detail?id=4654
-        // When the YouTube team fixes the API bug, we can remove this temporary
-        // bug fix.
-        state.browserIsFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        // When the YouTube team fixes the API bug, we can remove this
+        // temporary bug fix.
+        state.browserIsFirefox = navigator.userAgent
+            .toLowerCase().indexOf('firefox') > -1;
 
         if (state.videoType === 'html5') {
             state.videoPlayer.player = new HTML5Video.Player(state.el, {
@@ -117,7 +129,8 @@ function (HTML5Video) {
                 events: {
                     onReady: state.videoPlayer.onReady,
                     onStateChange: state.videoPlayer.onStateChange,
-                    onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange
+                    onPlaybackQualityChange: state.videoPlayer
+                        .onPlaybackQualityChange
                 }
             });
         }
@@ -125,9 +138,10 @@ function (HTML5Video) {
 
     // function _restartUsingFlash(state)
     //
-    //     When we are about to play a YouTube video in HTML5 mode and discover that we only
-    //     have one available playback rate, we will switch to Flash mode. In Flash speed
-    //     switching is done by reloading videos recorded at different frame rates.
+    //     When we are about to play a YouTube video in HTML5 mode and discover
+    //     that we only have one available playback rate, we will switch to
+    //     Flash mode. In Flash speed switching is done by reloading videos
+    //     recorded at different frame rates.
     function _restartUsingFlash(state) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
@@ -139,25 +153,29 @@ function (HTML5Video) {
         });
         state.currentPlayerMode = 'flash';
 
+        console.log('[Video info]: Changing YouTube player mode to "flash".');
+
         // Removed configuration option that requests the HTML5 mode.
         delete state.videoPlayer.playerVars.html5;
 
         // Request for the creation of a new Flash player
         state.videoPlayer.player = new YT.Player(state.id, {
-            'playerVars': state.videoPlayer.playerVars,
-            'videoId': state.youtubeId(),
-            'events': {
-                'onReady': state.videoPlayer.onReady,
-                'onStateChange': state.videoPlayer.onStateChange,
-                'onPlaybackQualityChange': state.videoPlayer.onPlaybackQualityChange
+            playerVars: state.videoPlayer.playerVars,
+            videoId: state.youtubeId(),
+            events: {
+                onReady: state.videoPlayer.onReady,
+                onStateChange: state.videoPlayer.onStateChange,
+                onPlaybackQualityChange: state.videoPlayer
+                    .onPlaybackQualityChange
             }
         });
     }
 
     // ***************************************************************
     // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // These are available via the 'state' object. Their context ('this'
+    // keyword) is the 'state' object. The magic private function that makes
+    // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
     function pause() {
@@ -174,9 +192,11 @@ function (HTML5Video) {
 
     // This function gets the video's current play position in time
     // (currentTime) and its duration.
-    // It is called at a regular interval when the video is playing (see below).
+    // It is called at a regular interval when the video is playing (see
+    // below).
     function update() {
-        this.videoPlayer.currentTime = this.videoPlayer.player.getCurrentTime();
+        this.videoPlayer.currentTime = this.videoPlayer.player
+            .getCurrentTime();
 
         if (isFinite(this.videoPlayer.currentTime)) {
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
@@ -206,19 +226,27 @@ function (HTML5Video) {
 
         if (
             this.currentPlayerMode === 'html5' &&
-            !(this.browserIsFirefox && newSpeed === '1.0' && this.videoType === 'youtube')
+            !(
+                this.browserIsFirefox &&
+                newSpeed === '1.0' &&
+                this.videoType === 'youtube'
+            )
         ) {
             this.videoPlayer.player.setPlaybackRate(newSpeed);
         } else {
-            // We request the reloading of the video in the case when YouTube is in
-            // Flash player mode, or when we are in Firefox, and the new speed is 1.0.
-            // The second case is necessary to avoid the bug where in Firefox speed
-            // switching to 1.0 in HTML5 player mode is handled incorrectly by YouTube
-            // API.
+            // We request the reloading of the video in the case when YouTube
+            // is in Flash player mode, or when we are in Firefox, and the new
+            // speed is 1.0. The second case is necessary to avoid the bug
+            // where in Firefox speed switching to 1.0 in HTML5 player mode is
+            // handled incorrectly by YouTube API.
             if (this.videoPlayer.isPlaying()) {
-                this.videoPlayer.player.loadVideoById(this.youtubeId(), this.videoPlayer.currentTime);
+                this.videoPlayer.player.loadVideoById(
+                    this.youtubeId(), this.videoPlayer.currentTime
+                );
             } else {
-                this.videoPlayer.player.cueVideoById(this.youtubeId(), this.videoPlayer.currentTime);
+                this.videoPlayer.player.cueVideoById(
+                    this.youtubeId(), this.videoPlayer.currentTime
+                );
             }
 
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
@@ -243,7 +271,9 @@ function (HTML5Video) {
 
         if (this.videoPlayer.isPlaying()) {
             clearInterval(this.videoPlayer.updateInterval);
-            this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
+            this.videoPlayer.updateInterval = setInterval(
+                this.videoPlayer.update, 200
+            );
         } else {
             this.videoPlayer.currentTime = params.time;
         }
@@ -286,7 +316,9 @@ function (HTML5Video) {
         );
 
         if (!this.videoPlayer.updateInterval) {
-            this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
+            this.videoPlayer.updateInterval = setInterval(
+                this.videoPlayer.update, 200
+            );
         }
 
         this.trigger('videoControl.play', null);
@@ -325,19 +357,26 @@ function (HTML5Video) {
         //   https://bugzilla.mozilla.org/show_bug.cgi?id=840745
         //   https://developer.mozilla.org/en-US/docs/DOM/HTMLMediaElement
 
-        availablePlaybackRates = _.filter(availablePlaybackRates, function(item){
-            var speed = Number(item);
-            return  speed > 0.25 && speed <= 5;
-        });
+        availablePlaybackRates = _.filter(
+            availablePlaybackRates,
+            function (item) {
+                var speed = Number(item);
+                return speed > 0.25 && speed <= 5;
+            }
+        );
 
-        if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {
+        if (
+            this.currentPlayerMode === 'html5' &&
+            this.videoType === 'youtube'
+        ) {
             if (availablePlaybackRates.length === 1) {
-                // This condition is needed in cases when Firefox version is less than 20. In those versions
-                // HTML5 playback could only happen at 1 speed (no speed changing). Therefore, in this case,
-                // we need to switch back to Flash.
+                // This condition is needed in cases when Firefox version is
+                // less than 20. In those versions HTML5 playback could only
+                // happen at 1 speed (no speed changing). Therefore, in this
+                // case, we need to switch back to Flash.
                 //
-                // This might also happen in other browsers, therefore when we have 1 speed available, we fall
-                // back to Flash.
+                // This might also happen in other browsers, therefore when we
+                // have 1 speed available, we fall back to Flash.
 
                 _restartUsingFlash(this);
 
@@ -352,18 +391,26 @@ function (HTML5Video) {
                 // and their associated subs.
 
                 // First clear the dictionary.
-                $.each(this.videos, function(index, value) {
+                $.each(this.videos, function (index, value) {
                     delete _this.videos[index];
                 });
                 this.speeds = [];
                 // Recreate it with the supplied frame rates.
-                $.each(availablePlaybackRates, function(index, value) {
-                    _this.videos[value.toFixed(2).replace(/\.00$/, '.0')] = baseSpeedSubs;
+                $.each(availablePlaybackRates, function (index, value) {
+                    var key = value.toFixed(2).replace(/\.00$/, '.0');
 
-                    _this.speeds.push(value.toFixed(2).replace(/\.00$/, '.0'));
+                    _this.videos[key] = baseSpeedSubs;
+
+                    _this.speeds.push(key);
                 });
 
-                this.trigger('videoSpeedControl.reRender', {'newSpeeds': this.speeds, 'currentSpeed': this.speed});
+                this.trigger(
+                    'videoSpeedControl.reRender',
+                    {
+                        newSpeeds: this.speeds,
+                        currentSpeed: this.speed
+                    }
+                );
 
                 this.setSpeed($.cookie('video_speed'));
             }
@@ -373,9 +420,15 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        if (!onTouchBasedDevice() && $('.video:first').data('autoplay') === 'True') {
+        /* The following has been commented out to make sure autoplay is 
+           disabled for students.
+        if (
+            !onTouchBasedDevice() &&
+            $('.video:first').data('autoplay') === 'True'
+        ) {
             this.videoPlayer.play();
         }
+        */
     }
 
     function onStateChange(event) {
@@ -400,19 +453,37 @@ function (HTML5Video) {
 
         duration = this.videoPlayer.duration();
 
-        this.trigger('videoProgressSlider.updatePlayTime', {'time': time, 'duration': duration});
-        this.trigger('videoControl.updateVcrVidTime', {'time': time, 'duration': duration});
+        this.trigger(
+            'videoProgressSlider.updatePlayTime',
+            {
+                time: time,
+                duration: duration
+            }
+        );
+
+        this.trigger(
+            'videoControl.updateVcrVidTime',
+            {
+                time: time,
+                duration: duration
+            }
+        );
+
         this.trigger('videoCaption.updatePlayTime', time);
     }
 
     function isPlaying() {
-        return this.videoPlayer.player.getPlayerState() === this.videoPlayer.PlayerState.PLAYING;
+        var playerState = this.videoPlayer.player.getPlayerState(),
+            PLAYING = this.videoPlayer.PlayerState.PLAYING;
+
+        return playerState === PLAYING;
     }
 
     function duration() {
         var dur;
 
         dur = this.videoPlayer.player.getDuration();
+
         if (!isFinite(dur)) {
             dur = this.getDuration();
         }
@@ -431,7 +502,7 @@ function (HTML5Video) {
 
         // If extra parameters were passed to the log.
         if (data) {
-            $.each(data, function(paramName, value) {
+            $.each(data, function (paramName, value) {
                 logInfo[paramName] = value;
             });
         }

@@ -4,7 +4,9 @@
 from lettuce import world, step
 from common import *
 from terrain.steps import reload_the_page
-from selenium.common.exceptions import InvalidElementStateException
+from selenium.common.exceptions import (
+    InvalidElementStateException, WebDriverException)
+from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=E0611
 
 
 @step(u'I am viewing the grading settings')
@@ -34,7 +36,7 @@ def delete_grade(step):
 def view_grade_slider(step, how_many):
     grade_slider_css = '.grade-specific-bar'
     all_grades = world.css_find(grade_slider_css)
-    assert len(all_grades) == int(how_many)
+    assert_equal(len(all_grades), int(how_many))
 
 
 @step(u'I move a grading section')
@@ -49,7 +51,7 @@ def confirm_change(step):
     range_css = '.range'
     all_ranges = world.css_find(range_css)
     for i in range(len(all_ranges)):
-        assert world.css_html(range_css, index=i) != '0-50'
+        assert_not_equal(world.css_html(range_css, index=i), '0-50')
 
 
 @step(u'I change assignment type "([^"]*)" to "([^"]*)"$')
@@ -57,7 +59,7 @@ def change_assignment_name(step, old_name, new_name):
     name_id = '#course-grading-assignment-name'
     index = get_type_index(old_name)
     f = world.css_find(name_id)[index]
-    assert index != -1
+    assert_not_equal(index, -1)
     for count in range(len(old_name)):
         f._element.send_keys(Keys.END, Keys.BACK_SPACE)
     f._element.send_keys(new_name)
@@ -65,21 +67,28 @@ def change_assignment_name(step, old_name, new_name):
 
 @step(u'I go back to the main course page')
 def main_course_page(step):
-    main_page_link_css = 'a[href="/%s/%s/course/%s"]' % (world.scenario_dict['COURSE'].org,
-                                                        world.scenario_dict['COURSE'].number,
-                                                        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
-    world.css_click(main_page_link_css)
+    main_page_link = '/{}/{}/course/{}'.format(world.scenario_dict['COURSE'].org,
+                                               world.scenario_dict['COURSE'].number,
+                                               world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
+    world.visit(main_page_link)
+    assert_in('Course Outline', world.css_text('h1.page-header'))
 
 
 @step(u'I do( not)? see the assignment name "([^"]*)"$')
 def see_assignment_name(step, do_not, name):
     assignment_menu_css = 'ul.menu > li > a'
+    # First assert that it is there, make take a bit to redraw
+    assert_true(
+        world.css_find(assignment_menu_css),
+        msg="Could not find assignment menu"
+    )
+
     assignment_menu = world.css_find(assignment_menu_css)
     allnames = [item.html for item in assignment_menu]
     if do_not:
-        assert not name in allnames
+        assert_not_in(name, allnames)
     else:
-        assert name in allnames
+        assert_in(name, allnames)
 
 
 @step(u'I delete the assignment type "([^"]*)"$')
@@ -107,7 +116,7 @@ def populate_course(step):
 def changes_not_persisted(step):
     reload_the_page(step)
     name_id = '#course-grading-assignment-name'
-    assert(world.css_value(name_id) == 'Homework')
+    assert_equal(world.css_value(name_id), 'Homework')
 
 
 @step(u'I see the assignment type "(.*)"$')
@@ -115,7 +124,7 @@ def i_see_the_assignment_type(_step, name):
     assignment_css = '#course-grading-assignment-name'
     assignments = world.css_find(assignment_css)
     types = [ele['value'] for ele in assignments]
-    assert name in types
+    assert_in(name, types)
 
 
 @step(u'I change the highest grade range to "(.*)"$')
@@ -129,26 +138,41 @@ def change_grade_range(_step, range_name):
 def i_see_highest_grade_range(_step, range_name):
     range_css = 'span.letter-grade'
     grade = world.css_find(range_css).first
-    assert grade.value == range_name
+    assert_equal(grade.value, range_name)
 
 
 @step(u'I cannot edit the "Fail" grade range$')
 def cannot_edit_fail(_step):
     range_css = 'span.letter-grade'
     ranges = world.css_find(range_css)
-    assert len(ranges) == 2
+    assert_equal(len(ranges), 2)
+    assert_not_equal(ranges.last.value, 'Failure')
+
+    # try to change the grade range -- this should throw an exception
     try:
         ranges.last.value = 'Failure'
-        assert False, "Should not be able to edit failing range"
-    except InvalidElementStateException:
+    except (InvalidElementStateException):
         pass  # We should get this exception on failing to edit the element
 
+    # check to be sure that nothing has changed
+    ranges = world.css_find(range_css)
+    assert_equal(len(ranges), 2)
+    assert_not_equal(ranges.last.value, 'Failure')
 
 
 @step(u'I change the grace period to "(.*)"$')
 def i_change_grace_period(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
     ele = world.css_find(grace_period_css).first
+    
+    # Sometimes it takes a moment for the JavaScript
+    # to populate the field.  If we don't wait for
+    # this to happen, then we can end up with
+    # an invalid value (e.g. "00:0048:00")
+    # which prevents us from saving.
+    assert_true(world.css_has_value(grace_period_css, "00:00"))
+
+    # Set the new grace period
     ele.value = grace_period
 
 
@@ -156,7 +180,7 @@ def i_change_grace_period(_step, grace_period):
 def the_grace_period_is(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
     ele = world.css_find(grace_period_css).first
-    assert ele.value == grace_period
+    assert_equal(ele.value, grace_period)
 
 
 def get_type_index(name):

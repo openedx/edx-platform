@@ -10,20 +10,34 @@ function () {
     return function (state) {
         state.videoSpeedControl = {};
 
+        if (state.videoType === 'html5') {
+            _initialize(state);
+        } else if (state.videoType === 'youtube' && state.youtubeXhr) {
+            state.youtubeXhr.done(function () {
+                _initialize(state);
+            });
+        }
+
         if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
+            console.log(
+                '[Video info]: HTML5 mode - playbackRate is not supported.'
+            );
+
             _hideSpeedControl(state);
 
             return;
         }
-
-        _makeFunctionsPublic(state);
-        _renderElements(state);
-        _bindHandlers(state);
     };
 
     // ***************************************************************
     // Private functions start here.
     // ***************************************************************
+
+    function _initialize(state) {
+        _makeFunctionsPublic(state);
+        _renderElements(state);
+        _bindHandlers(state);
+    }
 
     // function _makeFunctionsPublic(state)
     //
@@ -55,7 +69,7 @@ function () {
             state.videoSpeedControl.el
         );
 
-        $.each(state.videoSpeedControl.speeds, function(index, speed) {
+        $.each(state.videoSpeedControl.speeds, function (index, speed) {
             var link = '<a class="speed_link" href="#">' + speed + 'x</a>';
 
             state.videoSpeedControl.videoSpeedsEl
@@ -68,26 +82,27 @@ function () {
     }
 
     /**
-    * @desc Check if playbackRate supports by browser.
-    *
-    * @type {function}
-    * @access private
-    *
-    * @param {object} state The object containg the state of the video player.
-    *     All other modules, their parameters, public variables, etc. are
-    *     available via this object.
-    *
-    * @this {object} The global window object.
-    *
-    * @returns {Boolean}
-    *       true: Browser support playbackRate functionality.
-    *       false: Browser doesn't support playbackRate functionality.
-    */
+     * @desc Check if playbackRate supports by browser.
+     *
+     * @type {function}
+     * @access private
+     *
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {Boolean}
+     *       true: Browser support playbackRate functionality.
+     *       false: Browser doesn't support playbackRate functionality.
+     */
     function _checkPlaybackRates() {
         var video = document.createElement('video');
 
-        // If browser supports, 1.0 should be returned by playbackRate property.
-        // In this case, function return True. Otherwise, False will be returned.
+        // If browser supports, 1.0 should be returned by playbackRate
+        // property. In this case, function return True. Otherwise, False will
+        // be returned.
         return Boolean(video.playbackRate);
     }
 
@@ -118,7 +133,7 @@ function () {
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
         if (onTouchBasedDevice()) {
-            state.videoSpeedControl.el.on('click', function(event) {
+            state.videoSpeedControl.el.on('click', function (event) {
                 // So that you can't highlight this control via a drag
                 // operation, we disable the default browser actions on a
                 // click event.
@@ -144,68 +159,92 @@ function () {
                 });
 
             // ******************************
-            // Attach 'focus', and 'blur' events to the speed button which
+            // The tabbing will cycle through the elements in the following
+            // order:
+            // 1. Play control
+            // 2. Speed control
+            // 3. Fastest speed called firstSpeed
+            // 4. Intermediary speed called otherSpeed 
+            // 5. Slowest speed called lastSpeed
+            // 6. Volume control
+            // This field will keep track of where the focus is coming from.
+            state.previousFocus = '';
+
+            // ******************************
+            // Attach 'focus', and 'blur' events to the speed control which
             // either brings up the speed dialog with individual speed entries,
             // or closes it.
             state.videoSpeedControl.el.children('a')
                 .on('focus', function () {
-                    // If the focus is comming from the first speed entry, this
-                    // means we are tabbing backwards. In this case we have to
-                    // hide the speed entries which will allow us to change the
-                    // focus further backwards.
-                    if (state.firstSpeedBlur === true) {
-                        state.videoSpeedControl.el.removeClass('open');
-
-                        state.firstSpeedBlur = false;
-                    }
-
-                    // If the focus is comming from some other element, show
-                    // the drop down with the speed entries.
-                    else {
-                        state.videoSpeedControl.el.addClass('open');
+                    // If the focus is coming from the first speed entry 
+                    // (tabbing backwards) or last speed entry (tabbing forward) 
+                    // hide the speed entries dialog.
+                    if (state.previousFocus === 'firstSpeed' ||
+                        state.previousFocus === 'lastSpeed') {
+                         state.videoSpeedControl.el.removeClass('open');
                     }
                 })
                 .on('blur', function () {
-                    // When the focus leaves this element, if the speed entries
-                    // dialog is shown (tabbing forwards), then we will set
-                    // focus to the first speed entry.
-                    //
-                    // If the selector does not select anything, then this
-                    // means that the speed entries dialog is closed, and we
-                    // are tabbing backwads. The browser will select the
-                    // previous element to tab to by itself.
-                    state.videoSpeedControl.videoSpeedsEl
+                    // When the focus leaves this element, the speed entries
+                    // dialog will be shown.
+                    
+                    // If we are tabbing forward (previous focus is play
+                    // control), we open the dialog and set focus on the first
+                    // speed entry.
+                    if (state.previousFocus === 'playPause') {
+                        state.videoSpeedControl.el.addClass('open');
+                        state.videoSpeedControl.videoSpeedsEl
                         .find('a.speed_link:first')
                         .focus();
+                    }
+
+                    // If we are tabbing backwards (previous focus is volume 
+                    // control), we open the dialog and set focus on the 
+                    // last speed entry.
+                    if (state.previousFocus === 'volume') {
+                        state.videoSpeedControl.el.addClass('open');
+                        state.videoSpeedControl.videoSpeedsEl
+                        .find('a.speed_link:last')
+                        .focus();
+                    }
+                    
                 });
 
-
             // ******************************
-            // Attach 'focus', and 'blur' events to elements which represent
-            // individual speed entries.
+            // Attach 'blur' event to elements which represent individual speed
+            // entries and use it to track the origin of the focus.
             speedLinks = state.videoSpeedControl.videoSpeedsEl
                 .find('a.speed_link');
 
-            speedLinks.last().on('blur', function () {
-                // If we have reached the last speed entry, and the focus
-                // changes to the next element, we need to hide the speeds
-                // control drop-down.
-                state.videoSpeedControl.el.removeClass('open');
-            });
             speedLinks.first().on('blur', function () {
-                // This flag will indicate that the focus to the next
-                // element that will receive it is comming from the first
-                // speed entry.
-                //
-                // This flag will be used to correctly handle scenario of
-                // tabbing backwards.
-                state.firstSpeedBlur = true;
+                // The previous focus is a speed entry (we are tabbing
+                // backwards), the dialog will close, set focus on the speed
+                // control and track the focus on first speed.
+                if (state.previousFocus === 'otherSpeed') {
+                    state.previousFocus = 'firstSpeed';
+                    state.videoSpeedControl.el.children('a').focus();
+                }    
             });
-            speedLinks.on('focus', function () {
-                // Clear the flag which is only set when we are un-focusing
-                // (the blur event) from the first speed entry.
-                state.firstSpeedBlur = false;
+
+            // Track the focus on intermediary speeds.
+            speedLinks
+                .filter(function (index) {
+                    return index === 1 || index === 2
+                })
+                .on('blur', function () {
+                    state.previousFocus = 'otherSpeed';
+                });
+
+            speedLinks.last().on('blur', function () {
+                // The previous focus is a speed entry (we are tabbing forward),
+                // the dialog will close, set focus on the speed control and
+                // track the focus on last speed.
+                if (state.previousFocus === 'otherSpeed') {
+                    state.previousFocus = 'lastSpeed';
+                    state.videoSpeedControl.el.children('a').focus();
+                }   
             });
+            
         }
     }
 
@@ -244,6 +283,9 @@ function () {
                 this.videoSpeedControl.currentSpeed
             );
         }
+        // When a speed entry has been selected, we want the speed control to 
+        // regain focus.
+        parentEl.parent().siblings('a').focus();
     }
 
     function reRender(params) {
@@ -253,7 +295,7 @@ function () {
         this.videoSpeedControl.videoSpeedsEl.find('li').removeClass('active');
         this.videoSpeedControl.speeds = params.newSpeeds;
 
-        $.each(this.videoSpeedControl.speeds, function(index, speed) {
+        $.each(this.videoSpeedControl.speeds, function (index, speed) {
             var link, listItem;
 
             link = '<a class="speed_link" href="#">' + speed + 'x</a>';

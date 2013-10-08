@@ -10,7 +10,6 @@ from collections import namedtuple
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
-from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
@@ -170,7 +169,9 @@ class Location(_LocationBase):
             # names allow colons
             check(list_[4], INVALID_CHARS_NAME)
 
-        if isinstance(location, basestring):
+        if isinstance(location, Location):
+            return location
+        elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
                 log.debug('location is instance of %s but no URL match' % basestring)
@@ -196,8 +197,6 @@ class Location(_LocationBase):
 
             check_dict(kwargs)
             return _LocationBase.__new__(_cls, **kwargs)
-        elif isinstance(location, Location):
-            return _LocationBase.__new__(_cls, location)
         else:
             raise InvalidLocationError(location)
 
@@ -205,7 +204,7 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{tag}://{org}/{course}/{category}/{name}".format(**self.dict())
+        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
             url += "@" + self.revision
         return url
@@ -398,7 +397,7 @@ class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(self, metadata_inheritance_cache_subsystem=None, request_cache=None, modulestore_update_signal=None):
+    def __init__(self, metadata_inheritance_cache_subsystem=None, request_cache=None, modulestore_update_signal=None, xblock_mixins=()):
         '''
         Set up the error-tracking logic.
         '''
@@ -406,6 +405,7 @@ class ModuleStoreBase(ModuleStore):
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
         self.modulestore_update_signal = modulestore_update_signal
         self.request_cache = request_cache
+        self.xblock_mixins = xblock_mixins
 
     def _get_errorlog(self, location):
         """
@@ -448,13 +448,3 @@ class ModuleStoreBase(ModuleStore):
             if c.id == course_id:
                 return c
         return None
-
-
-def namedtuple_to_son(namedtuple, prefix=''):
-    """
-    Converts a namedtuple into a SON object with the same key order
-    """
-    son = SON()
-    for idx, field_name in enumerate(namedtuple._fields):
-        son[prefix + field_name] = namedtuple[idx]
-    return son

@@ -86,10 +86,12 @@ because the `capa` package handles problem XML.
 
 # Running Tests
 
-Before running tests, ensure that you have all the dependencies.  You can install dependencies using:
+You can run all of the unit-level tests using the command
 
-    rake install_prereqs
+    rake test
 
+This includes python, javascript, and documentation tests. It does not, however,
+run any acceptance tests.
 
 ## Running Python Unit tests
 
@@ -97,15 +99,15 @@ We use [nose](https://nose.readthedocs.org/en/latest/) through
 the [django-nose plugin](https://pypi.python.org/pypi/django-nose)
 to run the test suite.
 
-You can run tests using `rake` commands.  For example,
+You can run all the python tests using `rake` commands.  For example,
 
-    rake test
+    rake test:python
 
 runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
-You can re-run all failed python tests by running (all JS tests will still run)
+You can re-run all failed python tests by running
 
-    rake test[--failed]
+    rake test:python[--failed]
 
 You can also run the tests without `collectstatic`, which tends to be faster:
 
@@ -126,11 +128,11 @@ other module level tests include
 
 To run a single django test class:
 
-    rake test_lms[courseware.tests.tests:testViewAuth]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest]
 
 To run a single django test:
 
-    rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login]
 
 To re-run all failing django tests from lms or cms:
 
@@ -203,24 +205,27 @@ with Chrome (not Chromium) version 28.0.1500.71 with ChromeDriver
 version 2.1.210398.
 
 To run all the acceptance tests:
+    rake test:acceptance
 
-    rake test_acceptance_lms
-    rake test_acceptance_cms
+To run only for lms or cms:
+
+    rake test:acceptance:lms
+    rake test:acceptance:cms
 
 To test only a specific feature:
 
-    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature"]
+    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature"]
 
 To test only a specific scenario
 
-    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature -s 3"]
+    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature -s 3"]
 
 To start the debugger on failure, add the `--pdb` option:
 
-    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
+    rake test:acceptance:lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
 
 To run tests faster by not collecting static files, you can use
-`rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
+`rake test:acceptance:lms:fast` and `rake test:acceptance:cms:fast`.
 
 Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py

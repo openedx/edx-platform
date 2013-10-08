@@ -8,6 +8,8 @@ import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+from xblock.field_data import DictFieldData
+from xblock.fragment import Fragment
 
 from . import get_test_system
 
@@ -60,12 +62,12 @@ class CHModuleFactory(object):
         """
         A factory method for making CHM's
         """
-        model_data = {'data': CHModuleFactory.sample_problem_xml}
+        field_data = {'data': CHModuleFactory.sample_problem_xml}
 
         if hints is not None:
-            model_data['hints'] = hints
+            field_data['hints'] = hints
         else:
-            model_data['hints'] = {
+            field_data['hints'] = {
                 '24.0': {'0': ['Best hint', 40],
                          '3': ['Another hint', 30],
                          '4': ['A third hint', 20],
@@ -74,31 +76,31 @@ class CHModuleFactory(object):
             }
 
         if mod_queue is not None:
-            model_data['mod_queue'] = mod_queue
+            field_data['mod_queue'] = mod_queue
         else:
-            model_data['mod_queue'] = {
+            field_data['mod_queue'] = {
                 '24.0': {'2': ['A non-approved hint']},
                 '26.0': {'5': ['Another non-approved hint']}
             }
 
         if previous_answers is not None:
-            model_data['previous_answers'] = previous_answers
+            field_data['previous_answers'] = previous_answers
         else:
-            model_data['previous_answers'] = [
+            field_data['previous_answers'] = [
                 ['24.0', [0, 3, 4]],
                 ['29.0', []]
             ]
 
         if user_submissions is not None:
-            model_data['user_submissions'] = user_submissions
+            field_data['user_submissions'] = user_submissions
         else:
-            model_data['user_submissions'] = ['24.0', '29.0']
+            field_data['user_submissions'] = ['24.0', '29.0']
 
         if user_voted is not None:
-            model_data['user_voted'] = user_voted
+            field_data['user_voted'] = user_voted
 
         if moderate is not None:
-            model_data['moderate'] = moderate
+            field_data['moderate'] = moderate
 
         descriptor = Mock(weight='1')
         # Make the descriptor have a capa problem child.
@@ -138,8 +140,7 @@ class CHModuleFactory(object):
             if descriptor.name == 'capa':
                 return capa_module
         system.get_module = fake_get_module
-
-        module = CrowdsourceHinterModule(system, descriptor, model_data)
+        module = CrowdsourceHinterModule(descriptor, system, DictFieldData(field_data), Mock())
 
         return module
 
@@ -196,10 +197,10 @@ class VerticalWithModulesFactory(object):
     @staticmethod
     def create():
         """Make a vertical."""
-        model_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
+        field_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
         system = get_test_system()
         descriptor = VerticalDescriptor.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
-        module = VerticalModule(system, descriptor, model_data)
+        module = VerticalModule(system, descriptor, field_data)
 
         return module
 
@@ -209,14 +210,16 @@ class FakeChild(object):
     A fake Xmodule.
     """
     def __init__(self):
-        self.system = Mock()
-        self.system.ajax_url = 'this/is/a/fake/ajax/url'
+        self.runtime = get_test_system()
+        self.runtime.ajax_url = 'this/is/a/fake/ajax/url'
+        self.student_view = Mock(return_value=Fragment(self.get_html()))
+        self.save = Mock()
 
     def get_html(self):
         """
         Return a fake html string.
         """
-        return 'This is supposed to be test html.'
+        return u'This is supposed to be test html.'
 
 
 class CrowdsourceHinterTest(unittest.TestCase):
@@ -238,7 +241,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return [FakeChild()]
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.get_html()
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('This is supposed to be test html.' in out_html)
         self.assertTrue('this/is/a/fake/ajax/url' in out_html)
 
@@ -255,7 +258,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             """
             return []
         mock_module.get_display_items = fake_get_display_items
-        out_html = mock_module.get_html()
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('Error in loading crowdsourced hinter' in out_html)
 
     @unittest.skip("Needs to be finished.")
@@ -266,8 +269,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         NOT WORKING RIGHT NOW
         """
         mock_module = VerticalWithModulesFactory.create()
-        out_html = mock_module.get_html()
-        print out_html
+        out_html = mock_module.runtime.render(mock_module, None, 'student_view').content
         self.assertTrue('Test numerical problem.' in out_html)
         self.assertTrue('Another test numerical problem.' in out_html)
 

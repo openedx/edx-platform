@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import logging
 import inspect
 from abc import ABCMeta, abstractmethod
-from urllib import quote
 
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -17,6 +16,15 @@ from .parsers import parse_url, parse_course_id, parse_block_ref
 from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, URL_VERSION_PREFIX
 
 log = logging.getLogger(__name__)
+
+
+class LocalId(object):
+    """
+    Class for local ids for non-persisted xblocks
+
+    Should be hashable and distinguishable, but nothing else
+    """
+    pass
 
 
 class Locator(object):
@@ -106,6 +114,30 @@ class CourseLocator(Locator):
     course_id = None
     branch = None
 
+    def __init__(self, url=None, version_guid=None, course_id=None, branch=None):
+        """
+        Construct a CourseLocator
+        Caller may provide url (but no other parameters).
+        Caller may provide version_guid (but no other parameters).
+        Caller may provide course_id (optionally provide branch).
+
+        Resulting CourseLocator will have either a version_guid property
+        or a course_id (with optional branch) property, or both.
+
+        version_guid must be an instance of bson.objectid.ObjectId or None
+        url, course_id, and branch must be strings or None
+
+        """
+        self._validate_args(url, version_guid, course_id)
+        if url:
+            self.init_from_url(url)
+        if version_guid:
+            self.init_from_version_guid(version_guid)
+        if course_id or branch:
+            self.init_from_course_id(course_id, branch)
+        assert self.version_guid or self.course_id, \
+            "Either version_guid or course_id should be set."
+
     def __unicode__(self):
         """
         Return a string representing this location.
@@ -127,18 +159,13 @@ class CourseLocator(Locator):
         """
         return 'edx://' + unicode(self)
 
-    # -- unused args which are used via inspect
-    # pylint: disable= W0613
-    def validate_args(self, url, version_guid, course_id, branch):
+    def _validate_args(self, url, version_guid, course_id):
         """
-        Validate provided arguments.
+        Validate provided arguments. Internal use only which is why it checks for each
+        arg and doesn't use keyword
         """
-        need_oneof = set(('url', 'version_guid', 'course_id'))
-        args, _, _, values = inspect.getargvalues(inspect.currentframe())
-        provided_args = [a for a in args if a != 'self' and values[a] is not None]
-        if len(need_oneof.intersection(provided_args)) == 0:
-            raise InsufficientSpecificationError("Must provide one of these args: %s " %
-                                                 list(need_oneof))
+        if not any((url, version_guid, course_id)):
+            raise InsufficientSpecificationError("Must provide one of url, version_guid, course_id")
 
     def is_fully_specified(self):
         """
@@ -146,8 +173,8 @@ class CourseLocator(Locator):
         are specified.
         This should always return True, since this should be validated in the constructor.
         """
-        return self.version_guid is not None \
-            or (self.course_id is not None and self.branch is not None)
+        return (self.version_guid is not None or
+            (self.course_id is not None and self.branch is not None))
 
     def set_course_id(self, new):
         """
@@ -181,30 +208,6 @@ class CourseLocator(Locator):
                              version_guid=self.version_guid,
                              branch=self.branch)
 
-    def __init__(self, url=None, version_guid=None, course_id=None, branch=None):
-        """
-        Construct a CourseLocator
-        Caller may provide url (but no other parameters).
-        Caller may provide version_guid (but no other parameters).
-        Caller may provide course_id (optionally provide branch).
-
-        Resulting CourseLocator will have either a version_guid property
-        or a course_id (with optional branch) property, or both.
-
-        version_guid must be an instance of bson.objectid.ObjectId or None
-        url, course_id, and branch must be strings or None
-
-        """
-        self.validate_args(url, version_guid, course_id, branch)
-        if url:
-            self.init_from_url(url)
-        if version_guid:
-            self.init_from_version_guid(version_guid)
-        if course_id or branch:
-            self.init_from_course_id(course_id, branch)
-        assert self.version_guid or self.course_id, \
-            "Either version_guid or course_id should be set."
-
     @classmethod
     def as_object_id(cls, value):
         """
@@ -225,9 +228,11 @@ class CourseLocator(Locator):
         """
         if isinstance(url, Locator):
             url = url.url()
-        assert isinstance(url, basestring), '%s is not an instance of basestring' % url
+        if not isinstance(url, basestring):
+            raise TypeError('%s is not an instance of basestring' % url)
         parse = parse_url(url)
-        assert parse, 'Could not parse "%s" as a url' % url
+        if not parse:
+            raise ValueError('Could not parse "%s" as a url' % url)
         self._set_value(
             parse, 'version_guid', lambda (new_guid): self.set_version_guid(self.as_object_id(new_guid))
         )
@@ -242,13 +247,13 @@ class CourseLocator(Locator):
         """
         version_guid = self.as_object_id(version_guid)
 
-        assert isinstance(version_guid, ObjectId), \
-            '%s is not an instance of ObjectId' % version_guid
+        if not isinstance(version_guid, ObjectId):
+            raise TypeError('%s is not an instance of ObjectId' % version_guid)
         self.set_version_guid(version_guid)
 
     def init_from_course_id(self, course_id, explicit_branch=None):
         """
-        Course_id is a string like 'mit.eecs.6002x' or 'mit.eecs.6002x/branch/published'.
+        Course_id is a CourseLocator or a string like 'mit.eecs.6002x' or 'mit.eecs.6002x/branch/published'.
 
         Revision (optional) is a string like 'published'.
         It may be provided explicitly (explicit_branch) or embedded into course_id.
@@ -262,10 +267,12 @@ class CourseLocator(Locator):
         if course_id:
             if isinstance(course_id, CourseLocator):
                 course_id = course_id.course_id
-                assert course_id, "%s does not have a valid course_id"
+                if not course_id:
+                    raise ValueError("%s does not have a valid course_id" % course_id)
 
             parse = parse_course_id(course_id)
-            assert parse, 'Could not parse "%s" as a course_id' % course_id
+            if not parse:
+                raise ValueError('Could not parse "%s" as a course_id' % course_id)
             self.set_course_id(parse['id'])
             rev = parse['branch']
             if rev:
@@ -340,7 +347,7 @@ class BlockUsageLocator(CourseLocator):
         url, course_id, branch, and usage_id must be strings or None
 
         """
-        self.validate_args(url, version_guid, course_id, branch)
+        self._validate_args(url, version_guid, course_id)
         if url:
             self.init_block_ref_from_url(url)
         if course_id:
@@ -369,7 +376,7 @@ class BlockUsageLocator(CourseLocator):
 
         :param block_locator:
         """
-        if self.course_id and self.version_guid:
+        if self.version_guid:
             return BlockUsageLocator(version_guid=self.version_guid,
                                      branch=self.branch,
                                      usage_id=self.usage_id)
@@ -386,9 +393,13 @@ class BlockUsageLocator(CourseLocator):
         self.set_property('usage_id', new)
 
     def init_block_ref(self, block_ref):
-        parse = parse_block_ref(block_ref)
-        assert parse, 'Could not parse "%s" as a block_ref' % block_ref
-        self.set_usage_id(parse['block'])
+        if isinstance(block_ref, LocalId):
+            self.set_usage_id(block_ref)
+        else:
+            parse = parse_block_ref(block_ref)
+            if not parse:
+                raise ValueError('Could not parse "%s" as a block_ref' % block_ref)
+            self.set_usage_id(parse['block'])
 
     def init_block_ref_from_url(self, url):
         if isinstance(url, Locator):
@@ -409,15 +420,11 @@ class BlockUsageLocator(CourseLocator):
         """
         Return a string representing this location.
         """
-        rep = CourseLocator.__unicode__(self)
-        if self.usage_id is None:
-            # usage_id has not been initialized
-            return rep + BLOCK_PREFIX + 'NONE'
-        else:
-            return rep + BLOCK_PREFIX + self.usage_id
+        rep = super(BlockUsageLocator, self).__unicode__()
+        return rep + BLOCK_PREFIX + unicode(self.usage_id)
 
 
-class DescriptionLocator(Locator):
+class DefinitionLocator(Locator):
     """
     Container for how to locate a description (the course-independent content).
     """
@@ -454,10 +461,10 @@ class VersionTree(object):
         """
         :param locator: must be version specific (Course has version_guid or definition had id)
         """
-        assert isinstance(locator, Locator) and not inspect.isabstract(locator), \
-            "locator must be a concrete subclass of Locator"
-        assert locator.version(), \
-            "locator must be version specific (Course has version_guid or definition had id)"
+        if not isinstance(locator, Locator) and not inspect.isabstract(locator):
+            raise TypeError("locator {} must be a concrete subclass of Locator".format(locator))
+        if not locator.version():
+            raise ValueError("locator must be version specific (Course has version_guid or definition had id)")
         self.locator = locator
         if tree_dict is None:
             self.children = []

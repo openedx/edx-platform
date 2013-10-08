@@ -1,7 +1,7 @@
 // studio - views - textbooks
 // ====================
 
-body.course.textbooks {
+.view-textbooks {
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
@@ -13,7 +13,7 @@ body.course.textbooks {
     margin-right: flex-gutter();
 
     .no-textbook-content {
-      @extend .ui-well;
+      @extend %ui-well;
       padding: ($baseline*2);
       background-color: $gray-l4;
       text-align: center;
@@ -30,7 +30,7 @@ body.course.textbooks {
     }
 
     .textbook {
-      @extend .ui-window;
+      @extend %ui-window;
       position: relative;
 
       .view-textbook {
@@ -42,7 +42,7 @@ body.course.textbooks {
         }
 
         .textbook-title {
-          @extend .t-title4;
+          @extend %t-title4;
           margin-right: ($baseline*14);
           font-weight: bold;
         }
@@ -71,7 +71,7 @@ body.course.textbooks {
           margin-left: $baseline;
 
           .chapter {
-            @extend .t-copy-sub2;
+            @extend %t-copy-sub2;
             margin-bottom: ($baseline/4);
             border-bottom: 1px solid $gray-l4;
 
@@ -106,16 +106,16 @@ body.course.textbooks {
 
             .view {
               @include blue-button;
-              @extend .t-action4;
+              @extend %t-action4;
             }
 
             .edit {
               @include blue-button;
-              @extend .t-action4;
+              @extend %t-action4;
             }
 
             .delete {
-              @extend .ui-btn-non;
+              @extend %ui-btn-non;
             }
           }
 
@@ -160,7 +160,7 @@ body.course.textbooks {
 
         .action-primary {
           @include blue-button;
-          @extend .t-action2;
+          @extend %t-action2;
           @include transition(all .15s);
           display: inline-block;
           padding: ($baseline/5) $baseline;
@@ -170,7 +170,7 @@ body.course.textbooks {
 
         .action-secondary {
           @include grey-button;
-          @extend .t-action2;
+          @extend %t-action2;
           @include transition(all .15s);
           display: inline-block;
           padding: ($baseline/5) $baseline;
@@ -182,7 +182,7 @@ body.course.textbooks {
       }
 
       .copy {
-        @extend .t-copy-sub2;
+        @extend %t-copy-sub2;
         margin: ($baseline) 0 ($baseline/2) 0;
         color: $gray;
 
@@ -196,7 +196,7 @@ body.course.textbooks {
 
       .chapters-fields,
       .textbook-fields {
-        @extend .cont-no-list;
+        @extend %cont-no-list;
 
         .field {
           margin: 0 0 ($baseline*0.75) 0;
@@ -222,7 +222,7 @@ body.course.textbooks {
           }
 
           label {
-            @extend  .t-copy-sub1;
+            @extend %t-copy-sub1;
             @include transition(color, 0.15s, ease-in-out);
             margin: 0 0 ($baseline/4) 0;
 
@@ -233,13 +233,13 @@ body.course.textbooks {
 
 
           &.add-textbook-name label {
-            @extend .t-title5;
+            @extend %t-title5;
           }
 
 
           //this section is borrowed from _account.scss - we should clean up and unify later
           input, textarea {
-            @extend .t-copy-base;
+            @extend %t-copy-base;
             height: 100%;
             width: 100%;
             padding: ($baseline/2);
@@ -292,7 +292,7 @@ body.course.textbooks {
           }
 
           .tip {
-            @extend .t-copy-sub2;
+            @extend %t-copy-sub2;
             @include transition(color, 0.15s, ease-in-out);
             display: block;
             margin-top: ($baseline/4);
@@ -328,7 +328,7 @@ body.course.textbooks {
             }
 
             .action-upload {
-                @extend .ui-btn-flat-outline;
+                @extend %ui-btn-flat-outline;
                 position: absolute;
                 top: 3px;
                 right: 0;
@@ -356,7 +356,7 @@ body.course.textbooks {
 
 
       .action-add-chapter {
-        @extend .ui-btn-flat-outline;
+        @extend %ui-btn-flat-outline;
         @include font-size(16);
         display: block;
         width: 100%;

@@ -55,13 +55,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @return: Rendered HTML
         """
         # set context variables and render template
-        if self.child_state != self.INITIAL:
-            latest = self.latest_answer()
-            previous_answer = latest if latest is not None else ''
-        else:
-            previous_answer = ''
+        previous_answer = self.get_display_answer()
 
-        previous_answer = previous_answer.replace("\n","<br/>")
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -91,6 +86,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
             'save_post_assessment': self.save_hint,
+            'store_answer': self.store_answer,
         }
 
         if dispatch not in handlers:
@@ -183,14 +179,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         error_message = ""
         # add new history element with answer and empty score and hint.
-        success, data = self.append_image_to_student_answer(data)
+        success, error_message, data = self.append_file_link_to_student_answer(data)
         if success:
             data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
             self.new_history_entry(data['student_answer'])
             self.change_state(self.ASSESSING)
-        else:
-            # This is a student_facing_error
-            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
             'success': success,
@@ -218,13 +211,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(data)
 
         try:
-            score = int(data['assessment'])
+            score = int(data.get('assessment'))
             score_list = data.getlist('score_list[]')
             for i in xrange(0, len(score_list)):
                 score_list[i] = int(score_list[i])
-        except ValueError:
+        except (ValueError, TypeError):
             # This is a dev_facing_error
-            log.error("Non-integer score value passed to save_assessment ,or no score list present.")
+            log.error("Non-integer score value passed to save_assessment, or no score list present.")
             # This is a student_facing_error
             return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 

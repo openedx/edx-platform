@@ -39,7 +39,7 @@ username = prompt('username on server', 'victor@edx.org')
 password = prompt('password', 'abc123', safe=True)
 
 print "get csrf cookie"
-session = requests.session()
+session = requests.Session()
 r = session.get(server + '/')
 r.raise_for_status()
 

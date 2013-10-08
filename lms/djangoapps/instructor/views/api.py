@@ -9,7 +9,6 @@ Many of these GETs may become PUTs in the future.
 import re
 import logging
 import requests
-from requests.status_codes import codes
 from collections import OrderedDict
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -29,14 +28,17 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 
 from courseware.models import StudentModule
+from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
+from instructor.views.tools import strip_if_string, get_student_from_identifier
 import instructor.access as access
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
+import csv
 
 log = logging.getLogger(__name__)
 
@@ -234,7 +236,7 @@ def modify_access(request, course_id):
         request.user, course_id, 'instructor', depth=None
     )
 
-    email = request.GET.get('email')
+    email = strip_if_string(request.GET.get('email'))
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
@@ -371,6 +373,38 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_anon_ids(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with 2-column CSV output of user-id, anonymized-user-id
+    """
+    # TODO: the User.objects query and CSV generation here could be
+    # centralized into analytics. Currently analytics has similar functionality
+    # but not quite what's needed.
+    def csv_response(filename, header, rows):
+        """Returns a CSV http response for the given header and rows (excel/utf-8)."""
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+        # In practice, there should not be non-ascii data in this query,
+        # but trying to do the right thing anyway.
+        encoded = [unicode(s).encode('utf-8') for s in header]
+        writer.writerow(encoded)
+        for row in rows:
+            encoded = [unicode(s).encode('utf-8') for s in row]
+            writer.writerow(encoded)
+        return response
+
+    students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+    ).order_by('id')
+    header =['User ID', 'Anonymized user ID']
+    rows = [[s.id, unique_id_for_user(s)] for s in students]
+    return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_distribution(request, course_id):
     """
     Respond with json of the distribution of students over selected features which have choices.
@@ -422,20 +456,19 @@ def get_distribution(request, course_id):
 @common_exceptions_400
 @require_level('staff')
 @require_query_params(
-    student_email="email of student for whom to get progress url"
+    unique_student_identifier="email or username of student for whom to get progress url"
 )
 def get_student_progress_url(request, course_id):
     """
     Get the progress url of a student.
     Limited to staff access.
 
-    Takes query paremeter student_email and if the student exists
+    Takes query paremeter unique_student_identifier and if the student exists
     returns e.g. {
         'progress_url': '/../...'
     }
     """
-    student_email = request.GET.get('student_email')
-    user = User.objects.get(email=student_email)
+    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
 
@@ -462,7 +495,7 @@ def reset_student_attempts(request, course_id):
 
     Takes some of the following query paremeters
         - problem_to_reset is a urlname of a problem
-        - student_email is an email
+        - unique_student_identifier is an email or username
         - all_students is a boolean
             requires instructor access
             mutually exclusive with delete_module
@@ -475,15 +508,18 @@ def reset_student_attempts(request, course_id):
         request.user, course_id, 'staff', depth=None
     )
 
-    problem_to_reset = request.GET.get('problem_to_reset')
-    student_email = request.GET.get('student_email')
+    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
     delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
     # parameter combinations
-    if all_students and student_email:
+    if all_students and student:
         return HttpResponseBadRequest(
-            "all_students and student_email are mutually exclusive."
+            "all_students and unique_student_identifier are mutually exclusive."
         )
     if all_students and delete_module:
         return HttpResponseBadRequest(
@@ -500,15 +536,16 @@ def reset_student_attempts(request, course_id):
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
-    if student_email:
+    if student:
         try:
-            student = User.objects.get(email=student_email)
             enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
             return HttpResponseBadRequest("Module does not exist.")
+        response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
         response_payload['task'] = 'created'
+        response_payload['student'] = 'All Students'
     else:
         return HttpResponseBadRequest()
 
@@ -527,21 +564,25 @@ def rescore_problem(request, course_id):
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
-        - student_email is an email
+        - unique_student_identifier is an email or username
         - all_students is a boolean
 
-    all_students and student_email cannot both be present.
+    all_students and unique_student_identifier cannot both be present.
     """
-    problem_to_reset = request.GET.get('problem_to_reset')
-    student_email = request.GET.get('student_email', False)
+    problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
+
     all_students = request.GET.get('all_students') in ['true', 'True', True]
 
-    if not (problem_to_reset and (all_students or student_email)):
+    if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
 
-    if all_students and student_email:
+    if all_students and student:
         return HttpResponseBadRequest(
-            "Cannot rescore with all_students and student_email."
+            "Cannot rescore with all_students and unique_student_identifier."
         )
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
@@ -549,9 +590,8 @@ def rescore_problem(request, course_id):
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
-    if student_email:
-        response_payload['student_email'] = student_email
-        student = User.objects.get(email=student_email)
+    if student:
+        response_payload['student'] = student_identifier
         instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
@@ -574,21 +614,22 @@ def list_instructor_tasks(request, course_id):
     Takes optional query paremeters.
         - With no arguments, lists running tasks.
         - `problem_urlname` lists task history for problem
-        - `problem_urlname` and `student_email` lists task
+        - `problem_urlname` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
-    problem_urlname = request.GET.get('problem_urlname', False)
-    student_email = request.GET.get('student_email', False)
+    problem_urlname = strip_if_string(request.GET.get('problem_urlname', False))
+    student = request.GET.get('unique_student_identifier', None)
+    if student is not None:
+        student = get_student_from_identifier(student)
 
-    if student_email and not problem_urlname:
+    if student and not problem_urlname:
         return HttpResponseBadRequest(
-            "student_email must accompany problem_urlname"
+            "unique_student_identifier must accompany problem_urlname"
         )
 
     if problem_urlname:
         module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)
-        if student_email:
-            student = User.objects.get(email=student_email)
+        if student:
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
@@ -694,7 +735,7 @@ def update_forum_role_membership(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    email = request.GET.get('email')
+    email = strip_if_string(request.GET.get('email'))
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
@@ -807,7 +848,11 @@ def _msk_from_problem_urlname(course_id, urlname):
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
-    urlname = "problem/" + urlname
+    # Combined open ended problems also have state that can be deleted.  However,
+    # appending "problem" will only allow capa problems to be reset.
+    # Get around this for combinedopenended problems.
+    if "combinedopenended" not in urlname:
+        urlname = "problem/" + urlname
 
     (org, course_name, __) = course_id.split("/")
     module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname

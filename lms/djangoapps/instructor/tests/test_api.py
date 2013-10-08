@@ -4,6 +4,7 @@ Unit tests for instructor.api methods.
 # pylint: disable=E1111
 import unittest
 import json
+import requests
 from urllib import quote
 from django.conf import settings
 from django.test import TestCase
@@ -445,6 +446,19 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    def test_get_anon_ids(self):
+        """
+        Test the CSV output for the anonymized user ids.
+        """
+        url = reverse('get_anon_ids', kwargs={'course_id': self.course.id})
+        with patch('instructor.views.api.unique_id_for_user') as mock_unique:
+            mock_unique.return_value = '42'
+            response = self.client.get(url, {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
+        self.assertTrue(body.endswith('"7","42"\n'))
+
     def test_get_students_features_csv(self):
         """
         Test that some minimum of information is formatted
@@ -498,8 +512,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
-        url += "?student_email={}".format(
+        url += "?unique_student_identifier={}".format(
             quote(self.students[0].email.encode("utf-8"))
+        )
+        print url
+        response = self.client.get(url)
+        print response
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertIn('progress_url', res_json)
+
+    def test_get_student_progress_url_from_uname(self):
+        """ Test that progress_url is in the successful response. """
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
+        url += "?unique_student_identifier={}".format(
+            quote(self.students[0].username.encode("utf-8"))
         )
         print url
         response = self.client.get(url)
@@ -565,7 +592,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 200)
@@ -594,7 +621,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': 'robot-not-a-real-module',
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -604,7 +631,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
             'delete_module': True,
         })
         print response.content
@@ -620,11 +647,11 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
     def test_reset_student_attempts_nonsense(self):
-        """ Test failure with both student_email and all_students. """
+        """ Test failure with both unique_student_identifier and all_students. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
             'all_students': True,
         })
         print response.content
@@ -636,7 +663,19 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    @patch.object(instructor_task.api, 'submit_rescore_problem_for_student')
+    def test_rescore_problem_single_from_uname(self, act):
+        """ Test rescoring of a single student. """
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'unique_student_identifier': self.student.username,
         })
         print response.content
         self.assertEqual(response.status_code, 200)
@@ -733,7 +772,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_urlname': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 200)
@@ -756,7 +795,7 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
     class FakeProxyResponse(object):
         """ Fake successful requests response object. """
         def __init__(self):
-            self.status_code = instructor.views.api.codes.OK
+            self.status_code = requests.status_codes.codes.OK
             self.content = '{"test_content": "robot test content"}'
 
     class FakeBadProxyResponse(object):

@@ -4,7 +4,7 @@ Tests for xmodule.modulestore.locator.
 from unittest import TestCase
 
 from bson.objectid import ObjectId
-from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DescriptionLocator
+from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
 from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX, URL_VERSION_PREFIX
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 
@@ -91,8 +91,8 @@ class LocatorTest(TestCase):
                        'mit.eecs' + BRANCH_PREFIX + 'this ',
                        'mit.eecs' + BRANCH_PREFIX + 'th%is ',
                        ):
-            self.assertRaises(AssertionError, CourseLocator, course_id=bad_id)
-            self.assertRaises(AssertionError, CourseLocator, url='edx://' + bad_id)
+            self.assertRaises(ValueError, CourseLocator, course_id=bad_id)
+            self.assertRaises(ValueError, CourseLocator, url='edx://' + bad_id)
 
     def test_course_constructor_bad_url(self):
         for bad_url in ('edx://',
@@ -100,7 +100,7 @@ class LocatorTest(TestCase):
                         'http://mit.eecs',
                         'mit.eecs',
                         'edx//mit.eecs'):
-            self.assertRaises(AssertionError, CourseLocator, url=bad_url)
+            self.assertRaises(ValueError, CourseLocator, url=bad_url)
 
     def test_course_constructor_redundant_001(self):
         testurn = 'mit.eecs.6002x'
@@ -208,6 +208,12 @@ class LocatorTest(TestCase):
                                      block=expected_block_ref)
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
+        agnostic = testobj.version_agnostic()
+        self.assertIsNone(agnostic.version_guid)
+        self.check_block_locn_fields(agnostic, 'test_block constructor',
+                                     course_id=expected_id,
+                                     branch=expected_branch,
+                                     block=expected_block_ref)
 
     def test_block_constructor_url_version_prefix(self):
         test_id_loc = '519665f6223ebd6980884f2b'
@@ -220,6 +226,14 @@ class LocatorTest(TestCase):
             block='lab2',
             version_guid=ObjectId(test_id_loc)
         )
+        agnostic = testobj.version_agnostic()
+        self.check_block_locn_fields(
+            agnostic, 'error parsing URL with version and block',
+            block='lab2',
+            course_id=None,
+            version_guid=ObjectId(test_id_loc)
+        )
+        self.assertIsNone(agnostic.course_id)
 
     def test_block_constructor_url_kitchen_sink(self):
         test_id_loc = '519665f6223ebd6980884f2b'
@@ -240,11 +254,11 @@ class LocatorTest(TestCase):
         self.assertEqual('BlockUsageLocator("mit.eecs.6002x/branch/published/block/HW3")', repr(testobj))
 
     def test_description_locator_url(self):
-        definition_locator = DescriptionLocator("chapter12345_2")
+        definition_locator = DefinitionLocator("chapter12345_2")
         self.assertEqual('edx://' + URL_VERSION_PREFIX + 'chapter12345_2', definition_locator.url())
 
     def test_description_locator_version(self):
-        definition_locator = DescriptionLocator("chapter12345_2")
+        definition_locator = DefinitionLocator("chapter12345_2")
         self.assertEqual("chapter12345_2", definition_locator.version())
 
     # ------------------------------------------------------------------

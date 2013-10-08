@@ -605,6 +605,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'save_post_assessment': self.message_post,
             'skip_post_assessment': self.skip_post_assessment,
             'check_for_score': self.check_for_score,
+            'store_answer': self.store_answer,
         }
 
         if dispatch not in handlers:
@@ -650,15 +651,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(data)
 
         # add new history element with answer and empty score and hint.
-        success, data = self.append_image_to_student_answer(data)
+        success, error_message, data = self.append_file_link_to_student_answer(data)
         if success:
             data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
             self.new_history_entry(data['student_answer'])
             self.send_to_grader(data['student_answer'], system)
             self.change_state(self.ASSESSING)
-        else:
-            # This is a student_facing_error
-            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
             'success': success,
@@ -688,8 +686,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # set context variables and render template
         eta_string = None
         if self.child_state != self.INITIAL:
-            latest = self.latest_answer()
-            previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
@@ -698,8 +694,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         else:
             post_assessment = ""
             correct = ""
-            previous_answer = ""
-        previous_answer = previous_answer.replace("\n","<br/>")
+        previous_answer = self.get_display_answer()
+
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,

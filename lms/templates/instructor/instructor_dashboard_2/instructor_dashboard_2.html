@@ -3,6 +3,19 @@
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
 
+## ----- Tips on adding something to the new instructor dashboard -----
+## 1. add your input element, e.g. in instructor_dashboard2/data_download.html
+##   the input includes a reference like data-endpoint="${ section_data['get_anon_ids_url'] }"
+## 2. Go to the old dashboard djangoapps/instructor/views/instructor_dashboard.py and
+##   add in a definition of 'xxx_url' in the right section_data for whatever page your
+##   feature is on.
+## 3. Add a url() entry in api_urls.py
+## 4. Over in lms/static/coffee/src/instructor_dashboard/ there there are .coffee files
+##   for each page which define the .js. Edit this to make your input do something
+##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
+## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
+## 6. And tests go in lms/djangoapps/instructor/tests/
+
 <%block name="headextra">
   <%static:css group='course'/>
   <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
@@ -29,7 +42,7 @@
 
 <section class="container">
 <div class="instructor-dashboard-wrapper-2">
-<div class="olddash-button-wrapper"><a href="${ old_dashboard_url }"> Back to Standard Dashboard </a></div>
+<div class="olddash-button-wrapper"><a href="${ old_dashboard_url }"> ${_("Back to Standard Dashboard")} </a></div>
 <section class="instructor-dashboard-content-2">
 
   ## <h1>Instructor Dashboard</h1>

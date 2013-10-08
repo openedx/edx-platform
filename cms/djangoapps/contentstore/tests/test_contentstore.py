@@ -55,6 +55,8 @@ from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
 
+from contentstore.utils import delete_course_and_groups
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -168,6 +170,16 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
+    def lockAnAsset(self, content_store, course_location):
+        """
+        Lock an arbitrary asset in the course
+        :param course_location:
+        """
+        course_assets = content_store.get_all_content_for_course(course_location)
+        self.assertGreater(len(course_assets), 0, "No assets to lock")
+        content_store.set_attr(course_assets[0]['_id'], 'locked', True)
+        return course_assets[0]['_id']
+
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
 
@@ -219,7 +231,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                                'course', '2012_Fall', None]), depth=None)
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
-        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
 
         draft_store.convert_to_draft(html_module.location)
@@ -227,7 +239,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # refetch to check metadata
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
-        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
 
         # publish module
@@ -236,7 +248,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # refetch to check metadata
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
-        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
 
         # put back in draft and change metadata and see if it's now marked as 'own_metadata'
@@ -246,12 +258,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         new_graceperiod = timedelta(hours=1)
 
         self.assertNotIn('graceperiod', own_metadata(html_module))
-        html_module.lms.graceperiod = new_graceperiod
+        html_module.graceperiod = new_graceperiod
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         html_module.save()
         self.assertIn('graceperiod', own_metadata(html_module))
-        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+        self.assertEqual(html_module.graceperiod, new_graceperiod)
 
         draft_store.update_metadata(html_module.location, own_metadata(html_module))
 
@@ -259,7 +271,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
         self.assertIn('graceperiod', own_metadata(html_module))
-        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+        self.assertEqual(html_module.graceperiod, new_graceperiod)
 
         # republish
         draft_store.publish(html_module.location, 0)
@@ -269,7 +281,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
         self.assertIn('graceperiod', own_metadata(html_module))
-        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+        self.assertEqual(html_module.graceperiod, new_graceperiod)
 
     def test_get_depth_with_drafts(self):
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
@@ -345,6 +357,43 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
         expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
         expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+
+        self.assertEqual(course.tabs, expected_tabs)
+
+    def test_create_static_tab_and_rename(self):
+        module_store = modulestore('direct')
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        item = ItemFactory.create(parent_location=course_location, category='static_tab', display_name="My Tab")
+
+        course = module_store.get_item(course_location)
+
+        expected_tabs = []
+        expected_tabs.append({u'type': u'courseware'})
+        expected_tabs.append({u'type': u'course_info', u'name': u'Course Info'})
+        expected_tabs.append({u'type': u'textbooks'})
+        expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
+        expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
+        expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+        expected_tabs.append({u'type': u'static_tab', u'name': u'My Tab', u'url_slug': u'My_Tab'})
+
+        self.assertEqual(course.tabs, expected_tabs)
+
+        item.display_name = 'Updated'
+        item.save()
+        module_store.update_metadata(item.location, own_metadata(item))
+
+        course = module_store.get_item(course_location)
+
+        expected_tabs = []
+        expected_tabs.append({u'type': u'courseware'})
+        expected_tabs.append({u'type': u'course_info', u'name': u'Course Info'})
+        expected_tabs.append({u'type': u'textbooks'})
+        expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
+        expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
+        expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+        expected_tabs.append({u'type': u'static_tab', u'name': u'Updated', u'url_slug': u'My_Tab'})
 
         self.assertEqual(course.tabs, expected_tabs)
 
@@ -554,9 +603,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
@@ -589,7 +638,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_empty_trashcan(self):
         '''
-        This test will exercise the empting of the asset trashcan
+        This test will exercise the emptying of the asset trashcan
         '''
         content_store = contentstore()
         trash_store = contentstore('trashcan')
@@ -605,9 +654,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
-        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
-        self.assertEqual(resp.status_code, 200)
+        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
 
         # make sure there's something in the trashcan
         all_assets = trash_store.get_all_content_for_course(course_location)
@@ -868,7 +917,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         content_store = contentstore()
 
-        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
         location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
         # get a vertical (and components in it) to copy into an orphan sub dag
@@ -878,6 +927,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
         vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
+
         draft_store.save_xmodule(vertical)
         orphan_vertical = draft_store.get_item(vertical.location)
         self.assertEqual(orphan_vertical.location.name, 'no_references')
@@ -912,6 +962,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertIn(private_location_no_draft.url(), sequential.children)
 
+        locked_asset = self.lockAnAsset(content_store, location)
+        locked_asset_attrs = content_store.get_attrs(locked_asset)
+        # the later import will reupload
+        del locked_asset_attrs['uploadDate']
+
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
@@ -943,12 +998,34 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
         # remove old course
-        delete_course(module_store, content_store, location)
+        delete_course(module_store, content_store, location, commit=True)
+        # reimport over old course
+        stub_location = Location(['i4x', 'edX', 'toy', None, None])
+        course_location = course.location
+        self.check_import(
+            module_store, root_dir, draft_store, content_store, stub_location, course_location,
+            locked_asset, locked_asset_attrs
+        )
+        # import to different course id
+        stub_location = Location(['i4x', 'anotherX', 'anotherToy', None, None])
+        course_location = stub_location.replace(category='course', name='Someday')
+        self.check_import(
+            module_store, root_dir, draft_store, content_store, stub_location, course_location,
+            locked_asset, locked_asset_attrs
+        )
 
+        shutil.rmtree(root_dir)
+
+    def check_import(self, module_store, root_dir, draft_store, content_store, stub_location, course_location,
+        locked_asset, locked_asset_attrs):
         # reimport
-        import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
+        import_from_xml(
+            module_store, root_dir, ['test_export'], draft_store=draft_store,
+            static_content_store=content_store,
+            target_location_namespace=course_location
+        )
 
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'vertical', None]))
+        items = module_store.get_items(stub_location.replace(category='vertical', name=None))
         self.assertGreater(len(items), 0)
         for descriptor in items:
             # don't try to look at private verticals. Right now we're running
@@ -959,13 +1036,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 self.assertEqual(resp.status_code, 200)
 
         # verify that we have the content in the draft store as well
-        vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                  'vertical', 'vertical_test', None]), depth=1)
+        vertical = draft_store.get_item(
+            stub_location.replace(category='vertical', name='vertical_test', revision=None),
+            depth=1
+        )
 
         self.assertTrue(getattr(vertical, 'is_draft', False))
-        self.assertNotIn('index_in_children_list', child.xml_attributes)
+        self.assertNotIn('index_in_children_list', vertical.xml_attributes)
         self.assertNotIn('parent_sequential_url', vertical.xml_attributes)
-                
+
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
             self.assertNotIn('index_in_children_list', child.xml_attributes)
@@ -976,23 +1055,34 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 self.assertNotIn('parent_sequential_url', child.data)
 
         # make sure that we don't have a sequential that is in draft mode
-        sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                    'sequential', 'vertical_sequential', None]))
+        sequential = draft_store.get_item(
+            stub_location.replace(category='sequential', name='vertical_sequential', revision=None)
+        )
 
         self.assertFalse(getattr(sequential, 'is_draft', False))
 
         # verify that we have the private vertical
-        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                               'vertical', 'a_private_vertical', None]))
+        test_private_vertical = draft_store.get_item(
+            stub_location.replace(category='vertical', name='a_private_vertical', revision=None)
+        )
 
         self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
 
         # make sure the textbook survived the export/import
-        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
+        course = module_store.get_item(course_location)
 
         self.assertGreater(len(course.textbooks), 0)
 
-        shutil.rmtree(root_dir)
+        locked_asset['course'] = stub_location.course
+        locked_asset['org'] = stub_location.org
+        new_attrs = content_store.get_attrs(locked_asset)
+        for key, value in locked_asset_attrs.iteritems():
+            if key == '_id':
+                self.assertEqual(value['name'], new_attrs[key]['name'])
+            elif key == 'filename':
+                pass
+            else:
+                self.assertEqual(value, new_attrs[key])
 
     def test_export_course_with_metadata_only_video(self):
         module_store = modulestore('direct')
@@ -1251,6 +1341,28 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+
+    def test_forum_unseeding_on_delete(self):
+        """Test new course creation and verify forum unseeding """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+        course_id = self._get_course_id(test_course_data)
+        delete_course_and_groups(course_id, commit=True)
+        self.assertFalse(are_permissions_roles_seeded(course_id))
+
+    def test_forum_unseeding_with_multiple_courses(self):
+        """Test new course creation and verify forum unseeding when there are multiple courses"""
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+
+        # unseed the forums for the first course
+        course_id = self._get_course_id(test_course_data)
+        delete_course_and_groups(course_id, commit=True)
+        self.assertFalse(are_permissions_roles_seeded(course_id))
+
+        second_course_id = self._get_course_id(second_course_data)
+        # permissions should still be there for the other course
+        self.assertTrue(are_permissions_roles_seeded(second_course_id))
 
     def _get_course_id(self, test_course_data):
         """Returns the course ID (org/number/run)."""
@@ -1628,8 +1740,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
-            self.assertEqual(course.lms.xqa_key, vertical.lms.xqa_key)
-            self.assertEqual(course.start, vertical.lms.start)
+            self.assertEqual(course.xqa_key, vertical.xqa_key)
+            self.assertEqual(course.start, vertical.start)
 
         self.assertGreater(len(verticals), 0)
 
@@ -1645,16 +1757,16 @@ class ContentStoreTest(ModuleStoreTestCase):
         new_module = module_store.get_item(new_component_location)
 
         # check for grace period definition which should be defined at the course level
-        self.assertEqual(parent.lms.graceperiod, new_module.lms.graceperiod)
-        self.assertEqual(parent.lms.start, new_module.lms.start)
-        self.assertEqual(course.start, new_module.lms.start)
+        self.assertEqual(parent.graceperiod, new_module.graceperiod)
+        self.assertEqual(parent.start, new_module.start)
+        self.assertEqual(course.start, new_module.start)
 
-        self.assertEqual(course.lms.xqa_key, new_module.lms.xqa_key)
+        self.assertEqual(course.xqa_key, new_module.xqa_key)
 
         #
         # now let's define an override at the leaf node level
         #
-        new_module.lms.graceperiod = timedelta(1)
+        new_module.graceperiod = timedelta(1)
         new_module.save()
         module_store.update_metadata(new_module.location, own_metadata(new_module))
 
@@ -1662,7 +1774,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
-        self.assertEqual(timedelta(1), new_module.lms.graceperiod)
+        self.assertEqual(timedelta(1), new_module.graceperiod)
 
     def test_default_metadata_inheritance(self):
         course = CourseFactory.create()
@@ -1670,7 +1782,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         course.children.append(vertical)
         # in memory
         self.assertIsNotNone(course.start)
-        self.assertEqual(course.start, vertical.lms.start)
+        self.assertEqual(course.start, vertical.start)
         self.assertEqual(course.textbooks, [])
         self.assertIn('GRADER', course.grading_policy)
         self.assertIn('GRADE_CUTOFFS', course.grading_policy)
@@ -1682,7 +1794,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         fetched_item = module_store.get_item(vertical.location)
         self.assertIsNotNone(fetched_course.start)
         self.assertEqual(course.start, fetched_course.start)
-        self.assertEqual(fetched_course.start, fetched_item.lms.start)
+        self.assertEqual(fetched_course.start, fetched_item.start)
         self.assertEqual(course.textbooks, fetched_course.textbooks)
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
@@ -1755,12 +1867,10 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             'track'
         }
 
-        fields = self.video_descriptor.fields
         location = self.video_descriptor.location
 
-        for field in fields:
-            if field.name in attrs_to_strip:
-                field.delete_from(self.video_descriptor)
+        for field_name in attrs_to_strip:
+            delattr(self.video_descriptor, field_name)
 
         self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
         get_modulestore(location).update_metadata(

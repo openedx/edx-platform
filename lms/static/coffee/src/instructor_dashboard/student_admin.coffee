@@ -9,12 +9,6 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 load_IntervalManager = -> window.InstructorDashboard.util.IntervalManager
 
 
-# wrap window.confirm
-# display `msg`
-# run `ok` or `cancel` depending on response
-confirm_then = ({msg, ok, cancel}) ->
-  if window.confirm msg then ok?() else cancel?()
-
 # get jquery element and assert its existance
 find_and_assert = ($root, selector) ->
   item = $root.find selector
@@ -80,10 +74,9 @@ class StudentAdmin
     # gather buttons
     # some buttons are optional because they can be flipped by the instructor task feature switch
     # student-specific
-    @$field_student_select        = find_and_assert @$section, "input[name='student-select']"
+    @$field_student_select_progress = find_and_assert @$section, "input[name='student-select-progress']"
+    @$field_student_select_grade  = find_and_assert @$section, "input[name='student-select-grade']"
     @$progress_link               = find_and_assert @$section, "a.progress-link"
-    @$btn_enroll                  = find_and_assert @$section, "input[name='enroll']"
-    @$btn_unenroll                = find_and_assert @$section, "input[name='unenroll']"
     @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
     @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
     @$btn_delete_state_single     = @$section.find "input[name='delete-state-single']"
@@ -100,7 +93,8 @@ class StudentAdmin
     @$table_running_tasks         = @$section.find ".running-tasks-table"
 
     # response areas
-    @$request_response_error_single = find_and_assert @$section, ".student-specific-container .request-response-error"
+    @$request_response_error_progress = find_and_assert @$section, ".student-specific-container .request-response-error"
+    @$request_response_error_grade = find_and_assert @$section, ".student-grade-container .request-response-error"
     @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
 
     # start polling for task list
@@ -117,96 +111,109 @@ class StudentAdmin
     # go to student progress page
     @$progress_link.click (e) =>
       e.preventDefault()
-      email = @$field_student_select.val()
+      unique_student_identifier = @$field_student_select_progress.val()
+      if not unique_student_identifier
+        return @$request_response_error_progress.text gettext("Please enter a student email address or username.")
+      error_message = gettext("Error getting student progress url for '<%= student_id %>'. Check that the student identifier is spelled correctly.")
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier})
 
       $.ajax
         dataType: 'json'
         url: @$progress_link.data 'endpoint'
-        data: student_email: email
+        data: unique_student_identifier: unique_student_identifier
         success: @clear_errors_then (data) ->
           window.location = data.progress_url
-        error: std_ajax_err => @$request_response_error_single.text "Error getting student progress url for '#{email}'."
-
-    # enroll student
-    @$btn_enroll.click =>
-      send_data =
-        action: 'enroll'
-        emails: @$field_student_select.val()
-        auto_enroll: false
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_enroll.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log "student #{send_data.emails} enrolled"
-        error: std_ajax_err => @$request_response_error_single.text "Error enrolling student '#{send_data.emails}'."
-
-    # unenroll student
-    @$btn_unenroll.click =>
-      send_data =
-        action: 'unenroll'
-        emails: @$field_student_select.val()
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_unenroll.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log "student #{send_data.emails} unenrolled"
-        error: std_ajax_err => @$request_response_error_single.text "Error unenrolling student '#{send_data.emails}'."
+        error: std_ajax_err => @$request_response_error_progress.text full_error_message
 
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
+      unique_student_identifier = @$field_student_select_grade.val()
+      problem_to_reset = @$field_problem_select_single.val()
+      if not unique_student_identifier
+        return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
+      if not problem_to_reset
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
-        student_email: @$field_student_select.val()
-        problem_to_reset: @$field_problem_select_single.val()
+        unique_student_identifier: unique_student_identifier
+        problem_to_reset: problem_to_reset
         delete_module: false
+      success_message = gettext("Success! Problem attempts reset for problem '<%= problem_id %>' and student '<%= student_id %>'.")
+      error_message = gettext("Error resetting problem attempts for problem '<%= problem_id %>' and student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
+      full_success_message = _.template(success_message, {problem_id: problem_to_reset, student_id: unique_student_identifier})
+      full_error_message = _.template(error_message, {problem_id: problem_to_reset, student_id: unique_student_identifier})
 
       $.ajax
         dataType: 'json'
         url: @$btn_reset_attempts_single.data 'endpoint'
         data: send_data
-        success: @clear_errors_then -> console.log 'problem attempts reset'
-        error: std_ajax_err => @$request_response_error_single.text "Error resetting problem attempts."
+        success: @clear_errors_then -> alert full_success_message
+        error: std_ajax_err => @$request_response_error_grade.text full_error_message
 
     # delete state for student on problem
-    @$btn_delete_state_single.click => confirm_then
-      msg: "Delete student '#{@$field_student_select.val()}'s state on problem '#{@$field_problem_select_single.val()}'?"
-      ok: =>
+    @$btn_delete_state_single.click =>
+      unique_student_identifier = @$field_student_select_grade.val()
+      problem_to_reset = @$field_problem_select_single.val()
+      if not unique_student_identifier
+        return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
+      if not problem_to_reset
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
+      confirm_message = gettext("Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?")
+      full_confirm_message = _.template(confirm_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
+
+      if window.confirm full_confirm_message
         send_data =
-          student_email: @$field_student_select.val()
-          problem_to_reset: @$field_problem_select_single.val()
+          unique_student_identifier: unique_student_identifier
+          problem_to_reset: problem_to_reset
           delete_module: true
+        error_message = gettext("Error deleting student '<%= student_id %>'s state on problem '<%= problem_id %>'. Check that the problem and student identifiers are spelled correctly.")
+        full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
         $.ajax
           dataType: 'json'
           url: @$btn_delete_state_single.data 'endpoint'
           data: send_data
-          success: @clear_errors_then -> console.log 'module state deleted'
-          error: std_ajax_err => @$request_response_error_single.text "Error deleting problem state."
+          success: @clear_errors_then -> alert gettext('Module state successfully deleted.')
+          error: std_ajax_err => @$request_response_error_grade.text full_error_message
+      else
+        # Clear error messages if "Cancel" was chosen on confirmation alert
+        @clear_errors()
 
     # start task to rescore problem for student
     @$btn_rescore_problem_single.click =>
+      unique_student_identifier = @$field_student_select_grade.val()
+      problem_to_reset = @$field_problem_select_single.val()
+      if not unique_student_identifier
+        return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
+      if not problem_to_reset
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
-        student_email: @$field_student_select.val()
-        problem_to_reset: @$field_problem_select_single.val()
+        unique_student_identifier: unique_student_identifier
+        problem_to_reset: problem_to_reset
+      success_message = gettext("Started rescore problem task for problem '<%= problem_id %>' and student '<%= student_id %>'. Click the 'Show Background Task History for Student' button to see the status of the task.")
+      full_success_message = _.template(success_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
+      error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>' for student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
         dataType: 'json'
         url: @$btn_rescore_problem_single.data 'endpoint'
         data: send_data
-        success: @clear_errors_then -> console.log 'started rescore problem task'
-        error: std_ajax_err => @$request_response_error_single.text "Error starting a task to rescore student's problem."
+        success: @clear_errors_then -> alert full_success_message
+        error: std_ajax_err => @$request_response_error_grade.text full_error_message
 
     # list task history for student+problem
     @$btn_task_history_single.click =>
+      unique_student_identifier = @$field_student_select_grade.val()
+      problem_to_reset = @$field_problem_select_single.val()
+      if not unique_student_identifier
+        return @$request_response_error_grade.text gettext("Please enter a student email address or username.")
+      if not problem_to_reset
+        return @$request_response_error_grade.text gettext("Please enter a problem urlname.")
       send_data =
-        student_email: @$field_student_select.val()
-        problem_urlname: @$field_problem_select_single.val()
-
-      if not send_data.student_email
-        return @$request_response_error_single.text "Enter a student email."
-      if not send_data.problem_urlname
-        return @$request_response_error_single.text "Enter a problem urlname."
+        unique_student_identifier: unique_student_identifier
+        problem_urlname: problem_to_reset
+      error_message = gettext("Error getting task history for problem '<%= problem_id %>' and student '<%= student_id %>'. Check that the problem and student identifiers are spelled correctly.")
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
         dataType: 'json'
@@ -214,37 +221,59 @@ class StudentAdmin
         data: send_data
         success: @clear_errors_then (data) =>
           create_task_list_table @$table_task_history_single, data.tasks
-        error: std_ajax_err => @$request_response_error_single.text "Error getting task history for student+problem"
+        error: std_ajax_err => @$request_response_error_grade.text full_error_message
 
     # start task to reset attempts on problem for all students
-    @$btn_reset_attempts_all.click => confirm_then
-      msg: "Reset attempts for all students on problem '#{@$field_problem_select_all.val()}'?"
-      ok: =>
+    @$btn_reset_attempts_all.click =>
+      problem_to_reset = @$field_problem_select_all.val()
+      if not problem_to_reset
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
+      confirm_message = gettext("Reset attempts for all students on problem '<%= problem_id %>'?")
+      full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
+      if window.confirm full_confirm_message
         send_data =
           all_students: true
-          problem_to_reset: @$field_problem_select_all.val()
+          problem_to_reset: problem_to_reset
+        success_message = gettext("Successfully started task to reset attempts for problem '<%= problem_id %>'. Click the 'Show Background Task History for Problem' button to see the status of the task.")
+        full_success_message = _.template(success_message, {problem_id: problem_to_reset})
+        error_message = gettext("Error starting a task to reset attempts for all students on problem '<%= problem_id %>'. Check that the problem identifier is spelled correctly.")
+        full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
           dataType: 'json'
           url: @$btn_reset_attempts_all.data 'endpoint'
           data: send_data
-          success: @clear_errors_then -> console.log 'started reset attempts task'
-          error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts for all students on this problem."
+          success: @clear_errors_then -> alert full_success_message
+          error: std_ajax_err => @$request_response_error_all.text full_error_message
+      else
+        # Clear error messages if "Cancel" was chosen on confirmation alert
+        @clear_errors()
 
     # start task to rescore problem for all students
-    @$btn_rescore_problem_all.click => confirm_then
-      msg: "Rescore problem '#{@$field_problem_select_all.val()}' for all students?"
-      ok: =>
+    @$btn_rescore_problem_all.click =>
+      problem_to_reset = @$field_problem_select_all.val()
+      if not problem_to_reset
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
+      confirm_message = gettext("Rescore problem '<%= problem_id %>' for all students?")
+      full_confirm_message = _.template(confirm_message, {problem_id: problem_to_reset})
+      if window.confirm full_confirm_message
         send_data =
           all_students: true
-          problem_to_reset: @$field_problem_select_all.val()
+          problem_to_reset: problem_to_reset
+        success_message = gettext("Successfully started task to rescore problem '<%= problem_id %>' for all students. Click the 'Show Background Task History for Problem' button to see the status of the task.")
+        full_success_message = _.template(success_message, {problem_id: problem_to_reset})
+        error_message = gettext("Error starting a task to rescore problem '<%= problem_id %>'. Check that the problem identifier is spelled correctly.")
+        full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
           dataType: 'json'
           url: @$btn_rescore_problem_all.data 'endpoint'
           data: send_data
-          success: @clear_errors_then -> console.log 'started rescore problem task'
-          error: std_ajax_err => @$request_response_error_all.text "Error starting a task to rescore this problem for all students."
+          success: @clear_errors_then -> alert full_success_message
+          error: std_ajax_err => @$request_response_error_all.text full_error_message
+      else
+        # Clear error messages if "Cancel" was chosen on confirmation alert
+        @clear_errors()
 
     # list task history for problem
     @$btn_task_history_all.click =>
@@ -252,7 +281,7 @@ class StudentAdmin
         problem_urlname: @$field_problem_select_all.val()
 
       if not send_data.problem_urlname
-        return @$request_response_error_all.text "Enter a problem urlname."
+        return @$request_response_error_all.text gettext("Please enter a problem urlname.")
 
       $.ajax
         dataType: 'json'
@@ -260,7 +289,7 @@ class StudentAdmin
         data: send_data
         success: @clear_errors_then (data) =>
           create_task_list_table @$table_task_history_all, data.tasks
-        error: std_ajax_err => @$request_response_error_all.text "Error listing task history for this student and problem."
+        error: std_ajax_err => @$request_response_error_all.text gettext("Error listing task history for this student and problem.")
 
   reload_running_tasks_list: =>
     list_endpoint = @$table_running_tasks.data 'endpoint'
@@ -272,10 +301,17 @@ class StudentAdmin
 
   # wraps a function, but first clear the error displays
   clear_errors_then: (cb) ->
-    @$request_response_error_single.empty()
+    @$request_response_error_progress.empty()
+    @$request_response_error_grade.empty()
     @$request_response_error_all.empty()
     ->
       cb?.apply this, arguments
+
+
+  clear_errors: ->
+    @$request_response_error_progress.empty()
+    @$request_response_error_grade.empty()
+    @$request_response_error_all.empty()
 
   # handler for when the section title is clicked.
   onClickTitle: -> @task_poller?.start()

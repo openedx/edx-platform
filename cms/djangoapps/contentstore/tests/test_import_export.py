@@ -6,6 +6,9 @@ import shutil
 import tarfile
 import tempfile
 import copy
+from path import path
+import json
+import logging
 from uuid import uuid4
 from pymongo import MongoClient
 
@@ -18,6 +21,8 @@ from xmodule.contentstore.django import _CONTENTSTORE
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
+
+log = logging.getLogger(__name__)
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
@@ -32,7 +37,7 @@ class ImportTestCase(CourseTestCase):
             'course': self.course.location.course,
             'name': self.course.location.name,
         })
-        self.content_dir = tempfile.mkdtemp()
+        self.content_dir = path(tempfile.mkdtemp())
 
         def touch(name):
             """ Equivalent to shell's 'touch'"""
@@ -60,10 +65,14 @@ class ImportTestCase(CourseTestCase):
         with tarfile.open(self.bad_tar, "w:gz") as btar:
             btar.add(bad_dir)
 
+        self.unsafe_common_dir = path(tempfile.mkdtemp(dir=self.content_dir))
+
+
     def tearDown(self):
         shutil.rmtree(self.content_dir)
         MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         _CONTENTSTORE.clear()
+
 
     def test_no_coursexml(self):
         """
@@ -78,6 +87,17 @@ class ImportTestCase(CourseTestCase):
                     "course-data": [btar]
                 })
         self.assertEquals(resp.status_code, 415)
+        # Check that `import_status` returns the appropriate stage (i.e., the
+        # stage at which import failed).
+        status_url = reverse("import_status", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': os.path.split(self.bad_tar)[1],
+        })
+        resp_status = self.client.get(status_url)
+        log.debug(str(self.client.session["import_status"]))
+        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], 2)
+
 
     def test_with_coursexml(self):
         """
@@ -92,3 +112,99 @@ class ImportTestCase(CourseTestCase):
                         "course-data": [gtar]
                     })
         self.assertEquals(resp.status_code, 200)
+
+    ## Unsafe tar methods #####################################################
+    # Each of these methods creates a tarfile with a single type of unsafe
+    # content.
+
+    def _fifo_tar(self):
+        """
+        Tar file with FIFO
+        """
+        fifop    = self.unsafe_common_dir / "fifo.file"
+        fifo_tar = self.unsafe_common_dir / "fifo.tar.gz"
+        os.mkfifo(fifop)
+        with tarfile.open(fifo_tar, "w:gz") as tar:
+            tar.add(fifop)
+
+        return fifo_tar
+
+    def _symlink_tar(self):
+        """
+        Tarfile with symlink to path outside directory.
+        """
+        outsidep = self.unsafe_common_dir / "unsafe_file.txt"
+        symlinkp = self.unsafe_common_dir / "symlink.txt"
+        symlink_tar = self.unsafe_common_dir / "symlink.tar.gz"
+        outsidep.symlink(symlinkp)
+        with tarfile.open(symlink_tar, "w:gz" ) as tar:
+            tar.add(symlinkp)
+
+        return symlink_tar
+
+    def _outside_tar(self):
+        """
+        Tarfile with file that extracts to outside directory.
+
+        Extracting this tarfile in directory <dir> will put its contents
+        directly in <dir> (rather than <dir/tarname>).
+        """
+        outside_tar = self.unsafe_common_dir / "unsafe_file.tar.gz"
+        with tarfile.open(outside_tar, "w:gz") as tar:
+            tar.addfile(tarfile.TarInfo(str(self.content_dir / "a_file")))
+
+        return outside_tar
+
+    def _outside_tar2(self):
+        """
+        Tarfile with file that extracts to outside directory.
+
+        The path here matches the basename (`self.unsafe_common_dir`), but
+        then "cd's out". E.g. "/usr/../etc" == "/etc", but the naive basename
+        of the first (but not the second) is "/usr"
+
+        Extracting this tarfile in directory <dir> will also put its contents
+        directly in <dir> (rather than <dir/tarname>).
+        """
+        outside_tar = self.unsafe_common_dir / "unsafe_file.tar.gz"
+        with tarfile.open(outside_tar, "w:gz") as tar:
+            tar.addfile(tarfile.TarInfo(str(self.unsafe_common_dir / "../a_file")))
+
+        return outside_tar
+
+    def test_unsafe_tar(self):
+        """
+        Check that safety measure work.
+
+        This includes:
+            'tarbombs' which include files or symlinks with paths
+        outside or directly in the working directory,
+            'special files' (character device, block device or FIFOs),
+
+        all raise exceptions/400s.
+        """
+
+        def try_tar(tarpath):
+            with open(tarpath) as tar:
+                resp = self.client.post(
+                        self.url,
+                        { "name": tarpath, "course-data": [tar] }
+                )
+            self.assertEquals(resp.status_code, 400)
+            self.assertTrue("SuspiciousFileOperation" in resp.content)
+
+        try_tar(self._fifo_tar())
+        try_tar(self._symlink_tar())
+        try_tar(self._outside_tar())
+        try_tar(self._outside_tar2())
+        # Check that `import_status` returns the appropriate stage (i.e.,
+        # either 3, indicating all previous steps are completed, or 0,
+        # indicating no upload in progress)
+        status_url = reverse("import_status", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': os.path.split(self.good_tar)[1],
+        })
+        resp_status = self.client.get(status_url)
+        import_status = json.loads(resp_status.content)["ImportStatus"]
+        self.assertIn(import_status, (0, 3))

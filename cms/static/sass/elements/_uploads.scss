@@ -5,7 +5,7 @@ body.course.feature-upload {
 
   // dialog
   .wrapper-dialog {
-    @extend .ui-depth5;
+    @extend %ui-depth5;
     @include transition(all 0.05s ease-in-out);
     position: fixed;
     top: 0;
@@ -34,14 +34,14 @@ body.course.feature-upload {
       text-align: left;
 
       .title {
-        @extend .t-title5;
+        @extend %t-title5;
         margin-bottom: ($baseline/2);
         font-weight: 600;
         color: $black;
       }
 
       .message {
-        @extend .t-copy-sub2;
+        @extend %t-copy-sub2;
         color: $gray;
       }
 
@@ -59,7 +59,7 @@ body.course.feature-upload {
         }
 
         input[type="file"] {
-          @extend .t-copy-sub2;
+          @extend %t-copy-sub2;
         }
 
         .status-upload {
@@ -140,7 +140,7 @@ body.course.feature-upload {
 
 
           .action-item {
-            @extend .t-action4;
+            @extend %t-action4;
             display: inline-block;
             margin-right: ($baseline*0.75);
 

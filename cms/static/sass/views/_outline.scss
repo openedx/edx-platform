@@ -1,7 +1,7 @@
 // studio - views - course outline
 // ====================
 
-body.course.outline {
+.view-outline {
 
   input.courseware-unit-search-input {
       float: left;
@@ -630,7 +630,7 @@ body.course.outline {
             }
 
             label {
-              @extend .t-copy-sub1;
+              @extend %t-copy-sub1;
               margin-bottom: ($baseline/4);
             }
           }

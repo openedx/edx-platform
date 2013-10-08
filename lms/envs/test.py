@@ -17,6 +17,8 @@ import os
 from path import path
 from warnings import filterwarnings
 
+os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
+
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
@@ -42,6 +44,16 @@ SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+_system = 'lms'
+
+_report_dir = REPO_ROOT / 'reports' / _system
+_report_dir.makedirs_p()
+
+NOSE_ARGS = [
+    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
+    '--xunit-file', _report_dir / 'nosetests.xml',
+]
 
 # Local Directories
 TEST_ROOT = path("test_root")
@@ -97,6 +109,17 @@ MODULESTORE = {
     }
 }
 
+# Starting modulestores generates log messages.  If we wait to init modulestores,
+# then those messages will be silenced by the test runner.
+INIT_MODULESTORE_ON_STARTUP = False
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'xcontent',
+    }
+}
 
 DATABASES = {
     'default': {
@@ -154,6 +177,25 @@ OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+###################### Payment ##############################3
+# Enable fake payment processing page
+MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+# Configure the payment processor to use the fake processing page
+# Since both the fake payment page and the shoppingcart app are using
+# the same settings, we can generate this randomly and guarantee
+# that they are using the same secret.
+from random import choice
+import string
+RANDOM_SHARED_SECRET = ''.join(
+    choice(string.letters + string.digits + string.punctuation)
+    for x in range(250)
+)
+
+CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
+CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 ################################# CELERY ######################################
 

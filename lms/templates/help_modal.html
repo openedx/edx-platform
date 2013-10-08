@@ -9,11 +9,14 @@
 % if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal">${_("Help")}</a>
+  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
   <div class="inner-wrapper" id="help_wrapper">
+    ## TODO: find a way to refactor this
+    <a href="#" role="button" class="close-modal" tabindex="0" title="${_('Close Modal')}">&#10005;</a>
+
     <header>
       <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
       <hr>
@@ -47,48 +50,39 @@ discussion_link = get_discussion_link(course) if course else None
       <a href="#" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
       <a href="#" id="feedback_link_question">${_('Ask a question')}</a>
     </div>
-
-## TODO: find a way to refactor this
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
+
     <header></header>
 
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
-      <div id="feedback_error" class="modal-form-error"></div>
+      <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
-      <label data-field="name">${_('Name*')}</label>
-      <input name="name" type="text">
-      <label data-field="email">${_('E-mail*')}</label>
-      <input name="email" type="text">
+      <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
+      <input name="name" type="text" id="feedback_form_name" aria-required="true">
+      <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
+      <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
-      <label data-field="subject">${_('Briefly describe your issue*')}</label>
-      <input name="subject" type="text">
-      <label data-field="details">${_('Tell us the details*')}
+      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue*')}</label>
+      <input name="subject" type="text" id="feedback_form_subject" aria-required="true">
+      <label data-field="details" for="feedback_form_details">${_('Tell us the details*')}
 <span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
-      <textarea name="details"></textarea>
+      <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
       <input name="course_id" type="hidden" value="${course.id | h}">
 % endif
       <div class="submit">
-        <input name="submit" type="submit" value="Submit">
+        <input name="submit" type="submit" value="Submit" id="feedback_submit">
       </div>
     </form>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
   </div>
 
-  <div class="inner-wrapper" id="feedback_success_wrapper">
+  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
+    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}" tabindex="0">&#10005;</a>
+
     <header>
       <h2>${_('Thank You!')}</h2>
       <hr>
@@ -112,21 +106,32 @@ discussion_link = get_discussion_link(course) if course else None
     ).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="{}" target="_blank">'.format(marketing_link('FAQ')),
+        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
         link_end='</a>'
     )}
     </p>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
   </div>
 </section>
 
 <script type="text/javascript">
 (function() {
+    var onModalClose = function() {
+            $(".help-modal .close-modal").off("click");
+            $("#lean_overlay").off("click");
+            $("#help-modal").attr("aria-hidden", "true");
+            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $(".help-tab a").focus();
+        },
+        cycle_modal_tab = function(from_element_name, to_element_name) {
+            $(from_element_name).on('keydown', function(e) {
+                var keyCode = e.keyCode || e.which;
+                if (keyCode === 9) {
+                    e.preventDefault();
+                    $(to_element_name).focus();
+                }
+            });
+        };
+
     $(".help-tab").click(function() {
         $(".field-error").removeClass("field-error");
         $("#feedback_form")[0].reset();
@@ -135,6 +140,10 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_error").css("display", "none");
         $("#feedback_success_wrapper").css("display", "none");
         $("#help_wrapper").css("display", "block");
+        $("#help-modal").attr("aria-hidden", "false");
+        $("#help-modal .close-modal").click(onModalClose);
+        $("#lean_overlay").click(onModalClose);
+        $("#help_wrapper .close-modal").focus();
     });
     showFeedback = function(event, issue_type, title, subject_label, details_label) {
         $("#help_wrapper").css("display", "none");
@@ -143,8 +152,19 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
         $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
         $("#feedback_form_wrapper label[data-field='details']").html(details_label);
+        $("#feedback_form_wrapper .close-modal").focus();
         event.preventDefault();
     };
+    cycle_modal_tab("#feedback_link_question", "#help_wrapper .close-modal");
+    cycle_modal_tab("#feedback_submit", "#feedback_form_wrapper .close-modal");
+    cycle_modal_tab("#feedback-faq-link", "#feedback_success_wrapper .close-modal");
+    $("#help-modal").on("keydown", function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 27) {
+            e.preventDefault();
+            $("#help_wrapper .close-modal").click();
+        }
+    });
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
@@ -175,6 +195,8 @@ discussion_link = get_discussion_link(course) if course else None
     });
     $("#feedback_form").submit(function() {
         $("input[type='submit']", this).attr("disabled", "disabled");
+        $('area,input,select,textarea,button').attr('tabindex', -1);
+        $("#feedback_form_wrapper .close-modal").focus();
     });
     $("#feedback_form").on("ajax:complete", function() {
         $("input[type='submit']", this).removeAttr("disabled");
@@ -182,16 +204,17 @@ discussion_link = get_discussion_link(course) if course else None
     $("#feedback_form").on("ajax:success", function(event, data, status, xhr) {
         $("#feedback_form_wrapper").css("display", "none");
         $("#feedback_success_wrapper").css("display", "block");
+        $("#feedback_success_wrapper").focus();
     });
     $("#feedback_form").on("ajax:error", function(event, xhr, status, error) {
-        $(".field-error").removeClass("field-error");
+        $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
         var responseData;
         try {
             responseData = jQuery.parseJSON(xhr.responseText);
         } catch(err) {
         }
         if (responseData) {
-            $("[data-field='"+responseData.field+"']").addClass("field-error");
+            $("[data-field='"+responseData.field+"']").addClass("field-error").attr("aria-invalid", "true");
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
@@ -217,6 +240,8 @@ discussion_link = get_discussion_link(course) if course else None
             });
 %endif
         }
+        // Make change explicit to assistive technology
+        $("#feedback_error").focus();
     });
 })(this)
 </script>

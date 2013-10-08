@@ -6,6 +6,32 @@ div.peer-grading{
         margin: 0;
         height: 75px;
     }
+    
+    div.feedback-area.track-changes {
+        position: relative;
+        margin: 0px;
+        height: 400px;
+        border: 1px solid lightgray;
+        padding: 5px;
+        resize: vertical;
+        width: 99%;
+        overflow: auto;
+    }
+
+    div.feedback-area.track-changes, p.ice-legend {
+        .ice-controls {
+            float: right;
+        }
+        .del {
+            position: relative;
+            text-decoration: line-through;
+            background-color: #ffc3c3;
+        }
+        .ins {
+            position: relative;
+            background-color: #c3ffc3;
+        }
+    }
 
     ul.rubric-list{
         margin: 0;

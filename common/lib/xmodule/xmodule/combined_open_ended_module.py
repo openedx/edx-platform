@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, List, Float, Boolean
+from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, Timedelta
@@ -14,13 +14,29 @@ import textwrap
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
-    "display_name", "max_attempts", "graded", "accept_file_upload",
-    "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
-    "max_to_calibrate", "peer_grader_count", "required_peer_grading",
+    "display_name",
+    "max_attempts",
+    "graded",
+    "accept_file_upload",
+    "skip_spelling_checks",
+    "due",
+    "graceperiod",
+    "weight",
+    "min_to_calibrate",
+    "max_to_calibrate",
+    "peer_grader_count",
+    "required_peer_grading",
+    "peer_grade_finished_submissions_when_none_pending",
 ]
 
-V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                         "student_attempts", "ready_to_reset", "old_task_states"]
+V1_STUDENT_ATTRIBUTES = [
+    "current_task_number",
+    "task_states",
+    "state",
+    "student_attempts",
+    "ready_to_reset",
+    "old_task_states",
+]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
@@ -234,6 +250,14 @@ class CombinedOpenEndedFields(object):
         default=False,
         scope=Scope.settings
     )
+    track_changes = Boolean(
+        display_name="Peer Track Changes",
+        help=("EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  "
+              "If set to 'True', peer graders will be able to make changes to the student "
+              "submission and those changes will be tracked and shown along with the graded feedback."),
+        default=False,
+        scope=Scope.settings
+    )
     due = Date(
         help="Date that this problem is due by",
         scope=Scope.settings
@@ -279,6 +303,14 @@ class CombinedOpenEndedFields(object):
         default=3,
         scope=Scope.settings,
         values={"min": 1, "step": "1", "max": 5}
+    )
+    peer_grade_finished_submissions_when_none_pending = Boolean(
+        display_name='Allow "overgrading" of peer submissions',
+        help=("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
+              "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
+              "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"),
+        default=False,
+        scope=Scope.settings,
     )
     markdown = String(
         help="Markdown source of this module",

@@ -80,7 +80,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gsomething)
         for sec in gsvals:
             sdesc = sec['section_descriptor']
-            frmat = getattr(sdesc.lms, 'format', None)
+            frmat = getattr(sdesc, 'format', None)
             aname = ''
             if frmat in graders:
                 gform = graders[frmat]

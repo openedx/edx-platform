@@ -97,9 +97,9 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         self.assertIsNotNone(content)
 
-        # make sure course.lms.static_asset_path is correct
-        print "static_asset_path = {0}".format(course.lms.static_asset_path)
-        self.assertEqual(course.lms.static_asset_path, 'test_import_course')
+        # make sure course.static_asset_path is correct
+        print "static_asset_path = {0}".format(course.static_asset_path)
+        self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
         '''

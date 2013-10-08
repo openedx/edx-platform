@@ -49,7 +49,7 @@ import pyparsing
 
 from .registry import TagRegistry
 from chem import chemcalc
-from preview import latex_preview
+from calc.preview import latex_preview
 import xqueue_interface
 from datetime import datetime
 
@@ -208,10 +208,10 @@ class InputTypeBase(object):
         # end up in a partially-initialized state.
         loaded = {}
         to_render = set()
-        for a in self.get_attributes():
-            loaded[a.name] = a.parse_from_xml(self.xml)
-            if a.render:
-                to_render.add(a.name)
+        for attribute in self.get_attributes():
+            loaded[attribute.name] = attribute.parse_from_xml(self.xml)
+            if attribute.render:
+                to_render.add(attribute.name)
 
         self.loaded_attributes = loaded
         self.to_render = to_render
@@ -256,6 +256,7 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
+            'STATIC_URL': self.system.STATIC_URL,
         }
         context.update((a, v) for (
             a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
@@ -325,7 +326,7 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('inline', '')]
+                Attribute('inline', False)]
 
 registry.register(OptionInput)
 
@@ -493,26 +494,26 @@ class JSInput(InputTypeBase):
         """
         Register the attributes.
         """
-        return [Attribute('params', None),       # extra iframe params
-                Attribute('html_file', None),
-                Attribute('gradefn', "gradefn"),
-                Attribute('get_statefn', None), # Function to call in iframe
-                                                 #   to get current state.
-                Attribute('set_statefn', None), # Function to call iframe to
-                                                 #   set state
-                Attribute('width', "400"),       # iframe width
-                Attribute('height', "300")]      # iframe height
-
-
+        return [
+            Attribute('params', None),       # extra iframe params
+            Attribute('html_file', None),
+            Attribute('gradefn', "gradefn"),
+            Attribute('get_statefn', None),  # Function to call in iframe
+                                             #   to get current state.
+            Attribute('set_statefn', None),  # Function to call iframe to
+                                             #   set state
+            Attribute('width', "400"),       # iframe width
+            Attribute('height', "300")       # iframe height
+        ]
 
     def _extra_context(self):
         context = {
-            'applet_loader': '/static/js/capa/src/jsinput.js',
+            'applet_loader': '{static_url}js/capa/src/jsinput.js'.format(
+                static_url=self.system.STATIC_URL),
             'saved_state': self.value
         }
 
         return context
-
 
 
 registry.register(JSInput)
@@ -1015,7 +1016,10 @@ class ChemicalEquationInput(InputTypeBase):
         """
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
+        return {
+            'previewer': '{static_url}js/capa/chemical_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+        }
 
     def handle_ajax(self, dispatch, data):
         '''
@@ -1048,8 +1052,8 @@ class ChemicalEquationInput(InputTypeBase):
 
         try:
             result['preview'] = chemcalc.render_to_html(formula)
-        except pyparsing.ParseException as p:
-            result['error'] = u"Couldn't parse formula: {0}".format(p.msg)
+        except pyparsing.ParseException as err:
+            result['error'] = u"Couldn't parse formula: {0}".format(err.msg)
         except Exception:
             # this is unexpected, so log
             log.warning(
@@ -1082,7 +1086,10 @@ class FormulaEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'), ]
+        return [
+            Attribute('size', '20'),
+            Attribute('inline', False),
+        ]
 
     def _extra_context(self):
         """
@@ -1096,8 +1103,9 @@ class FormulaEquationInput(InputTypeBase):
             reported_status = self.status
 
         return {
-            'previewer': '/static/js/capa/src/formula_equation_preview.js',
-            'reported_status': reported_status
+            'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+            'reported_status': reported_status,
         }
 
     def handle_ajax(self, dispatch, get):
@@ -1189,15 +1197,19 @@ class DragAndDropInput(InputTypeBase):
                     'can_reuse': smth}.
             """
             tag_attrs = dict()
-            tag_attrs['draggable'] = {'id': Attribute._sentinel,
-                                      'label': "", 'icon': "",
-                                      'can_reuse': ""}
+            tag_attrs['draggable'] = {
+                'id': Attribute._sentinel,
+                'label': "", 'icon': "",
+                'can_reuse': ""
+            }
 
-            tag_attrs['target'] = {'id': Attribute._sentinel,
-                                   'x': Attribute._sentinel,
-                                   'y': Attribute._sentinel,
-                                   'w': Attribute._sentinel,
-                                   'h': Attribute._sentinel}
+            tag_attrs['target'] = {
+                'id': Attribute._sentinel,
+                'x': Attribute._sentinel,
+                'y': Attribute._sentinel,
+                'w': Attribute._sentinel,
+                'h': Attribute._sentinel
+            }
 
             dic = dict()
 
@@ -1276,7 +1288,8 @@ class EditAMoleculeInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/editamolecule.js',
+            'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1312,7 +1325,8 @@ class DesignProtein2dInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/design-protein-2d.js',
+            'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1348,7 +1362,8 @@ class EditAGeneInput(InputTypeBase):
         """
             """
         context = {
-            'applet_loader': '/static/js/capa/edit-a-gene.js',
+            'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context

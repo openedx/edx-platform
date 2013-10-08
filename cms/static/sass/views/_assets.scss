@@ -1,206 +1,333 @@
 // studio - views - assets
 // ====================
 
-body.course.uploads {
+.view-uploads {
 
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
   .nav-actions {
 
     .icon-cloud-upload {
-      @include font-size(16);
+      @extend %t-copy;
       vertical-align: bottom;
       margin-right: ($baseline/5);
     }
 
   }
 
-  input.asset-search-input {
-    float: left;
-    width: 260px;
-    background-color: #fff;
-  }
-
-
   .asset-library {
     @include clearfix;
 
     table {
       width: 100%;
-      border-radius: 3px 3px 0 0;
-      border: 1px solid #c5cad4;
+      word-wrap: break-word;
 
-      td,
       th {
-        padding: 10px 20px;
-        text-align: left;
+        @extend %t-copy-sub2;
+        background-color: $gray-l5;
+        padding: 0 $baseline ($baseline*.75) $baseline;
         vertical-align: middle;
+        text-align: left;
+        color: $gray;
       }
 
-      thead th {
-        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-        background-color: #ced2db;
-        font-size: 12px;
-        font-weight: 700;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+      td {
+        padding: ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
       }
 
       tbody {
-        background: #fff;
+        box-shadow: 0 2px 2px $shadow-l1;
+        border: 1px solid $gray-l4;
+        background: $white;
 
         tr {
-          border-top: 1px solid #c5cad4;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border-top: 1px solid $gray-l4;
 
           &:first-child {
             border-top: none;
           }
+
+          &:nth-child(odd) {
+            background-color: $gray-l6;
+          }
+
+          a {
+            color: $gray-d1;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+
+          &.is-locked {
+            background-image: url('../img/bg-micro-stripes.png');
+            background-position: 0 0;
+            background-repeat: repeat;
+          }
+
+          &:hover {
+            background-color: $blue-l5;
+
+            .date-col,
+            .embed-col,
+            .embed-col .embeddable-xml-input {
+              color: $gray;
+            }
+          }
         }
 
+      .thumb-col {
+        padding: ($baseline/2) $baseline;
+
+        .thumb {
+          width: 100px;
+        }
+
+          img {
+            width: 100%;
+          }
+        }
+
+
         .name-col {
-          font-size: 14px;
+
+          .title {
+            @extend %t-copy-sub1;
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+          }
         }
 
         .date-col {
-          font-size: 12px;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub2;
+          color: $gray-l2;
+        }
+
+        .embed-col {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          padding-left: ($baseline*.75);
+          color: $gray-l2;
+
+          .embeddable-xml-input {
+            @include transition(all $tmg-f2 ease-in-out 0s);
+            @extend %t-copy-sub2;
+            box-shadow: none;
+            border: none;
+            background: none;
+            width: 100%;
+            color: $gray-l2;
+
+            &:focus {
+              background-color: $white;
+              box-shadow: 0 1px 5px $shadow-l1 inset;
+              border: 1px solid $gray-l3;
+            }
+          }
+        }
+
+        .actions-col {
+          padding: ($baseline/2);
+          text-align: center;
         }
       }
-
-      .thumb-col {
-        width: 100px;
-      }
-
-      .date-col {
-        width: 220px;
-      }
-
-      .embed-col {
-        width: 250px;
-      }
-
-      .delete-col {
-        width: 20px;
-      }
-
-      .embeddable-xml-input {
-        box-shadow: none;
-        width: 100%;
-      }
-
-      .thumb {
-        width: 100px;
-        max-height: 80px;
-
-        img {
-          width: 100%;
-        }
-      }
-    }
-
-    .pagination {
-      float: right;
-      margin: 15px 10px;
-
-      ol, li {
-        display: inline;
-      }
-
-      a {
-        display: inline-block;
-        height: 25px;
-        padding: 0 4px;
-        text-align: center;
-        line-height: 25px;
-      }
-    }
-  }
-    .show-xml {
-    @include blue-button;
-  }
-}
-
-.upload-modal {
-  display: none;
-  width: 640px !important;
-  margin-left: -320px !important;
-
-  .modal-body {
-    height: auto !important;
-    overflow-y: auto !important;
-    text-align: center;
-  }
-
-  .file-input {
-    display: none;
-  }
-
-  .choose-file-button {
-    @include blue-button;
-    padding: 10px 82px 12px;
-    font-size: 17px;
-  }
-
-  .progress-bar {
-    display: none;
-    width: 350px;
-    height: 50px;
-    margin: 30px auto 10px;
-    border: 1px solid $blue;
-
-    &.loaded {
-      border-color: #66b93d;
-
-      .progress-fill {
-        background: #66b93d;
-      }
     }
   }
 
-  .progress-fill {
-    width: 0%;
-    height: 50px;
-    background: $blue;
-    color: #fff;
-    line-height: 48px;
-  }
+  .action-item {
+    display: inline-block;
+    margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
 
-  h1 {
-    float: none;
-    margin: 40px 0 30px;
-    font-size: 34px;
-    font-weight: 300;
-  }
-
-  .close-button {
-    @include white-button;
-    position: absolute;
-    top: 0;
-    right: 15px;
-    width: 29px;
-    height: 29px;
-    padding: 0 !important;
-    border-radius: 17px !important;
-    line-height: 29px;
-    text-align: center;
-  }
-
-  .embeddable {
-    display: none;
-    margin: 30px 0 130px;
-
-    label {
+    .action-button {
+      @include transition(all $tmg-f2 ease-in-out 0s);
       display: block;
-      margin-bottom: 10px;
-      font-weight: 700;
+      height: ($baseline*1.5);
+      width: ($baseline*1.5);
+      border-radius: 3px;
+      color: $gray-l3;
+
+      &:hover {
+        background-color: $blue;
+        color: $gray-l6;
+      }
     }
+
+    [class^="icon-"] {
+      display: inline-block;
+      vertical-align: bottom;
+    }
+
+
+    &.action-lock {
+      position: relative;
+    }
+
+    &.action-lock label {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 30px;
+      width: 30px;
+
+      &:hover {
+        background-color: $blue;
+      }
+    }
+
+    &.action-lock .lock-checkbox {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 30px;
+      width: 30px;
+      opacity: 0;
+    }
+
+    &.action-lock .lock-checkbox:hover ~ .action-button {
+      background-color: $blue;
+      color: $gray-l6;
+    }
+
+    &.action-lock .lock-checkbox ~ .action-button {
+      .icon-lock {
+        display: none;
+      }
+
+      .icon-unlock-alt {
+        display: inline-block;
+      }
+    }
+
+    &.action-lock .lock-checkbox:checked ~ .action-button {
+      background-color: $gray;
+      color: $white;
+
+      .icon-lock {
+        display: inline-block;
+      }
+
+     .icon-unlock-alt {
+        display: none;
+      }
+    }
+
   }
 
-  .embeddable-xml-input {
-    box-shadow: none;
-    width: 400px;
+  .show-xml {
+    @include blue-button;
   }
 
-  .copy-button {
-    @include white-button;
+  .upload-modal {
     display: none;
-    margin-bottom: 100px;
+    width: 640px !important;
+    margin-left: -320px !important;
+
+    .modal-body {
+      height: auto !important;
+      overflow-y: auto !important;
+      text-align: center;
+    }
+
+    .title {
+      @extend %t-title3;
+      float: none;
+      margin: ($baseline*2) 0 ($baseline*1.5);
+      font-weight: 300;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .choose-file-button {
+      @include blue-button;
+      padding: 10px 82px 12px;
+      font-size: 17px;
+    }
+
+    .progress-bar {
+      display: none;
+      width: ($baseline*15);
+      height: 35px;
+      margin: ($baseline) auto;
+      border: 1px solid $green;
+      border-radius: ($baseline*2);
+
+      &.loaded {
+        border-color: #66b93d;
+
+        .progress-fill {
+          background: #66b93d;
+        }
+      }
+    }
+
+    .progress-fill {
+      @extend %t-copy-sub1;
+      width: 0%;
+      height: ($baseline*1.5);
+      border-radius: ($baseline*2);
+      background: $green;
+      padding-top: ($baseline/4);
+      color: $white;
+    }
+
+    .close-button {
+      @include transition(color $tmg-f2 ease-in-out 0s);
+      position: absolute;
+      top: 0;
+      right: ($baseline*.75);
+      border: none;
+      background: none;
+      padding: 0;
+
+      [class^="icon-"] {
+        @extend %t-action1;
+      }
+
+      &:hover {
+        background: none;
+        box-shadow: none;
+        color: $blue;
+      }
+    }
+
+    .embeddable {
+      display: none;
+      margin: ($baseline*1.5) 0 ($baseline*4);
+
+      label {
+        display: block;
+        margin-bottom: ($baseline/2);
+        font-weight: 700;
+      }
+    }
+
+    .embeddable-xml-input {
+      box-shadow: none;
+      width: ($baseline*20);
+    }
+
+    .copy-button {
+      @include white-button;
+      display: none;
+      margin-bottom: ($baseline*5);
+    }
   }
 }

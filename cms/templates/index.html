@@ -3,13 +3,11 @@
 <%inherit file="base.html" />
 
 <%block name="title">${_("My Courses")}</%block>
-<%block name="bodyclass">is-signedin index dashboard</%block>
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
-<script src="http://malsup.github.com/jquery.form.js"></script>
+<%block name="bodyclass">is-signedin index view-dashboard</%block>
 
 <%block name="jsextra">
 <script type="text/javascript">
+require(['jquery', 'jquery.form'], function($) {
     $(document).ready(function () {
 
         // showing/hiding creation rights UI
@@ -33,6 +31,7 @@
           $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
         });
     });
+});
 </script>
 </%block>
 

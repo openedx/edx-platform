@@ -17,7 +17,7 @@
                 <div class="visibility-control visibility-control-prompt">
                     <div class="inner">
                     </div>
-                    <a href="" class="section-header section-header-prompt question-header">${_('Hide Prompt')}</a>
+                    <a href="" class="section-header section-header-prompt question-header">${_('Hide Question')}</a>
                 </div>
                 <div class="prompt-information-container">
                     <section>
@@ -26,7 +26,7 @@
                     </section>
                 </div>
             </div>
-            <section class="grading-wrapper">
+            <section class="grading-wrapper" data-track-changes="${'true' if track_changes else 'false'}">
                 <div class="grading-message">
                 </div>
                 <h2>${_("Student Response")}</h2>
@@ -41,16 +41,36 @@
                     <div class="evaluation">
                         <p class="rubric-selection-container"></p>
                         <p class="score-selection-container"></p>
-                        <h3>${_("Written Feedback")}</h3>
-                        <p>${_("Please include some written feedback as well.")}</p>
-                        <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
-                        <div class="flag-student-container"> ${_("This submission has explicit or pornographic content : ")}
-                            <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 
-                        </div>
-                        <div class="answer-unknown-container"> ${_("I do not know how to grade this question : ")}
+                        <hr />
+                        <div class="answer-unknown-container">
                             <input type="checkbox" class="answer-unknown-checkbox" value="answer_is_unknown">
+                            ${_("I am unsure about the scores I have given above: ")}
+                        </div>
+                        <br />
+                        <h3>${_("Written Feedback")}</h3>
+                        % if track_changes:
+                            <p class="peer-grading-instructions">${_("Please edit your peer's submission and give them written comments below.")}</p>
+                            <p class="ice-legend">
+                                <span class="ins">${_("This is an insertion.")}</span>&nbsp;
+                                <span class="del">${_("This is a deletion.")}</span>&nbsp;
+                                <span class="ins">${_("[This is a comment.]")}</span>&nbsp;
+                                <span class="ice-controls">
+                                    <a href="#" class="undo-change"><i class="icon-undo"></i> Undo Change</a>&nbsp;&nbsp;
+                                    <a href="#" class="reset-changes"><i class="icon-refresh"></i> Reset Changes</a>
+                                </span>
+                            </p>
+                            <div name="feedback" class="feedback-area track-changes" contenteditable="true"></div>
+                        % else:
+                            <p class="ora-instructions">${_("Please include some written feedback as well.")}</p>
+                            <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
+                        % endif
+                        <div class="flag-student-container">
+                            <br />
+                            <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 
+                            ${_("This submission has explicit, offensive, or (I suspect) plagiarized content. ")}
                         </div>
                     </div>
+                    <hr />
                     <div class="submission">
                         <input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
                     </div>
@@ -85,7 +105,7 @@
         <section class="flag-submission-confirmation">
             <h4>${_("Are you sure that you want to flag this submission?")}</h4>
             <p>
-            ${_("You are about to flag a submission. You should only flag a submission that contains explicit or offensive content. If the submission is not addressed to the question or is incorrect, you should give it a score of zero and accompanying feedback instead of flagging it.")}
+            ${_("You are about to flag a submission. You should only flag a submission that contains explicit, offensive, or  (suspected) plagiarized content. If the submission is not addressed to the question or is incorrect, you should give it a score of zero and accompanying feedback instead of flagging it.")}
             </p>
             <div>
                 <input type="button" class="flag-submission-removal-button" value="${_("Remove Flag")}" name="calibration-interstitial-page-button" />

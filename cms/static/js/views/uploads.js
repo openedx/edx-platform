@@ -1,4 +1,6 @@
-CMS.Views.UploadDialog = Backbone.View.extend({
+define(["backbone", "underscore", "jquery", "jquery.form"],
+function(Backbone, _, $) {
+var UploadDialog = Backbone.View.extend({
     options: {
         shown: true,
         successMessageTimeout: 2000 // 2 seconds
@@ -49,13 +51,13 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     show: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = true;
-        $body.addClass('dialog-is-shown');
+        $("body").addClass('dialog-is-shown');
         return this.render();
     },
     hide: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = false;
-        $body.removeClass('dialog-is-shown');
+        $("body").removeClass('dialog-is-shown');
         return this.render();
     },
     hideAndRemove: function(e) {
@@ -103,3 +105,5 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         });
     }
 });
+return UploadDialog;
+}); // end define()

@@ -1,7 +1,9 @@
+import logging
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -18,6 +20,7 @@ __all__ = ['save_item', 'create_item', 'delete_item']
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
+log = logging.getLogger(__name__)
 
 @login_required
 @expect_json
@@ -32,7 +35,25 @@ def save_item(request):
     """
     # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
     # little smarter and able to pass something more akin to {unset: [field, field]}
-    item_location = request.POST['id']
+
+    try:
+        item_location = request.POST['id']
+    except KeyError:
+        import inspect
+
+        log.exception(
+            '''Request missing required attribute 'id'.
+                Request info:
+                %s
+                Caller:
+                Function %s in file %s
+            ''',
+            request.META,
+            inspect.currentframe().f_back.f_code.co_name,
+            inspect.currentframe().f_back.f_code.co_filename
+        )
+        return HttpResponseBadRequest()
+
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -58,18 +79,21 @@ def save_item(request):
         # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
         for metadata_key in request.POST.get('nullout', []):
-            _get_xblock_field(existing_item, metadata_key).write_to(existing_item, None)
+            setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
         for metadata_key, value in request.POST.get('metadata', {}).items():
-            field = _get_xblock_field(existing_item, metadata_key)
+            field = existing_item.fields[metadata_key]
 
             if value is None:
                 field.delete_from(existing_item)
             else:
-                value = field.from_json(value)
+                try:
+                    value = field.from_json(value)
+                except ValueError:
+                    return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
@@ -79,16 +103,6 @@ def save_item(request):
 
     return JsonResponse()
 
-
-def _get_xblock_field(xblock, field_name):
-    """
-    A temporary function to get the xblock field either from the xblock or one of its namespaces by name.
-    :param xblock:
-    :param field_name:
-    """
-    for field in xblock.iterfields():
-        if field.name == field_name:
-            return field
 
 @login_required
 @expect_json

@@ -2,7 +2,7 @@
 <!-- NOTE not used currently but retained b/c it's yet-to-be-wired functionality -->
 <%inherit file="base.html" />
 <%block name="title">${_("Schedule and details")}</%block>
-<%block name="bodyclass">is-signedin course settings</%block>
+<%block name="bodyclass">is-signedin course view-settings</%block>
 
 
 <%namespace name='static' file='static_content.html'/>
@@ -12,7 +12,6 @@ from contentstore import utils
 
 
 <%block name="jsextra">
-  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
 

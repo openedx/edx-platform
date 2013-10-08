@@ -30,7 +30,7 @@
             <div class="visibility-control visibility-control-prompt">
                 <div class="inner">
                 </div>
-                <a href="" class="section-header section-header-prompt question-header">${_("Hide Prompt")}</a>
+                <a href="" class="section-header section-header-prompt question-header">${_("Hide Question")}</a>
             </div>
             <div class="problem-container">
             % for item in items:
@@ -39,7 +39,7 @@
             </div>
             <div class="oe-tools response-tools">
                 <span class="oe-tools-label"></span>
-                <input type="button" value="${_('Try Again')}" class="reset-button" name="reset"/>
+                <input type="button" value="${_('New Submission')}" class="reset-button" name="reset"/>
             </div>
         </div>
 
@@ -56,5 +56,10 @@
         <div class="result-container">
         </div>
     </div>
+    % if is_staff:
+        <div class="staff-info">
+            Staff Warning: Please note that if you submit a duplicate of text that has already been submitted for grading, it will not show up in the staff grading view.  It will be given the same grade that the original received automatically, and will be returned within 30 minutes if the original is already graded, or when the original is graded if not.
+        </div>
+    % endif
 </section>
 

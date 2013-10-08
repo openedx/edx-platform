@@ -5,11 +5,11 @@ from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-import self_assessment_module
-import open_ended_module
+from  xmodule.open_ended_grading_classes import self_assessment_module
+from  xmodule.open_ended_grading_classes import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 
 log = logging.getLogger("mitx.courseware")
 
@@ -127,6 +127,9 @@ class CombinedOpenEndedV1Module():
         self.peer_grader_count = instance_state.get('peer_grader_count', 3)
         self.min_to_calibrate = instance_state.get('min_to_calibrate', 3)
         self.max_to_calibrate = instance_state.get('max_to_calibrate', 6)
+        self.peer_grade_finished_submissions_when_none_pending = instance_state.get(
+            'peer_grade_finished_submissions_when_none_pending', False
+        )
 
         due_date = instance_state.get('due', None)
 
@@ -158,6 +161,9 @@ class CombinedOpenEndedV1Module():
                 'peer_grader_count': self.peer_grader_count,
                 'min_to_calibrate': self.min_to_calibrate,
                 'max_to_calibrate': self.max_to_calibrate,
+                'peer_grade_finished_submissions_when_none_pending': (
+                    self.peer_grade_finished_submissions_when_none_pending
+                ),
             }
         }
 
@@ -386,7 +392,8 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': HUMAN_STATES.get(self.state, "Not started.")
+            'human_state': HUMAN_STATES.get(self.state, "Not started."),
+            'is_staff': self.system.user_is_staff,
         }
 
         return context
@@ -547,6 +554,11 @@ class CombinedOpenEndedV1Module():
         return last_response_dict
 
     def extract_human_name_from_task(self, task_xml):
+        """
+        Given the xml for a task, pull out the human name for it.
+        Input: xml string
+        Output: a human readable task name (ie Self Assessment)
+        """
         tree = etree.fromstring(task_xml)
         payload = tree.xpath("/openended/openendedparam/grader_payload")
         if len(payload) == 0:
@@ -644,7 +656,13 @@ class CombinedOpenEndedV1Module():
         all_responses = []
         success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
         if not can_see_rubric:
-            return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
+            return {
+                'html': self.system.render_template(
+                    '{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR),
+                    {'error': error}),
+                'success': True,
+                'hide_reset': True
+            }
 
         contexts = []
         rubric_number = self.current_task_number
@@ -717,6 +735,9 @@ class CombinedOpenEndedV1Module():
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_current_state(self, data):
+        """
+        Gets the current state of the module.
+        """
         return self.get_context()
 
     def get_last_response_ajax(self, data):
@@ -769,6 +790,7 @@ class CombinedOpenEndedV1Module():
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
         self.current_task_number = 0
         self.ready_to_reset = False
+
         self.setup_next_task()
         return {'success': True, 'html': self.get_html_nonsystem()}
 
@@ -823,6 +845,16 @@ class CombinedOpenEndedV1Module():
         """
         return (self.state == self.DONE or self.ready_to_reset) and self.is_scored
 
+    def get_weight(self):
+        """
+        Return the weight of the problem.  The old default weight was None, so set to 1 in that case.
+        Output - int weight
+        """
+        weight = self.weight
+        if weight is None:
+            weight = 1
+        return weight
+
     def get_score(self):
         """
         Score the student received on the problem, or None if there is no
@@ -837,9 +869,7 @@ class CombinedOpenEndedV1Module():
         score = None
 
         #The old default was None, so set to 1 if it is the old default weight
-        weight = self.weight
-        if weight is None:
-            weight = 1
+        weight = self.get_weight()
         if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
@@ -858,7 +888,6 @@ class CombinedOpenEndedV1Module():
             if len(score_mat) > 0:
                 # Currently, assume that the final step is the correct one, and that those are the final scores.
                 # This will change in the future, which is why the machinery above exists to extract all scores on all steps
-                # TODO: better final score handling.
                 scores = score_mat[-1]
                 score = max(scores)
             else:
@@ -879,27 +908,35 @@ class CombinedOpenEndedV1Module():
         return score_dict
 
     def max_score(self):
-        ''' Maximum score. Two notes:
-
-            * This is generic; in abstract, a problem could be 3/5 points on one
-              randomization, and 5/7 on another
-        '''
+        """
+        Maximum score possible in this module.  Returns the max score if finished, None if not.
+        """
         max_score = None
         if self.check_if_done_and_scored():
             max_score = self._max_score
         return max_score
 
     def get_progress(self):
-        ''' Return a progress.Progress object that represents how far the
+        """
+        Generate a progress object. Progress objects represent how far the
         student has gone in this module.  Must be implemented to get correct
-        progress tracking behavior in nesting modules like sequence and
-        vertical.
+        progress tracking behavior in nested modules like sequence and
+        vertical.  This behavior is consistent with capa.
 
-        If this module has no notion of progress, return None.
-        '''
-        progress_object = Progress(self.current_task_number, len(self.task_xml))
+        If the module is unscored, return None (consistent with capa).
+        """
 
-        return progress_object
+        d = self.get_score()
+
+        if d['total'] > 0 and self.is_scored:
+
+            try:
+                return Progress(d['score'], d['total'])
+            except (TypeError, ValueError):
+                log.exception("Got bad progress")
+                return None
+
+        return None
 
     def out_of_sync_error(self, data, msg=''):
         """

@@ -2,7 +2,7 @@ import unittest
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
@@ -191,6 +191,26 @@ class TemplateTests(unittest.TestCase):
         version_history = modulestore('split').get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
 
+    def test_split_inject_loc_mapper(self):
+        """
+        Test that creating a loc_mapper causes it to automatically attach to the split mongo store
+        """
+        # instantiate location mapper before split
+        mapper = loc_mapper()
+        # split must inject the location mapper itself since the mapper existed before it did
+        self.assertEqual(modulestore('split').loc_mapper, mapper)
+
+    def test_loc_inject_into_split(self):
+        """
+        Test that creating a loc_mapper causes it to automatically attach to the split mongo store
+        """
+        # force instantiation of split modulestore before there's a location mapper and verify
+        # it has no pointer to loc mapper
+        self.assertIsNone(modulestore('split').loc_mapper)
+        # force instantiation of location mapper which must inject itself into the split
+        mapper = loc_mapper()
+        self.assertEqual(modulestore('split').loc_mapper, mapper)
+
     # ================================= JSON PARSING ===========================
     # These are example methods for creating xmodules in memory w/o persisting them.
     # They were in x_module but since xblock is not planning to support them but will
@@ -218,20 +238,16 @@ class TemplateTests(unittest.TestCase):
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:
-            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.get_inherited_settings().copy()
+            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.inherited_settings.copy()
             json_fields = json_data.get('fields', {})
-            for field in inheritance.INHERITABLE_METADATA:
-                if field in json_fields:
-                    json_data['_inherited_settings'][field] = json_fields[field]
+            for field_name in inheritance.InheritanceMixin.fields:
+                if field_name in json_fields:
+                    json_data['_inherited_settings'][field_name] = json_fields[field_name]
 
         new_block = system.xblock_from_json(class_, usage_id, json_data)
         if parent_xblock is not None:
-            children = parent_xblock.children
-            children.append(new_block)
-            # trigger setter method by using top level field access
-            parent_xblock.children = children
-            # decache pending children field settings (Note, truly persisting at this point would break b/c
-            # persistence assumes children is a list of ids not actual xblocks)
+            parent_xblock.children.append(new_block.scope_ids.usage_id)
+            # decache pending children field settings
             parent_xblock.save()
         return new_block
 

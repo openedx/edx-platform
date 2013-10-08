@@ -12,7 +12,7 @@ import logging
 import unittest
 
 from lxml import etree
-from mock import Mock, MagicMock, ANY
+from mock import Mock, MagicMock, ANY, patch
 from pytz import UTC
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
@@ -22,9 +22,15 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
-from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+from xmodule.progress import Progress
+from xmodule.tests.test_util_open_ended import (
+    MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
-    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE)
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile
+)
+
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -68,7 +74,8 @@ class OpenEndedChildTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+            'peer_grade_finished_submissions_when_none_pending': False,
+        }
     }
     definition = Mock()
     descriptor = Mock()
@@ -191,7 +198,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'peer_grader_count': 1,
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
-            }
+            'peer_grade_finished_submissions_when_none_pending': False,
+        }
     }
 
     oeparam = etree.XML('''
@@ -338,6 +346,41 @@ class OpenEndedModuleTest(unittest.TestCase):
         score = self.openendedmodule.latest_score()
         self.assertEquals(score, 1)
 
+    def test_open_ended_display(self):
+        """
+        Test storing answer with the open ended module.
+        """
+        
+        # Create a module with no state yet.  Important that this start off as a blank slate.
+        test_module = OpenEndedModule(self.test_system, self.location,
+                                                self.definition, self.descriptor, self.static_data, self.metadata)
+        
+        saved_response = "Saved response."
+        submitted_response = "Submitted response."
+
+        # Initially, there will be no stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # And the initial answer to display will be an empty string.
+        self.assertEqual(test_module.get_display_answer(), "")
+
+        # Now, store an answer in the module.
+        test_module.handle_ajax("store_answer", {'student_answer' : saved_response}, get_test_system())
+        # The stored answer should now equal our response.
+        self.assertEqual(test_module.stored_answer, saved_response)
+        self.assertEqual(test_module.get_display_answer(), saved_response)
+
+        # Mock out the send_to_grader function so it doesn't try to connect to the xqueue.
+        test_module.send_to_grader = Mock(return_value=True)
+        # Submit a student response to the question.
+        test_module.handle_ajax(
+            "save_answer",
+            {"student_answer": submitted_response},
+            get_test_system()
+        )
+        # Submitting an answer should clear the stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # Confirm that the answer is stored properly.
+        self.assertEqual(test_module.latest_answer(), submitted_response)
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     """
@@ -415,13 +458,13 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
     combinedoe_container = CombinedOpenEndedModule(
-        test_system,
-        descriptor,
-        model_data={
+        descriptor=descriptor,
+        runtime=test_system,
+        field_data=DictFieldData({
             'data': full_definition,
             'weight': '1',
-            'location': location
-        }
+        }),
+        scope_ids=ScopeIds(None, None, None, None),
     )
 
     def setUp(self):
@@ -480,6 +523,29 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
 
+    def test_container_get_progress(self):
+        """
+        See if we can get the progress from the actual xmodule
+        """
+        progress = self.combinedoe_container.max_score()
+        self.assertEqual(progress, None)
+
+    def test_get_progress(self):
+        """
+        Test if we can get the correct progress from the combined open ended class
+        """
+        self.combinedoe.update_task_states()
+        self.combinedoe.state = "done"
+        self.combinedoe.is_scored = True
+        progress = self.combinedoe.get_progress()
+        self.assertIsInstance(progress, Progress)
+
+        # progress._a is the score of the xmodule, which is 0 right now.
+        self.assertEqual(progress._a, 0)
+
+        # progress._b is the max_score (which is 1), divided by the weight (which is 1).
+        self.assertEqual(progress._b, 1)
+
     def test_container_weight(self):
         """
         Check the problem weight in the container
@@ -529,7 +595,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA})
+                                                   instance_state={'task_states': TEST_STATE_SA})
 
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                    self.location,
@@ -537,7 +603,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    descriptor,
                                                    static_data=self.static_data,
                                                    metadata=self.metadata,
-                                                   instance_state={'task_states' : TEST_STATE_SA_IN})
+                                                   instance_state={'task_states': TEST_STATE_SA_IN})
 
 
     def test_get_score_realistic(self):
@@ -581,7 +647,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         descriptor = Mock(data=definition)
         instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
-            instance_state.update({'current_task_number' : task_number})
+            instance_state.update({'current_task_number': task_number})
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
                                                definition,
@@ -687,7 +753,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         html = module.handle_ajax("get_html", {})
-        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files" : False, "student_file" : None})
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
         html = module.handle_ajax("get_html", {})
 
         #Mock a student submitting an assessment
@@ -836,3 +902,78 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         #Try to reset, should fail because only 1 attempt is allowed
         reset_data = json.loads(module.handle_ajax("reset", {}))
         self.assertEqual(reset_data['success'], False)
+
+class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
+    """
+    Test if student is able to upload images properly.
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestionImageUpload"])
+    answer_text = "Hello, this is my amazing answer."
+    file_text = "Hello, this is my amazing file."
+    file_name = "Student file 1"
+    answer_link = "http://www.edx.org"
+    autolink_tag = "<a href="
+
+    def setUp(self):
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.test_system.s3_interface = test_util_open_ended.S3_INTERFACE
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
+
+    def test_file_upload_fail(self):
+        """
+        Test to see if a student submission without a file attached fails.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer
+        response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
+        response = json.loads(response)
+        self.assertFalse(response['success'])
+        self.assertIn('error', response)
+
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.S3Connection',
+        test_util_open_ended.MockS3Connection
+    )
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.Key',
+        test_util_open_ended.MockS3Key
+    )
+    def test_file_upload_success(self):
+        """
+        Test to see if a student submission with a file is handled properly.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer with a file
+        response = module.handle_ajax("save_answer", {
+            "student_answer": self.answer_text,
+            "valid_files_attached": True,
+            "student_file": [MockUploadedFile(self.file_name, self.file_text)],
+        })
+
+        response = json.loads(response)
+        self.assertTrue(response['success'])
+        self.assertIn(self.file_name, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
+
+    def test_link_submission_success(self):
+        """
+        Students can submit links instead of files.  Check that the link is properly handled.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Simulate a student saving an answer with a link.
+        response = module.handle_ajax("save_answer", {
+            "student_answer": "{0} {1}".format(self.answer_text, self.answer_link)
+            })
+
+        response = json.loads(response)
+
+        self.assertTrue(response['success'])
+        self.assertIn(self.answer_link, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -7,6 +8,7 @@ from mock import patch
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.test import TestCase
 from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -19,7 +21,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
 from external_auth.models import ExternalAuthMap
-from external_auth.views import shib_login, course_specific_login, course_specific_register
+from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, Registration, CourseEnrollment
@@ -32,11 +34,12 @@ TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT,
 # b/c of how mod_shib works but should test the behavior with the rest of the attributes present/missing
 
 # For the sake of python convention we'll make all of these variable names ALL_CAPS
-IDP = 'https://idp.stanford.edu/'
-REMOTE_USER = 'test_user@stanford.edu'
-MAILS = [None, '', 'test_user@stanford.edu']
-GIVENNAMES = [None, '', 'Jason', 'jas\xc3\xb6n; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
-SNS = [None, '', 'Bau', '\xe5\x8c\x85; smith']  # At Stanford, the sns can be a list delimited by ';'
+IDP = u'https://idp.stanford.edu/'
+REMOTE_USER = u'test_user@stanford.edu'
+MAILS = [None, u'', u'test_user@stanford.edu']
+DISPLAYNAMES = [None, u'', u'Jason \u5305']
+GIVENNAMES = [None, u'', u'jas\xf6n; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
+SNS = [None, u'', u'\u5305; smith']  # At Stanford, the sns can be a list delimited by ';'
 
 
 def gen_all_identities():
@@ -46,10 +49,12 @@ def gen_all_identities():
     could potentially pass to django via request.META, i.e.
     setting (or not) request.META['givenName'], etc.
     """
-    def _build_identity_dict(mail, given_name, surname):
+    def _build_identity_dict(mail, display_name, given_name, surname):
         """ Helper function to return a dict of test identity """
         meta_dict = {'Shib-Identity-Provider': IDP,
                      'REMOTE_USER': REMOTE_USER}
+        if display_name is not None:
+            meta_dict['displayName'] = display_name
         if mail is not None:
             meta_dict['mail'] = mail
         if given_name is not None:
@@ -61,7 +66,8 @@ def gen_all_identities():
     for mail in MAILS:
         for given_name in GIVENNAMES:
             for surname in SNS:
-                yield _build_identity_dict(mail, given_name, surname)
+                for display_name in DISPLAYNAMES:
+                    yield _build_identity_dict(mail, display_name, given_name, surname)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, SESSION_ENGINE='django.contrib.sessions.backends.cache')
@@ -75,7 +81,7 @@ class ShibSPTest(ModuleStoreTestCase):
     def setUp(self):
         self.store = editable_modulestore()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_exception_shib_login(self):
         """
         Tests that we get the error page when there is no REMOTE_USER
@@ -101,7 +107,7 @@ class ShibSPTest(ModuleStoreTestCase):
         self.assertIn(u'logged in via Shibboleth', args[0])
         self.assertEquals(remote_user, args[1])
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login(self):
         """
         Tests that:
@@ -195,11 +201,13 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertEquals(len(audit_log_calls), 0)
                 else:
                     self.assertEqual(response.status_code, 200)
-                    self.assertContains(response, "<title>Register for")
+                    self.assertContains(response,
+                                        ("<title>Preferences for {platform_name}</title>"
+                                         .format(platform_name=settings.PLATFORM_NAME)))
                     # no audit logging calls
                     self.assertEquals(len(audit_log_calls), 0)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_registration_form(self):
         """
         Tests the registration form showing up with the proper parameters.
@@ -219,17 +227,18 @@ class ShibSPTest(ModuleStoreTestCase):
                 self.assertNotContains(response, mail_input_HTML)
             sn_empty = not identity.get('sn')
             given_name_empty = not identity.get('givenName')
-            fullname_input_HTML = '<input id="name" type="text" name="name"'
-            if sn_empty and given_name_empty:
-                self.assertContains(response, fullname_input_HTML)
+            displayname_empty = not identity.get('displayName')
+            fullname_input_html = '<input id="name" type="text" name="name"'
+            if sn_empty and given_name_empty and displayname_empty:
+                self.assertContains(response, fullname_input_html)
             else:
-                self.assertNotContains(response, fullname_input_HTML)
+                self.assertNotContains(response, fullname_input_html)
 
             # clean up b/c we don't want existing ExternalAuthMap for the next run
             client.session['ExternalAuthMap'].delete()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
-    def test_registration_formSubmit(self):
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    def test_registration_form_submit(self):
         """
         Tests user creation after the registration form that pops is submitted.  If there is no shib
         ExternalAuthMap in the session, then the created user should take the username and email from the
@@ -292,18 +301,26 @@ class ShibSPTest(ModuleStoreTestCase):
             profile = UserProfile.objects.get(user=user)
             sn_empty = not identity.get('sn')
             given_name_empty = not identity.get('givenName')
-            if sn_empty and given_name_empty:
-                self.assertEqual(profile.name, postvars['name'])
+            displayname_empty = not identity.get('displayName')
+
+            if displayname_empty:
+                if sn_empty and given_name_empty:
+                    self.assertEqual(profile.name, postvars['name'])
+                else:
+                    self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+                    self.assertNotIn(u';', profile.name)
             else:
                 self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+                self.assertEqual(profile.name, identity.get('displayName'))
+
             # clean up for next loop
             request2.session['ExternalAuthMap'].delete()
             UserProfile.objects.filter(user=user).delete()
             Registration.objects.filter(user=user).delete()
             user.delete()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
-    def test_course_specificLoginAndReg(self):
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    def test_course_specific_login_and_reg(self):
         """
         Tests that the correct course specific login and registration urls work for shib
         """
@@ -322,8 +339,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                      '?course_id=MITx/999/Robot_Super_Course' +
                                                      '&enrollment_action=enroll')
             _reg_request = self.request_factory.get('/course_specific_register/MITx/999/Robot_Super_Course' +
-                                                   '?course_id=MITx/999/course/Robot_Super_Course' +
-                                                   '&enrollment_action=enroll')
+                                                    '?course_id=MITx/999/course/Robot_Super_Course' +
+                                                    '&enrollment_action=enroll')
 
             login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
             reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
@@ -357,8 +374,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                      '?course_id=DNE/DNE/DNE' +
                                                      '&enrollment_action=enroll')
             _reg_request = self.request_factory.get('/course_specific_register/DNE/DNE/DNE' +
-                                                   '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
-                                                   '&enrollment_action=enroll')
+                                                    '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
+                                                    '&enrollment_action=enroll')
 
             login_response = course_specific_login(login_request, 'DNE/DNE/DNE')
             reg_response = course_specific_register(login_request, 'DNE/DNE/DNE')
@@ -374,7 +391,7 @@ class ShibSPTest(ModuleStoreTestCase):
                              '?course_id=DNE/DNE/DNE' +
                              '&enrollment_action=enroll')
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_enrollment_limit_by_domain(self):
         """
             Tests that the enrollmentDomain setting is properly limiting enrollment to those who have
@@ -438,10 +455,12 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertEqual(response.status_code, 400)
                     self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login_enrollment(self):
         """
-            A functionality test that a student with an existing shib login can auto-enroll in a class with GET params
+            A functionality test that a student with an existing shib login
+            can auto-enroll in a class with GET or POST params.  Also tests the direction functionality of
+            the 'next' GET/POST param
         """
         student = UserFactory.create()
         extauth = ExternalAuthMap(external_id='testuser@stanford.edu',
@@ -465,13 +484,46 @@ class ShibSPTest(ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
         self.client.logout()
         request_kwargs = {'path': '/shib-login/',
-                          'data': {'enrollment_action': 'enroll', 'course_id': course.id},
+                          'data': {'enrollment_action': 'enroll', 'course_id': course.id, 'next': '/testredirect'},
                           'follow': False,
                           'REMOTE_USER': 'testuser@stanford.edu',
                           'Shib-Identity-Provider': 'https://idp.stanford.edu/'}
         response = self.client.get(**request_kwargs)
         # successful login is a redirect to "/"
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/')
+        self.assertEqual(response['location'], 'http://testserver/testredirect')
         # now there is enrollment
         self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
+
+        # Clean up and try again with POST (doesn't happen with real production shib, doing this for test coverage)
+        self.client.logout()
+        CourseEnrollment.unenroll(student, course.id)
+        self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
+
+        response = self.client.post(**request_kwargs)
+        # successful login is a redirect to "/"
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], 'http://testserver/testredirect')
+        # now there is enrollment
+        self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
+
+
+class ShibUtilFnTest(TestCase):
+    """
+    Tests util functions in shib module
+    """
+    def test__flatten_to_ascii(self):
+        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
+        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
+        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
+        self.assertEqual(_flatten_to_ascii(u'jas\xf6n'), u'jason')  # umlaut
+        self.assertEqual(_flatten_to_ascii(u'Jason\u5305'), u'Jason')  # mandarin, so it just gets dropped
+        self.assertEqual(_flatten_to_ascii(u'abc'), u'abc')  # pass through
+
+        unicode_test = _flatten_to_ascii(DIACRITIC)
+        self.assertEqual(unicode_test, FLATTENED)
+        self.assertIsInstance(unicode_test, unicode)
+
+        str_test = _flatten_to_ascii(STR_DIACRI)
+        self.assertEqual(str_test, FLATTENED)
+        self.assertIsInstance(str_test, str)

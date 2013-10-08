@@ -1,4 +1,6 @@
-if (!window.CmsUtils) window.CmsUtils = {};
+require(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
+         "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function($, _, gettext, NotificationView, PromptView) {
 
 var $body;
 var $modal;
@@ -13,13 +15,8 @@ var $newComponentButton;
 $(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
-    $modalCover = $('<div class="modal-cover">');
-    // cdodge: this looks funny, but on AWS instances, this base.js get's wrapped in a separate scope as part of Django static
-    // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
-    // scopes (namely the course-info tab)
-    window.$modalCover = $modalCover;
+    $modalCover = $('.modal-cover');
 
-    $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
@@ -95,7 +92,7 @@ $(document).ready(function() {
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
-    $('a.show-tender').bind('click', window.CmsUtils.smoothScrollTop);
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling footer additional support
     $('.cta-show-sock').bind('click', toggleSock);
@@ -130,10 +127,10 @@ $(document).ready(function() {
     $('.sync-date').bind('click', syncReleaseDate);
 
     // import form setup
-    $('.import .file-input').bind('change', showImportSubmit);
-    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
+    $('.view-import .file-input').bind('change', showImportSubmit);
+    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
-        $('.import .file-input').click();
+        $('.view-import .file-input').click();
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -169,10 +166,7 @@ function smoothScrollLink(e) {
     });
 }
 
-// On AWS instances, this base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-//  when we can access it from other scopes (namely Course Advanced Settings).
-window.CmsUtils.smoothScrollTop = function(e) {
+function smoothScrollTop(e) {
     (e).preventDefault();
 
     $.smoothScroll({
@@ -188,11 +182,6 @@ function linkNewWindow(e) {
     window.open($(e.target).attr('href'));
     e.preventDefault();
 }
-
-// On AWS instances, base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-// when we can access it from other scopes (namely the checklists)
-window.cmsLinkNewWindow = linkNewWindow;
 
 function toggleSections(e) {
     e.preventDefault();
@@ -238,7 +227,7 @@ function showImportSubmit(e) {
         $('.error-block').hide();
         $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
         $('.file-name-block').show();
-        $('.import .choose-file-button').hide();
+        $('.view-import .choose-file-button').hide();
         $('.submit-button').show();
         $('.progress').show();
     } else {
@@ -378,7 +367,7 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el, type) {
-    var confirm = new CMS.Views.Prompt.Warning({
+    var confirm = new PromptView.Warning({
         title: gettext('Delete this ' + type + '?'),
         message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
         actions: {
@@ -394,8 +383,8 @@ function _deleteItem($el, type) {
                         'id': id
                     });
 
-                    var deleting = new CMS.Views.Notification.Mini({
-                        title: gettext('Deleting') + '&hellip;'
+                    var deleting = new NotificationView.Mini({
+                        title: gettext('Deleting&hellip;')
                     });
                     deleting.show();
 
@@ -421,11 +410,6 @@ function _deleteItem($el, type) {
     confirm.show();
 }
 
-function markAsLoaded() {
-    $('.upload-modal .copy-button').css('display', 'inline-block');
-    $('.upload-modal .progress-bar').addClass('loaded');
-}
-
 function hideModal(e) {
     if (e) {
         e.preventDefault();
@@ -434,8 +418,7 @@ function hideModal(e) {
     // of the editor. Users must press Cancel or Save to exit the editor.
     // module_edit adds and removes the "is-fixed" class.
     if (!$modalCover.hasClass("is-fixed")) {
-        $('.file-input').unbind('change', startUpload);
-        $modal.hide();
+        $(".modal, .edit-subsection-publish-settings").hide();
         $modalCover.hide();
     }
 }
@@ -626,25 +609,25 @@ function addNewCourse(e) {
             return gettext('Please do not use any spaces or special characters in this field.');
         }
         return '';
-    }
+    };
 
-    // Ensure that all items are less than 80 characters.
+    // Ensure that org/course_num/run < 65 chars.
     var validateTotalCourseItemsLength = function() {
         var totalLength = _.reduce(
-            ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+            ['.new-course-org', '.new-course-number', '.new-course-run'],
             function(sum, ele) {
                 return sum + $(ele).val().length;
         }, 0
         );
-        if(totalLength > 80) {
+        if(totalLength > 65) {
             $('.wrap-error').addClass('is-shown');
-            $('#course_creation_error').html('<p>' + gettext('Course fields must have a combined length of no more than 80 characters.') + '</p>');
+            $('#course_creation_error').html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
             $('.new-course-save').addClass('is-disabled');
         }
         else {
             $('.wrap-error').removeClass('is-shown');
         }
-    }
+    };
 
     // Handle validation asynchronously
     _.each(
@@ -839,8 +822,8 @@ function saveSetSectionScheduleDate(e) {
         'start': datetime
     });
 
-    var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;"
+    var saving = new NotificationView.Mini({
+        title: gettext("Saving&hellip;")
     });
     saving.show();
     // call into server to commit the new order
@@ -880,3 +863,5 @@ function saveSetSectionScheduleDate(e) {
         saving.hide();
     });
 }
+
+}); // end require()

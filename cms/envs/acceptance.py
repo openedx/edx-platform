@@ -24,14 +24,17 @@ from random import choice, randint
 def seed():
     return os.getppid()
 
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'acceptance_xmodule',
     'collection': 'acceptance_modulestore_%s' % seed(),
+}
+
+MODULESTORE_OPTIONS = dict({
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}
+}, **DOC_STORE_CONFIG)
 
 MODULESTORE = {
     'default': {
@@ -68,8 +71,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_edx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
     }
 }
 
@@ -84,5 +87,26 @@ USE_I18N = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
+
+# Where to run: local, saucelabs, or grid
+LETTUCE_SELENIUM_CLIENT = os.environ.get('LETTUCE_SELENIUM_CLIENT', 'local')
+
+SELENIUM_GRID = {
+    'URL': 'http://127.0.0.1:4444/wd/hub',
+    'BROWSER': LETTUCE_BROWSER,
+}
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *  # pylint: disable=F0401
+except ImportError:
+    pass
+
+# Because an override for where to run will affect which ports to use,
+# set this up after the local overrides.
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    LETTUCE_SERVER_PORT = choice(PORTS)
+else:
+    LETTUCE_SERVER_PORT = randint(1024, 65535)
