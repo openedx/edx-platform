@@ -1,5 +1,5 @@
 requirejs.config({
-   paths: {
+    paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
@@ -32,9 +32,11 @@ requirejs.config({
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
+        "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
+        "domReady": "xmodule_js/common_static/js/vendor/domReady",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix"
-    },
+    }
     shim: {
         "gettext": {
             exports: "gettext"
@@ -145,6 +147,7 @@ define([
     "coffee/spec/views/section_spec",
     "coffee/spec/views/course_info_spec", "coffee/spec/views/feedback_spec",
     "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
+    "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
 
     # these tests are run separate in the cms-squire suite, due to process

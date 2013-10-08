@@ -863,5 +863,8 @@ function saveSetSectionScheduleDate(e) {
         saving.hide();
     });
 }
+    // Add to window object for unit test (overview_spec).
+    window.saveSetSectionScheduleDate = saveSetSectionScheduleDate;
+    window.deleteSection = deleteSection;
 
 }); // end require()

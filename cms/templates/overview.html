@@ -82,7 +82,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
         </div>
         <div class="item-actions">
           <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" data-tooltip="${_('Drag to re-order')}" class="drag-handle"></a>
+          <span data-tooltip="${_('Drag to re-order')}" class="drag-handle"></span>
         </div>
       </header>
     </section>
@@ -138,9 +138,12 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
+      <article class="courseware-overview" data-id="${context_course.location.url()}">
         % for section in sections:
-        <section class="courseware-section branch" data-id="${section.location}">
+        <section class="courseware-section branch is-draggable" data-id="${section.location}" data-parent-id="${context_course.location.url()}">
+
+          <%include file="widgets/_ui-dnd-indicator-before.html" />
+
           <header>
           <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
@@ -169,7 +172,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
             <div class="item-actions">
               <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
+              <span data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle"></span>
             </div>
           </header>
           <div class="subsection-list">
@@ -178,9 +181,12 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                 <span class="new-folder-icon"></span>${_("New Subsection")}
               </a>
             </div>
-            <ol data-section-id="${section.location.url()}">
+            <ol class="sortable-subsection-list" data-id="${section.location.url()}">
               % for subsection in section.get_children():
-              <li class="branch collapsed id-holder" data-id="${subsection.location}">
+              <li class="courseware-subsection branch collapsed id-holder is-draggable" data-id="${subsection.location}" data-parent-id="${section.location.url()}">
+
+                <%include file="widgets/_ui-dnd-indicator-before.html" />
+
                 <div class="section-item">
                   <div class="details">
                     <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
@@ -195,14 +201,21 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
                   <div class="item-actions">
                     <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
-                    <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
+                    <span data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle"></span>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}
+
+                <%include file="widgets/_ui-dnd-indicator-after.html" />
               </li>
               % endfor
+              <li class="ui-splint ui-splint-indicator">
+                <%include file="widgets/_ui-dnd-indicator-initial.html" />
+              </li>
             </ol>
           </div>
+
+          <%include file="widgets/_ui-dnd-indicator-after.html" />
         </section>
         % endfor
       </article>

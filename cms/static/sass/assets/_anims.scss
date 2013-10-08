@@ -140,22 +140,22 @@
   }
 
   90% {
-    @include transform(translateY(-($notification-height)));
+    @include transform(translateY(-($ui-notification-height)));
   }
 
   100% {
-    @include transform(translateY(-($notification-height*0.99)));
+    @include transform(translateY(-($ui-notification-height*0.99)));
   }
 }
 
 // notifications slide down
 @include keyframes(notificationSlideDown) {
   0% {
-    @include transform(translateY(-($notification-height*0.99)));
+    @include transform(translateY(-($ui-notification-height*0.99)));
   }
 
   10% {
-    @include transform(translateY(-($notification-height)));
+    @include transform(translateY(-($ui-notification-height)));
   }
 
   100% {
@@ -210,4 +210,40 @@
 // canned animation - use if you want out of the box/non-customized anim
 %anim-bounceOut {
   @include animation(bounceOut $tmg-f1 ease-in-out 1);
+}
+
+
+// ====================
+
+
+// flash
+@include keyframes(flash) {
+  0%, 100% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-flash {
+  @include animation(flash $tmg-f1 ease-in-out 1);
+}
+
+// flash - double
+@include keyframes(flashDouble) {
+0%, 50%, 100% {
+  opacity: 1.0;
+}
+
+25%, 75% {
+    opacity: 0.0;
+  }
+  }
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-flashDouble {
+  @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }
