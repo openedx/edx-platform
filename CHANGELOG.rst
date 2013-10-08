@@ -9,6 +9,8 @@ LMS: Fix issue with CourseMode expiration dates
 
 LMS: Ported bulk emailing to the beta instructor dashboard.
 
+LMS: Add monitoring of bulk email subtasks to display progress on instructor dash.
+
 LMS: Add PaidCourseRegistration mode, where payment is required before course
 registration.
 

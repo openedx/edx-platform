@@ -469,8 +469,10 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
             else:
                 dog_stats_api.increment('course_email.sent', tags=[_statsd_tag(course_title)])
-
-                log.debug('Email with id %s sent to %s', email_id, email)
+                if settings.BULK_EMAIL_LOG_SENT_EMAILS:
+                    log.info('Email with id %s sent to %s', email_id, email)
+                else:
+                    log.debug('Email with id %s sent to %s', email_id, email)
                 num_sent += 1
 
             # Pop the user that was emailed off the end of the list:
@@ -611,21 +613,23 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
              task_id, subtask_status['succeeded'], subtask_status['failed'], subtask_status['skipped'])
 
     # Calculate time until we retry this task (in seconds):
+    # The value for max_retries is increased by the number of times an "infinite-retry" exception
+    # has been retried.  We want the regular retries to trigger max-retry checking, but not these
+    # special retries.  So we count them separately.
     max_retries = _get_current_task().max_retries + subtask_status['retried_nomax']
     base_delay = _get_current_task().default_retry_delay
     if skip_retry_max:
-        retry_index = subtask_status['retried_nomax']
-        exp = min(retry_index, 5)
-        countdown = ((2 ** exp) * base_delay) * random.uniform(.5, 1.25)
+        # once we reach five retries, don't increase the countdown further.
+        retry_index = min(subtask_status['retried_nomax'], 5)
         exception_type = 'sending-rate'
     else:
         retry_index = subtask_status['retried_withmax']
-        countdown = ((2 ** retry_index) * base_delay) * random.uniform(.75, 1.5)
         exception_type = 'transient'
 
-    # max_retries is increased by the number of times an "infinite-retry" exception
-    # has been retried.  We want the regular retries to trigger max-retry checking, but not these
-    # special retries.  So we count them separately.
+    # Skew the new countdown value by a random factor, so that not all
+    # retries are deferred by the same amount.
+    countdown = ((2 ** retry_index) * base_delay) * random.uniform(.75, 1.25)
+
     log.warning('Task %s: email with id %d not delivered due to %s error %s, retrying send to %d recipients in %s seconds (with max_retry=%s)',
                 task_id, email_id, exception_type, current_exception, len(to_list), countdown, max_retries)
 
@@ -644,7 +648,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
             throw=True,
         )
     except RetryTaskError as retry_error:
-        # If retry call is successful, update with the current progress:
+        # If the retry call is successful, update with the current progress:
         log.exception('Task %s: email with id %d caused send_course_email task to retry.',
                       task_id, email_id)
         return subtask_status, retry_error
