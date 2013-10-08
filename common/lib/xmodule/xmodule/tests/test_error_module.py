@@ -29,7 +29,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
     def test_error_module_xml_rendering(self):
         descriptor = error_module.ErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course, self.error_msg)
-        self.assertTrue(isinstance(descriptor, error_module.ErrorDescriptor))
+        self.assertIsInstance(descriptor, error_module.ErrorDescriptor)
         module = descriptor.xmodule(self.system)
         context_repr = module.get_html()
         self.assertIn(self.error_msg, context_repr)
@@ -43,7 +43,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
 
         error_descriptor = error_module.ErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
-        self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
+        self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
         module = error_descriptor.xmodule(self.system)
         context_repr = module.get_html()
         self.assertIn(self.error_msg, context_repr)
@@ -60,7 +60,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
     def test_non_staff_error_module_create(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course)
-        self.assertTrue(isinstance(descriptor, error_module.NonStaffErrorDescriptor))
+        self.assertIsInstance(descriptor, error_module.NonStaffErrorDescriptor)
 
     def test_from_xml_render(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
@@ -78,7 +78,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
 
         error_descriptor = error_module.NonStaffErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
-        self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
+        self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
         module = error_descriptor.xmodule(self.system)
         context_repr = module.get_html()
         self.assertNotIn(self.error_msg, context_repr)
