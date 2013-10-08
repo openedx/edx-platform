@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-08 14:49+0400\n"
-"PO-Revision-Date: 2013-10-08 12:21+0400\n"
+"PO-Revision-Date: 2013-10-08 14:54+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
 "language/ru/)\n"
@@ -560,33 +560,33 @@ msgstr "Показать дискуссии"
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:88
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:156
 msgid "Misuse Reported"
-msgstr ""
+msgstr "Жалоба отправлена"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:92
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:160
 msgid "Report Misuse"
-msgstr ""
+msgstr "Пожаловаться"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:100
 msgid "Pinned"
-msgstr ""
+msgstr "Прикрепленно"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:104
 msgid "Pin Thread"
-msgstr ""
+msgstr "Прикрепить тему"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:218
 msgid "Pinning not currently available"
-msgstr ""
+msgstr "Прикрепление недоступно"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:54
 msgid "anonymous"
-msgstr ""
+msgstr "аноним"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:70
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:70
 msgid "staff"
-msgstr ""
+msgstr "преподаватель"
 
 #: lms/static/admin/js/SelectFilter2.js:45
 #, c-format
