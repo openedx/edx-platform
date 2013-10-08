@@ -9,9 +9,6 @@ import json
 from uuid import uuid4
 from time import sleep
 
-from sys import exc_info
-from traceback import format_exc
-
 from dogapi import dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
 from boto.ses.exceptions import (
@@ -31,7 +28,6 @@ from celery.exceptions import RetryTaskError
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.mail import EmailMultiAlternatives, get_connection
-from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
@@ -405,8 +401,8 @@ def _get_source_address(course_id, course_title):
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
     course_num = course_id.split('/')[1]
-    INVALID_CHARS = re.compile(r"[^\w.-]")
-    course_num = INVALID_CHARS.sub('_', course_num)
+    invalid_chars = re.compile(r"[^\w.-]")
+    course_num = invalid_chars.sub('_', course_num)
 
     from_addr = '"{0}" Course Staff <{1}-{2}>'.format(course_title_no_quotes, course_num, settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
     return from_addr
