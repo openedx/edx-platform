@@ -428,7 +428,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
+DEFAULT_BULK_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
 EMAILS_PER_TASK = 100
 EMAILS_PER_QUERY = 1000
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
