@@ -27,7 +27,7 @@ if Backbone?
 
     addReplyLink: () ->
       if @model.hasOwnProperty('parent')
-        name = @model.parent.get('username') ? "anonymous"
+        name = @model.parent.get('username') ? gettext("anonymous")
         html = "<a href='#comment_#{@model.parent.id}'>@#{name}</a>:  "
         p = @$('.response-body p:first')
         p.prepend(html)
@@ -39,7 +39,7 @@ if Backbone?
 
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
-        @$el.find("a.profile-link").after('<span class="staff-label">staff</span>')
+        @$el.find("a.profile-link").after('<span class="staff-label">' + gettext('staff') + '</span>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.find("a.profile-link").after('<span class="community-ta-label">Community&nbsp;&nbsp;TA</span>')
 

@@ -570,7 +570,7 @@ body.discussion {
     font-family: $sans-serif;
 
     &:before {
-      content: 'PREVIEW';
+      content: 'ПРЕДПРОСМОТР';
       position: absolute;
       top: 3px;
       left: 5px;
@@ -2366,7 +2366,7 @@ body.discussion {
       @include transition(all .2s ease-out 0s);
 
       &:before {
-        content: 'PREVIEW';
+        content: 'ПРЕДПРОСМОТР';
         position: absolute;
         top: 3px;
         left: 5px;

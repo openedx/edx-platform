@@ -38,7 +38,7 @@ if Backbone?
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.addClass("staff")
-        @$el.prepend('<div class="staff-banner">staff</div>')
+        @$el.prepend('<div class="staff-banner">' + gettext('staff') + '</div>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.addClass("community-ta")
         @$el.prepend('<div class="community-ta-banner">Community TA</div>')
@@ -101,11 +101,11 @@ if Backbone?
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
         
     updateModelDetails: =>
       @renderFlagged()
