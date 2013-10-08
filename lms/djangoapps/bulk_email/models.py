@@ -41,7 +41,7 @@ SEND_TO_ALL = 'all'
 TO_OPTIONS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL]
 
 
-class CourseEmail(Email, models.Model):
+class CourseEmail(Email):
     """
     Stores information for an email to a course.
     """
@@ -103,7 +103,7 @@ class CourseEmail(Email, models.Model):
     @transaction.autocommit
     def save_now(self):
         """
-        Writes InstructorTask immediately, ensuring the transaction is committed.
+        Writes CourseEmail immediately, ensuring the transaction is committed.
 
         Autocommit annotation makes sure the database entry is committed.
         When called from any view that is wrapped by TransactionMiddleware,
