@@ -17,10 +17,13 @@ class TestTimeLimitModuleRendering(XModuleRenderingTestBase):
     """
     def test_with_children(self):
         block = ItemFactory.create(category='timelimit')
+        block.xmodule_runtime = self.new_module_runtime()
         ItemFactory.create(category='html', data='<html>This is just text</html>', parent=block)
 
-        assert_student_view(block, self.runtime.render(block.xmodule(self.runtime), None, 'student_view'))
+        assert_student_view(block, block.render('student_view'))
 
     def test_without_children(self):
         block = ItemFactory.create(category='timelimit')
-        assert_student_view(block, self.runtime.render(block.xmodule(self.runtime), None, 'student_view'))
+        block.xmodule_runtime = self.new_module_runtime()
+
+        assert_student_view(block, block.render('student_view'))

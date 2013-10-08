@@ -7,7 +7,6 @@ from pytz import UTC
 
 from xmodule.modulestore import Location
 from xmodule.x_module import XModuleDescriptor
-from xmodule.course_module import CourseDescriptor
 
 
 class Dummy(object):
@@ -124,16 +123,28 @@ class ItemFactory(XModuleFactory):
         :target_class: is ignored
         """
 
+        # All class attributes (from this class and base classes) are
+        # passed in via **kwargs. However, some of those aren't actual field values,
+        # so pop those off for use separately
+
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
         # catch any old style users before they get into trouble
-        assert not 'template' in kwargs
-        data = kwargs.get('data')
-        category = kwargs.get('category')
-        display_name = kwargs.get('display_name')
-        metadata = kwargs.get('metadata', {})
-        location = kwargs.get('location')
-        if kwargs.get('boilerplate') is not None:
-            template_id = kwargs.get('boilerplate')
+        assert 'template' not in kwargs
+        parent_location = Location(kwargs.pop('parent_location', None))
+        data = kwargs.pop('data', None)
+        category = kwargs.pop('category', None)
+        display_name = kwargs.pop('display_name', None)
+        metadata = kwargs.pop('metadata', {})
+        location = kwargs.pop('location')
+        assert location != parent_location
+
+        store = kwargs.pop('modulestore')
+
+        # This code was based off that in cms/djangoapps/contentstore/views.py
+        parent = kwargs.pop('parent', None) or store.get_item(parent_location)
+
+        if 'boilerplate' in kwargs:
+            template_id = kwargs.pop('boilerplate')
             clz = XModuleDescriptor.load_class(category)
             template = clz.get_template(template_id)
             assert template is not None
@@ -141,21 +152,20 @@ class ItemFactory(XModuleFactory):
             if not isinstance(data, basestring):
                 data.update(template.get('data'))
 
-        store = kwargs.get('modulestore')
-
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
+        module = store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
+
+        module = store.get_item(location)
+
+        for attr, val in kwargs.items():
+            setattr(module, attr, val)
+        module.save()
+
+        store.save_xmodule(module)
 
         if location.category not in DETACHED_CATEGORIES:
-
-            parent_location = Location(kwargs.get('parent_location'))
-            assert location != parent_location
-
-            # This code was based off that in cms/djangoapps/contentstore/views.py
-            parent = kwargs.get('parent') or store.get_item(parent_location)
-
             parent.children.append(location.url())
             store.update_children(parent_location, parent.children)
 

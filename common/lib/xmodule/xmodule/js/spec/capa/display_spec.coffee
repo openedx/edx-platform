@@ -139,12 +139,12 @@ describe 'Problem', ->
 
     it 'log the problem_graded event, after the problem is done grading.', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-        response = 
+        response =
           success: 'correct'
           contents: 'mock grader response'
         callback(response)
       @problem.check()
-      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.url
+      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
 
     it 'submit the answer for check', ->
       spyOn $, 'postWithPrefix'

@@ -81,7 +81,7 @@ def preview_component(request, location):
 
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': component.runtime.render(component, None, 'studio_view').content,
+        'editor': component.render('studio_view').content,
     })
 
 
@@ -94,11 +94,6 @@ def preview_module_system(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
-
-    def preview_field_data(descriptor):
-        "Helper method to create a DbModel from a descriptor"
-        student_data = DbModel(SessionKeyValueStore(request))
-        return lms_field_data(descriptor._field_data, student_data)
 
     course_id = get_course_for_item(descriptor.location).location.course_id
 
@@ -118,7 +113,6 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xmodule_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
@@ -136,7 +130,8 @@ def preview_module_system(request, preview_id, descriptor):
                 getattr(descriptor, 'data_dir', descriptor.location.course),
                 course_id=descriptor.location.org + '/' + descriptor.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE',
             ),
-        )
+        ),
+        error_descriptor_class=ErrorDescriptor,
     )
 
 
@@ -148,17 +143,12 @@ def load_preview_module(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
-    system = preview_module_system(request, preview_id, descriptor)
-    try:
-        module = descriptor.xmodule(system)
-    except:
-        log.debug("Unable to load preview module", exc_info=True)
-        module = ErrorDescriptor.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        ).xmodule(system)
-
-    return module
+    student_data = DbModel(SessionKeyValueStore(request))
+    descriptor.bind_for_student(
+        preview_module_system(request, preview_id, descriptor),
+        lms_field_data(descriptor._field_data, student_data),  # pylint: disable=protected-access
+    )
+    return descriptor
 
 
 def get_preview_html(request, descriptor, idx):
@@ -167,4 +157,4 @@ def get_preview_html(request, descriptor, idx):
     specified by the descriptor and idx.
     """
     module = load_preview_module(request, str(idx), descriptor)
-    return module.runtime.render(module, None, "student_view").content
+    return module.render("student_view").content

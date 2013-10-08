@@ -157,10 +157,6 @@ class VideoModule(VideoFields, XModule):
         log.debug(u"DISPATCH {0}".format(dispatch))
         raise Http404()
 
-    def get_instance_state(self):
-        """Return information about state (position)."""
-        return json.dumps({'position': self.position})
-
     def get_html(self):
         caption_asset_path = "/static/subs/"
 

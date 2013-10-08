@@ -817,7 +817,7 @@ def instructor_dashboard(request, course_id):
     # HTML editor for email
     if idash_mode == 'Email' and is_studio_course:
         html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
-        fragment = course.system.render(html_module, None, 'studio_view')
+        fragment = course.system.render(html_module, 'studio_view')
         fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
         email_editor = fragment.content
 

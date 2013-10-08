@@ -89,7 +89,7 @@ class TimeLimitModule(TimeLimitFields, XModule):
         children = self.get_display_items()
         if children:
             child = children[0]
-            return self.runtime.render_child(child, None, 'student_view').content
+            return child.render('student_view').content
         else:
             return u""
 
