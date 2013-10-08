@@ -171,6 +171,21 @@
         </li>
         % endif
 
+        %if verification_status == 'denied':
+        <li>
+          <span class="title">${_("Photo Verification Failed")}</span>
+          <p>
+          ${verification_msg}
+          </p>  
+          <p>
+          <a href="${reverse('verify_student_reverify')}">Please submit new verification photos.</a>
+          </p>
+          <p>
+              Note: if you fail to pass a verification attempt before the course ends, you will not receive a verified certificate.
+          </p>
+        </li> 
+        %endif
+
       </ul>
     </section>
 
