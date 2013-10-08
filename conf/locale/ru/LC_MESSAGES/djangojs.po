@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-01 19:32+0400\n"
-"PO-Revision-Date: 2013-10-07 18:35+0400\n"
+"PO-Revision-Date: 2013-10-08 12:21+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
 "language/ru/)\n"
@@ -215,7 +215,7 @@ msgstr "Ключ должен содержать только буквы, циф
 
 #: cms/static/js/models/settings/course_grading_policy.js:70
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "Время оценивания должно быть задано в формате ЧЧ:ММ."
 
 #: cms/static/js/models/settings/course_grading_policy.js:107
 msgid "There's already another assignment type with this name."
@@ -269,11 +269,11 @@ msgstr "Выбрать файл"
 
 #: cms/static/js/views/assets.js:80
 msgid "Upload New File"
-msgstr ""
+msgstr "Загрузка нового файла"
 
 #: cms/static/js/views/assets.js:85
 msgid "Load Another File"
-msgstr ""
+msgstr "Загрузить другой файл"
 
 #: cms/static/js/views/course_info_edit.js:174
 msgid "Are you sure you want to delete this update?"
@@ -401,11 +401,12 @@ msgstr "Статус: не сдан"
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:351
 msgid "The problem state got out of sync.  Try reloading the page."
 msgstr ""
+"Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:413
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:413
 msgid "You need to pick a rating before you can submit."
-msgstr ""
+msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:458
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
@@ -413,6 +414,8 @@ msgstr ""
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:747
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr ""
+"Ваши оценки не соответствуют критериям для того что приступить к следующему "
+"этапу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:471
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:471
@@ -435,7 +438,7 @@ msgstr "Отправить ответ"
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:532
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:532
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "Ваш ответ сохранен, но еще не отправлен."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:563
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:563
@@ -452,6 +455,8 @@ msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
+"Вы пытаетесь загрузить слишком большой фаил для нашей системы. Пожалйста "
+"выберите фаил меньше 2MB или вставьте ссылку на ваш фаил в поле для ответа."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:699
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:699
@@ -472,6 +477,9 @@ msgid ""
 "have uploaded the image to the web, you can paste a link to it into the "
 "answer box."
 msgstr ""
+"Для данной задачи требуется отправка файлов, но данная функциональность не "
+"поддерживается вашим браузером. Попробуйте обновить ваш браузер , либо вы "
+"можете загрузить ваш фаил в интернет и вставить ссылку в поле для ответа."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:832
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:841
@@ -739,7 +747,7 @@ msgstr "Вернуться к списку заданий"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:450
 msgid "Try loading again"
-msgstr ""
+msgstr "Пытаюсь загрузить снова"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:455
 msgid "available"
@@ -759,11 +767,11 @@ msgstr "Проверить наличие заданий"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:472
 msgid "System got into invalid state "
-msgstr ""
+msgstr "Кажется что-то пошло не так"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:487
 msgid "System got into invalid state for submission: "
-msgstr ""
+msgstr "Кажется что-то пошло не так для посылки: "
 
 #~ msgid "Answer saved."
 #~ msgstr "Ответ сохранен."
