@@ -313,11 +313,11 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         log.info("Send-email task %s: succeeded", current_task_id)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
     elif isinstance(send_exception, RetryTaskError):
-        # If retrying, record the progress made before the retry condition
-        # was encountered.  Once the retry is running, it will be only processing
-        # what wasn't already accomplished.
+        # If retrying, a RetryTaskError needs to be returned to Celery.
+        # We assume that the the progress made before the retry condition
+        # was encountered has already been updated before the retry call was made,
+        # so we only log here.
         log.warning("Send-email task %s: being retried", current_task_id)
-        update_subtask_status(entry_id, current_task_id, new_subtask_status)
         raise send_exception
     else:
         log.error("Send-email task %s: failed: %s", current_task_id, send_exception)
@@ -622,6 +622,10 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         # once we reach five retries, don't increase the countdown further.
         retry_index = min(subtask_status['retried_nomax'], 5)
         exception_type = 'sending-rate'
+        # if we have a cap, after all, apply it now:
+        if hasattr(settings, 'BULK_EMAIL_INFINITE_RETRY_CAP'):
+            retry_cap = settings.BULK_EMAIL_INFINITE_RETRY_CAP + subtask_status['retried_withmax']
+            max_retries = min(max_retries, retry_cap)
     else:
         retry_index = subtask_status['retried_withmax']
         exception_type = 'transient'
@@ -633,6 +637,14 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
     log.warning('Task %s: email with id %d not delivered due to %s error %s, retrying send to %d recipients in %s seconds (with max_retry=%s)',
                 task_id, email_id, exception_type, current_exception, len(to_list), countdown, max_retries)
 
+    # we make sure that we update the InstructorTask with the current subtask status
+    # *before* actually calling retry(), to be sure that there is no race
+    # condition between this update and the update made by the retried task.
+    update_subtask_status(entry_id, task_id, subtask_status)
+
+    # Now attempt the retry.  If it succeeds, it returns a RetryTaskError that
+    # needs to be returned back to Celery.  If it fails, we return the existing
+    # exception.
     try:
         send_course_email.retry(
             args=[
