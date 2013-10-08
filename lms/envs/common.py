@@ -114,6 +114,7 @@ MITX_FEATURES = {
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
+    # bulk email available to instructors:
     'ENABLE_INSTRUCTOR_EMAIL': False,
 
     # enable analytics server.
@@ -340,7 +341,7 @@ TRACKING_BACKENDS = {
     }
 }
 
-# Backawrds compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
+# Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS enough.
 if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
@@ -425,12 +426,9 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
-# Email
+# Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_BULK_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
-EMAILS_PER_TASK = 100
-EMAILS_PER_QUERY = 1000
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
@@ -817,11 +815,29 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 ################################ Bulk Email ###################################
 
+DEFAULT_BULK_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
+EMAILS_PER_TASK = 100
+EMAILS_PER_QUERY = 1000
+
+# Initial delay used for retrying tasks.  Additional retries use
+# longer delays.  Value is in seconds.
+BULK_EMAIL_DEFAULT_RETRY_DELAY = 30
+
+# Maximum number of retries per task for errors that are not related
+# to throttling.
+BULK_EMAIL_MAX_RETRIES = 5
+
+# Maximum number of retries per task for errors that are related to
+# throttling.  If this is not set, then there is no cap on such retries.
+BULK_EMAIL_INFINITE_RETRY_CAP = 1000
+
 # We want Bulk Email running on the high-priority queue, so we define the
 # routing key that points to it.  At the moment, the name is the same.
 BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
-BULK_EMAIL_DEFAULT_RETRY_DELAY = 15
-BULK_EMAIL_MAX_RETRIES = 5
+
+# Flag to indicate if individual email addresses should be logged as they are sent
+# a bulk email message.
+BULK_EMAIL_LOG_SENT_EMAILS = False
 
 ################################### APPS ######################################
 INSTALLED_APPS = (
