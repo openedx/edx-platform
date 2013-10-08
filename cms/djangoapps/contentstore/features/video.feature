@@ -43,29 +43,29 @@ Feature: CMS.Video Component
     Then the correct Youtube video is shown
 
   # 7
-  Scenario: Closed captions become visible when the mouse hovers over CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
-    And I hover over button "CC"
-    Then Captions become "visible"
-    And I hover over button "volume"
-    Then Captions become "invisible" after 3 seconds
+  #  Scenario: Closed captions become visible when the mouse hovers over CC button
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  Then Captions become "invisible" after 3 seconds
+  #  And I hover over button "CC"
+  #  Then Captions become "visible"
+  #  And I hover over button "volume"
+  #  Then Captions become "invisible" after 3 seconds
 
   # 8
-  Scenario: Open captions never become invisible
-    Given I have created a Video component with subtitles
-    And Make sure captions are open
-    Then Captions are "visible"
-    And I hover over button "CC"
-    Then Captions are "visible"
-    And I hover over button "volume"
-    Then Captions are "visible"
+  #Scenario: Open captions never become invisible
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are open
+  #  Then Captions are "visible"
+  #  And I hover over button "CC"
+  #  Then Captions are "visible"
+  #  And I hover over button "volume"
+  #  Then Captions are "visible"
 
   # 9
-  Scenario: Closed captions are invisible when mouse doesn't hover on CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
-    And I hover over button "volume"
-    Then Captions are "invisible"
+  #Scenario: Closed captions are invisible when mouse doesn't hover on CC button
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  Then Captions become "invisible" after 3 seconds
+  #  And I hover over button "volume"
+  #  Then Captions are "invisible"
