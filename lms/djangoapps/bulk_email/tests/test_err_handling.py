@@ -138,36 +138,6 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertIsInstance(exc, SMTPConnectError)
 
     @patch('bulk_email.tasks.increment_subtask_status')
-    @patch('bulk_email.tasks.send_course_email.retry')
-    @patch('bulk_email.tasks.log')
-    @patch('bulk_email.tasks.get_connection', Mock(return_value=EmailTestException))
-    def test_general_exception(self, mock_log, retry, result):
-        """
-        Tests the if the error is unexpected, we log and retry
-        """
-        test_email = {
-            'action': 'Send email',
-            'to_option': 'myself',
-            'subject': 'test subject for myself',
-            'message': 'test message for myself'
-        }
-        # For some reason (probably the weirdness of testing with celery tasks) assertRaises doesn't work here
-        # so we assert on the arguments of log.exception
-        self.client.post(self.url, test_email)
-        self.assertTrue(mock_log.exception.called)
-        ((log_str, _task_id, email_id), _) = mock_log.exception.call_args
-        self.assertIn('caused send_course_email task to fail with unexpected exception.', log_str)
-        self.assertEqual(email_id, 1)
-        self.assertTrue(retry.called)
-        # check the results being returned
-        self.assertTrue(result.called)
-        ((initial_results, ), kwargs) = result.call_args
-        self.assertEquals(initial_results['skipped'], 0)
-        self.assertEquals(initial_results['failed'], 0)
-        self.assertEquals(initial_results['succeeded'], 0)
-        self.assertEquals(kwargs['failed'], 1)
-
-    @patch('bulk_email.tasks.increment_subtask_status')
     @patch('bulk_email.tasks.log')
     def test_nonexist_email(self, mock_log, result):
         """
