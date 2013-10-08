@@ -26,6 +26,19 @@
     data-yt-test-timeout="${yt_test_timeout}"
     data-yt-test-url="${yt_test_url}"
 
+    ## For now, the option "data-autohide-html5" is hard coded. This option
+    ## either enables or disables autohiding of controls and captions on mouse
+    ## inactivity. If set to true, controls and captions will autohide for
+    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
+    ## whole video. When the mouse moves (or a key is pressed while any part of
+    ## the video player is focused), the captions and controls will be shown
+    ## once again.
+    ##
+    ## There is no option in the "Advanced Editor" to set this option. However,
+    ## this option will have an effect if changed to "True". The code on
+    ## front-end exists.
+    data-autohide-html5="False"
+
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
