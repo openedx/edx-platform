@@ -237,7 +237,6 @@ def _flatten_to_ascii(txt):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
 def _signup(request, eamap, retfun=None):
     """
     Present form to complete for signup via external authentication.
