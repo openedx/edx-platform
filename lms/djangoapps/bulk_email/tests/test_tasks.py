@@ -21,14 +21,13 @@ from boto.exception import AWSConnectionError
 
 from celery.states import SUCCESS, FAILURE
 
-# from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
 
 from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
 
-# from instructor_task.tests.test_tasks import TestInstructorTasks
 from instructor_task.tasks import send_bulk_course_email
+from instructor_task.subtasks import update_subtask_status
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
@@ -37,6 +36,41 @@ from instructor_task.tests.factories import InstructorTaskFactory
 class TestTaskFailure(Exception):
     """Dummy exception used for unit tests."""
     pass
+
+
+def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
+    """
+    Check whether a subtask has been updated before really updating.
+
+    Check whether a subtask which has been retried
+    has had the retry already write its results here before the code
+    that was invoking the retry had a chance to update this status.
+
+    This is the norm in "eager" mode (used by tests) where the retry is called
+    and run to completion before control is returned to the code that
+    invoked the retry.  If the retries eventually end in failure (e.g. due to
+    a maximum number of retries being attempted), the "eager" code will return
+    the error for each retry that is on the stack.  We want to just ignore the
+    later updates that are called as the result of the earlier retries.
+
+    This should not be an issue in production, where status is updated before
+    a task is retried, and is then updated afterwards if the retry fails.
+    """
+    entry = InstructorTask.objects.get(pk=entry_id)
+    subtask_dict = json.loads(entry.subtasks)
+    subtask_status_info = subtask_dict['status']
+    current_subtask_status = subtask_status_info[current_task_id]
+
+    def _get_retry_count(subtask_result):
+        """Return the number of retries counted for the given subtask."""
+        retry_count = subtask_result.get('retried_nomax', 0)
+        retry_count += subtask_result.get('retried_withmax', 0)
+        return retry_count
+
+    current_retry_count = _get_retry_count(current_subtask_status)
+    new_retry_count = _get_retry_count(new_subtask_status)
+    if current_retry_count <= new_retry_count:
+        update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
@@ -244,14 +278,15 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # always fail to connect, triggering repeated retries until limit is hit:
             get_conn.return_value.send_messages.side_effect = cycle([exception])
-            self._test_run_with_task(
-                send_bulk_course_email,
-                'emailed',
-                num_emails,
-                expected_succeeds,
-                failed=expected_fails,
-                retried_withmax=(settings.BULK_EMAIL_MAX_RETRIES + 1)
-            )
+            with patch('bulk_email.tasks.update_subtask_status', my_update_subtask_status):
+                self._test_run_with_task(
+                    send_bulk_course_email,
+                    'emailed',
+                    num_emails,
+                    expected_succeeds,
+                    failed=expected_fails,
+                    retried_withmax=(settings.BULK_EMAIL_MAX_RETRIES + 1)
+                )
 
     def test_retry_after_smtp_disconnect(self):
         self._test_retry_after_limited_retry_error(SMTPServerDisconnected(425, "Disconnecting"))
