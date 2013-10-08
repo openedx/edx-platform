@@ -414,7 +414,7 @@
       @include transition(all, .2s, easeOut);
 
       &:before {
-        content: 'PREVIEW';
+        content: 'ПРЕДПРОСМОТР';
         position: absolute;
         top: 3px;
         left: 5px;

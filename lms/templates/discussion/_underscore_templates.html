@@ -32,8 +32,8 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}      
       
-          <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote">
-          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}<span class="sr">votes (click to vote)</span></span></a>
+          <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="${_('vote')}">
+          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}<span class="sr">${_("votes (click to vote)")}</span></span></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -53,12 +53,12 @@
         
         
       % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread')}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
 
       %else:
       ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread')}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
       ${"<% }  %>"}  
       % endif
@@ -66,7 +66,7 @@
       
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
-          (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
+          (${_("this post is about ")}<a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
       </div>
       ${'<% } %>'}
 
@@ -95,7 +95,7 @@
     ##  <label class="sr" for="edit-post-tags">${_("Edit post tags")}</label>
     ##  <input type="text" id="edit-post-tags" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
     ##</div>
-    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post")}">
+    <input type="submit" id="edit-post-submit" class="post-update" value="${_('Update post')}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -109,7 +109,7 @@
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
                 <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
-                data-placeholder="Add a comment..."></div>
+                data-placeholder="${_('Add a comment...')}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
@@ -121,11 +121,11 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}<span class="sr">votes (click to vote)</span></span></a>
-        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <a href="javascript:void(0)" class="vote-btn" data-tooltip="${_('vote')}"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}<span class="sr">${_("votes (click to vote)")}</span></span></a>
+        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse')}"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
-        ${"<% } else {print('<span class=\"anonymous\"><em>anonymous</em></span>');} %>"}
+        ${"<% } else {print('<span class=\"anonymous\"><em>' + _('anonymous') + '</em></span>');} %>"}
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
@@ -146,7 +146,7 @@
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response")}">
+    <input type="submit" id="edit-response-submit" class="post-update" value="${_("Update response")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>

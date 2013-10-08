@@ -11,10 +11,12 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-FORUM_ROLE_ADMINISTRATOR = 'Administrator'
-FORUM_ROLE_MODERATOR = 'Moderator'
-FORUM_ROLE_COMMUNITY_TA = 'Community TA'
-FORUM_ROLE_STUDENT = 'Student'
+from django.utils.translation import ugettext_noop as _u
+
+FORUM_ROLE_ADMINISTRATOR = _u('Administrator')
+FORUM_ROLE_MODERATOR = _u('Moderator')
+FORUM_ROLE_COMMUNITY_TA = _u('Community TA')
+FORUM_ROLE_STUDENT = _u('Student')
 
 
 @receiver(post_save, sender=CourseEnrollment)

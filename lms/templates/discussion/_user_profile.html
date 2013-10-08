@@ -10,7 +10,7 @@
   %>
   <div class="sidebar-username">${django_user.profile.firstname + ' ' + django_user.profile.lastname | h}</div>
   <div class="sidebar-user-roles">
-    ${", ".join(role_names)}
+    ${", ".join(_(role_names)}
   </div>
   <div class="sidebar-threads-count"><span>${profiled_user['threads_count'] | h}</span> ${pluralize('discussion', profiled_user['threads_count']) | h} started</div>
   <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
