@@ -355,6 +355,19 @@ body.course.unit,.view-unit {
 
           }
         }
+
+      .wrapper-alert-error {
+          box-shadow: none;
+          border-top: 5px solid $red-l1;
+
+          .copy,
+          .title {
+            color: $white;
+          }
+
+      }
+
+
       }
     }
 

@@ -1,6 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="bodyclass">error</%block>
 
 <%block name="content">
   <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
@@ -12,11 +11,11 @@
           ${_("We're having trouble rendering your component")}
         </h2>
 
-        <p>You can try re-editing your component to check that your syntax is correct.</p>
+        <p>Students will not be able to access this component. Re-edit your component to fix the error.</p>
 
         % if message:
         <p class="description">
-            ${_("Error message:")}
+            ${_("Error:")}
             ${message | h}
         </p>
         % endif
