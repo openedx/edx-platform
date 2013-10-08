@@ -3,10 +3,15 @@ Tests for the wrapping layer that provides the XBlock API using XModule/Descript
 functionality
 """
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
+from xmodule.x_module import ModuleSystem
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -16,15 +21,15 @@ from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
-from xmodule.video_module import VideoDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
-from xmodule.videoalpha_module import VideoAlphaDescriptor
+from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
+from xmodule.tests import get_test_descriptor_system
 
 LEAF_XMODULES = (
     AnnotatableDescriptor,
@@ -35,9 +40,8 @@ LEAF_XMODULES = (
     HtmlDescriptor,
     PeerGradingDescriptor,
     PollDescriptor,
-    VideoDescriptor,
     # This is being excluded because it has dependencies on django
-    #VideoAlphaDescriptor,
+    #VideoDescriptor,
     WordCloudDescriptor,
 )
 
@@ -65,26 +69,27 @@ class TestXBlockWrapper(object):
 
     @property
     def leaf_module_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        runtime.anonymous_student_id = 'dummy_anonymous_student_id'
-        runtime.open_ended_grading_interface = {}
-        runtime.seed = 5
-        runtime.get = lambda x: getattr(runtime, x)
-        runtime.ajax_url = 'dummy_ajax_url'
-        runtime.xblock_model_data = lambda d: d._model_data
-        return runtime
-
-    @property
-    def leaf_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        runtime = ModuleSystem(
+            render_template=lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs),
+            anonymous_student_id='dummy_anonymous_student_id',
+            open_ended_grading_interface={},
+            static_url='/static',
+            ajax_url='dummy_ajax_url',
+            xmodule_field_data=lambda d: d._field_data,
+            get_module=Mock(),
+            replace_urls=Mock(),
+            track_function=Mock(),
+        )
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
-        return descriptor_cls(
-            self.leaf_descriptor_runtime,
-            {'location': 'i4x://org/course/category/name'}
+        location = 'i4x://org/course/category/name'
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
+            ScopeIds(None, descriptor_cls.__name__, location, location),
+            DictFieldData({}),
         )
 
     def leaf_module(self, descriptor_cls):
@@ -95,23 +100,20 @@ class TestXBlockWrapper(object):
         if depth == 0:
             runtime.get_module.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
         else:
-            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth-1)
+            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth - 1)
         runtime.position = 2
         return runtime
 
-    @property
-    def container_descriptor_runtime(self):
-        runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
-        return runtime
-
     def container_descriptor(self, descriptor_cls):
-        return descriptor_cls(
-            self.container_descriptor_runtime,
-            {
-                'location': 'i4x://org/course/category/name',
+        location = 'i4x://org/course/category/name'
+        runtime = get_test_descriptor_system()
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        return runtime.construct_xblock_from_class(
+            descriptor_cls,
+            ScopeIds(None, descriptor_cls.__name__, location, location),
+            DictFieldData({
                 'children': range(3)
-            }
+            }),
         )
 
     def container_module(self, descriptor_cls, depth):
@@ -130,7 +132,7 @@ class TestStudentView(TestXBlockWrapper):
     # it generates the same thing from student_view that it does from get_html
     def check_student_view_leaf_node(self, descriptor_cls):
         xmodule = self.leaf_module(descriptor_cls)
-        assert_equal(xmodule.get_html(), xmodule.student_view(None).content)
+        assert_equal(xmodule.get_html(), xmodule.runtime.render(xmodule, None, 'student_view').content)
 
 
     # Test that for all container XModule Descriptors,
@@ -151,7 +153,7 @@ class TestStudentView(TestXBlockWrapper):
     # as it does using get_html
     def check_student_view_container_node_xmodules_only(self, descriptor_cls):
         xmodule = self.container_module(descriptor_cls, 2)
-        assert_equal(xmodule.get_html(), xmodule.student_view(None).content)
+        assert_equal(xmodule.get_html(), xmodule.runtime.render(xmodule, None, 'student_view').content)
 
     # Check that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, it generates the same html from student_view
@@ -182,14 +184,14 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.leaf_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
 
 
     # Test that for all of the Descriptors listed in CONTAINER_XMODULES
     # render the same thing using studio_view as they do using get_html, under the following conditions:
-    # a) All of its descendents are xmodules
-    # b) Some of its descendents are xmodules and some are xblocks
-    # c) All of its descendents are xblocks
+    # a) All of its descendants are xmodules
+    # b) Some of its descendants are xmodules and some are xblocks
+    # c) All of its descendants are xblocks
     def test_studio_view_container_node(self):
         for descriptor_cls in CONTAINER_XMODULES:
             yield self.check_studio_view_container_node_xmodules_only, descriptor_cls
@@ -205,7 +207,7 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         descriptor = self.container_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+        assert_equal(descriptor.get_html(), descriptor.runtime.render(descriptor, None, 'studio_view').content)
 
     # Check that when a descriptor is generated from descriptor_cls
     # with mixed xmodule and xblock children, it generates the same html from studio_view

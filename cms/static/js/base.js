@@ -1,4 +1,6 @@
-if (!window.CmsUtils) window.CmsUtils = {};
+require(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
+         "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function($, _, gettext, NotificationView, PromptView) {
 
 var $body;
 var $modal;
@@ -13,13 +15,8 @@ var $newComponentButton;
 $(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
-    $modalCover = $('<div class="modal-cover">');
-    // cdodge: this looks funny, but on AWS instances, this base.js get's wrapped in a separate scope as part of Django static
-    // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
-    // scopes (namely the course-info tab)
-    window.$modalCover = $modalCover;
+    $modalCover = $('.modal-cover');
 
-    $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
@@ -95,7 +92,7 @@ $(document).ready(function() {
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
-    $('a.show-tender').bind('click', window.CmsUtils.smoothScrollTop);
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling footer additional support
     $('.cta-show-sock').bind('click', toggleSock);
@@ -130,10 +127,10 @@ $(document).ready(function() {
     $('.sync-date').bind('click', syncReleaseDate);
 
     // import form setup
-    $('.import .file-input').bind('change', showImportSubmit);
-    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
+    $('.view-import .file-input').bind('change', showImportSubmit);
+    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
-        $('.import .file-input').click();
+        $('.view-import .file-input').click();
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -169,10 +166,7 @@ function smoothScrollLink(e) {
     });
 }
 
-// On AWS instances, this base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-//  when we can access it from other scopes (namely Course Advanced Settings).
-window.CmsUtils.smoothScrollTop = function(e) {
+function smoothScrollTop(e) {
     (e).preventDefault();
 
     $.smoothScroll({
@@ -188,11 +182,6 @@ function linkNewWindow(e) {
     window.open($(e.target).attr('href'));
     e.preventDefault();
 }
-
-// On AWS instances, base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-// when we can access it from other scopes (namely the checklists)
-window.cmsLinkNewWindow = linkNewWindow;
 
 function toggleSections(e) {
     e.preventDefault();
@@ -238,7 +227,7 @@ function showImportSubmit(e) {
         $('.error-block').hide();
         $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
         $('.file-name-block').show();
-        $('.import .choose-file-button').hide();
+        $('.view-import .choose-file-button').hide();
         $('.submit-button').show();
         $('.progress').show();
     } else {
@@ -378,7 +367,7 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el, type) {
-    var confirm = new CMS.Views.Prompt.Warning({
+    var confirm = new PromptView.Warning({
         title: gettext('Delete this ' + type + '?'),
         message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
         actions: {
@@ -394,8 +383,8 @@ function _deleteItem($el, type) {
                         'id': id
                     });
 
-                    var deleting = new CMS.Views.Notification.Mini({
-                        title: gettext('Deleting') + '&hellip;'
+                    var deleting = new NotificationView.Mini({
+                        title: gettext('Deleting&hellip;')
                     });
                     deleting.show();
 
@@ -421,11 +410,6 @@ function _deleteItem($el, type) {
     confirm.show();
 }
 
-function markAsLoaded() {
-    $('.upload-modal .copy-button').css('display', 'inline-block');
-    $('.upload-modal .progress-bar').addClass('loaded');
-}
-
 function hideModal(e) {
     if (e) {
         e.preventDefault();
@@ -434,8 +418,7 @@ function hideModal(e) {
     // of the editor. Users must press Cancel or Save to exit the editor.
     // module_edit adds and removes the "is-fixed" class.
     if (!$modalCover.hasClass("is-fixed")) {
-        $('.file-input').unbind('change', startUpload);
-        $modal.hide();
+        $(".modal, .edit-subsection-publish-settings").hide();
         $modalCover.hide();
     }
 }
@@ -605,80 +588,117 @@ function cancelNewSection(e) {
 function addNewCourse(e) {
     e.preventDefault();
     $('.new-course-button').addClass('is-disabled');
+    $('.new-course-save').addClass('is-disabled');
     var $newCourse = $('.wrapper-create-course').addClass('is-shown');
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $newCourse.find('.new-course-name').focus().select();
-    $newCourse.find('form').bind('submit', saveNewCourse);
+    var $courseName = $('.new-course-name');
+    $courseName.focus().select();
+    $('.new-course-save').on('click', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
     $body.bind('keyup', {
         $cancelButton: $cancelButton
     }, checkForCancel);
+
+    // Check that a course (org, number, run) doesn't use any special characters
+    var validateCourseItemEncoding = function(item) {
+        var required = validateRequiredField(item);
+        if(required) {
+            return required;
+        }
+        if(item !== encodeURIComponent(item)) {
+            return gettext('Please do not use any spaces or special characters in this field.');
+        }
+        return '';
+    };
+
+    // Ensure that org/course_num/run < 65 chars.
+    var validateTotalCourseItemsLength = function() {
+        var totalLength = _.reduce(
+            ['.new-course-org', '.new-course-number', '.new-course-run'],
+            function(sum, ele) {
+                return sum + $(ele).val().length;
+        }, 0
+        );
+        if(totalLength > 65) {
+            $('.wrap-error').addClass('is-shown');
+            $('#course_creation_error').html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
+            $('.new-course-save').addClass('is-disabled');
+        }
+        else {
+            $('.wrap-error').removeClass('is-shown');
+        }
+    };
+
+    // Handle validation asynchronously
+    _.each(
+        ['.new-course-org', '.new-course-number', '.new-course-run'],
+        function(ele) {
+            var $ele = $(ele);
+            $ele.on('keyup', function(event) {
+                // Don't bother showing "required field" error when
+                // the user tabs into a new field; this is distracting
+                // and unnecessary
+                if(event.keyCode === 9) {
+                    return;
+                }
+                var error = validateCourseItemEncoding($ele.val());
+                setNewCourseFieldInErr($ele.parent('li'), error);
+                validateTotalCourseItemsLength();
+            });
+        }
+    );
+    var $name = $('.new-course-name');
+    $name.on('keyup', function() {
+        var error = validateRequiredField($name.val());
+        setNewCourseFieldInErr($name.parent('li'), error);
+        validateTotalCourseItemsLength();
+    });
 }
+
+function validateRequiredField(msg) {
+    return msg.length === 0 ? gettext('Required field.') : '';
+}
+
+function setNewCourseFieldInErr(el, msg) {
+    if(msg) {
+        el.addClass('error');
+        el.children('span.tip-error').addClass('is-showing').removeClass('is-hiding').text(msg);
+        $('.new-course-save').addClass('is-disabled');
+    }
+    else {
+        el.removeClass('error');
+        el.children('span.tip-error').addClass('is-hiding').removeClass('is-showing');
+        // One "error" div is always present, but hidden or shown
+        if($('.error').length === 1) {
+            $('.new-course-save').removeClass('is-disabled');
+        }
+    }
+};
 
 function saveNewCourse(e) {
     e.preventDefault();
+
+    // One final check for empty values
+    var errors = _.reduce(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(acc, ele) {
+            var $ele = $(ele);
+            var error = validateRequiredField($ele.val());
+            setNewCourseFieldInErr($ele.parent('li'), error);
+            return error ? true : acc;
+        },
+        false
+    );
+
+    if(errors) {
+        return;
+    }
 
     var $newCourseForm = $(this).closest('#create-course-form');
     var display_name = $newCourseForm.find('.new-course-name').val();
     var org = $newCourseForm.find('.new-course-org').val();
     var number = $newCourseForm.find('.new-course-number').val();
     var run = $newCourseForm.find('.new-course-run').val();
-
-    var required_field_text = gettext('Required field');
-
-    var display_name_errMsg = (display_name === '') ? required_field_text : null;
-    var org_errMsg = (org === '') ? required_field_text : null;
-    var number_errMsg = (number === '') ? required_field_text : null;
-    var run_errMsg = (run === '') ? required_field_text : null;
-
-    var bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
-
-    // check for suitable encoding
-    if (!bInErr) {
-        var encoding_errMsg = gettext('Please do not use any spaces or special characters in this field.');
-
-        if (encodeURIComponent(org) != org)
-            org_errMsg = encoding_errMsg;
-        if (encodeURIComponent(number) != number)
-            number_errMsg = encoding_errMsg;
-        if (encodeURIComponent(run) != run)
-            run_errMsg = encoding_errMsg;
-
-        bInErr = (org_errMsg || number_errMsg || run_errMsg);
-    }
-
-    var header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
-
-    var setNewCourseErrMsgs = function(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg) {
-        if (header_err_msg) {
-            $('.wrapper-create-course').addClass('has-errors');
-            $('.wrap-error').addClass('is-shown');
-            $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
-        } else {
-            $('.wrap-error').removeClass('is-shown');
-            $('#course_creation_error').html('');
-        }
-
-        var setNewCourseFieldInErr = function(el, msg) {
-            el.children('.tip-error').remove();
-            if (msg !== null && msg !== '') {
-                el.addClass('error');
-                el.append('<span class="tip tip-error">' + msg + '</span>');
-            } else {
-                el.removeClass('error');
-            }
-        };
-
-        setNewCourseFieldInErr($('#field-course-name'), display_name_errMsg);
-        setNewCourseFieldInErr($('#field-organization'), org_errMsg);
-        setNewCourseFieldInErr($('#field-course-number'), number_errMsg);
-        setNewCourseFieldInErr($('#field-course-run'), run_errMsg);
-    };
-
-    setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
-
-    if (bInErr)
-        return;
 
     analytics.track('Created a Course', {
         'org': org,
@@ -697,9 +717,9 @@ function saveNewCourse(e) {
             if (data.id !== undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
-                var orgErrMsg = (data.OrgErrMsg !== undefined) ? data.OrgErrMsg : null;
-                var courseErrMsg = (data.CourseErrMsg !== undefined) ? data.CourseErrMsg : null;
-                setNewCourseErrMsgs(data.ErrMsg, null, orgErrMsg, courseErrMsg, null);
+                $('.wrap-error').addClass('is-shown');
+                $('#course_creation_error').html('<p>' + data.ErrMsg + '</p>');
+                $('.new-course-save').addClass('is-disabled');
             }
         }
     );
@@ -709,6 +729,16 @@ function cancelNewCourse(e) {
     e.preventDefault();
     $('.new-course-button').removeClass('is-disabled');
     $('.wrapper-create-course').removeClass('is-shown');
+    // Clear out existing fields and errors
+    _.each(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(field) {
+            $(field).val('');
+        }
+    );
+    $('#course_creation_error').html('');
+    $('.wrap-error').removeClass('is-shown');
+    $('.new-course-save').off('click');
 }
 
 function addNewSubsection(e) {
@@ -792,8 +822,8 @@ function saveSetSectionScheduleDate(e) {
         'start': datetime
     });
 
-    var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;"
+    var saving = new NotificationView.Mini({
+        title: gettext("Saving&hellip;")
     });
     saving.show();
     // call into server to commit the new order
@@ -833,3 +863,5 @@ function saveSetSectionScheduleDate(e) {
         saving.hide();
     });
 }
+
+}); // end require()

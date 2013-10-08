@@ -1,0 +1,34 @@
+<div id="${element_id}" class="${element_class}">
+
+    ## This form will be hidden. Once available on the client, the LTI
+    ## module JavaScript will trigget a "submit" on the form, and the
+    ## result will be rendered to the below iFrame.
+    <form
+        action="${launch_url}"
+        name="ltiLaunchForm"
+        class="ltiLaunchForm"
+        method="post"
+        target="ltiLaunchFrame"
+        encType="application/x-www-form-urlencoded"
+    >
+
+        % for param_name, param_value in input_fields.items():
+            <input name="${param_name}" value="${param_value}" />
+        %endfor
+
+        <input type="submit" value="Press to Launch" />
+    </form>
+
+    <h3 class="error_message">
+        Please provide launch_url. Click "Edit", and fill in the
+        required fields.
+    </h3>
+
+    ## The result of the form submit will be rendered here.
+    <iframe
+        name="ltiLaunchFrame"
+        class="ltiLaunchFrame"
+        src=""
+    ></iframe>
+
+</div>

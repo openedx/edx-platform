@@ -1,4 +1,5 @@
-Feature: Login in as a registered user
+@shard_1
+Feature: LMS.Login in as a registered user
   As a registered user
   In order to access my content
   I want to be able to login in to edX
@@ -11,7 +12,8 @@ Feature: Login in as a registered user
     And I submit my credentials on the login form
     Then I should see the login error message "This account has not been activated"
 
-    # CHROME ONLY, firefox will not redirect properly
+    # firefox will not redirect properly when the whole suite is run
+    @skip_firefox
     Scenario: Login to an activated account
     Given I am an edX user
     And I am an activated user

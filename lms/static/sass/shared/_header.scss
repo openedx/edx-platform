@@ -123,6 +123,13 @@ header.global {
             border-radius: 0 4px 4px 0;
             border-left: none;
             padding: 5px 8px 7px 8px;
+            
+            &.shopping-cart {
+              border-radius: 4px;
+              border: 1px solid $border-color-2;
+              margin-right: 10px;
+              padding-bottom: 6px;
+            }
           }
         }
       }
@@ -279,7 +286,7 @@ header.global {
       display: inline-block;
 
       .cta {
-        @extend .m-btn-primary;
+        @extend %m-btn-primary;
       }
     }
 

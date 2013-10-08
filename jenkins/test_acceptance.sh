@@ -13,7 +13,7 @@ export PYTHONIOENCODING=UTF-8
 
 if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
     mkdir -p /mnt/virtualenvs/"$JOB_NAME"
-    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+    virtualenv --system-site-packages /mnt/virtualenvs/"$JOB_NAME"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
@@ -28,12 +28,22 @@ TESTS_FAILED=0
 # and is capturing display :1
 # The command for this is:
 # /usr/bin/Xvfb :1 -screen 0 1024x268x24
-# This allows us to run Chrome without a display
+# This allows us to run Chrome or Firefox without a display
 export DISPLAY=:1
+SKIP_TESTS=""
+
+# Testing for the existance of these environment variables
+if [ ! -z ${LETTUCE_BROWSER+x} ]; then
+	SKIP_TESTS="--tag -skip_$LETTUCE_BROWSER"
+fi
+if [ "$LETTUCE_SELENIUM_CLIENT" == saucelabs ]; then
+	# SAUCE_INFO is a - seperated string PLATFORM-BROWSER-VERSION-DEVICE
+	# Error checking is done in the setting up of the browser
+	IFS='-' read -a SAUCE <<< "${SAUCE_INFO}"
+	SKIP_TESTS="--tag -skip_sauce --tag -skip_${SAUCE[1]}"
+fi
 
 # Run the lms and cms acceptance tests
-# (the -v flag turns off color in the output)
-rake test_acceptance_lms["-v 3"] || TESTS_FAILED=1
-rake test_acceptance_cms["-v 3"] || TESTS_FAILED=1
+rake test:acceptance["$SKIP_TESTS"] || TESTS_FAILED=1
 
 [ $TESTS_FAILED == '0' ]

@@ -3,7 +3,6 @@
 
 from lettuce import step, world
 from django.contrib.auth.models import User
-from nose.tools import assert_true
 
 
 @step('I am an unactivated user$')

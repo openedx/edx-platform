@@ -16,6 +16,8 @@ Module containing the problem elements which render into input objects
 - crystallography
 - vsepr_input
 - drag_and_drop
+- formulaequationinput
+- chemicalequationinput
 
 These are matched by *.html files templates/*.html which are mako templates with the
 actual html.
@@ -47,6 +49,7 @@ import pyparsing
 
 from .registry import TagRegistry
 from chem import chemcalc
+from calc.preview import latex_preview
 import xqueue_interface
 from datetime import datetime
 
@@ -205,10 +208,10 @@ class InputTypeBase(object):
         # end up in a partially-initialized state.
         loaded = {}
         to_render = set()
-        for a in self.get_attributes():
-            loaded[a.name] = a.parse_from_xml(self.xml)
-            if a.render:
-                to_render.add(a.name)
+        for attribute in self.get_attributes():
+            loaded[attribute.name] = attribute.parse_from_xml(self.xml)
+            if attribute.render:
+                to_render.add(attribute.name)
 
         self.loaded_attributes = loaded
         self.to_render = to_render
@@ -253,6 +256,7 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
+            'STATIC_URL': self.system.STATIC_URL,
         }
         context.update((a, v) for (
             a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
@@ -322,7 +326,7 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('inline', '')]
+                Attribute('inline', False)]
 
 registry.register(OptionInput)
 
@@ -490,26 +494,26 @@ class JSInput(InputTypeBase):
         """
         Register the attributes.
         """
-        return [Attribute('params', None),       # extra iframe params
-                Attribute('html_file', None),
-                Attribute('gradefn', "gradefn"),
-                Attribute('get_statefn', None), # Function to call in iframe
-                                                 #   to get current state.
-                Attribute('set_statefn', None), # Function to call iframe to
-                                                 #   set state
-                Attribute('width', "400"),       # iframe width
-                Attribute('height', "300")]      # iframe height
-
-
+        return [
+            Attribute('params', None),       # extra iframe params
+            Attribute('html_file', None),
+            Attribute('gradefn', "gradefn"),
+            Attribute('get_statefn', None),  # Function to call in iframe
+                                             #   to get current state.
+            Attribute('set_statefn', None),  # Function to call iframe to
+                                             #   set state
+            Attribute('width', "400"),       # iframe width
+            Attribute('height', "300")       # iframe height
+        ]
 
     def _extra_context(self):
         context = {
-            'applet_loader': '/static/js/capa/src/jsinput.js',
+            'applet_loader': '{static_url}js/capa/src/jsinput.js'.format(
+                static_url=self.system.STATIC_URL),
             'saved_state': self.value
         }
 
         return context
-
 
 
 registry.register(JSInput)
@@ -531,7 +535,7 @@ class TextLine(InputTypeBase):
     is used e.g. for embedding simulations turned into questions.
 
     Example:
-        <texline math="1" trailing_text="m/s" />
+        <textline math="1" trailing_text="m/s" />
 
     This example will render out a text line with a math preview and the text 'm/s'
     after the end of the text line.
@@ -1012,7 +1016,10 @@ class ChemicalEquationInput(InputTypeBase):
         """
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
+        return {
+            'previewer': '{static_url}js/capa/chemical_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+        }
 
     def handle_ajax(self, dispatch, data):
         '''
@@ -1037,15 +1044,16 @@ class ChemicalEquationInput(InputTypeBase):
 
         result = {'preview': '',
                   'error': ''}
-        formula = data['formula']
-        if formula is None:
+        try:
+            formula = data['formula']
+        except KeyError:
             result['error'] = "No formula specified."
             return result
 
         try:
             result['preview'] = chemcalc.render_to_html(formula)
-        except pyparsing.ParseException as p:
-            result['error'] = "Couldn't parse formula: {0}".format(p)
+        except pyparsing.ParseException as err:
+            result['error'] = u"Couldn't parse formula: {0}".format(err.msg)
         except Exception:
             # this is unexpected, so log
             log.warning(
@@ -1055,6 +1063,102 @@ class ChemicalEquationInput(InputTypeBase):
         return result
 
 registry.register(ChemicalEquationInput)
+
+#-------------------------------------------------------------------------
+
+
+class FormulaEquationInput(InputTypeBase):
+    """
+    An input type for entering formula equations.  Supports live preview.
+
+    Example:
+
+    <formulaequationinput size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "formulaequationinput.html"
+    tags = ['formulaequationinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [
+            Attribute('size', '20'),
+            Attribute('inline', False),
+        ]
+
+    def _extra_context(self):
+        """
+        TODO (vshnayder): Get rid of 'previewer' once we have a standard way of requiring js to be loaded.
+        """
+        # `reported_status` is basically `status`, except we say 'unanswered'
+        reported_status = ''
+        if self.status == 'unsubmitted':
+            reported_status = 'unanswered'
+        elif self.status in ('correct', 'incorrect', 'incomplete'):
+            reported_status = self.status
+
+        return {
+            'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+            'reported_status': reported_status,
+        }
+
+    def handle_ajax(self, dispatch, get):
+        '''
+        Since we only have formcalc preview this input, check to see if it
+        matches the corresponding dispatch and send it through if it does
+        '''
+        if dispatch == 'preview_formcalc':
+            return self.preview_formcalc(get)
+        return {}
+
+    def preview_formcalc(self, get):
+        """
+        Render an preview of a formula or equation. `get` should
+        contain a key 'formula' with a math expression.
+
+        Returns a json dictionary:
+        {
+           'preview' : '<some latex>' or ''
+           'error' : 'the-error' or ''
+           'request_start' : <time sent with request>
+        }
+        """
+
+        result = {'preview': '',
+                  'error': ''}
+
+        try:
+            formula = get['formula']
+        except KeyError:
+            result['error'] = "No formula specified."
+            return result
+
+        result['request_start'] = int(get.get('request_start', 0))
+
+        try:
+            # TODO add references to valid variables and functions
+            # At some point, we might want to mark invalid variables as red
+            # or something, and this is where we would need to pass those in.
+            result['preview'] = latex_preview(formula)
+        except pyparsing.ParseException as err:
+            result['error'] = "Sorry, couldn't parse formula"
+            result['formula'] = formula
+        except Exception:
+            # this is unexpected, so log
+            log.warning(
+                "Error while previewing formula", exc_info=True
+            )
+            result['error'] = "Error while rendering preview"
+
+        return result
+
+registry.register(FormulaEquationInput)
 
 #-----------------------------------------------------------------------------
 
@@ -1093,15 +1197,19 @@ class DragAndDropInput(InputTypeBase):
                     'can_reuse': smth}.
             """
             tag_attrs = dict()
-            tag_attrs['draggable'] = {'id': Attribute._sentinel,
-                                      'label': "", 'icon': "",
-                                      'can_reuse': ""}
+            tag_attrs['draggable'] = {
+                'id': Attribute._sentinel,
+                'label': "", 'icon': "",
+                'can_reuse': ""
+            }
 
-            tag_attrs['target'] = {'id': Attribute._sentinel,
-                                   'x': Attribute._sentinel,
-                                   'y': Attribute._sentinel,
-                                   'w': Attribute._sentinel,
-                                   'h': Attribute._sentinel}
+            tag_attrs['target'] = {
+                'id': Attribute._sentinel,
+                'x': Attribute._sentinel,
+                'y': Attribute._sentinel,
+                'w': Attribute._sentinel,
+                'h': Attribute._sentinel
+            }
 
             dic = dict()
 
@@ -1180,7 +1288,8 @@ class EditAMoleculeInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/editamolecule.js',
+            'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1216,7 +1325,8 @@ class DesignProtein2dInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/design-protein-2d.js',
+            'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1252,7 +1362,8 @@ class EditAGeneInput(InputTypeBase):
         """
             """
         context = {
-            'applet_loader': '/static/js/capa/edit-a-gene.js',
+            'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context

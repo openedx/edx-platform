@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_true, assert_false, assert_equal
+from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=E0611
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -72,7 +72,7 @@ def i_click_the_text_span(step, text):
     span_locator = '.toggle-button-sections span'
     assert_true(world.browser.is_element_present_by_css(span_locator))
     # first make sure that the expand/collapse text is the one you expected
-    assert_equal(world.browser.find_by_css(span_locator).value, text)
+    assert_true(world.css_has_value(span_locator, text))
     world.css_click(span_locator)
 
 

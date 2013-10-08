@@ -18,19 +18,19 @@ class @HTMLEditingDescriptor
 
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
-    tinyMCE.baseURL = '/static/js/vendor/tiny_mce'
+    tinyMCE.baseURL = "#{baseUrl}/js/vendor/tiny_mce"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
-      script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
+      script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.js",
       theme : "advanced",
       skin: 'studio',
       schema: "html5",
       # Necessary to preserve relative URLs to our images.
       convert_urls : false,
       # TODO: we should share this CSS with studio (and LMS)
-      content_css : "/static/css/tiny-mce.css",
+      content_css : "#{baseUrl}/css/tiny-mce.css",
       # The default popup_css path uses an absolute path referencing page in which tinyMCE is being hosted.
       # Supply the correct relative path instead.
-      popup_css: '/static/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css',
+      popup_css: "#{baseUrl}/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css",
       formats : {
         # Disable h4, h5, and h6 styles as we don't have CSS for them.
         h4: {},
@@ -67,7 +67,7 @@ class @HTMLEditingDescriptor
   setupTinyMCE: (ed) =>
     ed.addButton('wrapAsCode', {
       title : 'Code',
-      image : '/static/images/ico-tinymce-code.png',
+      image : "#{baseUrl}/images/ico-tinymce-code.png",
       onclick : () ->
         ed.formatter.toggle('code')
         # Without this, the dirty flag does not get set unless the user also types in text.
@@ -101,32 +101,25 @@ class @HTMLEditingDescriptor
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
     if visualEditor.isDirty()
-      content = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+      content = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
       @advanced_editor.setValue(content)
       @advanced_editor.setCursor(0)
     @advanced_editor.refresh()
     @advanced_editor.focus()
     @showingVisualEditor = false
 
-  rewriteStaticLinks: (content, from, to) ->
-    if from == null || to == null
-      return content
-
-    regex = new RegExp(from, 'g')
-    return content.replace(regex, to)    
-
   # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
   showVisualEditor: (visualEditor) ->
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
-    content = @rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
+    content = rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
     visualEditor.setContent(content)
     visualEditor.startContent = content
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
   initInstanceCallback: (visualEditor) =>
-    visualEditor.setContent(@rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url))
+    visualEditor.setContent(rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url))
     @focusVisualEditor(visualEditor)
 
   focusVisualEditor: (visualEditor) =>
@@ -150,5 +143,5 @@ class @HTMLEditingDescriptor
     text = @advanced_editor.getValue()
     visualEditor = @getVisualEditor()
     if @showingVisualEditor and visualEditor.isDirty()
-      text = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+      text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
     data: text

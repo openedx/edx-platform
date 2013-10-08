@@ -3,7 +3,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
-from contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading
 from contentstore.utils import update_item
 from xmodule.fields import Date
@@ -23,6 +23,8 @@ class CourseDetails(object):
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
+        self.course_image_name = ""
+        self.course_image_asset_path = ""  # URL of the course image
 
     @classmethod
     def fetch(cls, course_location):
@@ -40,6 +42,8 @@ class CourseDetails(object):
         course.end_date = descriptor.end
         course.enrollment_start = descriptor.enrollment_start
         course.enrollment_end = descriptor.enrollment_end
+        course.course_image_name = descriptor.course_image
+        course.course_image_asset_path = course_image_url(descriptor)
 
         temploc = course_location.replace(category='about', name='syllabus')
         try:
@@ -120,6 +124,10 @@ class CourseDetails(object):
         if converted != descriptor.enrollment_end:
             dirty = True
             descriptor.enrollment_end = converted
+
+        if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
+            descriptor.course_image = jsondict['course_image_name']
+            dirty = True
 
         if dirty:
             # Save the data that we've just changed to the underlying

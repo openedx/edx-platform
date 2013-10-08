@@ -1,0 +1,91 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.conf import settings %>
+
+<%inherit file="../main.html" />
+<%block name="bodyclass">purchase-receipt</%block>
+
+<%block name="title"><title>${_("Register for [Course Name] | Receipt (Order")} ${order.id})</title></%block>
+
+<%block name="content">
+
+<div class="container">
+  <section class="notification">
+    <h2>Thank you for your Purchase!</h2>
+    <p>Please print this receipt page for your records.  You should also have received a receipt in your email.</p>
+    % for inst in instructions:
+      <p>${inst}</p>
+    % endfor
+  </section>
+
+  <section class="wrapper cart-list">
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <h1>${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h1>
+        <hr />
+
+        <table class="order-receipt">
+          <tbody>
+          <tr>
+            <td colspan="2"><h3 class="order-number">${_("Order #")}${order.id}</h3></td>
+            <td></td>
+            <td colspan="2"><h3 class="order-date">${_("Date:")} ${order.purchase_time.date().isoformat()}</h3></td>
+          </tr>
+          <tr>
+            <td colspan="5"><h2 class="items-ordered">${_("Items ordered:")}</h2></td>
+          </tr>
+          <tr>
+            <th class="qty">${_("Qty")}</th>
+            <th class="desc">${_("Description")}</th>
+            <th class="u-pr">${_("Unit Price")}</th>
+            <th class="pri">${_("Price")}</th>
+            <th class="curr">${_("Currency")}</th>
+          </tr>
+          % for item in order_items:
+            <tr class="order-item">
+              % if item.status == "purchased":
+                <td>${item.qty}</td>
+                <td>${item.line_desc}</td>
+                <td>${"{0:0.2f}".format(item.unit_cost)}</td>
+                <td>${"{0:0.2f}".format(item.line_cost)}</td>
+                <td>${item.currency.upper()}</td></tr>
+              % elif item.status == "refunded":
+                <td><del>${item.qty}</del></td>
+                <td><del>${item.line_desc}</del></td>
+                <td><del>${"{0:0.2f}".format(item.unit_cost)}</del></td>
+                <td><del>${"{0:0.2f}".format(item.line_cost)}</del></td>
+                <td><del>${item.currency.upper()}</del></td></tr>
+              % endif
+          % endfor
+          <tr>
+            <td colspan="3"></td>
+            <th>${_("Total Amount")}</th>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="3"></td>
+            <td>${"{0:0.2f}".format(order.total_cost)}</td>
+            <td></td>
+          </tr>
+          </tbody>
+        </table>
+
+        % if any_refunds:
+          <p>
+            ${_("Note: items with strikethough like ")}<del>this</del>${_(" have been refunded.")}
+          </p>
+        % endif
+
+        <h2>${_("Billed To:")}</h2>
+        <p>
+          ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br />
+          ${order.bill_to_first} ${order.bill_to_last}<br />
+          ${order.bill_to_street1}<br />
+          ${order.bill_to_street2}<br />
+          ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br />
+          ${order.bill_to_country.upper()}<br />
+        </p>
+    </div>
+  </section>
+</div>
+</%block>

@@ -16,7 +16,9 @@
 </%def>
 
 <!DOCTYPE html>
-<html>
+<!--[if lt IE 8]><html class="ie"><![endif]-->
+<!--[if IE 8]><html class="ie8"><![endif]-->
+<!--[if gte IE 9]><!--><html><!--<![endif]-->
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
@@ -24,6 +26,9 @@
     % else:
       ## "edX" should not be translated
       <title>edX</title>
+
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
@@ -71,6 +76,7 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <%include file="mathjax_accessible.html" />
 
 % if theme_enabled():
   <%include file="theme-header.html" />

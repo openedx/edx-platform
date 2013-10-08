@@ -9,6 +9,8 @@ from django.utils.translation import ugettext as _
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
+# shopping cart
+import shoppingcart
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -44,7 +46,7 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('{settings.PLATFORM_NAME} home')}" />
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${settings.PLATFORM_NAME} ${_('Home')}" />
       </%block>
     </a>
   </h1>
@@ -57,9 +59,11 @@ site_status_msg = get_site_status_msg(course_id)
 
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
-        <li class="nav-global-01">
-          <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
-        </li>
+        % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+          <li class="nav-global-01">
+            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+          </li>
+        % endif  
       </%block>
     </ol>
     <ol class="user">
@@ -79,7 +83,17 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
-
+      % if settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and \
+           settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and \
+           shoppingcart.models.Order.user_cart_has_items(user):
+        <ol class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <i class="icon-shopping-cart"></i> Shopping Cart
+            </a>
+          </li>
+        </ol>
+      % endif
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
@@ -123,7 +137,7 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<div class="ie-banner">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
 % endif
 
 %if not user.is_authenticated():

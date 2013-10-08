@@ -47,19 +47,19 @@ data: |
    <p>Enter the numerical value of Pi:
        <numericalresponse answer="3.14159">
            <responseparam type="tolerance" default=".02" />
-           <textline />
+           <formulaequationinput />
        </numericalresponse>
    </p>
    <p>Enter the approximate value of 502*9:
        <numericalresponse answer="$computed_response">
            <responseparam type="tolerance" default="15%"/>
-           <textline />
+           <formulaequationinput />
        </numericalresponse>
    </p>
 
    <p>Enter the number of fingers on a human hand:
        <numericalresponse answer="5">
-           <textline />
+           <formulaequationinput />
        </numericalresponse>
    </p>
        <solution>

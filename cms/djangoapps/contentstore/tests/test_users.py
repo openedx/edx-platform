@@ -6,7 +6,7 @@ from .utils import CourseTestCase
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from auth.authz import get_course_groupname_for_role
-from student.views import is_enrolled_in_course
+from student.models import CourseEnrollment
 
 
 class UsersTestCase(CourseTestCase):
@@ -72,13 +72,13 @@ class UsersTestCase(CourseTestCase):
 
     def test_detail_inactive(self):
         resp = self.client.get(self.inactive_detail_url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         result = json.loads(resp.content)
         self.assertFalse(result["active"])
 
     def test_detail_invalid(self):
         resp = self.client.get(self.invalid_detail_url)
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 404)
         result = json.loads(resp.content)
         self.assertIn("error", result)
 
@@ -87,7 +87,7 @@ class UsersTestCase(CourseTestCase):
             self.detail_url,
             data={"role": None},
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -103,7 +103,7 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -122,7 +122,7 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -142,7 +142,7 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -157,7 +157,7 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("error", result)
         self.assert_not_enrolled()
@@ -169,7 +169,7 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("error", result)
         self.assert_not_enrolled()
@@ -180,7 +180,7 @@ class UsersTestCase(CourseTestCase):
             data={"role": "staff"},
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -197,7 +197,7 @@ class UsersTestCase(CourseTestCase):
             self.detail_url,
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -214,7 +214,7 @@ class UsersTestCase(CourseTestCase):
             self.detail_url,
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
@@ -273,7 +273,7 @@ class UsersTestCase(CourseTestCase):
             data={"role": "instructor"},
             HTTP_ACCEPT="application/json",
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("error", result)
 
@@ -288,7 +288,7 @@ class UsersTestCase(CourseTestCase):
             data={"role": "instructor"},
             HTTP_ACCEPT="application/json",
         )
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("error", result)
 
@@ -306,7 +306,7 @@ class UsersTestCase(CourseTestCase):
         })
 
         resp = self.client.delete(self_url)
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         # reload user from DB
         user = User.objects.get(email=self.user.email)
         groups = [g.name for g in user.groups.all()]
@@ -321,7 +321,7 @@ class UsersTestCase(CourseTestCase):
         self.ext_user.save()
 
         resp = self.client.delete(self.detail_url)
-        self.assert4XX(resp.status_code)
+        self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("error", result)
         # reload user from DB
@@ -347,7 +347,7 @@ class UsersTestCase(CourseTestCase):
             self.detail_url,
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         self.assert_enrolled()
 
     def test_staff_to_instructor_still_enrolled(self):
@@ -366,19 +366,19 @@ class UsersTestCase(CourseTestCase):
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
         self.assert_enrolled()
 
     def assert_not_enrolled(self):
         """ Asserts that self.ext_user is not enrolled in self.course. """
         self.assertFalse(
-            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
+            CourseEnrollment.is_enrolled(self.ext_user, self.course.location.course_id),
             'Did not expect ext_user to be enrolled in course'
         )
 
     def assert_enrolled(self):
         """ Asserts that self.ext_user is enrolled in self.course. """
         self.assertTrue(
-            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
+            CourseEnrollment.is_enrolled(self.ext_user, self.course.location.course_id),
             'User ext_user should have been enrolled in the course'
         )

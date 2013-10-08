@@ -1,0 +1,21 @@
+<% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
+<section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
+  <div class="${reported_status}" id="status_${id}">
+    <input type="text" name="input_${id}" id="input_${id}"
+	   data-input-id="${id}" value="${value|h}"
+	   % if size:
+	   size="${size}"
+	   % endif
+	   />
+
+      <p class="status">${reported_status}</p>
+
+      <div id="input_${id}_preview" class="equation">
+        \[\]
+        <img src="${STATIC_URL}images/spinner.gif" class="loading"/>
+      </div>
+    <p id="answer_${id}" class="answer"></p>
+  </div>
+
+  <div class="script_placeholder" data-src="${previewer}"/>
+</section>

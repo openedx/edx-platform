@@ -1,10 +1,10 @@
 // studio - views - course export
 // ====================
 
-body.course.export {
+.view-export {
 
   .export-overview {
-    @extend .ui-window;
+    @extend %ui-window;
     @include clearfix;
     padding: 30px 40px;
   }

@@ -1,4 +1,4 @@
-from nose.tools import assert_equals
+from nose.tools import assert_equals  # pylint: disable=E0611
 from lxml import etree
 from xmodule.stringify import stringify_children
 

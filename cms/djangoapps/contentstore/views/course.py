@@ -18,6 +18,7 @@ from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.contentstore.content import StaticContent
 
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
@@ -44,7 +45,7 @@ from .component import (
 
 from django_comment_common.utils import seed_permissions_roles
 
-from student.views import enroll_in_course
+from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
 __all__ = ['course_index', 'create_new_course', 'course_info',
@@ -82,7 +83,9 @@ def course_index(request, org, course, name):
         'context_course': course,
         'lms_link': lms_link,
         'sections': sections,
-        'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+        'course_graders': json.dumps(
+            CourseGradingModel.fetch(course.location).graders
+        ),
         'parent_location': course.location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
@@ -120,24 +123,35 @@ def create_new_course(request):
     except ItemNotFoundError:
         pass
     if existing_course is not None:
-        return JsonResponse(
-            {
-                'ErrMsg': _('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.'),
-                'OrgErrMsg': _('Please change either the organization or course number so that it is unique.'),
-                'CourseErrMsg': _('Please change either the organization or course number so that it is unique.'),
-            }
-        )
+        return JsonResponse({
+            'ErrMsg': _('There is already a course defined with the same '
+                'organization, course number, and course run. Please '
+                'change either organization or course number to be '
+                'unique.'),
+            'OrgErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+            'CourseErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+        })
 
-    course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
+    course_search_location = [
+        'i4x',
+        dest_location.org,
+        dest_location.course,
+        'course',
+        None
+    ]
     courses = modulestore().get_items(course_search_location)
     if len(courses) > 0:
-        return JsonResponse(
-            {
-                'ErrMsg': _('There is already a course defined with the same organization and course number. Please change at least one field to be unique.'),
-                'OrgErrMsg': _('Please change either the organization or course number so that it is unique.'),
-                'CourseErrMsg': _('Please change either the organization or course number so that it is unique.'),
-            }
-        )
+        return JsonResponse({
+            'ErrMsg': _('There is already a course defined with the same '
+                'organization and course number. Please '
+                'change at least one field to be unique.'),
+            'OrgErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+            'CourseErrMsg': _('Please change either the organization or '
+                'course number so that it is unique.'),
+        })
 
     # instantiate the CourseDescriptor and then persist it
     # note: no system to pass
@@ -145,11 +159,17 @@ def create_new_course(request):
         metadata = {}
     else:
         metadata = {'display_name': display_name}
-    modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
+    modulestore('direct').create_and_save_xmodule(
+        dest_location,
+        metadata=metadata
+    )
     new_course = modulestore('direct').get_item(dest_location)
 
     # clone a default 'about' overview module as well
-    dest_about_location = dest_location.replace(category='about', name='overview')
+    dest_about_location = dest_location.replace(
+        category='about',
+        name='overview'
+    )
     overview_template = AboutDescriptor.get_template('overview.yaml')
     modulestore('direct').create_and_save_xmodule(
         dest_about_location,
@@ -164,8 +184,9 @@ def create_new_course(request):
     # seed the forums
     seed_permissions_roles(new_course.location.course_id)
 
-    # auto-enroll the course creator in the course so that "View Live" will work.
-    enroll_in_course(request.user, new_course.location.course_id)
+    # auto-enroll the course creator in the course so that "View Live" will
+    # work.
+    CourseEnrollment.enroll(request.user, new_course.location.course_id)
 
     return JsonResponse({'id': new_course.location.url()})
 
@@ -174,7 +195,8 @@ def create_new_course(request):
 @ensure_csrf_cookie
 def course_info(request, org, course, name, provided_id=None):
     """
-    Send models and views as well as html for editing the course info to the client.
+    Send models and views as well as html for editing the course info to the
+    client.
 
     org, course, name: Attributes of the Location for the item to edit
     """
@@ -185,13 +207,16 @@ def course_info(request, org, course, name, provided_id=None):
     # get current updates
     location = Location(['i4x', org, course, 'course_info', "updates"])
 
-    return render_to_response('course_info.html', {
-        'context_course': course_module,
-        'url_base': "/" + org + "/" + course + "/",
-        'course_updates': json.dumps(get_course_updates(location)),
-        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
-    })
-
+    return render_to_response(
+        'course_info.html',
+        {
+            'context_course': course_module,
+            'url_base': "/" + org + "/" + course + "/",
+            'course_updates': json.dumps(get_course_updates(location)),
+            'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url(),
+            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(location) + '/'
+        }
+    )
 
 @expect_json
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
@@ -202,14 +227,13 @@ def course_info_updates(request, org, course, provided_id=None):
     restful CRUD operations on course_info updates.
 
     org, course: Attributes of the Location for the item to edit
-    provided_id should be none if it's new (create) and a composite of the update db id + index otherwise.
+    provided_id should be none if it's new (create) and a composite of the
+    update db id + index otherwise.
     """
     # ??? No way to check for access permission afaik
     # get current updates
     location = ['i4x', org, course, 'course_info', "updates"]
 
-    # Hmmm, provided_id is coming as empty string on create whereas I believe it used to be None :-(
-    # Possibly due to my removing the seemingly redundant pattern in urls.py
     if provided_id == '':
         provided_id = None
 
@@ -223,21 +247,27 @@ def course_info_updates(request, org, course, provided_id=None):
         try:
             return JsonResponse(delete_course_update(location, request.POST, provided_id))
         except:
-            return HttpResponseBadRequest("Failed to delete",
-                                          content_type="text/plain")
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+            return HttpResponseBadRequest(
+                "Failed to delete",
+                content_type="text/plain"
+            )
+    # can be either and sometimes django is rewriting one to the other:
+    elif request.method in ('POST', 'PUT'):
         try:
             return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
-            return HttpResponseBadRequest("Failed to save",
-                                          content_type="text/plain")
+            return HttpResponseBadRequest(
+                "Failed to save",
+                content_type="text/plain"
+            )
 
 
 @login_required
 @ensure_csrf_cookie
 def get_course_settings(request, org, course, name):
     """
-    Send models and views as well as html for editing the course settings to the client.
+    Send models and views as well as html for editing the course settings to
+    the client.
 
     org, course, name: Attributes of the Location for the item to edit
     """
@@ -253,7 +283,14 @@ def get_course_settings(request, org, course, name):
                                        "course": course,
                                        "name": name,
                                        "section": "details"}),
-        'about_page_editable': not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False)
+        'about_page_editable': not settings.MITX_FEATURES.get(
+            'ENABLE_MKTG_SITE', False
+        ),
+        'upload_asset_url': reverse('upload_asset', kwargs={
+            'org': org,
+            'course': course,
+            'coursename': name,
+        })
     })
 
 
@@ -261,7 +298,8 @@ def get_course_settings(request, org, course, name):
 @ensure_csrf_cookie
 def course_config_graders_page(request, org, course, name):
     """
-    Send models and views as well as html for editing the course settings to the client.
+    Send models and views as well as html for editing the course settings to
+    the client.
 
     org, course, name: Attributes of the Location for the item to edit
     """
@@ -281,7 +319,8 @@ def course_config_graders_page(request, org, course, name):
 @ensure_csrf_cookie
 def course_config_advanced_page(request, org, course, name):
     """
-    Send models and views as well as html for editing the advanced course settings to the client.
+    Send models and views as well as html for editing the advanced course
+    settings to the client.
 
     org, course, name: Attributes of the Location for the item to edit
     """
@@ -301,8 +340,9 @@ def course_config_advanced_page(request, org, course, name):
 @ensure_csrf_cookie
 def course_settings_updates(request, org, course, name, section):
     """
-    restful CRUD operations on course settings. This differs from get_course_settings by communicating purely
-    through json (not rendering any html) and handles section level operations rather than whole page.
+    Restful CRUD operations on course settings. This differs from
+    get_course_settings by communicating purely through json (not rendering any
+    html) and handles section level operations rather than whole page.
 
     org, course: Attributes of the Location for the item to edit
     section: one of details, faculty, grading, problems, discussions
@@ -318,9 +358,15 @@ def course_settings_updates(request, org, course, name, section):
 
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(manager.fetch(Location(['i4x', org, course, 'course', name])), encoder=CourseSettingsEncoder)
+        return JsonResponse(
+            manager.fetch(Location(['i4x', org, course, 'course', name])),
+            encoder=CourseSettingsEncoder
+        )
     elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-        return JsonResponse(manager.update_from_json(request.POST), encoder=CourseSettingsEncoder)
+        return JsonResponse(
+            manager.update_from_json(request.POST),
+            encoder=CourseSettingsEncoder
+        )
 
 
 @expect_json
@@ -329,8 +375,9 @@ def course_settings_updates(request, org, course, name, section):
 @ensure_csrf_cookie
 def course_grader_updates(request, org, course, name, grader_index=None):
     """
-    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
-    through json (not rendering any html) and handles section level operations rather than whole page.
+    Restful CRUD operations on course_info updates. This differs from
+    get_course_settings by communicating purely through json (not rendering any
+    html) and handles section level operations rather than whole page.
 
     org, course: Attributes of the Location for the item to edit
     """
@@ -339,13 +386,18 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(CourseGradingModel.fetch_grader(Location(location), grader_index))
+        return JsonResponse(CourseGradingModel.fetch_grader(
+            Location(location), grader_index
+        ))
     elif request.method == "DELETE":
         # ??? Should this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(location), grader_index)
         return JsonResponse()
     else:  # post or put, doesn't matter.
-        return JsonResponse(CourseGradingModel.update_grader_from_json(Location(location), request.POST))
+        return JsonResponse(CourseGradingModel.update_grader_from_json(
+            Location(location),
+            request.POST
+        ))
 
 
 # # NB: expect_json failed on ["key", "key2"] and json payload
@@ -354,8 +406,9 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 @ensure_csrf_cookie
 def course_advanced_updates(request, org, course, name):
     """
-    restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
-    the payload is either a key or a list of keys to delete.
+    Restful CRUD operations on metadata. The payload is a json rep of the
+    metadata dicts. For delete, otoh, the payload is either a key or a list of
+    keys to delete.
 
     org, course: Attributes of the Location for the item to edit
     """
@@ -364,20 +417,26 @@ def course_advanced_updates(request, org, course, name):
     if request.method == 'GET':
         return JsonResponse(CourseMetadata.fetch(location))
     elif request.method == 'DELETE':
-        return JsonResponse(CourseMetadata.delete_key(location, json.loads(request.body)))
+        return JsonResponse(CourseMetadata.delete_key(
+            location,
+            json.loads(request.body)
+        ))
     else:
         # NOTE: request.POST is messed up because expect_json
-        # cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        # cloned_request.POST.copy() is creating a defective entry w/ the whole
+        # payload as the key
         request_body = json.loads(request.body)
         # Whether or not to filter the tabs key out of the settings metadata
         filter_tabs = True
 
-        # Check to see if the user instantiated any advanced components. This is a hack
-        # that does the following :
-        #   1) adds/removes the open ended panel tab to a course automatically if the user
-        #   has indicated that they want to edit the combinedopendended or peergrading module
-        #   2) adds/removes the notes panel tab to a course automatically if the user has
-        #   indicated that they want the notes module enabled in their course
+        # Check to see if the user instantiated any advanced components. This
+        # is a hack that does the following :
+        #   1) adds/removes the open ended panel tab to a course automatically
+        #   if the user has indicated that they want to edit the
+        #   combinedopendended or peergrading module
+        #   2) adds/removes the notes panel tab to a course automatically if
+        #   the user has indicated that they want the notes module enabled in
+        #   their course
         # TODO refactor the above into distinct advanced policy settings
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
             # Get the course so that we can scrape current tabs
@@ -389,19 +448,25 @@ def course_advanced_updates(request, org, course, name):
                 'notes': NOTE_COMPONENT_TYPES,
             }
 
-            # Check to see if the user instantiated any notes or open ended components
+            # Check to see if the user instantiated any notes or open ended
+            # components
             for tab_type in tab_component_map.keys():
                 component_types = tab_component_map.get(tab_type)
                 found_ac_type = False
                 for ac_type in component_types:
                     if ac_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
                         # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                        # If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                        changed, new_tabs = add_extra_panel_tab(
+                            tab_type,
+                            course_module
+                        )
+                        # If a tab has been added to the course, then send the
+                        # metadata along to CourseMetadata.update_from_json
                         if changed:
                             course_module.tabs = new_tabs
                             request_body.update({'tabs': new_tabs})
-                            # Indicate that tabs should not be filtered out of the metadata
+                            # Indicate that tabs should not be filtered out of
+                            # the metadata
                             filter_tabs = False
                         # Set this flag to avoid the tab removal code below.
                         found_ac_type = True
@@ -410,18 +475,26 @@ def course_advanced_updates(request, org, course, name):
                 # we may need to remove the tab from the course.
                 if not found_ac_type:
                     # Remove tab from the course if needed
-                    changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+                    changed, new_tabs = remove_extra_panel_tab(
+                        tab_type, course_module
+                    )
                     if changed:
                         course_module.tabs = new_tabs
                         request_body.update({'tabs': new_tabs})
-                        # Indicate that tabs should *not* be filtered out of the metadata
+                        # Indicate that tabs should *not* be filtered out of
+                        # the metadata
                         filter_tabs = False
         try:
-            return JsonResponse(CourseMetadata.update_from_json(location,
-                                                                request_body,
-                                                                filter_tabs=filter_tabs))
+            return JsonResponse(CourseMetadata.update_from_json(
+                location,
+                request_body,
+                filter_tabs=filter_tabs
+            ))
         except (TypeError, ValueError) as err:
-            return HttpResponseBadRequest("Incorrect setting format. " + str(err), content_type="text/plain")
+            return HttpResponseBadRequest(
+                "Incorrect setting format. " + str(err),
+                content_type="text/plain"
+            )
 
 
 class TextbookValidationError(Exception):
@@ -498,7 +571,8 @@ def textbook_index(request, org, course, name):
     if request.is_ajax():
         if request.method == 'GET':
             return JsonResponse(course_module.pdf_textbooks)
-        elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+        # can be either and sometimes django is rewriting one to the other:
+        elif request.method in ('POST', 'PUT'):
             try:
                 textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as err:
@@ -517,7 +591,10 @@ def textbook_index(request, org, course, name):
             # Save the data that we've just changed to the underlying
             # MongoKeyValueStore before we update the mongo datastore.
             course_module.save()
-            store.update_metadata(course_module.location, own_metadata(course_module))
+            store.update_metadata(
+                course_module.location,
+                own_metadata(course_module)
+            )
             return JsonResponse(course_module.pdf_textbooks)
     else:
         upload_asset_url = reverse('upload_asset', kwargs={
@@ -599,7 +676,8 @@ def textbook_by_id(request, org, course, name, tid):
         if not textbook:
             return JsonResponse(status=404)
         return JsonResponse(textbook)
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+    elif request.method in ('POST', 'PUT'):  # can be either and sometimes
+                                        # django is rewriting one to the other
         try:
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as err:
@@ -616,7 +694,10 @@ def textbook_by_id(request, org, course, name, tid):
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         course_module.save()
-        store.update_metadata(course_module.location, own_metadata(course_module))
+        store.update_metadata(
+            course_module.location,
+            own_metadata(course_module)
+        )
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
         if not textbook:
@@ -626,5 +707,8 @@ def textbook_by_id(request, org, course, name, tid):
         new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
         course_module.pdf_textbooks = new_textbooks
         course_module.save()
-        store.update_metadata(course_module.location, own_metadata(course_module))
+        store.update_metadata(
+            course_module.location,
+            own_metadata(course_module)
+        )
         return JsonResponse()

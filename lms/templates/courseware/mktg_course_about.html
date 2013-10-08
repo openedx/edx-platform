@@ -10,7 +10,7 @@
 
 <%block name="title"><title>${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
 
-<%block name="bodyclass">view-partial-mktgregister</%block>
+<%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
 
 <%block name="headextra">
@@ -27,7 +27,12 @@
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
-        window.top.location.href = "${reverse('dashboard')}";
+        if (xhr.responseText != "") {
+          window.top.location.href = xhr.responseText;
+        }
+        else {
+          window.top.location.href = "${reverse('dashboard')}";
+        }
       } else if (xhr.status == 403) {
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
@@ -52,7 +57,13 @@
             <div class="action is-registered">${_("You Are Registered")}</div>
           %endif
         %elif allow_registration:
-          <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong></a>
+        <a class="action action-register register ${'has-option-verified' if len(course_modes) > 1 else ''}" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong>
+            %if len(course_modes) > 1:
+            <span class="track">
+            and choose your student track
+            </span>
+            %endif
+        </a>
         %else:
           <div class="action registration-closed is-disabled">${_("Registration Is Closed")}</div>
         %endif

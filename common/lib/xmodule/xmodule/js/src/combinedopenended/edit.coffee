@@ -63,6 +63,8 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
     else
       @createXMLEditor()
 
+    @alertTaskRubricModification()
+
   ###
   Creates the XML Editor and sets it as the current editor. If text is passed in,
   it will replace the text present in the HTML template.
@@ -93,6 +95,8 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
       # Hide markdown-specific toolbar buttons
       $(@element.find('.editor-bar')).hide()
 
+  alertTaskRubricModification: ->
+    return alert("Before you edit, please note that if you alter the tasks block or the rubric block of this question after students have submitted responses, it may result in their responses and grades being deleted!  Use caution when altering problems that have already been released to students.")
   ###
   Have the user confirm the one-way conversion to XML.
   Returns true if the user clicked OK, else false.

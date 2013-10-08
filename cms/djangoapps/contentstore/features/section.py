@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 
 ############### ACTIONS ####################
 

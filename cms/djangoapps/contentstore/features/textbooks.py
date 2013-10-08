@@ -3,7 +3,8 @@
 
 from lettuce import world, step
 from django.conf import settings
-import os
+from common import upload_file
+from nose.tools import assert_equal
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -24,14 +25,8 @@ def assert_create_new_textbook_msg(_step):
 
 
 @step(u'I upload the textbook "([^"]*)"$')
-def upload_file(_step, file_name):
-    file_css = '.upload-dialog input[type=file]'
-    upload = world.css_find(file_css)
-    # uploading the file itself
-    path = os.path.join(TEST_ROOT, 'uploads', file_name)
-    upload._element.send_keys(os.path.abspath(path))
-    button_css = ".upload-dialog .action-upload"
-    world.css_click(button_css)
+def upload_textbook(_step, file_name):
+    upload_file(file_name)
 
 
 @step(u'I click (on )?the New Textbook button')
@@ -88,20 +83,23 @@ def save_textbook(_step):
 
 @step(u'I should see a textbook named "([^"]*)" with a chapter path containing "([^"]*)"')
 def check_textbook(_step, textbook_name, chapter_name):
-    title = world.css_find(".textbook h3.textbook-title")
-    chapter = world.css_find(".textbook .wrap-textbook p")
-    assert title.text == textbook_name, "{} != {}".format(title.text, textbook_name)
-    assert chapter.text == chapter_name, "{} != {}".format(chapter.text, chapter_name)
+    title = world.css_text(".textbook h3.textbook-title", index=0)
+    chapter = world.css_text(".textbook .wrap-textbook p", index=0)
+    assert_equal(title, textbook_name)
+    assert_equal(chapter, chapter_name)
 
 
 @step(u'I should see a textbook named "([^"]*)" with (\d+) chapters')
 def check_textbook_chapters(_step, textbook_name, num_chapters_str):
     num_chapters = int(num_chapters_str)
-    title = world.css_find(".textbook .view-textbook h3.textbook-title")
-    toggle = world.css_find(".textbook .view-textbook .chapter-toggle")
-    assert title.text == textbook_name, "{} != {}".format(title.text, textbook_name)
-    assert toggle.text == "{num} PDF Chapters".format(num=num_chapters), \
-        "Expected {num} chapters, found {real}".format(num=num_chapters, real=toggle.text)
+    title = world.css_text(".textbook .view-textbook h3.textbook-title", index=0)
+    toggle_text = world.css_text(".textbook .view-textbook .chapter-toggle", index=0)
+    assert_equal(title, textbook_name)
+    assert_equal(
+        toggle_text,
+        "{num} PDF Chapters".format(num=num_chapters),
+        "Expected {num} chapters, found {real}".format(num=num_chapters, real=toggle_text)
+    )
 
 
 @step(u'I click the textbook chapters')

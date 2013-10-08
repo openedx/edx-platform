@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches
+from nose.tools import assert_false, assert_equal, assert_regexp_matches  # pylint: disable=E0611
 from common import type_in_codemirror, press_the_notification_button
 
 KEY_CSS = '.key input.policy-key'
@@ -11,12 +11,16 @@ DISPLAY_NAME_KEY = "display_name"
 DISPLAY_NAME_VALUE = '"Robot Super Course"'
 
 
-############### ACTIONS ####################
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-advanced a'
     world.css_click(link_css)
+    world.wait_for_requirejs(
+        ["jquery", "js/models/course", "js/models/settings/advanced",
+         "js/views/settings/advanced", "codemirror"])
+    # this shouldn't be necessary, but we experience sporadic failures otherwise
+    world.wait(1)
 
 
 @step('I am on the Advanced Course Settings page in Studio$')
@@ -45,7 +49,6 @@ def create_value_not_in_quotes(step):
     change_display_name_value(step, 'quote me')
 
 
-############### RESULTS ####################
 @step('I see default advanced settings$')
 def i_see_default_advanced_settings(step):
     # Test only a few of the existing properties (there are around 34 of them)
@@ -88,12 +91,15 @@ def the_policy_key_value_is_changed(step):
     assert_equal(get_display_name_value(), '"foo"')
 
 
-############# HELPERS ###############
 def assert_policy_entries(expected_keys, expected_values):
     for key, value in zip(expected_keys, expected_values):
         index = get_index_of(key)
         assert_false(index == -1, "Could not find key: {key}".format(key=key))
-        assert_equal(value, world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+        found_value = world.css_find(VALUE_CSS)[index].value
+        assert_equal(
+            value, found_value,
+            "Expected {} to have value {} but found {}".format(key, value, found_value)
+        )
 
 
 def get_index_of(expected_key):
@@ -117,4 +123,6 @@ def change_display_name_value(step, new_value):
 
 def change_value(step, key, new_value):
     type_in_codemirror(get_index_of(key), new_value)
+    world.wait(0.5)
     press_the_notification_button(step, "Save")
+    world.wait_for_ajax_complete()

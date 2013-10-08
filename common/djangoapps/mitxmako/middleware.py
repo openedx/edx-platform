@@ -12,39 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from mako.lookup import TemplateLookup
-import tempdir
+from dealer.git import git
 from django.template import RequestContext
-from django.conf import settings
-
 requestcontext = None
-lookup = {}
 
 
 class MakoMiddleware(object):
-    def __init__(self):
-        """Setup mako variables and lookup object"""
-        # Set all mako variables based on django settings
-        template_locations = settings.MAKO_TEMPLATES
-        module_directory = getattr(settings, 'MAKO_MODULE_DIR', None)
-
-        if module_directory is None:
-            module_directory = tempdir.mkdtemp_clean()
-
-        for location in template_locations:
-            lookup[location] = TemplateLookup(directories=template_locations[location],
-                                module_directory=module_directory,
-                                output_encoding='utf-8',
-                                input_encoding='utf-8',
-                                default_filters=['decode.utf8'],
-                                encoding_errors='replace',
-                                )
-
-        import mitxmako
-        mitxmako.lookup = lookup
 
     def process_request(self, request):
         global requestcontext
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
         requestcontext['site'] = request.get_host()
+        requestcontext['REVISION'] = git.revision

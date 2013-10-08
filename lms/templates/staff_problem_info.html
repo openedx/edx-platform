@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 ## The JS for this is defined in xqa_interface.html
-${module_content}
+${block_content}
 %if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool']:
 %  if edit_link:
 <div>
@@ -56,12 +56,6 @@ location = ${location | h}
 <table>
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
-  %endfor
-</table>
-<table>
-  <tr><th>${_('{platform_name} Fields').format(platform_name=settings.PLATFORM_NAME)}</th></tr>
-  %for name, field in lms_fields:
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>

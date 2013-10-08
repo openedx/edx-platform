@@ -1,2 +1,8 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @jtauber - to check licensing
+#   * One of @e0d, @jarv, or @feanil - to check system requirements
+
 # This must be installed after distribute has been updated.
 MySQL-python==1.2.4
