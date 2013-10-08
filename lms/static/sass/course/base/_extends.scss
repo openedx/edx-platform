@@ -22,6 +22,12 @@ h1.top-header {
   font-size: em(13);
 }
 
+.primary-button {
+  @include button(simple, $link-color);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
 .blue-button {
   @include button(simple, $blue);
   @extend .button-reset;

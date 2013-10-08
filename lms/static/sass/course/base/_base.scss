@@ -91,6 +91,11 @@ button,
 .button {
   @extend .gray-button;
 
+  &.primary-button,
+  &.primary-button:hover {
+    @extend .primary-button;
+  }
+  
   form & {
     @extend .gray-button;
   }
