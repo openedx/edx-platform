@@ -416,32 +416,26 @@ class LoncapaProblem(object):
     
     def shuffled_tree(self, tree):
         """
-        Returns a tree modified to reflect multiple-choice shuffling.
+        Implements the shuffling of the tree if needed.
+        Returns a new, shuffled tree if shuffling was required, or None.
+        The caller needs to distinguish these cases to update data structures
+        to match the new tree.
         """
         # TBD: logic to decide if we shuffle
         # TBD: integrate with the "seed" .. maybe need to fix that to change sometimes
         # Q: not sure about multiple choicegroups in the tree .. what is that?
         # Q: could take tree param, or use self.tree as starting point
+        if not tree.xpath('//choicegroup[@shuffle="true"]'):
+            return None
         shuffled = deepcopy(tree)
-        for choicegroup in shuffled.xpath('//choicegroup'):
-            #ipdb.set_trace()
-            if choicegroup.get('shuffle') == 'true':
-                #print(choicegroup.getchildren())
-                # grab out to python list for general manipulation
-                ordering = list(choicegroup.getchildren())
-                # remove all from parent
-                for choice in ordering:
-                    choicegroup.remove(choice)
-                # the last shall be first .. our test shuffle
-                #last = ordering.pop(-1)
-                #ordering.insert(0, last)
-                #print(ordering)
-                ordering = self.shuffle_choices(ordering)
-                for choice in ordering:
-                    choicegroup.append(choice)
-                
-            #print(choicegroup.getchildren())
-            #ipdb.set_trace()
+        for choicegroup in shuffled.xpath('//choicegroup[@shuffle="true"]'):
+            ordering = list(choicegroup.getchildren())
+            # remove all from parent
+            for choice in ordering:
+                choicegroup.remove(choice)
+            ordering = self.shuffle_choices(ordering)
+            for choice in ordering:
+                choicegroup.append(choice)
         return shuffled
 
     def get_html(self):
@@ -450,9 +444,14 @@ class LoncapaProblem(object):
         '''
         #import ipdb
         #ipdb.set_trace()
-        shuffled = self.tree
         shuffled = self.shuffled_tree(self.tree)
-        html = contextualize_text(etree.tostring(self._extract_html(shuffled)), self.context)
+        if shuffled:  # shuffling happened
+            process_this = shuffled
+            self._preprocess_problem(process_this)
+        else:
+            process_this = self.tree
+        html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
+        self._preprocess_problem(self.tree)  # switch the preprocess state back to the regular tree
         return html
 
     def handle_input_ajax(self, data):

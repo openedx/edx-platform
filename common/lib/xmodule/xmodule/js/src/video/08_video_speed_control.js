@@ -265,7 +265,6 @@ function () {
 
     function changeVideoSpeed(event) {
         var parentEl = $(event.target).parent();
-        console.log('bleh bleh');
 
         event.preventDefault();
 
