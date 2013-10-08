@@ -29,6 +29,8 @@ $(function () {
         barGraphOpened.scale.stackColor.range(["#555555","#555555"]);
         
         barGraphOpened.drawGraph();
+        
+        $('svg').siblings('.loading').remove();
       }
 
       i+=1;
@@ -57,10 +59,12 @@ $(function () {
         barGraphGrade.legend.width += 2;
         
         barGraphGrade.drawGraph();
+        
+        $('svg').siblings('.loading').remove();
       }
 
       i+=1;
     }
   });
-
+  
 });

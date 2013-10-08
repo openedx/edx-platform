@@ -8,6 +8,7 @@
     width: 100%;
     float: left;
     clear: both;
+    margin-top: 25px;
 }
 .metrics-left {
     position: relative;
@@ -35,6 +36,22 @@
     fill: white;
 }
 
+p.loading {
+  padding-top: 100px;
+  text-align: center;
+}
+
+p.nothing {
+  padding-top: 25px;
+}
+
+h3.attention {
+  padding: 10px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  margin-top: 25px;
+}
+
 </style>
 
   %if not any (section_data.values()):
@@ -48,6 +65,8 @@
     </script>
 
     <div id="metrics"></div>
+    
+    <h3 class="attention">Loading the latest graphs for you; depending on your class size, this may take a few minutes.</h3>
 
     %for i in range(0,len(section_data['sub_section_display_name'])):
       <div class="metrics-container" id="metrics_section_${i}">
@@ -55,11 +74,14 @@
         <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
         <div class="metrics-left" id="metric_opened_${i}">
           <h3>Count of Students Opened a Subsection</h3>
+          <p class="loading"><i class="icon-spinner icon-spin icon-large"></i> Loading...</p>
         </div>
         <div class="metrics-right" id="metric_grade_${i}">
           <h3>Grade Distribution per Problem</h3>
           %if not section_data['section_has_problem'][i]:
-            <p>${_("There are no problems in this section.")}</p>
+            <p class="nothing">${_("There are no problems in this section.")}</p>
+          %else:
+            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i> Loading...</p>
           %endif
         </div>
       </div>
