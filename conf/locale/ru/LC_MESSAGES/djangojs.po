@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-01 19:32+0400\n"
+"POT-Creation-Date: 2013-10-08 14:49+0400\n"
 "PO-Revision-Date: 2013-10-08 12:21+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
@@ -556,6 +556,37 @@ msgstr "Скрыть дискуссии"
 #: common/static/coffee/src/discussion/discussion_module_view.js:84
 msgid "Show Discussion"
 msgstr "Показать дискуссии"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:88
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:156
+msgid "Misuse Reported"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:92
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:160
+msgid "Report Misuse"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:100
+msgid "Pinned"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:104
+msgid "Pin Thread"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:218
+msgid "Pinning not currently available"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js:54
+msgid "anonymous"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js:70
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:70
+msgid "staff"
+msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js:45
 #, c-format

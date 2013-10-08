@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-07 19:40+0400\n"
+"POT-Creation-Date: 2013-10-08 14:49+0400\n"
 "PO-Revision-Date: 2013-10-08 12:28+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -3087,6 +3087,25 @@ msgstr "Выбрано неправильное количество."
 msgid "No selected price or selected price is too low."
 msgstr ""
 
+#: common/djangoapps/django_comment_common/models.py:16
+msgid "Administrator"
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py:17
+#, fuzzy
+msgid "Moderator"
+msgstr "Добавить модератора"
+
+#: common/djangoapps/django_comment_common/models.py:18
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:134
+msgid "Community TA"
+msgstr "Общественные ассистенты преподавателя"
+
+#: common/djangoapps/django_comment_common/models.py:19
+#, fuzzy
+msgid "Student"
+msgstr "Студенты"
+
 #: common/djangoapps/student/models.py:93
 msgid "Master's or professional degree"
 msgstr "Магистр"
@@ -4147,270 +4166,270 @@ msgstr "Аналитика"
 msgid "Course Statistics At A Glance"
 msgstr "Обзор статистики курса"
 
-#: lms/djangoapps/instructor/views/legacy.py:202
+#: lms/djangoapps/instructor/views/legacy.py:203
 msgid "Couldn't find student with that email or username."
 msgstr ""
 "Невозможно найти студента с таким почтовым адресом или именем пользователя"
 
-#: lms/djangoapps/instructor/views/legacy.py:240
+#: lms/djangoapps/instructor/views/legacy.py:241
 msgid "List of students enrolled in {0}"
 msgstr "Список студентов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:246
+#: lms/djangoapps/instructor/views/legacy.py:247
 msgid "Summary Grades of students enrolled in {0}"
 msgstr "Общие оценки студентов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:253
+#: lms/djangoapps/instructor/views/legacy.py:254
 msgid "Raw Grades of students enrolled in {0}"
 msgstr "Сырые оценки студетнов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:281
+#: lms/djangoapps/instructor/views/legacy.py:282
 msgid "Failed to create a background task for rescoring \"{0}\"."
 msgstr "Ошибка создания теневого задания для переоценки \"{0}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:285
+#: lms/djangoapps/instructor/views/legacy.py:286
 msgid ""
 "Failed to create a background task for rescoring \"{0}\": problem not found."
 msgstr ""
 "Ошибка создания теневого задания для переоценки \"{0}\": задача не найдена."
 
-#: lms/djangoapps/instructor/views/legacy.py:288
+#: lms/djangoapps/instructor/views/legacy.py:289
 msgid "Failed to create a background task for rescoring \"{url}\": {message}."
 msgstr "Ошибка создания теневого задания для переоценки \"{url}\": {message}."
 
-#: lms/djangoapps/instructor/views/legacy.py:296
+#: lms/djangoapps/instructor/views/legacy.py:297
 msgid "Failed to create a background task for resetting \"{0}\"."
 msgstr "Ошибка создания теневого задания для сброса \"{0}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:301
+#: lms/djangoapps/instructor/views/legacy.py:302
 msgid ""
 "Failed to create a background task for resetting \"{0}\": problem not found."
 msgstr ""
 "\"Ошибка создания теневого задания для сброса \"{0}\": задача не найдена.\""
 
-#: lms/djangoapps/instructor/views/legacy.py:304
+#: lms/djangoapps/instructor/views/legacy.py:305
 msgid "Failed to create a background task for resetting \"{url}\": {message}."
 msgstr "Ошибка создания теневого задания для сброса \"{url}\": {message}."
 
-#: lms/djangoapps/instructor/views/legacy.py:345
+#: lms/djangoapps/instructor/views/legacy.py:346
 msgid "Found module.  "
 msgstr "Найден модуль.   "
 
-#: lms/djangoapps/instructor/views/legacy.py:347
+#: lms/djangoapps/instructor/views/legacy.py:348
 msgid "Couldn't find module with that urlname: {0}. "
 msgstr "Невозможно найти модуль с таким адресом: {0}."
 
-#: lms/djangoapps/instructor/views/legacy.py:358
+#: lms/djangoapps/instructor/views/legacy.py:359
 msgid "Deleted student module state for {0}!"
 msgstr "Удалить состояние студента для модуля {0}!"
 
-#: lms/djangoapps/instructor/views/legacy.py:371
+#: lms/djangoapps/instructor/views/legacy.py:372
 msgid "Failed to delete module state for {id}/{url}. "
 msgstr "Ошибка удаления состояния модуля для {id}/{url}. "
 
-#: lms/djangoapps/instructor/views/legacy.py:394
+#: lms/djangoapps/instructor/views/legacy.py:395
 msgid "Module state successfully reset!"
 msgstr "Состояния модуля успешно сброшено!"
 
-#: lms/djangoapps/instructor/views/legacy.py:396
+#: lms/djangoapps/instructor/views/legacy.py:397
 msgid "Couldn't reset module state for {id}/{url}. "
 msgstr "Невозможно сбросить состояние модуля для {id}/{url}. "
 
-#: lms/djangoapps/instructor/views/legacy.py:406
+#: lms/djangoapps/instructor/views/legacy.py:407
 msgid ""
 "Failed to create a background task for rescoring \"{key}\" for student {id}."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:410
+#: lms/djangoapps/instructor/views/legacy.py:411
 msgid "Failed to create a background task for rescoring \"{key}\": {id}."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:424
+#: lms/djangoapps/instructor/views/legacy.py:425
 msgid "Progress page for username: {1} with email address: {2}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:438
+#: lms/djangoapps/instructor/views/legacy.py:439
 msgid "Assignment Name"
 msgstr "Название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:462
+#: lms/djangoapps/instructor/views/legacy.py:463
 msgid "Please enter an assignment name"
 msgstr "Введите название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:466
+#: lms/djangoapps/instructor/views/legacy.py:467
 #, python-format
 msgid "Invalid assignment name '%s'"
 msgstr "Неправильное название задания '%s'"
 
-#: lms/djangoapps/instructor/views/legacy.py:469
-#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/djangoapps/instructor/views/legacy.py:470
+#: lms/djangoapps/instructor/views/legacy.py:1093
 msgid "External email"
 msgstr "Внешний почтовый адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:471
+#: lms/djangoapps/instructor/views/legacy.py:472
 #, python-format
 msgid "Grades for assignment \"%s\""
 msgstr "Оценки для задания \"%s\""
 
-#: lms/djangoapps/instructor/views/legacy.py:490
+#: lms/djangoapps/instructor/views/legacy.py:491
 msgid "Staff group = {0}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:491
+#: lms/djangoapps/instructor/views/legacy.py:492
 msgid "List of Staff"
 msgstr "Список преподавателей"
 
-#: lms/djangoapps/instructor/views/legacy.py:496
+#: lms/djangoapps/instructor/views/legacy.py:497
 msgid "Instructor group = {0}"
 msgstr "Инструктор group = {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:499
-#: lms/djangoapps/instructor/views/legacy.py:925
-#: lms/djangoapps/instructor/views/legacy.py:999
-#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/djangoapps/instructor/views/legacy.py:500
+#: lms/djangoapps/instructor/views/legacy.py:926
+#: lms/djangoapps/instructor/views/legacy.py:1000
+#: lms/djangoapps/instructor/views/legacy.py:1093
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: lms/djangoapps/instructor/views/legacy.py:499
-#: lms/djangoapps/instructor/views/legacy.py:925
-#: lms/djangoapps/instructor/views/legacy.py:999
+#: lms/djangoapps/instructor/views/legacy.py:500
+#: lms/djangoapps/instructor/views/legacy.py:926
+#: lms/djangoapps/instructor/views/legacy.py:1000
 msgid "Full name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:501
+#: lms/djangoapps/instructor/views/legacy.py:502
 msgid "List of Instructors in course {0}"
 msgstr "Список инструкторов курса {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:514
-#: lms/djangoapps/instructor/views/legacy.py:533
-#: lms/djangoapps/instructor/views/legacy.py:955
+#: lms/djangoapps/instructor/views/legacy.py:515
+#: lms/djangoapps/instructor/views/legacy.py:534
+#: lms/djangoapps/instructor/views/legacy.py:956
 msgid "Error: unknown username \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:518
+#: lms/djangoapps/instructor/views/legacy.py:519
 msgid "Added {user} to instructor group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:537
+#: lms/djangoapps/instructor/views/legacy.py:538
 msgid "Removed {user} from instructor group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:559
+#: lms/djangoapps/instructor/views/legacy.py:560
 #, python-format
 msgid "Student profile data for course %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:573
+#: lms/djangoapps/instructor/views/legacy.py:574
 #, python-format
 msgid "Found %d records to dump "
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:575
+#: lms/djangoapps/instructor/views/legacy.py:576
 msgid "Couldn't find module with that urlname."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:582
+#: lms/djangoapps/instructor/views/legacy.py:583
 #, python-format
 msgid "Student state for problem %s"
 msgstr "Удалить состояние студента для задания %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:599
+#: lms/djangoapps/instructor/views/legacy.py:600
 msgid "Beta test group = {0}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:600
+#: lms/djangoapps/instructor/views/legacy.py:601
 msgid "List of beta_testers"
 msgstr "Список бета-тестеров"
 
-#: lms/djangoapps/instructor/views/legacy.py:738
+#: lms/djangoapps/instructor/views/legacy.py:739
 msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "public classes (~10k), it may take 1-2 hours to send all emails."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:740
+#: lms/djangoapps/instructor/views/legacy.py:741
 msgid "Your email was successfully queued for sending."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:872
+#: lms/djangoapps/instructor/views/legacy.py:873
 msgid "No remote gradebook defined in course metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:877
+#: lms/djangoapps/instructor/views/legacy.py:878
 msgid "No remote gradebook url defined in settings.MITX_FEATURES"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:882
+#: lms/djangoapps/instructor/views/legacy.py:883
 msgid "No gradebook name defined in course remote_gradebook metadata"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py:894
-#, python-format
-msgid "Failed to communicate with gradebook server at %s<br/>"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py:895
 #, python-format
+msgid "Failed to communicate with gradebook server at %s<br/>"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:896
+#, python-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:906
+#: lms/djangoapps/instructor/views/legacy.py:907
 #, python-format
 msgid "Remote gradebook response for %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:925
+#: lms/djangoapps/instructor/views/legacy.py:926
 msgid "Roles"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:926
+#: lms/djangoapps/instructor/views/legacy.py:927
 msgid "List of Forum {name}s in course {id}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:931
-#: lms/djangoapps/instructor/views/legacy.py:959
+#: lms/djangoapps/instructor/views/legacy.py:932
+#: lms/djangoapps/instructor/views/legacy.py:960
 msgid "Error: unknown rolename \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:967
+#: lms/djangoapps/instructor/views/legacy.py:968
 msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:970
+#: lms/djangoapps/instructor/views/legacy.py:971
 msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:973
+#: lms/djangoapps/instructor/views/legacy.py:974
 msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:976
+#: lms/djangoapps/instructor/views/legacy.py:977
 msgid ""
 "Error: user \"{0}\" should first be added as staff before adding as a forum "
 "administrator, cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:979
+#: lms/djangoapps/instructor/views/legacy.py:980
 msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1001
+#: lms/djangoapps/instructor/views/legacy.py:1002
 msgid "{0} in course {1}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1018
+#: lms/djangoapps/instructor/views/legacy.py:1019
 msgid "Error: unknown username or email \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1024
+#: lms/djangoapps/instructor/views/legacy.py:1025
 msgid "{action} {user} {prep} {title} group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/djangoapps/instructor/views/legacy.py:1093
 msgid "ID"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/djangoapps/instructor/views/legacy.py:1093
 #: lms/templates/dashboard.html:172 lms/templates/register-shib.html:139
 #: lms/templates/register.html:161
 #: lms/templates/verify_student/_modal_editname.html:19
@@ -4418,25 +4437,25 @@ msgstr ""
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:1092
+#: lms/djangoapps/instructor/views/legacy.py:1093
 msgid "edX email"
 msgstr "edX адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:1275
+#: lms/djangoapps/instructor/views/legacy.py:1276
 msgid "Enrollment of students"
 msgstr "Зачислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1348
+#: lms/djangoapps/instructor/views/legacy.py:1349
 msgid "Un-enrollment of students"
 msgstr "Отчислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1534
+#: lms/djangoapps/instructor/views/legacy.py:1535
 msgid ""
 "Failed to find any background tasks for course \"{course}\", module "
 "\"{problem}\" and student \"{student}\"."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1537
+#: lms/djangoapps/instructor/views/legacy.py:1538
 msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
@@ -7810,18 +7829,43 @@ msgstr "Эта нить закрыта."
 msgid "Post a response:"
 msgstr "Отправить ответ:"
 
+#: lms/templates/discussion/_underscore_templates.html:35
+#: lms/templates/discussion/_underscore_templates.html:124
+#, fuzzy
+msgid "vote"
+msgstr "голоса"
+
+#: lms/templates/discussion/_underscore_templates.html:36
+#: lms/templates/discussion/_underscore_templates.html:124
+msgid "votes (click to vote)"
+msgstr ""
+
 #: lms/templates/discussion/_underscore_templates.html:45
 msgid "&bull; This thread is closed."
 msgstr "&bull; Эта нить закрыта."
 
+#: lms/templates/discussion/_underscore_templates.html:51
 #: lms/templates/discussion/_underscore_templates.html:52
+#: lms/templates/discussion/_underscore_templates.html:132
+#: lms/templates/discussion/_underscore_templates.html:133
+#: lms/templates/discussion/_underscore_templates.html:157
 msgid "Report Misuse"
 msgstr "Уведомить о неправильном использовании"
+
+#: lms/templates/discussion/_underscore_templates.html:56
+#: lms/templates/discussion/_underscore_templates.html:61
+#, fuzzy
+msgid "pin this thread"
+msgstr "Прикрепить нить"
 
 #: lms/templates/discussion/_underscore_templates.html:57
 #: lms/templates/discussion/_underscore_templates.html:62
 msgid "Pin Thread"
 msgstr "Прикрепить нить"
+
+#: lms/templates/discussion/_underscore_templates.html:69
+msgid "this post is about "
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html:76
 #: lms/templates/discussion/_underscore_templates.html:138
@@ -7845,6 +7889,15 @@ msgstr "Обновить сообщение"
 #, fuzzy
 msgid "Add a comment"
 msgstr "Добавить комментарий"
+
+#: lms/templates/discussion/_underscore_templates.html:112
+#, fuzzy
+msgid "Add a comment..."
+msgstr "Добавить комментарий"
+
+#: lms/templates/discussion/_underscore_templates.html:125
+msgid "endorse"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html:144
 msgid "Editing response"
@@ -8235,10 +8288,6 @@ msgid ""
 msgstr ""
 "АП форумного общества - это члены общества, которые вам кажутся особенно "
 "полезными на форумах."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:134
-msgid "Community TA"
-msgstr "Общественные ассистенты преподавателя"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:5
 msgid "Student-specific grade adjustment"
