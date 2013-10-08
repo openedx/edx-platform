@@ -87,11 +87,11 @@ def increment_subtask_status(subtask_result, succeeded=0, failed=0, skipped=0, r
     return new_result
 
 
-def _get_retry_count(subtask_result):
-    """Return the number of retries counted for the given subtask."""
-    retry_count = subtask_result.get('retried_nomax', 0)
-    retry_count += subtask_result.get('retried_withmax', 0)
-    return retry_count
+# def _get_retry_count(subtask_result):
+#     """Return the number of retries counted for the given subtask."""
+#     retry_count = subtask_result.get('retried_nomax', 0)
+#     retry_count += subtask_result.get('retried_withmax', 0)
+#     return retry_count
 
 
 def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_id_list):
@@ -196,34 +196,8 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
             TASK_LOG.warning(msg)
             raise ValueError(msg)
 
-        # Check for race condition where a subtask which has been retried
-        # has the retry already write its results here before the code
-        # that was invoking the retry has had a chance to update this status.
-        # While we think this is highly unlikely in production code, it is
-        # the norm in "eager" mode (used by tests) where the retry is called
-        # and run to completion before control is returned to the code that
-        # invoked the retry.
-        current_subtask_status = subtask_status_info[current_task_id]
-        current_retry_count = _get_retry_count(current_subtask_status)
-        new_retry_count = _get_retry_count(new_subtask_status)
-        if current_retry_count > new_retry_count:
-            TASK_LOG.warning("Task id %s: Retry %s has already updated InstructorTask -- skipping update for retry %s.",
-                             current_task_id, current_retry_count, new_retry_count)
-            transaction.rollback()
-            return
-        elif new_retry_count > 0:
-            TASK_LOG.debug("Task id %s: previous retry %s is not newer -- applying update for retry %s.",
-                           current_task_id, current_retry_count, new_retry_count)
-
-        # Update status unless it has already been set.  This can happen
-        # when a task is retried and running in eager mode -- the retries
-        # will be updating before the original call, and we don't want their
-        # ultimate status to be clobbered by the "earlier" updates.  This
-        # should not be a problem in normal (non-eager) processing.
-        current_state = current_subtask_status['state']
-        new_state = new_subtask_status['state']
-        if new_state != RETRY or current_state not in READY_STATES:
-            subtask_status_info[current_task_id] = new_subtask_status
+        # Update status:
+        subtask_status_info[current_task_id] = new_subtask_status
 
         # Update the parent task progress.
         # Set the estimate of duration, but only if it
@@ -239,6 +213,7 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
         # In future, we can make this more responsive by updating status
         # between retries, by comparing counts that change from previous
         # retry.
+        new_state = new_subtask_status['state']
         if new_subtask_status is not None and new_state in READY_STATES:
             for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
                 task_progress[statname] += new_subtask_status[statname]
