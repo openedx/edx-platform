@@ -11,7 +11,7 @@ from pymongo.errors import PyMongoError
 from track.backends import BaseBackend
 
 
-log = logging.getLogger('track.backends.mongodb')
+log = logging.getLogger(__name__)
 
 
 class MongoBackend(BaseBackend):
@@ -64,14 +64,17 @@ class MongoBackend(BaseBackend):
             **extra
         )
 
-        self.collection = self.connection[db_name][collection_name]
+        database = self.connection[db_name]
 
         if user or password:
-            self.collection.database.authenticate(user, password)
+            database.authenticate(user, password)
+
+        self.collection = database[collection_name]
 
         self._create_indexes()
 
     def _create_indexes(self):
+        """Ensures the proper fields are indexed"""
         # WARNING: The collection will be locked during the index
         # creation. If the collection has a large number of
         # documents in it, the operation can take a long time.
@@ -83,8 +86,12 @@ class MongoBackend(BaseBackend):
         self.collection.ensure_index('event_type')
 
     def send(self, event):
+        """Insert the event in to the Mongo collection"""
         try:
             self.collection.insert(event, manipulate=False)
         except PyMongoError:
+            # The event will be lost in case of a connection error.
+            # pymongo will re-connect/re-authenticate automatically
+            # during the next event.
             msg = 'Error inserting to MongoDB event tracker backend'
             log.exception(msg)
