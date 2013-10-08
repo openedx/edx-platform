@@ -41,7 +41,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         """
         patch.stopall()
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
