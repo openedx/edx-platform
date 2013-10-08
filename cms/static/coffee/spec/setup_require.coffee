@@ -58,4 +58,4 @@ require =
         "codemirror":
             exports: "CodeMirror"
     # load these automatically
-    deps: ["js/base", "coffee/src/main"]
+    deps: ["jquery", "js/base", "coffee/src/main"]
