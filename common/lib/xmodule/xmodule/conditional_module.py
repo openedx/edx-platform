@@ -10,7 +10,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import Scope, List
+from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -148,7 +148,7 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [child.get_html() for child in self.get_display_items()]
+        html = [self.runtime.render_child(child, None, 'student_view').content for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 

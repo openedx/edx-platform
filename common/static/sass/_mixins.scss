@@ -44,14 +44,14 @@
 // ====================
 
 // extends - UI - used for page/view-level wrappers (for centering/grids)
-.ui-wrapper {
+%ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
   width: 100%;
 }
 
 // extends - UI - window
-.ui-window {
+%ui-window {
   @include clearfix();
   border-radius: 3px;
   box-shadow: 0 1px 1px $shadow-l1;
@@ -61,27 +61,27 @@
 }
 
 // extends - UI - visual link
-.ui-fake-link {
+%ui-fake-link {
   cursor: pointer;
 }
 
 // extends - UI - functional disable
-.ui-disabled {
+%ui-disabled {
   pointer-events: none;
   outline: none;
 }
 
 // extends - UI - depth levels
-.ui-depth0 { z-index: 0; }
-.ui-depth1 { z-index: 10; }
-.ui-depth2 { z-index: 100; }
-.ui-depth3 { z-index: 1000; }
-.ui-depth4 { z-index: 10000; }
-.ui-depth5 { z-index: 100000; }
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
 
 
 // extends - UI - buttons
-.ui-btn {
+%ui-btn {
   @include box-sizing(border-box);
   @include transition(color 0.25s ease-in-out 0s, border-color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s);
   display: inline-block;
@@ -105,18 +105,18 @@
 }
 
 // pill button
-.ui-btn-pill {
+%ui-btn-pill {
   border-radius: ($baseline/5);
 }
 
-.ui-btn-rounded {
+%ui-btn-rounded {
   border-radius: ($baseline/2);
 }
 
 // primary button
-.ui-btn-primary {
-  @extend .ui-btn;
-  @extend .ui-btn-pill;
+%ui-btn-primary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
   padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
@@ -137,9 +137,9 @@
 }
 
 // secondary button
-.ui-btn-secondary {
-  @extend .ui-btn;
-  @extend .ui-btn-pill;
+%ui-btn-secondary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
   border-width: 1px;
   border-style: solid;
   padding:($baseline/2) $baseline;
@@ -156,8 +156,8 @@
   }
 }
 
-.ui-btn-flat-outline {
-  @extend .t-action4;
+%ui-btn-flat-outline {
+  @extend %t-action4;
   @include transition(all .15s);
   font-weight: 600;
   text-align: center;
@@ -183,7 +183,7 @@
 }
 
 // button with no button shell until hover for understated actions
-.ui-btn-non {
+%ui-btn-non {
   @include transition(all .15s);
   border: none;
   border-radius: ($baseline/4);
@@ -198,12 +198,12 @@
   }
 
   span {
-    @extend .cont-text-sr;
+    @extend %cont-text-sr;
   }
 }
 
 // extends - UI archetypes - well
-.ui-well {
+%ui-well {
   box-shadow: inset 0 1px 2px 1px $shadow;
   padding: ($baseline*0.75) $baseline;
 }
@@ -211,7 +211,7 @@
 // ====================
 
 // extends - content - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
-.cont-no-list {
+%cont-no-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -224,14 +224,14 @@
 }
 
 // extends - content - image-replacement hidden text
-.cont-text-hide {
+%cont-text-hide {
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
 }
 
 // extends - content - hidden elems - screenreaders
-.cont-text-sr {
+%cont-text-sr {
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -243,7 +243,7 @@
 }
 
 // extends - content - wrapping
-.cont-text-wrap {
+%cont-text-wrap {
   text-wrap: wrap;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
@@ -251,7 +251,7 @@
 }
 
 // extends - content - text overflow by ellipsis
-.cont-truncated {
+%cont-truncated {
   @include box-sizing(border-box);
   overflow: hidden;
   white-space: nowrap;

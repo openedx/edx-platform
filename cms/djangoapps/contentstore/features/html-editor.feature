@@ -1,4 +1,5 @@
-Feature: HTML Editor
+@shard_3
+Feature: CMS.HTML Editor
   As a course author, I want to be able to create HTML blocks.
 
   Scenario: User can view metadata
@@ -6,6 +7,8 @@ Feature: HTML Editor
     And I edit and select Settings
     Then I see only the HTML display name setting
 
+  # Safari doesn't save the name properly
+  @skip_safari
   Scenario: User can modify display name
     Given I have created a Blank HTML Page
     And I edit and select Settings

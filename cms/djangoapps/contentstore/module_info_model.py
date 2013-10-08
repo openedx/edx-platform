@@ -1,6 +1,5 @@
 from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import Location
 
 
 def get_module_info(store, location, rewrite_static_links=False):
@@ -13,16 +12,12 @@ def get_module_info(store, location, rewrite_static_links=False):
 
     data = module.data
     if rewrite_static_links:
+        # we pass a partially bogus course_id as we don't have the RUN information passed yet
+        # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
         data = replace_static_urls(
             module.data,
             None,
-            course_namespace=Location([
-                module.location.tag,
-                module.location.org,
-                module.location.course,
-                None,
-                None
-            ])
+            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
         )
 
     return {
@@ -69,11 +64,11 @@ def set_module_info(store, location, post_data):
 
             if posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
-                if metadata_key in module._model_data:
-                    del module._model_data[metadata_key]
+                if module._field_data.has(module, metadata_key):
+                    module._field_data.delete(module, metadata_key)
                 del posted_metadata[metadata_key]
             else:
-                module._model_data[metadata_key] = value
+                module._field_data.set(module, metadata_key, value)
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata

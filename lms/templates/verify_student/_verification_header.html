@@ -1,0 +1,21 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<header class="page-header">
+  <h2 class="title">
+    <span class="sts-label">${_("You are registering for")}</span>
+
+    <span class="wrapper-sts">
+      <span class="sts-course">
+        <span class="sts-course-org">${course_org}</span>
+        <span class="sts-course-number">${course_num}</span>
+        <span class="sts-course-name">${course_name}</span>
+      </span>
+
+      <span class="sts-track">
+        <span class="sts-track-value">
+          <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+        </span>
+      </span>
+    </span>
+  </h2>
+</header>

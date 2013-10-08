@@ -11,19 +11,19 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, editable_modulestore
 
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
         Check that a course gets graded properly.
@@ -217,7 +217,8 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         course_data = {'grading_policy': grading_policy}
-        modulestore().update_item(self.course.location, course_data)
+        store = editable_modulestore('direct')
+        store.update_item(self.course.location, course_data)
         self.refresh_course()
 
     def get_grade_summary(self):
@@ -233,14 +234,14 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
                                         kwargs={'course_id': self.course.id}))
 
         return grades.grade(self.student_user, fake_request,
-                            self.course, model_data_cache)
+                            self.course, field_data_cache)
 
     def get_progress_summary(self):
         """
@@ -254,7 +255,7 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
@@ -263,7 +264,7 @@ class TestCourseGrader(TestSubmittingProblems):
         progress_summary = grades.progress_summary(self.student_user,
                                                    fake_request,
                                                    self.course,
-                                                   model_data_cache)
+                                                   field_data_cache)
         return progress_summary
 
     def check_grade_percent(self, percent):

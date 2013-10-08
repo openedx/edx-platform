@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror
 
 DISPLAY_NAME = "Display Name"
@@ -12,7 +12,6 @@ RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
 
 
-############### ACTIONS ####################
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
     world.create_component_instance(
@@ -29,15 +28,15 @@ def i_edit_and_select_settings(step):
     world.edit_component_and_select_settings()
 
 
-@step('I see five alphabetized settings and their expected values$')
-def i_see_five_settings_with_values(step):
+@step('I see the advanced settings and their expected values$')
+def i_see_advanced_settings_with_values(step):
     world.verify_all_setting_entries(
         [
             [DISPLAY_NAME, "Blank Common Problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
-            [SHOW_ANSWER, "Finished", False]
+            [SHOW_ANSWER, "Finished", False],
         ])
 
 
@@ -141,8 +140,9 @@ def set_the_max_attempts(step, max_attempts_set):
     if world.is_firefox():
         world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.save_component_and_reopen(step)
-    value =  int(world.css_value('input.setting-input', index=index))
-    assert value >= 0
+    value = world.css_value('input.setting-input', index=index)
+    assert value != "", "max attempts is blank"
+    assert int(value) >= 0
 
 
 @step('Edit High Level Source is not visible')
@@ -159,7 +159,7 @@ def edit_high_level_source_links_visible(step):
 def cancel_does_not_save_changes(step):
     world.cancel_component(step)
     step.given("I edit and select Settings")
-    step.given("I see five alphabetized settings and their expected values")
+    step.given("I see the advanced settings and their expected values")
 
 
 @step('I have created a LaTeX Problem')
@@ -187,7 +187,7 @@ def high_level_source_persisted(step):
         css_sel = '.problem div>span'
         return world.css_text(css_sel) == 'hi'
 
-    world.wait_for(verify_text)
+    world.wait_for(verify_text, timeout=10)
 
 
 @step('I view the High Level Source I see my changes')
@@ -197,9 +197,20 @@ def high_level_source_in_editor(step):
 
 
 def verify_high_level_source_links(step, visible):
-    assert_equal(visible, world.is_css_present('.launch-latex-compiler'))
+    if visible:
+        assert_true(world.is_css_present('.launch-latex-compiler'),
+                    msg="Expected to find the latex button but it is not present.")
+    else:
+        assert_true(world.is_css_not_present('.launch-latex-compiler'),
+                    msg="Expected not to find the latex button but it is present.")
+
     world.cancel_component(step)
-    assert_equal(visible, world.is_css_present('.upload-button'))
+    if visible:
+        assert_true(world.is_css_present('.upload-button'),
+                    msg="Expected to find the upload button but it is not present.")
+    else:
+        assert_true(world.is_css_not_present('.upload-button'),
+                    msg="Expected not to find the upload button but it is present.")
 
 
 def verify_modified_weight():

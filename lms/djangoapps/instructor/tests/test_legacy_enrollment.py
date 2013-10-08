@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -18,7 +18,7 @@ from django.core import mail
 USER_COUNT = 4
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check Enrollment/Unenrollment with/without auto-enrollment on activation and with/without email notification
@@ -51,7 +51,13 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Run the Un-enroll students command
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student0@test.com student1@test.com'})
+        response = self.client.post(
+            url,
+            {
+                'action': 'Unenroll multiple students',
+                'multiple_students': 'student0@test.com student1@test.com'
+            }
+        )
 
         # Check the page output
         self.assertContains(response, '<td>student0@test.com</td>')
@@ -60,12 +66,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the enrollment table
         user = User.objects.get(email='student0@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
         user = User.objects.get(email='student1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
@@ -96,7 +100,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(1, cea[0].auto_enroll)
 
         # Check there is no enrollment db entry other than for the other students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
+        ce = CourseEnrollment.objects.filter(course_id=course.id, is_active=1)
         self.assertEqual(4, len(ce))
 
         # Create and activate student accounts with same email
@@ -111,12 +115,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check students are enrolled
         user = User.objects.get(email='student1_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
 
         user = User.objects.get(email='student1_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
 
     def test_repeat_enroll(self):
         """
@@ -156,7 +158,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(0, cea[0].auto_enroll)
 
         # Check there is no enrollment db entry other than for the setup instructor and students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
+        ce = CourseEnrollment.objects.filter(course_id=course.id, is_active=1)
         self.assertEqual(4, len(ce))
 
         # Create and activate student accounts with same email
@@ -171,11 +173,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check students are not enrolled
         user = User.objects.get(email='student2_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
+
         user = User.objects.get(email='student2_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
     def test_get_and_clean_student_list(self):
         """
@@ -194,7 +195,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Create activated, but not enrolled, user
-        UserFactory.create(username="student3_0", email="student3_0@test.com", first_name="Jim", last_name="Tester")
+        UserFactory.create(username="student3_0", email="student3_0@test.com")
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
@@ -208,17 +209,37 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been enrolled in MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Jim Tester\n\nYou have been enrolled in MITx/999/Robot_Super_Course at edx.org by a member of the course staff. " +
-                                              "The course should now appear on your edx.org dashboard.\n\n" +
-                                              "To start accessing course materials, please visit https://edx.org/courses/MITx/999/Robot_Super_Course\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to Jim Tester")
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been enrolled in Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Robot Test\n\nYou have been enrolled in Robot Super Course "
+            "at edx.org by a member of the course staff. "
+            "The course should now appear on your edx.org dashboard.\n\n"
+            "To start accessing course materials, please visit "
+            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
+            "----\nThis email was automatically sent from edx.org to Robot Test"
+        )
 
-        self.assertEqual(mail.outbox[1].subject, 'You have been invited to register for MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[1].body, "Dear student,\n\nYou have been invited to join MITx/999/Robot_Super_Course at edx.org by a member of the course staff.\n\n" +
-                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form.\n" +
-                                              "Once you have registered and activated your account, you will see MITx/999/Robot_Super_Course listed on your dashboard.\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to student3_1@test.com")
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[1].body,
+            "Dear student,\n\nYou have been invited to join "
+            "Robot Super Course at edx.org by a member of the "
+            "course staff.\n\n"
+            "To finish your registration, please visit "
+            "https://edx.org/register and fill out the registration form "
+            "making sure to use student3_1@test.com in the E-mail field.\n"
+            "Once you have registered and activated your account, you will "
+            "see Robot Super Course listed on your dashboard.\n\n"
+            "----\nThis email was automatically sent from edx.org to "
+            "student3_1@test.com"
+        )
 
     def test_unenrollment_email_on(self):
         """
@@ -241,11 +262,23 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Student,\n\nYou have been un-enrolled from course MITx/999/Robot_Super_Course by a member of the course staff. " +
-                         "Please disregard the invitation previously sent.\n\n" +
-                         "----\nThis email was automatically sent from edx.org to student4_0@test.com")
-        self.assertEqual(mail.outbox[1].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Student,\n\nYou have been un-enrolled from course "
+            "Robot Super Course by a member of the course staff. "
+            "Please disregard the invitation previously sent.\n\n"
+            "----\nThis email was automatically sent from edx.org "
+            "to student4_0@test.com"
+        )
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+
 
     def test_send_mail_to_student(self):
         """

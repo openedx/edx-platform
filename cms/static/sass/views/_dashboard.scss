@@ -1,7 +1,7 @@
 // studio - views - user dashboard
 // ====================
 
-body.dashboard {
+.view-dashboard {
 
 	// temp
 	.content {
@@ -58,8 +58,8 @@ body.dashboard {
 	      }
 
 	      .action-create-course {
-	      	@extend .btn-primary-green;
-	      	@extend .t-action3;
+	      	@extend %btn-primary-green;
+	      	@extend %t-action3;
 	      }
 	    }
 	  }
@@ -72,8 +72,8 @@ body.dashboard {
 		overflow: hidden;
 
 		.ui-toggle-control {
-			@extend .ui-depth2;
-			@extend .btn-secondary-gray;
+			@extend %ui-depth2;
+			@extend %btn-secondary-gray;
 			@include clearfix();
 			display: block;
 			text-align: left;
@@ -85,14 +85,14 @@ body.dashboard {
 			}
 
 			.label {
-				@extend .t-action3;
+				@extend %t-action3;
 				float: left;
 				width: flex-grid(8, 9);
 				margin: 3px flex-gutter() 0 0;
 			}
 
 			.icon-remove-sign {
-				@extend .t-action1;
+				@extend %t-action1;
 				@include transform(rotate(45deg));
 				@include transform-origin(center center);
 				@include transition(all $tmg-f1 linear 0s);
@@ -102,7 +102,7 @@ body.dashboard {
 		}
 
 		.ui-toggle-target {
-			@extend .ui-depth1;
+			@extend %ui-depth1;
 			@include transition(opacity $tmg-f1 ease-in-out 0s);
 			position: relative;
 			top: -2px;
@@ -136,7 +136,7 @@ body.dashboard {
 		margin-top: $baseline;
 
 		.title {
-			@extend .t-title7;
+			@extend %t-title7;
 			margin-bottom: ($baseline/4);
 			font-weight: 700;
 			color: $gray-d1;
@@ -154,8 +154,8 @@ body.dashboard {
       }
 
       .action-primary {
-        @extend .btn-primary-blue;
-        @extend .t-action3;
+        @extend %btn-primary-blue;
+        @extend %t-action3;
       }
 
       // specific - request button
@@ -203,7 +203,7 @@ body.dashboard {
     .status-update {
 
     	.label {
-				@extend .cont-text-sr;
+				@extend %cont-text-sr;
     	}
 
     	.value {
@@ -232,7 +232,7 @@ body.dashboard {
 			}
 
     	.value-formal {
-    		@extend .t-title5;
+    		@extend %t-title5;
     		margin: ($baseline/2);
     		font-weight: 700;
 
@@ -242,7 +242,7 @@ body.dashboard {
     	}
 
     	.value-description {
-    		@extend .t-copy-sub1;
+    		@extend %t-copy-sub1;
     		position: relative;
     		color: $white;
 				opacity: 0.85;
@@ -253,7 +253,7 @@ body.dashboard {
 		&.is-unrequested {
 
 			.title {
-				@extend .cont-text-sr;
+				@extend %cont-text-sr;
 			}
 		}
 
@@ -336,21 +336,21 @@ body.dashboard {
 
       // encompassing course link
       .course-link {
-        @extend .ui-depth2;
+        @extend %ui-depth2;
         width: flex-grid(7, 9);
         margin-right: flex-gutter();
       }
 
       // course title
       .course-title {
-        @extend .t-title4;
+        @extend %t-title4;
         margin: 0 ($baseline*2) ($baseline/4) 0;
         font-weight: 300;
       }
 
       // course metadata
       .course-metadata {
-        @extend .t-copy-sub1;
+        @extend %t-copy-sub1;
         @include transition(opacity $tmg-f1 ease-in-out 0);
         color: $gray;
         opacity: 0.75;
@@ -375,20 +375,20 @@ body.dashboard {
           }
 
           .label {
-            @extend .cont-text-sr;
+            @extend %cont-text-sr;
           }
         }
       }
 
       .course-actions {
-        @extend .ui-depth3;
+        @extend %ui-depth3;
         position: static;
         width: flex-grid(2, 9);
         text-align: right;
 
         // view live button
         .view-live-button {
-          @extend .ui-depth3;
+          @extend %ui-depth3;
           @include transition(opacity $tmg-f2 ease-in-out 0);
           @include box-sizing(border-box);
           padding: ($baseline/2);
@@ -447,7 +447,7 @@ body.dashboard {
 		}
 
 		label {
-			@extend .t-title7;
+			@extend %t-title7;
 			display: block;
 			font-weight: 700;
 		}
@@ -460,7 +460,7 @@ body.dashboard {
 		}
 
 		.new-course-name {
-			@extend .t-title5;
+			@extend %t-title5;
 			font-weight: 300;
 		}
 

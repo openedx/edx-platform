@@ -134,6 +134,7 @@ xdescribe 'Sequence', ->
     beforeEach ->
       jasmine.stubRequests()
       @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
+      $.scrollTo 150
       $('.sequence-nav-buttons .next a').click()
 
     it 'log the next sequence event', ->
@@ -142,10 +143,14 @@ xdescribe 'Sequence', ->
     it 'call render on the next sequence', ->
       expect($('#seq_content').html()).toEqual 'Sample Problem'
 
+    it 'scrolls to the top of the page', ->
+      expect($('body').scrollTop()).toBe 0
+
   describe 'previous', ->
     beforeEach ->
       jasmine.stubRequests()
       @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
+      $.scrollTo 150
       $('.sequence-nav-buttons .prev a').click()
 
     it 'log the previous sequence event', ->
@@ -153,6 +158,9 @@ xdescribe 'Sequence', ->
 
     it 'call render on the previous sequence', ->
       expect($('#seq_content').html()).toEqual 'Video 1'
+
+    it 'scrolls to the top of the page', ->
+      expect($('body').scrollTop()).toBe 0
 
   describe 'link_for', ->
     it 'return a link for specific position', ->

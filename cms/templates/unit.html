@@ -1,34 +1,34 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
-<%block name="bodyclass">is-signedin course unit</%block>
+<%block name="bodyclass">is-signedin course unit view-unit</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
-  $(document).ready(function() {
-    new CMS.Views.UnitEdit({
-      el: $('.main-wrapper'),
-      model: new CMS.Models.Module({
-        id: '${unit_location}',
-        state: '${unit_state}'
-      })
-    });
+require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/unit", "jquery.ui"],
+    function(doc, $, ModuleModel, UnitEditView, ui) {
+  window.unit_location_analytics = '${unit_location}';
 
-    $(document).ready(function() {
+  // tabs
+  $('.tab-group').tabs();
 
-      // tabs
-      $('.tab-group').tabs();
-    });
+  new UnitEditView({
+    el: $('.main-wrapper'),
+    model: new ModuleModel({
+      id: '${unit_location}',
+      state: '${unit_state}'
+    })
+  });
 
-    $('.new-component-template').each(function(){
-        $emptyEditor = $(this).find('.empty');
-        $(this).prepend($emptyEditor);
-      });
-    });
-
-    var unit_location_analytics = '${unit_location}';
+  $('.new-component-template').each(function(){
+      $emptyEditor = $(this).find('.empty');
+      $(this).prepend($emptyEditor);
+  });
+});
   </script>
 
 </%block>

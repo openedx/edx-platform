@@ -25,8 +25,10 @@ def enrolled_students_features(course_id, features):
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
-    students = User.objects.filter(courseenrollment__course_id=course_id)\
-        .order_by('username').select_related('profile')
+    students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1,
+    ).order_by('username').select_related('profile')
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -78,7 +80,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gsomething)
         for sec in gsvals:
             sdesc = sec['section_descriptor']
-            frmat = getattr(sdesc.lms, 'format', None)
+            frmat = getattr(sdesc, 'format', None)
             aname = ''
             if frmat in graders:
                 gform = graders[frmat]

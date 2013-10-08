@@ -1,0 +1,68 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="../main.html" />
+
+<%block name="title"><title>${_("Your Shopping Cart")}</title></%block>
+
+<section class="container cart-list">
+  <h2>${_("Your selected items:")}</h2>
+  % if shoppingcart_items:
+    <table class="cart-table">
+      <thead>
+        <tr class="cart-headings">
+          <th class="qty">${_("Quantity")}</th>
+          <th class="dsc">${_("Description")}</th>
+          <th class="u-pr">${_("Unit Price")}</th>
+          <th class="prc">${_("Price")}</th>
+          <th class="cur">${_("Currency")}</th>
+        </tr>
+      </thead>
+      <tbody>
+        % for item in shoppingcart_items:
+        <tr class="cart-items">
+          <td>${item.qty}</td>
+          <td>${item.line_desc}</td>
+          <td>${"{0:0.2f}".format(item.unit_cost)}</td>
+          <td>${"{0:0.2f}".format(item.line_cost)}</td>
+          <td>${item.currency.upper()}</td>
+          <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td>
+        </tr>
+        % endfor
+        <tr class="cart-headings">
+          <td colspan="4"></td>
+          <th>${_("Total Amount")}</th>
+        </tr>
+        <tr class="cart-totals">
+          <td colspan="4"></td>
+          <td class="cart-total-cost">${"{0:0.2f}".format(amount)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <input id="back_input" type="submit" value="Return" /> -->
+    ${form_html}
+  % else:
+    <p>${_("You have selected no items for purchase.")}</p>
+  % endif
+
+</section>
+
+
+<script>
+  $(function() {
+    $('a.remove_line_item').click(function(event) {
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.remove_item')}";
+      $.post(post_url, {id:$(this).data('item-id')})
+        .always(function(data){
+        location.reload(true);
+      });
+    });
+
+    $('#back_input').click(function(){
+      history.back();
+    });
+  });
+</script>
+

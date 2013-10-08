@@ -55,11 +55,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @return: Rendered HTML
         """
         # set context variables and render template
-        if self.child_state != self.INITIAL:
-            latest = self.latest_answer()
-            previous_answer = latest if latest is not None else ''
-        else:
-            previous_answer = ''
+        previous_answer = self.get_display_answer()
 
         context = {
             'prompt': self.child_prompt,
@@ -90,6 +86,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
             'save_post_assessment': self.save_hint,
+            'store_answer': self.store_answer,
         }
 
         if dispatch not in handlers:
@@ -182,25 +179,17 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         error_message = ""
         # add new history element with answer and empty score and hint.
-        success, data = self.append_image_to_student_answer(data)
+        success, error_message, data = self.append_file_link_to_student_answer(data)
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
-            if allowed_to_submit:
-                data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
-                self.new_history_entry(data['student_answer'])
-                self.change_state(self.ASSESSING)
-            else:
-                # Error message already defined
-                success = False
-        else:
-            # This is a student_facing_error
-            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
+            data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
+            self.new_history_entry(data['student_answer'])
+            self.change_state(self.ASSESSING)
 
         return {
             'success': success,
             'rubric_html': self.get_rubric_html(system),
             'error': error_message,
-            'student_response': data['student_answer'],
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def save_assessment(self, data, _system):
@@ -222,13 +211,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(data)
 
         try:
-            score = int(data['assessment'])
+            score = int(data.get('assessment'))
             score_list = data.getlist('score_list[]')
             for i in xrange(0, len(score_list)):
                 score_list[i] = int(score_list[i])
-        except ValueError:
+        except (ValueError, TypeError):
             # This is a dev_facing_error
-            log.error("Non-integer score value passed to save_assessment ,or no score list present.")
+            log.error("Non-integer score value passed to save_assessment, or no score list present.")
             # This is a student_facing_error
             return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 
@@ -272,8 +261,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
-            # This is a dev_facing_error
-            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
 

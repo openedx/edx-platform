@@ -31,7 +31,10 @@ def offline_grade_calculation(course_id):
     '''
 
     tstart = time.time()
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1
+    ).prefetch_related("groups").order_by('username')
 
     enc = MyEncoder()
 

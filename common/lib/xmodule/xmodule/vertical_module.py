@@ -23,7 +23,7 @@ class VerticalModule(VerticalFields, XModule):
         if self.contents is None:
             self.contents = [{
                 'id': child.id,
-                'content': child.get_html()
+                'content': self.runtime.render_child(child, None, 'student_view').content
             } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {

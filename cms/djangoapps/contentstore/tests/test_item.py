@@ -1,4 +1,4 @@
-from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
 from xmodule.capa_module import CapaDescriptor
@@ -34,7 +34,7 @@ class DeleteItem(CourseTestCase):
             resp.content,
             "application/json"
         )
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 204)
 
 
 class TestCreateItem(CourseTestCase):
@@ -69,7 +69,7 @@ class TestCreateItem(CourseTestCase):
         # get the new item and check its category and display_name
         chap_location = self.response_id(resp)
         new_obj = modulestore().get_item(chap_location)
-        self.assertEqual(new_obj.category, 'chapter')
+        self.assertEqual(new_obj.scope_ids.block_type, 'chapter')
         self.assertEqual(new_obj.display_name, display_name)
         self.assertEqual(new_obj.location.org, self.course.location.org)
         self.assertEqual(new_obj.location.course, self.course.location.course)
@@ -226,7 +226,7 @@ class TestEditItem(CourseTestCase):
         Test setting due & start dates on sequential
         """
         sequential = modulestore().get_item(self.seq_location)
-        self.assertIsNone(sequential.lms.due)
+        self.assertIsNone(sequential.due)
         self.client.post(
             reverse('save_item'),
             json.dumps({
@@ -236,7 +236,7 @@ class TestEditItem(CourseTestCase):
             content_type="application/json"
         )
         sequential = modulestore().get_item(self.seq_location)
-        self.assertEqual(sequential.lms.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.client.post(
             reverse('save_item'),
             json.dumps({
@@ -246,5 +246,5 @@ class TestEditItem(CourseTestCase):
             content_type="application/json"
         )
         sequential = modulestore().get_item(self.seq_location)
-        self.assertEqual(sequential.lms.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
-        self.assertEqual(sequential.lms.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+        self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(sequential.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))

@@ -1,40 +1,38 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%block name="title">${_("Grading Settings")}</%block>
-<%block name="bodyclass">is-signedin course grading settings</%block>
+<%block name="bodyclass">is-signedin course grading view-settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils
+  from contentstore import utils
+  from django.utils.translation import ugettext as _
 %>
+
+<%block name="header_extras">
+% for template_name in ["course_grade_policy"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-
-  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
-
   <script type="text/javascript">
-    $(document).ready(function(){
-
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
-
-      var editor = new CMS.Views.Settings.Grading({
-          el: $('.settings-grading'),
-          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
-      });
-
-      editor.render();
+require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings/course_grading_policy"], function(doc, $, GradingView, CourseGradingPolicyModel) {
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
     });
 
+    var editor = new GradingView({
+        el: $('.settings-grading'),
+        model : new CourseGradingPolicyModel(${course_details|n},{parse:true})
+    });
+
+    editor.render();
+});
   </script>
 </%block>
 
@@ -97,7 +95,7 @@ from contentstore import utils
           <ol class="list-input">
             <li class="field text" id="field-course-grading-graceperiod">
               <label for="course-grading-graceperiod">${_("Grace Period on Deadline:")}</label>
-              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="HH:MM" autocomplete="off" />
+              <input type="text" class="short time" id="course-grading-graceperiod" value="00:00" placeholder="HH:MM" autocomplete="off" />
               <span class="tip tip-inline">${_("Leeway on due dates")}</span>
             </li>
           </ol>

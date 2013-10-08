@@ -2,7 +2,7 @@ import time
 import logging
 import re
 
-from xblock.core import ModelType
+from xblock.fields import Field
 import datetime
 import dateutil.parser
 
@@ -11,7 +11,7 @@ from pytz import UTC
 log = logging.getLogger(__name__)
 
 
-class Date(ModelType):
+class Date(Field):
     '''
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
@@ -19,6 +19,8 @@ class Date(ModelType):
     CURRENT_YEAR = datetime.datetime.now(UTC).year
     PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
     PREVENT_DEFAULT_DAY_MON_SEED2 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=UTC)
+
+    MUTABLE = False
 
     def _parse_date_wo_default_month_day(self, field):
         """
@@ -76,12 +78,15 @@ class Date(ModelType):
             else:
                 return value.isoformat()
         else:
-            raise TypeError("Cannot convert {} to json".format(value))
+            raise TypeError("Cannot convert {!r} to json".format(value))
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
 
-class Timedelta(ModelType):
+class Timedelta(Field):
+    # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
+    MUTABLE = False
+
     def from_json(self, time_str):
         """
         time_str: A string with the following components:

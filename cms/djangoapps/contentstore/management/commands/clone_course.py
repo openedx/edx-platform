@@ -9,18 +9,10 @@ from xmodule.course_module import CourseDescriptor
 
 from auth.authz import _copy_course_group
 
+
 #
 # To run from command line: rake cms:clone SOURCE_LOC=MITx/111/Foo1 DEST_LOC=MITx/135/Foo3
 #
-from request_cache.middleware import RequestCache
-from django.core.cache import get_cache
-
-#
-# To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
-#
-
-CACHE = get_cache('mongo_metadata_inheritance')
-
 class Command(BaseCommand):
     """Clone a MongoDB-backed course to another location"""
     help = 'Clone a MongoDB backed course to another location'
@@ -36,8 +28,6 @@ class Command(BaseCommand):
         mstore = modulestore('direct')
         cstore = contentstore()
 
-        mstore.metadata_inheritance_cache_subsystem = CACHE
-        mstore.request_cache = RequestCache.get_request_cache()
         org, course_num, run = dest_course_id.split("/")
         mstore.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 

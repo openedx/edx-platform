@@ -15,14 +15,13 @@
 
 </section>
 
-<script src="http://malsup.github.com/jquery.form.js"></script>
 <script>
-(function() {
-    
+require(["domReady!", "jquery", "jquery.form"], function(doc, $) {
+
 var bar = $('.bar');
 var percent = $('.percent');
 var status = $('#status');
-   
+
 $('form').ajaxForm({
     beforeSend: function() {
         status.empty();
@@ -35,10 +34,10 @@ $('form').ajaxForm({
         bar.width(percentVal)
         percent.html(percentVal);
     },
-complete: function(xhr) {
-status.html(xhr.responseText);
-}
-}); 
+    complete: function(xhr) {
+        status.html(xhr.responseText);
+    }
+});
 
-})();       
+});
 </script>

@@ -163,10 +163,13 @@ div.book-wrapper {
 
             &:hover {
               opacity: 1.0;
-              filter: alpha(opacity=100);
+            }
+
+            &.is-disabled {
+              display:none;
             }
           }
-
+          
           &.last {
             left: 0;
 

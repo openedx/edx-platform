@@ -4,7 +4,7 @@ from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
-from statsd import statsd
+from dogapi import dog_stats_api
 
 import hashlib
 
@@ -70,7 +70,7 @@ def update_hash(hasher, obj):
         hasher.update(repr(obj))
 
 
-@statsd.timed('capa.safe_exec.time')
+@dog_stats_api.timed('capa.safe_exec.time')
 def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None, slug=None, unsafely=False):
     """
     Execute python code safely.

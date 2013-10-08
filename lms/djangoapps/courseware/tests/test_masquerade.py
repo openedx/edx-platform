@@ -15,23 +15,23 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group, User
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from modulestore_config import TEST_DATA_XML_MODULESTORE
-from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 import json
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
-    '''
-    Check for staff being able to masquerade as student
-    '''
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Check for staff being able to masquerade as student.
+    """
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
 
-        #self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        #self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        # Clear out the modulestores, causing them to reload
+        clear_existing_modulestores()
+
         self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
 
         # Create staff account
@@ -50,7 +50,6 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         self.logout()
         self.login(self.instructor, self.password)
         self.enroll(self.graded_course)
-        # self.factory = RequestFactory()
 
     def get_cw_section(self):
         url = reverse('courseware_section',
@@ -70,9 +69,9 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         self.assertTrue(sdebug in resp.content)
 
     def toggle_masquerade(self):
-        '''
-        Toggle masquerade state
-        '''
+        """
+        Toggle masquerade state.
+        """
         masq_url = reverse('masquerade-switch', kwargs={'marg': 'toggle'})
         print "masq_url ", masq_url
         resp = self.client.get(masq_url)

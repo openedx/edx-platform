@@ -28,7 +28,14 @@ class NoPathToItem(Exception):
 
 
 class DuplicateItemError(Exception):
-    pass
+    """
+    Attempted to create an item which already exists.
+    """
+    def __init__(self, element_id, store=None, collection=None):
+        super(DuplicateItemError, self).__init__()
+        self.element_id = element_id
+        self.store = store
+        self.collection = collection
 
 
 class VersionConflictError(Exception):

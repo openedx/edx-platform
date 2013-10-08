@@ -16,10 +16,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from helpers import LoginEnrollmentTestCase, check_for_get_code
-from modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -359,7 +359,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.course.has_started())
 
         # but should be accessible for beta testers
-        self.course.lms.days_early_for_beta = 2
+        self.course.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = User.objects.get(email=student_email)

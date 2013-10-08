@@ -5,7 +5,7 @@
 
 edX Data Documentation
 ======================
-The following documents are targetted at those who are working with various data formats consumed and produced by the edX platform -- primarily course authors and those who are conducting research on data in our system. Developer oriented discussion of architecture and strictly internal APIs should be documented elsewhere.
+The following documents are targeted at those who are working with various data formats consumed and produced by the edX platform -- primarily course authors and those who are conducting research on data in our system. Developer oriented discussion of architecture and strictly internal APIs should be documented elsewhere.
 
 Course Data Formats
 -------------------
@@ -30,6 +30,7 @@ Specific Problem Types
    course_data_formats/custom_response.rst
    course_data_formats/symbolic_response.rst
    course_data_formats/jsinput.rst
+   course_data_formats/formula_equation_input.rst
 
 
 Internal Data Formats

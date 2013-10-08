@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_raises, assert_not_equals
+from nose.tools import assert_equals, assert_raises, assert_not_equals  # pylint: disable=E0611
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import InvalidLocationError
 
@@ -159,3 +159,12 @@ def test_clean_for_html():
 def test_html_id():
     loc = Location("tag://org/course/cat/name:more_name@rev")
     assert_equals(loc.html_id(), "tag-org-course-cat-name_more_name-rev")
+
+
+def test_course_id():
+    loc = Location('i4x', 'mitX', '103', 'course', 'test2')
+    assert_equals('mitX/103/test2', loc.course_id)
+
+    loc = Location('i4x', 'mitX', '103', '_not_a_course', 'test2')
+    with assert_raises(InvalidLocationError):
+        loc.course_id

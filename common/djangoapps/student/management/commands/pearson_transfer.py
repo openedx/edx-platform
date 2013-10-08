@@ -1,16 +1,19 @@
-import os
 from optparse import make_option
+import os
 from stat import S_ISDIR
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.core.management import call_command
+import boto
 from dogapi import dog_http_api, dog_stats_api
 import paramiko
-import boto
 
-dog_http_api.api_key = settings.DATADOG_API
-dog_stats_api.start(api_key=settings.DATADOG_API, statsd=True)
+from django.conf import settings
+from django.core.management import call_command
+from django.core.management.base import BaseCommand, CommandError
+
+import django_startup
+
+
+django_startup.autostartup()
 
 
 class Command(BaseCommand):

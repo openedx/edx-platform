@@ -1,0 +1,106 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">register verification-process is-verified</%block>
+<%block name="title"><title>${_("Register for {} | Verification").format(course_name)}</title></%block>
+
+<%block name="js_extra">
+<script type="text/javascript">
+var submitToPaymentProcessing = function(event) {
+    event.preventDefault();
+    var xhr = $.post(
+      "/verify_student/create_order",
+      {
+        "course_id" : "${course_id}",
+      },
+      function(data) {
+        for (prop in data) {
+          $('<input>').attr({
+              type: 'hidden',
+              name: prop,
+              value: data[prop]
+          }).appendTo('#pay_form');
+        }
+      }
+    )
+    .done(function(data) {
+      $("#pay_form").submit();
+    })
+    .fail(function(jqXhr,text_status, error_thrown) { alert(jqXhr.responseText); });
+}
+$(document).ready(function() {
+    $("#pay_button").click(submitToPaymentProcessing);
+});
+</script>
+</%block>
+
+<%block name="content">
+<div class="container">
+  <section class="wrapper">
+
+    <%include file="_verification_header.html" />
+
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">${_("Your Progress")}</h3>
+
+        <ol class="progress-steps">
+          <li class="progress-step is-completed" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name">${_("ID Verification")}</span>
+          </li>
+          <li class="progress-step is-current" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Review")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">${_("Make Payment")}</span>
+          </li>
+
+          <li class="progress-step progress-step-icon" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name">${_("Confirmation")}</span>
+          </li>
+        </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
+    </div>
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <h3 class="title">${_("You've Been Verified Previously")}</h3>
+
+        <div class="instruction">
+          <p>${_("We've already verified your identity (through the photos of you and your ID you provided earlier). You can proceed to make your secure payment and complete registration.")}</p>
+        </div>
+
+        <nav class="nav-wizard is-ready">
+
+          <span class="help help-inline price-value">${_("You have decided to pay $ ")} <strong>${chosen_price}</strong></span>
+
+          <ol class="wizard-steps">
+            <li class="wizard-step step-proceed">
+              <form id="pay_form" method="post" action="${purchase_endpoint}">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                <input type="hidden" name="course_id" value="${course_id | h}" />
+                <button type="submit" class="action-primary" id="pay_button">Go to Secure Payment</button>
+              </form>
+            </li>
+          </ol>
+        </nav>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_verification_support.html" />
+  </section>
+</div>
+</%block>

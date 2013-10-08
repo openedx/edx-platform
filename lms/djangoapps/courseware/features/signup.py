@@ -23,9 +23,8 @@ def i_press_the_button_on_the_registration_form(step):
 
 @step('I check the checkbox named "([^"]*)"$')
 def i_check_checkbox(step, checkbox):
-    def check_box():
-        world.browser.find_by_name(checkbox).check()
-    world.retry_on_exception(check_box)
+    css_selector = 'input[name={}]'.format(checkbox)
+    world.css_check(css_selector)
 
 
 @step('I should see "([^"]*)" in the dashboard banner$')

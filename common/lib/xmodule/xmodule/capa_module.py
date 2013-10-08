@@ -18,9 +18,10 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
@@ -150,6 +151,12 @@ class CapaFields(object):
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
+    )
+    text_customization = Dict(
+        help="String customization substitutions for particular locations",
+        scope=Scope.settings
+        # TODO: someday it should be possible to not duplicate this definition here
+        # and in inheritance.py
     )
 
 
@@ -341,14 +348,26 @@ class CapaModule(CapaFields, XModule):
         Determine the name for the "check" button.
 
         Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check"
+        final attempt, change the name to "Final Check".
+        The text can be customized by the text_customization setting.
         """
-        if self.max_attempts is not None:
-            final_check = (self.attempts >= self.max_attempts - 1)
-        else:
-            final_check = False
+        # The logic flow is a little odd so that _('xxx') strings can be found for
+        # translation while also running _() just once for each string.
+        check = _('Check')
+        final_check = _('Final Check')
 
-        return "Final Check" if final_check else "Check"
+        # Apply customizations if present
+        if 'custom_check' in self.text_customization:
+            check = _(self.text_customization.get('custom_check'))
+        if 'custom_final_check' in self.text_customization:
+            final_check = _(self.text_customization.get('custom_final_check'))
+        # TODO: need a way to get the customized words into the list of
+        # words to be translated
+
+        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
+            return final_check
+        else:
+            return check
 
     def should_show_check_button(self):
         """
@@ -1171,5 +1190,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
+                                    CapaDescriptor.text_customization])
         return non_editable_fields

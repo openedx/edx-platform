@@ -11,16 +11,20 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
+from mitxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xblock.field_data import DictFieldData
+from xblock.fields import Scope
 from xmodule.tests import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.xblock.field_data import lms_field_data
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class BaseTestXmodule(ModuleStoreTestCase):
     """Base class for testing Xmodules with mongo store.
 
@@ -45,6 +49,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
+    def xmodule_field_data(self, descriptor):
+        field_data = {}
+        field_data.update(self.MODEL_DATA)
+        student_data = DictFieldData(field_data)
+        return lms_field_data(descriptor._field_data, student_data)
+
     def setUp(self):
 
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -64,7 +74,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         # username = robot{0}, password = 'test'
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create()
             for i in range(self.USER_COUNT)
         ]
 
@@ -77,19 +87,16 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        self.runtime = get_test_system()
+        self.runtime = get_test_system(course_id=self.course.id)
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
 
-        model_data = {'location': self.item_descriptor.location}
-        model_data.update(self.MODEL_DATA)
+        self.runtime.xmodule_field_data = self.xmodule_field_data
 
-        self.item_module = self.item_descriptor.module_class(
-            self.runtime,
-            self.item_descriptor,
-            model_data
-        )
+        self.runtime.get_module = lambda descr: descr.xmodule(self.runtime)
+
+        self.item_module = self.item_descriptor.xmodule(self.runtime)
 
         self.item_url = Location(self.item_module.location).url()
 
@@ -110,6 +117,9 @@ class BaseTestXmodule(ModuleStoreTestCase):
             args=(self.course.id, self.item_url, dispatch)
         )
 
-    def tearDown(self):
-        for user in self.users:
-            user.delete()
+
+class XModuleRenderingTestBase(BaseTestXmodule):
+    def setUp(self):
+        super(XModuleRenderingTestBase, self).setUp()
+
+        self.runtime.render_template = render_to_string

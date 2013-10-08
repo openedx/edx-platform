@@ -37,15 +37,16 @@ class TemplateTestCase(unittest.TestCase):
         self.template_path = os.path.join(capa_path,
                                           'templates',
                                           self.TEMPLATE_NAME)
-        template_file = open(self.template_path)
-        self.template = MakoTemplate(template_file.read())
-        template_file.close()
+        with open(self.template_path) as f:
+            self.template = MakoTemplate(f.read())
 
     def render_to_xml(self, context_dict):
         """
         Render the template using the `context_dict` dict.
         Returns an `etree` XML element.
         """
+        # add dummy STATIC_URL to template context
+        context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
             xml_str = self.template.render_unicode(**context_dict)
         except:
@@ -352,10 +353,10 @@ class TextlineTemplateTest(TemplateTestCase):
         super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
-        cases = [({}, ' capa_inputtype '),
-                 ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
-                 ({'inline': True}, ' capa_inputtype inline'),
-                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'), ]
+        cases = [({}, ' capa_inputtype  textline'),
+                 ({'do_math': True}, 'text-input-dynamath capa_inputtype  textline'),
+                 ({'inline': True}, ' capa_inputtype inline textline'),
+                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline textline'), ]
 
         for (context, css_class) in cases:
             base_context = self.context.copy()
@@ -447,6 +448,32 @@ class TextlineTemplateTest(TemplateTestCase):
         xpath = "//span[@class='message']"
         self.assert_has_text(xml, xpath, self.context['msg'])
 
+
+class FormulaEquationInputTemplateTest(TemplateTestCase):
+    """
+    Test make template for `<formulaequationinput>`s.
+    """
+    TEMPLATE_NAME = 'formulaequationinput.html'
+
+    def setUp(self):
+        self.context = {
+            'id': 2,
+            'value': 'PREFILLED_VALUE',
+            'status': 'unsubmitted',
+            'previewer': 'file.js',
+            'reported_status': 'REPORTED_STATUS',
+        }
+        super(FormulaEquationInputTemplateTest, self).setUp()
+
+    def test_no_size(self):
+        xml = self.render_to_xml(self.context)
+        self.assert_no_xpath(xml, "//input[@size]", self.context)
+
+    def test_size(self):
+        self.context['size'] = '40'
+        xml = self.render_to_xml(self.context)
+
+        self.assert_has_xpath(xml, "//input[@size='40']", self.context)
 
 class AnnotationInputTemplateTest(TemplateTestCase):
     """

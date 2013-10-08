@@ -118,6 +118,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'answer': self.answer,
             'problem_id': self.display_name,
             'skip_basic_checks': self.skip_basic_checks,
+            'control': json.dumps(self.control),
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
@@ -526,7 +527,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback = "".join(feedback_items)
             else:
                 feedback = feedback_items
-            score = int(median(score_result['score']))
+            score = int(round(median(score_result['score'])))
         else:
             # This is for instructor and ML grading
             feedback, rubric_score = self._format_feedback(score_result, system)
@@ -604,6 +605,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'save_post_assessment': self.message_post,
             'skip_post_assessment': self.skip_post_assessment,
             'check_for_score': self.check_for_score,
+            'store_answer': self.store_answer,
         }
 
         if dispatch not in handlers:
@@ -640,6 +642,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         # Once we close the problem, we should not allow students
         # to save answers
+        error_message = ""
         closed, msg = self.check_if_closed()
         if closed:
             return msg
@@ -648,26 +651,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(data)
 
         # add new history element with answer and empty score and hint.
-        success, data = self.append_image_to_student_answer(data)
-        error_message = ""
+        success, error_message, data = self.append_file_link_to_student_answer(data)
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
-            if allowed_to_submit:
-                data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
-                self.new_history_entry(data['student_answer'])
-                self.send_to_grader(data['student_answer'], system)
-                self.change_state(self.ASSESSING)
-            else:
-                # Error message already defined
-                success = False
-        else:
-            # This is a student_facing_error
-            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
+            data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
+            self.new_history_entry(data['student_answer'])
+            self.send_to_grader(data['student_answer'], system)
+            self.change_state(self.ASSESSING)
 
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer']
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def update_score(self, data, system):
@@ -692,17 +686,15 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # set context variables and render template
         eta_string = None
         if self.child_state != self.INITIAL:
-            latest = self.latest_answer()
-            previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = self.get_eta()
+                eta_string = "Your response has been submitted.  Please check back later for your grade."
         else:
             post_assessment = ""
             correct = ""
-            previous_answer = self.initial_display
+        previous_answer = self.get_display_answer()
 
         context = {
             'prompt': self.child_prompt,

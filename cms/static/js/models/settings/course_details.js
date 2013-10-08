@@ -1,6 +1,6 @@
-if (!CMS.Models['Settings']) CMS.Models.Settings = new Object();
+define(["backbone", "underscore", "gettext", "js/models/location"], function(Backbone, _, gettext, Location) {
 
-CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
+var CourseDetails = Backbone.Model.extend({
     defaults: {
         location : null,	// the course's Location model, required
         start_date: null,	// maps to 'start'
@@ -10,13 +10,15 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         syllabus: null,
         overview: "",
         intro_video: null,
-        effort: null	// an int or null
+        effort: null,	// an int or null,
+        course_image_name: '', // the filename
+        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
     },
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
     parse: function(attributes) {
         if (attributes['course_location']) {
-            attributes.location = new CMS.Models.Location(attributes.course_location, {parse:true});
+            attributes.location = new Location(attributes.course_location, {parse:true});
         }
         if (attributes['start_date']) {
             attributes.start_date = new Date(attributes.start_date);
@@ -79,3 +81,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         else return "";
     }
 });
+
+return CourseDetails;
+
+}); // end define()

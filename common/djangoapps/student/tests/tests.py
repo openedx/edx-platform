@@ -11,21 +11,29 @@ import unittest
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
+from django.core.urlresolvers import reverse
 
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
 from mock import Mock, patch
 from textwrap import dedent
 
-from student.models import unique_id_for_user
-from student.views import process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper
-from student.views import enroll_in_course, is_enrolled_in_course
+from student.models import unique_id_for_user, CourseEnrollment
+from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
+                           change_enrollment)
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
+
+import shoppingcart
+
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
 
@@ -209,12 +217,167 @@ class CourseEndingTest(TestCase):
 
 
 class EnrollInCourseTest(TestCase):
-    """ Tests the helper method for enrolling a user in a class """
+    """Tests enrolling and unenrolling in courses."""
 
-    def test_enroll_in_course(self):
+    def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
-        user.save()
-        course_id = "course_id"
-        self.assertFalse(is_enrolled_in_course(user, course_id))
-        enroll_in_course(user, course_id)
-        self.assertTrue(is_enrolled_in_course(user, course_id))
+        course_id = "edX/Test101/2013"
+        course_id_partial = "edX/Test101"
+
+        # Test basic enrollment
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+
+        # Enrolling them again should be harmless
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+
+        # Now unenroll the user
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+
+        # Unenrolling them again should also be harmless
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+
+        # The enrollment record should still exist, just be inactive
+        enrollment_record = CourseEnrollment.objects.get(
+            user=user,
+            course_id=course_id
+        )
+        self.assertFalse(enrollment_record.is_active)
+
+    def test_enrollment_non_existent_user(self):
+        # Testing enrollment of newly unsaved user (i.e. no database entry)
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenroll does nothing
+        CourseEnrollment.unenroll(user, course_id)
+
+        # Implicit save() happens on new User object when enrolling, so this
+        # should still work
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+    def test_enrollment_by_email(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # This won't throw an exception, even though the user is not found
+        self.assertIsNone(
+            CourseEnrollment.enroll_by_email("not_jack@fake.edx.org", course_id)
+        )
+
+        self.assertRaises(
+            User.DoesNotExist,
+            CourseEnrollment.enroll_by_email,
+            "not_jack@fake.edx.org",
+            course_id,
+            ignore_errors=False
+        )
+
+        # Now unenroll them by email
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Harmless second unenroll
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenroll on non-existent user shouldn't throw an error
+        CourseEnrollment.unenroll_by_email("not_jack@fake.edx.org", course_id)
+
+    def test_enrollment_multiple_classes(self):
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id1 = "edX/Test101/2013"
+        course_id2 = "MITx/6.003z/2012"
+
+        CourseEnrollment.enroll(user, course_id1)
+        CourseEnrollment.enroll(user, course_id2)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id1)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id2)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
+
+    def test_activation(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Creating an enrollment doesn't actually enroll a student
+        # (calling CourseEnrollment.enroll() would have)
+        enrollment = CourseEnrollment.create_enrollment(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Until you explicitly activate it
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Activating something that's already active does nothing
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Now deactive
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Deactivating something that's already inactive does nothing
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # A deactivated enrollment should be activated if enroll() is called
+        # for that user/course_id combination
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class PaidRegistrationTest(ModuleStoreTestCase):
+    """
+    Tests for paid registration functionality (not verified student), involves shoppingcart
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        # Create course
+        self.req_factory = RequestFactory()
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = User.objects.create(username="jack", email="jack@fake.edx.org")
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    def test_change_enrollment_add_to_cart(self):
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id,
+                                                                       'enrollment_action': 'add_to_cart'})
+        request.user = self.user
+        response = change_enrollment(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
+        self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
+            shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))

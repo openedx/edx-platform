@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xblock.core import Scope, String
+from xblock.fields import Scope, String
 import textwrap
 
 log = logging.getLogger(__name__)

@@ -13,13 +13,22 @@ Introduction
 
 Since the launch of edX to our original partners, we have been working to provide opportunities for additional educators to create courses on our platform. The fruits of our efforts are Edge and Studio. These tools are available not only to our edX partners, but to all faculty at consortium universities.
 
+EdX (http://edx.org) is our original, premiere learning portal. Publication to
+edX is available on a limited basis, depending on your university’s agreement
+with edX. You need specific approval from your university to release your
+course on the edX portal. Once a course is released on the edX portal, it
+becomes a publicly available massively open online course (MOOC).
 
-
-EdX (http://edx.org) is our original, premiere learning portal. Publication to edX is available on a limited basis, depending on your university’s agreement with edX. You need specific approval from your university to release your course on the edX portal.
 
 Edge (http://edge.edx.org) is our newest online learning portal. It is almost identical to edX.org both visibly and functionally. 
 
-Edge is where you view the content you create with Studio, our course authoring tool, and where students will view your course. Instructors are encouraged to use Edge to experiment with creating courses. You do not need approval to release a course on Edge—you can create a course and release it immediately.
+Edge is where you view the content you create with Studio, our course authoring
+tool. Courses on Edge cannot be seen publicly; rather, only you, your
+colleagues, and the students with whom you explicitly share a course link can
+see your course. Instructors are encouraged to use Edge to experiment with
+creating courses. You do not need approval to release a course on Edge--you can
+create a course and release it immediately.
+
 
 Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It is the easiest way for educators to develop courses for the edX platform. You can create courses in Studio and view and enroll in them instantly on Edge—even before you have finished creating the course.
 

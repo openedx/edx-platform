@@ -16,9 +16,15 @@ class DataDownload
     @$display_table          = @$display.find '.data-display-table'
     @$request_response_error = @$display.find '.request-response-error'
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
+    @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
 
     # attach click handlers
+
+    # The list-anon case is always CSV
+    @$list_anon_btn.click (e) =>
+      url = @$list_anon_btn.data 'endpoint'
+      location.href = url
 
     # this handler binds to both the download
     # and the csv button

@@ -19,12 +19,13 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
-from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
 # the output.
+# 'correct', 'incorrect', and 'unanswered' keys are lists of CSS selectors
+# the presence of any in the list is sufficient
 PROBLEM_DICT = {
     'drop down': {
         'factory': OptionResponseXMLFactory(),
@@ -143,7 +144,7 @@ PROBLEM_DICT = {
                         ]
         },
         'correct': ['section.choicetextgroup_correct'],
-        'incorrect': ['span.incorrect', 'section.choicetextgroup_incorrect'],
+        'incorrect': ['section.choicetextgroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered']},
 
     'checkbox_text': {
@@ -165,7 +166,7 @@ def answer_problem(problem_type, correctness):
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
-        world.browser.select(select_name, option_text)
+        world.select_option(select_name, option_text)
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
@@ -239,9 +240,9 @@ def answer_problem(problem_type, correctness):
 def problem_has_answer(problem_type, answer_class):
     if problem_type == "drop down":
         if answer_class == 'blank':
-            assert world.browser.is_element_not_present_by_css('option[selected="true"]')
+            assert world.is_css_not_present('option[selected="true"]')
         else:
-            actual = world.browser.find_by_css('option[selected="true"]').value
+            actual = world.css_value('option[selected="true"]')
             expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
             assert actual == expected
 
@@ -301,10 +302,6 @@ def problem_has_answer(problem_type, answer_class):
         # input type coverage in this test.
         pass
 
-
-##############################
-#       HELPER METHODS
-##############################
 
 def add_problem_to_course(course, problem_type, extraMeta=None):
     '''

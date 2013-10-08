@@ -1,7 +1,7 @@
 // studio - views - course users
 // ====================
 
-body.course.users {
+.view-team {
 
   // LAYOUT: page
   .content-primary, .content-supplementary {
@@ -22,7 +22,7 @@ body.course.users {
   .content {
 
     .introduction {
-      @extend .t-copy-sub1;
+      @extend %t-copy-sub1;
       margin: 0 0 ($baseline*2) 0;
     }
   }
@@ -56,7 +56,7 @@ body.course.users {
 
         .action-primary {
           @include green-button(); // overwriting for the sake of syncing older green button styles for now
-          @extend .t-action3;
+          @extend %t-action3;
           padding: ($baseline/2) $baseline;
         }
       }
@@ -80,7 +80,7 @@ body.course.users {
   .user-list {
 
     .user-item {
-      @extend .ui-window;
+      @extend %ui-window;
       @include clearfix();
       position: relative;
       width: flex-grid(9, 9);
@@ -98,7 +98,7 @@ body.course.users {
 
       // ELEM: item - flag
       .flag-role {
-        @extend .ui-badge;
+        @extend %ui-badge;
         color: $white;
 
         .msg-you {
@@ -132,7 +132,7 @@ body.course.users {
         }
 
         .user-username {
-          @extend .t-title4;
+          @extend %t-title4;
           @include transition(color $tmg-f2 ease-in-out 0s);
           margin: 0 ($baseline/2) ($baseline/10) 0;
           color: $gray-d4;
@@ -140,7 +140,7 @@ body.course.users {
         }
 
         .user-email {
-          @extend .t-title6;
+          @extend %t-title6;
         }
       }
 
@@ -172,7 +172,7 @@ body.course.users {
         }
 
         .delete {
-          @extend .ui-btn-non;
+          @extend %ui-btn-non;
         }
 
         // HACK: nasty reset needed due to base.scss
@@ -187,7 +187,7 @@ body.course.users {
 
           &.add-admin-role {
             @include blue-button;
-            @extend .t-action2;
+            @extend %t-action2;
             @include transition(all .15s);
             display: inline-block;
             padding: ($baseline/5) $baseline;
@@ -196,7 +196,7 @@ body.course.users {
 
           &.remove-admin-role {
             @include grey-button;
-            @extend .t-action2;
+            @extend %t-action2;
             @include transition(all .15s);
             display: inline-block;
             padding: ($baseline/5) $baseline;
@@ -205,7 +205,7 @@ body.course.users {
         }
 
         .notoggleforyou {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
           color: $gray-l2;
         }
       }

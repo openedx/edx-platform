@@ -94,9 +94,9 @@ class MockPeerGradingService(object):
             'success': True,
             'submission_id': 1,
             'submission_key': "",
-            'student_response': 'fake student response',
-            'prompt': 'fake submission prompt',
-            'rubric': 'fake rubric',
+            'student_response': 'Sample student response.',
+            'prompt': 'Sample submission prompt.',
+            'rubric': 'Placeholder text for the full rubric.',
             'max_score': 4
         }
 
@@ -110,9 +110,9 @@ class MockPeerGradingService(object):
         return {'success': True,
                 'submission_id': 1,
                 'submission_key': '',
-                'student_response': 'fake student response',
-                'prompt': 'fake submission prompt',
-                'rubric': 'fake rubric',
+                'student_response': 'Sample student response.',
+                'prompt': 'Sample submission prompt.',
+                'rubric': 'Placeholder text for the full rubric.',
                 'max_score': 4}
 
     def save_calibration_essay(self, **kwargs):
@@ -124,4 +124,4 @@ class MockPeerGradingService(object):
                 ]}
 
     def get_data_for_location(self, problem_location, student_id):
-        return {"version": 1, "count_graded": 3, "count_required": 3, "success": True, "student_sub_count": 1}
+        return {"version": 1, "count_graded": 3, "count_required": 3, "success": True, "student_sub_count": 1, 'submissions_available' : 0}
