@@ -389,7 +389,7 @@
         .action {
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/4);
+          margin-right: ($baseline/2);
 
           &:last-child {
             margin-right: 0;
@@ -407,7 +407,14 @@
           }
 
           .delete {
-            @extend .ui-btn-non;
+            @extend %ui-btn-non;
+            @extend %t-action1;
+            color: $gray-l3;
+
+            &:hover {
+              background-color: $blue;
+              color: $gray-l6;
+            }
           }
         }
 
