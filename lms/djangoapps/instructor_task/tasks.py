@@ -19,6 +19,7 @@ a problem URL and optionally a student.  These are used to set up the initial va
 of the query for traversing StudentModule objects.
 
 """
+from django.utils.translation import ugettext_noop
 from celery import task
 from functools import partial
 from instructor_task.tasks_helper import (
@@ -51,7 +52,8 @@ def rescore_problem(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'rescored'
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('rescored')
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
 
     def filter_fcn(modules_to_update):
@@ -77,7 +79,8 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'reset'
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('reset')
     update_fcn = partial(reset_attempts_module_state, xmodule_instance_args)
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
@@ -98,7 +101,8 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'deleted'
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('deleted')
     update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
@@ -119,6 +123,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     `_xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.  This is unused here.
     """
-    action_name = 'emailed'
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('emailed')
     visit_fcn = perform_delegate_email_batches
     return run_main_task(entry_id, visit_fcn, action_name)

@@ -40,13 +40,10 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.instructor = self.create_instructor('instructor')
         self.problem_url = InstructorTaskModuleTestCase.problem_location(PROBLEM_URL_NAME)
 
-    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None, task_input=None):
+    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None):
         """Creates a InstructorTask entry for testing."""
         task_id = str(uuid4())
-        if task_input is None:
-            task_input = {}
-        else:
-            task_input = dict(task_input)
+        task_input = {}
         if use_problem_url:
             task_input['problem_url'] = self.problem_url
         if student_ident is not None:

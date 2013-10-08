@@ -188,12 +188,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         num_tasks_this_query = int(math.ceil(float(num_emails_this_query) / float(settings.EMAILS_PER_TASK)))
         chunk = int(math.ceil(float(num_emails_this_query) / float(num_tasks_this_query)))
         for i in range(num_tasks_this_query):
-            if i == num_tasks_this_query - 1:
-                # Avoid cutting off the very last email when chunking a task that divides perfectly
-                # (e.g. num_emails_this_query = 297 and EMAILS_PER_TASK is 100)
-                to_list = recipient_sublist[i * chunk:]
-            else:
-                to_list = recipient_sublist[i * chunk:i * chunk + chunk]
+            to_list = recipient_sublist[i * chunk:i * chunk + chunk]
             subtask_id = str(uuid4())
             subtask_id_list.append(subtask_id)
             subtask_status = create_subtask_status(subtask_id)
@@ -480,6 +475,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     except INFINITE_RETRY_ERRORS as exc:
         dog_stats_api.increment('course_email.infinite_retry', tags=[_statsd_tag(course_title)])
+        # Increment the "retried_nomax" counter, update other counters with progress to date,
+        # and set the state to RETRY:
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -497,6 +494,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         # without popping the current recipient off of the existing list.
         # Errors caught are those that indicate a temporary condition that might succeed on retry.
         dog_stats_api.increment('course_email.limited_retry', tags=[_statsd_tag(course_title)])
+        # Increment the "retried_withmax" counter, update other counters with progress to date,
+        # and set the state to RETRY:
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -514,6 +513,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         num_pending = len(to_list)
         log.exception('Task %s: email with id %d caused send_course_email task to fail with "fatal" exception.  %d emails unsent.',
                       task_id, email_id, num_pending)
+        # Update counters with progress to date, counting unsent emails as failures,
+        # and set the state to FAILURE:
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -531,6 +532,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         dog_stats_api.increment('course_email.limited_retry', tags=[_statsd_tag(course_title)])
         log.exception('Task %s: email with id %d caused send_course_email task to fail with unexpected exception.  Generating retry.',
                       task_id, email_id)
+        # Increment the "retried_withmax" counter, update other counters with progress to date,
+        # and set the state to RETRY:
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -544,7 +547,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         )
 
     else:
-        # Successful completion is marked by an exception value of None.
+        # All went well.  Update counters with progress to date,
+        # and set the state to SUCCESS:
         subtask_progress = increment_subtask_status(
             subtask_status,
             succeeded=num_sent,
@@ -552,6 +556,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             skipped=num_optout,
             state=SUCCESS
         )
+        # Successful completion is marked by an exception value of None.
         return subtask_progress, None
     finally:
         # Clean up at the end.
@@ -559,7 +564,15 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
 
 def _get_current_task():
-    """Stub to make it easier to test without actually running Celery"""
+    """
+    Stub to make it easier to test without actually running Celery.
+
+    This is a wrapper around celery.current_task, which provides access
+    to the top of the stack of Celery's tasks.  When running tests, however,
+    it doesn't seem to work to mock current_task directly, so this wrapper
+    is used to provide a hook to mock in tests, while providing the real
+    `current_task` in production.
+    """
     return current_task
 
 
