@@ -93,7 +93,10 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
         instructor_qset = instructor_group.user_set.all()
         recipient_qset = staff_qset | instructor_qset
         if to_option == SEND_TO_ALL:
+            # We also require students to have activated their accounts to
+            # provide verification that the provided email address is valid.
             enrollment_qset = User.objects.filter(
+                is_active=True,
                 courseenrollment__course_id=course_id,
                 courseenrollment__is_active=True
             )
