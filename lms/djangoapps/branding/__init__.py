@@ -47,8 +47,10 @@ def get_logo_url(domain=None):
     university = get_university(domain)
 
     if university is None:
-        return '/static/images/header-logo.png'
+        return '{static_url}images/header-logo.png'.format(
+            static_url=settings.STATIC_URL
+        )
 
-    return '/static/images/{uni}-on-edx-logo.png'.format(
-        uni=university
+    return '{static_url}images/{uni}-on-edx-logo.png'.format(
+        static_url=settings.STATIC_URL, uni=university
     )
