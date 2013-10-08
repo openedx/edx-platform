@@ -9,7 +9,7 @@ from collections import namedtuple
 from django.utils.translation import ugettext as _
 from django.db.models import Q
 
-Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency'])
+Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_date'])
 
 
 class CourseMode(models.Model):
@@ -39,7 +39,7 @@ class CourseMode(models.Model):
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
     DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
@@ -57,8 +57,14 @@ class CourseMode(models.Model):
         found_course_modes = cls.objects.filter(Q(course_id=course_id) &
                                                 (Q(expiration_date__isnull=True) |
                                                 Q(expiration_date__gte=now)))
-        modes = ([Mode(mode.mode_slug, mode.mode_display_name, mode.min_price, mode.suggested_prices, mode.currency)
-                  for mode in found_course_modes])
+        modes = ([Mode(
+            mode.mode_slug,
+            mode.mode_display_name,
+            mode.min_price,
+            mode.suggested_prices,
+            mode.currency,
+            mode.expiration_date
+        ) for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
         return modes

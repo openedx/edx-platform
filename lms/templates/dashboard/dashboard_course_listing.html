@@ -1,8 +1,9 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_modes" />
 
 <%! from django.utils.translation import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
+  from datetime import date
   from courseware.courses import course_image_url, get_course_about_section
   import waffle
 %>
@@ -116,8 +117,6 @@
         % endif
       % endif
 
-
-
       <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
 
 % if show_email_settings:
@@ -125,5 +124,18 @@
 % endif
 
   </section>
+      %if enrollment.mode != 'verified' and 'verified' in course_modes:
+        <div>
+            <a href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">${_("Get a verified certificate for this course!")}</a>
+            %if course_modes['verified'].expiration_date:
+                <% days_left = (course_modes['verified'].expiration_date - date.today()).days %>
+                <p>
+                    ${_('Only {days} days left!').format(days=days_left)}
+                </p>
+            %endif
+
+        </div>
+      %endif
+
 </article>
 </li>

@@ -300,6 +300,7 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
                                           if has_access(request.user, course, 'load'))
 
+    course_modes = {course.id: CourseMode.modes_for_course_dict(course.id) for course, _enrollment in courses}
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
     # only show email settings for Mongo course and when bulk email is turned on
@@ -324,6 +325,7 @@ def dashboard(request):
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
+               'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
                }
