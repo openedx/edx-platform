@@ -17,6 +17,9 @@ import json
 sysadmin
 """
 
+
+@login_required
+@ensure_csrf_cookie
 def sysadmin(request):
     """
     sysadmin page: for now, just list courses and allow deletion
@@ -92,7 +95,6 @@ def sysadmin(request):
         cinfo = db.modulestore.find_one({'_id.course':course, '_id.category':'course'}) or {}
         id = cinfo.get('_id',cinfo)
         name = id.get('name',id)
-        #print "course %s: %s" % (course, name)
         ctab[course] = name
         idtab[course] = id
 
