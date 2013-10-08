@@ -315,8 +315,10 @@
   display: inline-block;
   vertical-align: middle;
   border: none;
-  padding: 3px ($baseline/2);
+  border-radius: ($baseline/4);
   background: none;
+  padding: ($baseline/4) ($baseline/2);
+  vertical-align: middle;
   color: $gray-l1;
 
   &:hover,
