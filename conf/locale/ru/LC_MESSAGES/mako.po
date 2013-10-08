@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-08 14:49+0400\n"
-"PO-Revision-Date: 2013-10-08 12:28+0400\n"
+"PO-Revision-Date: 2013-10-08 15:05+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3089,12 +3089,11 @@ msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py:16
 msgid "Administrator"
-msgstr ""
+msgstr "Администратор"
 
 #: common/djangoapps/django_comment_common/models.py:17
-#, fuzzy
 msgid "Moderator"
-msgstr "Добавить модератора"
+msgstr "Модератор"
 
 #: common/djangoapps/django_comment_common/models.py:18
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:134
@@ -3102,9 +3101,8 @@ msgid "Community TA"
 msgstr "Общественные ассистенты преподавателя"
 
 #: common/djangoapps/django_comment_common/models.py:19
-#, fuzzy
 msgid "Student"
-msgstr "Студенты"
+msgstr "Студент"
 
 #: common/djangoapps/student/models.py:93
 msgid "Master's or professional degree"
@@ -4273,7 +4271,7 @@ msgstr "Оценки для задания \"%s\""
 
 #: lms/djangoapps/instructor/views/legacy.py:491
 msgid "Staff group = {0}"
-msgstr ""
+msgstr "Группа преподавателей = {0}"
 
 #: lms/djangoapps/instructor/views/legacy.py:492
 msgid "List of Staff"
@@ -4304,11 +4302,11 @@ msgstr "Список инструкторов курса {0}"
 #: lms/djangoapps/instructor/views/legacy.py:534
 #: lms/djangoapps/instructor/views/legacy.py:956
 msgid "Error: unknown username \"{0}\""
-msgstr ""
+msgstr "Ошибка: неизвестное имя пользователя \"{0}\""
 
 #: lms/djangoapps/instructor/views/legacy.py:519
 msgid "Added {user} to instructor group = {group}"
-msgstr ""
+msgstr "Добавить {user} в группу инструкторов = {group}"
 
 #: lms/djangoapps/instructor/views/legacy.py:538
 msgid "Removed {user} from instructor group = {group}"
@@ -4380,7 +4378,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py:926
 msgid "Roles"
-msgstr ""
+msgstr "Роли"
 
 #: lms/djangoapps/instructor/views/legacy.py:927
 msgid "List of Forum {name}s in course {id}"
@@ -7703,9 +7701,8 @@ msgid "Show Discussion"
 msgstr "Показать дискусии"
 
 #: lms/templates/discussion/_filter_dropdown.html:29
-#, fuzzy
 msgid "Filter Topics"
-msgstr "Фильтр"
+msgstr "Фильтр тем"
 
 #: lms/templates/discussion/_filter_dropdown.html:35
 #: lms/templates/discussion/_new_post.html:30
@@ -7765,9 +7762,8 @@ msgid "Create new post about:"
 msgstr "Создать новое сообщение о:"
 
 #: lms/templates/discussion/_new_post.html:33
-#, fuzzy
 msgid "Filter List"
-msgstr "Фильтр"
+msgstr "Фильтр списка"
 
 #: lms/templates/discussion/_recent_active_posts.html:7
 msgid "Following"
@@ -7831,9 +7827,8 @@ msgstr "Отправить ответ:"
 
 #: lms/templates/discussion/_underscore_templates.html:35
 #: lms/templates/discussion/_underscore_templates.html:124
-#, fuzzy
 msgid "vote"
-msgstr "голоса"
+msgstr "проголосовать"
 
 #: lms/templates/discussion/_underscore_templates.html:36
 #: lms/templates/discussion/_underscore_templates.html:124
@@ -7850,13 +7845,12 @@ msgstr "&bull; Эта нить закрыта."
 #: lms/templates/discussion/_underscore_templates.html:133
 #: lms/templates/discussion/_underscore_templates.html:157
 msgid "Report Misuse"
-msgstr "Уведомить о неправильном использовании"
+msgstr "Пожаловаться"
 
 #: lms/templates/discussion/_underscore_templates.html:56
 #: lms/templates/discussion/_underscore_templates.html:61
-#, fuzzy
 msgid "pin this thread"
-msgstr "Прикрепить нить"
+msgstr "прикрепить тему"
 
 #: lms/templates/discussion/_underscore_templates.html:57
 #: lms/templates/discussion/_underscore_templates.html:62
@@ -7877,23 +7871,20 @@ msgid "Editing post"
 msgstr "Редактирование сообщения"
 
 #: lms/templates/discussion/_underscore_templates.html:86
-#, fuzzy
 msgid "Edit post title"
-msgstr "Редактирование сообщения"
+msgstr "Редактировать заголовок сообщения"
 
 #: lms/templates/discussion/_underscore_templates.html:98
 msgid "Update post"
 msgstr "Обновить сообщение"
 
 #: lms/templates/discussion/_underscore_templates.html:110
-#, fuzzy
 msgid "Add a comment"
 msgstr "Добавить комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html:112
-#, fuzzy
 msgid "Add a comment..."
-msgstr "Добавить комментарий"
+msgstr "Добавить комментарий..."
 
 #: lms/templates/discussion/_underscore_templates.html:125
 msgid "endorse"
@@ -7933,7 +7924,7 @@ msgstr "Проголосовать за посты и хорошие ответ�
 
 #: lms/templates/discussion/_underscore_templates.html:212
 msgid "Report Forum Misuse"
-msgstr "Уведомить о неправильном использовании"
+msgstr "Пожаловаться на форум"
 
 #: lms/templates/discussion/_underscore_templates.html:216
 msgid "Follow posts for updates"
