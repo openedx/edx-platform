@@ -28,7 +28,6 @@ prepend_path: cms/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - coffee/spec/setup_require.js
     - xmodule_js/common_static/js/vendor/require.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/utility.js
