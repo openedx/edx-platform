@@ -884,6 +884,8 @@ class CapaModule(CapaFields, XModule):
             'max_value': score['total'],
         })
 
+        return {'grade': score['score'], 'max_grade': score['total']}
+
     def check_problem(self, data):
         """
         Checks whether answers to a problem are correct
@@ -951,7 +953,7 @@ class CapaModule(CapaFields, XModule):
                 return {'success': msg}
             raise
 
-        self.publish_grade()
+        published_grade = self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'
@@ -961,6 +963,8 @@ class CapaModule(CapaFields, XModule):
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
         #       'success' will always be incorrect
+        event_info['grade'] = published_grade['grade']
+        event_info['max_grade'] = published_grade['max_grade']
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts

@@ -2,9 +2,9 @@
  Tracking Logs
 ===============
 
-The following is an inventory of all LMS event types. 
+The following is an inventory of all LMS event types.
 
-This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard, 
+This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard,
 and a table of Instructor Event Types of all interaction with the Instructor Dashboard in the LMS.
 
 Common Fields
@@ -38,16 +38,16 @@ This section contains a table of fields common to all events.
 |                           | string is empty for anonymous events (i.e., user not logged |             |                                    |
 |                           | in).                                                        |             |                                    |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-       
+
 
 Event Types
 ===========
 
 There are two tables of event types -- one for student events, and one for instructor events.
 Table columns describe what each event type represents, which component it originates from, what scripting language was used to fire the event, and what ``event`` fields are associated with it.
-The ``event_source`` field from the "Common Fields" table above distinguishes between events that originated in the browser (in javascript) and events that originated on the server (during the processing of a request). 
+The ``event_source`` field from the "Common Fields" table above distinguishes between events that originated in the browser (in javascript) and events that originated on the server (during the processing of a request).
 
-Event types with several different historical names are enumerated by forward slashes. 
+Event types with several different historical names are enumerated by forward slashes.
 Rows identical after the second column have been combined, with the corresponding event types enumerated by commas.
 
 
@@ -162,6 +162,10 @@ The Student Event Type table lists the event types logged for interaction with t
 |                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
 |                                   |                               |                     |                 | ``attempts``        | integer       |                                                                     |
 |                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``grade``           | integer       | Current grade value                                                 |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``max_grade``       | integer       | Maximum possible grade value                                        |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
 |                                   |                               |                     |                 | ``correct_map``     | string / JSON | **See the table in**                                                |
 |                                   |                               |                     |                 |                     |               | **Addendum:** ``correct_map`` **Fields and Values below**           |
 +-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
@@ -241,7 +245,7 @@ Table of ``correct_map`` field types and values for the ``problem_check`` studen
 |                                                  |                                                  | string dump of a DateTime object of the form     |                                                  |
 |                                                  |                                                  | `'%Y%m%d%H%M%S'`.                                |                                                  |
 +--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+--------------------------------------------------+
- 
+
 
 Instructor Event Types
 ----------------------
