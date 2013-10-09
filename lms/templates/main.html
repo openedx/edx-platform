@@ -36,7 +36,6 @@
           if (window.location !== window.top.location) {
             window.top.location = window.location;
           }
-          window.baseUrl = "${settings.STATIC_URL}";
         })(this);
       </script>
     % endif
@@ -96,6 +95,7 @@
   <%include file="footer.html" />
 % endif
 
+  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
   <%static:js group='module-js'/>
 
