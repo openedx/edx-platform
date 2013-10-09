@@ -179,6 +179,13 @@ MITX_FEATURES = {
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Automatically approve student identity verification attempts
+    'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
+
+    # Disable instructor dash buttons for downloading course data
+    # when enrollment exceeds this number
+    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 }
 
 # Used for A/B testing
@@ -362,6 +369,10 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+# Should we initialize the modulestores at startup, or wait until they are
+# needed?
+INIT_MODULESTORE_ON_STARTUP = True
 
 ############# XBlock Configuration ##########
 
@@ -587,7 +598,7 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-    
+
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
 )
@@ -606,10 +617,9 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-# 'js/vendor/RequireJS.js' - Require JS wrapper.
-# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-    'js/vendor/RequireJS.js',
+    'js/vendor/require.js',
+    'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
     'js/vendor/jquery.min.js',
     'js/vendor/jquery-ui.min.js',

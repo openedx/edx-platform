@@ -51,7 +51,6 @@ _report_dir = REPO_ROOT / 'reports' / _system
 _report_dir.makedirs_p()
 
 NOSE_ARGS = [
-    '--tests', PROJECT_ROOT / 'djangoapps', COMMON_ROOT / 'djangoapps',
     '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
     '--xunit-file', _report_dir / 'nosetests.xml',
 ]
@@ -109,6 +108,10 @@ MODULESTORE = {
         }
     }
 }
+
+# Starting modulestores generates log messages.  If we wait to init modulestores,
+# then those messages will be silenced by the test runner.
+INIT_MODULESTORE_ON_STARTUP = False
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',

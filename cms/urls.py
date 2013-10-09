@@ -29,6 +29,8 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.course_index', name='course_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
         'contentstore.views.import_course', name='import_course'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import_status/(?P<name>[^/]+)$',
+        'contentstore.views.import_status', name='import_status'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
         'contentstore.views.export_course', name='export_course'),
@@ -102,6 +104,7 @@ urlpatterns = ('',  # nopep8
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
+    url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
 )
 
@@ -132,7 +135,7 @@ js_info_dict = {
 
 urlpatterns += (
     # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):

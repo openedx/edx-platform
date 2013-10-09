@@ -6,7 +6,7 @@
     <div class="drag_and_drop_problem_json" id="drag_and_drop_json_${id}"
         style="display:none;">${drag_and_drop_json}</div>
 
-    <div class="script_placeholder" data-src="/static/js/capa/drag_and_drop.js"></div>
+    <div class="script_placeholder" data-src="${STATIC_URL}js/capa/drag_and_drop.js"></div>
 
     % if status == 'unsubmitted':
         <div class="unanswered" id="status_${id}">

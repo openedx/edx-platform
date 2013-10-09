@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
 
 <div class="wrapper-comp-editor" id="editor-tab">
 <section class="problem-editor editor">
@@ -38,7 +39,7 @@
             <div class="row">
                 <h6>${_("Heading 1")}</h6>
                 <div class="col sample heading-1">
-                    <img src="/static/img/header-example.png" />
+                    <img src="${static.url("/img/header-example.png")}" />
                 </div>
                 <div class="col">
 <pre><code>H1
@@ -49,7 +50,7 @@
             <div class="row">
                 <h6>${_("Multiple Choice")}</h6>
                 <div class="col sample multiple-choice">
-                    <img src="/static/img/choice-example.png" />
+                    <img src="${static.url("img/choice-example.png")}" />
                 </div>
                 <div class="col">
 <pre><code>( ) red
@@ -60,7 +61,7 @@
             <div class="row">
                 <h6>${_("Checkboxes")}</h6>
                 <div class="col sample check-multiple">
-                    <img src="/static/img/multi-example.png" />
+                    <img src="${static.url("img/multi-example.png")}" />
                 </div>
                 <div class="col">
 <pre><code>[x] earth
@@ -71,7 +72,7 @@
             <div class="row">
                 <h6>${_("Text Input")}</h6>
                 <div class="col sample string-response">
-                    <img src="/static/img/string-example.png" />
+                    <img src="${static.url("img/string-example.png")}" />
                 </div>
                 <div class="col">
                     <pre><code>= dog</code></pre>
@@ -80,7 +81,7 @@
             <div class="row">
                 <h6>${_("Numerical Input")}</h6>
                 <div class="col sample numerical-response">
-                    <img src="/static/img/number-example.png" />
+                    <img src="${static.url("img/number-example.png")}" />
                 </div>
                 <div class="col">
                     <pre><code>= 3.14 +- 2%</code></pre>
@@ -89,7 +90,7 @@
             <div class="row">
                 <h6>${_("Dropdown")}</h6>
                 <div class="col sample option-reponse">
-                    <img src="/static/img/select-example.png" />
+                    <img src="${static.url("img/select-example.png")}" />
                 </div>
                 <div class="col">
                     <pre><code>[[wrong, (right)]]</code></pre>
@@ -98,7 +99,7 @@
             <div class="row">
                 <h6>${_("Explanation")}</h6>
                 <div class="col sample explanation">
-                    <img src="/static/img/explanation-example.png" />
+                    <img src="${static.url("img/explanation-example.png")}" />
                 </div>
                 <div class="col">
                     <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>

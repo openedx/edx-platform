@@ -32,6 +32,7 @@ from lms.xblock.mixin import LmsBlockMixin
 from cms.xmodule_namespace import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
+from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -69,6 +70,7 @@ ENABLE_JASMINE = False
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
@@ -88,7 +90,8 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -107,7 +110,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf'
+    'django.core.context_processors.csrf',
+    'dealer.contrib.django.staff.context_processor',  # access git revision
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -197,13 +201,14 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 # Static content
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' + git.revision + "/"
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles"
+STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    LMS_ROOT / "static",
 
     # This is how you would use the textbook images locally
     # ("book", ENV_ROOT / "book_images")
@@ -259,6 +264,7 @@ PIPELINE_JS = {
              'js/models/settings/course_grading_policy.js',
              'js/models/asset.js', 'js/models/assets.js',
              'js/views/assets.js',
+             'js/views/import.js',
              'js/views/assets_view.js', 'js/views/asset_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
@@ -266,21 +272,36 @@ PIPELINE_JS = {
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js')
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/discussion/*.js')
         ),
         'output_filename': 'js/cms-modules.js',
         'test_order': 1
     },
 }
 
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+)
+
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
-    "sass/*",
-    "coffee/*",
     "*.py",
     "*.pyc"
+    # it would be nice if we could do, for example, "**/*.scss",
+    # but these strings get passed down to the `fnmatch` module,
+    # which doesn't support that. :(
+    # http://docs.python.org/2/library/fnmatch.html
+    "sass/*.scss",
+    "sass/*/*.scss",
+    "sass/*/*/*.scss",
+    "sass/*/*/*/*.scss",
+    "coffee/*.coffee",
+    "coffee/*/*.coffee",
+    "coffee/*/*/*.coffee",
+    "coffee/*/*/*/*.coffee",
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'

@@ -41,13 +41,13 @@ def log_in(username='robot', password='test', email='robot@edx.org', name='Robot
 
 
 @world.absorb
-def register_by_course_id(course_id, is_staff=False):
-    create_user('robot', 'password')
-    u = User.objects.get(username='robot')
+def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
+    create_user(username, password)
+    user = User.objects.get(username=username)
     if is_staff:
-        u.is_staff = True
-        u.save()
-    CourseEnrollment.enroll(u, course_id)
+        user.is_staff = True
+        user.save()
+    CourseEnrollment.enroll(user, course_id)
 
 
 @world.absorb

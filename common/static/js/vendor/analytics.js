@@ -5533,6 +5533,10 @@ if (typeof exports == "object") {
   module.exports = require("analytics");
 } else if (typeof define == "function" && define.amd) {
   define(function(){ return require("analytics"); });
+  // MODIFICATION:
+  // We have code, not using require, that expects analytics to be defined.
+  // Until we are using RequireJS throughout the product, define on the window object as well.
+  this["analytics"] = require("analytics");
 } else {
   this["analytics"] = require("analytics");
 }})();

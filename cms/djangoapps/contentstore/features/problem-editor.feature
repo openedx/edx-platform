@@ -5,7 +5,7 @@ Feature: CMS.Problem Editor
   Scenario: User can view metadata
     Given I have created a Blank Common Problem
     When I edit and select Settings
-    Then I see five alphabetized settings and their expected values
+    Then I see the advanced settings and their expected values
     And Edit High Level Source is not visible
 
   # Safari is having trouble saving the values on sauce

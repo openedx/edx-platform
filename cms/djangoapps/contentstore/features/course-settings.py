@@ -31,6 +31,9 @@ def test_i_select_schedule_and_details(step):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-schedule a'
     world.css_click(link_css)
+    world.wait_for_requirejs(
+        ["jquery", "js/models/course",
+         "js/models/settings/course_details", "js/views/settings/main"])
 
 
 @step('I have set course dates$')
@@ -51,12 +54,6 @@ def test_and_i_set_course_dates(step):
     set_date_or_time(ENROLLMENT_END_TIME_CSS, DUMMY_TIME)
 
 
-@step('Then I see the set dates on refresh$')
-def test_then_i_see_the_set_dates_on_refresh(step):
-    reload_the_page(step)
-    i_see_the_set_dates()
-
-
 @step('And I clear all the dates except start$')
 def test_and_i_clear_all_the_dates_except_start(step):
     set_date_or_time(COURSE_END_DATE_CSS, '')
@@ -64,9 +61,8 @@ def test_and_i_clear_all_the_dates_except_start(step):
     set_date_or_time(ENROLLMENT_END_DATE_CSS, '')
 
 
-@step('Then I see cleared dates on refresh$')
-def test_then_i_see_cleared_dates_on_refresh(step):
-    reload_the_page(step)
+@step('Then I see cleared dates$')
+def test_then_i_see_cleared_dates(step):
     verify_date_or_time(COURSE_END_DATE_CSS, '')
     verify_date_or_time(ENROLLMENT_START_DATE_CSS, '')
     verify_date_or_time(ENROLLMENT_END_DATE_CSS, '')
@@ -92,9 +88,8 @@ def test_i_receive_a_warning_about_course_start_date(step):
     assert_true('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
-@step('The previously set start date is shown on refresh$')
-def test_the_previously_set_start_date_is_shown_on_refresh(step):
-    reload_the_page(step)
+@step('the previously set start date is shown$')
+def test_the_previously_set_start_date_is_shown(step):
     verify_date_or_time(COURSE_START_DATE_CSS, '12/20/2013')
     verify_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
 
@@ -118,9 +113,8 @@ def test_the_warning_about_course_start_date_goes_away(step):
     assert_false('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
-@step('My new course start date is shown on refresh$')
-def test_my_new_course_start_date_is_shown_on_refresh(step):
-    reload_the_page(step)
+@step('my new course start date is shown$')
+def new_course_start_date_is_shown(step):
     verify_date_or_time(COURSE_START_DATE_CSS, '12/22/2013')
     # Time should have stayed from before attempt to clear date.
     verify_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
@@ -132,16 +126,6 @@ def test_i_change_fields(step):
     set_date_or_time(COURSE_END_DATE_CSS, '7/7/7777')
     set_date_or_time(ENROLLMENT_START_DATE_CSS, '7/7/7777')
     set_date_or_time(ENROLLMENT_END_DATE_CSS, '7/7/7777')
-
-
-@step('I do not see the new changes persisted on refresh$')
-def test_changes_not_shown_on_refresh(step):
-    step.then('Then I see the set dates on refresh')
-
-
-@step('I do not see the changes')
-def test_i_do_not_see_changes(_step):
-    i_see_the_set_dates()
 
 
 @step('I change the course overview')
@@ -167,12 +151,10 @@ def i_see_new_course_image(_step):
     assert len(images) == 1
     img = images[0]
     expected_src = '/c4x/MITx/999/asset/image.jpg'
+
     # Don't worry about the domain in the URL
-    try:
-        assert img['src'].endswith(expected_src)
-    except AssertionError as e:
-        e.args += ('Was looking for {}'.format(expected_src), 'Found {}'.format(img['src']))
-        raise
+    success_func = lambda _: img['src'].endswith(expected_src)
+    world.wait_for(success_func)
 
 
 @step('the image URL should be present in the field')
@@ -200,7 +182,9 @@ def verify_date_or_time(css, date_or_time):
     assert_equal(date_or_time, world.css_value(css))
 
 
-def i_see_the_set_dates():
+@step('I do not see the changes')
+@step('I see the set dates')
+def i_see_the_set_dates(_step):
     """
     Ensure that each field has the value set in `test_and_i_set_course_dates`.
     """

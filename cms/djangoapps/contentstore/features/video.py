@@ -1,9 +1,13 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from terrain.steps import reload_the_page
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
+
+BUTTONS = {
+    'CC': '.hide-subtitles',
+    'volume': '.volume',
+}
 
 
 @step('I have created a Video component$')
@@ -17,27 +21,38 @@ def i_created_a_video_component(step):
 
 
 @step('I have created a Video component with subtitles$')
-def i_created_a_video_component_subtitles(step):
-    step.given('I have created a Video component')
+def i_created_a_video_with_subs(_step):
+    _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
+
+@step('I have created a Video component with subtitles "([^"]*)"$')
+def i_created_a_video_with_subs_with_name(_step, sub_id):
+    _step.given('I have created a Video component')
 
     # Store the current URL so we can return here
     video_url = world.browser.url
 
     # Upload subtitles for the video using the upload interface
-    step.given('I have uploaded subtitles')
+    _step.given('I have uploaded subtitles "{}"'.format(sub_id))
 
     # Return to the video
     world.visit(video_url)
+    world.wait_for_xmodule()
 
 
-@step('I have uploaded subtitles')
-def i_have_uploaded_subtitles(step):
-    step.given('I go to the files and uploads page')
-    step.given('I upload the file "subs_OEoXaMPEzfM.srt.sjson"')
+@step('I have uploaded subtitles "([^"]*)"$')
+def i_have_uploaded_subtitles(_step, sub_id):
+    _step.given('I go to the files and uploads page')
+
+    sub_id = sub_id.strip()
+    if not sub_id:
+        sub_id = 'OEoXaMPEzfM'
+    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id))
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
+    world.wait_for_xmodule()
     assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
@@ -58,6 +73,7 @@ def i_edit_the_component(_step):
 
 @step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
+    world.wait_for_xmodule()
     button_css = 'a.hide-subtitles'
     if shown == 'hidden':
         world.css_click(button_css)
@@ -99,12 +115,44 @@ def xml_only_video(step):
         data='<video youtube="1.00:%s"></video>' % youtube_id
     )
 
-    # Refresh to see the new video
-    reload_the_page(step)
-
 
 @step('The correct Youtube video is shown$')
 def the_youtube_video_is_shown(_step):
+    world.wait_for_xmodule()
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
+
+
+@step('Make sure captions are (.+)$')
+def set_captions_visibility_state(_step, captions_state):
+    if captions_state == 'closed':
+        if world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+    else:
+        if not world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+
+
+@step('I hover over button "([^"]*)"$')
+def hover_over_button(_step, button):
+    world.css_find(BUTTONS[button.strip()]).mouse_over()
+
+
+@step('Captions (?:are|become) "([^"]*)"$')
+def are_captions_visibile(_step, visibility_state):
+    _step.given('Captions become "{0}" after 0 seconds'.format(visibility_state))
+
+
+@step('Captions (?:are|become) "([^"]*)" after (.+) seconds$')
+def check_captions_visibility_state(_step, visibility_state, timeout):
+    timeout = int(timeout.strip())
+
+    # Captions become invisible by fading out. We must wait by a specified
+    # time.
+    world.wait(timeout)
+
+    if visibility_state == 'visible':
+        assert world.css_visible('.subtitles')
+    else:
+        assert not world.css_visible('.subtitles')
 

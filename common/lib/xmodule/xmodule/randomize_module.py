@@ -80,9 +80,9 @@ class RandomizeModule(RandomizeFields, XModule):
     def get_html(self):
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
-            return "<div>Nothing to randomize between</div>"
+            return u"<div>Nothing to randomize between</div>"
 
-        return self.child.get_html()
+        return self.runtime.render_child(self.child, None, 'student_view').content
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'

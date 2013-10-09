@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
+from mitxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xblock.field_data import DictFieldData
@@ -73,7 +74,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         # username = robot{0}, password = 'test'
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create()
             for i in range(self.USER_COUNT)
         ]
 
@@ -92,6 +93,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
 
         self.runtime.xmodule_field_data = self.xmodule_field_data
+
+        self.runtime.get_module = lambda descr: descr.xmodule(self.runtime)
 
         self.item_module = self.item_descriptor.xmodule(self.runtime)
 
@@ -114,6 +117,9 @@ class BaseTestXmodule(ModuleStoreTestCase):
             args=(self.course.id, self.item_url, dispatch)
         )
 
-    def tearDown(self):
-        for user in self.users:
-            user.delete()
+
+class XModuleRenderingTestBase(BaseTestXmodule):
+    def setUp(self):
+        super(XModuleRenderingTestBase, self).setUp()
+
+        self.runtime.render_template = render_to_string

@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_false  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal, assert_in, assert_false  # pylint: disable=E0611
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
 from django.conf import settings
@@ -64,32 +64,17 @@ def select_new_course(_step, whom):
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
-    # TODO: fix up this code. Selenium is not dealing well with css transforms,
-    # as it thinks that the notification and the buttons are always visible
 
-    # First wait for the notification to pop up
-    notification_css = 'div#page-notification div.wrapper-notification'
-    world.wait_for_visible(notification_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    # Now make sure the button is there
+    # Because the notification uses a CSS transition,
+    # Selenium will always report it as being visible.
+    # This makes it very difficult to successfully click
+    # the "Save" button at the UI level.
+    # Instead, we use JavaScript to reliably click
+    # the button.
     btn_css = 'div#page-notification a.action-%s' % name.lower()
-    world.wait_for_visible(btn_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    if world.is_firefox():
-        # This is done to explicitly make the changes save on firefox.
-        # It will remove focus from the previously focused element
-        world.trigger_event(btn_css, event='focus')
-        world.browser.execute_script("$('{}').click()".format(btn_css))
-    else:
-        world.css_click(btn_css)
+    world.trigger_event(btn_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(btn_css))
+    world.wait_for_ajax_complete()
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -168,6 +153,18 @@ def log_into_studio(
     assert_in(uname, world.css_text('h2.title', timeout=10))
 
 
+def add_course_author(user, course):
+    """
+    Add the user to the instructor group of the course
+    so they will have the permissions to see it in studio
+    """
+    for role in ("staff", "instructor"):
+        groupname = get_course_groupname_for_role(course.location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        user.groups.add(group)
+    user.save()
+
+
 def create_a_course():
     course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
     world.scenario_dict['COURSE'] = course
@@ -176,13 +173,7 @@ def create_a_course():
     if not user:
         user = get_user_by_email('robot+studio@edx.org')
 
-    # Add the user to the instructor group of the course
-    # so they will have the permissions to see it in studio
-    for role in ("staff", "instructor"):
-        groupname = get_course_groupname_for_role(course.location, role)
-        group, __ = Group.objects.get_or_create(name=groupname)
-        user.groups.add(group)
-    user.save()
+    add_course_author(user, course)
 
     # Navigate to the studio dashboard
     world.visit('/')
@@ -238,7 +229,9 @@ def open_new_unit(step):
     step.given('I have opened a new course section in Studio')
     step.given('I have added a new subsection')
     step.given('I expand the first section')
+    old_url = world.browser.url
     world.css_click('a.new-unit-item')
+    world.wait_for(lambda x: world.browser.url != old_url)
 
 
 @step('the save notification button is disabled')
@@ -292,6 +285,7 @@ def type_in_codemirror(index, text):
     g._element.send_keys(text)
     if world.is_firefox():
         world.trigger_event('div.CodeMirror', index=index, event='blur')
+    world.wait_for_ajax_complete()
 
 
 def upload_file(filename):

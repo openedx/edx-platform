@@ -99,16 +99,19 @@ def initial_setup(server):
         success = False
         num_attempts = 0
         while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
-            world.browser = Browser(browser_driver)
 
-            # Try to visit the main page
-            # If the browser session is invalid, this will
+            # Load the browser and try to visit the main page
+            # If the browser couldn't be reached or
+            # the browser session is invalid, this will
             # raise a WebDriverException
             try:
+                world.browser = Browser(browser_driver)
+                world.browser.driver.set_script_timeout(10)
                 world.visit('/')
 
             except WebDriverException:
-                world.browser.quit()
+                if hasattr(world, 'browser'):
+                    world.browser.quit()
                 num_attempts += 1
 
             else:
@@ -130,6 +133,7 @@ def initial_setup(server):
             **make_saucelabs_desired_capabilities()
         )
         world.absorb(30, 'IMPLICIT_WAIT')
+        world.browser.set_script_timeout(10)
 
     elif world.LETTUCE_SELENIUM_CLIENT == 'grid':
         world.browser = Browser(
@@ -138,6 +142,7 @@ def initial_setup(server):
             browser=settings.SELENIUM_GRID.get('BROWSER'),
         )
         world.absorb(30, 'IMPLICIT_WAIT')
+        world.browser.driver.set_script_timeout(10)
 
     else:
         raise Exception("Unknown selenium client '{}'".format(world.LETTUCE_SELENIUM_CLIENT))
@@ -190,6 +195,7 @@ def screenshot_on_error(scenario):
             world.browser.driver.save_screenshot(image_name)
         except WebDriverException:
             LOGGER.error('Could not capture a screenshot')
+
 
 @after.all
 def teardown_browser(total):
