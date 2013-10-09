@@ -76,19 +76,19 @@
     </div>
 
     <div class="focus_grabber last"></div>
-
+<ul class="downloads-wrapper">
 % if sources.get('main'):
-    <div class="video-sources">
-        <p>${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}</p>
-    </div>
+    <li class="video-sources">
+        ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+    </li>
 % endif
 
 % if track:
-    <div class="video-tracks">
-        <p>${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}</p>
-    </div>
+    <li class="video-tracks">
+        ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+    </li>
 % endif
-
+</ul>
 </div>
 
 

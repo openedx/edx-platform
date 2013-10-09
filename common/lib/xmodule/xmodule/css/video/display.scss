@@ -32,13 +32,9 @@ div.video {
     display: inline-block;
     margin: ($baseline*.75) ($baseline/2) 0 0;
 
-    p {
-      display: inline-block;
-      margin: 0;
-    }
-
     a {
       @include transition(all 0.25s ease-in-out 0s);
+      @include font-size(14);
       display: inline-block;
       border-radius: 3px 3px 3px 3px;
       background-color: $white;
