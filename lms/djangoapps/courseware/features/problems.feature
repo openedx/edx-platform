@@ -10,6 +10,8 @@ Feature: LMS.Answer problems
         When I answer a "<ProblemType>" problem "correctly"
         Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
+        And a "problem_check" server event is emitted
+        And a "problem_check" browser event is emitted
 
         Examples:
         | ProblemType       |
