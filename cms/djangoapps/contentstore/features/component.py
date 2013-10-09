@@ -5,7 +5,6 @@ from lettuce import world, step
 from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
 from common import create_studio_user, add_course_author, log_into_studio
 
-
 @step(u'I am in Studio editing a new unit$')
 def add_unit(step):
     world.clear_courses()
@@ -96,8 +95,13 @@ def add_a_multi_step_component(step, is_advanced, category):
 
 @step(u'I see (HTML|Problem) components in this order:')
 def see_a_multi_step_component(step, category):
-    components = world.css_find('li.component section.xmodule_display')
+
+    # Wait for all components to finish rendering
+    selector = 'li.component section.xmodule_display'
+    world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
+
     for idx, step_hash in enumerate(step.hashes):
+
         if category == 'HTML':
             html_matcher = {
                 'Text':
@@ -107,9 +111,11 @@ def see_a_multi_step_component(step, category):
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
             }
-            assert_in(html_matcher[step_hash['Component']], components[idx].html)
+            actual_html = world.css_html(selector, index=idx)
+            assert_in(html_matcher[step_hash['Component']], actual_html)
         else:
-            assert_in(step_hash['Component'].upper(), components[idx].text)
+            actual_text = world.css_text(selector, index=idx)
+            assert_in(step_hash['Component'].upper(), actual_text)
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
