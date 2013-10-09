@@ -2,6 +2,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 from oauthlib.oauth1.rfc5849 import signature
 import mock
+import sys
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -13,9 +14,14 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
     protocol = "HTTP/1.0"
 
-    def log_request(self, *args, **kwargs):
-        """Don't log requests, this is just test code."""
-        pass
+    def log_message(self, format, *args):
+        """Log an arbitrary message."""
+        # Code copied from BaseHTTPServer.py. Changed to write to sys.stdout
+        # so that messages won't pollute test output.
+        sys.stdout.write("%s - - [%s] %s\n" %
+                         (self.client_address[0],
+                          self.log_date_time_string(),
+                          format % args))
 
     def do_HEAD(self):
         self._send_head()
