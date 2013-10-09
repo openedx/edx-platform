@@ -246,7 +246,9 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-metadata_cache_key = attrgetter('org', 'course')
+def metadata_cache_key(location):
+    """Turn a `Location` into a useful cache key."""
+    return u"{0.org}/{0.course}".format(location)
 
 
 class MongoModuleStore(ModuleStoreBase):
