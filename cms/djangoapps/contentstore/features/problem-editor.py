@@ -5,7 +5,7 @@ import os
 import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
-from common import type_in_codemirror
+from common import type_in_codemirror, open_new_course
 
 
 DISPLAY_NAME = "Display Name"
@@ -201,7 +201,7 @@ def high_level_source_in_editor(_step):
 
 @step(u'I have an empty course')
 def i_have_empty_course(step):
-    step.given('I have clicked the new unit button')
+    open_new_course()
 
 
 @step(u'I go to the import page')
@@ -238,11 +238,7 @@ def i_can_see_message(_step, msg):
 
 @step(u'I can edit the problem$')
 def i_can_edit_problem(_step):
-    try:
-        world.edit_component()
-    except TimeoutException:
-        assert_true(False)
-    assert_true(True)
+    world.edit_component()
 
 
 def verify_high_level_source_links(step, visible):

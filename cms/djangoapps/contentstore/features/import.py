@@ -16,6 +16,7 @@ def import_file(filename):
 
 @world.absorb
 def go_to_import():
-    world.click_course_content()
+    menu_css = 'li.nav-course-tools'
     import_css = 'li.nav-course-tools-import a'
+    world.css_click(menu_css)
     world.css_click(import_css)
