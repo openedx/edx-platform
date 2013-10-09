@@ -1,6 +1,7 @@
 (function () {
     describe('VideoCaption', function () {
-        var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
+        var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD,
+            WAIT_TIMEOUT = 1000;
 
         function initialize() {
             loadFixtures('video_all.html');
@@ -48,7 +49,7 @@
                         }
 
                         return false;
-                    }, 'Expect captions to be loaded.', 1000);
+                    }, 'Expect captions to be loaded.', WAIT_TIMEOUT);
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
@@ -469,9 +470,7 @@
             });
 
             describe('set the height of caption container', function () {
-                // Temporarily disabled due to intermittent failures
-                // with error "Expected 745 to be close to 805, 2." in Firefox
-                xit('when CC button is enabled', function () {
+                it('when CC button is enabled', function () {
                     var realHeight = parseInt(
                             $('.subtitles').css('maxHeight'), 10
                         ),
@@ -576,12 +575,7 @@
                     $('.subtitles li[data-start="14910"]').trigger('click');
                 });
 
-                // Temporarily disabled due to intermittent failures
-                // Fails with error: "InvalidStateError: An attempt was made to
-                // use an object that is not, or is no longer, usable
-                // Expected 0 to equal 14.91."
-                // on Firefox
-                xit('trigger seek event with the correct time', function () {
+                it('trigger seek event with the correct time', function () {
                     expect(videoPlayer.currentTime).toEqual(14.91);
                 });
             });
@@ -763,33 +757,41 @@
                 });
             });
 
-            xdescribe('when enter key is pressed on a caption', function () {
-                var subDataLiIdx__0;
+            describe('when enter key is pressed on a caption', function () {
 
-                beforeEach(function () {
-                    var e;
+                var assertCaptions = function (expectations) {
 
-                    subDataLiIdx__0 = $('.subtitles li[data-index=0]');
+                        waitsFor(function () {
+                            return videoCaption.captions.length;
+                        }, "Captions are not loaded.", WAIT_TIMEOUT);
 
-                    spyOn(videoCaption, 'seekPlayer').andCallThrough();
-                    videoCaption.isMouseFocus = false;
-                    subDataLiIdx__0.trigger(jQuery.Event('focus'));
-                    e = jQuery.Event('keydown');
-                    e.which = 13; // ENTER key
-                    subDataLiIdx__0.trigger(e);
+                        runs(expectations);
+                    },
+                    initializeClick = function () {
+                        var e,
+                        subDataLiIdx__0 = $('.subtitles li[data-index=0]');
+
+                        spyOn(videoCaption, 'seekPlayer').andCallThrough();
+                        videoCaption.isMouseFocus = false;
+                        subDataLiIdx__0.trigger(jQuery.Event('focus'));
+                        e = jQuery.Event('keydown');
+                        e.which = 13; // ENTER key
+                        subDataLiIdx__0.trigger(e);
+                    };
+
+                it('shows an outline around it' , function () {
+                    assertCaptions(function() {
+                        var subDataLiIdx__0 = $('.subtitles li[data-index=0]');
+                        initializeClick();
+                        expect(subDataLiIdx__0).toHaveClass('focused');
+                    });
                 });
 
-                // Temporarily disabled due to intermittent failures.
-                //
-                // Fails with error: "InvalidStateError: InvalidStateError: An
-                // attempt was made to use an object that is not, or is no
-                // longer, usable".
-                xit('shows an outline around it', function () {
-                    expect(subDataLiIdx__0).toHaveClass('focused');
-                });
-
-                xit('calls seekPlayer', function () {
-                    expect(videoCaption.seekPlayer).toHaveBeenCalled();
+                it('calls seekPlayer', function () {
+                    assertCaptions(function() {
+                        initializeClick();
+                        expect(videoCaption.seekPlayer).toHaveBeenCalled();
+                    });
                 });
             });
         });

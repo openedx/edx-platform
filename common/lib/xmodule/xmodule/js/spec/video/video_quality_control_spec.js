@@ -11,7 +11,9 @@
 
     beforeEach(function() {
       oldOTBD = window.onTouchBasedDevice;
-      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+      window.onTouchBasedDevice = jasmine
+                                      .createSpy('onTouchBasedDevice')
+                                      .andReturn(false);
     });
 
     afterEach(function() {
@@ -20,7 +22,8 @@
     });
 
     describe('constructor', function() {
-      var oldYT = window.YT;
+      var oldYT = window.YT,
+      SELECTOR = 'a.quality_control';
 
       beforeEach(function() {
         window.YT = {
@@ -37,21 +40,13 @@
       });
 
       it('render the quality control', function() {
-        expect(videoControl.secondaryControlsEl.html())
-          .toContain(
-            '<a ' +
-              'href="#" ' +
-              'class="quality_control" ' +
-              'title="HD off" ' +
-              'role="button" ' +
-              'aria-disabled="false"' +
-            '>HD off</a>'
-          );
+        var container = videoControl.secondaryControlsEl;
+        expect(container).toContain(SELECTOR);
       });
 
       it('bind the quality control', function() {
-        expect($('.quality_control'))
-          .toHandleWith('click', videoQualityControl.toggleQuality);
+        var handler = videoQualityControl.toggleQuality;
+        expect($(SELECTOR)).toHandleWith('click', handler);
       });
     });
   });
