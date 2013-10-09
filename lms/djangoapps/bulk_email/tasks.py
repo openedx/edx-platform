@@ -142,7 +142,16 @@ def _send_course_email(email_id, to_list, course_title, course_url, image_url, t
     subject = "[" + course_title + "] " + msg.subject
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
+    course_num = msg.course_id.split('/')[1]  # course_id = 'org/course_num/run'
+    # Substitute a '_' anywhere a non-(ascii, period, or dash) character appears.
+    INVALID_CHARS = re.compile(r"[^\w.-]")
+    course_num = INVALID_CHARS.sub('_', course_num)
+
+    # Make a unique from name and address for each course, eg
+    # "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
+    from_addr = '"{0}" Course Staff <{1}-{2}>'.format(
+        course_title_no_quotes, course_num, settings.DEFAULT_BULK_FROM_EMAIL
+    )
 
     course_email_template = CourseEmailTemplate.get_template()
 
