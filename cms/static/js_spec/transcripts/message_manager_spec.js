@@ -100,7 +100,6 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             beforeEach(function () {
                 view.render('found');
                 spyOn(view, 'hideError');
-                spyOn(window, 'gettext');
                 spyOn($.fn, 'html').andCallThrough();
                 $error = view.$el.find('.transcripts-error-message');
                 $buttons = view.$el.find('.wrapper-transcripts-buttons');
@@ -110,7 +109,6 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 view.showError(null);
 
                 expect(view.hideError).not.toHaveBeenCalled();
-                expect(window.gettext).not.toHaveBeenCalled();
                 expect($error.html).not.toHaveBeenCalled();
                 expect($error).toHaveClass('is-invisible');
                 expect($buttons).not.toHaveClass('is-invisible');
@@ -120,7 +118,6 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 view.showError(errorMessage);
 
                 expect(view.hideError).toHaveBeenCalled();
-                expect(window.gettext).toHaveBeenCalled();
                 expect($error.html).toHaveBeenCalled();
                 expect($error).not.toHaveClass('is-invisible');
                 expect($buttons).not.toHaveClass('is-invisible');
@@ -130,7 +127,6 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 view.showError(errorMessage, true);
 
                 expect(view.hideError).toHaveBeenCalled();
-                expect(window.gettext).toHaveBeenCalled();
                 expect($error.html).toHaveBeenCalled();
                 expect($error).not.toHaveClass('is-invisible');
                 expect($buttons).toHaveClass('is-invisible');
