@@ -4,6 +4,11 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
+// HACK: this should be removed when it is safe to do so
+if(window.baseUrl) {
+    requirejs.config({baseUrl: baseUrl});
+}
+
 // The current JS file will be loaded and run each time. It will require a
 // single dependency which will be loaded and stored by RequireJS. On
 // subsequent runs, RequireJS will return the dependency from memory, rather
