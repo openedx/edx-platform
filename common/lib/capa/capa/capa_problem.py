@@ -447,11 +447,12 @@ class LoncapaProblem(object):
         shuffled = self.shuffled_tree(self.tree)
         if shuffled:  # shuffling happened
             process_this = shuffled
-            self._preprocess_problem(process_this)
+            ###self._preprocess_problem(process_this)
         else:
-            process_this = self.tree
+            process_this = deepcopy(self.tree)
+            # deepcopy here just to shake out tests which fail with a tree copy
+            # Take out the copy and everything works fine.
         html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
-        self._preprocess_problem(self.tree)  # switch the preprocess state back to the regular tree
         return html
 
     def handle_input_ajax(self, data):
