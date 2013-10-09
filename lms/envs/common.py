@@ -1023,7 +1023,7 @@ def enable_theme(theme_name):
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
-    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
 ######################## CAS authentication ###########################

@@ -418,6 +418,11 @@ MKTG_URL_LINK_MAP = {
 
 COURSES_WITH_UNSAFE_CODE = []
 
+################# Student Verification #################
+VERIFY_STUDENT = {
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
+}
+
 ############################## EVENT TRACKING #################################
 
 TRACK_MAX_EVENT = 10000
