@@ -37,7 +37,7 @@ window.LTI = (function () {
     //
     // @return    undefined
     function initialize(element) {
-        var form, openInANewPage, formAction;
+        var form, openInANewPage;
 
         // In cms (Studio) the element is already a jQuery object. In lms it is
         // a DOM object.
@@ -47,16 +47,6 @@ window.LTI = (function () {
         element = $(element);
 
         form = element.find('.ltiLaunchForm');
-        formAction = form.attr('action');
-
-        // If action is empty string, or action is the default URL that should
-        // not cause a form submit.
-        if (!formAction || formAction === 'http://www.example.com') {
-
-            // Nothing to do - no valid action provided. Error message will be
-            // displaced in browser (HTML).
-            return;
-        }
 
         // We want a Boolean 'true' or 'false'. First we will retrieve the data
         // attribute, and then we will parse it via native JSON.parse().

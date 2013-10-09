@@ -34,7 +34,7 @@
     % if open_in_a_new_page:
         <p>
             <span class="description">
-                ${display_name} (External resource)
+                ${display_name} (${_('External resource')})
             </span>
             <a href="#" class='link_lti_new_window'>
                 <i class="icon-external-link"></i>
@@ -51,8 +51,8 @@
     % endif
 % else:
     <h3 class="error_message">
-        Please provide launch_url. Click "Edit", and fill in the
-        required fields.
+        ${_('Please provide launch_url. Click "Edit", and fill in the
+        required fields.')}
     </h3>
 %endif
 </div>
