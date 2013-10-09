@@ -284,7 +284,7 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
                         $(ele).data('child-selector', type);
                         var draggable = new Draggabilly(ele, {
                             handle: handleClass,
-                            axis: 'y'
+                            containment: '.wrapper-dnd'
                         });
                         draggable.on('dragStart', _.bind(overviewDragger.onDragStart, overviewDragger));
                         draggable.on('dragMove', _.bind(overviewDragger.onDragMove, overviewDragger));
