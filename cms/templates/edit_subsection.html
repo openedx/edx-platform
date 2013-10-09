@@ -21,9 +21,11 @@
         <label>${_("Display Name:")}</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
-        <div class="sortable-unit-list">
-        <label>${_("Units:")}</label>
-          ${units.enum_units(subsection, subsection_units=subsection_units)}
+        <div class="wrapper-dnd">
+          <div class="sortable-unit-list">
+            <label>${_("Units:")}</label>
+              ${units.enum_units(subsection, subsection_units=subsection_units)}
+          </div>
         </div>
       </article>
     </div>
