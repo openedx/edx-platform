@@ -2,7 +2,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="bodyclass">register verification-process step-select-track ${'is-upgrading' if upgrade else ''}</%block>
 <%block name="title"><title>${_("Register for {} | Choose Your Track").format(course_name)}</title></%block>
 
 <%block name="js_extra">
@@ -48,7 +48,10 @@ $(document).ready(function() {
 
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">
+
+        %if not upgrade:
         <h3 class="title">${_("Select your track:")}</h3>
+        %endif
 
         <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
 
@@ -133,25 +136,29 @@ $(document).ready(function() {
           </div>
           % endif
 
-          % if "audit" in modes:
-          <span class="deco-divider">
-            <span class="copy">${_("or")}</span>
-          </span>
-          <div class="register-choice register-choice-audit">
-            <div class="wrapper-copy">
-              <h4 class="title">${_("Audit This Course")}</h4>
-              <div class="copy">
-                <p>${_("Sign up to audit this course for free and track your own progress.")}</p>
-              </div>
-            </div>
+          %if not upgrade:
 
-            <ul class="list-actions">
-              <li class="action action-select">
-                <input type="submit" name="mode" value="Select Audit" />
-              </li>
-            </ul>
-          </div>
-          % endif
+            % if "audit" in modes:
+            <span class="deco-divider">
+              <span class="copy">${_("or")}</span>
+            </span>
+            <div class="register-choice register-choice-audit">
+              <div class="wrapper-copy">
+                <h4 class="title">${_("Audit This Course")}</h4>
+                <div class="copy">
+                  <p>${_("Sign up to audit this course for free and track your own progress.")}</p>
+                </div>
+              </div>
+
+              <ul class="list-actions">
+                <li class="action action-select">
+                  <input type="submit" name="mode" value="Select Audit" />
+                </li>
+              </ul>
+            </div>
+            % endif
+
+          %endif
 
           <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
         </form>

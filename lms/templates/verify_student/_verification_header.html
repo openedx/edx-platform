@@ -2,7 +2,11 @@
 
 <header class="page-header">
   <h2 class="title">
-    <span class="sts-label">${_("You are registering for")}</span>
+    %if upgrade:
+      <span class="sts-label">${_("You are upgrading your registration for")}</span>
+    %else:
+      <span class="sts-label">${_("You are registering for")}</span>
+    %endif
 
     <span class="wrapper-sts">
       <span class="sts-course">
