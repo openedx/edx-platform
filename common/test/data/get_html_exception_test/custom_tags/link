@@ -1,1 +1,0 @@
-<a href="${url_to_link_to}"  target="_blank"> ${text_of_link} </a>

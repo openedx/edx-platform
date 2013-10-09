@@ -9,14 +9,13 @@ def import_file(filename):
     world.browser.attach_file('course-data', os.path.abspath(path))
     world.css_click('input.submit-button')
     # Go to course outline
-    menu_css = 'li.nav-course-courseware'
+    world.click_course_content()
     outline_css = 'li.nav-course-courseware-outline a'
-    world.css_click(menu_css)
     world.css_click(outline_css)
+
 
 @world.absorb
 def go_to_import():
-    menu_css = 'li.nav-course-tools'
+    world.click_course_content()
     import_css = 'li.nav-course-tools-import a'
-    world.css_click(menu_css)
     world.css_click(import_css)

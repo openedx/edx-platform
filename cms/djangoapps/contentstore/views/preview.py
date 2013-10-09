@@ -79,13 +79,12 @@ def preview_component(request, location):
     # can bind to it correctly
     component.runtime.wrappers.append(partial(wrap_xmodule, 'xmodule_edit.html'))
 
-
     try:
         content = component.render('studio_view').content
     # catch exceptions indiscriminately, since after this point they escape the
     # dungeon and surface as uneditable, unsaveable, and undeletable
     # component-goblins.
-    except Exception as exc:                          #pylint: disable=W0703
+    except Exception as exc:                          # pylint: disable=W0703
         content = render_to_string('html_error.html', {'message': str(exc)})
 
     return render_to_response('component.html', {
@@ -168,6 +167,6 @@ def get_preview_html(request, descriptor, idx):
     module = load_preview_module(request, str(idx), descriptor)
     try:
         content = module.render("student_view").content
-    except Exception as exc:                          #pylint: disable=W0703
+    except Exception as exc:                          # pylint: disable=W0703
         content = render_to_string('html_error.html', {'message': str(exc)})
     return content

@@ -1,1 +1,0 @@
-<a href="/static/handouts/${handout_name}" target="_blank"> ${text_of_link} </a>
