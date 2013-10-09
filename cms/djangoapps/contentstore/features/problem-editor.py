@@ -6,7 +6,6 @@ import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror
-from time import sleep
 
 
 DISPLAY_NAME = "Display Name"
@@ -199,9 +198,11 @@ def high_level_source_in_editor(_step):
     open_high_level_source()
     assert_equal('hi', world.css_value('.source-edit-box'))
 
+
 @step(u'I have an empty course')
 def i_have_empty_course(step):
     step.given('I have clicked the new unit button')
+
 
 @step(u'I go to the import page')
 def i_go_to_import(_step):
@@ -215,7 +216,6 @@ def i_import_the_file(_step, filename):
 
 @step(u'I click on the link "([^"]*)"$')
 def i_click_on(_step, link):
-    #go = "$(\"a:contains('{0}')\").click()".format(link)
     world.browser.click_link_by_text(link)
 
 
@@ -232,7 +232,7 @@ def i_go_to_unit(_step, unit):
 
 @step(u'I see a message that says "([^"]*)"$')
 def i_can_see_message(_step, msg):
-    msg = json.dumps(msg) # escape quotes
+    msg = json.dumps(msg)     # escape quotes
     world.browser.is_text_present(msg)
 
 
