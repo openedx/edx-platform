@@ -223,6 +223,9 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect($('#subsection-1')).toHaveClass('expand-on-drop')
     
         describe "onDragMove", ->
+            beforeEach ->
+                @scrollSpy = spyOn(window, 'scrollBy').andCallThrough()
+
             it "adds the correct CSS class to the drop destination", ->
                 $ele = $('#unit-1')
                 dragY = $ele.offset().top + 10
@@ -251,20 +254,16 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect($ele).not.toHaveClass('valid-drop')
     
             it "scrolls up if necessary", ->
-                scrollSpy = spyOn(window, 'scrollBy').andCallThrough()
                 OverviewDragger.onDragMove(
                     {element: $('#unit-1')}, '', {clientY: 2}
                 )
-                expect(scrollSpy).toHaveBeenCalledWith(0, -10)
+                expect(@scrollSpy).toHaveBeenCalledWith(0, -10)
     
             it "scrolls down if necessary", ->
-                height = Math.max(window.innerHeight, 100);
-                spyOn(window, 'innerHeight').andReturn(height)
-                scrollSpy = spyOn(window, 'scrollBy').andCallThrough()
                 OverviewDragger.onDragMove(
-                    {element: $('#unit-1')}, '', {clientY: (height - 5)}
+                    {element: $('#unit-1')}, '', {clientY: (window.innerHeight - 5)}
                 )
-                expect(scrollSpy).toHaveBeenCalledWith(0, 10)
+                expect(@scrollSpy).toHaveBeenCalledWith(0, 10)
     
         describe "onDragEnd", ->
             beforeEach ->
