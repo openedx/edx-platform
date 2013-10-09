@@ -30,17 +30,20 @@ div.video {
   .video-sources,
   .video-tracks {
     display: inline-block;
+    margin: ($baseline*.75) ($baseline/2) 0 0;
 
     p {
-      margin: ($baseline*.75) ($baseline/2) 0 0;
       display: inline-block;
+      margin: 0;
     }
 
     a {
+      @include transition(all 0.25s ease-in-out 0s);
       display: inline-block;
       border-radius: 3px 3px 3px 3px;
       background-color: $white;
       padding: ($baseline*.75);
+      color: $lighter-base-font-color;
 
       &:hover {
         background-color: $blue;
