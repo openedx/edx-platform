@@ -32,15 +32,15 @@
 
 % if launch_url and launch_url !=  'http://www.example.com':
     % if open_in_a_new_page:
-        <p>
-            <span class="description">
+        <div class="wrapper-lti-link">
+            <h3 class="title">
                 ${display_name} (${_('External resource')})
-            </span>
-            <a href="#" class='link_lti_new_window'>
-                <i class="icon-external-link"></i>
+            </h3>
+            <p class="lti-link external"><a href="#" class='link_lti_new_window'>
                 ${_('View resource in a new window')}
-            </a>
-        </p>
+                 <i class="icon-external-link"></i>
+            </a></p>
+        </div>
     % else:
         ## The result of the form submit will be rendered here.
         <iframe
