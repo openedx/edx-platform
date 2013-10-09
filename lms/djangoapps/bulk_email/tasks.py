@@ -35,16 +35,16 @@ from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
-    SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL,
+    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
 )
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
-from courseware.courses import get_course_by_id, course_image_url
+from courseware.courses import get_course, course_image_url
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     update_subtask_status,
     create_subtask_status,
     increment_subtask_status,
-    update_instructor_task_for_subtasks,
+    initialize_subtask_info,
 )
 
 log = get_task_logger(__name__)
@@ -82,9 +82,13 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
     will be properly deduped.
     """
+    if to_option not in TO_OPTIONS:
+        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
+        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
-    elif to_option == SEND_TO_ALL or to_option == SEND_TO_STAFF:
+    else:
         staff_grpname = _course_staff_group_name(course_location)
         staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
         staff_qset = staff_group.user_set.all()
@@ -102,9 +106,7 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
             )
             recipient_qset = recipient_qset | enrollment_qset
         recipient_qset = recipient_qset.distinct()
-    else:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+
     recipient_qset = recipient_qset.order_by('pk')
     return recipient_qset
 
@@ -146,7 +148,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Perfunctory check, since expansion is made for convenience of other task
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
-        format_msg = "Course id conflict: explicit value %s does not match task value %s"
+        format_msg = "Course id conflict: explicit value {} does not match task value {}"
         raise ValueError(format_msg.format(course_id, entry.course_id))
 
     email_id = task_input['email_id']
@@ -162,14 +164,14 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
-        format_msg = "Course id conflict: explicit value %s does not match email value %s"
+        format_msg = "Course id conflict: explicit value {} does not match email value {}"
         raise ValueError(format_msg.format(course_id, email_obj.course_id))
 
     try:
-        course = get_course_by_id(course_id, depth=1)
-    except Http404 as exc:
-        log.exception("Task %s: get_course_by_id failed: %s", task_id, exc.args[0])
-        raise ValueError("Course not found: " + exc.args[0])
+        course = get_course(course_id)
+    except ValueError:
+        log.exception("Task %s: course not found: %s", task_id, course_id)
+        raise
 
     global_email_context = _get_course_email_context(course)
     recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
@@ -222,7 +224,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         raise Exception(error_msg)
 
     # Update the InstructorTask  with information about the subtasks we've defined.
-    progress = update_instructor_task_for_subtasks(entry, action_name, total_num_emails, subtask_id_list)
+    progress = initialize_subtask_info(entry, action_name, total_num_emails, subtask_id_list)
     num_subtasks = len(subtask_id_list)
     log.info("Preparing to queue %d email tasks (%d emails) for course %s, email %s, to %s",
              num_subtasks, total_num_emails, course_id, email_id, to_option)
@@ -298,15 +300,13 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
             )
     except Exception:
         # Unexpected exception. Try to write out the failure to the entry before failing.
-        _, send_exception, traceback = exc_info()
-        traceback_string = format_exc(traceback) if traceback is not None else ''
-        log.error("Send-email task %s: failed unexpectedly: %s %s", current_task_id, send_exception, traceback_string)
+        log.exception("Send-email task %s: failed unexpectedly!", current_task_id)
         # We got here for really unexpected reasons.  Since we don't know how far
         # the task got in emailing, we count all recipients as having failed.
         # It at least keeps the counts consistent.
         new_subtask_status = increment_subtask_status(subtask_status, failed=num_to_send, state=FAILURE)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-        raise send_exception
+        raise
 
     if send_exception is None:
         # Update the InstructorTask object that is storing its progress.
@@ -318,11 +318,11 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
         log.warning("Send-email task %s: being retried", current_task_id)
-        raise send_exception
+        raise send_exception  # pylint: disable=E0702
     else:
         log.error("Send-email task %s: failed: %s", current_task_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-        raise send_exception
+        raise send_exception  # pylint: disable=E0702
 
     log.info("Send-email task %s: returning status %s", current_task_id, new_subtask_status)
     return new_subtask_status
@@ -406,7 +406,16 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     course_title = global_email_context['course_title']
     subject = "[" + course_title + "] " + course_email.subject
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
+    course_num = course_email.course_id.split('/')[1]  # course_id = 'org/course_num/run'
+    # Substitute a '_' anywhere a non-(ascii, period, or dash) character appears.
+    INVALID_CHARS = re.compile(r"[^\w.-]")
+    course_num = INVALID_CHARS.sub('_', course_num)
+
+    # Make a unique from name and address for each course, eg
+    # "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
+    from_addr = '"{0}" Course Staff <{1}-{2}>'.format(
+        course_title_no_quotes, course_num, settings.DEFAULT_BULK_FROM_EMAIL
+    )
 
     course_email_template = CourseEmailTemplate.get_template()
     try:
@@ -440,9 +449,13 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             )
             email_msg.attach_alternative(html_msg, 'text/html')
 
-            # Throttle if we have gotten the rate limiter
+            # Throttle if we have gotten the rate limiter.  This is not very high-tech,
+            # but if a task has been retried for rate-limiting reasons, then we sleep
+            # for a period of time between all emails within this task.  Choice of
+            # the value depends on the number of workers that might be sending email in
+            # parallel, and what the SES throttle rate is.
             if throttle:
-                sleep(0.2)
+                sleep(settings.BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS)
 
             try:
                 log.debug('Email with id %s to be sent to %s', email_id, email)

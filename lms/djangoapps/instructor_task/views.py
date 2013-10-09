@@ -154,6 +154,7 @@ def get_task_completion_info(instructor_task):
 
     if instructor_task.task_state == PROGRESS:
         # special message for providing progress updates:
+        # Translators: {action} is a past-tense verb that is localized separately. {attempted} and {succeeded} are counts.
         msg_format = _("Progress: {action} {succeeded} of {attempted} so far")
     elif student is not None and problem_url is not None:
         # this reports on actions on problems for a particular student:

@@ -90,9 +90,15 @@ def _update_instructor_task(instructor_task, task_result):
     is usually not saved.  In general, tasks that have finished (either with
     success or failure) should have their entries updated by the task itself,
     so are not updated here.  Tasks that are still running are not updated
-    while they run.  So the one exception to the no-save rule are tasks that
+    and saved while they run.  The one exception to the no-save rule are tasks that
     are in a "revoked" state.  This may mean that the task never had the
     opportunity to update the InstructorTask entry.
+
+    Tasks that are in progress and have subtasks doing the processing do not look
+    to the task's AsyncResult object.  When subtasks are running, the
+    InstructorTask object itself is updated with the subtasks' progress,
+    not any AsyncResult object.  In this case, the InstructorTask is
+    not updated at all.
 
     Calculates json to store in "task_output" field of the `instructor_task`,
     as well as updating the task_state.
@@ -110,10 +116,12 @@ def _update_instructor_task(instructor_task, task_result):
     returned_result = task_result.result
     result_traceback = task_result.traceback
 
-    # Assume we don't always update the InstructorTask entry if we don't have to:
+    # Assume we don't always save the InstructorTask entry if we don't have to,
+    # but that in most cases we will update the InstructorTask in-place with its
+    # current progress.
+    entry_needs_updating = True
     entry_needs_saving = False
     task_output = None
-    entry_needs_updating = True
 
     if instructor_task.task_state == PROGRESS and len(instructor_task.subtasks) > 0:
         # This happens when running subtasks:  the result object is marked with SUCCESS,

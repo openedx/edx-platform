@@ -112,9 +112,9 @@ class BaseInstructorTask(Task):
         except InstructorTask.DoesNotExist:
             # if the InstructorTask object does not exist, then there's no point
             # trying to update it.
-            pass
+            TASK_LOG.error("Task (%s) has no InstructorTask object for id %s", task_id, entry_id)
         else:
-            TASK_LOG.warning("background task (%s) failed: %s %s", task_id, einfo.exception, einfo.traceback)
+            TASK_LOG.warning("Task (%s) failed: %s %s", task_id, einfo.exception, einfo.traceback)
             entry.task_output = InstructorTask.create_output_for_failure(einfo.exception, einfo.traceback)
             entry.task_state = FAILURE
             entry.save_now()
@@ -131,7 +131,15 @@ class UpdateProblemModuleStateError(Exception):
 
 
 def _get_current_task():
-    """Stub to make it easier to test without actually running Celery"""
+    """
+    Stub to make it easier to test without actually running Celery.
+
+    This is a wrapper around celery.current_task, which provides access
+    to the top of the stack of Celery's tasks.  When running tests, however,
+    it doesn't seem to work to mock current_task directly, so this wrapper
+    is used to provide a hook to mock in tests, while providing the real
+    `current_task` in production.
+    """
     return current_task
 
 
