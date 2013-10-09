@@ -730,11 +730,7 @@ def create_account(request, post_override=None):
     post_vars = dict(post_vars.items())
     
     # Confirm we have a properly formed request
-    for a in ['email', 'password', "lastname", "firstname", "middlename", "year_of_birth",
-        "level_of_education", "education_place", "education_year",
-        "work_type", "work_number", "work_name", "work_login", "work_location",
-        "work_occupation", "work_occupation_other", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
-        "contact_phone"]:
+    for a in ['email', 'password', "lastname", "firstname", "middlename"]:
         if a not in post_vars:
             js['value'] = ugettext_lazy("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
