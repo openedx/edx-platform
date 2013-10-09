@@ -35,7 +35,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, options):
+def create_modulestore_instance(engine, doc_store_config, options):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -63,6 +63,7 @@ def create_modulestore_instance(engine, options):
         request_cache=request_cache,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
+        doc_store_config=doc_store_config,
         **_options
     )
 
@@ -73,8 +74,11 @@ def modulestore(name='default'):
     modulestore or create a new one
     """
     if name not in _MODULESTORES:
-        _MODULESTORES[name] = create_modulestore_instance(settings.MODULESTORE[name]['ENGINE'],
-                                                          settings.MODULESTORE[name]['OPTIONS'])
+        _MODULESTORES[name] = create_modulestore_instance(
+            settings.MODULESTORE[name]['ENGINE'],
+            settings.MODULESTORE[name].get('DOC_STORE_CONFIG', {}),
+            settings.MODULESTORE[name].get('OPTIONS', {})
+        )
         # inject loc_mapper into newly created modulestore if it needs it
         if name == 'split' and _loc_singleton is not None:
             _MODULESTORES['split'].loc_mapper = _loc_singleton
