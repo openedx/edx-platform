@@ -70,3 +70,14 @@ Feature: LMS.Verified certificates
         And the course has an honor mode
         When I give a reason why I cannot pay
         Then I should see the course on my dashboard
+
+    Scenario: The upsell offer is on the dashboard if I am auditing.
+        Given I am logged in
+        When I select the audit track
+        And I navigate to my dashboard
+        Then I see the upsell link on my dashboard
+
+    Scenario: I can take the upsell offer and be registered for a verified course
+        Given I am logged in
+        And I select the audit track
+        And I navigate to my dashboard
