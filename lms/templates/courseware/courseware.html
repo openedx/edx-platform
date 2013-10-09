@@ -14,6 +14,7 @@
     ## all needs to stay together for the Candy.js plugin to work.
     <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
   % endif
+  ${fragment.head_html()}
 </%block>
 
 <%block name="js_extra">
@@ -150,6 +151,8 @@
   </script>
 % endif
 
+${fragment.foot_html()}
+
 </%block>
 
 % if timer_expiration_duration:
@@ -185,7 +188,7 @@
 % endif
 
     <section class="course-content">
-      ${content}
+      ${fragment.body_html()}
     </section>
   </div>
 </section>

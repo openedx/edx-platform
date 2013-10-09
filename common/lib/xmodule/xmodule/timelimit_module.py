@@ -9,6 +9,7 @@ from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 from xblock.fields import Float, String, Boolean, Scope
+from xblock.fragment import Fragment
 
 
 log = logging.getLogger(__name__)
@@ -84,14 +85,14 @@ class TimeLimitModule(TimeLimitFields, XModule):
     def get_remaining_time_in_ms(self):
         return int((self.ending_at - time()) * 1000)
 
-    def get_html(self):
+    def student_view(self, context):
         # assumes there is one and only one child, so it only renders the first child
         children = self.get_display_items()
         if children:
             child = children[0]
-            return child.render('student_view').content
+            return child.render('student_view', context)
         else:
-            return u""
+            return Fragment()
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
