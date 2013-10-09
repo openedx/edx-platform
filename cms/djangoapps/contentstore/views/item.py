@@ -5,7 +5,6 @@ from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -72,14 +71,13 @@ def save_item(request):
             inspect.currentframe().f_back.f_code.co_name,
             inspect.currentframe().f_back.f_code.co_filename
         )
-        return HttpResponseBadRequest()
-
+        return JsonResponse({"error": "Request missing required attribute 'id'."}, 400)
 
     try:
         old_item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
         log.error("Can't find item by location.")
-        return JsonResponse()
+        return JsonResponse(status=404)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -131,7 +129,7 @@ def save_item(request):
         new_item = modulestore().get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
         log.error("Can't find item by location.")
-        return JsonResponse()
+        return JsonResponse(status=404)
 
     if new_item.category == 'video':
         manage_video_subtitles_save(old_item, new_item)
