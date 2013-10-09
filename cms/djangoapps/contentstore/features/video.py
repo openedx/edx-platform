@@ -3,6 +3,7 @@
 from lettuce import world, step
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
+from selenium.webdriver.common.keys import Keys
 
 BUTTONS = {
     'CC': '.hide-subtitles',
@@ -154,3 +155,25 @@ def check_captions_visibility_state(_step, visibility_state, timeout):
         assert world.css_visible('.subtitles')
     else:
         assert not world.css_visible('.subtitles')
+
+
+def find_caption_line_by_data_index(index):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=index)
+    return world.css_find(SELECTOR).first
+
+
+@step('I focus on caption line with data-index (\d+)$')
+def focus_on_caption_line(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
+
+
+@step('I press "enter" button on caption line with data-index (\d+)$')
+def focus_on_caption_line(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
+
+
+@step('I see caption line with data-index (\d+) has class "([^"]*)"$')
+def caption_line_has_class(_step, index, className):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
+    world.css_has_class(SELECTOR, className.strip())
+

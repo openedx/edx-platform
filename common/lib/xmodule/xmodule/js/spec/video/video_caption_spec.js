@@ -756,44 +756,6 @@
                     expect(videoCaption.autoScrolling).toBe(true);
                 });
             });
-
-            describe('when enter key is pressed on a caption', function () {
-
-                var assertCaptions = function (expectations) {
-
-                        waitsFor(function () {
-                            return videoCaption.captions.length;
-                        }, "Captions are not loaded.", WAIT_TIMEOUT);
-
-                        runs(expectations);
-                    },
-                    initializeClick = function () {
-                        var e,
-                        subDataLiIdx__0 = $('.subtitles li[data-index=0]');
-
-                        spyOn(videoCaption, 'seekPlayer').andCallThrough();
-                        videoCaption.isMouseFocus = false;
-                        subDataLiIdx__0.trigger(jQuery.Event('focus'));
-                        e = jQuery.Event('keydown');
-                        e.which = 13; // ENTER key
-                        subDataLiIdx__0.trigger(e);
-                    };
-
-                it('shows an outline around it' , function () {
-                    assertCaptions(function() {
-                        var subDataLiIdx__0 = $('.subtitles li[data-index=0]');
-                        initializeClick();
-                        expect(subDataLiIdx__0).toHaveClass('focused');
-                    });
-                });
-
-                it('calls seekPlayer', function () {
-                    assertCaptions(function() {
-                        initializeClick();
-                        expect(videoCaption.seekPlayer).toHaveBeenCalled();
-                    });
-                });
-            });
         });
     });
 
