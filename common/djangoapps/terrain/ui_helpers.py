@@ -336,8 +336,10 @@ def css_click(css_selector, index=0, wait_time=30):
     This method will return True if the click worked.
     """
     wait_for_clickable(css_selector, timeout=wait_time)
-    assert_true(world.css_find(css_selector)[index].visible,
-                msg="Element {}[{}] is present but not visible".format(css_selector, index))
+    assert_true(
+        world.css_visible(css_selector, index=index),
+        msg="Element {}[{}] is present but not visible".format(css_selector, index)
+    )
 
     # Sometimes you can't click in the center of the element, as
     # another element might be on top of it. In this case, try
@@ -368,9 +370,10 @@ def css_click_at(css_selector, index=0, x_coord=10, y_coord=10, timeout=5):
     rather than in the center of the element
     '''
     wait_for_clickable(css_selector, timeout=timeout)
-    element = css_find(css_selector)[index]
-    assert_true(element.visible,
-                msg="Element {}[{}] is present but not visible".format(css_selector, index))
+    assert_true(
+        world.css_visible(css_selector, index=index),
+        msg="Element {}[{}] is present but not visible".format(css_selector, index)
+    )
 
     element.action_chains.move_to_element_with_offset(element._element, x_coord, y_coord)
     element.action_chains.click()
@@ -512,7 +515,6 @@ def retry_on_exception(func, max_attempts=5, ignored_exceptions=StaleElementRefe
     while attempt < max_attempts:
         try:
             return func()
-            break
         except ignored_exceptions:
             world.wait(1)
             attempt += 1
