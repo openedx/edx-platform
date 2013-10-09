@@ -951,7 +951,7 @@ class DragAndDropTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        path_to_images = '/static/images/'
+        path_to_images = '/dummy-static/images/'
 
         xml_str = """
         <drag_and_drop_input id="prob_1_2" img="{path}about_1.png" target_outline="false">
@@ -978,15 +978,15 @@ class DragAndDropTest(unittest.TestCase):
 
         user_input = {  # order matters, for string comparison
                         "target_outline": "false",
-                        "base_image": "/static/images/about_1.png",
+                        "base_image": "/dummy-static/images/about_1.png",
                         "draggables": [
 {"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
-{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", "target_fields": []},
-{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/dummy-static/images/cc.jpg", "target_fields": []},
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/dummy-static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/dummy-static/images/mute.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/dummy-static/images/spinner.gif", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/dummy-static/images/volume.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": "", "target_fields": []}],
                         "one_per_target": "True",
                         "targets": [
