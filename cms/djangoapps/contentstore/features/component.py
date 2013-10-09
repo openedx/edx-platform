@@ -39,6 +39,15 @@ def add_a_single_step_component(step):
         css_selector = 'a[data-type="{}"]'.format(component.lower())
         world.css_click(css_selector)
 
+	# In the current implementation, all the "new component"
+	# buttons are handled by one BackBone.js view.
+	# If we click two buttons at super-human speed,
+	# the view will miss the second click while it's
+	# processing the first.
+	# To account for this, we wait for each component
+	# to be created before clicking the next component.
+        world.wait_for_visible('section.xmodule_{}Module'.format(component))
+
 
 @step(u'I see this type of single step component:$')
 def see_a_single_step_component(step):
