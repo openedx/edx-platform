@@ -9,6 +9,7 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
+USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",

@@ -109,6 +109,11 @@ CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
+# HACK
+# Setting this flag to false causes imports to not load correctly in the lettuce python files
+# We do not yet understand why this occurs. Setting this to true is a stopgap measure
+USE_I18N = True
+
 MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
 FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 

@@ -16,6 +16,7 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
+USE_I18N = True
 TEMPLATE_DEBUG = True
 
 
