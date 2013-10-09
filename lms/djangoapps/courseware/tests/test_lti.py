@@ -72,10 +72,11 @@ class TestLTI(BaseTestXmodule):
         generated_context = self.item_module.render('student_view').content
         expected_context = {
             'input_fields': self.correct_headers,
+            'display_name': self.item_module.display_name,
             'element_class': self.item_module.location.category,
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
-            'open_in_a_new_page': True
+            'open_in_a_new_page': True,
         }
         self.assertEqual(
             generated_context,
