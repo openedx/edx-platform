@@ -15,6 +15,8 @@ import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
+from pytils.translit import slugify
+
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -444,10 +446,9 @@ class OpenEndedChild(object):
             and len(data['student_file']) > 0):
                 has_file_to_upload = True
                 student_file = data['student_file'][0]
-                log.error("Trying to upload \"%s\"" % student_file)
-                new_filename = str(uuid.uuid4()) + '.' +  student_file.name.split(".")[-1]
-                log.error("New file name \"%s\"" % new_filename)
-                student_file.name = new_filename
+                # Bad workaround about cyrillic unicode
+                # student_file.name = str(uuid.uuid4()) + '.' +  student_file.name.split(".")[-1]
+                student_file.name = slugify(student_file.name)
                 # Upload the file to S3 and generate html to embed a link.
                 s3_public_url = self.upload_file_to_s3(student_file)
                 image_tag = self.generate_file_link_html_from_url(s3_public_url, student_file.name)
