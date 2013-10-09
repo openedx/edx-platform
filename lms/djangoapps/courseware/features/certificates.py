@@ -221,6 +221,12 @@ def see_the_course_on_my_dashboard(step):
     assert world.is_css_present(course_link_css)
 
 
+@step(u'I see the upsell link on my dashboard')
+def see_upsell_link_on_my_dashboard(step):
+    course_link_css = 'div.verified-upsell a[href*="edx/999/Certificates"'
+    assert world.is_css_present(course_link_css)
+
+
 @step(u'I see that I am on the verified track')
 def see_that_i_am_on_the_verified_track(step):
     id_verified_css = 'li.course-item article.course.verified'

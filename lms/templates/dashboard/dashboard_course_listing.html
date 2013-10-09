@@ -125,7 +125,7 @@
 
   </section>
       %if enrollment.mode != 'verified' and 'verified' in course_modes:
-        <div>
+        <div class='verified-upsell'>
             <a href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">${_("Get a verified certificate for this course!")}</a>
             %if course_modes['verified'].expiration_date:
                 <% days_left = (course_modes['verified'].expiration_date - date.today()).days %>
