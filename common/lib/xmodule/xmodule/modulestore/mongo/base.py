@@ -21,7 +21,6 @@ from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from operator import attrgetter
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
