@@ -221,7 +221,7 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # We want i18n to be turned off in production, at least until we have full
 # localizations. It's disconcerting for everything on the page to be in English
 # except for one or two strings like "login" which are correctly localized.
-USE_I18N = DEBUG
+USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
