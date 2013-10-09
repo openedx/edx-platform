@@ -111,7 +111,7 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
                 };
                 if (!ele.hasClass('collapsed')) {
                     ele.addClass('collapsed');
-                    ele.find('.expand-collapse-icon').addClass('expand').removeClass('collapse');
+                    ele.find('.expand-collapse-icon').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
@@ -207,7 +207,7 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
 
             expandElement: function (ele) {
                 ele.removeClass('collapsed');
-                ele.find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+                ele.find('.expand-collapse-icon').first().removeClass('expand').addClass('collapse');
             },
 
             /*
