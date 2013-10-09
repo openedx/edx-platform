@@ -12,7 +12,7 @@ from mock import Mock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.x_module import ModuleSystem
+from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
@@ -143,6 +143,10 @@ class TestStudentView(TestXBlockWrapper):
     # Check that when an xmodule is instantiated from descriptor_cls
     # it generates the same thing from student_view that it does from get_html
     def check_student_view_leaf_node(self, descriptor_cls):
+
+        if descriptor_cls.module_class.student_view != XModule.student_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements student_view")
+
         descriptor = self.leaf_module(descriptor_cls)
         assert_equal(
             descriptor._xmodule.get_html(),
@@ -165,6 +169,10 @@ class TestStudentView(TestXBlockWrapper):
     # with only xmodule children, it generates the same html from student_view
     # as it does using get_html
     def check_student_view_container_node_xmodules_only(self, descriptor_cls):
+
+        if descriptor_cls.module_class.student_view != XModule.student_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements student_view")
+
         descriptor = self.container_module(descriptor_cls, 2)
         assert_equal(
             descriptor._xmodule.get_html(),
@@ -197,7 +205,10 @@ class TestStudioView(TestXBlockWrapper):
     # it generates the same thing from studio_view that it does from get_html
     def check_studio_view_leaf_node(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
-            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+            raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
+
+        if descriptor_cls.studio_view != XModuleDescriptor.studio_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
 
         descriptor = self.leaf_descriptor(descriptor_cls)
         assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)
@@ -221,6 +232,9 @@ class TestStudioView(TestXBlockWrapper):
     def check_studio_view_container_node_xmodules_only(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+
+        if descriptor_cls.studio_view != XModuleDescriptor.studio_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
 
         descriptor = self.container_descriptor(descriptor_cls, 2)
         assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)

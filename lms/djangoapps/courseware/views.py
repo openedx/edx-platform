@@ -31,6 +31,7 @@ from django_comment_client.utils import get_discussion_title
 
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
+from xblock.fragment import Fragment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
@@ -327,7 +328,7 @@ def index(request, course_id, chapter=None, section=None,
             'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
-            'content': '',
+            'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
@@ -395,7 +396,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # check here if this section *is* a timed module.
             if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(user, course_id, student_module_cache,
+                timer_context = update_timelimit_module(user, course_id, section_field_data_cache,
                                                         section_descriptor, section_module)
                 if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
@@ -407,7 +408,7 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.render('student_view').content
+            context['fragment'] = section_module.render('student_view')
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
@@ -417,11 +418,15 @@ def index(request, course_id, chapter=None, section=None,
             prev_section_url = reverse('courseware_section', kwargs={'course_id': course_id,
                                                                      'chapter': chapter_descriptor.url_name,
                                                                      'section': prev_section.url_name})
-            context['content'] = render_to_string('courseware/welcome-back.html',
-                                                  {'course': course,
-                                                   'chapter_module': chapter_module,
-                                                   'prev_section': prev_section,
-                                                   'prev_section_url': prev_section_url})
+            context['fragment'] = Fragment(content=render_to_string(
+                'courseware/welcome-back.html',
+                {
+                    'course': course,
+                    'chapter_module': chapter_module,
+                    'prev_section': prev_section,
+                    'prev_section_url': prev_section_url
+                }
+            ))
 
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
