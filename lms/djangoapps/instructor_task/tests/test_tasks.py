@@ -7,7 +7,6 @@ paths actually work.
 """
 import json
 from uuid import uuid4
-from unittest import skip
 
 from mock import Mock, MagicMock, patch
 
@@ -97,16 +96,17 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         with self.assertRaises(ItemNotFoundError):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
-    def _test_run_with_task(self, task_class, action_name, expected_num_succeeded):
+    def _test_run_with_task(self, task_class, action_name, expected_num_succeeded, expected_num_skipped=0):
         """Run a task and check the number of StudentModules processed."""
         task_entry = self._create_input_entry()
         status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
         # check return value
-        self.assertEquals(status.get('attempted'), expected_num_succeeded)
+        self.assertEquals(status.get('attempted'), expected_num_succeeded + expected_num_skipped)
         self.assertEquals(status.get('succeeded'), expected_num_succeeded)
-        self.assertEquals(status.get('total'), expected_num_succeeded)
+        self.assertEquals(status.get('skipped'), expected_num_skipped)
+        self.assertEquals(status.get('total'), expected_num_succeeded + expected_num_skipped)
         self.assertEquals(status.get('action_name'), action_name)
-        self.assertGreater('duration_ms', 0)
+        self.assertGreater(status.get('duration_ms'), 0)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         self.assertEquals(json.loads(entry.task_output), status)
@@ -220,7 +220,6 @@ class TestRescoreInstructorTask(TestInstructorTasks):
     def test_rescore_with_short_error_msg(self):
         self._test_run_with_short_error_msg(rescore_problem)
 
-    @skip
     def test_rescoring_unrescorable(self):
         input_state = json.dumps({'done': True})
         num_students = 1
@@ -228,9 +227,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
-        # TODO: figure out why this patch isn't working, when it seems to work fine for
-        # the test_rescoring_success test below.  Weird.
-        with patch('courseware.module_render.get_module_for_descriptor_internal') as mock_get_module:
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             with self.assertRaises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
@@ -247,8 +244,8 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
         mock_instance = Mock()
-        mock_instance.rescore_problem = Mock({'success': 'correct'})
-        with patch('courseware.module_render.get_module_for_descriptor_internal') as mock_get_module:
+        mock_instance.rescore_problem = Mock(return_value={'success': 'correct'})
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check return value
@@ -258,7 +255,47 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self.assertEquals(output.get('succeeded'), num_students)
         self.assertEquals(output.get('total'), num_students)
         self.assertEquals(output.get('action_name'), 'rescored')
-        self.assertGreater('duration_ms', 0)
+        self.assertGreater(output.get('duration_ms'), 0)
+
+    def test_rescoring_bad_result(self):
+        # Confirm that rescoring does not succeed if "success" key is not an expected value.
+        input_state = json.dumps({'done': True})
+        num_students = 10
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry()
+        mock_instance = Mock()
+        mock_instance.rescore_problem = Mock(return_value={'success': 'bogus'})
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
+        # check return value
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output.get('attempted'), num_students)
+        self.assertEquals(output.get('succeeded'), 0)
+        self.assertEquals(output.get('total'), num_students)
+        self.assertEquals(output.get('action_name'), 'rescored')
+        self.assertGreater(output.get('duration_ms'), 0)
+
+    def test_rescoring_missing_result(self):
+        # Confirm that rescoring does not succeed if "success" key is not returned.
+        input_state = json.dumps({'done': True})
+        num_students = 10
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry()
+        mock_instance = Mock()
+        mock_instance.rescore_problem = Mock(return_value={'bogus': 'value'})
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
+        # check return value
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output.get('attempted'), num_students)
+        self.assertEquals(output.get('succeeded'), 0)
+        self.assertEquals(output.get('total'), num_students)
+        self.assertEquals(output.get('action_name'), 'rescored')
+        self.assertGreater(output.get('duration_ms'), 0)
 
 
 class TestResetAttemptsInstructorTask(TestInstructorTasks):
@@ -297,6 +334,18 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         # check that entries were reset
         self._assert_num_attempts(students, 0)
 
+    def test_reset_with_zero_attempts(self):
+        initial_attempts = 0
+        input_state = json.dumps({'attempts': initial_attempts})
+        num_students = 10
+        students = self._create_students_with_state(num_students, input_state)
+        # check that entries were set correctly
+        self._assert_num_attempts(students, initial_attempts)
+        # run the task
+        self._test_run_with_task(reset_problem_attempts, 'reset', 0, expected_num_skipped=num_students)
+        # check that entries were reset
+        self._assert_num_attempts(students, 0)
+
     def _test_reset_with_student(self, use_email):
         """Run a reset task for one student, with several StudentModules for the problem defined."""
         num_students = 10
@@ -323,7 +372,8 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         self.assertEquals(status.get('succeeded'), 1)
         self.assertEquals(status.get('total'), 1)
         self.assertEquals(status.get('action_name'), 'reset')
-        self.assertGreater('duration_ms', 0)
+        self.assertGreater(status.get('duration_ms'), 0)
+
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         self.assertEquals(json.loads(entry.task_output), status)

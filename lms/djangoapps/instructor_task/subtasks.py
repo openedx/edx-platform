@@ -5,7 +5,7 @@ from time import time
 import json
 
 from celery.utils.log import get_task_logger
-from celery.states import SUCCESS, RETRY, READY_STATES
+from celery.states import SUCCESS, READY_STATES
 
 from django.db import transaction
 
@@ -87,14 +87,7 @@ def increment_subtask_status(subtask_result, succeeded=0, failed=0, skipped=0, r
     return new_result
 
 
-# def _get_retry_count(subtask_result):
-#     """Return the number of retries counted for the given subtask."""
-#     retry_count = subtask_result.get('retried_nomax', 0)
-#     retry_count += subtask_result.get('retried_withmax', 0)
-#     return retry_count
-
-
-def update_instructor_task_for_subtasks(entry, action_name, total_num, subtask_id_list):
+def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
     """
     Store initial subtask information to InstructorTask object.
 

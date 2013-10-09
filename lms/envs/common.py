@@ -839,6 +839,12 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 # a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
 
+# Delay in seconds to sleep between individual mail messages being sent,
+# when a bulk email task is retried for rate-related reasons.  Choose this
+# value depending on the number of workers that might be sending email in
+# parallel, and what the SES rate is.
+BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
+
 ################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...

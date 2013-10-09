@@ -153,7 +153,11 @@ class CourseEmailTemplate(models.Model):
 
         If one isn't stored, an exception is thrown.
         """
-        return CourseEmailTemplate.objects.get()
+        try:
+            return CourseEmailTemplate.objects.get()
+        except CourseEmailTemplate.DoesNotExist:
+            log.exception("Attempting to fetch a non-existent course email template")
+            raise
 
     @staticmethod
     def _render(format_string, message_body, context):
