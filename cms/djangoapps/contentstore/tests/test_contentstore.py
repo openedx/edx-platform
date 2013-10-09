@@ -1588,14 +1588,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
 
-        # static_pages
-        resp = self.client.get(reverse('static_pages',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'coursename': loc.name}))
-        self.assertEqual(resp.status_code, 200)
-
-        # static_pages
+        # asset_index
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
