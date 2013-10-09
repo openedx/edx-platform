@@ -357,6 +357,7 @@ body.course.unit,.view-unit {
         }
 
       .wrapper-alert-error {
+          margin-top: ($baseline*1.25);
           box-shadow: none;
           border-top: 5px solid $red-l1;
 
