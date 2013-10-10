@@ -177,7 +177,7 @@ class UserProfile(models.Model):
         ('other', _('Other'))
     )
     work_occupation = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
-    work_occupation_other = models.CharField(blank=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
+    work_occupation_other = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
     work_teaching_experience = models.IntegerField(blank=True, null=True, db_index=True)
     work_managing_experience = models.IntegerField(blank=True, null=True, db_index=True)
     WORK_QUALIFICATION_CATEGORY_CHOICES = (
@@ -1111,13 +1111,13 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=UserProfile)
 def update_user_information(sender, instance, created, **kwargs):
     if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:
-        cc_user = cc.User.from_django_user(instance)
+        cc_user = cc.User.from_django_user(instance.user)
         cc_user.save()
     except Exception as e:
         log = logging.getLogger("mitx.discussion")

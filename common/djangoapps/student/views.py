@@ -759,7 +759,7 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ["email", "password", "lastname", "firstname", "middlename"]
+    required_post_vars = ["email", "password", "lastname", "firstname"]
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
