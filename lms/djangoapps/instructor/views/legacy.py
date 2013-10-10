@@ -496,7 +496,7 @@ def instructor_dashboard(request, course_id):
         unique_student_identifier = request.POST.get(
             'unique_student_identifier', ''
         )
-        section = get_module_url(request.POST.get('section'))
+        url = get_module_url(request.POST.get('section'))
 
         # try to uniquely id student by email address or username
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -506,9 +506,9 @@ def instructor_dashboard(request, course_id):
         message, due_date = parse_datetime(request.POST.get('due_datetime'))
         msg += message
 
-        if section and student and due_date:
+        if url and student and due_date:
             error = set_due_date_extension(
-                request, course_id, section, student, due_date)
+                course, url, student, due_date)
             if error:
                 msg += '<font color="red">{0}</font>'.format(error)
                 log.debug(error)
