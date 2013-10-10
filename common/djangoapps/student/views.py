@@ -915,7 +915,7 @@ def create_account(request, post_override=None):
         js['field'] = 'email'
         return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
-    if 'work_login' in required_post_vars
+    if 'work_login' in required_post_vars:
         try:
             _validate_statgradlogin(post_vars['work_login'])
         except ValidationError:
