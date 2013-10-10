@@ -20,7 +20,7 @@ var CourseGradingPolicy = Backbone.Model.extend({
                 graderCollection.reset(attributes.graders);
             }
             else {
-                graderCollection = new CourseGraderCollection(attributes.graders);
+                graderCollection = new CourseGraderCollection(attributes.graders, {parse:true});
                 graderCollection.course_location = attributes['course_location'] || this.get('course_location');
             }
             attributes.graders = graderCollection;
