@@ -759,22 +759,18 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ["email", "password", "lastname", "firstname", "middlename", "year_of_birth",
-        "education_place", "education_year",
-        "work_type", "work_number", "work_name", "work_login", "work_location",
-        "work_occupation", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
-        "contact_phone", "terms_of_service", "honor_code"]
+    required_post_vars = ["email", "password", "lastname", "firstname", "middlename"]
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
-    if len(post_vars["level_of_education"]) < 1:
+    if  "level_of_education" in required_post_vars and  len(post_vars.get("level_of_education") < 1:
         js['value'] = _('Education level is required')
         js['field'] = "level_of_education"
         return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
-    if post_vars["work_occupation"] == 'other' and "work_occupation2" in post_vars:
+    if "work_occupation" in required_post_vars and repost_var.get("work_occupation") == 'other' and "work_occupation2" in post_vars:
         post_vars.post_vars["work_occupation"] = post_vars["work_occupation2"]
-    if post_vars["work_occupation_other"] == 'other' and "work_occupation_other2" in post_vars:
+    if "work_occupation_other" in required_post_vars and  post_vars.get("work_occupation_other") == 'other' and "work_occupation_other2" in post_vars:
         post_vars.post_vars["work_occupation_other"] = post_vars["work_occupation_other2"]
 
     for a in required_post_vars:
@@ -806,7 +802,7 @@ def create_account(request, post_override=None):
             js['field'] = a
             return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
-    numeric_post_vars = ["education_year","work_managing_experience","work_teaching_experience"]
+    numeric_post_vars = []
 
     for a in numeric_post_vars:
         if len(post_vars[a]) > 0 and not post_vars[a].isdigit():
@@ -829,12 +825,13 @@ def create_account(request, post_override=None):
         js['field'] = 'email'
         return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
-    try:
-        _validate_statgradlogin(post_vars['work_login'])
-    except ValidationError:
-        js['value'] = ugettext_lazy("Valid StatGrad login is required.").format(field=a)
-        js['field'] = 'work_login'
-        return HttpResponse(json.dumps(js, cls=LazyEncoder))
+    if 'work_login' in required_post_vars
+        try:
+            _validate_statgradlogin(post_vars['work_login'])
+        except ValidationError:
+            js['value'] = ugettext_lazy("Valid StatGrad login is required.").format(field=a)
+            js['field'] = 'work_login'
+            return HttpResponse(json.dumps(js, cls=LazyEncoder))
 
     # try:
     #     validate_slug(post_vars['username'])
