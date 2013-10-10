@@ -189,7 +189,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_successful(self):
         # Select number of emails to fit into a single subtask.
-        num_emails = settings.EMAILS_PER_TASK
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         self._create_students(num_emails - 1)
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
@@ -198,7 +198,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_unactivated_user(self):
         # Select number of emails to fit into a single subtask.
-        num_emails = settings.EMAILS_PER_TASK
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         students = self._create_students(num_emails - 1)
         # mark a student as not yet having activated their email:
@@ -211,7 +211,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_skipped(self):
         # Select number of emails to fit into a single subtask.
-        num_emails = settings.EMAILS_PER_TASK
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         students = self._create_students(num_emails - 1)
         # have every fourth student optout:
@@ -227,7 +227,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     def _test_email_address_failures(self, exception):
         """Test that celery handles bad address errors by failing and not retrying."""
         # Select number of emails to fit into a single subtask.
-        num_emails = settings.EMAILS_PER_TASK
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
         # We also send email to the instructor:
         self._create_students(num_emails - 1)
         expected_fails = int((num_emails + 3) / 4.0)

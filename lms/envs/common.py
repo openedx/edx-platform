@@ -798,9 +798,13 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 ################################ Bulk Email ###################################
 
-DEFAULT_BULK_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
-EMAILS_PER_TASK = 100
-EMAILS_PER_QUERY = 1000
+# Suffix used to construct 'from' email address for bulk emails.
+# A course-specific identifier is prepended.
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
+
+# Parameters for breaking down course enrollment into subtasks.
+BULK_EMAIL_EMAILS_PER_TASK = 100
+BULK_EMAIL_EMAILS_PER_QUERY = 1000
 
 # Initial delay used for retrying tasks.  Additional retries use
 # longer delays.  Value is in seconds.
