@@ -1,7 +1,6 @@
 (function () {
     describe('VideoCaption', function () {
-        var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD,
-            WAIT_TIMEOUT = 1000;
+        var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
         function initialize() {
             loadFixtures('video_all.html');
