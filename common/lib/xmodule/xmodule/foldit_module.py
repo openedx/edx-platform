@@ -20,6 +20,13 @@ class FolditFields(object):
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "may differ from the global due date if an instructor has granted "
+             "an extension to the student.",
+        default=None,
+        scope=Scope.user_state,
+    )
 
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')

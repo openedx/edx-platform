@@ -3,6 +3,7 @@ Instructor Views
 """
 from collections import defaultdict
 import csv
+import datetime
 import json
 import logging
 from markupsafe import escape
@@ -49,6 +50,8 @@ from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
+
+from .extensions import set_due_date_extension
 
 
 log = logging.getLogger(__name__)
@@ -186,6 +189,22 @@ def instructor_dashboard(request, course_id):
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
+
+    def parse_datetime(s):
+        """
+        Constructs a datetime object in UTC from user input.
+        """
+        msg = ""
+        dt = None
+        try:
+            d, t = s.split()
+            mm, dd, yy = map(int, d.split('/'))
+            h, m = map(int, t.split(':'))
+            dt = datetime.datetime(yy, mm, dd, h, m, tzinfo=timezone.utc)
+            return msg, dt
+        except:
+            msg = "<font color='red'>Unable to parse date: {0} </font>".format(s)
+        return msg, dt
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -468,6 +487,33 @@ def instructor_dashboard(request, course_id):
                     files = {'datafile': fp}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
+
+    #----------------------------------------
+    # Extensions
+
+    elif "Change due date for student" in action:
+        # get the form data
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', ''
+        )
+        section = get_module_url(request.POST.get('section'))
+
+        # try to uniquely id student by email address or username
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        # parse datetime
+        message, due_date = parse_datetime(request.POST.get('due_datetime'))
+        msg += message
+
+        if section and student and due_date:
+            error = set_due_date_extension(
+                request, course_id, section, student, due_date)
+            if error:
+                msg += '<font color="red">{0}</font>'.format(error)
+                log.debug(error)
+            else:
+                msg += 'Successfully changed due date.'
 
     #----------------------------------------
     # Admin

@@ -48,6 +48,13 @@ class PeerGradingFields(object):
         help="Due date that should be displayed.",
         default=None,
         scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "may differ from the global due date if an instructor has granted "
+             "an extension to the student.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
         scope=Scope.settings

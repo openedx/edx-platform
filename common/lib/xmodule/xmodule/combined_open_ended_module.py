@@ -229,6 +229,13 @@ class CombinedOpenEndedFields(object):
         default=None,
         scope=Scope.settings
     )
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "may differ from the global due date if an instructor has granted "
+             "an extension to the student.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = String(
         help="Amount of time after the due date that submissions will be accepted",
         default=None,
