@@ -73,7 +73,7 @@ urlpatterns = ('',  # nopep8
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)(/start/(?P<start>\d+))?(/max/(?P<maxresults>\d+))?$',
         'contentstore.views.asset_index', name='asset_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
         'contentstore.views.assets.update_asset', name='update_asset'),
