@@ -18,7 +18,7 @@ class AjaxExceptionMiddleware(object):
         """
         if isinstance(exception, CommentClientError) and request.is_ajax():
             try:
-                return JsonError(json.loads(exception.message))
+                return JsonError(json.loads(exception.message), 500)
             except ValueError:
-                return JsonError(exception.message)
+                return JsonError(exception.message, 500)
         return None

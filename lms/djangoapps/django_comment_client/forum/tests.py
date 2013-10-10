@@ -65,7 +65,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
     @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('student.models.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
