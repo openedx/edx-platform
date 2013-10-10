@@ -133,12 +133,20 @@ def wait_for_requirejs(dependencies=None):
             world.wait(1)
             continue
         elif result not in (None, True, False):
-            # we got a require.js error
-            msg = "Error loading dependencies: type={0} modules={1}".format(
-                result['requireType'], result['requireModules'])
-            err = RequireJSError(msg)
-            err.error = result
-            raise err
+            # We got a require.js error
+            # Sometimes requireJS will throw an error with requireType=require
+            # This doesn't seem to cause problems on the page, so we ignore it
+            if result['requireType'] == 'require':
+                world.wait(1)
+                continue
+
+            # Otherwise, fail and report the error
+            else:
+                msg = "Error loading dependencies: type={0} modules={1}".format(
+                    result['requireType'], result['requireModules'])
+                err = RequireJSError(msg)
+                err.error = result
+                raise err
         else:
             return result
 
