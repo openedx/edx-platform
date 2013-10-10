@@ -75,6 +75,11 @@ Common: Allow instructors to input complicated expressions as answers to
 `NumericalResponse`s. Prior to the change only numbers were allowed, now any
 answer from '1/3' to 'sqrt(12)*(1-1/3^2+1/5/3^2)' are valid.
 
+Studio/LMS: Allow for 'preview' and 'published' in a single LMS instance. Use
+middlware components to retain the incoming Django request and put in thread
+local storage. It is recommended that all developers define a 'preview.localhost'
+which maps to the same IP address as localhost in his/her HOSTS file.
+
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at
 the top right of the existing dashboard.

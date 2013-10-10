@@ -7,10 +7,13 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 from importlib import import_module
 
+import re
+
 from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError
 from django.dispatch import Signal
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
+from xmodule.util.django import get_current_request_hostname
 
 # We may not always have the request_cache module available
 try:
@@ -68,11 +71,41 @@ def create_modulestore_instance(engine, doc_store_config, options):
     )
 
 
-def modulestore(name='default'):
+def get_default_store_name_for_current_request():
+    """
+    This method will return the appropriate default store mapping for the current Django request,
+    else 'default' which is the system default
+    """
+    store_name = 'default'
+
+    # see what request we are currently processing - if any at all - and get hostname for the request
+    hostname = get_current_request_hostname()
+
+    # get mapping information which is defined in configurations
+    mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
+   
+    # compare hostname against the regex expressions set of mappings
+    # which will tell us which store name to use
+    if hostname and mappings:
+        for key in mappings.keys():
+            if re.match(key, hostname):
+                store_name = mappings[key]
+                return store_name
+
+    return store_name
+
+
+def modulestore(name=None):
     """
     This returns an instance of a modulestore of given name. This will wither return an existing
     modulestore or create a new one
     """
+
+    if not name:
+        # If caller did not specify name then we should
+        # determine what should be the default
+        name = get_default_store_name_for_current_request()
+
     if name not in _MODULESTORES:
         _MODULESTORES[name] = create_modulestore_instance(
             settings.MODULESTORE[name]['ENGINE'],
