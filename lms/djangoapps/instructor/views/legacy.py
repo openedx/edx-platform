@@ -60,10 +60,6 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 
-from bulk_email.models import CourseEmail
-from html_to_text import html_to_text
-from bulk_email import tasks
-
 log = logging.getLogger(__name__)
 
 # internal commands for managing forum roles:
