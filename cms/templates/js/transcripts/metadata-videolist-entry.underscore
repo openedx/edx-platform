@@ -22,6 +22,6 @@
   </div>
 </div>
 <div class="transcripts-status is-invisible">
-    <label class="label setting-label transcripts-label"><%= gettext("Timed Transcripts") %></label>
+    <label class="label setting-label transcripts-label"><%= gettext("Timed Transcript") %></label>
     <div class="wrapper-transcripts-message"></div>
 </div>

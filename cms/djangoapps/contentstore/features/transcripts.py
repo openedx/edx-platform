@@ -22,11 +22,11 @@ ERROR_MESSAGES = {
 }
 
 STATUSES = {
-    'found': u'Timed Transcripts Found',
-    'not found': u'No Timed Transcripts',
-    'replace': u'Timed Transcripts Conflict',
-    'uploaded_successfully': u'Timed Transcripts uploaded successfully',
-    'use existing': u'Timed Transcripts Not Updated',
+    'found': u'Timed Transcript Found',
+    'not found': u'No Timed Transcript',
+    'replace': u'Timed Transcript Conflict',
+    'uploaded_successfully': u'Timed Transcript uploaded successfully',
+    'use existing': u'Timed Transcript Not Updated',
 }
 
 SELECTORS = {
@@ -42,10 +42,10 @@ BUTTONS = {
     'import': ('.setting-import',  'Import from YouTube'),
     'download_to_edit': ('.setting-download', 'Download to Edit'),
     'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download to Edit'),
-    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcripts'),
-    'replace': ('.setting-replace', 'Yes, Replace EdX Timed Transcripts with YouTube Timed Transcripts'),
-    'choose': ('.setting-choose', 'Timed Transcripts from {}'),
-    'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcripts'),
+    'upload_new_timed_transcripts': ('.setting-upload',  'Upload New Timed Transcript'),
+    'replace': ('.setting-replace', 'Yes, Replace EdX Timed Transcript with YouTube Timed Transcript'),
+    'choose': ('.setting-choose', 'Timed Transcript from {}'),
+    'use_existing': ('.setting-use-existing', 'Use Existing Timed Transcript'),
 }
 
 

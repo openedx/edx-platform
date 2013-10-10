@@ -99,7 +99,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
 
                 subEntry = {
                     default_value: 'default value',
-                    display_name: 'Timed Transcripts',
+                    display_name: 'Timed Transcript',
                     explicitly_set: true,
                     field_name: 'sub',
                     help: 'Specifies the name for this component.',
@@ -268,7 +268,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     expect(youtubeValue).toBe('');
                 });
 
-                it('Timed Transcripts field is updated', function () {
+                it('Timed Transcript field is updated', function () {
                     Utils.Storage.set('sub', 'test_value');
 
                     transcripts.syncAdvancedTab(metadataCollection);
@@ -279,7 +279,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     expect(subValue).toBe('test_value');
                 });
 
-                it('Timed Transcripts field is updated just once', function () {
+                it('Timed Transcript field is updated just once', function () {
                     Utils.Storage.set('sub', 'test_value');
 
                     var collection = metadataCollection.models,

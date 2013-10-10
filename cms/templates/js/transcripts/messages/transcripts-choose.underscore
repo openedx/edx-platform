@@ -1,10 +1,10 @@
 <div class="transcripts-message-status status-error">
     <i class="icon-remove"></i>
-    <%= gettext("Timed Transcripts Conflict") %>
+    <%= gettext("Timed Transcript Conflict") %>
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("The timed transcripts file for the first HTML5 source does not appear to be the same as the timed transcripts file for the second HTML5 source .") %>
+    <%= gettext("The timed transcript for the first HTML5 source does not appear to be the same as the timed transcript for the second HTML5 source.") %>
     <strong>
         <%= gettext("Which one would you like to use?") %>
     </strong>
@@ -18,7 +18,7 @@
     <% _.each(html5_list, function(value, index) {
         var type = grouped_list[value][0].type,
             file_name = value + ((type) ? ('.' + type) : ''),
-            message = gettext("Timed Transcripts from ") + file_name;
+            message = gettext("Timed Transcript from ") + file_name;
     %>
         <button
             class="action setting-choose"
