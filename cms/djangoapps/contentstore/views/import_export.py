@@ -35,8 +35,6 @@ from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 from extract_tar import safetar_extractall
 
-import traceback
-
 
 __all__ = ['import_course', 'import_status', 'generate_export_course', 'export_course']
 
@@ -230,7 +228,7 @@ def import_course(request, org, course, name):
             except Exception as exception:   # pylint: disable=W0703
                 return JsonResponse(
                     {
-                        'ErrMsg': str(exception) + traceback.format_exc(),
+                        'ErrMsg': str(exception),
                         'Stage': session_status[key]
                     },
                     status=400

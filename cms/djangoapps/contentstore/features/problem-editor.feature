@@ -95,7 +95,7 @@ Feature: CMS.Problem Editor
     And I go to the import page
     And I import the file "get_html_exception_test.tar.gz"
     When I go to the unit "Probability and BMI"
-    And I click on the link "edit a draft"
+    And I click on "edit a draft"
     Then I see a message that says "We're having trouble rendering your component"
     And I can edit the problem
 
