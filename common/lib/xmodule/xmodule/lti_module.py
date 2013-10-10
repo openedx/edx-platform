@@ -92,10 +92,10 @@ class LTIModule(LTIFields, XModule):
 
             <form
                     action="${launch_url}"
-                    name="ltiLaunchForm"
+                    name="ltiLaunchForm-${element_id}"
                     class="ltiLaunchForm"
                     method="post"
-                    target="ltiLaunchFrame"
+                    target="ltiLaunchFrame-${element_id}"
                     encType="application/x-www-form-urlencoded"
                 >
                     <input name="launch_presentation_return_url" value="" />
