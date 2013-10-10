@@ -1,6 +1,6 @@
-require(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
+require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
          "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
-    function($, _, gettext, NotificationView, PromptView) {
+    function(domReady, $, _, gettext, NotificationView, PromptView) {
 
 var $body;
 var $modal;
@@ -12,7 +12,7 @@ var $newComponentTypePicker;
 var $newComponentTemplatePickers;
 var $newComponentButton;
 
-$(document).ready(function() {
+domReady(function() {
     $body = $('body');
     $modal = $('.history-modal');
     $modalCover = $('.modal-cover');
