@@ -124,7 +124,7 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware', 'instructor',)
+LETTUCE_APPS = ('courseware',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid
