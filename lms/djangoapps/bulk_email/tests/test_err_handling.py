@@ -76,7 +76,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         # have every fourth email fail due to blacklisting:
         get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
                                                                  None, None, None])
-        students = [UserFactory() for _ in xrange(settings.EMAILS_PER_TASK)]
+        students = [UserFactory() for _ in xrange(settings.BULK_EMAIL_EMAILS_PER_TASK)]
         for student in students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
@@ -93,9 +93,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         # Test that after the rejected email, the rest still successfully send
         ((_initial_results), kwargs) = result.call_args
         self.assertEquals(kwargs['skipped'], 0)
-        expected_fails = int((settings.EMAILS_PER_TASK + 3) / 4.0)
+        expected_fails = int((settings.BULK_EMAIL_EMAILS_PER_TASK + 3) / 4.0)
         self.assertEquals(kwargs['failed'], expected_fails)
-        self.assertEquals(kwargs['succeeded'], settings.EMAILS_PER_TASK - expected_fails)
+        self.assertEquals(kwargs['succeeded'], settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.send_course_email.retry')
