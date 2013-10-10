@@ -6,7 +6,10 @@ from pkg_resources import resource_string
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
 from xblock.fields import Integer, Scope, String, List, Float, Boolean
-from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import (
+    CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor,
+    STAFF_DEFAULT_FOR_AI_GRADING, STAFF_DEFAULT_FOR_PEER_GRADING
+)
 from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
@@ -27,6 +30,8 @@ V1_SETTINGS_ATTRIBUTES = [
     "peer_grader_count",
     "required_peer_grading",
     "peer_grade_finished_submissions_when_none_pending",
+    "staff_minimum_for_peer_grading",
+    "staff_minimum_for_ai_grading",
 ]
 
 V1_STUDENT_ATTRIBUTES = [
@@ -303,6 +308,20 @@ class CombinedOpenEndedFields(object):
         default=3,
         scope=Scope.settings,
         values={"min": 1, "step": "1", "max": 5}
+    )
+    staff_minimum_for_peer_grading = Integer(
+        display_name="Staff Grading Needed For Peer Grading",
+        help="The number of responses that need to be staff graded before peer grading can start.  Must be higher than the maximum number of calibration essays shown to peer graders (specified by the Maximum Peer Grading Calibrations setting).",
+        default=STAFF_DEFAULT_FOR_PEER_GRADING,
+        scope=Scope.settings,
+        values={"min": 1, "step": "1", "max": 50}
+    )
+    staff_minimum_for_ai_grading = Integer(
+        display_name="Staff Grading Needed For AI Grading",
+        help="The number of responses that need to be staff graded before AI grading can start.  Must be higher than 50.  At least 100 is recommended.",
+        default=STAFF_DEFAULT_FOR_AI_GRADING,
+        scope=Scope.settings,
+        values={"min": 50, "step": "1", "max": 300}
     )
     peer_grade_finished_submissions_when_none_pending = Boolean(
         display_name='Allow "overgrading" of peer submissions',

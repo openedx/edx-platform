@@ -29,6 +29,12 @@ IS_SCORED = False
 # Metadata overrides this.
 ACCEPT_FILE_UPLOAD = False
 
+# The default number of essays that need to be scored by staff to enable AI scoring.
+STAFF_DEFAULT_FOR_AI_GRADING = 100
+
+# The default number of essays that need to be scored by staff to enable peer scoring.
+STAFF_DEFAULT_FOR_PEER_GRADING = 10
+
 # Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
@@ -130,6 +136,8 @@ class CombinedOpenEndedV1Module():
         self.peer_grade_finished_submissions_when_none_pending = instance_state.get(
             'peer_grade_finished_submissions_when_none_pending', False
         )
+        self.staff_minimum_for_peer_grading = instance_state.get('staff_minimum_for_peer_grading', STAFF_DEFAULT_FOR_PEER_GRADING)
+        self.staff_minimum_for_ai_grading = instance_state.get('staff_minimum_for_ai_grading', STAFF_DEFAULT_FOR_AI_GRADING)
 
         due_date = instance_state.get('due', None)
 
@@ -164,6 +172,8 @@ class CombinedOpenEndedV1Module():
                 'peer_grade_finished_submissions_when_none_pending': (
                     self.peer_grade_finished_submissions_when_none_pending
                 ),
+                'staff_minimum_for_peer_grading': self.staff_minimum_for_peer_grading,
+                'staff_minimum_for_ai_grading': self.staff_minimum_for_ai_grading,
             }
         }
 
