@@ -17,7 +17,7 @@ var CourseGradingPolicy = Backbone.Model.extend({
             // interesting race condition: if {parse:true} when newing, then parse called before .attributes created
             if (this.attributes && this.has('graders')) {
                 graderCollection = this.get('graders');
-                graderCollection.reset(attributes.graders);
+                graderCollection.reset(attributes.graders, {parse:true});
             }
             else {
                 graderCollection = new CourseGraderCollection(attributes.graders, {parse:true});
