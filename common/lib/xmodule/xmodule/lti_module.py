@@ -152,7 +152,7 @@ class LTIModule(LTIFields, XModule):
             except ValueError:
                 raise LTIError('Could not parse LTI passport: {0!r}. \
                     Should be "id:key:secret" string.'.format(lti_passport))
-            if lti_id == self.lti_id:
+            if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
 
@@ -165,8 +165,7 @@ class LTIModule(LTIFields, XModule):
                 raise LTIError('Could not parse custom parameter: {0!r}. \
                     Should be "x=y" string.'.format(custom_parameter))
 
-            # LTI specs:  'custom_' should be prepended before each custom parameter
-            custom_parameters[u'custom_' + unicode(param_name)] = unicode(param_value)
+            custom_parameters[unicode(param_name.strip())] = unicode(param_value.strip())
 
         input_fields = self.oauth_params(
             custom_parameters,
@@ -177,7 +176,7 @@ class LTIModule(LTIFields, XModule):
             'input_fields': input_fields,
 
             # these params do not participate in oauth signing
-            'launch_url': self.launch_url,
+            'launch_url': self.launch_url.strip(),
             'element_id': self.location.html_id(),
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
@@ -227,7 +226,7 @@ class LTIModule(LTIFields, XModule):
 
         try:
             __, headers, __ = client.sign(
-                unicode(self.launch_url),
+                unicode(self.launch_url.strip()),
                 http_method=u'POST',
                 body=body,
                 headers=headers)
