@@ -28,21 +28,18 @@ class SplitModuleTest(unittest.TestCase):
     versions. It creates unique collection names and removes them after all
     tests finish.
     '''
-    # Snippets of what would be in the django settings envs file
-    DOC_STORE_CONFIG = {
+    # Snippet of what would be in the django settings envs file
+    modulestore_options = {
+        'default_class': 'xmodule.raw_module.RawDescriptor',
         'host': 'localhost',
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
-    }
-    modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'xblock_mixins': (InheritanceMixin, XModuleMixin)
     }
 
     MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }
 
@@ -69,8 +66,8 @@ class SplitModuleTest(unittest.TestCase):
         Loads the initial data into the db ensuring the collection name is
         unique.
         '''
-        collection_prefix = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['collection'] + '.'
-        dbname = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['db']
+        collection_prefix = SplitModuleTest.MODULESTORE['OPTIONS']['collection'] + '.'
+        dbname = SplitModuleTest.MODULESTORE['OPTIONS']['db']
         processes = [
             subprocess.Popen([
                 'mongoimport', '-d', dbname, '-c',
@@ -92,7 +89,7 @@ class SplitModuleTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        collection_prefix = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['collection'] + '.'
+        collection_prefix = SplitModuleTest.MODULESTORE['OPTIONS']['collection'] + '.'
         if SplitModuleTest.modulestore:
             for collection in ('active_versions', 'structures', 'definitions'):
                 modulestore().db.drop_collection(collection_prefix + collection)
@@ -1118,10 +1115,7 @@ def modulestore():
         options['render_template'] = render_to_template_mock
 
         # pylint: disable=W0142
-        SplitModuleTest.modulestore = class_(
-            SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],
-            **options
-        )
+        SplitModuleTest.modulestore = class_(**options)
 
     return SplitModuleTest.modulestore
 
