@@ -15,11 +15,11 @@ Feature: CMS.Video Component
 
   # 3
   # Sauce Labs cannot delete cookies
-  #  @skip_sauce
-  #Scenario: Captions are hidden correctly
-  #  Given I have created a Video component with subtitles
-  #  And I have hidden captions
-  #  Then when I view the video it does not show the captions
+  @skip_sauce
+  Scenario: Captions are hidden correctly
+    Given I have created a Video component with subtitles
+    And I have hidden captions
+    Then when I view the video it does not show the captions
 
   # 4
   # Sauce Labs cannot delete cookies
