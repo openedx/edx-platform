@@ -397,12 +397,7 @@ class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(
-        self,
-        doc_store_config=None,  # ignore if passed up
-        metadata_inheritance_cache_subsystem=None, request_cache=None,
-        modulestore_update_signal=None, xblock_mixins=()
-    ):
+    def __init__(self, metadata_inheritance_cache_subsystem=None, request_cache=None, modulestore_update_signal=None, xblock_mixins=()):
         '''
         Set up the error-tracking logic.
         '''

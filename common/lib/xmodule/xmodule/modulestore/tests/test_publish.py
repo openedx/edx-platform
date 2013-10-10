@@ -26,18 +26,18 @@ class TestPublish(unittest.TestCase):
         'db': 'test_xmodule',
     }
 
-    modulestore_options = {
+    modulestore_options = dict({
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    }
+    }, **db_config)
 
     def setUp(self):
-        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
+        self.modulestore_options['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
 
-        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
-        self.draft_mongo = DraftMongoModuleStore(self.db_config, **self.modulestore_options)
+        self.old_mongo = MongoModuleStore(**self.modulestore_options)
+        self.draft_mongo = DraftMongoModuleStore(**self.modulestore_options)
         self.addCleanup(self.tear_down_mongo)
         self.course_location = None
 
