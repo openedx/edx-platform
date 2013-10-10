@@ -16,7 +16,6 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string
 import datetime
-import time
 import copy
 
 from django.http import Http404

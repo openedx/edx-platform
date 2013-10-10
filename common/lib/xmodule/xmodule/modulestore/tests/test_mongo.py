@@ -285,13 +285,6 @@ class TestMongoKeyValueStore(object):
         self.metadata = {'meta': 'meta_val'}
         self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)
 
-    def _check_read(self, key, expected_value):
-        """
-        Asserts the get and has methods.
-        """
-        assert_equals(expected_value, self.kvs.get(key))
-        assert self.kvs.has(key)
-
     def test_read(self):
         assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
         assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
