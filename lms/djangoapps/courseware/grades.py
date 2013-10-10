@@ -14,6 +14,7 @@ from .module_render import get_module, get_module_for_descriptor
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.graders import Score
+from xmodule.utils import get_extended_due_date
 from .models import StudentModule
 
 log = logging.getLogger("mitx.courseware")
@@ -325,7 +326,7 @@ def progress_summary(student, request, course, model_data_cache):
                 'scores': scores,
                 'section_total': section_total,
                 'format': module_format,
-                'due': section_module.lms.due,
+                'due': get_extended_due_date(section_module.lms),
                 'graded': graded,
             })
 
