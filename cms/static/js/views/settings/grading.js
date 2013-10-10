@@ -1,5 +1,5 @@
-define(["js/views/validation", "underscore", "jquery", "js/views/settings/grader"],
-    function(ValidatingView, _, $, GraderView) {
+define(["js/views/validation", "underscore", "jquery", "jquery.ui", "js/views/settings/grader"],
+    function(ValidatingView, _, $, ui, GraderView) {
 
 var GradingView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
