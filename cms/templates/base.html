@@ -159,9 +159,14 @@ var require = {
             deps: ["coffee/src/ajax_prefix"]
         }
     },
-    // load these automatically
-    deps: ["jquery", "js/base", "coffee/src/main", "coffee/src/logger", "datepair"]
-    // we need "datepair" because it dynamically modifies the page when it is loaded -- yuck!
+    // load jquery automatically
+    deps: ["jquery"],
+    callback: function() {
+        // load other scripts on every page, after jquery loads
+        require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair"]);
+        // we need "datepair" because it dynamically modifies the page
+        // when it is loaded -- yuck!
+    }
 };
 </script>
 <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
