@@ -25,13 +25,11 @@ MODULESTORE = {
                 },
                 'default': {
                     'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-                    'DOC_STORE_CONFIG': {
+                    'OPTIONS': {
+                        'default_class': 'xmodule.raw_module.RawDescriptor',
                         'host': 'localhost',
                         'db': 'xmodule',
                         'collection': 'modulestore',
-                    },
-                    'OPTIONS': {
-                        'default_class': 'xmodule.raw_module.RawDescriptor',
                         'fs_root': DATA_DIR,
                         'render_template': 'mitxmako.shortcuts.render_to_string',
                     }
