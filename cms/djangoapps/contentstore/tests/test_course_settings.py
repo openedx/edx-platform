@@ -441,7 +441,6 @@ class CourseMetadataEditingTest(CourseTestCase):
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(self.course, {
             "advertised_start": "start A",
-            "testcenter_info": {"c": "test"},
             "days_early_for_beta": 2
         })
         self.update_check(test_model)
@@ -464,8 +463,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
         self.assertEqual(test_model['advertised_start'], 'start A', "advertised_start not expected value")
-        self.assertIn('testcenter_info', test_model, 'Missing testcenter_info metadata field')
-        self.assertDictEqual(test_model['testcenter_info'], {"c": "test"}, "testcenter_info not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
         self.assertEqual(test_model['days_early_for_beta'], 2, "days_early_for_beta not expected value")
 
