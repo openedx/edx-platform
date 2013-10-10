@@ -1,5 +1,5 @@
 """
-Unit tests for email feature flag in instructor dashboard
+Unit tests for email feature flag in legacy instructor dashboard
 and student dashboard. Additionally tests that bulk email
 is always disabled for non-Mongo backed courses, regardless
 of email feature flag.

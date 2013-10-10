@@ -62,7 +62,6 @@ from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 from bulk_email import tasks
 
-
 log = logging.getLogger(__name__)
 
 # internal commands for managing forum roles:
