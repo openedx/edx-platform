@@ -27,6 +27,33 @@ div.video {
     height: 0px;
   }
 
+  .wrapper-downloads {
+    margin: 0;
+    padding: 0;
+
+    .video-sources,
+    .video-tracks {
+      display: inline-block;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
+
+      a {
+        @include transition(all 0.25s ease-in-out 0s);
+        @include font-size(14);
+        display: inline-block;
+        border-radius: 3px 3px 3px 3px;
+        background-color: $very-light-text;
+        padding: ($baseline*.75);
+        color: $lighter-base-font-color;
+
+        &:hover {
+          background-color: $action-primary-active-bg;
+          color: $very-light-text;
+        }
+      }
+
+    }
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
