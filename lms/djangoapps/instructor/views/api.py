@@ -40,8 +40,6 @@ import analytics.csvs
 import csv
 
 from bulk_email.models import CourseEmail
-from html_to_text import html_to_text
-from bulk_email import tasks
 
 log = logging.getLogger(__name__)
 
@@ -755,7 +753,7 @@ def send_email(request, course_id):
     Send an email to self, staff, or everyone involved in a course.
     Query Parameters:
     - 'send_to' specifies what group the email should be sent to
-       Options are defined by the Email model in
+       Options are defined by the CourseEmail model in
        lms/djangoapps/bulk_email/models.py
     - 'subject' specifies email's subject
     - 'message' specifies email's content
@@ -763,17 +761,15 @@ def send_email(request, course_id):
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
-    text_message = html_to_text(message)
-    email = CourseEmail(
-        course_id=course_id,
-        sender=request.user,
-        to_option=send_to,
-        subject=subject,
-        html_message=message,
-        text_message=text_message,
-    )
-    email.save()
-    tasks.delegate_email_batches.delay(email.id, request.user.id)  # pylint: disable=E1101
+
+    # Create the CourseEmail object.  This is saved immediately, so that
+    # any transaction that has been pending up to this point will also be
+    # committed.
+    email = CourseEmail.create(course_id, request.user, send_to, subject, message)
+
+    # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+
     response_payload = {'course_id': course_id}
     return JsonResponse(response_payload)
 

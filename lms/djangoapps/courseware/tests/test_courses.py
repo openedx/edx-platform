@@ -4,22 +4,36 @@ import mock
 from django.test import TestCase
 from django.http import Http404
 from django.test.utils import override_settings
-from courseware.courses import get_course_by_id, get_cms_course_link_by_id
+from courseware.courses import get_course_by_id, get_course, get_cms_course_link_by_id
 from xmodule.modulestore.django import get_default_store_name_for_current_request
 
 CMS_BASE_TEST = 'testcms'
 
+
 class CoursesTest(TestCase):
+    """Test methods related to fetching courses."""
+
     def test_get_course_by_id_invalid_chars(self):
         """
         Test that `get_course_by_id` throws a 404, rather than
-        an exception, when faced with unexpected characters 
+        an exception, when faced with unexpected characters
         (such as unicode characters, and symbols such as = and ' ')
         """
         with self.assertRaises(Http404):
             get_course_by_id('MITx/foobar/statistics=introduction')
             get_course_by_id('MITx/foobar/business and management')
             get_course_by_id('MITx/foobar/NiñøJoséMaríáßç')
+
+    def test_get_course_invalid_chars(self):
+        """
+        Test that `get_course` throws a ValueError, rather than
+        a 404, when faced with unexpected characters
+        (such as unicode characters, and symbols such as = and ' ')
+        """
+        with self.assertRaises(ValueError):
+            get_course('MITx/foobar/statistics=introduction')
+            get_course('MITx/foobar/business and management')
+            get_course('MITx/foobar/NiñøJoséMaríáßç')
 
     @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_link_by_id(self):
