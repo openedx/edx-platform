@@ -8,6 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.core import Scope, Integer, String
 from .fields import Date
+from .utils import get_extended_due_date
 
 
 log = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class FolditModule(FolditFields, XModule):
             show_leaderboard="false"/>
         """
         XModule.__init__(self, *args, **kwargs)
-        self.due_time = self.due
+        self.due_time = get_extended_due_date(self)
 
     def is_complete(self):
         """
