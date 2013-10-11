@@ -468,3 +468,51 @@ class TestStudentProblemList(ModuleStoreTestCase):
         self.assertEqual(len(valid_problems), 2)
         # Ensure that human names are being set properly.
         self.assertEqual(valid_problems[0]['grader_type_display_name'], "Instructor Assessment")
+
+    def test_get_problems_success(self):
+        """
+        Test to see if we find any open ended modules when they exist.
+        """
+
+        items_exist = utils.check_if_open_ended_problems_exist(self.course_name)
+        self.assertTrue(items_exist)
+
+    def test_get_problems_fail(self):
+        """
+        Test to see if we find any open ended modules when they exist.
+        """
+
+        items_exist = utils.check_if_open_ended_problems_exist("random course")
+        self.assertFalse(items_exist)
+
+
+class TestCourseDataService(ModuleStoreTestCase):
+    """
+    Test the course data service to see if it initializes properly.
+    """
+
+    # Fake grading interface to pass into course data service.
+    GRADING_INTERFACE = {
+        'url': '',
+        'username': '',
+        'password': '',
+        'staff_grading': '',
+        'peer_grading': '',
+        'system': '',
+        'grading_controller': '',
+    }
+
+    def test_initialize_service(self):
+        """
+        Try to initialize a course data service and verify its settings.
+        """
+
+        # Initialize the service.
+        course_data_service = utils.CourseDataService(self.GRADING_INTERFACE)
+
+        # Verify that everything is setup properly.
+        self.assertEqual(course_data_service.url, '')
+        self.assertEqual(course_data_service.course_data_url, '/get_course_data/')
+        self.assertEqual(course_data_service.login_url, '/login/')
+        self.assertEqual(course_data_service.username, '')
+        self.assertEqual(course_data_service.password, '')

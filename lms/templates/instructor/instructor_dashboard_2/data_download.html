@@ -57,3 +57,21 @@
     <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
   </div>
 %endif
+
+%if section_data['open_ended_problems_exist_in_course']:
+<div class="open-ended-download-container action-type-container">
+    <hr>
+    <h2> ${_("Download open response assessment data")} </h2>
+    <p>${_("Data for your open response assessment problems can be downloaded using the button below.  The data will consist of information about all student submissions for all open response assessment problems in the course, including current status, grades, and feedback where applicable.  The data will be in CSV format.")}</p>
+    <p>${_("This data is regenerated every 12 hours, so if there is nothing to download now or you see an error, please check back later.")}</p>
+    <br/>
+    <input type="button" name="get-open-ended-data-url" value="${_("Get Open Response Assessment Data CSV")}" data-endpoint="${ section_data['get_open_ended_data_url'] }">
+
+    <div class="oe-data-display">
+        <div class="data-display-text"></div>
+        <div class="request-response-error"></div>
+    </div>
+</div>
+
+%endif
+

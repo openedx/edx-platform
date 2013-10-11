@@ -30,8 +30,11 @@ class DataDownload
     @$grades                        = @$section.find '.grades-download-container'
     @$grades_request_response       = @$grades.find '.request-response'
     @$grades_request_response_error = @$grades.find '.request-response-error'
-
     @grade_downloads = new GradeDownloads(@$section)
+    @$oe_data_download_btn = @$section.find("input[name='get-open-ended-data-url']'")
+    @$oe_display                = @$section.find '.oe-data-display'
+    @$oe_display_text           = @$oe_display.find '.data-display-text'
+    @$oe_request_response_error = @$oe_display.find '.request-response-error'
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -40,6 +43,25 @@ class DataDownload
     @$list_anon_btn.click (e) =>
       url = @$list_anon_btn.data 'endpoint'
       location.href = url
+
+    # This handler properly calls the api endpoint for open ended data.
+    # Displays an error if there is a problem fetching the data,
+    # and a link to the data otherwise.
+    @$oe_data_download_btn.click (e) =>
+      url = @$oe_data_download_btn.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: std_ajax_err =>
+          @clear_oe_display()
+          @$oe_request_response_error.text gettext("Error getting open response assessment data.  Please notify technical support if this persists.")
+        success: (data) =>
+          @clear_oe_display()
+          if data.success == true
+            button_text = gettext("Click to download data")
+            @$oe_display_text.html "<a href='" + data.file_url + "' target='_blank'>" + button_text + "</a>"
+          else
+            @$oe_request_response_error.text gettext("No open response assessment data is available.  Please check again later.")
 
     # this handler binds to both the download
     # and the csv button
@@ -133,6 +155,9 @@ class DataDownload
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
 
+  clear_oe_display: ->
+    @$oe_display_text.empty()
+    @$oe_request_response_error.empty()
 
 class GradeDownloads
   ### Grade Downloads -- links expire quickly, so we refresh every 5 mins ####

@@ -44,6 +44,8 @@ import csv
 
 from bulk_email.models import CourseEmail
 
+from open_ended_grading.utils import CourseDataService, GradingServiceError
+
 log = logging.getLogger(__name__)
 
 
@@ -451,6 +453,25 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     header = ['User ID', 'Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s)] for s in students]
     return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_open_ended_data(_request, course_id):
+    """
+    Respond with a json dictionary containing a success boolean and a file_url
+    where a csv file of open ended data can be downloaded if success is True.
+    """
+
+    service = CourseDataService(settings.OPEN_ENDED_GRADING_INTERFACE)
+
+    try:
+        response = service.get_course_data(course_id)
+    except GradingServiceError:
+        response = {'success': False}
+
+    return JsonResponse(response)
 
 
 @ensure_csrf_cookie
