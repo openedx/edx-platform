@@ -371,6 +371,7 @@ def user_profile(request, course_id, user_id):
         raise Http404
 
 
+@login_required
 def followed_threads(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
