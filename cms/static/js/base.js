@@ -116,13 +116,6 @@ domReady(function() {
 
     $('.sync-date').bind('click', syncReleaseDate);
 
-    // import form setup
-    $('.view-import .file-input').bind('change', showImportSubmit);
-    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
-        e.preventDefault();
-        $('.view-import .file-input').click();
-    });
-
 
     // section date setting
     $('.set-publish-date').bind('click', setSectionScheduleDate);
@@ -167,28 +160,12 @@ function linkNewWindow(e) {
     e.preventDefault();
 }
 
-
-function showImportSubmit(e) {
-    var filepath = $(this).val();
-    if (filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
-        $('.error-block').hide();
-        $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
-        $('.file-name-block').show();
-        $('.view-import .choose-file-button').hide();
-        $('.submit-button').show();
-        $('.progress').show();
-    } else {
-        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
-    }
-}
-
 function syncReleaseDate(e) {
     e.preventDefault();
     $(this).closest('.notice').hide();
     $("#start_date").val("");
     $("#start_time").val("");
 }
-
 
 function autosaveInput(e) {
     var self = this;
