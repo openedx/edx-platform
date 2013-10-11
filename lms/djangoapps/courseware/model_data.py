@@ -353,7 +353,13 @@ class LmsKeyValueStore(KeyValueStore):
         for field in kv_dict:
             # Check field for validity
             if field.field_name in self._descriptor_model_data:
-                raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
+                # xblock model data will set any mutable field as dirty whether
+                # it's been mutated or not.  In light of that it's better to
+                # silently skip these fields rather than raise an error.
+                #raise InvalidWriteError(
+                #    "Not allowed to overwrite descriptor model data",
+                #    field.field_name)
+                continue
 
             if field.scope not in self._allowed_scopes:
                 raise InvalidScopeError(field.scope)
