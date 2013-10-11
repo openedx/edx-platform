@@ -5,9 +5,9 @@
     <div class="visibility-control visibility-control-rubric">
         <div class="inner">
         </div>
-        <span class="section-header section-header-rubric">${_("Rubric")}</span>
+        <span class="section-header section-header-rubric sr">${_("Rubric")}</span>
     </div>
-    <p>${_("Select the criteria you feel best represents this submission in each category.")}</p>
+    <p class="sr">${_("Select the criteria you feel best represents this submission in each category.")}</p>
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>

@@ -467,12 +467,12 @@ class @StaffGrading
   collapse_question: () =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "(Hide)"
+    if @question_header.text() == gettext("(Hide)")
       Logger.log 'staff_grading_hide_question', {location: @location}
-      new_text = "(Show)"
+      new_text = gettext("(Show)")
     else
       Logger.log 'staff_grading_show_question', {location: @location}
-      new_text = "(Hide)"
+      new_text = gettext("(Hide)")
     @question_header.text(new_text)
 
   scroll_to_top: () =>

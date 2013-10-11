@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-08 14:49+0400\n"
-"PO-Revision-Date: 2013-10-08 15:05+0400\n"
+"PO-Revision-Date: 2013-10-11 16:59+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -6833,7 +6833,7 @@ msgid ""
 "Select the criteria you feel best represents this submission in each "
 "category."
 msgstr ""
-"Выберите пункт критериев, который наилучших образом характеризует ответ в "
+"Выберите пункт критериев, который наилучшим образом характеризует ответ в "
 "каждой категории."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html:26
@@ -8043,7 +8043,7 @@ msgstr "Ответ студента"
 #: lms/templates/instructor/staff_grading.html:76
 #: lms/templates/peer_grading/peer_grading_problem.html:50
 msgid "Written Feedback"
-msgstr "Записанная обратная связь"
+msgstr "Комментарий к работе"
 
 #: lms/templates/instructor/staff_grading.html:77
 msgid "Feedback for student (optional)"
@@ -8051,7 +8051,7 @@ msgstr "Ответ для студента (дополнительно)"
 
 #: lms/templates/instructor/staff_grading.html:80
 msgid "Flag as inappropriate content for later review"
-msgstr "Отметьте неподходящий контент для последующего просмотра"
+msgstr "Отметьте, если ответ содержит нецензурную лекцию, оскорбления и т.п."
 
 #: lms/templates/instructor/staff_grading.html:85
 msgid "Skip"
