@@ -327,15 +327,6 @@ function setVisibility(e) {
     $(e.target).closest('.option').addClass('checked');
 }
 
-function editComponent(e) {
-    e.preventDefault();
-    $(this).closest('.xmodule_edit').addClass('editing').find('.component-editor').slideDown(150);
-}
-
-function closeComponentEditor(e) {
-    e.preventDefault();
-    $(this).closest('.xmodule_edit').removeClass('editing').find('.component-editor').slideUp(150);
-}
 
 function showDateSetter(e) {
     e.preventDefault();
@@ -365,7 +356,7 @@ function hideAlert(e) {
     $(this).closest('.wrapper-alert').removeClass('is-shown');
 }
 
-function addNewSection(e, isTemplate) {
+function addNewSection(e) {
     e.preventDefault();
 
     $(e.target).addClass('disabled');
