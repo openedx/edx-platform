@@ -57,6 +57,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # set context variables and render template
         previous_answer = self.get_display_answer()
 
+        # Use the module name as a unique id to pass to the template.
+        try:
+            module_id = self.system.location.name
+        except AttributeError:
+            # In cases where we don't have a system or a location, use a fallback.
+            module_id = "self_assessment"
+
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -66,6 +73,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
             'accept_file_upload': self.accept_file_upload,
+            'module_id': module_id,
         }
 
         html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
