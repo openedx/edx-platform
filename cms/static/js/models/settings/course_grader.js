@@ -10,13 +10,13 @@ var CourseGrader = Backbone.Model.extend({
     },
     parse : function(attrs) {
         if (attrs['weight']) {
-            if (!_.isNumber(attrs.weight)) attrs.weight = parseInt(attrs.weight, 10);
+            attrs.weight = parseInt(attrs.weight, 10);
         }
         if (attrs['min_count']) {
-            if (!_.isNumber(attrs.min_count)) attrs.min_count = parseInt(attrs.min_count, 10);
+            attrs.min_count = parseInt(attrs.min_count, 10);
         }
         if (attrs['drop_count']) {
-            if (!_.isNumber(attrs.drop_count)) attrs.drop_count = parseInt(attrs.drop_count, 10);
+            attrs.drop_count = parseInt(attrs.drop_count, 10);
         }
         return attrs;
     },
