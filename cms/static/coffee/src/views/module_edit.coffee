@@ -1,7 +1,7 @@
 define ["backbone", "jquery", "underscore", "gettext", "xmodule",
-        "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "jquery.inputnumber"],
-(Backbone, $, _, gettext, XModule, NotificationView, MetadataView, MetadataCollection) ->
+        "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata",
+        "js/utils/modal", "jquery.inputnumber"],
+(Backbone, $, _, gettext, XModule, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
     className: 'component'
@@ -103,17 +103,12 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
       event.preventDefault()
       @$el.removeClass('editing')
       @$component_editor().slideUp(150)
-      @hideModal()
-
-    hideModal: ->
-      $modalCover = $(".modal-cover")
-      $modalCover.hide()
-      $modalCover.removeClass('is-fixed')
+      ModalUtils.hideModalCover()
 
     clickEditButton: (event) ->
       event.preventDefault()
       @$el.addClass('editing')
-      $(".modal-cover").show().addClass('is-fixed')
+      ModalUtils.showModalCover(true)
       @$component_editor().slideDown(150)
       @loadEdit()
 

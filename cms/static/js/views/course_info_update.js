@@ -1,6 +1,6 @@
 define(["backbone", "underscore", "codemirror", "js/models/course_update",
-    "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper"],
-    function(Backbone, _, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper) {
+    "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
+    function(Backbone, _, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = Backbone.View.extend({
         // collection is CourseUpdateCollection
@@ -17,8 +17,6 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
             this.render();
             // when the client refetches the updates as a whole, re-render them
             this.listenTo(this.collection, 'reset', this.render);
-
-            this.$modalCover = $(".modal-cover");
         },
 
         render: function () {
@@ -64,9 +62,8 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
             $newForm.addClass('editing');
             this.$currentPost = $newForm.closest('li');
 
-            this.$modalCover.show();
-            this.$modalCover.bind('click', function() {
-                self.closeEditor(true);
+            this.$modalCover = ModalUtils.showModalCover(false, function() {
+                self.closeEditor(true)
             });
 
             $('.date').datepicker('destroy');
@@ -91,7 +88,7 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
                     ele.remove();
                 }
             });
-            this.closeEditor();
+            this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
                 'course': course_location_analytics,
@@ -121,10 +118,11 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
             this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
                 targetModel, 'content', self.options['base_asset_url'], $textArea.get(0));
 
-            this.$modalCover.show();
-            this.$modalCover.bind('click', function() {
-                self.closeEditor(false);
-            });
+            this.$modalCover = ModalUtils.showModalCover(false,
+                function() {
+                    self.closeEditor(false)
+                }
+            );
         },
 
         onDelete: function(event) {
@@ -198,8 +196,7 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
                 this.$currentPost.find('.CodeMirror').remove();
             }
 
-            this.$modalCover.unbind('click');
-            this.$modalCover.hide();
+            ModalUtils.hideModalCover(this.$modalCover);
             this.$codeMirror = null;
         },
 

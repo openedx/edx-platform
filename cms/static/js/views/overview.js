@@ -1,5 +1,106 @@
-define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notification", "draggabilly"],
-    function (domReady, $, ui, gettext, NotificationView, Draggabilly) {
+define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "draggabilly", "js/utils/modal", "js/utils/get_date"],
+    function (domReady, $, ui, _, gettext, NotificationView, Draggabilly, ModalUtils, DateUtils) {
+
+        var modalSelector = '.edit-subsection-publish-settings';
+
+        var toggleSections = function(e) {
+            e.preventDefault();
+
+            var $section = $('.courseware-section');
+            var $button = $(this);
+            var $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+                gettext('Collapse All Sections') + '</span>');
+            var $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+                gettext('Expand All Sections') + '</span>');
+
+            var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
+            $button.toggleClass('is-activated').html(buttonLabel);
+
+            if ($button.hasClass('is-activated')) {
+                $section.addClass('collapsed');
+                // first child in order to avoid the icons on the subsection lists which are not in the first child
+                $section.find('header .expand-collapse-icon').removeClass('collapse').addClass('expand');
+            } else {
+                $section.removeClass('collapsed');
+                // first child in order to avoid the icons on the subsection lists which are not in the first child
+                $section.find('header .expand-collapse-icon').removeClass('expand').addClass('collapse');
+            }
+        };
+
+
+        var editSectionPublishDate = function (e) {
+            e.preventDefault();
+            var $modal = $(modalSelector);
+            $modal.attr('data-id', $(this).attr('data-id'));
+            $modal.find('.start-date').val($(this).attr('data-date'));
+            $modal.find('.start-time').val($(this).attr('data-time'));
+            if ($modal.find('.start-date').val() == '' && $modal.find('.start-time').val() == '') {
+                $modal.find('.save-button').hide();
+            }
+            $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
+            ModalUtils.showModal();
+        };
+
+        function saveSetSectionScheduleDate(e) {
+            e.preventDefault();
+
+            var datetime = DateUtils(
+                $('.edit-subsection-publish-settings .start-date'),
+                $('.edit-subsection-publish-settings .start-time')
+            );
+
+            var id = $(modalSelector).attr('data-id');
+
+            analytics.track('Edited Section Release Date', {
+                'course': course_location_analytics,
+                'id': id,
+                'start': datetime
+            });
+
+            var saving = new NotificationView.Mini({
+                title: gettext("Saving&hellip;")
+            });
+            saving.show();
+            // call into server to commit the new order
+            $.ajax({
+                url: "/save_item",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'id': id,
+                    'metadata': {
+                        'start': datetime
+                    }
+                })
+            }).success(function() {
+                    var pad2 = function(number) {
+                        // pad a number to two places: useful for formatting months, days, hours, etc
+                        // when displaying a date/time
+                        return (number < 10 ? '0' : '') + number;
+                    };
+
+                    var $thisSection = $('.courseware-section[data-id="' + id + '"]');
+                    var html = _.template(
+                        '<span class="published-status">' +
+                            '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                            gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
+                            '</span>' +
+                            '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-id="{id}">' +
+                            gettext("Edit") +
+                            '</a>',
+                        {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
+                            hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
+                            id: id},
+                        {interpolate: /\{(.+?)\}/g});
+                    $thisSection.find('.section-published-date').html(html);
+                    ModalUtils.hideModal();
+                    saving.hide();
+                });
+        }
+        // Add to window object for unit test (overview_spec).
+        window.saveSetSectionScheduleDate = saveSetSectionScheduleDate;
+
 
         var overviewDragger = {
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
@@ -295,6 +396,13 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
         };
 
         domReady(function() {
+            $('.toggle-button-sections').bind('click', toggleSections);
+            var $body = $('body');
+            $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
+            $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
+            $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
+            $body.on('click', '.edit-subsection-publish-settings .cancel-button', ModalUtils.hideModal);
+
             // Section
             overviewDragger.makeDraggable(
                 '.courseware-section',
