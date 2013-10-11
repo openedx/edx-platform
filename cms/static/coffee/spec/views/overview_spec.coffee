@@ -1,5 +1,5 @@
 define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base", "date", "jquery.timepicker"],
-(OverviewDragger, Notification, sinon) ->
+(Overview, Notification, sinon) ->
 
     describe "Course Overview", ->
         beforeEach ->
@@ -62,9 +62,9 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                               </ol>
                               """
     
-            spyOn(window, 'saveSetSectionScheduleDate').andCallThrough()
+            spyOn(Overview, 'saveSetSectionScheduleDate').andCallThrough()
             # Have to do this here, as it normally gets bound in document.ready()
-            $('a.save-button').click(saveSetSectionScheduleDate)
+            $('a.save-button').click(Overview.saveSetSectionScheduleDate)
             $('a.delete-section-button').click(deleteSection)
             $(".edit-subsection-publish-settings .start-date").datepicker()
 
@@ -75,7 +75,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
             requests = @requests = []
             @xhr.onCreate = (req) -> requests.push(req)
 
-            OverviewDragger.makeDraggable(
+            Overview.overviewDragger.makeDraggable(
                 '.unit',
                 '.unit-drag-handle',
                 'ol.sortable-unit-list',
@@ -90,7 +90,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
         it "should save model when save is clicked", ->
             $('a.edit-button').click()
             $('a.save-button').click()
-            expect(saveSetSectionScheduleDate).toHaveBeenCalled()
+            expect(Overview.saveSetSectionScheduleDate).toHaveBeenCalled()
 
         it "should show a confirmation on save", ->
             $('a.edit-button').click()
@@ -120,7 +120,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 $ele.offset(
                     top: $ele.offset().top + 10, left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#unit-2'))
                 expect(destination.attachMethod).toBe('before')
     
@@ -130,7 +130,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#unit-4').offset().top + 8
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#unit-4'))
                 # Dragging down into first element, we have a fudge factor makes it easier to drag at beginning.
                 expect(destination.attachMethod).toBe('before')
@@ -139,7 +139,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#unit-4').offset().top + 12
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#unit-4'))
                 expect(destination.attachMethod).toBe('after')
     
@@ -149,7 +149,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#unit-3').offset().bottom + 4
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, -1)
+                destination = Overview.overviewDragger.findDestination($ele, -1)
                 expect(destination.ele).toBe($('#unit-3'))
                 # Dragging down up into last element, we have a fudge factor makes it easier to drag at beginning.
                 expect(destination.attachMethod).toBe('after')
@@ -158,7 +158,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#unit-3').offset().top + 4
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, -1)
+                destination = Overview.overviewDragger.findDestination($ele, -1)
                 expect(destination.ele).toBe($('#unit-3'))
                 expect(destination.attachMethod).toBe('before')
     
@@ -168,7 +168,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#subsection-3').offset().top + 10
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#subsection-list-3'))
                 expect(destination.attachMethod).toBe('prepend')
     
@@ -177,7 +177,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 $ele.offset(
                     top: $ele.offset().top + 200, left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination).toEqual(
                     ele: null
                     attachMethod: ""
@@ -190,21 +190,21 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     top: $('#subsection-2').offset().top + 3
                     left: $ele.offset().left
                 )
-                destination = OverviewDragger.findDestination($ele, 1)
+                destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#subsection-list-2'))
                 expect(destination.parentList).toBe($('#subsection-2'))
                 expect(destination.attachMethod).toBe('prepend')
     
         describe "onDragStart", ->
             it "sets the dragState to its default values", ->
-                expect(OverviewDragger.dragState).toEqual({})
+                expect(Overview.overviewDragger.dragState).toEqual({})
                 # Call with some dummy data
-                OverviewDragger.onDragStart(
+                Overview.overviewDragger.onDragStart(
                     {element: $('#unit-1')},
                     null,
                     null
                 )
-                expect(OverviewDragger.dragState).toEqual(
+                expect(Overview.overviewDragger.dragState).toEqual(
                     dropDestination: null,
                     attachMethod: '',
                     parentList: null,
@@ -214,7 +214,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
     
             it "collapses expanded elements", ->
                 expect($('#subsection-1')).not.toHaveClass('collapsed')
-                OverviewDragger.onDragStart(
+                Overview.overviewDragger.onDragStart(
                     {element: $('#subsection-1')},
                     null,
                     null
@@ -233,7 +233,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 $ele.offset(
                     top: dragY, left: dragX
                 )
-                OverviewDragger.onDragMove(
+                Overview.overviewDragger.onDragMove(
                     {element: $ele, dragPoint:
                         {y: dragY}}, '', {clientX: dragX}
                 )
@@ -246,7 +246,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 $ele.offset(
                     top: dragY, left: $ele.offset().left
                 )
-                OverviewDragger.onDragMove(
+                Overview.overviewDragger.onDragMove(
                     {element: $ele, dragPoint:
                         {y: dragY}}, '', {clientX: $ele.offset().left - 3}
                 )
@@ -254,33 +254,33 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect($ele).not.toHaveClass('valid-drop')
     
             it "scrolls up if necessary", ->
-                OverviewDragger.onDragMove(
+                Overview.overviewDragger.onDragMove(
                     {element: $('#unit-1')}, '', {clientY: 2}
                 )
                 expect(@scrollSpy).toHaveBeenCalledWith(0, -10)
     
             it "scrolls down if necessary", ->
-                OverviewDragger.onDragMove(
+                Overview.overviewDragger.onDragMove(
                     {element: $('#unit-1')}, '', {clientY: (window.innerHeight - 5)}
                 )
                 expect(@scrollSpy).toHaveBeenCalledWith(0, 10)
     
         describe "onDragEnd", ->
             beforeEach ->
-                @reorderSpy = spyOn(OverviewDragger, 'handleReorder')
+                @reorderSpy = spyOn(Overview.overviewDragger, 'handleReorder')
 
             afterEach ->
                 @reorderSpy.reset()
 
             it "calls handleReorder on a successful drag", ->
-                OverviewDragger.dragState.dropDestination = $('#unit-2')
-                OverviewDragger.dragState.attachMethod = "before"
-                OverviewDragger.dragState.parentList = $('#subsection-1')
+                Overview.overviewDragger.dragState.dropDestination = $('#unit-2')
+                Overview.overviewDragger.dragState.attachMethod = "before"
+                Overview.overviewDragger.dragState.parentList = $('#subsection-1')
                 $('#unit-1').offset(
                     top: $('#unit-1').offset().top + 10
                     left: $('#unit-1').offset().left
                 )
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
                 null,
                     {clientX: $('#unit-1').offset().left}
@@ -288,15 +288,15 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect(@reorderSpy).toHaveBeenCalled()
 
             it "clears out the drag state", ->
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
                 null,
                 null
                 )
-                expect(OverviewDragger.dragState).toEqual({})
+                expect(Overview.overviewDragger.dragState).toEqual({})
 
             it "sets the element to the correct position", ->
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
                 null,
                 null
@@ -308,7 +308,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
             it "expands an element if it was collapsed on drag start", ->
                 $('#subsection-1').addClass('collapsed')
                 $('#subsection-1').addClass('expand-on-drop')
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#subsection-1')},
                 null,
                 null
@@ -318,10 +318,10 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
 
             it "expands a collapsed element when something is dropped in it", ->
                 $('#subsection-2').addClass('collapsed')
-                OverviewDragger.dragState.dropDestination = $('#list-2')
-                OverviewDragger.dragState.attachMethod = "prepend"
-                OverviewDragger.dragState.parentList = $('#subsection-2')
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.dragState.dropDestination = $('#list-2')
+                Overview.overviewDragger.dragState.attachMethod = "prepend"
+                Overview.overviewDragger.dragState.parentList = $('#subsection-2')
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
                 null,
                     {clientX: $('#unit-1').offset().left}
@@ -344,15 +344,15 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 @clock.restore()
 
             it "should send an update on reorder", ->
-                OverviewDragger.dragState.dropDestination = $('#unit-4')
-                OverviewDragger.dragState.attachMethod = "after"
-                OverviewDragger.dragState.parentList = $('#subsection-2')
+                Overview.overviewDragger.dragState.dropDestination = $('#unit-4')
+                Overview.overviewDragger.dragState.attachMethod = "after"
+                Overview.overviewDragger.dragState.parentList = $('#subsection-2')
                 # Drag Unit 1 from Subsection 1 to the end of Subsection 2.
                 $('#unit-1').offset(
                     top: $('#unit-4').offset().top + 10
                     left: $('#unit-4').offset().left
                 )
-                OverviewDragger.onDragEnd(
+                Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
                     null,
                     {clientX: $('#unit-1').offset().left}

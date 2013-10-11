@@ -1,5 +1,204 @@
-define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notification", "draggabilly"],
-    function (domReady, $, ui, gettext, NotificationView, Draggabilly) {
+define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "draggabilly",
+    "js/utils/modal", "js/utils/cancel_on_escape", "js/utils/get_date"],
+    function (domReady, $, ui, _, gettext, NotificationView, Draggabilly, ModalUtils, CancelOnEscape, DateUtils) {
+
+        var modalSelector = '.edit-subsection-publish-settings';
+
+        var toggleSections = function(e) {
+            e.preventDefault();
+
+            var $section = $('.courseware-section');
+            var $button = $(this);
+            var $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+                gettext('Collapse All Sections') + '</span>');
+            var $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+                gettext('Expand All Sections') + '</span>');
+
+            var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
+            $button.toggleClass('is-activated').html(buttonLabel);
+
+            if ($button.hasClass('is-activated')) {
+                $section.addClass('collapsed');
+                // first child in order to avoid the icons on the subsection lists which are not in the first child
+                $section.find('header .expand-collapse-icon').removeClass('collapse').addClass('expand');
+            } else {
+                $section.removeClass('collapsed');
+                // first child in order to avoid the icons on the subsection lists which are not in the first child
+                $section.find('header .expand-collapse-icon').removeClass('expand').addClass('collapse');
+            }
+        };
+
+        var toggleSubmodules = function(e) {
+            e.preventDefault();
+            $(this).toggleClass('expand').toggleClass('collapse');
+            $(this).closest('.branch, .window').toggleClass('collapsed');
+        };
+
+        var editSectionPublishDate = function (e) {
+            e.preventDefault();
+            var $modal = $(modalSelector);
+            $modal.attr('data-id', $(this).attr('data-id'));
+            $modal.find('.start-date').val($(this).attr('data-date'));
+            $modal.find('.start-time').val($(this).attr('data-time'));
+            if ($modal.find('.start-date').val() == '' && $modal.find('.start-time').val() == '') {
+                $modal.find('.save-button').hide();
+            }
+            $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
+            ModalUtils.showModal();
+        };
+
+        var saveSetSectionScheduleDate = function (e) {
+            e.preventDefault();
+
+            var datetime = DateUtils(
+                $('.edit-subsection-publish-settings .start-date'),
+                $('.edit-subsection-publish-settings .start-time')
+            );
+
+            var id = $(modalSelector).attr('data-id');
+
+            analytics.track('Edited Section Release Date', {
+                'course': course_location_analytics,
+                'id': id,
+                'start': datetime
+            });
+
+            var saving = new NotificationView.Mini({
+                title: gettext("Saving&hellip;")
+            });
+            saving.show();
+            // call into server to commit the new order
+            $.ajax({
+                url: "/save_item",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'id': id,
+                    'metadata': {
+                        'start': datetime
+                    }
+                })
+            }).success(function() {
+                    var pad2 = function(number) {
+                        // pad a number to two places: useful for formatting months, days, hours, etc
+                        // when displaying a date/time
+                        return (number < 10 ? '0' : '') + number;
+                    };
+
+                    var $thisSection = $('.courseware-section[data-id="' + id + '"]');
+                    var html = _.template(
+                        '<span class="published-status">' +
+                            '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                            gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
+                            '</span>' +
+                            '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-id="{id}">' +
+                            gettext("Edit") +
+                            '</a>',
+                        {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
+                            hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
+                            id: id},
+                        {interpolate: /\{(.+?)\}/g});
+                    $thisSection.find('.section-published-date').html(html);
+                    ModalUtils.hideModal();
+                    saving.hide();
+                });
+        };
+
+        var addNewSection = function (e) {
+            e.preventDefault();
+
+            $(e.target).addClass('disabled');
+
+            var $newSection = $($('#new-section-template').html());
+            var $cancelButton = $newSection.find('.new-section-name-cancel');
+            $('.courseware-overview').prepend($newSection);
+            $newSection.find('.new-section-name').focus().select();
+            $newSection.find('.section-name-form').bind('submit', saveNewSection);
+            $cancelButton.bind('click', cancelNewSection);
+            CancelOnEscape($cancelButton);
+        };
+
+        var saveNewSection = function (e) {
+            e.preventDefault();
+
+            var $saveButton = $(this).find('.new-section-name-save');
+            var parent = $saveButton.data('parent');
+            var category = $saveButton.data('category');
+            var display_name = $(this).find('.new-section-name').val();
+
+            analytics.track('Created a Section', {
+                'course': course_location_analytics,
+                'display_name': display_name
+            });
+
+            $.post('/create_item', {
+                    'parent_location': parent,
+                    'category': category,
+                    'display_name': display_name
+                },
+
+                function(data) {
+                    if (data.id != undefined) location.reload();
+                });
+        };
+
+        var cancelNewSection = function (e) {
+            e.preventDefault();
+            $('.new-courseware-section-button').removeClass('disabled');
+            $(this).parents('section.new-section').remove();
+        };
+
+        var addNewSubsection = function (e) {
+            e.preventDefault();
+            var $section = $(this).closest('.courseware-section');
+            var $newSubsection = $($('#new-subsection-template').html());
+            $section.find('.subsection-list > ol').append($newSubsection);
+            $section.find('.new-subsection-name-input').focus().select();
+
+            var $saveButton = $newSubsection.find('.new-subsection-name-save');
+            var $cancelButton = $newSubsection.find('.new-subsection-name-cancel');
+
+            var parent = $(this).parents("section.branch").data("id");
+
+            $saveButton.data('parent', parent);
+            $saveButton.data('category', $(this).data('category'));
+
+            $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
+            $cancelButton.bind('click', cancelNewSubsection);
+            CancelOnEscape($cancelButton);
+        };
+
+        var saveNewSubsection = function (e) {
+            e.preventDefault();
+
+            var parent = $(this).find('.new-subsection-name-save').data('parent');
+            var category = $(this).find('.new-subsection-name-save').data('category');
+            var display_name = $(this).find('.new-subsection-name-input').val();
+
+            analytics.track('Created a Subsection', {
+                'course': course_location_analytics,
+                'display_name': display_name
+            });
+
+
+            $.post('/create_item', {
+                    'parent_location': parent,
+                    'category': category,
+                    'display_name': display_name
+                },
+
+                function(data) {
+                    if (data.id != undefined) {
+                        location.reload();
+                    }
+                });
+        };
+
+        var cancelNewSubsection = function (e) {
+            e.preventDefault();
+            $(this).parents('li.branch').remove();
+        };
 
         var overviewDragger = {
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
@@ -295,6 +494,24 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
         };
 
         domReady(function() {
+            // toggling overview section details
+            $(function() {
+                if ($('.courseware-section').length > 0) {
+                    $('.toggle-button-sections').addClass('is-shown');
+                }
+            });
+            $('.toggle-button-sections').bind('click', toggleSections);
+            $('.expand-collapse-icon').bind('click', toggleSubmodules);
+
+            var $body = $('body');
+            $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
+            $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
+            $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
+            $body.on('click', '.edit-subsection-publish-settings .cancel-button', ModalUtils.hideModal);
+
+            $('.new-courseware-section-button').bind('click', addNewSection);
+            $('.new-subsection-item').bind('click', addNewSubsection);
+
             // Section
             overviewDragger.makeDraggable(
                 '.courseware-section',
@@ -318,5 +535,8 @@ define(["domReady", "jquery", "jquery.ui", "gettext", "js/views/feedback_notific
             );
         });
 
-        return overviewDragger;
+        return {
+            overviewDragger: overviewDragger,
+            saveSetSectionScheduleDate: saveSetSectionScheduleDate
+        };
     });
