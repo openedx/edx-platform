@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-11 17:19+0400\n"
-"PO-Revision-Date: 2013-10-11 16:59+0400\n"
+"PO-Revision-Date: 2013-10-11 17:26+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -7697,7 +7697,6 @@ msgid "Filter Topics"
 msgstr "Фильтр тем"
 
 #: lms/templates/discussion/_filter_dropdown.html:30
-#, fuzzy
 msgid "filter topics"
 msgstr "Фильтр тем"
 
@@ -8026,10 +8025,9 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html:54
 msgid "Prompt"
-msgstr "Приглашение"
+msgstr "Условие задачи"
 
 #: lms/templates/instructor/staff_grading.html:54
-#, fuzzy
 msgid "(Show)"
 msgstr "Показать"
 
@@ -8391,7 +8389,6 @@ msgid "Open Ended Problems"
 msgstr "Задачи с открытым ответом"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:20
-#, fuzzy
 msgid "Here is a list of open ended problems for this course."
 msgstr "Вот список задач с открытым ответом в данном курсе."
 
