@@ -5,6 +5,7 @@ from lettuce import world, step
 from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
 from common import create_studio_user, add_course_author, log_into_studio
 
+
 @step(u'I am in Studio editing a new unit$')
 def add_unit(step):
     world.clear_courses()
@@ -18,7 +19,7 @@ def add_unit(step):
     add_course_author(user, course)
     log_into_studio()
     world.wait_for_requirejs([
-        "jquery", "js/models/course", "coffee/src/models/module",
+        "jquery", "gettext", "js/models/course", "coffee/src/models/module",
         "coffee/src/views/unit", "jquery.ui",
     ])
     world.wait_for_mathjax()
@@ -39,13 +40,13 @@ def add_a_single_step_component(step):
         css_selector = 'a[data-type="{}"]'.format(component.lower())
         world.css_click(css_selector)
 
-	# In the current implementation, all the "new component"
-	# buttons are handled by one BackBone.js view.
-	# If we click two buttons at super-human speed,
-	# the view will miss the second click while it's
-	# processing the first.
-	# To account for this, we wait for each component
-	# to be created before clicking the next component.
+        # In the current implementation, all the "new component"
+        # buttons are handled by one BackBone.js view.
+        # If we click two buttons at super-human speed,
+        # the view will miss the second click while it's
+        # processing the first.
+        # To account for this, we wait for each component
+        # to be created before clicking the next component.
         world.wait_for_visible('section.xmodule_{}Module'.format(component))
 
 

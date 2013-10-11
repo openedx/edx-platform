@@ -159,8 +159,8 @@ var require = {
             deps: ["coffee/src/ajax_prefix"]
         }
     },
-    // load jquery automatically
-    deps: ["jquery"],
+    // load jquery and gettext automatically
+    deps: ["jquery", "gettext"],
     callback: function() {
         // load other scripts on every page, after jquery loads
         require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair"]);
