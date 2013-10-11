@@ -1,5 +1,6 @@
 <%page args="grade_summary, grade_cutoffs, graph_div_id, show_grade_breakdown = True, show_grade_cutoffs = True, **kwargs"/>
 <%!
+  from django.utils.translation import ugettext as _
   import json
   import math
 %>
@@ -87,8 +88,8 @@ $(function () {
             })
             
             detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
-  
-    ticks += [ [overviewBarX, gettext("Total")] ]
+    
+    ticks += [ [overviewBarX, _("Total")] ]
     tickIndex += 1 + sectionSpacer
   
   totalScore = grade_summary['percent']

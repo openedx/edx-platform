@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-08 14:49+0400\n"
+"POT-Creation-Date: 2013-10-11 17:20+0400\n"
 "PO-Revision-Date: 2013-10-08 14:54+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
@@ -803,6 +803,17 @@ msgstr "Кажется что-то пошло не так"
 #: lms/static/coffee/src/staff_grading/staff_grading.js:487
 msgid "System got into invalid state for submission: "
 msgstr "Кажется что-то пошло не так для посылки: "
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:495
+#: lms/static/coffee/src/staff_grading/staff_grading.js:504
+#, fuzzy
+msgid "(Hide)"
+msgstr "Спрятать"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:499
+#, fuzzy
+msgid "(Show)"
+msgstr "Показать"
 
 #~ msgid "Answer saved."
 #~ msgstr "Ответ сохранен."

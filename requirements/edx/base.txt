@@ -109,4 +109,4 @@ git+https://github.com/brosner/django-announcements.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
 git+https://github.com/mitocw/django-cas.git
-git+https://github.com/j2a/pytils.git
+git+https://github.com/smartdec/pytils.git
