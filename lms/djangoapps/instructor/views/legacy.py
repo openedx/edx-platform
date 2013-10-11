@@ -30,7 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 
-from bulk_email.models import CourseEmail
+from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
@@ -801,9 +801,12 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
-    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
-    # 2) enable course email
+    # determine if this is a studio-backed course so we can provide a link to edit this course in studio
     is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
 
     email_editor = None
     # HTML editor for email
@@ -813,13 +816,12 @@ def instructor_dashboard(request, course_id):
         fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
         email_editor = fragment.content
 
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link_by_id(course_id)
-
-    # Flag for whether or not we display the email tab (depending upon
-    # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
+    # Enable instructor email only if the following conditions are met:
+    # 1. Feature flag is on
+    # 2. We have explicitly enabled email for the given course via django-admin
+    # 3. It is NOT an XML course
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       CourseAuthorization.instructor_email_enabled(course_id) and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
