@@ -3,10 +3,13 @@ Unit tests for bulk-email-related models.
 """
 from django.test import TestCase
 from django.core.management import call_command
+from django.conf import settings
 
 from student.tests.factories import UserFactory
 
-from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate
+from mock import patch
+
+from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization
 
 
 class CourseEmailTest(TestCase):
@@ -99,3 +102,46 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._get_sample_plain_context()
         template.render_plaintext("My new plain text.", context)
+
+
+class CourseAuthorizationTest(TestCase):
+    """Test the CourseAuthorization model."""
+
+    @patch.dict(settings.MITX_FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_creation_auth_on(self):
+        course_id = 'abc/123/doremi'
+        # Test that course is not authorized by default
+        self.assertFalse(CourseAuthorization.instructor_email_enabled(course_id))
+
+        # Authorize
+        cauth = CourseAuthorization(course_id=course_id, email_enabled=True)
+        cauth.save()
+        # Now, course should be authorized
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(course_id))
+        self.assertEquals(
+            cauth.__unicode__(),
+            "Course 'abc/123/doremi': Instructor Email Enabled"
+        )
+
+        # Unauthorize by explicitly setting email_enabled to False
+        cauth.email_enabled = False
+        cauth.save()
+        # Test that course is now unauthorized
+        self.assertFalse(CourseAuthorization.instructor_email_enabled(course_id))
+        self.assertEquals(
+            cauth.__unicode__(),
+            "Course 'abc/123/doremi': Instructor Email Not Enabled"
+        )
+
+    @patch.dict(settings.MITX_FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': False})
+    def test_creation_auth_off(self):
+        course_id = 'blahx/blah101/ehhhhhhh'
+        # Test that course is authorized by default, since auth is turned off
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(course_id))
+
+        # Use the admin interface to unauthorize the course
+        cauth = CourseAuthorization(course_id=course_id, email_enabled=False)
+        cauth.save()
+
+        # Now, course should STILL be authorized!
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(course_id))
