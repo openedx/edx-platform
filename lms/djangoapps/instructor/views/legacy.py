@@ -496,7 +496,7 @@ def instructor_dashboard(request, course_id):
         unique_student_identifier = request.POST.get(
             'unique_student_identifier', ''
         )
-        url = get_module_url(request.POST.get('section'))
+        url = request.POST.get('url')
 
         # try to uniquely id student by email address or username
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -817,7 +817,7 @@ def instructor_dashboard(request, course_id):
                'instructor_tasks': instructor_tasks,
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-
+               'units_with_due_dates': get_graded_units_with_due_dates(course),
                'analytics_results': analytics_results,
                }
 
@@ -825,6 +825,25 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
+
+def get_graded_units_with_due_dates(course):
+    units = []
+    def visit(node, level=0):
+        if getattr(node, 'due', None):
+            url = node.location.url()
+            title = getattr(node, 'display_name', None)
+            if not title:
+                title = url
+            else:
+                title += " (%s)" % url
+            units.append((title, url))
+        else:
+            for child in node.get_children():
+                visit(child, level+1)
+    visit(course)
+    units.sort(key=lambda x: x[0].lower())
+    return units
 
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):

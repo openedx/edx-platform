@@ -286,15 +286,12 @@ function goto( mode)
       <input type="text" name="unique_student_identifier">
     </p>
     <p>
-      ${_("Specify a particular unit or problem in the course here by its url:")}
-      <input type="text" name="section" size="60">
-    </p>
-    <p>
-      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. '
-          '(For example, if the location is <tt>i4x://university/course/problem/problemname</tt>, '
-          'then just provide the <tt>problemname</tt>. '
-          'If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then '
-          'provide <tt>notaproblem/someothername</tt>.)')}
+      ${_("Choose the graded unit:")}
+      <select name="url">
+        %for title, url in units_with_due_dates:
+        <option value="${url}">${title}</option>
+        %endfor
+      </select>
     </p>
     <p>
       ${_("Specify the individual due date and time in UTC:")}
