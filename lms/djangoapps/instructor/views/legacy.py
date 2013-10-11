@@ -51,7 +51,11 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
 
-from .extensions import set_due_date_extension
+from .extensions import (
+    dump_students_with_due_date_extensions,
+    dump_due_date_extensions_for_student,
+    get_units_with_due_date_options,
+    set_due_date_extension)
 
 
 log = logging.getLogger(__name__)
@@ -494,8 +498,7 @@ def instructor_dashboard(request, course_id):
     elif "Change due date for student" in action:
         # get the form data
         unique_student_identifier = request.POST.get(
-            'unique_student_identifier', ''
-        )
+            'unique_student_identifier', '')
         url = request.POST.get('url')
 
         # try to uniquely id student by email address or username
@@ -514,6 +517,44 @@ def instructor_dashboard(request, course_id):
                 log.debug(error)
             else:
                 msg += 'Successfully changed due date.'
+
+    elif "Reset due date for student" in action:
+        # get the form data
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', '')
+        url = request.POST.get('url')
+
+        # try to uniquely id student by email address or username
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        if url and student:
+            error = set_due_date_extension(
+                course, url, student, None)
+            if error:
+                msg += '<font color="red">{0}</font>'.format(error)
+                log.debug(error)
+            else:
+                msg += 'Successfully reset due date.'
+
+
+    elif "Dump list of students with due date extensions" in action:
+        url = request.POST.get('url')
+        error, datatable = dump_students_with_due_date_extensions(course, url)
+        if error:
+            msg += '<font color="red">{0}</font>'.format(error)
+
+    elif "Dump due date extensions for student" in action:
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', '')
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        if student:
+            error, datatable = dump_due_date_extensions_for_student(
+                course, student)
+            if error:
+                msg += '<font color="red">{0}</font>'.format(error)
 
     #----------------------------------------
     # Admin
@@ -817,7 +858,7 @@ def instructor_dashboard(request, course_id):
                'instructor_tasks': instructor_tasks,
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-               'units_with_due_dates': get_graded_units_with_due_dates(course),
+               'units_with_due_dates': get_units_with_due_date_options(course),
                'analytics_results': analytics_results,
                }
 
@@ -825,25 +866,6 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
-
-
-def get_graded_units_with_due_dates(course):
-    units = []
-    def visit(node, level=0):
-        if getattr(node, 'due', None):
-            url = node.location.url()
-            title = getattr(node, 'display_name', None)
-            if not title:
-                title = url
-            else:
-                title += " (%s)" % url
-            units.append((title, url))
-        else:
-            for child in node.get_children():
-                visit(child, level+1)
-    visit(course)
-    units.sort(key=lambda x: x[0].lower())
-    return units
 
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
