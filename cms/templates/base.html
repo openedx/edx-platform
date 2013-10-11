@@ -200,6 +200,9 @@ require(['js/models/course'], function(Course) {
       <%block name="content"></%block>
 
       % if user.is_authenticated():
+      <script type="text/javascript">
+        require(['js/sock']);
+      </script>
       <%include file="widgets/sock.html" />
       % endif
 
