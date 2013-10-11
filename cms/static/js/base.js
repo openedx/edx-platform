@@ -1,6 +1,6 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-         "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
-    function(domReady, $, _, gettext, NotificationView, PromptView) {
+         "js/utils/cancel_on_escape", "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, CancelOnEscape) {
 
 var $body;
 var $modal;
@@ -122,8 +122,6 @@ domReady(function() {
     $('.delete-subsection-button').bind('click', deleteSubsection);
 
     $('.sync-date').bind('click', syncReleaseDate);
-
-    $('.new-course-button').bind('click', addNewCourse);
 
     // section date setting
     $('.set-publish-date').bind('click', setSectionScheduleDate);
@@ -446,18 +444,8 @@ function addNewSection(e) {
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.section-name-form').bind('submit', saveNewSection);
     $cancelButton.bind('click', cancelNewSection);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
+    CancelOnEscape($cancelButton);
 }
-
-function checkForCancel(e) {
-    if (e.which == 27) {
-        $body.unbind('keyup', checkForCancel);
-        e.data.$cancelButton.click();
-    }
-}
-
 
 function saveNewSection(e) {
     e.preventDefault();
@@ -475,7 +463,7 @@ function saveNewSection(e) {
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': display_name,
+        'display_name': display_name
     },
 
     function(data) {
@@ -487,162 +475,6 @@ function cancelNewSection(e) {
     e.preventDefault();
     $('.new-courseware-section-button').removeClass('disabled');
     $(this).parents('section.new-section').remove();
-}
-
-function addNewCourse(e) {
-    e.preventDefault();
-    $('.new-course-button').addClass('is-disabled');
-    $('.new-course-save').addClass('is-disabled');
-    var $newCourse = $('.wrapper-create-course').addClass('is-shown');
-    var $cancelButton = $newCourse.find('.new-course-cancel');
-    var $courseName = $('.new-course-name');
-    $courseName.focus().select();
-    $('.new-course-save').on('click', saveNewCourse);
-    $cancelButton.bind('click', cancelNewCourse);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
-
-    // Check that a course (org, number, run) doesn't use any special characters
-    var validateCourseItemEncoding = function(item) {
-        var required = validateRequiredField(item);
-        if(required) {
-            return required;
-        }
-        if(item !== encodeURIComponent(item)) {
-            return gettext('Please do not use any spaces or special characters in this field.');
-        }
-        return '';
-    };
-
-    // Ensure that org/course_num/run < 65 chars.
-    var validateTotalCourseItemsLength = function() {
-        var totalLength = _.reduce(
-            ['.new-course-org', '.new-course-number', '.new-course-run'],
-            function(sum, ele) {
-                return sum + $(ele).val().length;
-        }, 0
-        );
-        if(totalLength > 65) {
-            $('.wrap-error').addClass('is-shown');
-            $('#course_creation_error').html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
-            $('.new-course-save').addClass('is-disabled');
-        }
-        else {
-            $('.wrap-error').removeClass('is-shown');
-        }
-    };
-
-    // Handle validation asynchronously
-    _.each(
-        ['.new-course-org', '.new-course-number', '.new-course-run'],
-        function(ele) {
-            var $ele = $(ele);
-            $ele.on('keyup', function(event) {
-                // Don't bother showing "required field" error when
-                // the user tabs into a new field; this is distracting
-                // and unnecessary
-                if(event.keyCode === 9) {
-                    return;
-                }
-                var error = validateCourseItemEncoding($ele.val());
-                setNewCourseFieldInErr($ele.parent('li'), error);
-                validateTotalCourseItemsLength();
-            });
-        }
-    );
-    var $name = $('.new-course-name');
-    $name.on('keyup', function() {
-        var error = validateRequiredField($name.val());
-        setNewCourseFieldInErr($name.parent('li'), error);
-        validateTotalCourseItemsLength();
-    });
-}
-
-function validateRequiredField(msg) {
-    return msg.length === 0 ? gettext('Required field.') : '';
-}
-
-function setNewCourseFieldInErr(el, msg) {
-    if(msg) {
-        el.addClass('error');
-        el.children('span.tip-error').addClass('is-showing').removeClass('is-hiding').text(msg);
-        $('.new-course-save').addClass('is-disabled');
-    }
-    else {
-        el.removeClass('error');
-        el.children('span.tip-error').addClass('is-hiding').removeClass('is-showing');
-        // One "error" div is always present, but hidden or shown
-        if($('.error').length === 1) {
-            $('.new-course-save').removeClass('is-disabled');
-        }
-    }
-};
-
-function saveNewCourse(e) {
-    e.preventDefault();
-
-    // One final check for empty values
-    var errors = _.reduce(
-        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
-        function(acc, ele) {
-            var $ele = $(ele);
-            var error = validateRequiredField($ele.val());
-            setNewCourseFieldInErr($ele.parent('li'), error);
-            return error ? true : acc;
-        },
-        false
-    );
-
-    if(errors) {
-        return;
-    }
-
-    var $newCourseForm = $(this).closest('#create-course-form');
-    var display_name = $newCourseForm.find('.new-course-name').val();
-    var org = $newCourseForm.find('.new-course-org').val();
-    var number = $newCourseForm.find('.new-course-number').val();
-    var run = $newCourseForm.find('.new-course-run').val();
-
-    analytics.track('Created a Course', {
-        'org': org,
-        'number': number,
-        'display_name': display_name,
-        'run': run
-    });
-
-    $.post('/create_new_course', {
-            'org': org,
-            'number': number,
-            'display_name': display_name,
-            'run': run
-        },
-        function(data) {
-            if (data.id !== undefined) {
-                window.location = '/' + data.id.replace(/.*:\/\//, '');
-            } else if (data.ErrMsg !== undefined) {
-                $('.wrap-error').addClass('is-shown');
-                $('#course_creation_error').html('<p>' + data.ErrMsg + '</p>');
-                $('.new-course-save').addClass('is-disabled');
-            }
-        }
-    );
-}
-
-function cancelNewCourse(e) {
-    e.preventDefault();
-    $('.new-course-button').removeClass('is-disabled');
-    $('.wrapper-create-course').removeClass('is-shown');
-    // Clear out existing fields and errors
-    _.each(
-        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
-        function(field) {
-            $(field).val('');
-        }
-    );
-    $('#course_creation_error').html('');
-    $('.wrap-error').removeClass('is-shown');
-    $('.new-course-save').off('click');
 }
 
 function addNewSubsection(e) {
@@ -662,9 +494,7 @@ function addNewSubsection(e) {
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
+    CancelOnEscape($cancelButton);
 }
 
 function saveNewSubsection(e) {
