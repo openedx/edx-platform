@@ -126,13 +126,6 @@ domReady(function() {
 
     $('.sync-date').bind('click', syncReleaseDate);
 
-    // import form setup
-    $('.view-import .file-input').bind('change', showImportSubmit);
-    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function(e) {
-        e.preventDefault();
-        $('.view-import .file-input').click();
-    });
-
     $('.new-course-button').bind('click', addNewCourse);
 
     // section date setting
@@ -219,20 +212,6 @@ function editSectionPublishDate(e) {
     }
     $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
     $modalCover.show();
-}
-
-function showImportSubmit(e) {
-    var filepath = $(this).val();
-    if (filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
-        $('.error-block').hide();
-        $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
-        $('.file-name-block').show();
-        $('.view-import .choose-file-button').hide();
-        $('.submit-button').show();
-        $('.progress').show();
-    } else {
-        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
-    }
 }
 
 function syncReleaseDate(e) {
