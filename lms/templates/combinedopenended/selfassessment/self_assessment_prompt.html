@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section id="self_assessment_${id}" class="open-ended-child" data-ajax-url="${ajax_url}"
+<section id="self_assessment_${module_id}" class="open-ended-child" data-ajax-url="${ajax_url}"
          data-id="${id}" data-state="${state}" data-allow_reset="${allow_reset}" data-child-type="${child_type}">
     <div class="error"></div>
     <div class="prompt">
@@ -8,10 +8,10 @@
     <div class="visibility-control visibility-control-response">
         <div class="inner">
         </div>
-        <span class="section-header section-header-response">${_("Response")}</span>
+        <label class="section-header section-header-response" for="answer_${module_id}">Response</label>
     </div>
     <div>
-    <textarea name="answer" class="answer short-form-response" cols="70" rows="20">${previous_answer|n}</textarea>
+    <textarea name="answer" class="answer short-form-response" cols="70" rows="20" id="answer_${module_id}">${previous_answer|n}</textarea>
 
     <div class="message-wrapper"></div>
     <div class="grader-status"></div>
