@@ -59,16 +59,22 @@ function () {
     // ***************************************************************
 
     function onQualityChange(value) {
+        var controlStateStr;
         this.videoQualityControl.quality = value;
 
         if (_.indexOf(this.config.availableQualities, value) !== -1) {
-            this.videoQualityControl.el.addClass('active');
-            this.videoQualityControl.el.attr('title', gettext('HD on'))
-                                       .text(gettext('HD on'));
+            controlStateStr = gettext('HD on');
+            this.videoQualityControl.el
+                                    .addClass('active')
+                                    .attr('title', controlStateStr)
+                                    .text(controlStateStr);
         } else {
-            this.videoQualityControl.el.removeClass('active');
-            this.videoQualityControl.el.attr('title', gettext('HD off'))
-                                       .text(gettext('HD off'));
+            controlStateStr = gettext('HD off');
+            this.videoQualityControl.el
+                                    .removeClass('active')
+                                    .attr('title', controlStateStr)
+                                    .text(controlStateStr);
+
         }
     }       
 
