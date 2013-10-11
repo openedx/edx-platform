@@ -4,14 +4,15 @@ class @Calculator
     $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
     $('div.help-wrapper a')
-      .focus($.proxy @helpOnFocus, @)
-      .blur($.proxy @helpOnBlur, @)
       .hover(
         $.proxy(@helpShow, @),
         $.proxy(@helpHide, @)
       )
       .click (e) ->
         e.preventDefault()
+      $('div.help-wrapper')
+        .focusin($.proxy @helpOnFocus, @)
+        .focusout($.proxy @helpOnBlur, @)
 
   toggle: (event) ->
     event.preventDefault()
@@ -20,15 +21,19 @@ class @Calculator
 
     $('div.calc-main').toggleClass 'open'
     if $calc.hasClass('closed')
-      $calc.attr 'aria-label', 'Open Calculator'
+      $calc.attr
+        'aria-label': 'Open Calculator'
+        'aria-expanded': false
       $calcWrapper
-        .find('input, a')
+        .find('input, a, dt, dd')
         .attr 'tabindex', -1
     else
-      $calc.attr 'aria-label', 'Close Calculator'
+      $calc.attr
+        'aria-label': 'Close Calculator'
+        'aria-expanded': true
       $calcWrapper
         .find('input, a')
-        .attr 'tabindex', null
+        .attr 'tabindex', 0
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the
       # focus on the text field before it transitions onto the page.
@@ -48,11 +53,15 @@ class @Calculator
 
   helpShow: ->
     $('.help').addClass 'shown'
+    $('#calculator_hint').attr 'aria-expanded', true
 
   helpHide: ->
     if not @isFocusedHelp
       $('.help').removeClass 'shown'
+      $('#calculator_hint').attr 'aria-expanded', false
 
   calculate: ->
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
-      $('#calculator_output').val(data.result)
+      $('#calculator_output')
+        .val(data.result)
+        .focus()
