@@ -7,10 +7,11 @@ from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
 from .x_module import XModule
-from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from .raw_module import RawDescriptor
+from .modulestore.django import modulestore
+from .modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
+from .utils import get_extended_due_date
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
 from xmodule.fields import Date, Timedelta
 
@@ -117,12 +118,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.lms.due
+            due_date = get_extended_due_date(self.linked_problem.lms)
             if due_date:
                 self.lms.due = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.graceperiod)
+            self.timeinfo = TimeInfo(
+                get_extended_due_date(self), self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -529,7 +531,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor.lms.due
+                problem['due'] = get_extended_due_date(descriptor.lms)
                 grace_period = descriptor.lms.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)

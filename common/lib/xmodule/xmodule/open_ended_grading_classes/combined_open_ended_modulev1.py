@@ -106,7 +106,9 @@ class CombinedOpenEndedV1Module():
         self.accept_file_upload = instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
-        due_date = instance_state.get('due', None)
+        due_date = instance_state.get('extended_due', None)
+        if due_date is None:
+            due_date = instance_state.get('due', None)
 
         grace_period_string = instance_state.get('graceperiod', None)
         try:
