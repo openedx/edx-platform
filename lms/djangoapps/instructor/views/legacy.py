@@ -469,7 +469,15 @@ def instructor_dashboard(request, course_id):
             else:
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': ['External email', aname]}
-                datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']]
+                # datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']] 
+                ddata = []
+                for x in allgrades['students']:
+                    try:
+                        ddata.append([x.email, x.grades[aidx]])
+                    except IndexError:
+                        log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
+                datatable['data'] = ddata
+                    
                 datatable['title'] = 'Grades for assignment "%s"' % aname
 
                 if 'Export CSV' in action:
