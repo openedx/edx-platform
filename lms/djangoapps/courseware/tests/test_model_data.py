@@ -66,12 +66,12 @@ class TestDescriptorFallback(TestCase):
         self.assertEquals('settings', self.kvs.get(settings_key('field_b')))
 
     def test_write_to_descriptor(self):
-        self.assertRaises(InvalidWriteError, self.kvs.set, content_key('field_a'), 'foo')
+        self.kvs.set(content_key('field_a'), 'foo')
         self.assertEquals('content', self.desc_md['field_a'])
-        self.assertRaises(InvalidWriteError, self.kvs.set, settings_key('field_b'), 'foo')
+        self.kvs.set(settings_key('field_b'), 'foo')
         self.assertEquals('settings', self.desc_md['field_b'])
 
-        self.assertRaises(InvalidWriteError, self.kvs.set_many, {content_key('field_a'): 'foo'})
+        self.kvs.set_many({content_key('field_a'): 'foo'})
         self.assertEquals('content', self.desc_md['field_a'])
 
         self.assertRaises(InvalidWriteError, self.kvs.delete, content_key('field_a'))
