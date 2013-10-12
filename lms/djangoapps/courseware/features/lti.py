@@ -19,8 +19,11 @@ def lti_is_not_rendered(_step):
     # iframe is not visible
     assert not world.css_visible('iframe')
 
+    location = world.scenario_dict['LTI'].location.html_id()
+    iframe_name = 'ltiLaunchFrame-' + location
+
     #inside iframe test content is not presented
-    with world.browser.get_iframe('ltiLaunchFrame') as iframe:
+    with world.browser.get_iframe(iframe_name) as iframe:
         # iframe does not contain functions from terrain/ui_helpers.py
         world.browser.driver.implicitly_wait(1)
         try:
@@ -29,6 +32,19 @@ def lti_is_not_rendered(_step):
             raise
         finally:
             world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
+
+
+def check_lti_ifarme_content(text):
+    #inside iframe test content is presented
+    location = world.scenario_dict['LTI'].location.html_id()
+    iframe_name = 'ltiLaunchFrame-' + location
+    with world.browser.get_iframe(iframe_name) as iframe:
+        # iframe does not contain functions from terrain/ui_helpers.py
+        assert iframe.is_element_present_by_css('.result', wait_time=5)
+        assert (text == world.retry_on_exception(
+            lambda: iframe.find_by_css('.result')[0].text,
+            max_attempts=5
+        ))
 
 
 @step('I view the LTI and it is rendered$')
@@ -41,15 +57,7 @@ def lti_is_rendered(_step):
 
     # iframe is visible
     assert world.css_visible('iframe')
-
-    #inside iframe test content is presented
-    with world.browser.get_iframe('ltiLaunchFrame') as iframe:
-        # iframe does not contain functions from terrain/ui_helpers.py
-        assert iframe.is_element_present_by_css('.result', wait_time=5)
-        assert ("This is LTI tool. Success." == world.retry_on_exception(
-            lambda: iframe.find_by_css('.result')[0].text,
-            max_attempts=5
-        ))
+    check_lti_ifarme_content("This is LTI tool. Success.")
 
 
 @step('I view the LTI but incorrect_signature warning is rendered$')
@@ -62,15 +70,7 @@ def incorrect_lti_is_rendered(_step):
 
     # iframe is visible
     assert world.css_visible('iframe')
-
-    #inside iframe test content is presented
-    with world.browser.get_iframe('ltiLaunchFrame') as iframe:
-        # iframe does not contain functions from terrain/ui_helpers.py
-        assert iframe.is_element_present_by_css('.result', wait_time=5)
-        assert ("Wrong LTI signature" == world.retry_on_exception(
-            lambda: iframe.find_by_css('.result')[0].text,
-            max_attempts=5
-        ))
+    check_lti_ifarme_content("Wrong LTI signature")
 
 
 @step('the course has correct LTI credentials$')
@@ -100,7 +100,7 @@ def set_incorrect_lti_passport(_step):
 @step('the course has an LTI component filled with correct fields$')
 def add_correct_lti_to_course(_step):
     category = 'lti'
-    world.ItemFactory.create(
+    world.scenario_dict['LTI'] = world.ItemFactory.create(
         # parent_location=section_location(course),
         parent_location=world.scenario_dict['SEQUENTIAL'].location,
         category=category,
@@ -128,7 +128,7 @@ def add_correct_lti_to_course(_step):
 @step('the course has an LTI component with incorrect fields$')
 def add_incorrect_lti_to_course(_step):
     category = 'lti'
-    world.ItemFactory.create(
+    world.scenario_dict['LTI'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['SEQUENTIAL'].location,
         category=category,
         display_name='LTI',
