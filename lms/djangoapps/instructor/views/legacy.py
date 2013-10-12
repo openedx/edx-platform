@@ -469,9 +469,8 @@ def instructor_dashboard(request, course_id):
             else:
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': ['External email', aname]}
-                # datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']] 
                 ddata = []
-                for x in allgrades['students']:
+                for x in allgrades['students']:	  # do one by one in case there is a student who has only partial grades
                     try:
                         ddata.append([x.email, x.grades[aidx]])
                     except IndexError:
