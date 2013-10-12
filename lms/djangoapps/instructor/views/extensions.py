@@ -12,7 +12,7 @@ def set_due_date_extension(course, url, student, due_date):
     """
     node = find_unit(course, url)
     if not node:
-        return "Couldn't find module for url: {0}" % url
+        return "Couldn't find module for url: {0}".format(url)
 
     def set_due_date(node):
         try:
@@ -79,7 +79,7 @@ def title_or_url(node):
 def dump_students_with_due_date_extensions(course, url):
     unit = find_unit(course, url)
     if not unit:
-        return "Couldn't find module for url: {0}" % url, {}
+        return "Couldn't find module for url: {0}".format(url), {}
 
     data = []
     query = StudentModule.objects.filter(
@@ -94,6 +94,7 @@ def dump_students_with_due_date_extensions(course, url):
         extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
         fullname = '%s %s' % (sm.student.first_name, sm.student.last_name)
         data.append((sm.student.username, fullname, extended_due))
+    data.sort(key=lambda x: x[0])
     return None, {
         "header": ["Username", "Full Name", "Extended Due Date"],
         "title": "Users with due date extensions for {0}".format(
