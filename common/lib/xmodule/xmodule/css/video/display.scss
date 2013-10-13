@@ -74,10 +74,8 @@ div.video {
     }
 
     section.video-player {
-      height: 0;
       overflow: hidden;
-      padding-bottom: 56.25%;
-      position: relative;
+      min-height: 300px;
 
       div {
         &.hidden {
@@ -85,12 +83,9 @@ div.video {
         }
       }
 
-      object, iframe {
+      object, iframe, video {
         border: none;
         height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
         width: 100%;
       }
 
@@ -701,15 +696,12 @@ div.video {
         display: table-cell;
         vertical-align: middle;
         float: none;
-      }
 
-      object, iframe {
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        overflow: hidden;
-        position: fixed;
-        top: 0;
+        object, iframe, video{
+          position: absolute;
+          width: auto;
+          height: auto;
+        }
       }
 
       section.video-controls {

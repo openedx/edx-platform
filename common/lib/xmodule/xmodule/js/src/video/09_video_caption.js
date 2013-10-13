@@ -700,7 +700,7 @@ function () {
 
     function hideCaptions(hide_captions, update_cookie) {
         var hideSubtitlesEl = this.videoCaption.hideSubtitlesEl,
-            type;
+            type, text;
 
         if (typeof update_cookie === 'undefined') {
             update_cookie = true;
@@ -710,27 +710,31 @@ function () {
             type = 'hide_transcript';
             this.captionsHidden = true;
 
-            hideSubtitlesEl
-                .attr('title', gettext('Turn on captions'))
-                .text(gettext('Turn on captions'));
-
             this.el.addClass('closed');
+
+            text = gettext('Turn on captions');
         } else {
             type = 'show_transcript';
             this.captionsHidden = false;
 
-            hideSubtitlesEl
-                .attr('title', gettext('Turn off captions'))
-                .text(gettext('Turn off captions'));
-
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
+
+            text = gettext('Turn off captions');
         }
+
+        hideSubtitlesEl
+            .attr('title', text)
+            .text(gettext(text));
 
         if (this.videoPlayer) {
             this.videoPlayer.log(type, {
                 currentTime: this.videoPlayer.currentTime
             });
+        }
+
+        if (this.resizer) {
+            this.resizer.alignByWidthOnly();
         }
 
         this.videoCaption.setSubtitlesHeight();
