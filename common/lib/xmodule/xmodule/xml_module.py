@@ -10,7 +10,7 @@ from xmodule.x_module import XModuleDescriptor, policy_key
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml_exporter import EdxJSONEncoder
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)
 
@@ -329,7 +329,7 @@ class XmlDescriptor(XModuleDescriptor):
         field_data['location'] = location
         field_data['category'] = xml_object.tag
         kvs = InheritanceKeyValueStore(initial_values=field_data)
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
 
         return system.construct_xblock_from_class(
             cls,

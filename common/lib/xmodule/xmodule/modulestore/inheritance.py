@@ -1,9 +1,14 @@
+"""
+Support for inheritance of fields down an XBlock hierarchy.
+"""
+
 from datetime import datetime
 from pytz import UTC
 
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
+from xblock.runtime import KeyValueStore, KvsFieldData
+
 from xmodule.fields import Date, Timedelta
-from xblock.runtime import KeyValueStore
 
 
 class InheritanceMixin(XBlockMixin):
@@ -111,6 +116,10 @@ def own_metadata(module):
     mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
+
+
+class InheritanceFieldData(KvsFieldData):
+    pass
 
 
 class InheritanceKeyValueStore(KeyValueStore):

@@ -4,7 +4,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
@@ -102,7 +102,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             json_data.get('fields', {}),
             json_data.get('_inherited_settings'),
         )
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(

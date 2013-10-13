@@ -8,7 +8,7 @@ from nose.tools import assert_equals, assert_not_equals, assert_true, assert_fal
 
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 
 from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
@@ -100,7 +100,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     def test_inherited_field(self):
         kvs = InheritanceKeyValueStore(initial_values={}, inherited_settings={'showanswer': 'inherited'})
-        model_data = DbModel(kvs)
+        model_data = KvsFieldData(kvs)
         descriptor = self.get_descriptor(model_data)
         editable_fields = descriptor.editable_metadata_fields
         self.assert_field_values(
@@ -113,7 +113,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             initial_values={'showanswer': 'explicit'},
             inherited_settings={'showanswer': 'inheritable value'}
         )
-        model_data = DbModel(kvs)
+        model_data = KvsFieldData(kvs)
         descriptor = self.get_descriptor(model_data)
         editable_fields = descriptor.editable_metadata_fields
         self.assert_field_values(
