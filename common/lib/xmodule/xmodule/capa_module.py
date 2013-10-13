@@ -905,6 +905,8 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
+        print "\n\n\n\n\nSELF.RERANDOMIZE: ", self.rerandomize, "\n\n\n\n\n"
+
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'

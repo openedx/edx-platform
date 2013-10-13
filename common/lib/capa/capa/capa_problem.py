@@ -107,6 +107,7 @@ class LoncapaProblem(object):
         # Set seed according to the following priority:
         #       1. Contained in problem's state
         #       2. Passed into capa_problem via constructor
+
         self.seed = state.get('seed', seed)
         assert self.seed is not None, "Seed must be provided for LoncapaProblem."
 
@@ -410,8 +411,8 @@ class LoncapaProblem(object):
                 middle.append(choice)
         
         rng = Random(self.seed)  # we'll make our own vs. messing with the global one
-        print 'Shuffling with seed:', self.seed
         rng.shuffle(middle)
+
         return head + middle + tail
     
     def shuffled_tree(self, tree):
@@ -427,7 +428,12 @@ class LoncapaProblem(object):
         # Q: could take tree param, or use self.tree as starting point
         if not tree.xpath('//choicegroup[@shuffle="true"]'):
             return None
-        shuffled = deepcopy(tree)
+
+        # import ipdb
+        # ipdb.set_trace()
+
+        # shuffled = deepcopy(tree)
+        shuffled = tree
         for choicegroup in shuffled.xpath('//choicegroup[@shuffle="true"]'):
             ordering = list(choicegroup.getchildren())
             # remove all from parent
@@ -438,6 +444,97 @@ class LoncapaProblem(object):
                 choicegroup.append(choice)
         return shuffled
 
+    def randomly_grab_gradiance_choices(self, choices):
+        """
+        Returns a list with 2 items:
+            1. the solutionID corresponding with the chosen correct answer
+            2. (subset) list of choice nodes with 3 incorrect and 1 correct
+        """
+
+        correctChoices = []
+        incorrectChoices = []
+        subsetChoices = []
+
+        for choice in choices:
+            if choice.get('correct') == 'true':
+                correctChoices.append(choice)
+            elif choice.get('correct') == 'false':
+                incorrectChoices.append(choice)
+
+        # Check if there are at least 1 correct and 3 incorrect answers
+        if len(correctChoices) < 1 or len(incorrectChoices) < 3:
+            return []
+
+        # Uses self.seed -- but want to randomize every time reaches this problem,
+        # so problem's "randomization" should be set to "always"
+        rnd = Random(self.seed)
+        ix = rnd.randint(0, len(correctChoices) - 1)
+        correctChoice = correctChoices[ix]
+        subsetChoices.append(correctChoice)
+        solutionID = correctChoice.get('solutionid')
+
+        # Add incorrect choices
+        toAdd = 3
+        while toAdd > 0:
+            ix = rnd.randint(0, len(incorrectChoices) - 1)
+            choice = incorrectChoices[ix]
+            subsetChoices.append(choice)
+            incorrectChoices.remove(choice)
+            toAdd = toAdd - 1
+
+        # Randomize correct answer position
+        ix = rnd.randint(0, 3)
+        if ix != 0:
+            tmp = subsetChoices[ix]
+            subsetChoices[ix] = subsetChoices[0] # where we put the correct answer
+            subsetChoices[0] = tmp
+
+        return [solutionID, subsetChoices]
+
+    def gradianced_tree(self, tree):
+        """
+        Implements gradiance-style problems for problems with the attribute 'gradiance' set to true
+        """
+        # import ipdb
+        # ipdb.set_trace()
+
+        gradianceProblemsQuery = '//problem[@gradiance="true"]'
+
+        # There are no gradiance problems
+        if not tree.xpath(gradianceProblemsQuery):
+            return None
+
+        for problem in tree.xpath(gradianceProblemsQuery):
+            # Grab the first choicegroup (there should only be one for gradiance problems)
+            choicegroup = problem.xpath('//choicegroup[@type="MultipleChoice"]')[0]
+            choicesList = list(choicegroup.iter('choice'))
+
+            for choice in choicesList:
+                choicegroup.remove(choice)
+
+            [solutionID, subsetChoices] = self.randomly_grab_gradiance_choices(choicesList)
+
+            for choice in subsetChoices:
+                choicegroup.append(choice)
+
+
+            # import ipdb
+            # ipdb.set_trace()
+
+            # Grab the solutions and only pick the one that matches the correct choice randomly chosen
+            solution = problem.xpath('//solution')[0]
+            solutionsList = list(solution.iter('div')) # TODO: it might not be a safe assumption to make...
+
+            for solutionDIV in solutionsList:
+                solution.remove(solutionDIV)
+
+            for solutionDIV in solutionsList:
+                # If solutionDIV does not have the correct solutionID, remove that <div> element
+                if solutionDIV.get('solutionid') == solutionID:
+                    solution.append(solutionDIV)
+
+        return tree
+
     def get_html(self):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
@@ -445,15 +542,69 @@ class LoncapaProblem(object):
         #import ipdb
         #ipdb.set_trace()
         shuffled = self.shuffled_tree(self.tree)
-        if shuffled:  # shuffling happened
+        gradiancedTree = self.gradianced_tree(self.tree)
+        
+        if shuffled is not None:  # shuffling happened
             process_this = shuffled
             ###self._preprocess_problem(process_this)
+        elif gradiancedTree is not None: # this was a gradiance problem
+            process_this = gradiancedTree
         else:
-            process_this = deepcopy(self.tree)
-            # deepcopy here just to shake out tests which fail with a tree copy
-            # Take out the copy and everything works fine.
+            process_this = self.tree
+
         html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
         return html
+
+    # def get_htmlBAD(self):
+    #     '''
+    #     Main method called externally to get the HTML to be rendered for this capa Problem.
+    #     '''
+    #     #import ipdb
+    #     #ipdb.set_trace()
+    #     shuffled = self.shuffled_tree(self.tree)
+    #     if shuffled:  # shuffling happened
+    #         process_this = shuffled
+    #         ###self._preprocess_problem(process_this)
+    #     else:
+    #         # process_this = self.tree
+    #         process_this = deepcopy(self.tree)
+    #         # deepcopy here just to shake out tests which fail with a tree copy
+    #         # Take out the copy and everything works fine.
+    #     # import ipdb
+    #     # ipdb.set_trace()
+    #     extractedHtml = self._extract_html(process_this)
+
+    #     print etree.tostring(extractedHtml, pretty_print=True)
+    #     html = contextualize_text(etree.tostring(extractedHtml), self.context)
+    #     #html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
+    #     return html
+
+    # def get_htmlGOOD(self):
+    #     '''
+    #     Main method called externally to get the HTML to be rendered for this capa Problem.
+    #     '''
+    #     #import ipdb
+    #     #ipdb.set_trace()
+    #     shuffled = self.shuffled_tree(self.tree)
+    #     if shuffled:  # shuffling happened
+    #         process_this = shuffled
+    #         ###self._preprocess_problem(process_this)
+    #     else:
+    #         process_this = self.tree
+    #         # deepcopy here just to shake out tests which fail with a tree copy
+    #         # Take out the copy and everything works fine.
+        
+    #     # import ipdb
+    #     # ipdb.set_trace()
+    #     extractedHtml = self._extract_html(process_this)
+
+    #     print "\n***\n"
+    #     print etree.tostring(extractedHtml, pretty_print=True)
+    #     print "\n***\n"
+
+    #     html = contextualize_text(etree.tostring(extractedHtml), self.context)
+    #     #html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
+    #     return html
 
     def handle_input_ajax(self, data):
         '''

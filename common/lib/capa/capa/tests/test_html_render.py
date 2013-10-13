@@ -196,9 +196,13 @@ class CapaHtmlRenderTest(unittest.TestCase):
         correctmap = problem.grade_answers({'1_2_1': 'test'})
 
         # Render the html
+        
+        print "OK time to start looking...\n"
+        # import ipdb
+        # ipdb.set_trace()
+
         rendered_html = etree.XML(problem.get_html())
-        import ipdb
-        #ipdb.set_trace()
+        
         #print 'foo:', rendered_html
 
 
