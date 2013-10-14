@@ -10,6 +10,8 @@
       }
 
       state = new Video('#example');
+
+      state.videoEl = $('video, iframe');
       videoPlayer = state.videoPlayer;
       player = videoPlayer.player;
       videoControl = state.videoControl;
@@ -17,6 +19,19 @@
       videoProgressSlider = state.videoProgressSlider;
       videoSpeedControl = state.videoSpeedControl;
       videoVolumeControl = state.videoVolumeControl;
+
+      state.resizer = (function () {
+        var methods = [
+          'align', 'alignByWidthOnly', 'alignByHeightOnly', 'setParams', 'setMode'
+        ],
+          obj = {};
+
+        $.each(methods, function(index, method) {
+           obj[method] = jasmine.createSpy(method).andReturn(obj);
+        });
+
+        return obj;
+      })();
     }
 
     function initializeYouTube() {
@@ -557,6 +572,7 @@
 
         it('tell VideoCaption to resize', function() {
           expect(videoCaption.resize).toHaveBeenCalled();
+          expect(state.resizer.setMode).toHaveBeenCalled();
         });
       });
 
@@ -583,6 +599,7 @@
 
         it('tell VideoCaption to resize', function() {
           expect(videoCaption.resize).toHaveBeenCalled();
+          expect(state.resizer.setMode).toHaveBeenCalledWith('width');
         });
       });
     });
