@@ -18,6 +18,7 @@ from logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+MITX_FEATURES['INDIVIDUAL_DUE_DATES'] = True # crossi dev, delete if checked in
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True

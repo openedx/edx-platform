@@ -858,10 +858,11 @@ def instructor_dashboard(request, course_id):
                'instructor_tasks': instructor_tasks,
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-               'units_with_due_dates': get_units_with_due_date_options(course),
                'analytics_results': analytics_results,
                }
 
+    if settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES'):
+        context['units_with_due_dates'] = get_units_with_due_date_options(course)
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
