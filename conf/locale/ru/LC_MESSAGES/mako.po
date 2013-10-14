@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-11 17:19+0400\n"
-"PO-Revision-Date: 2013-10-11 17:26+0400\n"
+"PO-Revision-Date: 2013-10-14 17:14+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -5891,11 +5891,8 @@ msgid "Welcome!"
 msgstr "Добро пожаловать!"
 
 #: lms/templates/register.html:94
-#, fuzzy
 msgid "Register below to create your {platform_name} account"
-msgstr ""
-"Добро пожаловать! Зарегистрируйтесь ниже, чтобы создать ваш {platform_name} "
-"аккаунт"
+msgstr "Зарегистрируйтесь ниже, чтобы создать ваш {platform_name} аккаунт"
 
 #: lms/templates/register.html:114
 msgid "Please complete the following fields to register for an account. "
@@ -8047,7 +8044,7 @@ msgstr "Ответ для студента (дополнительно)"
 
 #: lms/templates/instructor/staff_grading.html:80
 msgid "Flag as inappropriate content for later review"
-msgstr "Отметьте, если ответ содержит нецензурную лекцию, оскорбления и т.п."
+msgstr "Отметьте, если ответ содержит нецензурную лексику, оскорбления и т.п."
 
 #: lms/templates/instructor/staff_grading.html:85
 msgid "Skip"
