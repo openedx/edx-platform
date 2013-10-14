@@ -18,7 +18,7 @@
         name="ltiLaunchForm-${element_id}"
         class="ltiLaunchForm"
         method="post"
-        target=${"_blank" if open_in_a_new_page else "ltiLaunchFrame-${element_id}"}
+        target=${"_blank" if open_in_a_new_page else "ltiLaunchFrame-{0}".format(element_id)}
         encType="application/x-www-form-urlencoded"
     >
 

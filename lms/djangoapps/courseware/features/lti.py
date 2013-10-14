@@ -50,7 +50,7 @@ def lti_is_rendered(_step, rendered_in):
         assert world.is_css_present('.link_lti_new_window')
         assert not world.is_css_present('.error_message')
         check_lti_popup()
-    else:  # incorrent rendered_in parametetr
+    else:  # incorrent rendered_in parameter
         assert False
 
 
