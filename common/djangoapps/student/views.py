@@ -261,7 +261,7 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    return render_to_response('university_profile/edge.html', context)
+    return render_to_response('register.html', context)
 
 
 @login_required
