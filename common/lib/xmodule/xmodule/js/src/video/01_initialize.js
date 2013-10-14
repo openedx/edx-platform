@@ -138,25 +138,7 @@ function (VideoPlayer) {
     //     support HTML5. When we have this setting in cookies, we can select
     //     the proper mode from the start (not having to change mode later on).
     function _setPlayerMode(state) {
-        (function (currentPlayerMode) {
-            if (
-                (currentPlayerMode === 'html5') ||
-                (currentPlayerMode === 'flash')
-            ) {
-                state.currentPlayerMode = currentPlayerMode;
-            } else {
-                $.cookie('current_player_mode', 'html5', {
-                    expires: 3650,
-                    path: '/'
-                });
-                state.currentPlayerMode = 'html5';
-            }
-
-            console.log(
-                '[Video info]: YouTube player mode is "' +
-                state.currentPlayerMode + '".'
-            );
-        }($.cookie('current_player_mode')));
+        state.currentPlayerMode = 'html5';
     }
 
     // function _parseYouTubeIDs(state)
