@@ -104,17 +104,6 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
-          </li>
-          % else:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
-          </li>
-          % endif
-      % endif
     </ol>
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
