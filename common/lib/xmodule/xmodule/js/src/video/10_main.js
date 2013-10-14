@@ -1,6 +1,6 @@
 (function (requirejs, require, define) {
 
-// Main module.
+// Main module. Magic happens here.
 require(
 [
     'video/01_initialize.js',
