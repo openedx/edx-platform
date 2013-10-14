@@ -521,17 +521,25 @@ class LoncapaProblem(object):
             # import ipdb
             # ipdb.set_trace()
 
+            solutions = problem.xpath('//solution')
+            for solution in solutions:
+                if solution.get('solutionid') != solutionID:
+                    tree.remove(solution)
+
+            # tree.remove(solution[0])
+
             # Grab the solutions and only pick the one that matches the correct choice randomly chosen
-            solution = problem.xpath('//solution')[0]
-            solutionsList = list(solution.iter('div')) # TODO: it might not be a safe assumption to make...
+            # solution = problem.xpath('//solution')[0]
+            # solutionsList = list(solution.iter('div')) # TODO: it might not be a safe assumption to make...
 
-            for solutionDIV in solutionsList:
-                solution.remove(solutionDIV)
+            # for solutionDIV in solutionsList:
+            #     solution.remove(solutionDIV)
 
-            for solutionDIV in solutionsList:
-                # If solutionDIV does not have the correct solutionID, remove that <div> element
-                if solutionDIV.get('solutionid') == solutionID:
-                    solution.append(solutionDIV)
+            # for solutionDIV in solutionsList:
+            #     # If solutionDIV does not have the correct solutionID, remove that <div> element
+            #     if solutionDIV.get('solutionid') == solutionID:
+            #         solution.append(solutionDIV)
+            #         # print "\n\n\n\n\nSOLUTION:", solutionID, "\n\n\n\n"
 
         return tree
 
@@ -553,6 +561,10 @@ class LoncapaProblem(object):
             process_this = self.tree
 
         html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
+
+        # import ipdb
+        # ipdb.set_trace()
+
         return html
 
     # def get_htmlBAD(self):
@@ -831,6 +843,9 @@ class LoncapaProblem(object):
             return self.responders[problemtree].render_html(
                 self._extract_html, response_msg=overall_msg
             )
+
+        # import ipdb
+        # ipdb.set_trace()
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
