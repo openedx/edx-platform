@@ -40,7 +40,7 @@ define(
         };
 
         /**
-         * Check for import status updates every `timemout` milliseconds, and update
+         * Check for import status updates every `timeout` milliseconds, and update
          * the page accordingly.
          * @param {string} url Url to call for status updates.
          * @param {int} timeout Number of milliseconds to wait in between ajax calls
