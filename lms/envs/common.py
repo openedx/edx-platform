@@ -610,6 +610,9 @@ MIDDLEWARE_CLASSES = (
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
+
+    # Shoppingcart middleware (detects if request.user has a cart)
+    'shoppingcart.middleware.UserHasCartMiddleware',
 )
 
 ############################### Pipeline #######################################
