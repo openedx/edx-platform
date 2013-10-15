@@ -281,7 +281,7 @@
   }
 }
 
-@mixin gray-button {
+.gray-button {
   @include button;
   @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 $white-t1 inset;
