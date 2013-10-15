@@ -52,16 +52,16 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id),
     ]
 
+    # Gate access to course email by feature flag & by course-specific authorization
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
+        sections.append(_section_send_email(course_id, access, course))
+
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
     max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
-
-    # Gate access by feature flag & by course-specific authorization
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
-        sections.append(_section_send_email(course_id, access, course))
 
     context = {
         'course': course,
@@ -156,6 +156,7 @@ def _section_data_download(course_id):
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
     }
     return section_data
 
@@ -171,7 +172,8 @@ def _section_send_email(course_id, access, course):
         'section_display_name': _('Email'),
         'access': access,
         'send_email': reverse('send_email', kwargs={'course_id': course_id}),
-        'editor': email_editor
+        'editor': email_editor,
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
     }
     return section_data
 
