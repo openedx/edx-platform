@@ -1,24 +1,12 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-${_("Dear {full_name}").format(full_name=full_name)}
+Уважаемый ${full_name}
 
-${_("You have been enrolled in {course_name} at {site_name} by a member "
-	"of the course staff. The course should now appear on your {site_name} "
-	"dashboard.").format(
-		course_name=course.display_name_with_default,
-		site_name=site_name
-	)}
+Вы были зарегистрированы на курс ${course.display_name_with_default} на сайте ${site_name}. Курс должен появиться в Вашем личном кабинете.
 
-${_("To start accessing course materials, please visit {course_url}").format(
-		course_url=course_url
-	)}
+Для доступа к материалам курса перейдите по ссылке ${course_url}.
 
 ----
-${_("This email was automatically sent from {site_name} to "
-	"{full_name}").format(
-		site_name=site_name, full_name=full_name
-	)}
-
 Внимание!
 Это письмо было сформировано и отправлено автоматической системой информирования.
 Пожалуйста не отвечайте на него, так как ваш ответ не будет доставлен.
