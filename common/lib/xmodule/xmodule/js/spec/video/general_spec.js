@@ -208,7 +208,7 @@
                 state3 = new Video('#example3');
             });
 
-            it('check for YT availability is performed only once', function () {
+            xit('check for YT availability is performed only once', function () {
                 var numAjaxCalls = 0;
 
                 // Total ajax calls made.

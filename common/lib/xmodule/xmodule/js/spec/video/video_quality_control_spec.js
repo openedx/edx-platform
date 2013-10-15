@@ -29,7 +29,7 @@
         expect(videoControl.secondaryControlsEl.html()).toContain("<a href=\"#\" class=\"quality_control\" title=\"HD\">");
       });
 
-      it('bind the quality control', function() {
+      xit('bind the quality control', function() {
         expect($('.quality_control')).toHandleWith('click', videoQualityControl.toggleQuality);
       });
     });

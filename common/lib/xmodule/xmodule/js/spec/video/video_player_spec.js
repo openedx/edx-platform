@@ -83,7 +83,8 @@
 
         window.YT = {
             Player: function () { },
-            PlayerState: oldYT.PlayerState
+            PlayerState: oldYT.PlayerState,
+            ready: function(f){f();}
         };
 
         spyOn(window.YT, 'Player');
