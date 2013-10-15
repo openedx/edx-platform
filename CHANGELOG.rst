@@ -7,6 +7,8 @@ the top.  Include a label indicating the component affected.
 
 Blades: Add possibility to use multiple LTI tools per page.
 
+Blades: LTI module can now load external content in a new window.
+
 LMS: Disable data download buttons on the instructor dashboard for large courses
 
 LMS: Ported bulk emailing to the beta instructor dashboard.
