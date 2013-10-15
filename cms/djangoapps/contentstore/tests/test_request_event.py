@@ -3,7 +3,7 @@ import mock
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from contentstore.views.requests import event as cms_user_track
+from contentstore.views.helpers import event as cms_user_track
 
 
 class CMSLogTest(TestCase):
