@@ -8,10 +8,10 @@ from nose.tools import assert_equals, assert_not_equals, assert_true, assert_fal
 
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
-from xblock.runtime import KvsFieldData
+from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 from xmodule.fields import Date, Timedelta, RelativeTime
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
@@ -57,6 +57,87 @@ class TestFields(object):
     boolean_select = Boolean(scope=Scope.settings)
     # Used for testing Lists
     list_field = List(scope=Scope.settings, default=[])
+
+
+class InheritingFieldDataTest(unittest.TestCase):
+    """Tests of InheritingFieldData."""
+
+    class TestableInheritingXBlock(XmlDescriptor):
+        """An XBlock we can use in these tests."""
+        inherited = String(scope=Scope.settings, default="the default")
+        not_inherited = String(scope=Scope.settings, default="nothing")
+
+    def setUp(self):
+        self.system = get_test_descriptor_system()
+        self.all_blocks = {}
+        self.system.load_item = self.all_blocks.get
+        self.field_data = InheritingFieldData(
+            inheritable_names=['inherited'],
+            kvs=DictKeyValueStore({}),
+        )
+
+    def get_block(self, usage_id=None):
+        """Construct an XBlock for testing with."""
+        scope_ids = Mock()
+        if usage_id is None:
+            usage_id = "_auto%d" % len(self.all_blocks)
+        scope_ids.usage_id = usage_id
+        block = self.system.construct_xblock_from_class(
+            self.TestableInheritingXBlock,
+            field_data=self.field_data,
+            scope_ids=scope_ids,
+        )
+        self.all_blocks[usage_id] = block
+        return block
+
+    def test_default_value(self):
+        # Blocks with nothing set with return the fields' defaults.
+        block = self.get_block()
+        self.assertEqual(block.inherited, "the default")
+        self.assertEqual(block.not_inherited, "nothing")
+
+    def test_set_value(self):
+        # If you set a value, that's what you get back.
+        block = self.get_block()
+        block.inherited = "Changed!"
+        block.not_inherited = "New Value!"
+        self.assertEqual(block.inherited, "Changed!")
+        self.assertEqual(block.not_inherited, "New Value!")
+
+    def test_inherited(self):
+        # A child with get a value inherited from the parent.
+        parent = self.get_block(usage_id="parent")
+        parent.inherited = "Changed!"
+        self.assertEqual(parent.inherited, "Changed!")
+
+        child = self.get_block(usage_id="child")
+        child.parent = "parent"
+        self.assertEqual(child.inherited, "Changed!")
+
+    def test_inherited_across_generations(self):
+        # A child with get a value inherited from a great-grandparent.
+        parent = self.get_block(usage_id="parent")
+        parent.inherited = "Changed!"
+        self.assertEqual(parent.inherited, "Changed!")
+        parent_id = "parent"
+        for child_num in range(10):
+            usage_id = "child_{}".format(child_num)
+            child = self.get_block(usage_id=usage_id)
+            child.parent = "parent"
+            self.assertEqual(child.inherited, "Changed!")
+            parent_id = usage_id
+
+    def test_not_inherited(self):
+        # Fields not in the inherited_names list won't be inherited.
+        parent = self.get_block(usage_id="parent")
+        parent.not_inherited = "Changed!"
+        self.assertEqual(parent.not_inherited, "Changed!")
+
+        child = self.get_block(usage_id="child")
+        child.parent = "parent"
+        self.assertEqual(child.not_inherited, "nothing")
+
+
 
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):

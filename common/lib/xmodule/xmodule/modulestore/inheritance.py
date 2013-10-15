@@ -118,8 +118,35 @@ def own_metadata(module):
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
 
-class InheritanceFieldData(KvsFieldData):
-    pass
+class InheritingFieldData(KvsFieldData):
+    """A `FieldData` implementation that can inherit value from parents to children."""
+
+    def __init__(self, inheritable_names, **kwargs):
+        """
+        `inheritable_names` is a list of names that can be inherited from
+        parents.
+
+        """
+        super(InheritingFieldData, self).__init__(**kwargs)
+        self.inheritable_names = set(inheritable_names)
+
+    def default(self, block, name):
+        """
+        The default for an inheritable name is found on a parent.
+        """
+        if name in self.inheritable_names and block.parent is not None:
+            parent = block.get_parent()
+            if parent:
+                return getattr(parent, name)
+        super(InheritingFieldData, self).default(block, name)
+
+
+def inheriting_field_data(kvs):
+    """Create an InheritanceFieldData that inherits the names in InheritanceMixin."""
+    return InheritingFieldData(
+        inheritable_names=InheritanceMixin.fields.keys(),
+        kvs=kvs,
+    )
 
 
 class InheritanceKeyValueStore(KeyValueStore):
