@@ -193,6 +193,7 @@ def import_course(request, org, course, name):
                 if not dirpath:
                     return JsonResponse(
                         {
+
                             'ErrMsg': _('Could not find the course.xml file in the package.'),
                             'Stage': 2
                         },
