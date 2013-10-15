@@ -141,14 +141,55 @@ class LTIModule(LTIFields, XModule):
         Renders parameters to template.
         """
 
+        # LTI provides a list of default parameters that might be passed as
+        # part of the POST data. These parameters should not be prefixed.
+        # Likewise, The creator of an LTI link can add custom key/value parameters
+        # to a launch which are to be included with the launch of the LTI link.
+        # In this case, these parameters should be prefixed by 'custom_'.
+        # See http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html#_Toc316828520
+        PARAMETERS = [
+            "lti_message_type",
+            "lti_version",
+            "resource_link_id",
+            "resource_link_title",
+            "resource_link_description",
+            "user_id",
+            "user_image",
+            "roles",
+            "lis_person_name_given",
+            "lis_person_name_family",
+            "lis_person_name_full",
+            "lis_person_contact_email_primary",
+            "lis_person_sourcedid",
+            "role_scope_mentor",
+            "context_id",
+            "context_type",
+            "context_title",
+            "context_label",
+            "launch_presentation_locale",
+            "launch_presentation_document_target",
+            "launch_presentation_css_url",
+            "launch_presentation_width",
+            "launch_presentation_height",
+            "launch_presentation_return_url",
+            "tool_consumer_info_product_family_code",
+            "tool_consumer_info_version",
+            "tool_consumer_instance_guid",
+            "tool_consumer_instance_name",
+            "tool_consumer_instance_description",
+            "tool_consumer_instance_url",
+            "tool_consumer_instance_contact_email",
+        ]
+
         # Obtains client_key and client_secret credentials from current course:
         course_id = self.runtime.course_id
         course_location = CourseDescriptor.id_to_location(course_id)
         course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key = client_secret = ''
+
         for lti_passport in course.lti_passports:
             try:
-                lti_id, key, secret = lti_passport.split(':')
+                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
                 lti_id = key = secret = ''
                 log.error('Could not parse LTI passport: {0!r}. \
@@ -161,13 +202,16 @@ Should be "id:key:secret" string.'.format(lti_passport))
         custom_parameters = {}
         for custom_parameter in self.custom_parameters:
             try:
-                param_name, param_value = custom_parameter.split('=', 1)
+                param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
             except ValueError:
                 param_name = param_value = ''
                 log.error('Could not parse custom parameter: {0!r}. \
 Should be "x=y" string.'.format(custom_parameter))
 
-            custom_parameters[unicode(param_name.strip())] = unicode(param_value.strip())
+            if param_name not in PARAMETERS:
+                param_name = 'custom_' + param_name
+
+            custom_parameters[unicode(param_name)] = unicode(param_value)
 
         input_fields = self.oauth_params(
             custom_parameters,
