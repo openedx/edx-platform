@@ -11,8 +11,6 @@
 
         afterEach(function () {
             window.OldVideoPlayer = undefined;
-            window.onYouTubePlayerAPIReady = undefined;
-            window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
         });
 
