@@ -22,7 +22,7 @@ from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .requests import render_from_lms
+from .helpers import render_from_lms
 from .access import has_access
 from ..utils import get_course_for_item
 

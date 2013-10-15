@@ -129,7 +129,7 @@ class TestPublish(unittest.TestCase):
         """
         Applies action depth-first down tree and to item last.
 
-        A copy of  cms.djangoapps.contentstore.views.requests._xmodule_recurse to reproduce its use and behavior
+        A copy of  cms.djangoapps.contentstore.views.helpers._xmodule_recurse to reproduce its use and behavior
         outside of django.
         """
         for child in item.get_children():
