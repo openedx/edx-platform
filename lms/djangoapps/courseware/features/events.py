@@ -47,16 +47,9 @@ def event_is_emitted(_step, event_type, event_source):
 
     event = cursor.next()
 
-    # These fields should be present in the event, but we won't bother
-    # validating them since it is difficult to predict their values.
-    for expected_field in ['host', 'time', 'agent', 'ip', 'event_source', 'event', 'page']:
-        assert_in(expected_field, event, msg='Expected field {} not found in event'.format(expected_field))
-
     expected_field_values = {
         "username": world.scenario_dict['USER'].username,
         "event_type": event_type,
     }
     for key, value in expected_field_values.iteritems():
         assert_equals(event[key], value)
-
-    # Note that the event may contain other fields, which is fine!
