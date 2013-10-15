@@ -18,19 +18,18 @@ class @Calculator
     event.preventDefault()
     $calc = $('.calc')
     $calcWrapper = $('#calculator_wrapper')
+    text = gettext('Open Calculator')
+    isExpanded = false
 
     $('div.calc-main').toggleClass 'open'
     if $calc.hasClass('closed')
-      $calc.attr
-        'aria-label': 'Open Calculator'
-        'aria-expanded': false
       $calcWrapper
         .find('input, a, dt, dd')
         .attr 'tabindex', -1
     else
-      $calc.attr
-        'aria-label': 'Close Calculator'
-        'aria-expanded': true
+      text = gettext('Close Calculator')
+      isExpanded = true
+
       $calcWrapper
         .find('input, a')
         .attr 'tabindex', 0
@@ -38,6 +37,12 @@ class @Calculator
       # down to the bottom of the page. I suspect it's because it's putting the
       # focus on the text field before it transitions onto the page.
       setTimeout (-> $calcWrapper.find('#calculator_input').focus()), 100
+
+    $calc
+      .attr
+        'title': text
+        'aria-expanded': isExpanded
+      .text text
 
     $calc.toggleClass 'closed'
 
