@@ -92,7 +92,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
         title: gettext('Saving&hellip;')
       saving.show()
       @model.save(data).done( =>
-      #   # showToastMessage("Your changes have been saved.", null, 3)
         @module = null
         @render()
         @$el.removeClass('editing')
