@@ -157,16 +157,8 @@
         // CASE: has actions
         &.has-actions {
 
-          .status-detail {
-            width: flex-grid(5,9);
-          }
-
           .list-actions {
             display: none;
-            width: flex-grid(3,9);
-            float: right;
-            margin-left: flex-gutter();
-            text-align: right;
 
             .action-primary {
               @extend %btn-primary-blue;
