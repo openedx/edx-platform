@@ -2,8 +2,8 @@
  * Course import-related js.
  */
 define(
-        ["jquery", "underscore", "gettext"],
-        function($, _, gettext) {
+        ["domReady", "jquery", "underscore", "gettext"],
+        function(domReady, $, _, gettext) {
 
 "use strict";
 
@@ -145,6 +145,29 @@ var CourseImport = {
     }
 
 };
+
+var showImportSubmit = function (e) {
+    var filepath = $(this).val();
+    if (filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
+        $('.error-block').hide();
+        $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
+        $('.file-name-block').show();
+        $('.view-import .choose-file-button').hide();
+        $('.submit-button').show();
+        $('.progress').show();
+    } else {
+        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
+    }
+};
+
+domReady(function () {
+    // import form setup
+    $('.view-import .file-input').bind('change', showImportSubmit);
+    $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function (e) {
+        e.preventDefault();
+        $('.view-import .file-input').click();
+    });
+});
 
 return CourseImport;
 });
