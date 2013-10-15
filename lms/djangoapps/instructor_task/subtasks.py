@@ -147,6 +147,34 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
     return task_progress
 
 
+def check_subtask_is_valid(entry_id, current_task_id):
+    """
+    Confirms that the current subtask is known to the InstructorTask.
+
+    This may happen if a task that spawns subtasks is called twice with
+    the same task_id and InstructorTask entry_id.  The set of subtasks
+    that are recorded in the InstructorTask from the first call get clobbered
+    by the the second set of subtasks.  So when the first set of subtasks
+    actually run, they won't be found in the InstructorTask.
+
+    Raises a ValueError exception if not.
+    """
+    entry = InstructorTask.objects.get(pk=entry_id)
+    if len(entry.subtasks) == 0:
+        format_str = "Unexpected task_id '{}': unable to find email subtasks of instructor task '{}'"
+        msg = format_str.format(current_task_id, entry)
+        TASK_LOG.warning(msg)
+        raise ValueError(msg)
+
+    subtask_dict = json.loads(entry.subtasks)
+    subtask_status_info = subtask_dict['status']
+    if current_task_id not in subtask_status_info:
+        format_str = "Unexpected task_id '{}': unable to find status for email subtask of instructor task '{}'"
+        msg = format_str.format(current_task_id, entry)
+        TASK_LOG.warning(msg)
+        raise ValueError(msg)
+
+
 @transaction.commit_manually
 def update_subtask_status(entry_id, current_task_id, new_subtask_status):
     """

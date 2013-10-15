@@ -5,6 +5,7 @@ to a course.
 import math
 import re
 import random
+import json
 from uuid import uuid4
 from time import sleep
 
@@ -45,6 +46,7 @@ from instructor_task.subtasks import (
     create_subtask_status,
     increment_subtask_status,
     initialize_subtask_info,
+    check_subtask_is_valid,
 )
 
 log = get_task_logger(__name__)
@@ -208,6 +210,18 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         log.warning("Task %s: Failed to get CourseEmail with id %s", task_id, email_id)
         raise
 
+    # Check to see if email batches have already been defined.  This seems to
+    # happen sometimes when there is a loss of connection while a task is being
+    # queued.  When this happens, the same task gets called again, and a whole
+    # new raft of subtasks gets queued up.  We will assume that if subtasks
+    # have already been defined, there is no need to redefine them below.
+    # So we just return right away.  We don't raise an exception, because we want
+    # the current task to be marked with whatever it had been marked with before.
+    if len(entry.subtasks) > 0 and len(entry.task_output) > 0:
+        log.warning("Task %s has already been processed for email %s!  InstructorTask = %s", task_id, email_id, entry)
+        progress = json.loads(entry.task_output)
+        return progress
+
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
         format_msg = "Course id conflict: explicit value {} does not match email value {}"
@@ -300,14 +314,18 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     Emails are sent multi-part, in both plain text and html.  Updates InstructorTask object
     with status information (sends, failures, skips) and updates number of subtasks completed.
     """
-    # Get entry here, as a sanity check that it actually exists.  We won't actually do anything
-    # with it right away, but we also don't expect it to fail.
-    InstructorTask.objects.get(pk=entry_id)
-
     current_task_id = subtask_status['task_id']
     num_to_send = len(to_list)
     log.info("Preparing to send email %s to %d recipients as subtask %s for instructor task %d: context = %s, status=%s",
              email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
+
+    # Check that the requested subtask is actually known to the current InstructorTask entry.
+    # If this fails, it throws an exception, which should fail this subtask immediately.
+    # This can happen when the parent task has been run twice, and results in duplicate
+    # subtasks being created for the same InstructorTask entry.  We hope to catch this condition
+    # in perform_delegate_email_batches(), but just in case we fail to do so there,
+    # we check here as well.
+    check_subtask_is_valid(entry_id, current_task_id)
 
     send_exception = None
     new_subtask_status = None

@@ -19,7 +19,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from instructor_task.models import InstructorTask
-from instructor_task.subtasks import create_subtask_status
+from instructor_task.subtasks import create_subtask_status, initialize_subtask_info
 
 
 class EmailTestException(Exception):
@@ -201,13 +201,40 @@ class TestEmailErrors(ModuleStoreTestCase):
         with self.assertRaisesRegexp(ValueError, 'does not match email value'):
             perform_delegate_email_batches(entry.id, self.course.id, task_input, "action_name")  # pylint: disable=E1101
 
-    def test_send_email_undefined_email(self):
+    def test_send_email_undefined_subtask(self):
         # test at a lower level, to ensure that the course gets checked down below too.
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         entry_id = entry.id  # pylint: disable=E1101
         to_list = ['test@test.com']
         global_email_context = {'course_title': 'dummy course'}
         subtask_id = "subtask-id-value"
+        subtask_status = create_subtask_status(subtask_id)
+        email_id = 1001
+        with self.assertRaisesRegexp(ValueError, 'unable to find email subtasks of instructor task'):
+            send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status)
+
+    def test_send_email_missing_subtask(self):
+        # test at a lower level, to ensure that the course gets checked down below too.
+        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
+        entry_id = entry.id  # pylint: disable=E1101
+        to_list = ['test@test.com']
+        global_email_context = {'course_title': 'dummy course'}
+        subtask_id = "subtask-id-value"
+        initialize_subtask_info(entry, "emailed", 100, [subtask_id])
+        different_subtask_id = "bogus-subtask-id-value"
+        subtask_status = create_subtask_status(different_subtask_id)
+        bogus_email_id = 1001
+        with self.assertRaisesRegexp(ValueError, 'unable to find status for email subtask of instructor task'):
+            send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status)
+
+    def dont_test_send_email_undefined_email(self):
+        # test at a lower level, to ensure that the course gets checked down below too.
+        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
+        entry_id = entry.id  # pylint: disable=E1101
+        to_list = ['test@test.com']
+        global_email_context = {'course_title': 'dummy course'}
+        subtask_id = "subtask-id-value"
+        initialize_subtask_info(entry, "emailed", 100, [subtask_id])
         subtask_status = create_subtask_status(subtask_id)
         bogus_email_id = 1001
         with self.assertRaises(CourseEmail.DoesNotExist):
