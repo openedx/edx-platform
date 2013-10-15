@@ -94,9 +94,6 @@ domReady(function() {
     // tender feedback window scrolling
     $('a.show-tender').bind('click', smoothScrollTop);
 
-    // toggling footer additional support
-    $('.cta-show-sock').bind('click', toggleSock);
-
     // toggling overview section details
     $(function() {
         if ($('.courseware-section').length > 0) {
@@ -417,31 +414,6 @@ function hideModal(e) {
     if (!$modalCover.hasClass("is-fixed")) {
         $(".modal, .edit-subsection-publish-settings").hide();
         $modalCover.hide();
-    }
-}
-
-function toggleSock(e) {
-    e.preventDefault();
-
-    var $btnLabel = $(this).find('.copy');
-    var $sock = $('.wrapper-sock');
-    var $sockContent = $sock.find('.wrapper-inner');
-
-    $sock.toggleClass('is-shown');
-    $sockContent.toggle('fast');
-
-    $.smoothScroll({
-        offset: -200,
-        easing: 'swing',
-        speed: 1000,
-        scrollElement: null,
-        scrollTarget: $sock
-    });
-
-    if ($sock.hasClass('is-shown')) {
-        $btnLabel.text(gettext('Hide Studio Help'));
-    } else {
-        $btnLabel.text(gettext('Looking for Help with Studio?'));
     }
 }
 
