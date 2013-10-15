@@ -92,7 +92,7 @@ class Email
 
     ### Pending Instructor Tasks Section ####
     # Currently running tasks
-    @$table_running_tasks         = @$section.find ".running-tasks-table"
+    @$table_running_tasks = @$section.find ".running-tasks-table"
 
     # start polling for task list
     # if the list is in the DOM
