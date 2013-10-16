@@ -8,6 +8,7 @@ navigation.  We want to do this in the middleware to
 from django.conf import settings
 import shoppingcart
 
+
 class UserHasCartMiddleware(object):
     """
     Detects whether request.user has a cart and sets it as part of the request
@@ -23,9 +24,11 @@ class UserHasCartMiddleware(object):
         be displayed.  Anonymous users don't.
         """
         request.display_shopping_cart = False
-        if (request.user.is_authenticated() and  # user exists
-            settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings are set
-            settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
-            shoppingcart.models.Order.user_cart_has_items(request.user)):  # user's cart is non-empty
+        if (
+            request.user.is_authenticated() and                                # user exists
+            settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings is set
+            settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and             # setting is set
+            shoppingcart.models.Order.user_cart_has_items(request.user)        # user's cart is non-empty
+        ):
             request.display_shopping_cart = True
         return None

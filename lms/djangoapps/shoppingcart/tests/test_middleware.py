@@ -14,14 +14,21 @@ from course_modes.models import CourseMode
 from shoppingcart.models import Order, PaidCourseRegistration
 from shoppingcart.middleware import UserHasCartMiddleware
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
+    """
+    Unit test for shoppingcart middleware UserHasCartMiddleware
+    """
     def setUp(self):
         self.user = UserFactory.create()
         self.request = Mock()
-        self.mw = UserHasCartMiddleware()
+        self.middleware = UserHasCartMiddleware()
 
     def add_to_cart(self):
+        """
+        Adds content to self.user's cart
+        """
         course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         course_mode = CourseMode(course_id=course.id,
                                  mode_slug="honor",
@@ -38,7 +45,7 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.mw.process_request(self.request)
+        self.middleware.process_request(self.request)
         self.assertFalse(self.request.display_shopping_cart)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
@@ -48,7 +55,7 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.mw.process_request(self.request)
+        self.middleware.process_request(self.request)
         self.assertFalse(self.request.display_shopping_cart)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -57,7 +64,7 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         Tests when request.user is anonymous
         """
         self.request.user = AnonymousUser()
-        self.mw.process_request(self.request)
+        self.middleware.process_request(self.request)
         self.assertFalse(self.request.display_shopping_cart)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -66,7 +73,7 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         Tests when request.user doesn't have a cart with items
         """
         self.request.user = self.user
-        self.mw.process_request(self.request)
+        self.middleware.process_request(self.request)
         self.assertFalse(self.request.display_shopping_cart)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -76,5 +83,5 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.mw.process_request(self.request)
+        self.middleware.process_request(self.request)
         self.assertTrue(self.request.display_shopping_cart)
