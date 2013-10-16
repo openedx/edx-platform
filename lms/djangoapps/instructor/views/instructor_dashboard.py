@@ -27,7 +27,7 @@ from bulk_email.models import CourseAuthorization
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
-    """ Display the instructor dashboard for a course. """
+    """Display the instructor dashboard for a course."""
 
     course = get_course_by_id(course_id, depth=None)
     is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
@@ -45,11 +45,11 @@ def instructor_dashboard_2(request, course_id):
         raise Http404()
 
     sections = [
-        _section_course_info(course_id),
+        _section_course_info(course_id, access),
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
-        _section_data_download(course_id),
-        _section_analytics(course_id),
+        _section_data_download(course_id, access),
+        _section_analytics(course_id, access),
     ]
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -91,7 +91,7 @@ section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
 
-def _section_course_info(course_id):
+def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
@@ -100,6 +100,7 @@ def _section_course_info(course_id):
     section_data = {
         'section_key': 'course_info',
         'section_display_name': _('Course Info'),
+        'access': access,
         'course_id': course_id,
         'course_org': course_org,
         'course_num': course_num,
@@ -157,11 +158,12 @@ def _section_student_admin(course_id, access):
     return section_data
 
 
-def _section_data_download(course_id):
+def _section_data_download(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
+        'access': access,
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
@@ -183,15 +185,17 @@ def _section_send_email(course_id, access, course):
         'send_email': reverse('send_email', kwargs={'course_id': course_id}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'email_background_tasks_url': reverse('list_background_email_tasks', kwargs={'course_id': course_id}),
     }
     return section_data
 
 
-def _section_analytics(course_id):
+def _section_analytics(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'analytics',
         'section_display_name': _('Analytics'),
+        'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_id}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_id}),
     }

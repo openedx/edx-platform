@@ -118,7 +118,8 @@ MITX_FEATURES = {
     'ENABLE_INSTRUCTOR_EMAIL': True,
     # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
     #   for each course via django-admin interface.
-    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default for all courses.
+    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default
+    #   for all Mongo-backed courses.
     'REQUIRE_COURSE_EMAIL_AUTH': True,
 
     # enable analytics server.

@@ -42,10 +42,8 @@
   .msg-warning {
     border-top: 2px solid $warning-color;
     background: tint($warning-color,95%);
-
-    .copy {
-      color: $warning-color;
-    }
+    display: none;
+    color: $warning-color;
   }
 
   // TYPE: confirm
