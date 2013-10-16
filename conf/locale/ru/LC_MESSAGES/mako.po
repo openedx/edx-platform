@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-08 14:49+0400\n"
-"PO-Revision-Date: 2013-10-08 15:05+0400\n"
+"POT-Creation-Date: 2013-10-11 17:19+0400\n"
+"PO-Revision-Date: 2013-10-14 17:14+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -2494,93 +2494,75 @@ msgid "Middlename"
 msgstr "Отчество"
 
 #: cms/templates/signup.html:52 lms/templates/register.html:190
-#: lms/templates/signup_modal.html:64
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr "Год рождения"
 
 #: cms/templates/signup.html:61 lms/templates/register.html:199
-#: lms/templates/signup_modal.html:73
 msgid "Highest Level of Education Completed"
 msgstr "Образование"
 
 #: cms/templates/signup.html:70 lms/templates/register.html:208
-#: lms/templates/signup_modal.html:82
 msgid "Place where Education Completed"
 msgstr "Какое учебное заведение окончил(а)"
 
 #: cms/templates/signup.html:74 lms/templates/register.html:212
-#: lms/templates/signup_modal.html:86
 msgid "Year when education was Completed"
 msgstr "Год окончания учебного заведения"
 
 #: cms/templates/signup.html:84 lms/templates/register.html:222
-#: lms/templates/signup_modal.html:96
 msgid "Diploma qualification"
 msgstr "Квалификация по диплому"
 
 #: cms/templates/signup.html:88 lms/templates/register.html:226
-#: lms/templates/signup_modal.html:100
 msgid "Diploma specialty"
 msgstr "Специальность по диплому"
 
 #: cms/templates/signup.html:92 lms/templates/register.html:230
-#: lms/templates/signup_modal.html:107
 msgid "Type of educational institution"
 msgstr "Тип образовательного учреждения"
 
 #: cms/templates/signup.html:101 lms/templates/register.html:239
-#: lms/templates/signup_modal.html:116
 msgid "Number of educational institution"
 msgstr "Номер образовательного учреждения"
 
 #: cms/templates/signup.html:105 lms/templates/register.html:243
-#: lms/templates/signup_modal.html:128
 msgid "Name of educational institution"
 msgstr "Название образовательного учреждения"
 
 #: cms/templates/signup.html:109 lms/templates/register.html:247
-#: lms/templates/signup_modal.html:132
 msgid "StatGrad login of educational institution"
 msgstr "Логин образовательного учреждения в системе Статград"
 
 #: cms/templates/signup.html:113 lms/templates/register.html:251
-#: lms/templates/signup_modal.html:144
 msgid "Okrug of educational institution"
 msgstr "Округ образовательного учреждения"
 
 #: cms/templates/signup.html:122 lms/templates/register.html:260
-#: lms/templates/signup_modal.html:153
 msgid "Occupation at educational institution"
 msgstr "Должность по месту работы"
 
 #: cms/templates/signup.html:131 lms/templates/register.html:269
-#: lms/templates/signup_modal.html:163
 msgid "Another occupation at educational institution"
 msgstr "Вторая должность по месту работы"
 
 #: cms/templates/signup.html:140 lms/templates/register.html:278
-#: lms/templates/signup_modal.html:173
 msgid "Educational experience at educational institution"
 msgstr "Стаж педагогический (полных лет)"
 
 #: cms/templates/signup.html:144 lms/templates/register.html:282
-#: lms/templates/signup_modal.html:177
 msgid "Managing experience at educational institution"
 msgstr "Стаж руководящей работы (полных лет)"
 
 #: cms/templates/signup.html:148 lms/templates/register.html:286
-#: lms/templates/signup_modal.html:181
 msgid "Qualification category"
 msgstr "Квалификационная категория"
 
 #: cms/templates/signup.html:157 lms/templates/register.html:295
-#: lms/templates/signup_modal.html:190
 msgid "Qualification category year"
 msgstr "Год присвоения категории"
 
 #: cms/templates/signup.html:161 lms/templates/register.html:299
-#: lms/templates/signup_modal.html:214
 msgid "Contact phone"
 msgstr "Контактный телефон"
 
@@ -3401,183 +3383,183 @@ msgstr ""
 msgid "An account with the Email '{email}' already exists."
 msgstr "Учетная запись с адресом '{email}' уже существует."
 
-#: common/djangoapps/student/views.py:739
+#: common/djangoapps/student/views.py:735
 msgid "Error (401 {field}). E-mail us."
 msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
 
-#: common/djangoapps/student/views.py:744
+#: common/djangoapps/student/views.py:740
 msgid "To enroll, you must follow the honor code."
 msgstr "Для записи вы должны следовать Кодексу поведения."
 
-#: common/djangoapps/student/views.py:756
+#: common/djangoapps/student/views.py:752
 msgid "You must accept the terms of service."
 msgstr "Я согласен с условиями предоставления услуг"
 
-#: common/djangoapps/student/views.py:775
-#: common/djangoapps/student/views.py:796
+#: common/djangoapps/student/views.py:767
+#: common/djangoapps/student/views.py:788
 msgid "Education level is required"
 msgstr "Требуется заполненое поле Образование"
 
-#: common/djangoapps/student/views.py:786
+#: common/djangoapps/student/views.py:778
 msgid "Username must be minimum of two characters long."
 msgstr "Имя пользователя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:787
+#: common/djangoapps/student/views.py:779
 msgid "A properly formatted e-mail is required."
 msgstr "Требуется правильный электронный адрес."
 
-#: common/djangoapps/student/views.py:788
+#: common/djangoapps/student/views.py:780
 msgid "Your legal name must be a minimum of two characters long."
 msgstr "Ваше рельное имя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:789
+#: common/djangoapps/student/views.py:781
 msgid "A valid password is required."
 msgstr "Требуется корректный пароль."
 
-#: common/djangoapps/student/views.py:790
+#: common/djangoapps/student/views.py:782
 msgid "Accepting Terms of Service is required."
 msgstr "Требуется принять правила использования сервиса."
 
-#: common/djangoapps/student/views.py:791
+#: common/djangoapps/student/views.py:783
 msgid "Agreeing to the Honor Code is required."
 msgstr "Требуется принять Кодекс Чести."
 
-#: common/djangoapps/student/views.py:792
+#: common/djangoapps/student/views.py:784
 msgid "Lastname must be a minimum of two characters long."
 msgstr "Фамилия должна быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:793
+#: common/djangoapps/student/views.py:785
 msgid "Firstname must be a minimum of two characters long."
 msgstr "Имя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:794
+#: common/djangoapps/student/views.py:786
 msgid "Middlename must be a minimum of two characters long."
 msgstr "Отчество должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:795
+#: common/djangoapps/student/views.py:787
 msgid "Year of birth is required"
 msgstr "Требуется год рождения"
 
-#: common/djangoapps/student/views.py:797
+#: common/djangoapps/student/views.py:789
 msgid "Education place is required"
 msgstr "Требуется заполненое поле Название учебного учреждения"
 
-#: common/djangoapps/student/views.py:798
+#: common/djangoapps/student/views.py:790
 msgid "Education year is required"
 msgstr "Требуется заполненое поле Год окончания учебного заведения"
 
-#: common/djangoapps/student/views.py:799
+#: common/djangoapps/student/views.py:791
 msgid "Work type is required"
 msgstr "Требуется заполненое поле Тип образовательного учреждения"
 
-#: common/djangoapps/student/views.py:800
+#: common/djangoapps/student/views.py:792
 msgid "Work number is required"
 msgstr "Требуется заполненое поле Номер образовательного учреждения"
 
-#: common/djangoapps/student/views.py:801
+#: common/djangoapps/student/views.py:793
 msgid "Work name is required"
 msgstr "Требуется заполненое поле Название образовательного учреждения"
 
-#: common/djangoapps/student/views.py:802
+#: common/djangoapps/student/views.py:794
 msgid "Work StatGrad login is required"
 msgstr ""
 "Требуется заполненое поле Логин образовательного учреждения в системе "
 "Статград"
 
-#: common/djangoapps/student/views.py:803
+#: common/djangoapps/student/views.py:795
 msgid "Work location is required"
 msgstr "Должно быть указано местоположение рабочего места"
 
-#: common/djangoapps/student/views.py:804
+#: common/djangoapps/student/views.py:796
 msgid "Work occupation is required"
 msgstr "Должен быть указан род занятий"
 
-#: common/djangoapps/student/views.py:805
+#: common/djangoapps/student/views.py:797
 msgid "Work teaching experience is required"
 msgstr "Должен быть указан опыт работы"
 
-#: common/djangoapps/student/views.py:806
+#: common/djangoapps/student/views.py:798
 msgid "Work qualification category is required"
 msgstr "Должна быть указана квалификация"
 
-#: common/djangoapps/student/views.py:807
+#: common/djangoapps/student/views.py:799
 msgid "Work qualification year is required"
 msgstr "Должен быть указан стаж"
 
-#: common/djangoapps/student/views.py:808
+#: common/djangoapps/student/views.py:800
 msgid "Contact phone is required"
 msgstr "Должен быть указан контактный телефон"
 
-#: common/djangoapps/student/views.py:818
+#: common/djangoapps/student/views.py:810
 msgid "Education year must be numeric"
 msgstr "Год окончания должен быть числом"
 
-#: common/djangoapps/student/views.py:819
+#: common/djangoapps/student/views.py:811
 msgid "Work teaching experience must be numeric"
 msgstr "Должен быть указан опыт работы в виде числа"
 
-#: common/djangoapps/student/views.py:820
+#: common/djangoapps/student/views.py:812
 msgid "Work managing experience must be numeric"
 msgstr "Должен быть указан опыт работы в виде числа"
 
-#: common/djangoapps/student/views.py:821
+#: common/djangoapps/student/views.py:813
 msgid "Work qualification year must be numeric"
 msgstr "Год получения квалификации должен быть числом"
 
-#: common/djangoapps/student/views.py:822
+#: common/djangoapps/student/views.py:814
 msgid "Contact phone must be numeric"
 msgstr "Контактный телефон должен быть числом"
 
-#: common/djangoapps/student/views.py:832
+#: common/djangoapps/student/views.py:824
 msgid "Valid e-mail is required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:839
+#: common/djangoapps/student/views.py:832
 msgid "Valid StatGrad login is required."
 msgstr "Должен быть указан корректный логин СтатГрад"
 
-#: common/djangoapps/student/views.py:880
+#: common/djangoapps/student/views.py:873
 msgid "Could not send activation e-mail."
 msgstr "Невозможно отправить письмо с информацией об активации."
 
-#: common/djangoapps/student/views.py:1188
+#: common/djangoapps/student/views.py:1181
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr "Кажется, что-то пошло не так. Напишите нам, как это получилось"
 
-#: common/djangoapps/student/views.py:1207
+#: common/djangoapps/student/views.py:1200
 msgid "Invalid e-mail or user"
 msgstr "Неверный адрес e-mail или пользователь"
 
-#: common/djangoapps/student/views.py:1239
+#: common/djangoapps/student/views.py:1232
 msgid "No inactive user with this e-mail exists"
 msgstr "С таким адресом не существует неактивных пользователей"
 
-#: common/djangoapps/student/views.py:1254
+#: common/djangoapps/student/views.py:1247
 msgid "Unable to send reactivation email"
 msgstr "Невозможно отправить письмо с повторной активацией"
 
-#: common/djangoapps/student/views.py:1271
+#: common/djangoapps/student/views.py:1264
 msgid "Invalid password"
 msgstr "Неверный пароль"
 
-#: common/djangoapps/student/views.py:1278
+#: common/djangoapps/student/views.py:1271
 msgid "Valid e-mail address required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1283
+#: common/djangoapps/student/views.py:1276
 msgid "An account with this e-mail already exists."
 msgstr "Учетная запись с таким адресом электронной почты уже существует."
 
-#: common/djangoapps/student/views.py:1299
+#: common/djangoapps/student/views.py:1292
 msgid "Old email is the same as the new email."
 msgstr "Старый адрес электронной почты совпадает с новым."
 
-#: common/djangoapps/student/views.py:1388
+#: common/djangoapps/student/views.py:1381
 msgid "Name required"
 msgstr "Требуется имя"
 
-#: common/djangoapps/student/views.py:1423
-#: common/djangoapps/student/views.py:1433
+#: common/djangoapps/student/views.py:1416
+#: common/djangoapps/student/views.py:1426
 msgid "Invalid ID"
 msgstr "Неверный ID"
 
@@ -5250,7 +5232,7 @@ msgstr "Сохранить настройки"
 #: lms/templates/forgot_password_modal.html:33
 #: lms/templates/help_modal.html:18 lms/templates/help_modal.html:55
 #: lms/templates/help_modal.html:83 lms/templates/login_modal.html:42
-#: lms/templates/signup_modal.html:255
+#: lms/templates/signup_modal.html:101
 msgid "Close Modal"
 msgstr "Закрыть"
 
@@ -5909,11 +5891,8 @@ msgid "Welcome!"
 msgstr "Добро пожаловать!"
 
 #: lms/templates/register.html:94
-#, fuzzy
 msgid "Register below to create your {platform_name} account"
-msgstr ""
-"Добро пожаловать! Зарегистрируйтесь ниже, чтобы создать ваш {platform_name} "
-"аккаунт"
+msgstr "Зарегистрируйтесь ниже, чтобы создать ваш {platform_name} аккаунт"
 
 #: lms/templates/register.html:114
 msgid "Please complete the following fields to register for an account. "
@@ -5944,7 +5923,7 @@ msgstr "Дополнительная информация о пользоват�
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/register.html:345 lms/templates/signup_modal.html:241
+#: lms/templates/register.html:345 lms/templates/signup_modal.html:87
 msgid "Create My Account"
 msgstr "Создать учетную запись"
 
@@ -6040,31 +6019,19 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 msgid "e.g. yourname@domain.com"
 msgstr "например yourname@domain.com"
 
-#: lms/templates/signup_modal.html:117
-msgid "e.g. 9999"
-msgstr "например 9999"
-
-#: lms/templates/signup_modal.html:129
-msgid "e.g. School of art"
-msgstr "например Школа Искусств"
-
-#: lms/templates/signup_modal.html:133
-msgid "e.g. sch9999"
-msgstr "например sch9999"
-
-#: lms/templates/signup_modal.html:227
+#: lms/templates/signup_modal.html:73
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
 msgstr "Я согласен с {link_start}условиями предоставления услуг{link_end}*"
 
-#: lms/templates/signup_modal.html:234
+#: lms/templates/signup_modal.html:80
 msgid "I agree to the {link_start}Honor Code{link_end}*"
 msgstr "Я согласен с {link_start}Кодексом чести{link_end}*"
 
-#: lms/templates/signup_modal.html:248
+#: lms/templates/signup_modal.html:94
 msgid "Already have an account?"
 msgstr "Уже имеете учетную запись?"
 
-#: lms/templates/signup_modal.html:248
+#: lms/templates/signup_modal.html:94
 msgid "Login."
 msgstr "Учетная запись."
 
@@ -6745,6 +6712,15 @@ msgstr "Новая посылка"
 msgid "Next Step"
 msgstr "Следующий шаг"
 
+#: lms/templates/combinedopenended/combined_open_ended.html:61
+msgid ""
+"Staff Warning: Please note that if you submit a duplicate of text that has "
+"already been submitted for grading, it will not show up in the staff grading "
+"view.  It will be given the same grade that the original received "
+"automatically, and will be returned within 30 minutes if the original is "
+"already graded, or when the original is graded if not."
+msgstr ""
+
 #: lms/templates/combinedopenended/combined_open_ended_legend.html:4
 msgid "Legend"
 msgstr "Условные обозначения"
@@ -6833,7 +6809,7 @@ msgid ""
 "Select the criteria you feel best represents this submission in each "
 "category."
 msgstr ""
-"Выберите пункт критериев, который наилучших образом характеризует ответ в "
+"Выберите пункт критериев, который наилучшим образом характеризует ответ в "
 "каждой категории."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html:26
@@ -7663,6 +7639,19 @@ msgstr "{course_number} Прогресс"
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Прогресс курса у обучающегося '{username}' ({email})"
 
+#: lms/templates/courseware/progress.html:61
+msgid "{earned:.3n} of {total:.3n} possible points"
+msgstr ""
+
+#: lms/templates/courseware/progress.html:84
+#, fuzzy
+msgid "Problem Scores: "
+msgstr "Имя URL задачи:"
+
+#: lms/templates/courseware/progress.html:84
+msgid "Practice Scores: "
+msgstr ""
+
 #: lms/templates/courseware/progress.html:91
 msgid "No problem scores in this section"
 msgstr "Нет оцениваемых заданий в этой секции"
@@ -7702,6 +7691,10 @@ msgstr "Показать дискусии"
 
 #: lms/templates/discussion/_filter_dropdown.html:29
 msgid "Filter Topics"
+msgstr "Фильтр тем"
+
+#: lms/templates/discussion/_filter_dropdown.html:30
+msgid "filter topics"
 msgstr "Фильтр тем"
 
 #: lms/templates/discussion/_filter_dropdown.html:35
@@ -8029,11 +8022,11 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html:54
 msgid "Prompt"
-msgstr "Приглашение"
+msgstr "Условие задачи"
 
 #: lms/templates/instructor/staff_grading.html:54
-msgid "(Hide)"
-msgstr "(скрыть)"
+msgid "(Show)"
+msgstr "Показать"
 
 #: lms/templates/instructor/staff_grading.html:67
 #: lms/templates/peer_grading/peer_grading_problem.html:32
@@ -8043,7 +8036,7 @@ msgstr "Ответ студента"
 #: lms/templates/instructor/staff_grading.html:76
 #: lms/templates/peer_grading/peer_grading_problem.html:50
 msgid "Written Feedback"
-msgstr "Записанная обратная связь"
+msgstr "Комментарий к работе"
 
 #: lms/templates/instructor/staff_grading.html:77
 msgid "Feedback for student (optional)"
@@ -8051,7 +8044,7 @@ msgstr "Ответ для студента (дополнительно)"
 
 #: lms/templates/instructor/staff_grading.html:80
 msgid "Flag as inappropriate content for later review"
-msgstr "Отметьте неподходящий контент для последующего просмотра"
+msgstr "Отметьте, если ответ содержит нецензурную лексику, оскорбления и т.п."
 
 #: lms/templates/instructor/staff_grading.html:85
 msgid "Skip"
@@ -8393,7 +8386,6 @@ msgid "Open Ended Problems"
 msgstr "Задачи с открытым ответом"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:20
-#, fuzzy
 msgid "Here is a list of open ended problems for this course."
 msgstr "Вот список задач с открытым ответом в данном курсе."
 
@@ -11658,6 +11650,18 @@ msgstr ""
 #: lms/templates/verify_student/verified.html:88
 msgid "You have decided to pay $ "
 msgstr ""
+
+#~ msgid "e.g. 9999"
+#~ msgstr "например 9999"
+
+#~ msgid "e.g. School of art"
+#~ msgstr "например Школа Искусств"
+
+#~ msgid "e.g. sch9999"
+#~ msgstr "например sch9999"
+
+#~ msgid "(Hide)"
+#~ msgstr "(скрыть)"
 
 #~ msgid "Hide Prompt"
 #~ msgstr "Скрыть задание"

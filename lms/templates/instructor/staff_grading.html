@@ -25,8 +25,8 @@
 
 <! -- Problem List View -->
 <section class="problem-list-container">
-  <h2>${_("Instructions")}</h2>
-  <div class="instructions">
+  <h2 class="sr">${_("Instructions")}</h2>
+  <div class="instructions sr">
     <p>${_("This is the list of problems that currently need to be graded in order to train AI grading and create calibration essays for peer grading. Each problem needs to be treated separately, and we have indicated the number of student submissions that need to be graded.  You can grade more than the minimum required number of submissions--this will improve the accuracy of AI grading, though with diminishing returns. You can see the current accuracy of AI grading in the problem view.")}</p>
   </div>
 
@@ -39,9 +39,9 @@
 
 <section class="prompt-wrapper">
     <div class="grading-message"></div>
-  <h2 class="prompt-name">
+  <h2 class="prompt-name" style="font-weight: bold;">
   </h2>
-  <div class="meta-info-wrapper">
+  <div class="meta-info-wrapper sr">
       <div class="problem-meta-info-container">
       </div>
       <div class="ml-error-info-container">
@@ -51,7 +51,7 @@
       </div>
   </div>
   <div class="prompt-information-container">
-    <h3>${_('Prompt')} <a href="#" class="question-header">${_("(Hide)")}</a></h3>
+    <h3>${_('Prompt')} <a href="#" class="question-header">${_("(Show)")}</a></h3>
     <div class="prompt-container">
     </div>
   </div>
