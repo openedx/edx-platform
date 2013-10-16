@@ -91,8 +91,7 @@ def i_expand_a_section(step):
 @step(u'I see the "([^"]*)" link$')
 def i_see_the_span_with_text(step, text):
     span_locator = '.toggle-button-sections span'
-    assert_true(world.is_css_present(span_locator))
-    assert_equal(world.css_value(span_locator), text)
+    assert_true(world.css_has_value(span_locator, text))
     assert_true(world.css_visible(span_locator))
 
 
