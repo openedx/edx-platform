@@ -751,6 +751,7 @@
 
             .action {
               @extend %btn-verify-primary;
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
