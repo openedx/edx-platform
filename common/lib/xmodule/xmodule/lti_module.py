@@ -10,6 +10,7 @@ import oauthlib.oauth1
 import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
@@ -254,8 +255,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
 
-class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor):
+class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
-    LTIModuleDescriptor provides no export/import to xml.
+    Descriptor for LTI Xmodule.
     """
     module_class = LTIModule
