@@ -61,13 +61,18 @@ var require = {
         "underscore.string": "js/vendor/underscore.string.min",
         "backbone": "js/vendor/backbone-min",
         "backbone.associations": "js/vendor/backbone-associations-min",
-        "youtube": "js/load_youtube",
         "tinymce": "js/vendor/tiny_mce/tiny_mce",
         "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
-        "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
         "xmodule": "/xmodule/xmodule",
         "utility": "js/src/utility",
-        "draggabilly": "js/vendor/draggabilly.pkgd"
+        "draggabilly": "js/vendor/draggabilly.pkgd",
+
+        // externally hosted files
+        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
+        // youtube URL does not end in ".js". We add "?noext" to the path so
+        // that require.js adds the ".js" to the query component of the URL,
+        // and leaves the path component intact.
+        "youtube": "//www.youtube.com/player_api?noext"
     },
     shim: {
         "gettext": {
@@ -138,6 +143,9 @@ var require = {
             deps: ["backbone"],
             exports: "Backbone.Associations"
         },
+        "youtube": {
+            exports: "YT"
+        },
         "codemirror": {
             exports: "CodeMirror"
         },
@@ -207,6 +215,7 @@ require(['js/models/course'], function(Course) {
       % endif
 
       <%include file="widgets/footer.html" />
+      <%include file="widgets/tender.html" />
 
       <div id="page-notification"></div>
     </div>

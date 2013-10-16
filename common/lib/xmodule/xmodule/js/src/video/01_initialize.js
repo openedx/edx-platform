@@ -92,23 +92,12 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        var onPlayerReadyFunc;
-        if (
-            (
-                (state.videoType === 'youtube') &&
-                (window.YT) &&
-                (window.YT.Player)
-            ) ||
-            (state.videoType === 'html5')
-        ) {
-            VideoPlayer(state);
+        if(state.videoType === 'youtube') {
+            YT.ready(function() {
+                VideoPlayer(state);
+            })
         } else {
-            if (state.videoType === 'youtube') {
-                onPlayerReadyFunc = 'onYouTubePlayerAPIReady';
-            } else {
-                onPlayerReadyFunc = 'onHTML5PlayerAPIReady';
-            }
-            window[onPlayerReadyFunc] = _.bind(VideoPlayer, window, state);
+            VideoPlayer(state);
         }
     }
 

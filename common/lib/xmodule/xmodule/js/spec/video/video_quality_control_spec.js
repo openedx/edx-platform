@@ -20,17 +20,38 @@
     });
 
     describe('constructor', function() {
+      var oldYT = window.YT;
+
       beforeEach(function() {
+        window.YT = {
+            Player: function () { },
+            PlayerState: oldYT.PlayerState,
+            ready: function(f){f();}
+        };
+
         initialize();
       });
 
-      // Disabled when ARIA markup was added to the anchor
-      xit('render the quality control', function() {
-        expect(videoControl.secondaryControlsEl.html()).toContain("<a href=\"#\" class=\"quality_control\" title=\"HD\">");
+      afterEach(function () {
+        window.YT = oldYT;
+      });
+
+      it('render the quality control', function() {
+        expect(videoControl.secondaryControlsEl.html())
+          .toContain(
+            '<a ' +
+              'href="#" ' +
+              'class="quality_control" ' +
+              'title="HD" ' +
+              'role="button" ' +
+              'aria-disabled="false"' +
+            '>HD</a>'
+          );
       });
 
       it('bind the quality control', function() {
-        expect($('.quality_control')).toHandleWith('click', videoQualityControl.toggleQuality);
+        expect($('.quality_control'))
+          .toHandleWith('click', videoQualityControl.toggleQuality);
       });
     });
   });

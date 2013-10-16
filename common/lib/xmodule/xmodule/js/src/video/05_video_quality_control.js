@@ -59,14 +59,24 @@ function () {
     // ***************************************************************
 
     function onQualityChange(value) {
+        var controlStateStr;
         this.videoQualityControl.quality = value;
 
         if (_.indexOf(this.config.availableQualities, value) !== -1) {
-            this.videoQualityControl.el.addClass('active');
+            controlStateStr = gettext('HD on');
+            this.videoQualityControl.el
+                                    .addClass('active')
+                                    .attr('title', controlStateStr)
+                                    .text(controlStateStr);
         } else {
-            this.videoQualityControl.el.removeClass('active');
+            controlStateStr = gettext('HD off');
+            this.videoQualityControl.el
+                                    .removeClass('active')
+                                    .attr('title', controlStateStr)
+                                    .text(controlStateStr);
+
         }
-    }
+    }       
 
     // This function change quality of video.
     // Right now we haven't ability to choose quality of HD video,

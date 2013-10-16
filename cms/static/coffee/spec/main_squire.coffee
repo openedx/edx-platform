@@ -22,7 +22,7 @@ requirejs.config({
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
-        "youtube": "xmodule_js/common_static/js/load_youtube",
+        "youtube": "//www.youtube.com/player_api?noext",
         "tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/tiny_mce",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
         "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
@@ -99,6 +99,9 @@ requirejs.config({
         "backbone.associations": {
             deps: ["backbone"],
             exports: "Backbone.Associations"
+        },
+        "youtube": {
+            exports: "YT"
         },
         "codemirror": {
             exports: "CodeMirror"
