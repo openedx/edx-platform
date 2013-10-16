@@ -34,7 +34,7 @@ def add_a_multi_step_component(step, is_advanced, category):
             step=step,
             category='{}'.format(category.lower()),
             component_type=step_hash['Component'],
-            is_advanced=is_advanced,
+            is_advanced=bool(is_advanced),
         )
 
 

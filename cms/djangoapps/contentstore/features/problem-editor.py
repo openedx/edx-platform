@@ -17,7 +17,7 @@ SHOW_ANSWER = "Show Answer"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
-    world.add_unit()
+    world.create_course_with_unit()
     world.create_component_instance(
         step=step,
         category='problem',
@@ -166,7 +166,7 @@ def cancel_does_not_save_changes(step):
 
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
-    world.add_unit()
+    world.create_course_with_unit()
     world.create_component_instance(
         step=step,
         category='problem',

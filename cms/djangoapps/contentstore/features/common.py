@@ -225,7 +225,18 @@ def i_enabled_the_advanced_module(step, module):
 
 
 @world.absorb
-def add_unit():
+def create_course_with_unit():
+    """
+    Prepare for tests by creating a course with a section, subsection, and unit.
+    Performs the following:
+        Clear out all courseware
+        Create a course with a section, subsection, and unit
+        Create a user and make that user a course author
+        Log the user into studio
+        Open the course from the dashboard
+        Expand the section and click on the New Unit link
+    The end result is the page where the user is editing the new unit
+    """
     world.clear_courses()
     course = world.CourseFactory.create()
     world.scenario_dict['COURSE'] = course
@@ -233,7 +244,8 @@ def add_unit():
     world.ItemFactory.create(
         parent_location=section.location,
         category='sequential',
-        display_name='Subsection One',)
+        display_name='Subsection One',
+    )
     user = create_studio_user(is_staff=False)
     add_course_author(user, course)
 
@@ -255,7 +267,7 @@ def add_unit():
 @step('I have clicked the new unit button$')
 @step(u'I am in Studio editing a new unit$')
 def edit_new_unit(step):
-    add_unit()
+    create_course_with_unit()
 
 
 @step('the save notification button is disabled')

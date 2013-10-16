@@ -12,7 +12,7 @@ BUTTONS = {
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
-    world.add_unit()
+    world.create_course_with_unit()
     world.create_component_instance(
         step=step,
         category='video',

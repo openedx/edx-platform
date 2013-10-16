@@ -41,6 +41,29 @@ def click_new_component_button(step, component_button_css):
     world.css_click(component_button_css)
 
 
+def _click_advanced():
+    css = 'ul.problem-type-tabs a[href="#tab2"]'
+    world.css_click(css)
+    my_css = 'ul.problem-type-tabs li.ui-state-active a[href="#tab2"]'
+    assert(world.css_find(my_css))
+
+
+def _find_matching_link(category, component_type):
+    """
+    Find the link with the specified text. There should be one and only one.
+    """
+
+    # The tab shows links for the given category
+    links = world.css_find('div.new-component-{} a'.format(category))
+
+    # Find the link whose text matches what you're looking for
+    matched_links = [link for link in links if link.text == component_type]
+
+    # There should be one and only one
+    assert_equal(len(matched_links), 1)
+    return matched_links[0]
+
+
 def click_component_from_menu(category, component_type, is_advanced):
     """
     Creates a component for a category with more
@@ -49,39 +72,19 @@ def click_component_from_menu(category, component_type, is_advanced):
     the Advanced tab.
     The component_type is the link text, e.g. "Blank Common Problem"
     """
-    def click_advanced():
-        css = 'ul.problem-type-tabs a[href="#tab2"]'
-        world.css_click(css)
-        my_css = 'ul.problem-type-tabs li.ui-state-active a[href="#tab2"]'
-        assert(world.css_find(my_css))
-
-    # True, not None or False
     if is_advanced:
         # Sometimes this click does not work if you go too fast.
-        world.retry_on_exception(click_advanced, max_attempts=5, ignored_exceptions=AssertionError)
-
-    def find_matching_link():
-        """
-        Find the link with the specified text. There should be one and only one.
-        """
-        # The tab shows links for the given category
-        links = world.css_find('div.new-component-{} a'.format(category))
-
-        # Find the link whose text matches what you're looking for
-        matched_links = [link for link in links if link.text == component_type]
-
-        # There should be one and only one
-        assert_equal(len(matched_links), 1)
-        return matched_links[0]
-
-    def click_link():
-        link.click()
+        world.retry_on_exception(_click_advanced,
+            ignored_exceptions=AssertionError)
 
     # Retry this in case the list is empty because you tried too fast.
-    link = world.retry_on_exception(func=find_matching_link, ignored_exceptions=AssertionError)
+    link = world.retry_on_exception(
+        lambda: _find_matching_link(category, component_type),
+        ignored_exceptions=AssertionError
+    )
 
     # Wait for the link to be clickable. If you go too fast it is not.
-    world.retry_on_exception(click_link)
+    world.retry_on_exception(lambda: link.click())
 
 
 @world.absorb

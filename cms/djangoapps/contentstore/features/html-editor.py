@@ -6,7 +6,7 @@ from lettuce import world, step
 
 @step('I have created a Blank HTML Page$')
 def i_created_blank_html_page(step):
-    world.add_unit()
+    world.create_course_with_unit()
     world.create_component_instance(
         step=step,
         category='html',
@@ -21,7 +21,7 @@ def i_see_only_the_html_display_name(step):
 
 @step('I have created an E-text Written in LaTeX$')
 def i_created_etext_in_latex(step):
-    world.add_unit()
+    world.create_course_with_unit()
     world.create_component_instance(
         step=step,
         category='html',
