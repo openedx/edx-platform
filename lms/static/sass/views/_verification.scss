@@ -1190,7 +1190,7 @@
     .form-register-choose {
       @include clearfix();
       width: flex-grid(12,12);
-      margin: $baseline 0;
+      margin: ($baseline*2) 0;
 
       .deco-divider {
         width: flex-grid(8,12);
@@ -1352,12 +1352,13 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
+        margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
         input {
           width: auto;
+          padding: 0;
         }
 
         &:last-child {
