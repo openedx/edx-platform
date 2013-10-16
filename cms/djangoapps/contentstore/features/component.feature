@@ -80,9 +80,3 @@ Feature: CMS.Component Adding
         And I add a "Blank Advanced Problem" "Advanced Problem" component
         And I delete all components
         Then I see no components
-
-    Scenario: I see a notification on save
-        Given I am in Studio editing a new unit
-        And I add a "Discussion" "single step" component
-        And I edit and save a component
-        Then I am shown a notification

@@ -4,11 +4,13 @@
 from lettuce import world
 import time
 import json
+import re
 import platform
 from textwrap import dedent
 from urllib import quote_plus
 from selenium.common.exceptions import (
-    WebDriverException, TimeoutException, StaleElementReferenceException)
+    WebDriverException, TimeoutException,
+    StaleElementReferenceException)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,9 +18,48 @@ from lettuce.django import django_url
 from nose.tools import assert_true  # pylint: disable=E0611
 
 
+REQUIREJS_WAIT = {
+    # Settings - Schedule & Details
+    re.compile('^Schedule & Details Settings \|'): [
+        "jquery", "js/models/course",
+        "js/models/settings/course_details", "js/views/settings/main"],
+
+    # Settings - Advanced Settings
+    re.compile('^Advanced Settings \|'): [
+        "jquery", "js/models/course", "js/models/settings/advanced",
+        "js/views/settings/advanced", "codemirror"],
+
+    # Individual Unit (editing)
+    re.compile('^Individual Unit \|'): [
+        "coffee/src/models/module", "coffee/src/views/unit",
+        "coffee/src/views/module_edit"],
+
+    # Content - Outline
+    # Note that calling your org, course number, or display name, 'course' will mess this up
+    re.compile('^Course Outline \|'): [
+        "js/models/course", "js/models/location", "js/models/section",
+        "js/views/overview", "js/views/section_edit"],
+
+    # Dashboard
+    re.compile('^My Courses \|'): [
+        "js/sock", "gettext", "js/base",
+        "jquery.ui", "coffee/src/main", "underscore"],
+}
+
+
 @world.absorb
 def wait(seconds):
     time.sleep(float(seconds))
+
+
+@world.absorb
+def wait_for_js_to_load():
+    requirements = None
+    for test, req in REQUIREJS_WAIT.items():
+        if test.search(world.browser.title):
+            requirements = req
+            break
+    world.wait_for_requirejs(requirements)
 
 
 # Selenium's `execute_async_script` function pauses Selenium's execution
@@ -28,8 +69,6 @@ def wait(seconds):
 # passed to this callback get returned from the `execute_async_script`
 # function, which allows the JS to communicate information back to Python.
 # Ref: https://selenium.googlecode.com/svn/trunk/docs/api/dotnet/html/M_OpenQA_Selenium_IJavaScriptExecutor_ExecuteAsyncScript.htm
-
-
 @world.absorb
 def wait_for_js_variable_truthy(variable):
     """
@@ -37,7 +76,7 @@ def wait_for_js_variable_truthy(variable):
     environment until the given variable is defined and truthy. This process
     guards against page reloads, and seamlessly retries on the next page.
     """
-    js = """
+    javascript = """
         var callback = arguments[arguments.length - 1];
         var unloadHandler = function() {{
           callback("unload");
@@ -56,7 +95,13 @@ def wait_for_js_variable_truthy(variable):
         }}, 10);
     """.format(variable=variable)
     for _ in range(5):  # 5 attempts max
-        result = world.browser.driver.execute_async_script(dedent(js))
+        try:
+            result = world.browser.driver.execute_async_script(dedent(javascript))
+        except WebDriverException as wde:
+            if "document unloaded while waiting for result" in wde.msg:
+                result = "unload"
+            else:
+                raise
         if result == "unload":
             # we ran this on the wrong page. Wait a bit, and try again, when the
             # browser has loaded the next page.
@@ -105,7 +150,7 @@ def wait_for_requirejs(dependencies=None):
     if dependencies[0] != "jquery":
         dependencies.insert(0, "jquery")
 
-    js = """
+    javascript = """
         var callback = arguments[arguments.length - 1];
         if(window.require) {{
           requirejs.onError = callback;
@@ -126,7 +171,13 @@ def wait_for_requirejs(dependencies=None):
         }}
     """.format(deps=json.dumps(dependencies))
     for _ in range(5):  # 5 attempts max
-        result = world.browser.driver.execute_async_script(dedent(js))
+        try:
+            result = world.browser.driver.execute_async_script(dedent(javascript))
+        except WebDriverException as wde:
+            if "document unloaded while waiting for result" in wde.msg:
+                result = "unload"
+            else:
+                raise
         if result == "unload":
             # we ran this on the wrong page. Wait a bit, and try again, when the
             # browser has loaded the next page.
@@ -161,7 +212,7 @@ def wait_for_ajax_complete():
     keeps track of this information, go here:
     http://stackoverflow.com/questions/3148225/jquery-active-function#3148506
     """
-    js = """
+    javascript = """
         var callback = arguments[arguments.length - 1];
         if(!window.jQuery) {callback(false);}
         var intervalID = setInterval(function() {
@@ -171,13 +222,13 @@ def wait_for_ajax_complete():
           }
         }, 100);
     """
-    world.browser.driver.execute_async_script(dedent(js))
+    world.browser.driver.execute_async_script(dedent(javascript))
 
 
 @world.absorb
 def visit(url):
     world.browser.visit(django_url(url))
-    wait_for_requirejs()
+    wait_for_js_to_load()
 
 
 @world.absorb
@@ -246,11 +297,11 @@ def css_has_value(css_selector, value, index=0):
 
 @world.absorb
 def wait_for(func, timeout=5):
-        WebDriverWait(
-            driver=world.browser.driver,
-            timeout=timeout,
-            ignored_exceptions=(StaleElementReferenceException)
-        ).until(func)
+    WebDriverWait(
+        driver=world.browser.driver,
+        timeout=timeout,
+        ignored_exceptions=(StaleElementReferenceException)
+    ).until(func)
 
 
 @world.absorb
@@ -349,14 +400,10 @@ def css_click(css_selector, index=0, wait_time=30):
         msg="Element {}[{}] is present but not visible".format(css_selector, index)
     )
 
-    # Sometimes you can't click in the center of the element, as
-    # another element might be on top of it. In this case, try
-    # clicking in the upper left corner.
-    try:
-        return retry_on_exception(lambda: world.css_find(css_selector)[index].click())
-
-    except WebDriverException:
-        return css_click_at(css_selector, index=index)
+    result = retry_on_exception(lambda: world.css_find(css_selector)[index].click())
+    if result:
+        wait_for_js_to_load()
+    return result
 
 
 @world.absorb
@@ -369,23 +416,6 @@ def css_check(css_selector, index=0, wait_time=30):
     This method will return True if the check worked.
     """
     return css_click(css_selector=css_selector, index=index, wait_time=wait_time)
-
-
-@world.absorb
-def css_click_at(css_selector, index=0, x_coord=10, y_coord=10, timeout=5):
-    '''
-    A method to click at x,y coordinates of the element
-    rather than in the center of the element
-    '''
-    wait_for_clickable(css_selector, timeout=timeout)
-    assert_true(
-        world.css_visible(css_selector, index=index),
-        msg="Element {}[{}] is present but not visible".format(css_selector, index)
-    )
-
-    element.action_chains.move_to_element_with_offset(element._element, x_coord, y_coord)
-    element.action_chains.click()
-    element.action_chains.perform()
 
 
 @world.absorb
@@ -417,6 +447,7 @@ def css_fill(css_selector, text, index=0):
 @world.absorb
 def click_link(partial_text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click())
+    wait_for_js_to_load()
 
 
 @world.absorb
