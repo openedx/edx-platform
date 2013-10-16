@@ -47,6 +47,7 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
     k.key = keyname
     k.set_metadata('filename', file_to_upload.name)
     k.set_contents_from_file(file_to_upload)
+    k.content_disposition = "filename=" + file_to_upload.name
 
     k.set_acl("public-read")
     public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
@@ -418,9 +419,7 @@ class OpenEndedChild(object):
         @return: A URL corresponding to the uploaded object.
         """
 
-        file_key = file_data.name + datetime.now(UTC).strftime(
-            xqueue_interface.dateformat
-        )
+        file_key = str(uuid.uuid4())
 
         file_data.seek(0)
         s3_public_url = upload_to_s3(
