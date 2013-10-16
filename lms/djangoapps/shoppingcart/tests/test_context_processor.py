@@ -1,5 +1,5 @@
 """
-Unit tests for shoppingcart middleware
+Unit tests for shoppingcart context_processor
 """
 from mock import patch, Mock
 from django.conf import settings
@@ -10,31 +10,26 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
-from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from shoppingcart.models import Order, PaidCourseRegistration
-from shoppingcart.middleware import UserHasCartMiddleware
+from shoppingcart.context_processor import user_has_cart_context_processor
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
+class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     """
-    Unit test for shoppingcart middleware UserHasCartMiddleware
+    Unit test for shoppingcart context_processor
     """
     def setUp(self):
         self.user = UserFactory.create()
         self.request = Mock()
-        self.middleware = UserHasCartMiddleware()
 
     def add_to_cart(self):
         """
         Adds content to self.user's cart
         """
         course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        course_mode = CourseMode(course_id=course.id,
-                                 mode_slug="honor",
-                                 mode_display_name="honor cert",
-                                 min_price=40)
-        course_mode.save()
+        CourseModeFactory(course_id=course.id)
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course.id)
 
@@ -45,8 +40,8 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.middleware.process_request(self.request)
-        self.assertFalse(self.request.display_shopping_cart)
+        context = user_has_cart_context_processor(self.request)
+        self.assertFalse(context['display_shopping_cart'])
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
     def test_no_enable_paid_course_registration(self):
@@ -55,8 +50,8 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.middleware.process_request(self.request)
-        self.assertFalse(self.request.display_shopping_cart)
+        context = user_has_cart_context_processor(self.request)
+        self.assertFalse(context['display_shopping_cart'])
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_anonymous_user(self):
@@ -64,8 +59,8 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         Tests when request.user is anonymous
         """
         self.request.user = AnonymousUser()
-        self.middleware.process_request(self.request)
-        self.assertFalse(self.request.display_shopping_cart)
+        context = user_has_cart_context_processor(self.request)
+        self.assertFalse(context['display_shopping_cart'])
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_no_items_in_cart(self):
@@ -73,8 +68,8 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         Tests when request.user doesn't have a cart with items
         """
         self.request.user = self.user
-        self.middleware.process_request(self.request)
-        self.assertFalse(self.request.display_shopping_cart)
+        context = user_has_cart_context_processor(self.request)
+        self.assertFalse(context['display_shopping_cart'])
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_items_in_cart(self):
@@ -83,5 +78,5 @@ class UserCartMiddlewareUnitTest(ModuleStoreTestCase):
         """
         self.add_to_cart()
         self.request.user = self.user
-        self.middleware.process_request(self.request)
-        self.assertTrue(self.request.display_shopping_cart)
+        context = user_has_cart_context_processor(self.request)
+        self.assertTrue(context['display_shopping_cart'])
