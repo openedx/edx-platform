@@ -182,7 +182,6 @@ function () {
 
             this.videoCaption.hideSubtitlesEl.on({
                 mousemove: this.videoCaption.autoShowCaptions,
-                focus: this.videoCaption.autoShowCaptions,
 
                 mouseout: this.videoCaption.autoHideCaptions,
                 blur: this.videoCaption.autoHideCaptions
@@ -677,6 +676,7 @@ function () {
         event.preventDefault();
 
         if (this.el.hasClass('closed')) {
+            this.videoCaption.autoShowCaptions();
             this.videoCaption.hideCaptions(false);
         } else {
             this.videoCaption.hideCaptions(true);
