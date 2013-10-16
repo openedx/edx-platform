@@ -46,8 +46,8 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
     k = Key(bucket)
     k.key = keyname
     k.set_metadata('filename', file_to_upload.name)
-    k.set_contents_from_file(file_to_upload)
     k.set_metadata("Content-Disposition", "filename=" + file_to_upload.name)
+    k.set_contents_from_file(file_to_upload)
 
     k.set_acl("public-read")
     public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
