@@ -9,7 +9,6 @@ Many of these GETs may become PUTs in the future.
 import re
 import logging
 import requests
-from collections import OrderedDict
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -39,6 +38,8 @@ import analytics.basic
 import analytics.distributions
 import analytics.csvs
 import csv
+
+from bulk_email.models import CourseEmail
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +96,44 @@ def require_query_params(*args, **kwargs):
             for (param, extra) in required_params:
                 default = object()
                 if request.GET.get(param, default) == default:
-                    error_response_data['parameters'] += [param]
+                    error_response_data['parameters'].append(param)
+                    error_response_data['info'][param] = extra
+
+            if len(error_response_data['parameters']) > 0:
+                return JsonResponse(error_response_data, status=400)
+            else:
+                return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+def require_post_params(*args, **kwargs):
+    """
+    Checks for required parameters or renders a 400 error.
+    (decorator with arguments)
+
+    Functions like 'require_query_params', but checks for
+    POST parameters rather than GET parameters.
+    """
+    required_params = []
+    required_params += [(arg, None) for arg in args]
+    required_params += [(key, kwargs[key]) for key in kwargs]
+    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
+
+    def decorator(func):  # pylint: disable=C0111
+        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+            request = args[0]
+
+            error_response_data = {
+                'error': 'Missing required query parameter(s)',
+                'parameters': [],
+                'info': {},
+            }
+
+            for (param, extra) in required_params:
+                default = object()
+                if request.POST.get(param, default) == default:
+                    error_response_data['parameters'].append(param)
                     error_response_data['info'][param] = extra
 
             if len(error_response_data['parameters']) > 0:
@@ -397,7 +435,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
-    header =['User ID', 'Anonymized user ID']
+    header = ['User ID', 'Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s)] for s in students]
     return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
 
@@ -703,6 +741,36 @@ def list_forum_members(request, course_id):
         'course_id': course_id,
         rolename: map(extract_user_info, users),
     }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
+def send_email(request, course_id):
+    """
+    Send an email to self, staff, or everyone involved in a course.
+    Query Parameters:
+    - 'send_to' specifies what group the email should be sent to
+       Options are defined by the CourseEmail model in
+       lms/djangoapps/bulk_email/models.py
+    - 'subject' specifies email's subject
+    - 'message' specifies email's content
+    """
+    send_to = request.POST.get("send_to")
+    subject = request.POST.get("subject")
+    message = request.POST.get("message")
+
+    # Create the CourseEmail object.  This is saved immediately, so that
+    # any transaction that has been pending up to this point will also be
+    # committed.
+    email = CourseEmail.create(course_id, request.user, send_to, subject, message)
+
+    # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+
+    response_payload = {'course_id': course_id}
     return JsonResponse(response_payload)
 
 
