@@ -14,9 +14,10 @@ from .sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 import string
