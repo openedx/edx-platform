@@ -413,7 +413,9 @@ class OpenEndedChild(object):
         @return: A URL corresponding to the uploaded object.
         """
 
-        file_key = str(uuid.uuid4())
+        file_key = datetime.now(UTC).strftime(
+            xqueue_interface.dateformat
+        ) + file_data.name
 
         file_data.seek(0)
         s3_public_url = upload_to_s3(
