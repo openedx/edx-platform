@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Adds ability to disable a student's account. Students with disabled
+accounts will be prohibited from site access.
+
 LMS: Fix issue with CourseMode expiration dates
 
 LMS: Ported bulk emailing to the beta instructor dashboard.
