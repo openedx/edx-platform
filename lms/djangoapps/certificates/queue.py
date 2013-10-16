@@ -192,6 +192,7 @@ class XQueueCertInterface(object):
                         'username': student.username,
                         'course_id': course_id,
                         'name': profile.name,
+                        'grade': grade['grade'],
                     }
                     cert.status = status.generating
                     cert.save()
