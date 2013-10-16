@@ -1,7 +1,6 @@
 # disable missing docstring
 #pylint: disable=C0111
 
-import os
 import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
@@ -18,12 +17,11 @@ SHOW_ANSWER = "Show Answer"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
+    world.create_course_with_unit()
     world.create_component_instance(
-        step,
-        '.large-problem-icon',
-        'problem',
-        '.xmodule_CapaModule',
-        'blank_common.yaml'
+        step=step,
+        category='problem',
+        component_type='Blank Common Problem'
     )
 
 
@@ -168,14 +166,13 @@ def cancel_does_not_save_changes(step):
 
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
-    world.click_new_component_button(step, '.large-problem-icon')
-
-    def animation_done(_driver):
-        return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
-    world.wait_for(animation_done)
-    # Go to advanced tab.
-    world.css_click('#ui-id-2')
-    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
+    world.create_course_with_unit()
+    world.create_component_instance(
+        step=step,
+        category='problem',
+        component_type='Problem Written in LaTeX',
+        is_advanced=True
+    )
 
 
 @step('I edit and compile the High Level Source')
