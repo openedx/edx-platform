@@ -8,6 +8,7 @@
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
+git+https://github.com/smartdec/pytils.git@release/edu
 bleach==1.2.2
 html5lib==0.95
 boto==2.6.0
