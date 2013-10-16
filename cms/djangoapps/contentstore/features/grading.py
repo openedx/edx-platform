@@ -180,7 +180,7 @@ def cannot_edit_fail(_step):
 def i_change_grace_period(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
     ele = world.css_find(grace_period_css).first
-    
+
     # Sometimes it takes a moment for the JavaScript
     # to populate the field.  If we don't wait for
     # this to happen, then we can end up with

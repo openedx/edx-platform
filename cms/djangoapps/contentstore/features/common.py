@@ -223,6 +223,7 @@ def i_enabled_the_advanced_module(step, module):
     type_in_codemirror(0, '["%s"]' % module)
     press_the_notification_button(step, 'Save')
 
+
 @world.absorb
 def add_unit():
     world.clear_courses()

@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 
 
 @step(r'I wait (?:for )?"(\d+\.?\d*)" seconds?$')
-def wait(step, seconds):
+def wait_for_seconds(step, seconds):
     world.wait(seconds)
 
 
@@ -145,9 +145,9 @@ def should_see_in_the_page(step, doesnt_appear, text):
     else:
         multiplier = 1
     if doesnt_appear:
-        assert world.browser.is_text_not_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_not_present(text, wait_time=5 * multiplier)
     else:
-        assert world.browser.is_text_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_present(text, wait_time=5 * multiplier)
 
 
 @step('I am logged in$')
