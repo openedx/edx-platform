@@ -22,6 +22,12 @@ try:
 except ImportError:
     HAS_REQUEST_CACHE = False
 
+try:
+    from mongo_per_tracker.middleware import MongoPerfTracker
+    HAS_PERF_COUNTER = True
+except ImportError:
+    HAS_PERF_TRACKER = False
+
 _MODULESTORES = {}
 
 FUNCTION_KEYS = ['render_template']
@@ -56,6 +62,11 @@ def create_modulestore_instance(engine, options):
     else:
         request_cache = None
 
+    if HAS_PERF_TRACKER:
+        perf_tracker = MongoPerfTracker.get_perf_tracker()
+    else:
+        perf_tracker = None
+
     try:
         metadata_inheritance_cache = get_cache('mongo_metadata_inheritance')
     except InvalidCacheBackendError:
@@ -63,7 +74,7 @@ def create_modulestore_instance(engine, options):
 
     return class_(
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
-        request_cache=request_cache,
+        request_cache=request_cache, perf_tracker=perf_tracker,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         **_options

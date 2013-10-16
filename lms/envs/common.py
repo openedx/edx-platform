@@ -577,6 +577,9 @@ TEMPLATE_LOADERS = (
 
 )
 
+MONGO_PERF_READ_ACCESS_COUTNER_KEY = 'query_db_call'
+MONGO_PERF_TRACKER_OVERWITE_KEY = MONGO_PERF_READ_ACCESS_COUTNER_KEY
+
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
@@ -588,6 +591,7 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
+    'mongo_perf_tracker.middleware.MongoPerfTracker',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
