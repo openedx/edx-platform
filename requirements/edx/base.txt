@@ -11,7 +11,7 @@ beautifulsoup==3.2.1
 git+https://github.com/smartdec/pytils.git@release/edu
 bleach==1.2.2
 html5lib==0.95
-boto==2.6.0
+git+https://github.com/smartdec/boto.git@release/edu
 celery==3.0.19
 dealer==0.2.3
 distribute>=0.6.28, <0.7
