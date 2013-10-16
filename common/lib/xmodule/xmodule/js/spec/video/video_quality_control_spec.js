@@ -36,7 +36,6 @@
         window.YT = oldYT;
       });
 
-      // Disabled when ARIA markup was added to the anchor
       it('render the quality control', function() {
         expect(videoControl.secondaryControlsEl.html())
           .toContain(
