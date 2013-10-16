@@ -173,7 +173,7 @@ function goto( mode)
     </p>
 
     <p>
-    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Download CSV of answer distributions">
     <input type="submit" name="action" value="Dump description of graded assignments configuration">
     </p>
     <hr width="40%" style="align:left">
@@ -370,25 +370,9 @@ function goto( mode)
 
     <hr width="40%" style="align:left">
     <h2>${_("Enrollment Data")}</h2>
-    % if disable_buttons:
 
-    <div class="msg msg-warning">
-      <div class="copy">
-        <p>
-          ${_("Note: some of these buttons are known to time out for larger "
-              "courses. We have temporarily disabled those features for courses "
-              "with more than {max_enrollment} students. We are urgently working on "
-              "fixing this issue. Thank you for your patience as we continue "
-              "working to improve the platform!").format(
-              max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
-            )}
-        </p>
-      </div>
-    </div>
-    % endif
-
-    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="List enrolled students">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:

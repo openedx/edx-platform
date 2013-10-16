@@ -9,6 +9,7 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
+from django.conf import settings
 
 from xmodule_modifiers import wrap_xmodule
 from xmodule.html_module import HtmlDescriptor
@@ -50,12 +51,6 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id),
     ]
 
-    enrollment_count = sections[0]['enrollment_count']
-    disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    if max_enrollment_for_buttons is not None:
-        disable_buttons = enrollment_count > max_enrollment_for_buttons
-
     if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
         sections.append(_section_send_email(course_id, access, course))
 
@@ -63,7 +58,6 @@ def instructor_dashboard_2(request, course_id):
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
         'sections': sections,
-        'disable_buttons': disable_buttons,
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -159,9 +153,7 @@ def _section_data_download(course_id):
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
-    fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
-    email_editor = fragment.content
+    email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
