@@ -71,3 +71,5 @@ build
 lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
+
+.nfs*
