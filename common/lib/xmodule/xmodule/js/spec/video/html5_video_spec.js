@@ -28,7 +28,7 @@
                 spyOn(player, 'callStateChangeCallback').andCallThrough();
             });
 
-            describe('click', function () {
+            describe('[click]', function () {
                 describe('when player is paused', function () {
                     beforeEach(function () {
                         spyOn(player.video, 'play').andCallThrough();
@@ -61,7 +61,7 @@
                     });
                 });
 
-                describe('when player is playing', function () {
+                describe('[player is playing]', function () {
                     beforeEach(function () {
                         spyOn(player.video, 'pause').andCallThrough();
                         player.playerState  = STATUS.PLAYING;
@@ -94,7 +94,7 @@
                 });
             });
 
-            describe('play', function () {
+            describe('[play]', function () {
                 beforeEach(function () {
                     spyOn(player.video, 'play').andCallThrough();
                     player.playerState = STATUS.PAUSED;
@@ -126,7 +126,7 @@
                 });
             });
 
-            describe('pause', function () {
+            describe('[pause]', function () {
                 beforeEach(function () {
                     spyOn(player.video, 'pause').andCallThrough();
                     player.playerState = STATUS.UNSTARTED;
@@ -161,7 +161,7 @@
                 });
             });
 
-            describe('canplay', function () {
+            describe('[canplay]', function () {
                 beforeEach(function () {
                     waitsFor(function () {
                         return player.getPlayerState() !== STATUS.UNSTARTED;
@@ -193,7 +193,7 @@
                 });
             });
 
-            describe('ended', function () {
+            describe('[ended]', function () {
                 beforeEach(function () {
                     waitsFor(function () {
                         return player.getPlayerState() !== STATUS.UNSTARTED;
