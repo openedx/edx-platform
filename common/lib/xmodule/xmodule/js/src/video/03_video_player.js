@@ -420,7 +420,7 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        /* The following has been commented out to make sure autoplay is 
+        /* The following has been commented out to make sure autoplay is
            disabled for students.
         if (
             !onTouchBasedDevice() &&
