@@ -191,9 +191,8 @@ class LTIModule(LTIFields, XModule):
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
-                lti_id = key = secret = ''
-                log.error('Could not parse LTI passport: {0!r}. \
-Should be "id:key:secret" string.'.format(lti_passport))
+                raise LTIError('Could not parse LTI passport: {0!r}. \
+                    Should be "id:key:secret" string.'.format(lti_passport))
             if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
@@ -204,9 +203,8 @@ Should be "id:key:secret" string.'.format(lti_passport))
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
             except ValueError:
-                param_name = param_value = ''
-                log.error('Could not parse custom parameter: {0!r}. \
-Should be "x=y" string.'.format(custom_parameter))
+                raise LTIError('Could not parse custom parameter: {0!r}. \
+                    Should be "x=y" string.'.format(custom_parameter))
 
             if param_name not in PARAMETERS:
                 param_name = 'custom_' + param_name
