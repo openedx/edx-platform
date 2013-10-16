@@ -1,6 +1,9 @@
 <%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
-<html class="view-iframe">
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7 view-iframe"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8 view-iframe"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9 view-iframe"><![endif]-->
+<!--[if gt IE 9]><!--><html class="view-iframe"><!--<![endif]-->
 <head>
   <%block name="title"></%block>
 
@@ -8,15 +11,13 @@
   <meta name="path_prefix" content="${MITX_ROOT_URL}" />
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
-  <%static:css group='application'/>
+  <%static:css group='style-vendor'/>
+  <%static:css group='style-app'/>
+
   <%static:js group='main_vendor'/>
 
-  <!--[if IE]>
+  <!--[if lt IE 9]>
     <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
-
-  <!--[if lte IE 9]>
-    <%static:css group='ie-fixes'/>
   <![endif]-->
 
   <%block name="headextra"/>
