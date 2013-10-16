@@ -2,6 +2,7 @@ import os
 from lettuce import world
 from django.conf import settings
 
+
 def import_file(filename):
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
     path = os.path.join(settings.COMMON_TEST_DATA_ROOT, "imports", filename)

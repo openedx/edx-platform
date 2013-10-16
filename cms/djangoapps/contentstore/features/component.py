@@ -2,52 +2,19 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
-from common import create_studio_user, add_course_author, log_into_studio
-
-
-@step(u'I am in Studio editing a new unit$')
-def add_unit(step):
-    world.clear_courses()
-    course = world.CourseFactory.create()
-    section = world.ItemFactory.create(parent_location=course.location)
-    world.ItemFactory.create(
-        parent_location=section.location,
-        category='sequential',
-        display_name='Subsection One',)
-    user = create_studio_user(is_staff=False)
-    add_course_author(user, course)
-    log_into_studio()
-    world.wait_for_requirejs([
-        "jquery", "gettext", "js/models/course", "coffee/src/models/module",
-        "coffee/src/views/unit", "jquery.ui",
-    ])
-    world.wait_for_mathjax()
-    css_selectors = [
-        'a.course-link', 'div.section-item a.expand-collapse-icon',
-        'a.new-unit-item',
-    ]
-    for selector in css_selectors:
-        world.css_click(selector)
+from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
 
 @step(u'I add this type of single step component:$')
 def add_a_single_step_component(step):
-    world.wait_for_xmodule()
     for step_hash in step.hashes:
         component = step_hash['Component']
         assert_in(component, ['Discussion', 'Video'])
-        css_selector = 'a[data-type="{}"]'.format(component.lower())
-        world.css_click(css_selector)
 
-        # In the current implementation, all the "new component"
-        # buttons are handled by one BackBone.js view.
-        # If we click two buttons at super-human speed,
-        # the view will miss the second click while it's
-        # processing the first.
-        # To account for this, we wait for each component
-        # to be created before clicking the next component.
-        world.wait_for_visible('section.xmodule_{}Module'.format(component))
+        world.create_component_instance(
+            step=step,
+            category='{}'.format(component.lower()),
+        )
 
 
 @step(u'I see this type of single step component:$')
@@ -62,45 +29,13 @@ def see_a_single_step_component(step):
 
 @step(u'I add this type of( Advanced)? (HTML|Problem) component:$')
 def add_a_multi_step_component(step, is_advanced, category):
-    def click_advanced():
-        css = 'ul.problem-type-tabs a[href="#tab2"]'
-        world.css_click(css)
-        my_css = 'ul.problem-type-tabs li.ui-state-active a[href="#tab2"]'
-        assert(world.css_find(my_css))
-
-    def find_matching_link():
-        """
-        Find the link with the specified text. There should be one and only one.
-        """
-        # The tab shows links for the given category
-        links = world.css_find('div.new-component-{} a'.format(category))
-
-        # Find the link whose text matches what you're looking for
-        matched_links = [link for link in links if link.text == step_hash['Component']]
-
-        # There should be one and only one
-        assert_equal(len(matched_links), 1)
-        return matched_links[0]
-
-    def click_link():
-        link.click()
-
-    world.wait_for_xmodule()
-    category = category.lower()
     for step_hash in step.hashes:
-        css_selector = 'a[data-type="{}"]'.format(category)
-        world.css_click(css_selector)
-        world.wait_for_invisible(css_selector)
-
-        if is_advanced:
-            # Sometimes this click does not work if you go too fast.
-            world.retry_on_exception(click_advanced, max_attempts=5, ignored_exceptions=AssertionError)
-
-        # Retry this in case the list is empty because you tried too fast.
-        link = world.retry_on_exception(func=find_matching_link, ignored_exceptions=AssertionError)
-
-        # Wait for the link to be clickable. If you go too fast it is not.
-        world.retry_on_exception(click_link)
+        world.create_component_instance(
+            step=step,
+            category='{}'.format(category.lower()),
+            component_type=step_hash['Component'],
+            is_advanced=bool(is_advanced),
+        )
 
 
 @step(u'I see (HTML|Problem) components in this order:')

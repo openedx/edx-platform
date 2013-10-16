@@ -11,7 +11,6 @@
 # Disable the "unused argument" warning because lettuce uses "step"
 #pylint: disable=W0613
 
-import re
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
@@ -23,32 +22,15 @@ logger = getLogger(__name__)
 
 
 @step(r'I wait (?:for )?"(\d+\.?\d*)" seconds?$')
-def wait(step, seconds):
+def wait_for_seconds(step, seconds):
     world.wait(seconds)
-
-REQUIREJS_WAIT = {
-    re.compile('settings-details'): [
-        "jquery", "js/models/course",
-        "js/models/settings/course_details", "js/views/settings/main"],
-    re.compile('settings-advanced'): [
-        "jquery", "js/models/course", "js/models/settings/advanced",
-        "js/views/settings/advanced", "codemirror"],
-    re.compile('edit\/.+vertical'): [
-        "jquery", "js/models/course", "coffee/src/models/module",
-        "coffee/src/views/unit", "jquery.ui"],
-}
 
 
 @step('I reload the page$')
 def reload_the_page(step):
     world.wait_for_ajax_complete()
     world.browser.reload()
-    requirements = None
-    for test, req in REQUIREJS_WAIT.items():
-        if test.search(world.browser.url):
-            requirements = req
-            break
-    world.wait_for_requirejs(requirements)
+    world.wait_for_js_to_load()
 
 
 @step('I press the browser back button$')
@@ -163,9 +145,9 @@ def should_see_in_the_page(step, doesnt_appear, text):
     else:
         multiplier = 1
     if doesnt_appear:
-        assert world.browser.is_text_not_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_not_present(text, wait_time=5 * multiplier)
     else:
-        assert world.browser.is_text_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_present(text, wait_time=5 * multiplier)
 
 
 @step('I am logged in$')
