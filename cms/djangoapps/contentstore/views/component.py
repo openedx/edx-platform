@@ -52,6 +52,7 @@ NOTE_COMPONENT_TYPES = ['notes']
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'word_cloud',
+    'master_class',
     'graphical_slider_tool',
     'lti',
 ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES

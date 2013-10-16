@@ -991,6 +991,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
+        self.user = user
         self.user_is_staff = user is not None and user.is_staff
 
         if publish is None:
