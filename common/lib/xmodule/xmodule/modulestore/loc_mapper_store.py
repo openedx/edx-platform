@@ -56,7 +56,7 @@ class LocMapperStore(object):
         """
         Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
         provided, it creates the default map of using org.course.name from the location (just like course_id) if
-        the location.cateogry = 'course'; otherwise, it uses org.course.
+        the location.category = 'course'; otherwise, it uses org.course.
 
         You can create more than one mapping to the
         same course_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
