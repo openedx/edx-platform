@@ -47,7 +47,8 @@ class @TrackChanges
 
   reset_changes: (event) =>
     event.preventDefault()
-    @tracker.rejectAll()
+    if confirm "Are you sure you want to reset your changes?"
+      @tracker.rejectAll()
   
   undo_change: (event) =>
     event.preventDefault()
