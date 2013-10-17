@@ -7,6 +7,7 @@ paths actually work.
 """
 import json
 from uuid import uuid4
+from unittest import skip
 
 from mock import Mock, MagicMock, patch
 
@@ -22,7 +23,7 @@ from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state, update_offline_grades
-from instructor_task.tasks_helper import UpdateProblemModuleStateError, run_update_task, perform_module_state_update, initialize_mako
+from instructor_task.tasks_helper import UpdateProblemModuleStateError, perform_module_state_update
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -230,7 +231,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         update_fcn = lambda(_module_descriptor, _student_module): True
         visit_fcn = perform_module_state_update
         task_function = (lambda entry_id, xmodule_instance_args:
-                         run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None))
+                         run_main_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None))
 
     def test_rescoring_unrescorable(self):
         # run the task:

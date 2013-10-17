@@ -157,8 +157,7 @@ def run_main_task(entry_id, task_fcn, action_name):
     Arguments passed to `task_fcn` are:
 
      `entry_id` : the primary key for the InstructorTask entry representing the task.
-     `course_id` : the id for the course.
-     `task_input` : dict containing task-specific arguments, JSON-decoded from InstructorTask's task_input.
+     `task_fcn` :
      `action_name` : past-tense verb to use for constructing status messages.
 
     If no exceptions are raised, the `task_fcn` should return a dict containing
@@ -223,7 +222,7 @@ def run_main_task(entry_id, task_fcn, action_name):
     return task_progress
 
 
-def perform_enrolled_student_update(course_id, _module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+def perform_enrolled_student_update(_entry_id, course_id, _module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
     """
     """
     # Throw an exception if _module_state_key is specified, because that's not meaningful here
@@ -300,7 +299,7 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
     return task_progress
 
 
-def perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, task_input, action_name):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
@@ -413,89 +412,9 @@ def _get_task_id_from_xmodule_args(xmodule_instance_args):
     """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
     return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID) if xmodule_instance_args is not None else UNKNOWN_TASK_ID
 
-def run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn):
-    """
-    TODO: UPDATE THIS DOCSTRING
-
-    Performs generic update by visiting StudentModule instances with the update_fcn provided.
-
-    The `entry_id` is the primary key for the InstructorTask entry representing the task.  This function
-    updates the entry on success and failure of the perform_module_state_update function it
-    wraps.  It is setting the entry's value for task_state based on what Celery would set it to once
-    the task returns to Celery:  FAILURE if an exception is encountered, and SUCCESS if it returns normally.
-    Other arguments are pass-throughs to perform_module_state_update, and documented there.
-
-    If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
-
-          'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
-          'total': number of possible subtasks to attempt
-          'action_name': user-visible verb to use in status messages.  Should be past-tense.
-              Pass-through of input `action_name`.
-          'duration_ms': how long the task has (or had) been running.
-
-    Before returning, this is also JSON-serialized and stored in the task_output column of the InstructorTask entry.
-    """
-    # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
-    # There's no point in catching it here.
-    entry = InstructorTask.objects.get(pk=entry_id)
-
-    # get inputs to use in this task from the entry:
-    task_id = entry.task_id
-    course_id = entry.course_id
-    task_input = json.loads(entry.task_input)
-    module_state_key = task_input.get('problem_url')
-    student_ident = task_input.get('student')
-
-    # construct log message:
-    fmt = 'task "{task_id}": course "{course_id}" problem "{state_key}"'
-    task_info_string = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key)
-
-    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
-
-    # Now that we have an entry we can try to catch failures:
-    task_progress = None
-    try:
-        # Check that the task_id submitted in the InstructorTask matches the current task
-        # that is running.
-        request_task_id = _get_current_task().request.id
-        if task_id != request_task_id:
-            fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
-            message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
-            TASK_LOG.error(message)
-            raise UpdateProblemModuleStateError(message)
-
-        # Now do the work:
-        with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
-            task_progress = visit_fcn(course_id, module_state_key, student_ident, update_fcn, action_name, filter_fcn)
-        # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
-        # But we do this within the try, in case creating the task_output causes an exception to be
-        # raised.
-        entry.task_output = InstructorTask.create_output_for_success(task_progress)
-        entry.task_state = SUCCESS
-        entry.save_now()
-
-    except Exception:
-        # try to write out the failure to the entry before failing
-        _, exception, traceback = exc_info()
-        traceback_string = format_exc(traceback) if traceback is not None else ''
-        TASK_LOG.warning("background task (%s) failed: %s %s", task_id, exception, traceback_string)
-        entry.task_output = InstructorTask.create_output_for_failure(exception, traceback_string)
-        entry.task_state = FAILURE
-        entry.save_now()
-        raise
-
-    # Release any queries that the connection has been hanging onto:
-    reset_queries()
-
-    # log and exit, returning task_progress info as task result:
-    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
-    return task_progress
-
 def _get_xqueue_callback_url_prefix(xmodule_instance_args):
     """Gets prefix to use when constructing xqueue_callback_url."""
     return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
-
 
 def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):
     """
@@ -511,13 +430,6 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
     task_info = {'student': student.username, 'task_id': _get_task_id_from_xmodule_args(xmodule_instance_args)}
 
     return lambda event_type, event: task_track(request_info, task_info, event_type, event, page=source_page)
-
-
-def _get_xqueue_callback_url_prefix(xmodule_instance_args):
-    """
-
-    """
-    return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
 
 
 def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):

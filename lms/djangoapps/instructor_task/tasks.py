@@ -31,7 +31,6 @@ from instructor_task.tasks_helper import (
     perform_module_state_update,
     rescore_problem_module_state,
     reset_attempts_module_state,
-    run_update_task,
     update_offline_grade,
 )
 from bulk_email.tasks import perform_delegate_email_batches
@@ -64,7 +63,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
         """Filter that matches problems which are marked as being done"""
         return modules_to_update.filter(state__contains='"done": true')
 
-    visit_fcn = partial(_perform_module_state_update, update_fcn, filter_fcn)
+    visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
@@ -119,7 +118,6 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     action_name = 'deleted'
     update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
     visit_fcn = perform_module_state_update
-    return run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
 
     The task_input should be a dict with the following entries:
 
@@ -150,4 +148,4 @@ def update_offline_grades(entry_id, xmodule_instance_args):
     action_name = 'graded'
     update_fcn = partial(update_offline_grade, xmodule_instance_args)
     visit_fcn = perform_enrolled_student_update
-    return run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
+    return run_main_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
