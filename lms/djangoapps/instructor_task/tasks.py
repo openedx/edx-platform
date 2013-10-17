@@ -28,11 +28,11 @@ from instructor_task.tasks_helper import (
     BaseInstructorTask,
     delete_problem_module_state,
     perform_enrolled_student_update,
-    _perform_module_state_update, # Evil, temporary
+    perform_module_state_update,
     rescore_problem_module_state,
     reset_attempts_module_state,
+    run_update_task,
     update_offline_grade,
-    update_problem_module_state
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
