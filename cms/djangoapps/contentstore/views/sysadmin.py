@@ -2,10 +2,11 @@ import subprocess
 import logging
 
 from django_future.csrf import ensure_csrf_cookie
-from django.core.context_processors import csrf
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from mitxmako.shortcuts import render_to_response
 
@@ -38,15 +39,15 @@ def sysadmin(request):
 
     if action=='delete':
         if not course_id:
-            msg += "<font color='red'>Error - no course specified</font>"
+            msg += "<font color='red'>{0}</font>".format(_('Error - no course specified'))
         else:
             nrec = db.modulestore.find({'_id.course': course_id}).count()
             if not 'really' in request.GET:
-                msg += "Really delete course %s?\n" % course_id
-                msg += "%d records for this course in the database" % nrec
+                msg += _("Really delete course {0}?\n").format(course_id)
+                msg += _("{0} records for this course in the database").format(nrec)
                 logging.debug('Delete course %s requested' % course_id)
             else:
-                msg += "deleting %s" % course_id
+                msg += _("deleting {0}").format(course_id)
                 data = db.modulestore.find({'_id.course': course_id})
                 fn = 'course-%s-dump-%s.json' % (course_id, time.ctime(time.time()).replace(' ','_'))
                 fp = open('%s/%s' % (bdir,fn), 'w')
@@ -54,13 +55,13 @@ def sysadmin(request):
                     fp.write(json.dumps(d)+'\n')
                 fp.close()
                 db.modulestore.remove({'_id.course': course_id})
-                msg += "%d records for %s removed (backup file %s)" % (nrec, course_id, fn)
+                msg += _("{0} records for {1} removed (backup file {2})").format(nrec, course_id, fn)
                 logging.debug('Course %s deleted!' % course_id)
                 action = ""
 
     elif action=='dump':
         if not course_id:
-            msg += "<font color='red'>Error - no course specified</font>"
+            msg += "<font color='red'>{0}</font>".format(_("Error - no course specified"))
         else:
             data = db.modulestore.find({'_id.course': course_id})
             response = HttpResponse(mimetype='text/json')
@@ -82,7 +83,7 @@ def sysadmin(request):
         ret = subprocess.Popen(cmd, shell=True, executable = "/bin/bash",
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         ret = ''.join(ret)
-        msg = "<font color='red'>Added course from {0}</font>".format(giturl)
+        msg = "<font color='red'>{0} {1}</font>".format(_("Added course from"), giturl)
         msg += "<pre>{0}</pre>".format(ret.replace('<','&lt;'))
 
     #-----------------------------------------------------------------------------
