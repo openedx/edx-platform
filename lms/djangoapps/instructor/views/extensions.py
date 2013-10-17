@@ -10,9 +10,9 @@ def set_due_date_extension(course, url, student, due_date):
     Sets a due date extension.  Factored to be usable in both legacy and beta
     instructor dashboards.
     """
-    node = find_unit(course, url)
-    if not node:
-        return "Couldn't find module for url: {0}".format(url)
+    unit = find_unit(course, url)
+    if not unit:
+        return "Couldn't find module for url: {0}".format(url), None
 
     def set_due_date(node):
         try:
@@ -32,9 +32,9 @@ def set_due_date_extension(course, url, student, due_date):
         for child in node.get_children():
             set_due_date(child)
 
-    set_due_date(node)
+    set_due_date(unit)
 
-    return None # no error
+    return None, unit # no error
 
 
 def find_unit(node, url):

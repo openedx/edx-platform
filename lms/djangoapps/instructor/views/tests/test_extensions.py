@@ -38,15 +38,16 @@ class ExtensionsTests(unittest.TestCase):
     def test_set_due_date_extension_success(self):
         from ..extensions import set_due_date_extension as fut
         self.StudentModule.objects.get.return_value.state = json.dumps({})
-        error = fut(self.course, 'i4x://dummy/homework', self.student,
-                    extended_due_date)
+        error, unit = fut(self.course, 'i4x://dummy/homework', self.student,
+                          extended_due_date)
         self.assertEqual(error, None)
         state = json.loads(self.StudentModule.objects.get.return_value.state)
         self.assertEqual(state['extended_due'], u'2013-10-12T10:30:00Z')
 
     def test_set_due_date_extension_bad_url(self):
         from ..extensions import set_due_date_extension as fut
-        error = fut(self.course, 'i4x://foo', self.student, extended_due_date)
+        error, unit = fut(self.course, 'i4x://foo', self.student,
+                          extended_due_date)
         self.assertTrue(error.startswith("Couldn't find"))
 
     def test_dump_students_with_due_date_extensions(self):

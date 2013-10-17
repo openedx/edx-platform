@@ -512,13 +512,21 @@ def instructor_dashboard(request, course_id):
         msg += message
 
         if url and student and due_date:
-            error = set_due_date_extension(
+            error, unit = set_due_date_extension(
                 course, url, student, due_date)
             if error:
                 msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
-                msg += 'Successfully changed due date.'
+                studentname = '{0} {1} ({2})'.format(
+                    student.first_name, student.last_name, student.username)
+                unitname = getattr(unit, 'display_name', None)
+                if unitname:
+                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
+                msg += (
+                    'Successfully changed due date for student {0} for {1} '
+                    'to {2}').format(studentname, unitname,
+                                     due_date.strftime('%Y-%m-%d %H:%M'))
 
     elif "Reset due date for student" in action:
         # get the form data
@@ -533,14 +541,21 @@ def instructor_dashboard(request, course_id):
         msg += message
 
         if url and student:
-            error = set_due_date_extension(
+            error, unit = set_due_date_extension(
                 course, url, student, None)
             if error:
                 msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
-                msg += 'Successfully reset due date.'
-
+                studentname = '{0} {1} ({2})'.format(
+                    student.first_name, student.last_name, student.username)
+                unitname = getattr(unit, 'display_name', None)
+                if unitname:
+                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
+                msg += (
+                    'Successfully reset due date for student {0} for {1} '
+                    'to {2}').format(studentname, unitname,
+                                     unit.due.strftime('%Y-%m-%d %H:%M'))
 
     elif "Dump list of students with due date extensions" in action:
         url = request.POST.get('url')
