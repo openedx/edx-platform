@@ -32,7 +32,7 @@ def sysadmin(request):
     db = client.xmodule
 
     msg = ''
-    bdir = settings.getattr('DELETED_COURSE_BACKUPS_DIR', None)
+    bdir = getattr(settings, 'DELETED_COURSE_BACKUPS_DIR', None)
     
     action = request.GET.get('action', request.POST.get('action', ''))
     course_id = request.GET.get('course_id', '')
