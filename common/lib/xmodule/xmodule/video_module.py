@@ -63,19 +63,19 @@ class VideoFields(object):
         default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
-        help="The Youtube ID for the .75x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the .75x speed video.",
         display_name="Youtube ID for .75x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
-        help="The Youtube ID for the 1.25x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.25x speed video.",
         display_name="Youtube ID for 1.25x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
-        help="The Youtube ID for the 1.5x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.5x speed video.",
         display_name="Youtube ID for 1.5x speed",
         scope=Scope.settings,
         default=""
