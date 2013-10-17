@@ -30,6 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 
+from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
@@ -46,7 +47,8 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students)
+                                 submit_reset_problem_attempts_for_all_students,
+                                 submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
@@ -57,11 +59,6 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
-
-from bulk_email.models import CourseEmail
-from html_to_text import html_to_text
-from bulk_email import tasks
-
 
 log = logging.getLogger(__name__)
 
@@ -718,28 +715,32 @@ def instructor_dashboard(request, course_id):
         email_to_option = request.POST.get("to_option")
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
-        text_message = html_to_text(html_message)
 
-        email = CourseEmail(
-            course_id=course_id,
-            sender=request.user,
-            to_option=email_to_option,
-            subject=email_subject,
-            html_message=html_message,
-            text_message=text_message
-        )
+        try:
+            # Create the CourseEmail object.  This is saved immediately, so that
+            # any transaction that has been pending up to this point will also be
+            # committed.
+            email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
 
-        email.save()
+            # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+            submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
-        tasks.delegate_email_batches.delay(
-            email.id,
-            request.user.id
-        )
+        except Exception as err:
+            # Catch any errors and deliver a message to the user
+            error_msg = "Failed to send email! ({0})".format(err)
+            msg += "<font color='red'>" + error_msg + "</font>"
+            log.exception(error_msg)
 
-        if email_to_option == "all":
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+            # If sending the task succeeds, deliver a success message to the user.
+            if email_to_option == "all":
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
+            else:
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+
+    elif "Show Background Email Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
+        msg += message
 
     #----------------------------------------
     # psychometrics
@@ -806,9 +807,12 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
-    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
-    # 2) enable course email
+    # determine if this is a studio-backed course so we can provide a link to edit this course in studio
     is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
 
     email_editor = None
     # HTML editor for email
@@ -816,13 +820,12 @@ def instructor_dashboard(request, course_id):
         html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
         email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
 
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link_by_id(course_id)
-
-    # Flag for whether or not we display the email tab (depending upon
-    # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
+    # Enable instructor email only if the following conditions are met:
+    # 1. Feature flag is on
+    # 2. We have explicitly enabled email for the given course via django-admin
+    # 3. It is NOT an XML course
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       CourseAuthorization.instructor_email_enabled(course_id) and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
@@ -864,6 +867,7 @@ def instructor_dashboard(request, course_id):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -1515,7 +1519,7 @@ def dump_grading_context(course):
     return msg
 
 
-def get_background_task_table(course_id, problem_url, student=None):
+def get_background_task_table(course_id, problem_url=None, student=None, task_type=None):
     """
     Construct the "datatable" structure to represent background task history.
 
@@ -1526,14 +1530,16 @@ def get_background_task_table(course_id, problem_url, student=None):
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    history_entries = get_instructor_task_history(course_id, problem_url, student, task_type)
     datatable = {}
     msg = ""
     # first check to see if there is any history at all
     # (note that we don't have to check that the arguments are valid; it
     # just won't find any entries.)
     if (history_entries.count()) == 0:
-        if student is not None:
+        if problem_url is None:
+            msg += '<font color="red">Failed to find any background tasks for course "{course}".</font>'.format(course=course_id)
+        elif student is not None:
             template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
             msg += template.format(course=course_id, problem=problem_url, student=student.username)
         else:
@@ -1570,7 +1576,9 @@ def get_background_task_table(course_id, problem_url, student=None):
                    task_message]
             datatable['data'].append(row)
 
-        if student is not None:
+        if problem_url is None:
+            datatable['title'] = "{course_id}".format(course_id=course_id)
+        elif student is not None:
             datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
                                                                                location=problem_url,
                                                                                student=student.username)

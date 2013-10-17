@@ -114,7 +114,12 @@ MITX_FEATURES = {
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
-    'ENABLE_INSTRUCTOR_EMAIL': False,
+    # Enables the LMS bulk email feature for course staff
+    'ENABLE_INSTRUCTOR_EMAIL': True,
+    # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
+    #   for each course via django-admin interface.
+    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default for all courses.
+    'REQUIRE_COURSE_EMAIL_AUTH': True,
 
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
@@ -333,7 +338,7 @@ TRACKING_BACKENDS = {
     }
 }
 
-# Backawrds compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
+# Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS enough.
 if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
@@ -414,12 +419,9 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
-# Email
+# Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
-EMAILS_PER_TASK = 100
-EMAILS_PER_QUERY = 1000
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
@@ -567,6 +569,7 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -587,7 +590,7 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-    
+
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
 )
@@ -628,25 +631,49 @@ open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_end
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
-    'application': {
-        'source_filenames': ['sass/application.css'],
-        'output_filename': 'css/lms-application.css',
+    'style-vendor': {
+        'source_filenames': [
+            'css/vendor/font-awesome.css',
+            'css/vendor/jquery.qtip.min.css',
+            'css/vendor/responsive-carousel/responsive-carousel.css',
+            'css/vendor/responsive-carousel/responsive-carousel.slide.css',
+        ],
+        'output_filename': 'css/lms-style-vendor.css',
     },
-    'course': {
+    'style-app': {
+        'source_filenames': [
+            'sass/application.css',
+            'sass/ie.css'
+        ],
+        'output_filename': 'css/lms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/application-extend1.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1.css',
+    },
+    'style-app-extend2': {
+        'source_filenames': [
+            'sass/application-extend2.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2.css',
+    },
+    'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/jquery.qtip.min.css',
             'css/vendor/annotator.min.css',
+        ],
+        'output_filename': 'css/lms-style-course-vendor.css',
+    },
+    'style-course': {
+        'source_filenames': [
             'sass/course.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-course.css',
-    },
-    'ie-fixes': {
-        'source_filenames': ['sass/ie.css'],
-        'output_filename': 'css/lms-ie.css',
+        'output_filename': 'css/lms-style-course.css',
     },
 }
 
@@ -794,6 +821,45 @@ CELERY_QUEUES = {
     LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
 }
+
+# let logging work as configured:
+CELERYD_HIJACK_ROOT_LOGGER = False
+
+################################ Bulk Email ###################################
+
+# Suffix used to construct 'from' email address for bulk emails.
+# A course-specific identifier is prepended.
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
+
+# Parameters for breaking down course enrollment into subtasks.
+BULK_EMAIL_EMAILS_PER_TASK = 100
+BULK_EMAIL_EMAILS_PER_QUERY = 1000
+
+# Initial delay used for retrying tasks.  Additional retries use
+# longer delays.  Value is in seconds.
+BULK_EMAIL_DEFAULT_RETRY_DELAY = 30
+
+# Maximum number of retries per task for errors that are not related
+# to throttling.
+BULK_EMAIL_MAX_RETRIES = 5
+
+# Maximum number of retries per task for errors that are related to
+# throttling.  If this is not set, then there is no cap on such retries.
+BULK_EMAIL_INFINITE_RETRY_CAP = 1000
+
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it.  At the moment, the name is the same.
+BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# Flag to indicate if individual email addresses should be logged as they are sent
+# a bulk email message.
+BULK_EMAIL_LOG_SENT_EMAILS = False
+
+# Delay in seconds to sleep between individual mail messages being sent,
+# when a bulk email task is retried for rate-related reasons.  Choose this
+# value depending on the number of workers that might be sending email in
+# parallel, and what the SES rate is.
+BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 ################################### APPS ######################################
 INSTALLED_APPS = (

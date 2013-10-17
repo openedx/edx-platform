@@ -57,7 +57,7 @@ function () {
             state.videoControl.play();
         }
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.videoControl.fadeOutTimeout = state.config.fadeOutTimeout;
 
             state.videoControl.el.addClass('html5');
@@ -81,7 +81,7 @@ function () {
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.el.on('mousemove', state.videoControl.showControls);
             state.el.on('keydown', state.videoControl.showControls);
         }

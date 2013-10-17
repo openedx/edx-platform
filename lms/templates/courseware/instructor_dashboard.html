@@ -4,7 +4,9 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
@@ -369,7 +371,8 @@ function goto( mode)
 %if modeflag.get('Enrollment'):
 
     <hr width="40%" style="align:left">
-    <p>
+    <h2>${_("Enrollment Data")}</h2>
+
     <input type="submit" name="action" value="List enrolled students">
     <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
     <hr width="40%" style="align:left">
@@ -506,6 +509,13 @@ function goto( mode)
         return true;
       }
     </script>
+
+    <p>These email actions run in the background, and status for active email tasks will appear in a table below.
+       To see status for all bulk email tasks submitted for this course, click on this button:
+    </p>
+    <p>
+      <input type="submit" name="action" value="Show Background Email Task History">
+    </p>
 %endif
 
     </form>

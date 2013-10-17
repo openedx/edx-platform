@@ -19,14 +19,21 @@ a problem URL and optionally a student.  These are used to set up the initial va
 of the query for traversing StudentModule objects.
 
 """
+from django.utils.translation import ugettext_noop
 from celery import task
-from instructor_task.tasks_helper import (update_problem_module_state,
-                                          rescore_problem_module_state,
-                                          reset_attempts_module_state,
-                                          delete_problem_module_state)
+from functools import partial
+from instructor_task.tasks_helper import (
+    run_main_task,
+    BaseInstructorTask,
+    perform_module_state_update,
+    rescore_problem_module_state,
+    reset_attempts_module_state,
+    delete_problem_module_state,
+)
+from bulk_email.tasks import perform_delegate_email_batches
 
 
-@task
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -45,15 +52,19 @@ def rescore_problem(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'rescored'
-    update_fcn = rescore_problem_module_state
-    filter_fcn = lambda(modules_to_update): modules_to_update.filter(state__contains='"done": true')
-    return update_problem_module_state(entry_id,
-                                       update_fcn, action_name, filter_fcn=filter_fcn,
-                                       xmodule_instance_args=xmodule_instance_args)
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('rescored')
+    update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
+
+    def filter_fcn(modules_to_update):
+        """Filter that matches problems which are marked as being done"""
+        return modules_to_update.filter(state__contains='"done": true')
+
+    visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
+    return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -68,14 +79,14 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'reset'
-    update_fcn = reset_attempts_module_state
-    return update_problem_module_state(entry_id,
-                                       update_fcn, action_name, filter_fcn=None,
-                                       xmodule_instance_args=xmodule_instance_args)
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('reset')
+    update_fcn = partial(reset_attempts_module_state, xmodule_instance_args)
+    visit_fcn = partial(perform_module_state_update, update_fcn, None)
+    return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -90,8 +101,29 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
     to instantiate an xmodule instance.
     """
-    action_name = 'deleted'
-    update_fcn = delete_problem_module_state
-    return update_problem_module_state(entry_id,
-                                       update_fcn, action_name, filter_fcn=None,
-                                       xmodule_instance_args=xmodule_instance_args)
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('deleted')
+    update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
+    visit_fcn = partial(perform_module_state_update, update_fcn, None)
+    return run_main_task(entry_id, visit_fcn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
+def send_bulk_course_email(entry_id, _xmodule_instance_args):
+    """Sends emails to recipients enrolled in a course.
+
+    `entry_id` is the id value of the InstructorTask entry that corresponds to this task.
+    The entry contains the `course_id` that identifies the course, as well as the
+    `task_input`, which contains task-specific input.
+
+    The task_input should be a dict with the following entries:
+
+      'email_id': the full URL to the problem to be rescored.  (required)
+
+    `_xmodule_instance_args` provides information needed by _get_module_instance_for_task()
+    to instantiate an xmodule instance.  This is unused here.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('emailed')
+    visit_fcn = perform_delegate_email_batches
+    return run_main_task(entry_id, visit_fcn, action_name)
