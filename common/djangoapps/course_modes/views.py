@@ -34,12 +34,19 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
-        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
-            return redirect(reverse('dashboard'))
-        modes = CourseMode.modes_for_course_dict(course_id)
-
+        
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
 
+        # verified users do not need to register or upgrade
+        if enrollment_mode == 'verified':
+            return redirect(reverse('dashboard'))
+
+        # registered users who are not trying to upgrade do not need to re-register
+        if enrollment_mode != None and upgrade == False:
+            return redirect(reverse('dashboard'))
+
+        modes = CourseMode.modes_for_course_dict(course_id)
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(course_id, None)
 
