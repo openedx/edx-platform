@@ -342,13 +342,9 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  min_price=self.cost)
         course_mode.save()
 
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
-        crum_patcher = patch('student.models.crum.get_current_request')
-        self.mock_get_current_request = crum_patcher.start()
-        self.addCleanup(crum_patcher.stop)
-        self.mock_get_current_request.return_value = sentinel.request
 
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_id)
@@ -356,7 +352,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         # verify that we are still enrolled
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')

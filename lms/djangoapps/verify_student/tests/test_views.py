@@ -21,8 +21,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
-from mock import sentinel
-
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
@@ -133,14 +131,9 @@ class TestMidCourseReverifyView(TestCase):
         self.course_id = 'Robot/999/Test_Course'
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
-
-        crum_patcher = patch('student.models.crum.get_current_request')
-        self.mock_get_current_request = crum_patcher.start()
-        self.addCleanup(crum_patcher.stop)
-        self.mock_get_current_request.return_value = sentinel.request
 
     @patch('verify_student.views.render_to_response', render_mock)
     def test_midcourse_reverify_get(self):
@@ -149,8 +142,7 @@ class TestMidCourseReverifyView(TestCase):
         response = self.client.get(url)
 
         # Check that user entering the reverify flow was logged
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.reverify.started',
             {
                 'user_id': self.user.id,
@@ -158,7 +150,7 @@ class TestMidCourseReverifyView(TestCase):
                 'mode': "verified",
             }
         )
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
 
         self.assertEquals(response.status_code, 200)
         ((_template, context), _kwargs) = render_mock.call_args
@@ -172,8 +164,7 @@ class TestMidCourseReverifyView(TestCase):
         response = self.client.post(url, {'face_image': ','})
 
         # Check that submission event was logged
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.reverify.submitted',
             {
                 'user_id': self.user.id,
@@ -181,7 +172,7 @@ class TestMidCourseReverifyView(TestCase):
                 'mode': "verified",
             }
         )
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
 
         self.assertEquals(response.status_code, 302)
         try:

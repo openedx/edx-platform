@@ -40,8 +40,8 @@ postpay_mock = Mock()
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
+        patcher = patch('student.models.tracker')
+        self.mock_tracker = patcher.start()
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -221,7 +221,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         s['attempting_upgrade'] = True
         s.save()
 
-        self.mock_server_track.reset_mock()
+        self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
 
         # Once they've upgraded, they're no longer *attempting* to upgrade
@@ -246,8 +246,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         course_enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_id)
         course_enrollment.emit_event('edx.course.enrollment.upgrade.succeeded')
-        self.mock_server_track.assert_any_call(
-            None,
+        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.upgrade.succeeded',
             {
                 'user_id': course_enrollment.user.id,
