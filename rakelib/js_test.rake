@@ -32,7 +32,8 @@ end
 # command line arguments
 def js_test_tool(env, command, do_coverage)
     suite = suite_for_env(env)
-    cmd = "js-test-tool #{command} #{suite} --use-firefox --timeout-sec 600"
+    xunit_report = File.join(JS_REPORT_DIR, 'javascript_xunit.xml')
+    cmd = "js-test-tool #{command} #{suite} --use-firefox --timeout-sec 600 --xunit-report #{xunit_report}"
 
     if do_coverage
         report_dir = File.join(JS_REPORT_DIR, 'coverage.xml')
