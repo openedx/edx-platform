@@ -34,7 +34,8 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
-        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
+        # if the user is already enrolled, don't let them try to register again
+        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) != None:
             return redirect(reverse('dashboard'))
         modes = CourseMode.modes_for_course_dict(course_id)
 
