@@ -288,6 +288,7 @@ function goto( mode)
     <p>
       ${_("Choose the graded unit:")}
       <select name="url">
+        <option value="">Choose one</option>
         %for title, url in units_with_due_dates:
         <option value="${url}">${title}</option>
         %endfor

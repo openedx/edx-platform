@@ -500,6 +500,8 @@ def instructor_dashboard(request, course_id):
         unique_student_identifier = request.POST.get(
             'unique_student_identifier', '')
         url = request.POST.get('url')
+        if not url:
+            msg += '<font color="red">Must choose a unit. </font> '
 
         # try to uniquely id student by email address or username
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -513,7 +515,7 @@ def instructor_dashboard(request, course_id):
             error = set_due_date_extension(
                 course, url, student, due_date)
             if error:
-                msg += '<font color="red">{0}</font>'.format(error)
+                msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
                 msg += 'Successfully changed due date.'
@@ -523,6 +525,8 @@ def instructor_dashboard(request, course_id):
         unique_student_identifier = request.POST.get(
             'unique_student_identifier', '')
         url = request.POST.get('url')
+        if not url:
+            msg += '<font color="red">Must choose a unit.</font> '
 
         # try to uniquely id student by email address or username
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -532,7 +536,7 @@ def instructor_dashboard(request, course_id):
             error = set_due_date_extension(
                 course, url, student, None)
             if error:
-                msg += '<font color="red">{0}</font>'.format(error)
+                msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
                 msg += 'Successfully reset due date.'
@@ -540,9 +544,12 @@ def instructor_dashboard(request, course_id):
 
     elif "Dump list of students with due date extensions" in action:
         url = request.POST.get('url')
-        error, datatable = dump_students_with_due_date_extensions(course, url)
-        if error:
-            msg += '<font color="red">{0}</font>'.format(error)
+        if not url:
+            msg += '<font color="red">Must choose a unit. </font> '
+        else:
+            error, datatable = dump_students_with_due_date_extensions(course, url)
+            if error:
+                msg += '<font color="red">{0}</font> '.format(error)
 
     elif "Dump due date extensions for student" in action:
         unique_student_identifier = request.POST.get(
@@ -554,7 +561,7 @@ def instructor_dashboard(request, course_id):
             error, datatable = dump_due_date_extensions_for_student(
                 course, student)
             if error:
-                msg += '<font color="red">{0}</font>'.format(error)
+                msg += '<font color="red">{0}</font> '.format(error)
 
     #----------------------------------------
     # Admin
