@@ -80,7 +80,7 @@ TRACKING_BACKENDS.update({
     }
 })
 
-DEFAULT_BULK_FROM_EMAIL = "test@test.org"
+BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
@@ -98,6 +98,8 @@ MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
 # Enable email on the instructor dash
 MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
+MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
+
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
@@ -123,7 +125,15 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware',)
+LETTUCE_APPS = ('courseware', 'instructor',)
+
+# Lettuce appears to have a bug that causes it to search
+# `instructor_task` when we specify the `instructor` app.
+# This causes some pretty cryptic errors as lettuce tries
+# to parse files in `instructor_task` as features.
+# As a quick workaround, explicitly exclude the `instructor_task` app.
+LETTUCE_AVOID_APPS = ('instructor_task',)
+
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid
