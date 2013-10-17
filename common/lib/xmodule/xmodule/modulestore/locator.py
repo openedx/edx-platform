@@ -188,7 +188,7 @@ class CourseLocator(Locator):
             self.init_from_url(url)
         if version_guid:
             self.init_from_version_guid(version_guid)
-        if course_id or branch:
+        if course_id or branch:  # FIXME really should require it be course_id /block/block/mit.eecs is being accepted
             self.init_from_course_id(course_id, branch)
         if self.version_guid is None and self.course_id is None:
             raise ValueError("Either version_guid or course_id should be set: {}".format(url))
@@ -281,6 +281,29 @@ class CourseLocator(Locator):
         elif postfix is None:
             postfix = ''
         return prefix + unicode(self) + postfix
+
+    def url_reverse(self, prefix, postfix):
+        """
+        Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
+        :param prefix: the beginning of the url (should begin and end with / if non-empty)
+        :param postfix: the part to append to the url (should begin w/ / if non-empty)
+        """
+        if prefix:
+            if not prefix.endswith('/'):
+                prefix += '/'
+            if not prefix.startswith('/'):
+                prefix = '/' + prefix
+        else:
+            prefix = '/'
+        if postfix and not postfix.startswith('/'):
+            postfix = '/' + postfix
+        return prefix + unicode(self) + postfix
+
+    def reverse_kwargs(self):
+        """
+        Get the kwargs list to supply to reverse (basically, a dict of the set properties)
+        """
+        return {key: value for key, value in self.__dict__.iteritems() if value is not None}
 
     def init_from_url(self, url):
         """
@@ -447,6 +470,16 @@ class BlockUsageLocator(CourseLocator):
             return BlockUsageLocator(course_id=self.course_id,
                                      branch=self.branch,
                                      usage_id=self.usage_id)
+
+    def reverse_kwargs(self):
+        """
+        Get the kwargs list to supply to reverse (basically, a dict of the set properties)
+        """
+        result = super(BlockUsageLocator, self).reverse_kwargs()
+        if self.usage_id:
+            del result['usage_id']
+            result['block'] = self.usage_id
+        return result
 
     def set_usage_id(self, new):
         """
