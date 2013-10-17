@@ -15,12 +15,9 @@ def user_has_cart_context_processor(request):
     be displayed.  Anonymous users don't.
     Adds `display_shopping_cart` to the context
     """
-    display_shopping_cart = False
-    if (
-        request.user.is_authenticated() and                                # user exists
-        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings is set
-        settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and             # setting is set
-        shoppingcart.models.Order.user_cart_has_items(request.user)        # user's cart is non-empty
-    ):
-        display_shopping_cart = True
-    return {'display_shopping_cart': display_shopping_cart}
+    return {'display_shopping_cart': (
+        request.user.is_authenticated() and                                # user is logged in and
+        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings enable paid course reg and
+        settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
+        shoppingcart.models.Order.user_cart_has_items(request.user)        # user's cart has items
+    )}
