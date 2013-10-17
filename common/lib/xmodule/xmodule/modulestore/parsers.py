@@ -9,13 +9,14 @@ VERSION_PREFIX = "/version/"
 # Prefix for version when it begins the URL (no course ID).
 URL_VERSION_PREFIX = 'version/'
 
-URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
+URL_RE = re.compile(r'^(edx://)?(.+)$', re.IGNORECASE)
 
 
-def parse_url(string):
+def parse_url(string, tag_optional=False):
     """
-    A url must begin with 'edx://' (case-insensitive match),
-    followed by either a version_guid or a course_id.
+    A url usually begins with 'edx://' (case-insensitive match),
+    followed by either a version_guid or a course_id. If tag_optional, then
+    the url does not have to start with the tag and edx will be assumed.
 
     Examples:
         'edx://version/0123FFFF'
@@ -36,7 +37,9 @@ def parse_url(string):
     match = URL_RE.match(string)
     if not match:
         return None
-    path = match.group(1)
+    if match.group(1) is None and not tag_optional:
+        return None
+    path = match.group(2)
     if path.startswith(URL_VERSION_PREFIX):
         return parse_guid(path[len(URL_VERSION_PREFIX):])
     return parse_course_id(path)

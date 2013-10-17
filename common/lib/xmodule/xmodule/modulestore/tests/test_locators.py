@@ -7,6 +7,8 @@ from bson.objectid import ObjectId
 from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
 from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX, URL_VERSION_PREFIX
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
+from xmodule.modulestore import Location
+import random
 
 
 class LocatorTest(TestCase):
@@ -98,7 +100,6 @@ class LocatorTest(TestCase):
         for bad_url in ('edx://',
                         'edx:/mit.eecs',
                         'http://mit.eecs',
-                        'mit.eecs',
                         'edx//mit.eecs'):
             self.assertRaises(ValueError, CourseLocator, url=bad_url)
 
@@ -253,13 +254,62 @@ class LocatorTest(TestCase):
         testobj = BlockUsageLocator(course_id=testurn)
         self.assertEqual('BlockUsageLocator("mit.eecs.6002x/branch/published/block/HW3")', repr(testobj))
 
+    def test_old_location_helpers(self):
+        """
+        Test the functions intended to help with the conversion from old locations to locators
+        """
+        location_tuple = ('i4x', 'mit', 'eecs.6002x', 'course', 't3_2013')
+        location = Location(location_tuple)
+        self.assertEqual(location, Locator.to_locator_or_location(location))
+        self.assertEqual(location, Locator.to_locator_or_location(location_tuple))
+        self.assertEqual(location, Locator.to_locator_or_location(list(location_tuple)))
+        self.assertEqual(location, Locator.to_locator_or_location(location.dict()))
+
+        locator = BlockUsageLocator(course_id='foo.bar', branch='alpha', usage_id='deep')
+        self.assertEqual(locator, Locator.to_locator_or_location(locator))
+        self.assertEqual(locator.as_course_locator(), Locator.to_locator_or_location(locator.as_course_locator()))
+        self.assertEqual(location, Locator.to_locator_or_location(location.url()))
+        self.assertEqual(locator, Locator.to_locator_or_location(locator.url()))
+        self.assertEqual(locator, Locator.to_locator_or_location(locator.__dict__))
+
+        asset_location = Location(['c4x', 'mit', 'eecs.6002x', 'asset', 'selfie.jpeg'])
+        self.assertEqual(asset_location, Locator.to_locator_or_location(asset_location))
+        self.assertEqual(asset_location, Locator.to_locator_or_location(asset_location.url()))
+
+        def_location_url = "defx://version/" + '{:024x}'.format(random.randrange(16 ** 24))
+        self.assertEqual(DefinitionLocator(def_location_url), Locator.to_locator_or_location(def_location_url))
+
+        with self.assertRaises(ValueError):
+            Locator.to_locator_or_location(22)
+        with self.assertRaises(ValueError):
+            Locator.to_locator_or_location("hello.world.not.a.url")
+        self.assertIsNone(Locator.parse_url("unknown://foo.bar/baz"))
+
+    def test_as_old(self):
+        """
+        Test the as_old_location_xxx accessors
+        """
+        locator = CourseLocator(course_id='org.course.id.run', branch='mybranch')
+        self.assertEqual('org', locator.as_old_location_org)
+        self.assertEqual('course.id', locator.as_old_location_course)
+        self.assertEqual('run', locator.as_old_location_run)
+        self.assertEqual('org/course.id/run', locator.as_old_location_course_id)
+        locator = CourseLocator(course_id='org.course', branch='mybranch')
+        self.assertEqual('org', locator.as_old_location_org)
+        self.assertIsNone(locator.as_old_location_course)
+        self.assertEqual('course', locator.as_old_location_run)
+        self.assertEqual('org/course', locator.as_old_location_course_id)
+
     def test_description_locator_url(self):
-        definition_locator = DefinitionLocator("chapter12345_2")
-        self.assertEqual('edx://' + URL_VERSION_PREFIX + 'chapter12345_2', definition_locator.url())
+        object_id = '{:024x}'.format(random.randrange(16 ** 24))
+        definition_locator = DefinitionLocator(object_id)
+        self.assertEqual('defx://' + URL_VERSION_PREFIX + object_id, definition_locator.url())
+        self.assertEqual(definition_locator, DefinitionLocator(definition_locator.url()))
 
     def test_description_locator_version(self):
-        definition_locator = DefinitionLocator("chapter12345_2")
-        self.assertEqual("chapter12345_2", definition_locator.version())
+        object_id = '{:024x}'.format(random.randrange(16 ** 24))
+        definition_locator = DefinitionLocator(object_id)
+        self.assertEqual(object_id, str(definition_locator.version()))
 
     # ------------------------------------------------------------------
     # Utilities
