@@ -5,6 +5,8 @@ from itertools import cycle
 from mock import patch
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
+from celery.states import SUCCESS
+
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
@@ -19,7 +21,12 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from instructor_task.models import InstructorTask
-from instructor_task.subtasks import create_subtask_status, initialize_subtask_info
+from instructor_task.subtasks import (
+    create_subtask_status,
+    initialize_subtask_info,
+    update_subtask_status,
+    DuplicateTaskException,
+)
 
 
 class EmailTestException(Exception):
@@ -210,7 +217,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         subtask_id = "subtask-id-value"
         subtask_status = create_subtask_status(subtask_id)
         email_id = 1001
-        with self.assertRaisesRegexp(ValueError, 'unable to find email subtasks of instructor task'):
+        with self.assertRaisesRegexp(DuplicateTaskException, 'unable to find email subtasks of instructor task'):
             send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status)
 
     def test_send_email_missing_subtask(self):
@@ -224,8 +231,23 @@ class TestEmailErrors(ModuleStoreTestCase):
         different_subtask_id = "bogus-subtask-id-value"
         subtask_status = create_subtask_status(different_subtask_id)
         bogus_email_id = 1001
-        with self.assertRaisesRegexp(ValueError, 'unable to find status for email subtask of instructor task'):
+        with self.assertRaisesRegexp(DuplicateTaskException, 'unable to find status for email subtask of instructor task'):
             send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status)
+
+    def test_send_email_completed_subtask(self):
+        # test at a lower level, to ensure that the course gets checked down below too.
+        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
+        entry_id = entry.id  # pylint: disable=E1101
+        subtask_id = "subtask-id-value"
+        initialize_subtask_info(entry, "emailed", 100, [subtask_id])
+        subtask_status = create_subtask_status(subtask_id, state=SUCCESS)
+        update_subtask_status(entry_id, subtask_id, subtask_status)
+        bogus_email_id = 1001
+        to_list = ['test@test.com']
+        global_email_context = {'course_title': 'dummy course'}
+        new_subtask_status = create_subtask_status(subtask_id)
+        with self.assertRaisesRegexp(DuplicateTaskException, 'already completed'):
+            send_course_email(entry_id, bogus_email_id, to_list, global_email_context, new_subtask_status)
 
     def dont_test_send_email_undefined_email(self):
         # test at a lower level, to ensure that the course gets checked down below too.

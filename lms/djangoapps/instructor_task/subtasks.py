@@ -14,6 +14,11 @@ from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 TASK_LOG = get_task_logger(__name__)
 
 
+class DuplicateTaskException(Exception):
+    """Exception indicating that a task already exists or has already completed."""
+    pass
+
+
 def create_subtask_status(task_id, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
     """
     Create and return a dict for tracking the status of a subtask.
@@ -149,30 +154,48 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
 
 def check_subtask_is_valid(entry_id, current_task_id):
     """
-    Confirms that the current subtask is known to the InstructorTask.
+    Confirms that the current subtask is known to the InstructorTask and hasn't already been completed.
 
-    This may happen if a task that spawns subtasks is called twice with
-    the same task_id and InstructorTask entry_id.  The set of subtasks
-    that are recorded in the InstructorTask from the first call get clobbered
-    by the the second set of subtasks.  So when the first set of subtasks
-    actually run, they won't be found in the InstructorTask.
+    Problems can occur when the parent task has been run twice, and results in duplicate
+    subtasks being created for the same InstructorTask entry.  This can happen when Celery
+    loses its connection to its broker, and any current tasks get requeued.
 
-    Raises a ValueError exception if not.
+    If a parent task gets requeued, then the same InstructorTask may have a different set of
+    subtasks defined (to do the same thing), so the subtasks from the first queuing would not
+    be known to the InstructorTask.  We return an exception in this case.
+
+    If a subtask gets requeued, then the first time the subtask runs it should run fine to completion.
+    However, we want to prevent it from running again, so we check here to see what the existing
+    subtask's status is.  If it is complete, we return an exception.
+
+    Raises a DuplicateTaskException exception if it's not a task that should be run.
     """
+    # Confirm that the InstructorTask actually defines subtasks.
     entry = InstructorTask.objects.get(pk=entry_id)
     if len(entry.subtasks) == 0:
         format_str = "Unexpected task_id '{}': unable to find email subtasks of instructor task '{}'"
         msg = format_str.format(current_task_id, entry)
         TASK_LOG.warning(msg)
-        raise ValueError(msg)
+        raise DuplicateTaskException(msg)
 
+    # Confirm that the InstructorTask knows about this particular subtask.
     subtask_dict = json.loads(entry.subtasks)
     subtask_status_info = subtask_dict['status']
     if current_task_id not in subtask_status_info:
         format_str = "Unexpected task_id '{}': unable to find status for email subtask of instructor task '{}'"
         msg = format_str.format(current_task_id, entry)
         TASK_LOG.warning(msg)
-        raise ValueError(msg)
+        raise DuplicateTaskException(msg)
+
+    # Confirm that the InstructorTask doesn't think that this subtask has already been
+    # performed successfully.
+    subtask_status = subtask_status_info[current_task_id]
+    subtask_state = subtask_status.get('state')
+    if subtask_state in READY_STATES:
+        format_str = "Unexpected task_id '{}': already completed - status {} for email subtask of instructor task '{}'"
+        msg = format_str.format(current_task_id, subtask_status, entry)
+        TASK_LOG.warning(msg)
+        raise DuplicateTaskException(msg)
 
 
 @transaction.commit_manually
