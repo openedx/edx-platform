@@ -154,10 +154,6 @@
     display: none;
   }
 
-  .ie-banner {
-    display: block !important;
-  }
-
   div.course-wrapper {
     display: block !important;
 
@@ -186,4 +182,14 @@
     }
   }
 
+  .course-wrapper {
+    clear: both !important;
+  }
+}
+
+.lte9 {
+
+  .ie-banner {
+    display: block !important;
+  }
 }
