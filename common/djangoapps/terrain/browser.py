@@ -197,7 +197,7 @@ def screenshot_on_error(scenario):
             LOGGER.error('Could not capture a screenshot')
 
 
-@after.all
+@after.harvest
 def teardown_browser(total):
     """
     Quit the browser after executing the tests.
