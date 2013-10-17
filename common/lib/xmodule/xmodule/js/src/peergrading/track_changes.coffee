@@ -54,7 +54,7 @@ class @TrackChanges
     keyOfLatestChange = 0
     @tracked_changes = @$(@tracked_changes_sel)
     @tracked_changes.each ->
-      key = parseInt($(@).attr('data-cid'))
+      key = $(@).data('cid')
       if key > keyOfLatestChange
         keyOfLatestChange = key
     @tracker.rejectChange('[data-cid="'+ keyOfLatestChange + '"]')
