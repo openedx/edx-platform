@@ -8,12 +8,15 @@ http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 import logging
 import oauthlib.oauth1
 import urllib
+import json
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
+from xblock.fields import Boolean
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +48,7 @@ class LTIFields(object):
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
+    open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
@@ -92,10 +96,10 @@ class LTIModule(LTIFields, XModule):
 
             <form
                     action="${launch_url}"
-                    name="ltiLaunchForm"
+                    name="ltiLaunchForm-${element_id}"
                     class="ltiLaunchForm"
                     method="post"
-                    target="ltiLaunchFrame"
+                    target="ltiLaunchFrame-${element_id}"
                     encType="application/x-www-form-urlencoded"
                 >
                     <input name="launch_presentation_return_url" value="" />
@@ -169,14 +173,15 @@ class LTIModule(LTIFields, XModule):
             client_key,
             client_secret
         )
-
         context = {
             'input_fields': input_fields,
 
             # these params do not participate in oauth signing
             'launch_url': self.launch_url,
             'element_id': self.location.html_id(),
-            'element_class': self.location.category,
+            'element_class': self.category,
+            'open_in_a_new_page': self.open_in_a_new_page,
+            'display_name': self.display_name,
         }
 
         return self.system.render_template('lti.html', context)
@@ -254,8 +259,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
 
-class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor):
+class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
-    LTIModuleDescriptor provides no export/import to xml.
+    Descriptor for LTI Xmodule.
     """
     module_class = LTIModule

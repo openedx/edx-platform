@@ -52,7 +52,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
 
         actual_attr = self.annotatable._get_annotation_data_attr(0, el)
 
-        self.assertTrue(type(actual_attr) is dict)
+        self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_default(self):
@@ -62,7 +62,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
         actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-        self.assertTrue(type(actual_attr) is dict)
+        self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_valid_highlight(self):
@@ -78,7 +78,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-            self.assertTrue(type(actual_attr) is dict)
+            self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_invalid_highlight(self):
@@ -92,7 +92,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-            self.assertTrue(type(actual_attr) is dict)
+            self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_render_annotation(self):

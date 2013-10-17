@@ -33,8 +33,6 @@ def view_word_cloud(_step):
 @step('I press the Save button')
 def press_the_save_button(_step):
     button_css = '.input_cloud_section input.save'
-    elem = world.css_find(button_css).first
-    world.css_has_text(button_css, elem)
     world.css_click(button_css)
 
 

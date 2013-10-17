@@ -400,4 +400,21 @@
       }
     }
   }
+
+  // UI: DnD - specific elems/cases - units
+  .courseware-unit {
+
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+  }
+
+  // UI: DnD - specific elems/cases - empty parents initial drop indicator
+  .draggable-drop-indicator-initial {
+    display: none;
+  }
 }

@@ -5,7 +5,6 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
         @stubModule = jasmine.createSpy("Module")
         @stubModule.id = 'stub-id'
 
-
         setFixtures """
         <li class="component" id="stub-id">
           <div class="component-editor">
@@ -19,7 +18,7 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
             <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
             <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>
           </div>
-          <a href="#" class="drag-handle"></a>
+          <span class="drag-handle"></span>
           <section class="xmodule_display xmodule_stub" data-type="StubModule">
             <div id="stub-module-content"/>
           </section>

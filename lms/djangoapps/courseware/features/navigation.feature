@@ -18,6 +18,7 @@ Feature: LMS.Navigate Course
         Given I am viewing a section with multiple sequences
         When I navigate to an item in a sequence
         Then I see the content of the sequence item
+        And a "seq_goto" browser event is emitted
 
     Scenario: I can return to the last section I visited
         Given I am viewing a course with multiple sections

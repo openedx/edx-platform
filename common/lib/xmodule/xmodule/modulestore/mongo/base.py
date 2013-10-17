@@ -21,7 +21,6 @@ from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from operator import attrgetter
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -81,7 +80,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 return self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def set(self, key, value):
         if key.scope == Scope.children:
@@ -94,7 +93,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 self._data[key.field_name] = value
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def delete(self, key):
         if key.scope == Scope.children:
@@ -108,7 +107,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 del self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def has(self, key):
         if key.scope in (Scope.children, Scope.parent):
@@ -246,7 +245,9 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-metadata_cache_key = attrgetter('org', 'course')
+def metadata_cache_key(location):
+    """Turn a `Location` into a useful cache key."""
+    return u"{0.org}/{0.course}".format(location)
 
 
 class MongoModuleStore(ModuleStoreBase):

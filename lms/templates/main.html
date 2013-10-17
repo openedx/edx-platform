@@ -95,6 +95,7 @@
   <%include file="footer.html" />
 % endif
 
+  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
   <%static:js group='module-js'/>
 

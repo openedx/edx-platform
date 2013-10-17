@@ -6,7 +6,6 @@ import unittest
 import json
 import requests
 from urllib import quote
-from django.conf import settings
 from django.test import TestCase
 from nose.tools import raises
 from mock import Mock, patch
@@ -125,6 +124,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'list_forum_members',
             'update_forum_role_membership',
             'proxy_legacy_analytics',
+            'send_email',
         ]
         for endpoint in staff_level_endpoints:
             url = reverse(endpoint, kwargs={'course_id': self.course.id})
@@ -280,8 +280,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     This test does NOT test whether the actions had an effect on the
     database, that is the job of test_access.
     This tests the response and action switch.
-    Actually, modify_access does not having a very meaningful
-        response yet, so only the status code is tested.
+    Actually, modify_access does not have a very meaningful
+    response yet, so only the status code is tested.
     """
     def setUp(self):
         self.instructor = AdminFactory.create()
@@ -691,7 +691,74 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         })
         print response.content
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(act.called)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Checks that only instructors have access to email endpoints, and that
+    these endpoints are only accessible with courses that actually exist,
+    only with valid email messages.
+    """
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+        test_subject = u'\u1234 test subject'
+        test_message = u'\u6824 test message'
+        self.full_test_message = {
+            'send_to': 'staff',
+            'subject': test_subject,
+            'message': test_message,
+        }
+
+    def test_send_email_as_logged_in_instructor(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+
+    def test_send_email_but_not_logged_in(self):
+        self.client.logout()
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_not_staff(self):
+        self.client.logout()
+        student = UserFactory()
+        self.client.login(username=student.username, password='test')
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_course_not_exist(self):
+        url = reverse('send_email', kwargs={'course_id': 'GarbageCourse/DNE/NoTerm'})
+        response = self.client.post(url, self.full_test_message)
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_send_email_no_sendto(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'subject': 'test subject',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_subject(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_message(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+        })
+        self.assertEqual(response.status_code, 400)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

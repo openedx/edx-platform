@@ -27,6 +27,33 @@ div.video {
     height: 0px;
   }
 
+  .wrapper-downloads {
+    margin: 0;
+    padding: 0;
+
+    .video-sources,
+    .video-tracks {
+      display: inline-block;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
+
+      a {
+        @include transition(all 0.25s ease-in-out 0s);
+        @include font-size(14);
+        display: inline-block;
+        border-radius: 3px 3px 3px 3px;
+        background-color: $very-light-text;
+        padding: ($baseline*.75);
+        color: $lighter-base-font-color;
+
+        &:hover {
+          background-color: $action-primary-active-bg;
+          color: $very-light-text;
+        }
+      }
+
+    }
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
@@ -392,7 +419,7 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
-          
+
             &:hover, &:active {
               background-color: #444;
               color: #fff;
@@ -457,7 +484,7 @@ div.video {
           text-indent: -9999px;
           @include transition(none);
           width: 30px;
-          
+
           &:hover, &:active {
             background-color: #444;
             color: #fff;
@@ -611,7 +638,6 @@ div.video {
     ol.subtitles {
         width: 0;
         height: 0;
-        visibility: hidden;
     }
 
     ol.subtitles.html5 {
@@ -645,7 +671,6 @@ div.video {
       ol.subtitles {
         right: -(flex-grid(4));
         width: auto;
-        visibility: hidden;
       }
     }
 

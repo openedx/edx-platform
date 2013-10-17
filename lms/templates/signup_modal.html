@@ -9,6 +9,8 @@
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
     <div id="register">
       <header>
         <h2>${_('Sign Up for {span_start}{platform_name}{span_end}').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
@@ -130,12 +132,6 @@
       % endif
 
     </div>
-
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </a>
   </div>
 </section>
 

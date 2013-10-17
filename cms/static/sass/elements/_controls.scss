@@ -200,3 +200,83 @@
 %view-live-button {
   @extend %t-action4;
 }
+
+// ====================
+
+// UI: drag handles
+.drag-handle {
+
+  &:hover, &:focus {
+    cursor: move;
+  }
+}
+
+// UI: elem is draggable
+.is-draggable {
+  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0);
+  position: relative;
+
+  .draggable-drop-indicator {
+    @extend %ui-depth3;
+    @include transition(opacity $tmg-f2 linear 0s);
+    @include size(100%, auto);
+    position: absolute;
+    border-top: 1px solid $blue-l1;
+    opacity: 0.0;
+
+    *[class^="icon-caret"] {
+      @extend %t-icon5;
+      position: absolute;
+      top: -12px;
+      left: -($baseline/4);
+      color: $blue-s1;
+    }
+  }
+
+  .draggable-drop-indicator-before {
+    top: -($baseline/2);
+  }
+
+  .draggable-drop-indicator-after {
+    bottom: -($baseline/2);
+  }
+}
+
+// UI: drag state - is dragging
+.is-dragging {
+  @extend %ui-depth4;
+  left: -($baseline/4);
+  box-shadow: 0 1px 2px 0 $shadow-d1;
+  cursor: move;
+  opacity: 0.65;
+  border: 1px solid $gray-d3;
+
+  // UI: condition - valid drop
+  &.valid-drop {
+    border-color: $blue-s1;
+    box-shadow: 0 1px 2px 0 $blue-t2;
+  }
+}
+
+// UI: drag state - was dragging
+.was-dragging {
+  @include transition(transform $tmg-f2 ease-in-out 0);
+}
+
+// UI: drag target
+.drop-target {
+
+  &.drop-target-before {
+
+    > .draggable-drop-indicator-before {
+      opacity: 1.0;
+    }
+  }
+
+  &.drop-target-after {
+
+    > .draggable-drop-indicator-after {
+      opacity: 1.0;
+    }
+  }
+}

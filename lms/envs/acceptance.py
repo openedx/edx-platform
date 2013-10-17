@@ -74,6 +74,14 @@ DATABASES = {
     }
 }
 
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'track.backends.mongodb.MongoBackend'
+    }
+})
+
+DEFAULT_BULK_FROM_EMAIL = "test@test.org"
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -87,6 +95,9 @@ MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
+# Enable email on the instructor dash
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using

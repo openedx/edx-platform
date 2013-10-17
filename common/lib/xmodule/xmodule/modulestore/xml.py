@@ -204,7 +204,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             descriptor.save()
             return descriptor
 
-        render_template = lambda: ''
+        render_template = lambda template, context: u''
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...

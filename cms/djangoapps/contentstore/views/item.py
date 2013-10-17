@@ -12,7 +12,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from util.json_request import expect_json, JsonResponse
 from ..utils import get_modulestore
 from .access import has_access
-from .requests import _xmodule_recurse
+from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 
 __all__ = ['save_item', 'create_item', 'delete_item']

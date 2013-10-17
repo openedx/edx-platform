@@ -134,7 +134,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         return frag
 
     block_id = block.id
-    if block.descriptor.has_score:
+    if block.has_score:
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
     else:
@@ -142,7 +142,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         render_histogram = False
 
     if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-        [filepath, filename] = getattr(block.descriptor, 'xml_attributes', {}).get('filename', ['', None])
+        [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
         osfs = block.system.filestore
         if filename is not None and osfs.exists(filename):
             # if original, unmangled filename exists then use it (github
@@ -163,13 +163,13 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
     # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
     now = datetime.datetime.now(UTC())
     is_released = "unknown"
-    mstart = block.descriptor.start
+    mstart = block.start
 
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
     staff_context = {'fields': [(name, field.read_from(block)) for name, field in block.fields.items()],
-                     'xml_attributes': getattr(block.descriptor, 'xml_attributes', {}),
+                     'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
                      'xqa_key': block.xqa_key,
                      'source_file': source_file,

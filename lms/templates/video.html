@@ -26,6 +26,19 @@
     data-yt-test-timeout="${yt_test_timeout}"
     data-yt-test-url="${yt_test_url}"
 
+    ## For now, the option "data-autohide-html5" is hard coded. This option
+    ## either enables or disables autohiding of controls and captions on mouse
+    ## inactivity. If set to true, controls and captions will autohide for
+    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
+    ## whole video. When the mouse moves (or a key is pressed while any part of
+    ## the video player is focused), the captions and controls will be shown
+    ## once again.
+    ##
+    ## There is no option in the "Advanced Editor" to set this option. However,
+    ## this option will have an effect if changed to "True". The code on
+    ## front-end exists.
+    data-autohide-html5="False"
+
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -64,7 +77,7 @@
                             </div>
                         </div>
                         <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                        <a href="#" class="quality_control" title="${_('HD')}" role="button" aria-disabled="false">${_('HD')}</a>
+                        <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
                         <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
                     </div>
@@ -76,16 +89,19 @@
     </div>
 
     <div class="focus_grabber last"></div>
-</div>
-
+<ul class="wrapper-downloads">
 % if sources.get('main'):
-    <div class="video-sources">
-        <p>${(_('Download video') + ' <a href="%s">' + _('here') + '</a>.') % sources.get('main')}</p>
-    </div>
+    <li class="video-sources">
+        ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+    </li>
 % endif
 
 % if track:
-    <div class="video-tracks">
-        <p>${(_('Download subtitles') + ' <a href="%s">' + _('here') + '</a>.') % track}</p>
-    </div>
+    <li class="video-tracks">
+        ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+    </li>
 % endif
+</ul>
+</div>
+
+

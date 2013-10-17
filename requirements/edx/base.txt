@@ -98,6 +98,7 @@ django_debug_toolbar
 django-debug-toolbar-mongo
 nose-ignore-docstring
 nose-exclude
+django-crum==0.5
 
 git+https://github.com/mfogel/django-settings-context-processor.git
 

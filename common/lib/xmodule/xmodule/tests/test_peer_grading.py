@@ -199,6 +199,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         html = peer_grading.peer_grading()
         self.assertIn("Peer-Graded", html)
 
+
 class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading that is linked to an open ended module.
