@@ -15,6 +15,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 
+from bulk_email.models import CourseAuthorization
+
 from mock import patch
 
 
@@ -58,6 +60,32 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         self.assertTrue(selected_email_link in response.content)
         send_to_label = '<label for="id_to">Send to:</label>'
         self.assertTrue(send_to_label in response.content)
+
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_email_flag_unauthorized(self):
+        # Assert that the URL for the email view is not in the response
+        # email is enabled, but this course is not authorized to send email
+        response = self.client.get(self.url)
+        self.assertFalse(self.email_link in response.content)
+
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_email_flag_authorized(self):
+        # Assert that the URL for the email view is in the response
+        # email is enabled, and this course is authorized to send email
+
+        # Assert that instructor email is not enabled for this course
+        self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
+        response = self.client.get(self.url)
+        self.assertFalse(self.email_link in response.content)
+
+        # Authorize the course to use email
+        cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
+        cauth.save()
+
+        # Assert that instructor email is enabled for this course
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+        response = self.client.get(self.url)
+        self.assertTrue(self.email_link in response.content)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):

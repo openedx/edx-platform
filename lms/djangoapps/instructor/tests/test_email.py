@@ -90,7 +90,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
 
         # Assert that instructor email is enabled for this course
         self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
-        # Assert that the URL for the email view is not in the response
+        # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertTrue(self.email_link in response.content)
 
