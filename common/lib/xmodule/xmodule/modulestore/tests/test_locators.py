@@ -75,15 +75,13 @@ class LocatorTest(TestCase):
         """
         Test all sorts of badly-formed course_ids (and urls with those course_ids)
         """
-        for bad_id in ('mit.',
-                       ' mit.eecs',
+        for bad_id in (' mit.eecs',
                        'mit.eecs ',
                        URL_VERSION_PREFIX + 'mit.eecs',
                        BLOCK_PREFIX + 'block/mit.eecs',
                        'mit.ee cs',
                        'mit.ee,cs',
                        'mit.ee/cs',
-                       'mit.ee$cs',
                        'mit.ee&cs',
                        'mit.ee()cs',
                        BRANCH_PREFIX + 'this',
@@ -130,17 +128,17 @@ class LocatorTest(TestCase):
 
     def test_course_constructor_url_course_id_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs.6002x' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs-honors.6002x' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID and version GUID',
-                                      course_id='mit.eecs.6002x',
+                                      course_id='mit.eecs-honors.6002x',
                                       version_guid=ObjectId(test_id_loc))
 
     def test_course_constructor_url_course_id_branch_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs.6002x' + BRANCH_PREFIX + 'draft' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs.~6002x' + BRANCH_PREFIX + 'draft-1' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID branch, and version GUID',
-                                      course_id='mit.eecs.6002x',
-                                      branch='draft',
+                                      course_id='mit.eecs.~6002x',
+                                      branch='draft-1',
                                       version_guid=ObjectId(test_id_loc))
 
     def test_course_constructor_course_id_no_branch(self):
