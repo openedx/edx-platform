@@ -12,7 +12,7 @@ from util.testing import UrlResetMixin
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
-from mock import patch
+from mock import patch, ANY
 
 log = logging.getLogger(__name__)
 
@@ -97,6 +97,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
                 'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
             },
+            params={'request_id': ANY},
             headers={'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
             timeout=5
         )
@@ -132,7 +133,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
                 {
-                    'params': {'mark_as_read': True},
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -141,6 +143,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'),
                 {
                     'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -148,7 +151,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
                 {
-                    'params': {'mark_as_read': True},
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -189,7 +193,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
                 {
-                    'params': {'mark_as_read': True},
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -198,6 +203,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'),
                 {
                     'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -205,7 +211,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
                 {
-                    'params': {'mark_as_read': True},
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -242,7 +249,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
                 {
-                    'params': {},
+                    'data': None,
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -251,6 +259,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'),
                 {
                     'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -258,7 +267,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
                 {
-                    'params': {},
+                    'data': None,
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -295,7 +305,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
                 {
-                    'params': {},
+                    'data': None,
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -304,6 +315,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'),
                 {
                     'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
@@ -311,7 +323,8 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             (
                 ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
                 {
-                    'params': {},
+                    'data': None,
+                    'params': {'request_id': ANY},
                     'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
                     'timeout': 5
                 }
