@@ -1,5 +1,6 @@
 define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
-        "js/views/feedback_notification", "jquery.cookie"],
+        "js/views/feedback_notification",
+        "coffee/src/ajax_prefix", "jquery.cookie"],
 (domReady, $, str, Backbone, gettext, NotificationView) ->
   AjaxPrefix.addAjaxPrefix jQuery, ->
     $("meta[name='path_prefix']").attr('content')
