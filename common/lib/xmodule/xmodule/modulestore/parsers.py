@@ -10,7 +10,7 @@ VERSION_PREFIX = "/version/"
 URL_VERSION_PREFIX = 'version/'
 
 URL_RE = re.compile(r'^(edx://)?(.+)$', re.IGNORECASE)
-
+ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.]'
 
 def parse_url(string, tag_optional=False):
     """
@@ -45,17 +45,12 @@ def parse_url(string, tag_optional=False):
     return parse_course_id(path)
 
 
-BLOCK_RE = re.compile(r'^\w+$', re.IGNORECASE)
+BLOCK_RE = re.compile(r'^' + ALLOWED_ID_CHARS + r'+$', re.IGNORECASE)
 
 
 def parse_block_ref(string):
     r"""
-    A block_ref is a string of word_chars.
-
-    <word_chars> matches one or more Unicode word characters; this includes most
-    characters that can be part of a word in any language, as well as numbers
-    and the underscore. (see definition of \w in python regular expressions,
-    at http://docs.python.org/dev/library/re.html)
+    A block_ref is a string of url safe characters (see ALLOWED_ID_CHARS)
 
     If string is a block_ref, returns a dict with key 'block_ref' and the value,
     otherwise returns None.
@@ -65,7 +60,10 @@ def parse_block_ref(string):
     return None
 
 
-GUID_RE = re.compile(r'^(?P<version_guid>[A-F0-9]+)(' + BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE)
+GUID_RE = re.compile(
+    r'^(?P<version_guid>[A-F0-9]+)(' + BLOCK_PREFIX + '(?P<block>' + ALLOWED_ID_CHARS + r'+))?$',
+    re.IGNORECASE
+)
 
 
 def parse_guid(string):
@@ -83,10 +81,10 @@ def parse_guid(string):
 
 
 COURSE_ID_RE = re.compile(
-    r'^(?P<id>(\w+)(\.\w+\w*)*)(' +
-    BRANCH_PREFIX + '(?P<branch>\w+))?(' +
-    VERSION_PREFIX + '(?P<version_guid>[A-F0-9]+))?(' +
-    BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE
+    r'^(?P<id>' + ALLOWED_ID_CHARS + r'+)(' +
+    BRANCH_PREFIX + r'(?P<branch>' + ALLOWED_ID_CHARS + r'+))?(' +
+    VERSION_PREFIX + r'(?P<version_guid>[A-F0-9]+))?(' +
+    BLOCK_PREFIX + r'(?P<block>' + ALLOWED_ID_CHARS + r'+))?$', re.IGNORECASE
 )
 
 
@@ -117,12 +115,7 @@ def parse_course_id(string):
 
       block = name
 
-      name = <word_chars>
-
-    <word_chars> matches one or more Unicode word characters; this includes most
-    characters that can be part of a word in any language, as well as numbers
-    and the underscore. (see definition of \w in python regular expressions,
-    at http://docs.python.org/dev/library/re.html)
+      name = ALLOWED_ID_CHARS
 
     If string is a course_id, returns a dict with keys 'id', 'branch', and 'block'.
     Revision is optional: if missing returned_dict['branch'] is None.
