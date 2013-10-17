@@ -42,10 +42,10 @@
             '<a ' +
               'href="#" ' +
               'class="quality_control" ' +
-              'title="HD" ' +
+              'title="HD off" ' +
               'role="button" ' +
               'aria-disabled="false"' +
-            '>HD</a>'
+            '>HD off</a>'
           );
       });
 

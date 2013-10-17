@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in, assert_false  # pylint: disable=E0611
+from nose.tools import assert_true, assert_in, assert_false  # pylint: disable=E0611
 
 from auth.authz import get_user_by_email, get_course_groupname_for_role
 from django.conf import settings
@@ -224,14 +224,50 @@ def i_enabled_the_advanced_module(step, module):
     press_the_notification_button(step, 'Save')
 
 
-@step('I have clicked the new unit button')
-def open_new_unit(step):
-    step.given('I have opened a new course section in Studio')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    old_url = world.browser.url
-    world.css_click('a.new-unit-item')
-    world.wait_for(lambda x: world.browser.url != old_url)
+@world.absorb
+def create_course_with_unit():
+    """
+    Prepare for tests by creating a course with a section, subsection, and unit.
+    Performs the following:
+        Clear out all courseware
+        Create a course with a section, subsection, and unit
+        Create a user and make that user a course author
+        Log the user into studio
+        Open the course from the dashboard
+        Expand the section and click on the New Unit link
+    The end result is the page where the user is editing the new unit
+    """
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    world.scenario_dict['COURSE'] = course
+    section = world.ItemFactory.create(parent_location=course.location)
+    world.ItemFactory.create(
+        parent_location=section.location,
+        category='sequential',
+        display_name='Subsection One',
+    )
+    user = create_studio_user(is_staff=False)
+    add_course_author(user, course)
+
+    log_into_studio()
+    world.css_click('a.course-link')
+
+    css_selectors = [
+        'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
+    ]
+    for selector in css_selectors:
+        world.css_click(selector)
+
+    world.wait_for_mathjax()
+    world.wait_for_xmodule()
+
+    assert world.is_css_present('ul.new-component-type')
+
+
+@step('I have clicked the new unit button$')
+@step(u'I am in Studio editing a new unit$')
+def edit_new_unit(step):
+    create_course_with_unit()
 
 
 @step('the save notification button is disabled')
@@ -267,9 +303,9 @@ def confirm_the_prompt(step):
     assert_false(world.css_find(btn_css).visible)
 
 
-@step(u'I am shown a (.*)$')
-def i_am_shown_a_notification(step, notification_type):
-    assert world.is_css_present('.wrapper-%s' % notification_type)
+@step(u'I am shown a prompt$')
+def i_am_shown_a_notification(step):
+    assert world.is_css_present('.wrapper-prompt')
 
 
 def type_in_codemirror(index, text):

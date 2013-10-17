@@ -50,8 +50,8 @@ def other_delete_self(_step):
 
 @step(u'I make "([^"]*)" a course team admin')
 def make_course_team_admin(_step, name):
-    admin_btn_css = '.user-item[data-email="{email}"] .user-actions .add-admin-role'.format(
-        email=name+'@edx.org')
+    admin_btn_css = '.user-item[data-email="{name}@edx.org"] .user-actions .add-admin-role'.format(
+        name=name)
     world.css_click(admin_btn_css)
 
 
@@ -80,8 +80,8 @@ def see_course(_step, do_not_see, gender='self'):
 
 @step(u'"([^"]*)" should( not)? be marked as an admin')
 def marked_as_admin(_step, name, not_marked_admin):
-    flag_css = '.user-item[data-email="{email}"] .flag-role.flag-role-admin'.format(
-        email=name+'@edx.org')
+    flag_css = '.user-item[data-email="{name}@edx.org"] .flag-role.flag-role-admin'.format(
+        name=name)
     if not_marked_admin:
         assert world.is_css_not_present(flag_css)
     else:

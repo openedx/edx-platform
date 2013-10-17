@@ -23,6 +23,7 @@ from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 import json
 from django.utils.translation import ugettext as _
+from pymongo import DESCENDING
 
 
 __all__ = ['asset_index', 'upload_asset']
@@ -30,11 +31,14 @@ __all__ = ['asset_index', 'upload_asset']
 
 @login_required
 @ensure_csrf_cookie
-def asset_index(request, org, course, name):
+def asset_index(request, org, course, name, start=None, maxresults=None):
     """
     Display an editable asset library
 
     org, course, name: Attributes of the Location for the item to edit
+
+    :param start: which index of the result list to start w/, used for paging results
+    :param maxresults: maximum results
     """
     location = get_location_and_verify_access(request, org, course, name)
 
@@ -47,10 +51,17 @@ def asset_index(request, org, course, name):
     course_module = modulestore().get_item(location)
 
     course_reference = StaticContent.compute_location(org, course, name)
-    assets = contentstore().get_all_content_for_course(course_reference)
-
-    # sort in reverse upload date order
-    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+    if maxresults is not None:
+        maxresults = int(maxresults)
+        start = int(start) if start else 0
+        assets = contentstore().get_all_content_for_course(
+            course_reference, start=start, maxresults=maxresults,
+            sort=[('uploadDate', DESCENDING)]
+        )
+    else:
+        assets = contentstore().get_all_content_for_course(
+            course_reference, sort=[('uploadDate', DESCENDING)]
+        )
 
     asset_json = []
     for asset in assets:

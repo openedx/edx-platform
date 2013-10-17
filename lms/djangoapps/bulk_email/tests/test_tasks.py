@@ -186,6 +186,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertGreater(status.get('duration_ms'), 0)
         self.assertEquals(entry.task_state, SUCCESS)
         self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
+        return entry
 
     def test_successful(self):
         # Select number of emails to fit into a single subtask.
@@ -195,6 +196,23 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
+
+    def test_successful_twice(self):
+        # Select number of emails to fit into a single subtask.
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            task_entry = self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
+
+        # submit the same task a second time, and confirm that it is not run again.
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([Exception("This should not happen!")])
+            parent_status = self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
+        self.assertEquals(parent_status.get('total'), num_emails)
+        self.assertEquals(parent_status.get('succeeded'), num_emails)
+        self.assertEquals(parent_status.get('failed'), 0)
 
     def test_unactivated_user(self):
         # Select number of emails to fit into a single subtask.

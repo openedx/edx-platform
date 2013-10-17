@@ -191,7 +191,7 @@ def view_asset(_step, status):
     # Note that world.visit would trigger a 403 error instead of displaying "Unauthorized"
     # Instead, we can drop back into the selenium driver get command.
     world.browser.driver.get(url)
-    assert_equal(world.css_text('body'),expected_text)
+    assert_equal(world.css_text('body'), expected_text)
 
 
 @step('I see a confirmation that the file was deleted$')

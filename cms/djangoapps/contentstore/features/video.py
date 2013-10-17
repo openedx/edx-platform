@@ -12,11 +12,10 @@ BUTTONS = {
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
+    world.create_course_with_unit()
     world.create_component_instance(
-        step, '.large-video-icon',
-        'video',
-        '.xmodule_VideoModule',
-        has_multiple_templates=False
+        step=step,
+        category='video',
     )
 
 
@@ -155,4 +154,3 @@ def check_captions_visibility_state(_step, visibility_state, timeout):
         assert world.css_visible('.subtitles')
     else:
         assert not world.css_visible('.subtitles')
-
