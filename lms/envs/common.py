@@ -360,6 +360,7 @@ if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_ENABLED = True
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -885,6 +886,7 @@ INSTALLED_APPS = (
     'static_template_view',
     'staticbook',
     'track',
+    'eventtracking.django',
     'util',
     'certificates',
     'instructor',
