@@ -53,7 +53,7 @@ def the_course_has_an_honor_mode(step):
         mode_slug='honor',
         mode_display_name='honor mode',
         min_price=0,
-        )
+    )
     assert isinstance(honor_mode, CourseMode)
 
 
@@ -73,14 +73,26 @@ def select_contribution(amount=32):
     assert world.css_find(radio_css).selected
 
 
+def click_verified_track_button():
+    world.wait_for_ajax_complete()
+    btn_css = 'input[value="Select Certificate"]'
+    world.css_click(btn_css)
+
+
+@step(u'I select the verified track for upgrade')
+def select_verified_track_upgrade(step):
+    select_contribution(32)
+    click_verified_track_button()
+    # TODO: might want to change this depending on the changes for upgrade
+    assert world.is_css_present('section.progress')
+
+
 @step(u'I select the verified track$')
 def select_the_verified_track(step):
     create_cert_course()
     register()
     select_contribution(32)
-    world.wait_for_ajax_complete()
-    btn_css = 'input[value="Select Certificate"]'
-    world.css_click(btn_css)
+    click_verified_track_button()
     assert world.is_css_present('section.progress')
 
 
@@ -203,6 +215,20 @@ def submitted_photos_to_verify_my_identity(step):
     step.given('I go to step "4"')
 
 
+@step(u'I submit my photos and confirm')
+def submit_photos_and_confirm(step):
+    step.given('I go to step "1"')
+    step.given('I capture my "face" photo')
+    step.given('I approve my "face" photo')
+    step.given('I go to step "2"')
+    step.given('I capture my "photo_id" photo')
+    step.given('I approve my "photo_id" photo')
+    step.given('I go to step "3"')
+    step.given('I select a contribution amount')
+    step.given('I confirm that the details match')
+    step.given('I go to step "4"')
+
+
 @step(u'I see that my payment was successful')
 def see_that_my_payment_was_successful(step):
     title = world.css_find('div.wrapper-content-main h3.title')
@@ -225,6 +251,17 @@ def see_the_course_on_my_dashboard(step):
 def see_upsell_link_on_my_dashboard(step):
     course_link_css = 'div.verified-upsell a[href*="edx/999/Certificates"'
     assert world.is_css_present(course_link_css)
+
+
+@step(u'I do not see the upsell link on my dashboard')
+def see_upsell_link_on_my_dashboard(step):
+    course_link_css = 'div.verified-upsell a[href*="edx/999/Certificates"'
+    assert not world.is_css_present(course_link_css)
+
+
+@step(u'I select the upsell link on my dashboard')
+def see_upsell_link_on_my_dashboard(step):
+     world.css_click('div.verified-upsell a[href*="edx/999/Certificates"')
 
 
 @step(u'I see that I am on the verified track')
