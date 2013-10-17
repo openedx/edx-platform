@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Tests for course access
+"""
 import mock
 
 from django.test import TestCase
@@ -44,13 +47,12 @@ class CoursesTest(TestCase):
         self.assertEqual("//{}/".format(CMS_BASE_TEST), get_cms_course_link_by_id("too/too/many/slashes"))
         self.assertEqual("//{}/org/num/course/name".format(CMS_BASE_TEST), get_cms_course_link_by_id('org/num/name'))
 
-
     @mock.patch('xmodule.modulestore.django.get_current_request_hostname', mock.Mock(return_value='preview.localhost'))
-    @override_settings(HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={'preview\.': 'draft'})
-    def test_default_modulestore_preview_mapping(self):   
+    @override_settings(HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': 'draft'})
+    def test_default_modulestore_preview_mapping(self):
         self.assertEqual(get_default_store_name_for_current_request(), 'draft')
 
     @mock.patch('xmodule.modulestore.django.get_current_request_hostname', mock.Mock(return_value='localhost'))
-    @override_settings(HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={'preview\.': 'draft'})
+    @override_settings(HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS={r'preview\.': 'draft'})
     def test_default_modulestore_published_mapping(self):
         self.assertEqual(get_default_store_name_for_current_request(), 'default')
