@@ -35,6 +35,7 @@ Feature: LMS.Verified certificates
         And I navigate to my dashboard
         Then I see the course on my dashboard
         And I see that I am on the verified track
+        And I do not see the upsell link on my dashboard
 
     # Not easily automated
 #    Scenario: I can re-take photos
@@ -77,7 +78,17 @@ Feature: LMS.Verified certificates
         And I navigate to my dashboard
         Then I see the upsell link on my dashboard
 
-    Scenario: I can take the upsell offer and be registered for a verified course
+    Scenario: I can take the upsell offer and pay for it
         Given I am logged in
         And I select the audit track
         And I navigate to my dashboard
+        When I see the upsell link on my dashboard
+        And I select the upsell link on my dashboard
+        And I select the verified track for upgrade
+        And I submit my photos and confirm
+        And I am at the payment page
+        And I submit valid payment information
+        And I navigate to my dashboard
+        Then I see the course on my dashboard
+        And I see that I am on the verified track
+
