@@ -32,7 +32,7 @@ def sysadmin(request):
     db = client.xmodule
 
     msg = ''
-    bdir = "DATA-BACKUP"
+    bdir = settings.getattr('DELETED_COURSE_BACKUPS_DIR', None)
     
     action = request.GET.get('action', request.POST.get('action', ''))
     course_id = request.GET.get('course_id', '')
@@ -50,10 +50,11 @@ def sysadmin(request):
                 msg += _("deleting {0}").format(course_id)
                 data = db.modulestore.find({'_id.course': course_id})
                 fn = 'course-%s-dump-%s.json' % (course_id, time.ctime(time.time()).replace(' ','_'))
-                fp = open('%s/%s' % (bdir,fn), 'w')
-                for d in data:
-                    fp.write(json.dumps(d)+'\n')
-                fp.close()
+                if bdir is not None:
+                    fp = open('%s/%s' % (bdir,fn), 'w')
+                    for d in data:
+                        fp.write(json.dumps(d)+'\n')
+                    fp.close()
                 db.modulestore.remove({'_id.course': course_id})
                 msg += _("{0} records for {1} removed (backup file {2})").format(nrec, course_id, fn)
                 logging.debug('Course %s deleted!' % course_id)

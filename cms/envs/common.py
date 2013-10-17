@@ -81,6 +81,11 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+########## DIRECTORY WHERE DELETED COURSE CONTENT IS BACKED UP ##############
+
+# for example:
+# DELETED_COURSE_BACKUPS_DIR = ENV_ROOT / "data_backup"
+DELETED_COURSE_BACKUPS_DIR = None    # no backups
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
