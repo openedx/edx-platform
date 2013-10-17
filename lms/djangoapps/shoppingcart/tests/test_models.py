@@ -20,6 +20,7 @@ from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
+from django.core.exceptions import (ObjectDoesNotExist, MultipleObjectsReturned)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -360,3 +361,27 @@ class CertificateItemTest(ModuleStoreTestCase):
         cert_item = CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
         self.assertEquals(cert_item.single_item_receipt_template,
                           'shoppingcart/receipt.html')
+
+    def test_refund_cert_single_cert(self):
+        # enroll and buy; dup from test_existing_enrollment
+        CourseEnrollment.enroll(self.user, self.course_id)
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+        cart.purchase()
+        enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
+        # now that it's there, let's try refunding it
+        order = CertificateItem.refund_cert(target_user=self.user, target_course_id=self.course_id)
+        self.assertEquals(order.status, 'refunded')
+
+    def test_refund_cert_no_cert_exists(self):
+        order = CertificateItem.refund_cert(target_user=self.user, target_course_id=self.course_id)
+        self.assertRaises(ObjectDoesNotExist)
+
+    def test_refund_cert_duplicate_certs_exist(self):
+        for i in range(0, 2):
+            CourseEnrollment.enroll(self.user, self.course_id)
+            cart = Order.get_cart_for_user(user=self.user)
+            CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+            cart.purchase()
+            enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
+        self.assertRaises(MultipleObjectsReturned)

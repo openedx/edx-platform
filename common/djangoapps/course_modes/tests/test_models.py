@@ -5,7 +5,7 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 import pytz
 
 from django.test import TestCase
@@ -20,6 +20,7 @@ class CourseModeModelTest(TestCase):
     def setUp(self):
         self.course_id = 'TestCourse'
         CourseMode.objects.all().delete()
+        #todo use different default date
 
     def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices='', currency='usd'):
         """
@@ -31,7 +32,7 @@ class CourseModeModelTest(TestCase):
             mode_slug=mode_slug,
             min_price=min_price,
             suggested_prices=suggested_prices,
-            currency=currency
+            currency=currency,
         )
 
     def test_modes_for_course_empty(self):
@@ -112,3 +113,9 @@ class CourseModeModelTest(TestCase):
 
         modes = CourseMode.modes_for_course('second_test_course')
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+
+    def test_refund_expiration_date(self):
+        self.create_mode('verified', 'Verified Certificate')
+        modes = CourseMode.modes_for_course(self.course_id)
+        mode = Mode(u'verified', u'Verified Certificate', 0, '', 'usd')
+        self.assertEqual(CourseMode.refund_expiration_date(self.course_id, 'verified'), date(1990, 1, 1))

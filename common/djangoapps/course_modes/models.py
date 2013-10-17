@@ -2,7 +2,7 @@
 Add and create new modes for running courses on this particular LMS
 """
 import pytz
-from datetime import datetime
+from datetime import datetime, date
 
 from django.db import models
 from collections import namedtuple
@@ -100,6 +100,17 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
+
+    @classmethod
+    def refund_expiration_date(cls, course_id, mode_slug):
+        """
+        Returns the expiration date for verified certificate refunds.  After this date, refunds are
+        no longer possible.  Note that this is currently set to be identical to the expiration date for
+        verified cert signups, but this could be changed in the future
+        """
+        print "TODO fix this"
+        return date(1990, 1, 1)
+        #return cls.mode_for_course(course_id,mode_slug).expiration_date
 
     def __unicode__(self):
         return u"{} : {}, min={}, prices={}".format(

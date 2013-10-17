@@ -422,3 +422,28 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
         self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CertificateItemTest(ModuleStoreTestCase):
+    """
+    Tests for paid certificate functionality (verified student), involves shoppingcart
+    """
+    # test data
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        # Create course
+        self.req_factory = RequestFactory()
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = User.objects.create(username="test", email="test@test.org")
+
+    def test_unenroll_and_refund(self):
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id, 'enrollment_action': 'unenroll'})
+        request.user = self.user
+        response = change_enrollment(request)
+        self.assertEqual(response.status_code, 200)
+        # add more later; see if this even works
