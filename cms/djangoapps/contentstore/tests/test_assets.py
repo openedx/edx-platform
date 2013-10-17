@@ -174,6 +174,8 @@ class TestAssetIndex(CourseTestCase):
         course_filter = Location(
             XASSET_LOCATION_TAG, category='asset', course=self.course.location.course, org=self.course.location.org
         )
+        # purge existing entries (a bit brutal but hopefully tests are independent enuf to not trip on this)
+        cstore.fs_files.remove(course_filter.dict())
         base_entry = {
             'displayname': 'foo.jpg',
             'chunkSize': 262144,
