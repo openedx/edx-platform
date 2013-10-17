@@ -20,6 +20,7 @@ from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
 from xblock.fields import Scope
 from xblock.runtime import Mixologist
+from bson.objectid import ObjectId
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -519,6 +520,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 else:
                     result.setdefault(version['blocks'][usage_id]['edit_info']['previous_version'], set()).add(
                         version['blocks'][usage_id]['edit_info']['update_version'])
+
         # more than one possible_root means usage was added and deleted > 1x.
         if len(possible_roots) > 1:
             # find the history segment including block_locator's version
@@ -552,20 +554,21 @@ class SplitMongoModuleStore(ModuleStoreBase):
         :param user_id: request.user object
         """
         new_def_data = self._filter_special_fields(new_def_data)
+        new_id = ObjectId()
         document = {
+            '_id': new_id,
             "category" : category,
             "fields": new_def_data,
             "edit_info": {
+                "_id": new_id,
                 "edited_by": user_id,
                 "edited_on": datetime.datetime.now(UTC),
                 "previous_version": None,
-                "original_version": None
+                "original_version": new_id,
                 }
             }
-        new_id = self.definitions.insert(document)
+        self.definitions.insert(document)
         definition_locator = DefinitionLocator(new_id)
-        document['edit_info']['original_version'] = new_id
-        self.definitions.update({'_id': new_id}, {'$set': {"edit_info.original_version": new_id}})
         return definition_locator
 
     def update_definition_from_data(self, definition_locator, new_def_data, user_id):
@@ -589,15 +592,17 @@ class SplitMongoModuleStore(ModuleStoreBase):
         old_definition = self.definitions.find_one({'_id': definition_locator.definition_id})
         if old_definition is None:
             raise ItemNotFoundError(definition_locator.url())
-        del old_definition['_id']
 
         if needs_saved():
+            # new id to create new version
+            old_definition['_id'] = ObjectId()
             old_definition['fields'] = new_def_data
             old_definition['edit_info']['edited_by'] = user_id
             old_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+            # previous version id
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
-            new_id = self.definitions.insert(old_definition)
-            return DefinitionLocator(new_id), True
+            self.definitions.insert(old_definition)
+            return DefinitionLocator(old_definition['_id']), True
         else:
             return definition_locator, False
 
@@ -707,7 +712,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             new_structure = self._version_structure(structure, user_id)
 
-        # generate an id
+        new_id = new_structure['_id']
+
+        # generate usage id
         if usage_id is not None:
             if usage_id in new_structure['blocks']:
                 raise DuplicateItemError(usage_id, self, 'structures')
@@ -716,7 +723,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             new_usage_id = self._generate_usage_id(new_structure['blocks'], category)
 
-        update_version_keys = ['blocks.{}.edit_info.update_version'.format(new_usage_id)]
         block_fields = partitioned_fields.get(Scope.settings, {})
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
@@ -727,9 +733,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'edit_info': {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
-                'previous_version': None
+                'previous_version': None,
+                'update_version': new_id,
             }
         }
+
         # if given parent, add new block as child and update parent's version
         parent = None
         if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.usage_id is not None:
@@ -739,22 +747,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 parent['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                 parent['edit_info']['edited_by'] = user_id
                 parent['edit_info']['previous_version'] = parent['edit_info']['update_version']
-                update_version_keys.append(
-                    'blocks.{}.edit_info.update_version'.format(course_or_parent_locator.usage_id)
-                )
+                parent['edit_info']['update_version'] = new_id
         if continue_version:
-            new_id = structure['_id']
             # db update
             self.structures.update({'_id': new_id}, new_structure)
             # clear cache so things get refetched and inheritance recomputed
             self._clear_cache(new_id)
         else:
-            new_id = self.structures.insert(new_structure)
-
-        update_version_payload = {key: new_id for key in update_version_keys}
-        self.structures.update(
-            {'_id': new_id},
-            {'$set': update_version_payload})
+            self.structures.insert(new_structure)
 
         # update the index entry if appropriate
         if index_entry is not None:
@@ -815,22 +815,26 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # if building a wholly new structure
         if versions_dict is None or master_branch not in versions_dict:
             # create new definition and structure
+            definition_id = ObjectId()
             definition_entry = {
+                '_id': definition_id,
                 'category': root_category,
                 'fields': definition_fields,
                 'edit_info': {
                     'edited_by': user_id,
                     'edited_on': datetime.datetime.now(UTC),
                     'previous_version': None,
+                    'original_version': definition_id,
                 }
             }
-            definition_id = self.definitions.insert(definition_entry)
-            definition_entry['edit_info']['original_version'] = definition_id
-            self.definitions.update({'_id': definition_id}, {'$set': {"edit_info.original_version": definition_id}})
+            self.definitions.insert(definition_entry)
 
+            new_id = ObjectId()
             draft_structure = {
+                '_id': new_id,
                 'root': root_usage_id,
                 'previous_version': None,
+                'original_version': new_id,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.now(UTC),
                 'blocks': {
@@ -841,18 +845,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
                         'edit_info': {
                             'edited_on': datetime.datetime.now(UTC),
                             'edited_by': user_id,
-                            'previous_version': None
+                            'previous_version': None,
+                            'update_version': new_id,
                         }
                     }
                 }
             }
-            new_id = self.structures.insert(draft_structure)
-            draft_structure['original_version'] = new_id
-            self.structures.update(
-                {'_id': new_id},
-                {'$set': {"original_version": new_id,
-                    'blocks.{}.edit_info.update_version'.format(root_usage_id): new_id}}
-            )
+            self.structures.insert(draft_structure)
+
             if versions_dict is None:
                 versions_dict = {master_branch: new_id}
             else:
@@ -864,6 +864,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             draft_structure = self._lookup_course(draft_version)['structure']
             if definition_fields or block_fields:
                 draft_structure = self._version_structure(draft_structure, user_id)
+                new_id = draft_structure['_id']
                 root_block = draft_structure['blocks'][draft_structure['root']]
                 if block_fields is not None:
                     root_block['fields'].update(block_fields)
@@ -873,16 +874,17 @@ class SplitMongoModuleStore(ModuleStoreBase):
                     definition['edit_info']['previous_version'] = definition['_id']
                     definition['edit_info']['edited_by'] = user_id
                     definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-                    del definition['_id']
-                    root_block['definition'] = self.definitions.insert(definition)
+                    definition['_id'] = ObjectId()
+                    self.definitions.insert(definition)
+                    root_block['definition'] = definition['_id']
                     root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                     root_block['edit_info']['edited_by'] = user_id
                     root_block['edit_info']['previous_version'] = root_block['edit_info'].get('update_version')
-                # insert updates the '_id' in draft_structure
-                new_id = self.structures.insert(draft_structure)
+                    root_block['edit_info']['update_version'] = new_id
+
+                self.structures.insert(draft_structure)
                 versions_dict[master_branch] = new_id
-                self.structures.update({'_id': new_id},
-                    {'$set': {'blocks.{}.edit_info.update_version'.format(draft_structure['root']): new_id}})
+
         # create the index entry
         if id_root is None:
             id_root = org
@@ -895,7 +897,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
             'versions': versions_dict}
-        new_id = self.course_index.insert(index_entry)
+        self.course_index.insert(index_entry)
         return self.get_course(CourseLocator(course_id=new_id, branch=master_branch))
 
     def update_item(self, descriptor, user_id, force=False):
@@ -940,16 +942,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
             if descriptor.has_children:
                 block_data['fields']["children"] = [self._usage_id(child) for child in descriptor.children]
 
+            new_id = new_structure['_id']
             block_data['edit_info'] = {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
                 'previous_version': block_data['edit_info']['update_version'],
+                'update_version': new_id,
             }
-            new_id = self.structures.insert(new_structure)
-            self.structures.update(
-                {'_id': new_id},
-                {'$set': {'blocks.{}.edit_info.update_version'.format(descriptor.location.usage_id): new_id}})
-
+            self.structures.insert(new_structure)
             # update the index entry if appropriate
             if index_entry is not None:
                 self._update_head(index_entry, descriptor.location.branch, new_id)
@@ -983,15 +983,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         index_entry = self._get_index_if_valid(xblock.location, force)
         structure = self._lookup_course(xblock.location)['structure']
         new_structure = self._version_structure(structure, user_id)
+        new_id = new_structure['_id']
+        is_updated = self._persist_subdag(xblock, user_id, new_structure['blocks'], new_id)
 
-        changed_blocks = self._persist_subdag(xblock, user_id, new_structure['blocks'])
-
-        if changed_blocks:
-            new_id = self.structures.insert(new_structure)
-            update_command = {}
-            for usage_id in changed_blocks:
-                update_command['blocks.{}.edit_info.update_version'.format(usage_id)] = new_id
-            self.structures.update({'_id': new_id}, {'$set': update_command})
+        if is_updated:
+            self.structures.insert(new_structure)
 
             # update the index entry if appropriate
             if index_entry is not None:
@@ -1002,7 +998,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return xblock
 
-    def _persist_subdag(self, xblock, user_id, structure_blocks):
+    def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
         new_def_data = self._filter_special_fields(xblock.get_explicitly_set_fields_by_scope(Scope.content))
         if (xblock.definition_locator is None or xblock.definition_locator.definition_id is None):
@@ -1027,17 +1023,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 is_updated = True
 
         children = []
-        updated_blocks = []
         if xblock.has_children:
             for child in xblock.children:
                 if isinstance(child.usage_id, LocalId):
                     child_block = xblock.system.get_block(child)
-                    updated_blocks += self._persist_subdag(child_block, user_id, structure_blocks)
+                    is_updated = self._persist_subdag(child_block, user_id, structure_blocks, new_id) or is_updated
                     children.append(child_block.location.usage_id)
                 else:
                     children.append(child)
 
-        is_updated = is_updated or updated_blocks
         block_fields = xblock.get_explicitly_set_fields_by_scope(Scope.settings)
         if not is_new and not is_updated:
             is_updated = self._compare_settings(block_fields, structure_blocks[usage_id]['fields'])
@@ -1052,13 +1046,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 "fields": block_fields,
                 'edit_info': {
                     'previous_version': previous_version,
+                    'update_version': new_id,
                     'edited_by': user_id,
                     'edited_on': datetime.datetime.now(UTC)
                 }
             }
-            updated_blocks.append(usage_id)
 
-        return updated_blocks
+        return is_updated
 
     def _compare_settings(self, settings, original_fields):
         """
@@ -1133,15 +1127,16 @@ class SplitMongoModuleStore(ModuleStoreBase):
         index_entry = self._get_index_if_valid(usage_locator, force)
         new_structure = self._version_structure(original_structure, user_id)
         new_blocks = new_structure['blocks']
+        new_id = new_structure['_id']
         parents = self.get_parent_locations(usage_locator)
-        update_version_keys = []
         for parent in parents:
             parent_block = new_blocks[parent.usage_id]
             parent_block['fields']['children'].remove(usage_locator.usage_id)
             parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
             parent_block['edit_info']['edited_by'] = user_id
             parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
-            update_version_keys.append('blocks.{}.edit_info.update_version'.format(parent.usage_id))
+            parent_block['edit_info']['update_version'] = new_id
+
         # remove subtree
         def remove_subtree(usage_id):
             for child in new_blocks[usage_id]['fields'].get('children', []):
@@ -1151,10 +1146,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             remove_subtree(usage_locator.usage_id)
 
         # update index if appropriate and structures
-        new_id = self.structures.insert(new_structure)
-        if update_version_keys:
-            update_version_payload = {key: new_id for key in update_version_keys}
-            self.structures.update({'_id': new_id}, {'$set': update_version_payload})
+        self.structures.insert(new_structure)
 
         result = CourseLocator(version_guid=new_id)
 
@@ -1272,7 +1264,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # clear cache again b/c inheritance may be wrong over orphans
         self._clear_cache(original_structure['_id'])
 
-
     def _block_matches(self, value, qualifiers):
         '''
         Return True or False depending on whether the value (block contents)
@@ -1374,7 +1365,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         :param user_id:
         """
         new_structure = copy.deepcopy(structure)
-        del new_structure['_id']
+        new_structure['_id'] = ObjectId()
         new_structure['previous_version'] = structure['_id']
         new_structure['edited_by'] = user_id
         new_structure['edited_on'] = datetime.datetime.now(UTC)
