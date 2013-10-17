@@ -149,6 +149,7 @@ class LockAssetTestCase(CourseTestCase):
         self.assertFalse(resp_asset['locked'])
         verify_asset_locked_state(False)
 
+
 class TestAssetIndex(CourseTestCase):
     """
     Test getting asset lists via http (Note, the assets don't actually exist)
@@ -189,6 +190,7 @@ class TestAssetIndex(CourseTestCase):
         return course_filter.dict()
 
     ASSET_LIST_RE = re.compile(r'AssetCollection\((.*)\);$', re.MULTILINE)
+
     def check_page_content(self, resp_content, entry_count, last_date=None):
         """
         :param entry_count:
@@ -222,7 +224,7 @@ class TestAssetIndex(CourseTestCase):
         resp = self.client.get(asset_url)
         self.check_page_content(resp.content, 100)
         # get first page of 10
-        resp = self.client.get(asset_url + "/start/0/max/10")
+        resp = self.client.get(asset_url + "/max/10")
         last_date = self.check_page_content(resp.content, 10)
         # get next of 20
         resp = self.client.get(asset_url + "/start/10/max/20")
