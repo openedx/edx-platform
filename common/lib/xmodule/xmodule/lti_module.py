@@ -8,7 +8,6 @@ http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 import logging
 import oauthlib.oauth1
 import urllib
-import json
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -145,7 +144,7 @@ class LTIModule(LTIFields, XModule):
         # part of the POST data. These parameters should not be prefixed.
         # Likewise, The creator of an LTI link can add custom key/value parameters
         # to a launch which are to be included with the launch of the LTI link.
-        # In this case, these parameters should be prefixed by 'custom_'.
+        # In this case, we will automatically add `custom_` prefix before this parameters.
         # See http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html#_Toc316828520
         PARAMETERS = [
             "lti_message_type",
@@ -206,6 +205,7 @@ class LTIModule(LTIFields, XModule):
                 raise LTIError('Could not parse custom parameter: {0!r}. \
                     Should be "x=y" string.'.format(custom_parameter))
 
+            # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
             if param_name not in PARAMETERS:
                 param_name = 'custom_' + param_name
 
