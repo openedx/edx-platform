@@ -318,9 +318,12 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     # Check that the requested subtask is actually known to the current InstructorTask entry.
     # If this fails, it throws an exception, which should fail this subtask immediately.
     # This can happen when the parent task has been run twice, and results in duplicate
-    # subtasks being created for the same InstructorTask entry.  We hope to catch this condition
-    # in perform_delegate_email_batches(), but just in case we fail to do so there,
-    # we check here as well.
+    # subtasks being created for the same InstructorTask entry.  This can happen when Celery
+    # loses its connection to its broker, and any current tasks get requeued.
+    # We hope to catch this condition in perform_delegate_email_batches() when it's the parent
+    # task that is resubmitted, but just in case we fail to do so there, we check here as well.
+    # There is also a possibility that this task will be run twice by Celery, for the same reason.
+    # To deal with that, we need to confirm that the task has not already been completed.
     check_subtask_is_valid(entry_id, current_task_id)
 
     send_exception = None

@@ -16,6 +16,11 @@ Blades: LTI module can now load external content in a new window.
 
 LMS: Disable data download buttons on the instructor dashboard for large courses
 
+Common: Adds ability to disable a student's account. Students with disabled
+accounts will be prohibited from site access.
+
+LMS: Fix issue with CourseMode expiration dates
+
 LMS: Ported bulk emailing to the beta instructor dashboard.
 
 LMS: Add monitoring of bulk email subtasks to display progress on instructor dash.
