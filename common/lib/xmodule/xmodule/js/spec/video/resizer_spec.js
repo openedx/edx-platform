@@ -5,17 +5,16 @@ require(
 function (Resizer) {
 
     describe('Resizer', function () {
-        var config, container, element;
-
-        beforeEach(function () {
-            var html = [
+        var html = [
                 '<div class="rszr-wrapper" style="width:200px; height: 200px;">',
                     '<div class="rszr-el" style="width:100px; height: 150px;">',
                         'Content',
                     '</div>',
                 '</div>'
-            ].join('');
+            ].join(''),
+            config, container, element;
 
+        beforeEach(function () {
             setFixtures(html);
 
             container = $('.rszr-wrapper');
@@ -58,10 +57,10 @@ function (Resizer) {
                 realHeight = element.height(),
                 expectedWidth = 50;
 
-            // conatinerRatio >= elementRatio
+            // containerRatio >= elementRatio
             expect(realHeight).toBe(expectedHeight);
 
-            // conatinerRatio < elementRatio
+            // containerRatio < elementRatio
             container.width(expectedWidth);
             resizer.align();
             realWidth = element.width();
@@ -76,10 +75,10 @@ function (Resizer) {
                 realHeight = element.height(),
                 expectedWidth = 50;
 
-            // conatinerRatio >= elementRatio
+            // containerRatio >= elementRatio
             expect(realHeight).toBe(expectedHeight);
 
-            // conatinerRatio < elementRatio
+            // containerRatio < elementRatio
             container.width(expectedWidth);
             resizer.setMode('width');
             realWidth = element.width();
