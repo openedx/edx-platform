@@ -34,7 +34,7 @@ def initialize_course_tabs(course):
     # so if you change anything here, you need to also change it there.
     course.tabs = [
         {"type": "courseware", "name": _("Courseware")},
-        {"type": "course_info", , "name": _("Course Info")},
+        {"type": "course_info", "name": _("Course Info")},
         {"type": "discussion", "name": _("Discussion")},
         {"type": "wiki", "name": _("Wiki")},
         {"type": "progress", "name": _("Progress")},
