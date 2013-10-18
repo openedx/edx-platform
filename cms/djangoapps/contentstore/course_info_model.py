@@ -94,7 +94,7 @@ def update_course_updates(location, update, passed_id=None):
         passed_id = course_updates.location.url() + "/" + str(idx)
 
     # update db record
-    course_updates.data = html.tostring(course_html_parsed)
+    course_updates.data = html.tostring(course_html_parsed, encoding=unicode)
     modulestore('direct').update_item(location, course_updates.data)
 
     return {"id": passed_id,
@@ -111,7 +111,7 @@ def _course_info_content(html_parsed):
         content = html_parsed[0].tail
     else:
         content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-        content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+        content += "\n".join([html.tostring(ele, encoding=unicode) for ele in html_parsed[1:]])
     return content
 
 
