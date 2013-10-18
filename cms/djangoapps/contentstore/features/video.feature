@@ -77,3 +77,13 @@ Feature: CMS.Video Component
     Then I focus on caption line with data-index 0
     Then I press "enter" button on caption line with data-index 0
     And I see caption line with data-index 0 has class "focused"
+
+  # 11
+  Scenario: When start end end times are specified, a range on slider is shown
+    Given I have created a Video component
+    And I edit the component
+    And Enter a start time of 10 seconds
+    And Enter an end time of 20 seconds
+    And I close the component editor
+    And I click Play button
+    Then I see a range on slider starting at 20 and running for 40 %

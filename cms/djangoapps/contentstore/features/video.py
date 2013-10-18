@@ -8,6 +8,8 @@ from selenium.webdriver.common.keys import Keys
 BUTTONS = {
     'CC': '.hide-subtitles',
     'volume': '.volume',
+    'Play': '.video_control.play',
+    'Save': 'save-button',
 }
 
 
@@ -172,4 +174,27 @@ def focus_on_caption_line(_step, index):
 def caption_line_has_class(_step, index, className):
     SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
     world.css_has_class(SELECTOR, className.strip())
+
+
+@step('Enter (?:a|an) (.+) time of (.+) seconds$')
+def enter_start_end_time(_step, type_of_time, time):
+    type_of_time = type_of_time.strip()
+    time = int(time.strip())
+
+
+@step('I click (.+) button$')
+def click_a_button(_step, button):
+    button = button.strip(button)
+    world.browser.find_by_css(BUTTONS[button]).click()
+
+
+@step('I close the component editor$')
+def close_component_editor(_step):
+    _step.given('I click Save button')
+
+
+@step('I see a range on slider starting at (.+) and running for (.+) %$')
+def see_a_range_slider_with_proper_range(_step, left, width):
+    left = int(left.strip())
+    width = int(width.strip())
 
