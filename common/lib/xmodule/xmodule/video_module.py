@@ -28,8 +28,6 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
-from xblock.field_data import DictFieldData
-
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
 

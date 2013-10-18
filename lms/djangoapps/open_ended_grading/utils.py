@@ -12,8 +12,6 @@ from django.conf import settings
 
 from mitxmako.shortcuts import render_to_string
 
-from xblock.field_data import DictFieldData
-
 import logging
 
 log = logging.getLogger(__name__)

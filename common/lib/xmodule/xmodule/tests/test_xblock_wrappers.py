@@ -68,6 +68,8 @@ NOT_STUDIO_EDITABLE = (
 
 
 class TestXBlockWrapper(object):
+    """Helper methods used in test case classes below."""
+
     @property
     def leaf_module_runtime(self):
         runtime = ModuleSystem(
