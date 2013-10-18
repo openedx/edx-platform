@@ -12,11 +12,15 @@ from time import sleep
 from dogapi import dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
 from boto.ses.exceptions import (
+    SESAddressNotVerifiedError,
+    SESIdentityNotVerifiedError,
+    SESDomainNotConfirmedError,
+    SESAddressBlacklistedError,
     SESDailyQuotaExceededError,
     SESMaxSendingRateExceededError,
-    SESAddressBlacklistedError,
-    SESIllegalAddressError,
+    SESDomainEndsWithDotError,
     SESLocalAddressCharacterError,
+    SESIllegalAddressError,
 )
 from boto.exception import AWSConnectionError
 
@@ -50,11 +54,20 @@ log = get_task_logger(__name__)
 
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.
-SINGLE_EMAIL_FAILURE_ERRORS = (SESAddressBlacklistedError, SESIllegalAddressError, SESLocalAddressCharacterError)
+SINGLE_EMAIL_FAILURE_ERRORS = (
+    SESAddressBlacklistedError,  # Recipient's email address has been temporarily blacklisted.
+    SESDomainEndsWithDotError,  # Recipient's email address' domain ends with a period/dot.
+    SESIllegalAddressError,  # Raised when an illegal address is encountered.
+    SESLocalAddressCharacterError,  # An address contained a control or whitespace character.
+)
 
 # Exceptions that, if caught, should cause the task to be re-tried.
 # These errors will be caught a limited number of times before the task fails.
-LIMITED_RETRY_ERRORS = (SMTPConnectError, SMTPServerDisconnected, AWSConnectionError)
+LIMITED_RETRY_ERRORS = (
+    SMTPConnectError,
+    SMTPServerDisconnected,
+    AWSConnectionError,
+)
 
 # Errors that indicate that a mailing task should be retried without limit.
 # An example is if email is being sent too quickly, but may succeed if sent
@@ -63,12 +76,21 @@ LIMITED_RETRY_ERRORS = (SMTPConnectError, SMTPServerDisconnected, AWSConnectionE
 # Note that the SMTPDataErrors here are only those within the 4xx range.
 # Those not in this range (i.e. in the 5xx range) are treated as hard failures
 # and thus like SINGLE_EMAIL_FAILURE_ERRORS.
-INFINITE_RETRY_ERRORS = (SESMaxSendingRateExceededError, SMTPDataError)
+INFINITE_RETRY_ERRORS = (
+    SESMaxSendingRateExceededError,  # Your account's requests/second limit has been exceeded.
+    SMTPDataError,
+)
 
 # Errors that are known to indicate an inability to send any more emails,
 # and should therefore not be retried.  For example, exceeding a quota for emails.
 # Also, any SMTP errors that are not explicitly enumerated above.
-BULK_EMAIL_FAILURE_ERRORS = (SESDailyQuotaExceededError, SMTPException)
+BULK_EMAIL_FAILURE_ERRORS = (
+    SESAddressNotVerifiedError,  # Raised when a "Reply-To" address has not been validated in SES yet.
+    SESIdentityNotVerifiedError,  # Raised when an identity has not been verified in SES yet.
+    SESDomainNotConfirmedError,  # Raised when domain ownership is not confirmed for DKIM.
+    SESDailyQuotaExceededError,  # 24-hour allotment of outbound email has been exceeded.
+    SMTPException,
+)
 
 
 def _get_recipient_queryset(user_id, to_option, course_id, course_location):
