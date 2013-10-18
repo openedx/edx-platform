@@ -285,6 +285,28 @@ class LocatorTest(TestCase):
             Locator.to_locator_or_location("hello.world.not.a.url")
         self.assertIsNone(Locator.parse_url("unknown://foo.bar/baz"))
 
+    def test_url_reverse(self):
+        """
+        Test the url_reverse method
+        """
+        locator = CourseLocator(course_id="a.fancy_course-id", branch="branch_1.2-3")
+        self.assertEqual(
+            '/expression/{}/format'.format(unicode(locator)),
+            locator.url_reverse('expression', 'format')
+        )
+        self.assertEqual(
+            '/expression/{}/format'.format(unicode(locator)),
+            locator.url_reverse('/expression', '/format')
+        )
+        self.assertEqual(
+            '/expression/{}'.format(unicode(locator)),
+            locator.url_reverse('expression/', None)
+        )
+        self.assertEqual(
+            '/expression/{}'.format(unicode(locator)),
+            locator.url_reverse('/expression/', '')
+        )
+
     def test_description_locator_url(self):
         object_id = '{:024x}'.format(random.randrange(16 ** 24))
         definition_locator = DefinitionLocator(object_id)

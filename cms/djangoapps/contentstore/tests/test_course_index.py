@@ -61,7 +61,7 @@ class TestCourseIndex(CourseTestCase):
         Test the error conditions for the access
         """
         locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        outline_url = reverse('contentstore.views.course_handler', kwargs={'course_url': unicode(locator)})
+        outline_url = locator.url_reverse('course/', '')
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.createNonStaffAuthedUserClient()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')

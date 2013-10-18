@@ -15,10 +15,7 @@
       % if context_course:
       <% 
             ctx_loc = context_course.location
-            index_url = reverse(
-                'contentstore.views.course_handler', 
-                kwargs={'course_url': loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)}
-            )
+            index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>

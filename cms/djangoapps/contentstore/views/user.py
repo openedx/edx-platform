@@ -47,12 +47,13 @@ def index(request):
 
     def format_course_for_view(course):
         # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
-        course_url = loc_mapper().translate_location(
+        course_loc = loc_mapper().translate_location(
             course.location.course_id, course.location, published=False, add_entry_if_missing=True
         )
         return (
             course.display_name,
-            reverse("contentstore.views.course_handler", kwargs={'course_url': course_url}),
+            # note, couldn't get django reverse to work; so, wrote workaround
+            course_loc.url_reverse('course/', ''),
             get_lms_link_for_item(
                 course.location
             ),
