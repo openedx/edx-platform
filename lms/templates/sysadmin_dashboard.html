@@ -51,8 +51,7 @@ function goto( mode)
 <section class="container">
 <div class="sysadmin-dashboard-wrapper">
 
-  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt"
->
+  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
     <h1>Sysadmin Dashboard</h1>
 
     <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">${_('Status')}</a> |
@@ -63,32 +62,39 @@ function goto( mode)
            ]
     </h2>
 
-  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
-  | <span id="mitxver">${mitx_version}</span></div>
-
     <form name="dashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <input type="hidden" name="dash_mode" value="">
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Status'):
+	<h3>${_('User Management')}</h3>
+	<ul class="list-input">
+	  <li class="field text" style="padding-bottom: 1.2em">
+		<label for="student_uname">${_('Email or username')}</label>
+		<input type="text" name="student_uname" size=40 />
+	  </li>
 
+	  <li class="field text">
+		<label for="student_fullname">${_('Full Name')}</label>
+		<input type="text" name="student_fullname" size=40 >
+	  </li>
+	</ul>
+
+	<div class="form-actions">
+	  <p>
+		<input type="submit" name="action" value="${_('Delete user')}" />
+		<input type="submit" name="action" value="${_('Create user')}">
+	  </p>
+    </div>
+
+	<hr />
     <p>
-    ${_('Email or username')}: <input type="text" name="student_uname" size=40 >
-    <input type="submit" name="action" value="${_('Delete user')}">
+    <input type="submit" name="action" value="${_('Download list of all users (csv file)')}" style="width: 300px;">
     </p>
 
     <p>
-    ${_('Full Name')}: <input type="text" name="student_fullname" size=40 >
-    <input type="submit" name="action" value="${_('Create user')}">
-    </p>
-
-    <p>
-    <input type="submit" name="action" value="${_('Download list of all users (csv file)')}">
-    </p>
-
-    <p>
-    <input type="submit" name="action" value="${_('Check and repair external Auth Map')}">
+    <input type="submit" name="action" value="${_('Check and repair external Auth Map')}" style="width: 300px;">
     </p>
 
     <hr width="40%" style="align:left">
@@ -116,21 +122,37 @@ function goto( mode)
 %if modeflag.get('Courses'):
     <h3>${_('Administer Courses')}</h3><br/>
 
-    <p>
-    Repo location (ssh): <input type="text" name="repo_location" size=60 >
-    <input type="submit" name="action" value="${_('Load new course from github')}">
-    </p>
-    <p>
-    Course ID or dir: <input type="text" name="course_id" size=60 >
-    <input type="submit" name="action" value="${_('Delete course from site')}">
-    </p>
+    <ul class="list-input">
+	  <li class="field text">
+		<label for="repo_location">
+		  ${_('Repo location (ssh)')}:
+		</label>
+		<input type="text" name="repo_location" style="width:60%" />
+	  </li>
+	</ul>
+	<div class="form-actions">
+	  <input type="submit" name="action" value="${_('Load new course from github')}">
+	</div>
+	<hr />
+    <ul class="list-input">
+	  <li class="field text">
+		<label for="course_id">
+		  ${_('Course ID or dir')}:
+		</label>
+		<input type="text" name="course_id" style="width:60%" />
+	  </li>
+	</ul>
+	<div class="form-actions">
+      <input type="submit" name="action" value="${_('Delete course from site')}">
+	</div>
+	<hr style="width:40%" />
 %endif
 
 ##----------------------------------------------------------------------------- 
     </form>
 
 %if msg:
-    <p></p><p>${msg}</p>
+    <p>${msg}</p>
 %endif
 ##----------------------------------------------------------------------------- 
 ##----------------------------------------------------------------------------- 
@@ -182,5 +204,7 @@ function goto( mode)
 %endif
 
   </section>
+  <div style="text-align:right; float: right"><span id="djangopid">${_('Django PID')}: ${djangopid}</span>
+  | <span id="mitxver">${_('Platform Version')}: ${mitx_version}</span></div>
 </div>
 </section>

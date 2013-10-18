@@ -1,40 +1,31 @@
-# MITx sysadmin dashboard
-
 import csv
-import itertools
 import json
 import logging
 import os
-import requests
 import string
 import subprocess
 import time
-import urllib
 
 from random import choice
-from StringIO import StringIO
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
-from courseware.models import StudentModule
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.models import CourseEnrollment
 from student.models import UserProfile, Registration
 from external_auth.models import ExternalAuthMap
 
-from courseware.access import has_access, get_access_group_name, \
-    course_beta_test_group_name
-from courseware.courses import get_course_with_access, get_course_by_id
+from courseware.access import get_access_group_name
+from courseware.courses import get_course_by_id
 
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import authenticate
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from django.db import IntegrityError
+from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from mitxmako.shortcuts import render_to_response
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.store_utilities import delete_course
@@ -64,7 +55,7 @@ def git_info_for_course(cdir):
                 info[1] = k.split(' ', 1)[1].strip()
     return info
 
-def get_course_from_git(gitloc):
+def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
     msg = ''
     if not gitloc.endswith('.git') or 'http:' in gitloc or 'https:' \
         in gitloc:
@@ -148,10 +139,14 @@ def GenPasswd(length=8, chars=string.letters + string.digits):
     return ''.join([choice(chars) for i in range(length)])
 
 def create_user(uname, name, do_mit=False):
+
     if not uname:
         return _('Must provide username')
     if not name:
         return _('Must provide full name')
+
+    make_eamap = False
+
     msg = ''
     if do_mit:
         if not '@' in uname:
@@ -222,7 +217,8 @@ def delete_user(uname):
         try:
             u = User.objects.get(username=uname)
         except Exception, err:
-            msg = _('Cannot find user with username {0}').format(uname)
+            msg = _('Cannot find user with username {0} - {1}').format(uname,
+                                                                       err.msg)
             return msg
     u.delete()
     return _('Deleted user {0}').format(uname)
@@ -277,7 +273,6 @@ def sysadmin_dashboard(request):
     """
 
     msg = ''
-    problems = []
     plots = []
     datatable = {}
 
@@ -355,7 +350,8 @@ def sysadmin_dashboard(request):
     elif _('Create user') in action:
         uname = request.POST.get('student_uname', '').strip()
         name = request.POST.get('student_fullname', '').strip()
-
+        msg += create_user(uname, name, 
+                           do_mit=settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'])
     elif _('Delete user') in action:
         uname = request.POST.get('student_uname', '').strip()
         msg += delete_user(uname)
@@ -408,17 +404,17 @@ def sysadmin_dashboard(request):
             loc = course.location
             cs = contentstore()
             commit = True
-            ret = delete_course(def_ms, cs, loc, commit)
+            delete_course(def_ms, cs, loc, commit)
             # don't delete user permission groups, though
-
             msg += \
                 "<font color='red'>{0} {1} = {2} ({3})</font>".format(_('Deleted'
                     ), loc, course.id, course.display_name)
+
     elif action == _('Load new course from github'):
         gitloc = request.POST.get('repo_location', ''
                                   ).strip().replace(' ', '').replace(';'
                 , '')
-        msg += get_course_from_git(gitloc)
+        msg += get_course_from_git(gitloc, is_using_mongo, def_ms, datatable)
 
     else:	# default to showing status summary
         msg += '<h2>{0}</h2>'.format(_('Courses loaded in the modulestore'))
@@ -460,7 +456,7 @@ def view_git_logs(request, course_id=None):
 
     DBNAME = 'xlog'
 
-    mdb = mongoengine.connect(DBNAME)
+    mongoengine.connect(DBNAME)
 
     if course_id is None:
         cilset = CourseImportLog.objects.all().order_by('-created')
