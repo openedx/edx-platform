@@ -1,4 +1,3 @@
-
 define(
     [
         "backbone", "underscore", "js/models/metadata", "js/views/abstract_editor",
@@ -304,25 +303,31 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
         templateName: "metadata-string-entry",
 
-        render: function () {
-            Metadata.AbstractEditor.prototype.render.apply(this);
+        initialize: function () {
+            Metadata.AbstractEditor.prototype.initialize.apply(this);
 
             // Time format: HH:mm:ss
-            $.mask.definitions['h'] = '[0-2]';
-            $.mask.definitions['H'] = '[0-3]';
-            $.mask.definitions['m'] = $.mask.definitions['s'] = '[0-5]';
-            $.mask.definitions['M'] = $.mask.definitions['S'] = '[0-9]';
-            this.$el.find('#' + this.uniqueId).mask('hH:mM:sS', {placeholder: "0"});
+            var definitions = {
+                h: '[0-2]',
+                H: '[0-3]',
+                m: '[0-5]',
+                s: '[0-5]',
+                M: '[0-9]',
+                S: '[0-9]'
+            };
+
+            $.each(definitions, function(key, value) {
+                $.mask.definitions[key] = value;
+            });
+
+            this.$el
+                .find('#' + this.uniqueId)
+                .mask('hH:mM:sS', { placeholder: '0' });
         },
 
         getValueFromEditor : function () {
             var $input = this.$el.find('#' + this.uniqueId),
-                value = $input.val(),
-                time = Date.parse(value);
-
-            if (time === null) {
-                value = null;
-            }
+                value = $input.val();
 
             return value;
         },
