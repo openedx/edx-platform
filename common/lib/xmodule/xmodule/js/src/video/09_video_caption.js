@@ -432,14 +432,18 @@ function () {
         // outline has to be drawn (tabbing) or not (mouse click).
         this.videoCaption.isMouseFocus = false;
 
+        // Set top and bottom spacing heigh and make sure they are taken out of
+        // the tabbing order.
         this.videoCaption.subtitlesEl
             .prepend(
                 $('<li class="spacing">')
                     .height(this.videoCaption.topSpacingHeight())
+                    .attr('tabindex', -1)
             )
             .append(
                 $('<li class="spacing">')
                     .height(this.videoCaption.bottomSpacingHeight())
+                    .attr('tabindex', -1)
             );
 
         this.videoCaption.rendered = true;
