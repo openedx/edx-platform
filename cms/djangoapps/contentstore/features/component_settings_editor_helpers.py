@@ -2,8 +2,16 @@
 #pylint: disable=C0111
 
 from lettuce import world
-from nose.tools import assert_equal, assert_true, assert_in  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+
+
+def _is_expected_element_count(css, expected_number):
+    """
+    Returns whether the number of elements found on the page by css locator
+    the same number that you expected.
+    """
+    return len(world.css_find(css)) == expected_number
 
 
 @world.absorb
@@ -20,19 +28,26 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
     """
     assert_in(category, ['problem', 'html', 'video', 'discussion'])
 
-    component_button_css = '.large-{}-icon'.format(category.lower())
+    component_button_css = 'span.large-{}-icon'.format(category.lower())
+    if category == 'problem':
+        module_css = 'section.xmodule_CapaModule'
+    else:
+        module_css = 'section.xmodule_{}Module'.format(category.title())
+
+    # Count how many of that module is on the page. Later we will
+    # assert that one more was added.
+    # We need to use world.browser.find_by_css instead of world.css_find
+    # because it's ok if there are currently zero of them.
+    module_count_before =  len(world.browser.find_by_css(module_css))
+
     world.css_click(component_button_css)
 
     if category in ('problem', 'html'):
         world.wait_for_invisible(component_button_css)
         click_component_from_menu(category, component_type, is_advanced)
 
-    if category == 'problem':
-        expected_css = 'section.xmodule_CapaModule'
-    else:
-        expected_css = 'section.xmodule_{}Module'.format(category.title())
-
-    assert_true(world.is_css_present(expected_css))
+    world.wait_for(lambda _: _is_expected_element_count(module_css,
+        module_count_before + 1))
 
 
 @world.absorb
