@@ -36,34 +36,6 @@ from xblock.runtime import DbModel
 log = logging.getLogger(__name__)
 
 
-
-def parse_time_from_str_to_float(str_time):
-    """
-    Converts s in '12:34:45' format to seconds.
-
-    If s is None, returns 0"""
-    if not str_time:
-        return 0
-    else:
-        obj_time = time.strptime(str_time, '%H:%M:%S')
-        return datetime.timedelta(
-            hours=obj_time.tm_hour,
-            minutes=obj_time.tm_min,
-            seconds=obj_time.tm_sec
-        ).total_seconds()
-
-
-def parse_time_from_float_to_str(s):
-    """
-    Converts s from seconds to  '12:34:45' format.
-
-    If s is None, returns "00:00:00"
-    """
-    if not s:
-        return "00:00:00"
-    else:
-        return str(datetime.timedelta(seconds=s))
-
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
@@ -108,18 +80,20 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-    start_time = IsoTime(
+    start_time = IsoTime(  # datetime.timedelta object
         help="Start time for the video.",
         display_name="Start Time",
         scope=Scope.settings,
-        default="00:00:00"
+        default=datetime.timedelta(seconds=0)
     )
-    end_time = IsoTime(
+    end_time = IsoTime(  # datetime.timedelta object
         help="End time for the video.",
         display_name="End Time",
         scope=Scope.settings,
-        default="00:00:00"
+        default=datetime.timedelta(seconds=0)
     )
+    #front-end code of video player checks logical validity of (start_time, end_time) pair.
+
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
         display_name="Download Video",
@@ -211,8 +185,8 @@ class VideoModule(VideoFields, XModule):
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': json.dumps(self.show_captions),
-            'start': parse_time_from_str_to_float(self.start_time),
-            'end': parse_time_from_str_to_float(self.end_time),
+            'start': self.start_time.total_seconds(),
+            'end': self.end_time.total_seconds(),
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
@@ -388,9 +362,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         xml = etree.fromstring(xml_data)
         field_data = {}
 
+        # Convert between key types for certain attributes --
+        # necessary for backwards compatibility.
         conversions = {
-            # 'start_time': cls._parse_time,
-            # 'end_time': cls._parse_time
+            # example: 'start_time': cls._example_convert_start_time
         }
 
         # Convert between key names for certain attributes --
@@ -434,24 +409,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 field_data[attr] = value
 
         return field_data
-
-    @classmethod
-    def _parse_time(cls, str_time):
-        """Converts s in '12:34:45' format to seconds. If s is
-        None, returns empty string"""
-        if not str_time:
-            return ''
-        else:
-            try:
-                obj_time = time.strptime(str_time, '%H:%M:%S')
-                return datetime.timedelta(
-                    hours=obj_time.tm_hour,
-                    minutes=obj_time.tm_min,
-                    seconds=obj_time.tm_sec
-                ).total_seconds()
-            except ValueError:
-                # We've seen serialized versions of float in this field
-                return float(str_time)
 
 
 def _create_youtube_string(module):

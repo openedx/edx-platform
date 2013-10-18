@@ -2,7 +2,7 @@ import time
 import logging
 import re
 
-from xblock.fields import Field, String
+from xblock.fields import Field
 import datetime
 import dateutil.parser
 
@@ -118,14 +118,85 @@ class Timedelta(Field):
         return ' '.join(values)
 
 
-class IsoTime(String):
+class IsoTime(Field):
+    """
+    Field for start_time and end_time video module properties.
+
+    It was decided, that python representation of start_time and end_time
+    should be python datetime.timedelta object, to be consistent with
+    common time representation.
+
+    At the same time, serialized representation should be"HH:MM:SS"
+    This format is convenient to use in XML (and it is used now),
+    and also it is used in frond-end studio editor of video module as format
+    for start and end time fields.
+
+    In database we previously had float type for start_time and end_time fields,
+    so we are checking it also.
+
+    Python object of IsoTime is datetime.timedelta.
+    JSONed representation of IsoTime is "HH:MM:SS"
+    """
+    # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
+    MUTABLE = False
+
+    def _isotime_to_timedelta(self, value):
+        """
+        Validate that value in "HH:MM:SS" format and convert to timedelta.
+
+        Validate that user, that edits XML, sets proper format, and
+         that max value that can be used by user is "23:59:59".
+        """
+        try:
+            obj_time = time.strptime(value, '%H:%M:%S')
+        except ValueError as e:
+            raise e(
+                "Incorrect IsoTime value {} was set in XML or serialized."
+                "Original parse message is {}".format(value, e.message)
+            )
+        return datetime.timedelta(
+            hours=obj_time.tm_hour,
+            minutes=obj_time.tm_min,
+            seconds=obj_time.tm_sec
+        )
 
     def from_json(self, value):
-        if isinstance(value, float):
-            if not value:
-                return "00:00:00"
-            else:
-                return str(datetime.timedelta(seconds=value))
-        else:
-            return super(IsoTime, self).from_json(value)
+        """
+        Convert value in 'HH:MM:SS' format to datetime.timedelta.
 
+        If not value, returns 0.
+        If value is float (backward compatibility issue), convert to timedelta.
+        """
+        if not value:
+            return datetime.timedelta(seconds=0)
+
+        # We've seen serialized versions of float in this field
+        if isinstance(value, float):
+            return datetime.timedelta(seconds=value)
+
+        return self._isotime_to_timedelta(value)
+
+    def to_json(self, value):
+        """
+        Convert datetime.timedelta to "HH:MM:SS" format.
+
+        If not value, return "00:00:00"
+
+        Backward compatibility: check if value is float, and convert it. No exceptions here.
+
+        If value is not float, but is exceed 23:59:59, raise exception.
+        """
+        if not value:
+            return "00:00:00"
+
+        if isinstance(value, float):  # backward compatibility
+            if value > 86400:
+                value = 86400
+            return str(datetime.timedelta(seconds=value))
+
+        if value.total_seconds() > 86400:  # sanity check
+            raise ValueError(
+                "IsoTime max value is 23:59:59=86400 seconds"
+                "but {} seconds is passed".format(value.total_seconds())
+            )
+        return str(value)
