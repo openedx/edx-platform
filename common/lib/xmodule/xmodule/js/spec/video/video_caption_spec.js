@@ -567,7 +567,8 @@
             });
         });
 
-        describe('seekPlayer', function () {
+        // Disabled 10/9/13 due to flakiness in master
+        xdescribe('seekPlayer', function () {
             describe('when the video speed is 1.0x', function () {
                 beforeEach(function () {
                     videoSpeedControl.currentSpeed = '1.0';
