@@ -184,6 +184,78 @@
             });
         });
 
+        describe('checking start and end times', function () {
+            beforeEach(function () {
+                loadFixtures('video.html');
+
+            });
+
+            it('both times are proper', function () {
+                $('#example').find('.video')
+                    .data({
+                        'start': 12,
+                        'end': 24
+                    });
+
+                state = new Video('#example');
+
+                expect(state.config.start).toBe(12);
+                expect(state.config.end).toBe(24);
+            });
+
+            it('start time is invalid', function () {
+                $('#example').find('.video')
+                    .data({
+                        'start': '',
+                        'end': 24
+                    });
+
+                state = new Video('#example');
+
+                expect(state.config.start).toBe(0);
+                expect(state.config.end).toBe(24);
+            });
+
+            it('end time is invalid', function () {
+                $('#example').find('.video')
+                    .data({
+                        'start': 12,
+                        'end': ''
+                    });
+
+                state = new Video('#example');
+
+                expect(state.config.start).toBe(12);
+                expect(state.config.end).toBe(null);
+            });
+
+            it('start time is less than 0', function () {
+                $('#example').find('.video')
+                    .data({
+                        'start': -12,
+                        'end': 24
+                    });
+
+                state = new Video('#example');
+
+                expect(state.config.start).toBe(0);
+                expect(state.config.end).toBe(24);
+            });
+
+            it('start time is greater than end time', function () {
+                $('#example').find('.video')
+                    .data({
+                        'start': 42,
+                        'end': 24
+                    });
+
+                state = new Video('#example');
+
+                expect(state.config.start).toBe(42);
+                expect(state.config.end).toBe(null);
+            });
+        });
+
         describe('multiple YT on page', function () {
             var state1, state2, state3;
 
