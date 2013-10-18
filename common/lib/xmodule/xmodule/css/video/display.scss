@@ -633,6 +633,8 @@ div.video {
     ol.subtitles {
         width: 0;
         height: 0;
+
+        visibility: hidden;
     }
 
     ol.subtitles.html5 {
@@ -666,6 +668,8 @@ div.video {
       ol.subtitles {
         right: -(flex-grid(4));
         width: auto;
+
+        visibility: hidden;
       }
     }
 

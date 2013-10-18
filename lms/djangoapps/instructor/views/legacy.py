@@ -726,18 +726,31 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
-        # Create the CourseEmail object.  This is saved immediately, so that
-        # any transaction that has been pending up to this point will also be
-        # committed.
-        email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
+        try:
+            # Create the CourseEmail object.  This is saved immediately, so that
+            # any transaction that has been pending up to this point will also be
+            # committed.
+            email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
 
-        # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-        submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+            # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+            submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
-        if email_to_option == "all":
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
+        except Exception as err:
+            # Catch any errors and deliver a message to the user
+            error_msg = "Failed to send email! ({0})".format(err)
+            msg += "<font color='red'>" + error_msg + "</font>"
+            log.exception(error_msg)
+
         else:
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+            # If sending the task succeeds, deliver a success message to the user.
+            if email_to_option == "all":
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
+            else:
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+
+    elif "Show Background Email Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
+        msg += message
 
     elif "Show Background Email Task History" in action:
         message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
