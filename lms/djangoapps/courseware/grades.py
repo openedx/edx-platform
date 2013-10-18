@@ -228,7 +228,7 @@ def grade_as_task(student, course, track_function, xqueue_callback_url_prefix):
             # might be an indication that we should just stop altogether.  In which case
             # we would raise a FatalGradingModuleInstantiationException.
             error_message = module.error_msg
-            msg = "Unable to create module: %s".format(error_message)
+            msg = u"Unable to create module: {}".format(error_message)
             raise GradingModuleInstantiationException(msg)
 
     return _grade(student, course, grading_context, module_creator, field_data_cache, keep_raw_scores)

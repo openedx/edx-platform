@@ -16,6 +16,7 @@ from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
 
@@ -207,7 +208,7 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # write out a dump of memory usage at the end of this, to see what is left
     # around.  Enable it if it hasn't been explicitly disabled.
-    if action_name == 'graded' and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
+    if action_name == 'graded' and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', False):
         filename = "meliae_dump_{}.dat".format(task_id)
         # Hardcode the name of a dump directory to try to use.
         # If if doesn't exist, just continue to use the "local" directory.
@@ -222,13 +223,9 @@ def run_main_task(entry_id, task_fcn, action_name):
     return task_progress
 
 
-def perform_enrolled_student_update(_entry_id, course_id, _module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+def perform_enrolled_student_update(update_fcn, _entry_id, course_id, _task_input, action_name, filter_fcn=None, student_identifier=None):
     """
     """
-    # Throw an exception if _module_state_key is specified, because that's not meaningful here
-    if _module_state_key is not None:
-        raise ValueError("Value for problem_url not expected")
-
     # Get start time for task:
     start_time = time()
 

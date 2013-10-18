@@ -97,7 +97,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
         # real metadata stays in the content, but add a display name
         field_data = DictFieldData({
-            'error_msg': str(error_msg),
+            'error_msg': unicode(error_msg),
             'contents': contents,
             'display_name': 'Error: ' + location.url(),
             'location': location,

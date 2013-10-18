@@ -147,5 +147,5 @@ def update_offline_grades(entry_id, xmodule_instance_args):
     """
     action_name = 'graded'
     update_fcn = partial(update_offline_grade, xmodule_instance_args)
-    visit_fcn = perform_enrolled_student_update
-    return run_main_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
+    visit_fcn = partial(perform_enrolled_student_update, update_fcn)
+    return run_main_task(entry_id, visit_fcn, action_name)
