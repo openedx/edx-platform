@@ -5,7 +5,6 @@ from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
-from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 
 from mitxmako.shortcuts import render_to_response
@@ -18,20 +17,61 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
+from django.core.exceptions import PermissionDenied
+from xmodule.modulestore.django import loc_mapper
+from .access import has_access
+from xmodule.modulestore.locator import BlockUsageLocator
 
-from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
+from django.http import HttpResponseNotFound
 import json
 from django.utils.translation import ugettext as _
 from pymongo import DESCENDING
 
 
-__all__ = ['asset_index', 'upload_asset']
-
+__all__ = ['assets_handler']
 
 @login_required
 @ensure_csrf_cookie
-def asset_index(request, org, course, name, start=None, maxresults=None):
+def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+    """                                  TODO update DOCS!
+    The restful handler for course specific requests.
+    It provides the course tree with the necessary information for identifying and labeling the parts. The root
+    will typically be a 'course' object but may not be especially as we support modules.
+
+    GET
+        html: return html page overview for the given course
+        json: return json representing the course branch's index entry as well as dag w/ all of the children
+        replaced w/ json docs where each doc has {'_id': , 'display_name': , 'children': }
+    POST
+        json: create (or update?) this course or branch in this course for this user, return resulting json
+        descriptor (same as in GET course/...). Leaving off /branch/draft would imply create the course w/ default
+        branches. Cannot change the structure contents ('_id', 'display_name', 'children') but can change the
+        index entry.
+    PUT
+        json: update this course (index entry not xblock) such as repointing head, changing display name, org,
+        course_id, prettyid. Return same json as above.
+    DELETE
+        json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
+    """
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            raise NotImplementedError('coming soon')
+        elif request.method == 'POST' and asset_id is None:
+            # Add a new asset
+            return upload_asset(request, location)
+        else:
+            return update_asset(request, asset_id)
+    elif request.method == 'GET':  # assume html
+        return asset_index(request, location)
+    else:
+        return HttpResponseNotFound()
+
+def asset_index(request, location):
     """
     Display an editable asset library
 
@@ -40,17 +80,12 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
     :param start: which index of the result list to start w/, used for paging results
     :param maxresults: maximum results
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    old_location = loc_mapper().translate_locator_to_location(location)
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': org,
-        'course': course,
-        'coursename': name
-    })
-
-    course_module = modulestore().get_item(location)
-
-    course_reference = StaticContent.compute_location(org, course, name)
+    course_module = modulestore().get_item(old_location)
+    maxresults = request.REQUEST.get('max', None)
+    start = request.REQUEST.get('start', None)
+    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
     if maxresults is not None:
         maxresults = int(maxresults)
         start = int(start) if start else 0
@@ -77,33 +112,29 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
     return render_to_response('asset_index.html', {
         'context_course': course_module,
         'asset_list': json.dumps(asset_json),
-        'upload_asset_callback_url': upload_asset_callback_url,
-        'update_asset_callback_url': reverse('update_asset', kwargs={
-            'org': org,
-            'course': course,
-            'name': name
-        })
+        'upload_asset_callback_url': location.url_reverse('assets/', ''),
+        'update_asset_callback_url': location.url_reverse('assets/', '')
     })
 
 
 @require_POST
 @ensure_csrf_cookie
 @login_required
-def upload_asset(request, org, course, coursename):
+def upload_asset(request, location):
     '''
     This method allows for POST uploading of files into the course asset
     library, which will be supported by GridFS in MongoDB.
     '''
     # construct a location from the passed in path
-    location = get_location_and_verify_access(request, org, course, coursename)
+    old_location = loc_mapper().translate_locator_to_location(location)
 
     # Does the course actually exist?!? Get anything from it to prove its
     # existence
     try:
-        modulestore().get_item(location)
+        modulestore().get_item(old_location)
     except:
         # no return it as a Bad Request response
-        logging.error('Could not find course' + location)
+        logging.error('Could not find course' + old_location)
         return HttpResponseBadRequest()
 
     if 'file' not in request.FILES:
@@ -117,7 +148,8 @@ def upload_asset(request, org, course, coursename):
     filename = upload_file.name
     mime_type = upload_file.content_type
 
-    content_loc = StaticContent.compute_location(org, course, filename)
+    content_loc = StaticContent.compute_location(old_location.org, old_location.course, filename)
+
 
     chunked = upload_file.multiple_chunks()
     sc_partial = partial(StaticContent, content_loc, filename, mime_type)
@@ -160,7 +192,7 @@ def upload_asset(request, org, course, coursename):
 @require_http_methods(("DELETE", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def update_asset(request, org, course, name, asset_id):
+def update_asset(request, asset_id):
     """
     restful CRUD operations for a course asset.
     Currently only DELETE, POST, and PUT methods are implemented.
@@ -175,8 +207,6 @@ def update_asset(request, org, course, name, asset_id):
         except InvalidLocationError as err:
             # return a 'Bad Request' to browser as we have a malformed Location
             return JsonResponse({"error": err.message}, status=400)
-
-    get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'DELETE':
         loc = get_asset_location(asset_id)

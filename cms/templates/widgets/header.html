@@ -18,7 +18,9 @@
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             index_url = location.url_reverse('course/', '')
             checklists_url = location.url_reverse('checklists/', '')
-      %>
+            assets_url = location.url_reverse('assets/', '')
+
+        %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${index_url}">
@@ -46,7 +48,7 @@
                     <a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">${_("Static Pages")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Files &amp; Uploads")}</a>
+                    <a href="${assets_url}">${_("Files &amp; Uploads")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Textbooks")}</a>

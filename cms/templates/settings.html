@@ -214,7 +214,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                     </span>
 
                     <% ctx_loc = context_course.location %>
-                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('contentstore.views.assets_handler', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
 
                     % else:
                     <span class="wrapper-course-image">
