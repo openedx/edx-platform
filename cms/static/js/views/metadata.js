@@ -306,7 +306,15 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
         initialize: function () {
             Metadata.AbstractEditor.prototype.initialize.apply(this);
 
-            // Time format: HH:mm:ss
+            // This list of definitions is used for creating appropriate
+            // time format mask;
+            //
+            // For example, mask 'hH:mM:sS':
+            // min value: 00:00:00
+            // max value: 23:59:59
+            //
+            // With this mask user cannot set following values:
+            // 93:23:23, 23:60:60, 77:77:77, etc.
             var definitions = {
                 h: '[0-2]',
                 H: '[0-3]',
