@@ -55,7 +55,7 @@ end
 namespace :'test:js' do
 
     desc "Run the JavaScript tests and print results to the console"
-    task :run, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
+    task :run, [:env] => [:clean_test_files, :'assets:coffee', JS_REPORT_DIR] do |t, args|
         if args[:env].nil?
             puts "Running all test suites.  To run a specific test suite, try:"
             print_js_test_cmds('run')
