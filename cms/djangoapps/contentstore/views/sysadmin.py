@@ -1,3 +1,7 @@
+"""
+sysadmin - a custom page for MITx that they use to manage their instance. This page is enabled via
+a FEATURE FLAG
+"""
 import subprocess
 import logging
 
@@ -7,6 +11,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.http import Http404
 
 from xmodule.modulestore.django import modulestore
 
@@ -15,10 +20,6 @@ from mitxmako.shortcuts import render_to_response
 #import pymongo
 import time
 import json
-
-"""
-sysadmin
-"""
 
 
 @login_required
@@ -29,6 +30,9 @@ def sysadmin(request):
     """
     if (not request.user) or (not request.user.is_staff):
         return redirect('login')
+
+    if not settings.MITX_FEATURES.get('ENABLE_MITX_SYSADMIN_PAGE', False):
+        raise Http404
 
     collection = modulestore().collection
 
@@ -52,10 +56,9 @@ def sysadmin(request):
                 data = collection.find({'_id.course': course_id})
                 fn = 'course-%s-dump-%s.json' % (course_id, time.ctime(time.time()).replace(' ','_'))
                 if bdir is not None:
-                    fp = open('%s/%s' % (bdir,fn), 'w')
-                    for d in data:
-                        fp.write(json.dumps(d)+'\n')
-                    fp.close()
+                    with open('%s/%s' % (bdir, fn), 'w') as fp:
+                        for d in data:
+                            fp.write(json.dumps(d)+'\n')
                 collection.remove({'_id.course': course_id})
                 msg += _("{0} records for {1} removed (backup file {2})").format(nrec, course_id, fn)
                 logging.debug('Course %s deleted!' % course_id)

@@ -62,6 +62,9 @@ MITX_FEATURES = {
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
+
+    # Turns on or off the 'sysadmin' page used by MITx instances
+    'ENABLE_MITX_SYSADMIN_PAGE': False
 }
 ENABLE_JASMINE = False
 
