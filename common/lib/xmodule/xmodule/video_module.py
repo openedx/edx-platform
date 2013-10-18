@@ -135,6 +135,7 @@ class VideoModule(VideoFields, XModule):
 
     js = {
         'js': [
+            resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
             resource_string(__name__, 'js/src/video/02_html5_video.js'),
