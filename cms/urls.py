@@ -1,8 +1,10 @@
+import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
 # TODO: This should be removed once the CMS is running via wsgi on all production servers
 import cms.startup as startup
+from xmodule.modulestore import parsers
 startup.run()
 
 # There is a course creators admin table.
@@ -136,7 +138,8 @@ urlpatterns += patterns(
     ),
 
     url(r'^course$', 'index'),
-    url(r'^course/(?P<course_url>.*)$', 'course_handler'),
+    # (?ix) == ignore case and verbose (multiline regex)
+    url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
 )
 
 js_info_dict = {
