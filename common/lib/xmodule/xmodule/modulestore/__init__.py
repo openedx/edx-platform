@@ -397,11 +397,14 @@ class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
     '''
+    # pylint: disable=W0613
     def __init__(
         self,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        modulestore_update_signal=None, xblock_mixins=()
+        modulestore_update_signal=None, xblock_mixins=(),
+        # temporary parms to enable backward compatibility. remove once all envs migrated
+        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
     ):
         '''
         Set up the error-tracking logic.
