@@ -24,7 +24,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
   function(doc, $, CourseDetailsModel, MainView) {
-    // hilighting labels when fields are focused in
+    // highlighting labels when fields are focused in
     $("form :input").focus(function() {
       $("label[for='" + this.id + "']").addClass("is-focused");
     }).blur(function() {
@@ -215,7 +215,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                     </span>
 
                     <% ctx_loc = context_course.location %>
-                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href='${upload_asset_url}'>${_("files &amp; uploads")}</a></span>
 
                     % else:
                     <span class="wrapper-course-image">

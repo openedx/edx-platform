@@ -124,12 +124,6 @@ def course_index(request, course_id, branch, version_guid, block):
 
     lms_link = get_lms_link_for_item(old_location)
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': old_location.org,
-        'course': old_location.course,
-        'coursename': old_location.name
-    })
-
     course = modulestore().get_item(old_location, depth=3)
     sections = course.get_children()
 
@@ -143,7 +137,6 @@ def course_index(request, course_id, branch, version_guid, block):
         'parent_location': course.location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
-        'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
         'category': 'vertical'
     })
@@ -334,6 +327,9 @@ def get_course_settings(request, org, course, name):
 
     course_module = modulestore().get_item(location)
 
+    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+    upload_asset_url = new_loc.url_reverse('assets/', '')
+
     return render_to_response('settings.html', {
         'context_course': course_module,
         'course_location': location,
@@ -345,11 +341,7 @@ def get_course_settings(request, org, course, name):
         'about_page_editable': not settings.MITX_FEATURES.get(
             'ENABLE_MKTG_SITE', False
         ),
-        'upload_asset_url': reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name,
-        })
+        'upload_asset_url': upload_asset_url
     })
 
 
@@ -656,11 +648,8 @@ def textbook_index(request, org, course, name):
             )
             return JsonResponse(course_module.pdf_textbooks)
     else:
-        upload_asset_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name,
-        })
+        new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+        upload_asset_url = new_loc.url_reverse('assets/', '')
         textbook_url = reverse('textbook_index', kwargs={
             'org': org,
             'course': course,

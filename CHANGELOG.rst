@@ -5,7 +5,7 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-Studio: Change course overview page, checklists, and course staff management
+Studio: Change course overview page, checklists, assets, and course staff management
 page URLs to a RESTful interface. Also removed "\listing", which duplicated
 "\index".
 
