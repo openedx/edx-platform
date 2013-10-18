@@ -195,8 +195,12 @@ def i_change_grace_period(_step, grace_period):
 @step(u'I see the grace period is "(.*)"$')
 def the_grace_period_is(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
-    ele = world.css_find(grace_period_css).first
-    assert_equal(ele.value, grace_period)
+
+    # The default value is 00:00
+    # so we need to wait for it to change
+    world.wait_for(
+        lambda _: world.css_has_value(grace_period_css, grace_period)
+    )
 
 
 def get_type_index(name):
