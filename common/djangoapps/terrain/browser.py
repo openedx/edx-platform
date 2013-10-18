@@ -175,7 +175,7 @@ def reset_databases(scenario):
     If no data is created during the test, these lines equivilently do nothing.
     '''
     mongo = MongoClient()
-    mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
+    mongo.drop_database(settings.CONTENTSTORE['DOC_STORE_CONFIG']['db'])
     _CONTENTSTORE.clear()
 
     modulestore = xmodule.modulestore.django.editable_modulestore()

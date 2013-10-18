@@ -47,11 +47,13 @@ OPTIONS = {
         },
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': DEFAULT_CLASS,
+            'DOC_STORE_CONFIG': {
                 'host': HOST,
                 'db': DB,
                 'collection': COLLECTION,
+            },
+            'OPTIONS': {
+                'default_class': DEFAULT_CLASS,
                 'fs_root': DATA_DIR,
                 'render_template': RENDER_TEMPLATE,
             }
