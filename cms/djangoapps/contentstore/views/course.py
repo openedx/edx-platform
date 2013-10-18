@@ -132,12 +132,12 @@ def course_index(request, course_id, branch, version_guid, block):
     old_location = loc_mapper().translate_locator_to_location(location)
 
     lms_link = get_lms_link_for_item(old_location)
-
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': location.as_old_location_org,
-        'course': location.as_old_location_course,
-        'coursename': location.as_old_location_run
-    })
+#
+#    upload_asset_callback_url = reverse('upload_asset', kwargs={
+#        'org': location.as_old_location_org,
+#        'course': location.as_old_location_course,
+#        'coursename': location.as_old_location_run
+#    })
 
     course = modulestore().get_item(old_location, depth=3)
     sections = course.get_children()
@@ -152,7 +152,6 @@ def course_index(request, course_id, branch, version_guid, block):
         'parent_location': course.location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
-        'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
         'category': 'vertical'
     })

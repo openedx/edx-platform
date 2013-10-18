@@ -79,7 +79,7 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
+    upload_asset_callback_url = reverse('contentstore.views.assets_handler', kwargs={
         'org': org,
         'course': course,
         'coursename': name
