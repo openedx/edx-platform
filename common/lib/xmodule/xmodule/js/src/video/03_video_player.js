@@ -146,11 +146,6 @@ function (HTML5Video, Resizer) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
-        // Remember for future page loads that we should use Flash mode.
-        $.cookie('current_player_mode', 'flash', {
-            'expires': 3650,
-            'path': '/'
-        });
         state.currentPlayerMode = 'flash';
 
         console.log('[Video info]: Changing YouTube player mode to "flash".');
