@@ -498,15 +498,29 @@ class LoncapaProblem(object):
         # import ipdb
         # ipdb.set_trace()
 
-        gradianceProblemsQuery = '//problem[@gradiance="true"]'
+        gradianceProblemsQuery = '//multiplechoiceresponse[@gradiance="true"]'
 
-        # There are no gradiance problems
+        # There are no gradiance questions (by question, I mean multiplechoiceresponse tags)
         if not tree.xpath(gradianceProblemsQuery):
             return None
 
-        for problem in tree.xpath(gradianceProblemsQuery):
+        for multChoiceResponse in tree.xpath(gradianceProblemsQuery):
+            # Does this multChoiceResponse have targeted solutions?
+            # Targeted solutions = display an explanation based on the user's selected answer, not the correct answer
+            # Note: One could also imagine being able to show BOTH a nudge corresponding to the student's answer
+            #       as well as the explanation of the correct answer
+            hasTargetedSolutions = multChoiceResponse.get('targetedSolutions') == 'true'
+
+            # TODO: BELOW IS BAD... NEED TO FIND BY KEY!!
+            studentChoices = self.student_answers.values()
+            studentChoice = None
+            solutionIDForStudentChoice = None
+            if len(studentChoices) > 0:
+                studentChoice = studentChoices[0]
+            # TODO: ABOVE IS BAD... NEED TO FIND BY KEY!!
+
             # Grab the first choicegroup (there should only be one for gradiance problems)
-            choicegroup = problem.xpath('//choicegroup[@type="MultipleChoice"]')[0]
+            choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
             choicesList = list(choicegroup.iter('choice'))
 
             for choice in choicesList:
@@ -516,20 +530,29 @@ class LoncapaProblem(object):
 
             for choice in subsetChoices:
                 choicegroup.append(choice)
-
+                if choice.get('name') == studentChoice:
+                    solutionIDForStudentChoice = choice.get('solutionid')
 
             # import ipdb
             # ipdb.set_trace()
 
-            solutions = problem.xpath('//solution')
-            for solution in solutions:
-                if solution.get('solutionid') != solutionID:
-                    tree.remove(solution)
+            solutionset = multChoiceResponse.xpath('./following-sibling::solutionset')
+            if len(solutionset) > 0:
+                solutionset = solutionset[0]
+                solutions = solutionset.xpath('./solution')
+                for solution in solutions:
+                    if not hasTargetedSolutions:
+                        if solution.get('solutionid') != solutionID:
+                            solutionset.remove(solution)
+                    else:
+                        if solutionIDForStudentChoice is None or solution.get('solutionid') != solutionIDForStudentChoice:
+                            solutionset.remove(solution)
+
 
             # tree.remove(solution[0])
 
             # Grab the solutions and only pick the one that matches the correct choice randomly chosen
-            # solution = problem.xpath('//solution')[0]
+            # solution = multChoiceResponse.xpath('//solution')[0]
             # solutionsList = list(solution.iter('div')) # TODO: it might not be a safe assumption to make...
 
             # for solutionDIV in solutionsList:

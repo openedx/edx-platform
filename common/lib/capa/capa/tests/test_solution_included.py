@@ -44,35 +44,53 @@ class CapaShuffleTest(unittest.TestCase):
 
     def test_with_multiple_solutions(self):
         xml_str = textwrap.dedent("""
-            <problem gradiance="true">
+            <problem>
                 <p>What is the correct answer?</p>
-                <multiplechoiceresponse>
+                <multiplechoiceresponse gradiance="true" targetedSolutions="true">
                   <choicegroup type="MultipleChoice">
-                    <choice correct="false">wrong-1</choice>
-                    <choice correct="false">wrong-2</choice>
+                    <choice correct="false" solutionid="solution1w">wrong-1</choice>
+                    <choice correct="false" solutionid="solution2w">wrong-2</choice>
                     <choice correct="true" solutionid="solution1">correct-1</choice>
-                    <choice correct="false">wrong-3</choice>
-                    <choice correct="false">wrong-4</choice>
+                    <choice correct="false" solutionid="solution3w">wrong-3</choice>
+                    <choice correct="false" solutionid="solution4w">wrong-4</choice>
                     <choice correct="true" solutionid="solution2">correct-2</choice>
                   </choicegroup>
                 </multiplechoiceresponse>
 
-                <solution solutionid="solution1">
-                <div class="detailed-solution" >
-                    <p>Explanation</p>
+                <solutionset>
+                    <solution solutionid="solution1">
+                    <div class="detailed-solution" >
+                        <p>Explanation</p>
 
-                    <p>This is the 1st solution</p>
-                    <p>Not much to explain here, sorry!</p>
-                </div>
-                </solution>
+                        <p>This is the 1st solution</p>
+                        <p>Not much to explain here, sorry!</p>
+                    </div>
+                    </solution>
 
-                <solution solutionid="solution2">
-                <div class="detailed-solution" >
-                    <p>Explanation</p>
+                    <solution solutionid="solution2">
+                    <div class="detailed-solution" >
+                        <p>Explanation</p>
 
-                    <p>This is the 2nd solution</p>
-                </div>
-                </solution>
+                        <p>This is the 2nd solution</p>
+                    </div>
+                    </solution>
+
+                    <solution solutionid="solution1w">
+                    <div class="detailed-solution" >
+                        <p>Explanation</p>
+
+                        <p>This is the 1st WRRRRRONG solution</p>
+                    </div>
+                    </solution>
+
+                    <solution solutionid="solution2w">
+                    <div class="detailed-solution" >
+                        <p>Explanation</p>
+
+                        <p>This is the 2nd WRRRRRONG solution</p>
+                    </div>
+                    </solution>
+                </solutionset>
             </problem>
         """)
         problem = new_loncapa_problem(xml_str)
