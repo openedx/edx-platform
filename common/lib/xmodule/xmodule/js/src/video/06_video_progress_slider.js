@@ -86,8 +86,6 @@ function () {
     // ***************************************************************
 
     function buildSlider(state) {
-        console.log('state = ', state);
-
         state.videoProgressSlider.slider = state.videoProgressSlider.el
             .slider({
                 range: 'min',
@@ -101,37 +99,52 @@ function () {
     }
 
     function updateStartEndTimeRegion(params) {
-        var left, width;
+        var left, width, start, end;
 
-        if (this.config.end && params.duration) {
-            left = parseInt(100 * (this.config.start / params.duration), 10);
-            width = parseInt(
-                100 * (
-                    (this.config.end - this.config.start) / params.duration
-                ),
-                10
-            );
+        // We must have a duration in order to determine the area of range.
+        // It also must be non-zero.
+        if (!params.duration) {
+            return;
+        }
 
-            if (!this.videoProgressSlider.sliderRange) {
-                this.videoProgressSlider.sliderRange = $('<div />')
-                    .addClass('ui-slider-range')
-                    .addClass('ui-widget-header')
-                    .addClass('ui-corner-all')
-                    .css({
-                        left: left + '%',
-                        width: width + '%',
-                        'background-color': 'blue'
-                    });
+        // If the range spans the entire length of video, we don't do anything.
+        if (!this.config.start && !this.config.end) {
+            return;
+        }
 
-                this.videoProgressSlider.sliderProgress
-                    .after(this.videoProgressSlider.sliderRange);
-            } else {
-                this.videoProgressSlider.sliderRange
-                    .css({
-                        left: left + '%',
-                        width: width + '%'
-                    });
-            }
+        start = this.config.start;
+
+        // If end is set to null, then we set it to the end of the video. We
+        // know that start is not a the beginning, therefore we must build a
+        // range.
+        if (!this.config.end) {
+            end = params.duration;
+        } else {
+            end = this.config.end;
+        }
+
+        left = parseInt(100 * (start / params.duration), 10);
+        width = parseInt(100 * ((end - start) / params.duration), 10);
+
+        if (!this.videoProgressSlider.sliderRange) {
+            this.videoProgressSlider.sliderRange = $('<div />')
+                .addClass('ui-slider-range')
+                .addClass('ui-widget-header')
+                .addClass('ui-corner-all')
+                .addClass('slider-range')
+                .css({
+                    left: left + '%',
+                    width: width + '%'
+                });
+
+            this.videoProgressSlider.sliderProgress
+                .after(this.videoProgressSlider.sliderRange);
+        } else {
+            this.videoProgressSlider.sliderRange
+                .css({
+                    left: left + '%',
+                    width: width + '%'
+                });
         }
     }
 
