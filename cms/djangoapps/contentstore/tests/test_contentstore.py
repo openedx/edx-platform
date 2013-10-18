@@ -1629,11 +1629,12 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
 
-        # asset_index
-        resp = self.client.get(reverse('asset_index',
+        # assets_handler (HTML for full page content)
+        resp = self.client.get(reverse('contentstore.views.assets_handler',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
-                                               'name': loc.name}))
+                                               'name': loc.name},
+                                       ), HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page

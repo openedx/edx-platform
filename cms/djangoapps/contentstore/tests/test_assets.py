@@ -25,14 +25,14 @@ from xmodule.modulestore.xml_importer import import_from_xml
 class AssetsTestCase(CourseTestCase):
     def setUp(self):
         super(AssetsTestCase, self).setUp()
-        self.url = reverse("asset_index", kwargs={
+        self.url = reverse("contentstore.views.assets_handler", kwargs={
             'org': self.course.location.org,
             'course': self.course.location.course,
             'name': self.course.location.name,
         })
 
     def test_basic(self):
-        resp = self.client.get(self.url)
+        resp = self.client.get(self.url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 200)
 
     def test_static_url_generation(self):
@@ -43,14 +43,14 @@ class AssetsTestCase(CourseTestCase):
 
 class AssetsToyCourseTestCase(CourseTestCase):
     """
-    Tests the assets returned from asset_index for the toy test course.
+    Tests the assets returned from assets_handler (full page content) for the toy test course.
     """
     def test_toy_assets(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=contentstore(), verbose=True)
-        url = reverse("asset_index", kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+        url = reverse("contentstore.views.assets_handler", kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
 
-        resp = self.client.get(url)
+        resp = self.client.get(url, HTTP_ACCEPT='text/html')
         # Test a small portion of the asset data passed to the client.
         self.assertContains(resp, "new AssetCollection([{")
         self.assertContains(resp, "/c4x/edX/toy/asset/handouts_sample_handout.txt")
