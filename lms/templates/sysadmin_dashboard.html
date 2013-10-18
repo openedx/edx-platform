@@ -1,5 +1,6 @@
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
@@ -54,11 +55,11 @@ function goto( mode)
 >
     <h1>Sysadmin Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">Status</a> |
-          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">Courses</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
-          <a href="#" onclick="goto('Staffing');" class="${modeflag.get('Staffing')}">Staffing</a> |
-          <a href="/gitlogs">GitLogs</a>
+    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">${_('Status')}</a> |
+          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">${_('Courses')}</a> |
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_('Enrollment')}</a> |
+          <a href="#" onclick="goto('Staffing');" class="${modeflag.get('Staffing')}">${_('Staffing')}</a> |
+          <a href="/gitlogs">${_('GitLogs')}</a>
            ]
     </h2>
 
@@ -73,21 +74,21 @@ function goto( mode)
 %if modeflag.get('Status'):
 
     <p>
-    Email or username: <input type="text" name="student_uname" size=40 >
-    <input type="submit" name="action" value="Delete user">
+    ${_('Email or username')}: <input type="text" name="student_uname" size=40 >
+    <input type="submit" name="action" value="${_('Delete user')}">
     </p>
 
     <p>
-    Full Name: <input type="text" name="student_fullname" size=40 >
-    <input type="submit" name="action" value="Create user">
+    ${_('Full Name')}: <input type="text" name="student_fullname" size=40 >
+    <input type="submit" name="action" value="${_('Create user')}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Download list of all users (csv file)">
+    <input type="submit" name="action" value="${_('Download list of all users (csv file)')}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Check and repair external Auth Map">
+    <input type="submit" name="action" value="${_('Check and repair external Auth Map')}">
     </p>
 
     <hr width="40%" style="align:left">
@@ -96,43 +97,32 @@ function goto( mode)
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Enrollment'):
 
-<p>Go to each individual course's Instructor dashboard to manage
-course enrollment.</p>
+<p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
 
 %endif
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Staffing'):
 
-<h3>Manage course staff and instructors</h3><br/>
+<h3>${_('Manage course staff and instructors')}</h3><br/>
 
     <p>
-    <input type="submit" name="action" value="Download staff and instructor list (csv file)">
+    <input type="submit" name="action" value="${_('Download staff and instructor list (csv file)')}">
     </p>
-<!--
-    <p>You may upload a list of staff/instructors for all the courses.
-    The safest approach is to download the list, modify it, then upload.</p>
-    <p><font color="red">Careful!  The uploaded file <b>overwrites</b>
-    existing list, globally covering all courses!</font></p>
-    <p>
-    Staff and instructor list (CSV file): <input type="file" name="staff_file" >
-    <input type="submit" name="action" value="Upload staff and instructor list">
-    </p>
--->
 
 %endif
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Courses'):
-    <h3>Administer Courses</h3><br/>
+    <h3>${_('Administer Courses')}</h3><br/>
 
     <p>
     Repo location (ssh): <input type="text" name="repo_location" size=60 >
-    <input type="submit" name="action" value="Load new course from github">
+    <input type="submit" name="action" value="${_('Load new course from github')}">
     </p>
     <p>
     Course ID or dir: <input type="text" name="course_id" size=60 >
-    <input type="submit" name="action" value="Delete course from site">
+    <input type="submit" name="action" value="${_('Delete course from site')}">
     </p>
 %endif
 

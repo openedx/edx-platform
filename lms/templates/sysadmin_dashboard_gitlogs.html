@@ -48,7 +48,7 @@ textarea {
 % if course_id is None:
 
     <table class="stat_table">
-    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
+    <tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>git action</th></tr>
 
     % for cil in cilset[:10]:
 
@@ -64,10 +64,10 @@ textarea {
 
 % else:
 
-    <h2>Recent git load activity for ${course_id}</h2>
+    <h2>${_('Recent git load activity for')} ${course_id}</h2>
 
     <table class="stat_table">
-    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
+    <tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>${_('git action')}</th></tr>
 
     % for cil in cilset[:2]:
 
