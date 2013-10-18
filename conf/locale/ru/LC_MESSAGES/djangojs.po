@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-11 17:20+0400\n"
+"POT-Creation-Date: 2013-10-18 17:35+0400\n"
 "PO-Revision-Date: 2013-10-11 17:26+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
@@ -369,7 +369,7 @@ msgstr "Файлы должны быть в формате PNG или JPEG."
 #: common/lib/xmodule/xmodule/js/spec/combinedopenended/display_spec.js:132
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:462
 #: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:462
-#: lms/static/coffee/src/staff_grading/staff_grading.js:466
+#: lms/static/coffee/src/staff_grading/staff_grading.js:464
 msgid "Submit"
 msgstr "Отправить"
 
@@ -752,64 +752,64 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:373
+#: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Problem Name"
 msgstr "Имя задачи"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:373
+#: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Graded"
 msgstr "Оценено"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:373
+#: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Available to Grade"
 msgstr "Доступно для оценивания"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:373
+#: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Required"
 msgstr "Требуется"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:373
+#: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Progress"
 msgstr "Прогресс"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:445
+#: lms/static/coffee/src/staff_grading/staff_grading.js:443
 msgid "Back to problem list"
 msgstr "Вернуться к списку заданий"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:450
+#: lms/static/coffee/src/staff_grading/staff_grading.js:448
 msgid "Try loading again"
 msgstr "Пытаюсь загрузить снова"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:455
+#: lms/static/coffee/src/staff_grading/staff_grading.js:453
 msgid "available"
 msgstr "доступно"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:456
+#: lms/static/coffee/src/staff_grading/staff_grading.js:454
 msgid "graded"
 msgstr "оценено"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:457
+#: lms/static/coffee/src/staff_grading/staff_grading.js:455
 msgid "more needed to start ML"
 msgstr "требуется еще для начала автоматической проверки"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:470
+#: lms/static/coffee/src/staff_grading/staff_grading.js:468
 msgid "Re-check for submissions"
 msgstr "Проверить наличие заданий"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:472
+#: lms/static/coffee/src/staff_grading/staff_grading.js:470
 msgid "System got into invalid state "
 msgstr "Кажется что-то пошло не так"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:487
+#: lms/static/coffee/src/staff_grading/staff_grading.js:485
 msgid "System got into invalid state for submission: "
 msgstr "Кажется что-то пошло не так для посылки: "
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:495
-#: lms/static/coffee/src/staff_grading/staff_grading.js:504
+#: lms/static/coffee/src/staff_grading/staff_grading.js:493
+#: lms/static/coffee/src/staff_grading/staff_grading.js:502
 msgid "(Hide)"
 msgstr "Спрятать"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:499
+#: lms/static/coffee/src/staff_grading/staff_grading.js:497
 msgid "(Show)"
 msgstr "Показать"
 
