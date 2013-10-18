@@ -150,9 +150,11 @@ define('MasterClassMain', ['logme'], function (logme) {
             // Caсhing of DOM element
             cloudSectionEl = this.masterClassEl.find('.result_class_section');
 
+        gettext("You have been registered for this master class. We will provide addition information soon.")
+        gettext("You are pending for registration for this master class. Please visit this page later for result.")
         cloudSectionEl
             .addClass('active');
-        cloudSectionEl.find('.message').html(response.message);
+        cloudSectionEl.find('.message').html(gettext(response.message));
         cloudSectionEl
             .find('.total_places').html(response.total_places);
         cloudSectionEl
