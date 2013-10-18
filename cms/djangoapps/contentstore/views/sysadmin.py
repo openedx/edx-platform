@@ -8,9 +8,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from xmodule.modulestore.django import modulestore
+
 from mitxmako.shortcuts import render_to_response
 
-import pymongo
+#import pymongo
 import time
 import json
 
@@ -27,9 +29,8 @@ def sysadmin(request):
     """
     if (not request.user) or (not request.user.is_staff):
         return redirect('login')
-    
-    client = pymongo.MongoClient()
-    db = client.xmodule
+
+    collection = modulestore().collection
 
     msg = ''
     bdir = getattr(settings, 'DELETED_COURSE_BACKUPS_DIR', None)
@@ -41,21 +42,21 @@ def sysadmin(request):
         if not course_id:
             msg += "<font color='red'>{0}</font>".format(_('Error - no course specified'))
         else:
-            nrec = db.modulestore.find({'_id.course': course_id}).count()
+            nrec = collection.find({'_id.course': course_id}).count()
             if not 'really' in request.GET:
                 msg += _("Really delete course {0}?\n").format(course_id)
                 msg += _("{0} records for this course in the database").format(nrec)
                 logging.debug('Delete course %s requested' % course_id)
             else:
-                msg += _("deleting {0}").format(course_id)
-                data = db.modulestore.find({'_id.course': course_id})
+                msg += _("deleting {0}: ").format(course_id)
+                data = collection.find({'_id.course': course_id})
                 fn = 'course-%s-dump-%s.json' % (course_id, time.ctime(time.time()).replace(' ','_'))
                 if bdir is not None:
                     fp = open('%s/%s' % (bdir,fn), 'w')
                     for d in data:
                         fp.write(json.dumps(d)+'\n')
                     fp.close()
-                db.modulestore.remove({'_id.course': course_id})
+                collection.remove({'_id.course': course_id})
                 msg += _("{0} records for {1} removed (backup file {2})").format(nrec, course_id, fn)
                 logging.debug('Course %s deleted!' % course_id)
                 action = ""
@@ -64,11 +65,11 @@ def sysadmin(request):
         if not course_id:
             msg += "<font color='red'>{0}</font>".format(_("Error - no course specified"))
         else:
-            data = db.modulestore.find({'_id.course': course_id})
+            data = collection.find({'_id.course': course_id})
             response = HttpResponse(mimetype='text/json')
             fn = 'course-%s-dump-%s.json' % (course_id, time.ctime(time.time()).replace(' ','_'))
             response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
-            data = db.modulestore.find({'_id.course': course_id})
+            data = collection.find({'_id.course': course_id})
             for d in data:
                 response.write(json.dumps(d)+'\n')
             return response
@@ -92,9 +93,9 @@ def sysadmin(request):
     
     ctab = {}
     idtab = {}
-    courses = db.modulestore.distinct('_id.course')
+    courses = collection.distinct('_id.course')
     for course in courses:
-        cinfo = db.modulestore.find_one({'_id.course':course, '_id.category':'course'}) or {}
+        cinfo = collection.find_one({'_id.course':course, '_id.category':'course'}) or {}
         id = cinfo.get('_id',cinfo)
         name = id.get('name',id)
         ctab[course] = name
