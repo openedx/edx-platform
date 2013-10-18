@@ -15,7 +15,9 @@
       % if context_course:
       <% 
             ctx_loc = context_course.location
-            index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
+            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+            index_url = location.url_reverse('course/', '')
+            checklists_url = location.url_reverse('checklists/', '')
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -84,7 +86,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-tools-checklists">
-                    <a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Checklists")}</a>
+                    <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Import")}</a>
