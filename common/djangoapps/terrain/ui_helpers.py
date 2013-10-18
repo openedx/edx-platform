@@ -408,28 +408,34 @@ def css_click(css_selector, index=0, wait_time=30):
 
 
 @world.absorb
-def css_check(css_selector, index=0, wait_time=30):
+def css_check(css_selector, wait_time=30):
     """
     Checks a check box based on a CSS selector, first waiting for the element
     to be present and clickable. This is just a wrapper for calling "click"
     because that's how selenium interacts with check boxes and radio buttons.
 
+    Then for synchronization purposes, wait for the element to be checked.
     This method will return True if the check worked.
     """
-    return css_click(css_selector=css_selector, index=index, wait_time=wait_time)
+    css_click(css_selector=css_selector, wait_time=wait_time)
+    wait_for(lambda _: css_find(css_selector).selected)
+    return True
 
 
 @world.absorb
-def select_option(name, value, index=0, wait_time=30):
+def select_option(name, value, wait_time=30):
     '''
     A method to select an option
+    Then for synchronization purposes, wait for the option to be selected.
     This method will return True if the selection worked.
     '''
     select_css = "select[name='{}']".format(name)
     option_css = "option[value='{}']".format(value)
 
     css_selector = "{} {}".format(select_css, option_css)
-    return css_click(css_selector=css_selector, index=index, wait_time=wait_time)
+    css_click(css_selector=css_selector, wait_time=wait_time)
+    wait_for(lambda _: css_has_value(select_css, value))
+    return True
 
 
 @world.absorb
@@ -442,7 +448,14 @@ def id_click(elem_id):
 
 @world.absorb
 def css_fill(css_selector, text, index=0):
+    """
+    Set the value of the element to the specified text.
+    Note that this will replace the current value completely.
+    Then for synchronization purposes, wait for the value on the page.
+    """
     retry_on_exception(lambda: css_find(css_selector)[index].fill(text))
+    wait_for(lambda _: css_has_value(css_selector, text, index=index))
+    return True
 
 
 @world.absorb
