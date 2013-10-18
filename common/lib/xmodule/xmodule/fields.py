@@ -150,7 +150,7 @@ class IsoTime(Field):
         try:
             obj_time = time.strptime(value, '%H:%M:%S')
         except ValueError as e:
-            raise e(
+            raise ValueError(
                 "Incorrect IsoTime value {} was set in XML or serialized."
                 "Original parse message is {}".format(value, e.message)
             )
@@ -174,7 +174,11 @@ class IsoTime(Field):
         if isinstance(value, float):
             return datetime.timedelta(seconds=value)
 
-        return self._isotime_to_timedelta(value)
+        if isinstance(value, basestring):
+            return self._isotime_to_timedelta(value)
+
+        msg = "IsoTime Field {0} has bad value '{1}'".format(self._name, value)
+        raise TypeError(msg)
 
     def to_json(self, value):
         """
@@ -194,9 +198,12 @@ class IsoTime(Field):
                 value = 86400
             return str(datetime.timedelta(seconds=value))
 
-        if value.total_seconds() > 86400:  # sanity check
-            raise ValueError(
-                "IsoTime max value is 23:59:59=86400 seconds"
-                "but {} seconds is passed".format(value.total_seconds())
-            )
-        return str(value)
+        if isinstance(value, datetime.timedelta):
+            if value.total_seconds() > 86400:  # sanity check
+                raise ValueError(
+                    "IsoTime max value is 23:59:59=86400.0 seconds, "
+                    "but {} seconds is passed".format(value.total_seconds())
+                )
+            return str(value)
+
+        raise TypeError("IsoTime: cannot convert {!r} to json".format(value))

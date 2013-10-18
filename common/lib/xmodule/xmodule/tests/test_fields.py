@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from django.utils.timezone import UTC
-from xmodule.fields import Date, Timedelta
+from xmodule.fields import Date, Timedelta, IsoTime
 from xmodule.timeinfo import TimeInfo
 import time
 
@@ -116,3 +116,54 @@ class TimeInfoTest(unittest.TestCase):
         timeinfo = TimeInfo(due_date, grace_pd_string)
         self.assertEqual(timeinfo.close_date,
             due_date + Timedelta().from_json(grace_pd_string))
+
+
+class IsoTimeTest(unittest.TestCase):
+
+    delta = IsoTime()
+
+    def test_from_json(self):
+        self.assertEqual(
+            IsoTimeTest.delta.from_json('0:05:07'),
+            datetime.timedelta(seconds=307)
+        )
+
+        self.assertEqual(
+            IsoTimeTest.delta.from_json(100.0),
+            datetime.timedelta(seconds=100)
+        )
+        self.assertEqual(
+            IsoTimeTest.delta.from_json(None),
+            datetime.timedelta(seconds=0)
+        )
+
+        with self.assertRaises(TypeError):
+            IsoTimeTest.delta.from_json(1234)  # int
+
+        with self.assertRaises(ValueError):
+            IsoTimeTest.delta.from_json("77:77:77")
+
+    def test_to_json(self):
+        self.assertEqual(
+            "1:02:03",
+            IsoTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
+        )
+        self.assertEqual(
+            "00:00:00",
+            IsoTimeTest.delta.to_json(None)
+        )
+        self.assertEqual(
+            "0:01:40",
+            IsoTimeTest.delta.to_json(100.0)
+        )
+
+        with self.assertRaises(ValueError) as cm:
+            IsoTimeTest.delta.to_json(datetime.timedelta(seconds=90000))
+
+        self.assertEqual(
+            cm.exception.message,
+            "IsoTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"
+        )
+
+        with self.assertRaises(TypeError):
+            IsoTimeTest.delta.to_json("123")
