@@ -2,8 +2,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-11 17:19+0400\n"
+<<<<<<< HEAD
+"POT-Creation-Date: 2013-10-18 17:34+0400\n"
 "PO-Revision-Date: 2013-10-14 17:14+0400\n"
+=======
+"POT-Creation-Date: 2013-10-18 17:55+0400\n"
+"PO-Revision-Date: 2013-10-18 17:54+0300\n"
+>>>>>>> feature/master-class
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -12,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.5.4\n"
 "Generated-By: Babel 0.9.6\n"
 "X-POOTLE-MTIME: 1379946749.0\n"
 
@@ -170,13 +175,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:77
+#: cms/static/coffee/src/views/module_edit.js:67
 #, python-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:131
-#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:841
+#: cms/static/coffee/src/views/module_edit.js:121
+#: cms/static/coffee/src/views/unit.js:68 cms/static/js/base.js:841
 #: cms/static/js/models/section.js:26 cms/static/js/views/asset_view.js:84
 #: cms/static/js/views/course_info_edit.js:121
 #: cms/static/js/views/course_info_edit.js:330
@@ -185,36 +190,36 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/module_edit.js:140
+#: cms/static/coffee/src/views/module_edit.js:130
 msgid "There was an error saving your changes. Please try again."
 msgstr ""
 "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
 
-#: cms/static/coffee/src/views/tabs.js:96
+#: cms/static/coffee/src/views/tabs.js:88
 msgid "Delete Component Confirmation"
 msgstr "Подтверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:97
+#: cms/static/coffee/src/views/tabs.js:89
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr ""
 "Вы действительно хотите удалить этот компонент? Это действие не можетбыть "
 "отменено."
 
-#: cms/static/coffee/src/views/tabs.js:100
+#: cms/static/coffee/src/views/tabs.js:92
 #: cms/static/js/views/course_info_edit.js:178
 msgid "OK"
 msgstr "OK"
 
-#: cms/static/coffee/src/views/tabs.js:111
-#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:402
+#: cms/static/coffee/src/views/tabs.js:103
+#: cms/static/coffee/src/views/unit.js:168 cms/static/js/base.js:402
 #: cms/static/js/views/course_info_edit.js:186
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:124
-#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:418
+#: cms/static/coffee/src/views/tabs.js:116
+#: cms/static/coffee/src/views/unit.js:191 cms/static/js/base.js:418
 #: cms/static/js/views/asset_view.js:71
 #: cms/static/js/views/course_info_edit.js:204
 #: cms/static/js/views/textbook.js:48
@@ -232,15 +237,15 @@ msgstr "Удаление&hellip;"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: cms/static/coffee/src/views/unit.js:177
+#: cms/static/coffee/src/views/unit.js:159
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:178
+#: cms/static/coffee/src/views/unit.js:160
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Действие по удалению этого компонента не может быть отменено."
 
-#: cms/static/coffee/src/views/unit.js:181
+#: cms/static/coffee/src/views/unit.js:163
 msgid "Yes, delete this component"
 msgstr "Да, удалить этот компонент"
 
@@ -1606,10 +1611,6 @@ msgstr "Адрес электронной почты"
 #: cms/templates/login.html:29 lms/templates/login.html:137
 #: lms/templates/login_modal.html:33
 #: lms/templates/university_profile/edge.html:184
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:133
-#: lms/templates/university_profile/edge.html.BASE.21781.html:128
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:127
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:127
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
@@ -1618,10 +1619,6 @@ msgstr "Забыли пароль?"
 #: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
 #: lms/templates/register.html:129 lms/templates/signup_modal.html:45
 #: lms/templates/university_profile/edge.html:179
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:128
-#: lms/templates/university_profile/edge.html.BASE.21781.html:123
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:122
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:122
 msgid "Password"
 msgstr "Пароль"
 
@@ -1630,7 +1627,7 @@ msgid "Studio Support"
 msgstr "Помощь в студии"
 
 #: cms/templates/login.html:49 lms/templates/login.html:184
-#: lms/templates/register.html:388
+#: lms/templates/register.html:244
 msgid "Need Help?"
 msgstr "Нужна помощь?"
 
@@ -2493,76 +2490,76 @@ msgstr "Имя"
 msgid "Middlename"
 msgstr "Отчество"
 
-#: cms/templates/signup.html:52 lms/templates/register.html:190
+#: cms/templates/signup.html:52
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr "Год рождения"
 
-#: cms/templates/signup.html:61 lms/templates/register.html:199
+#: cms/templates/signup.html:61
 msgid "Highest Level of Education Completed"
 msgstr "Образование"
 
-#: cms/templates/signup.html:70 lms/templates/register.html:208
+#: cms/templates/signup.html:70
 msgid "Place where Education Completed"
 msgstr "Какое учебное заведение окончил(а)"
 
-#: cms/templates/signup.html:74 lms/templates/register.html:212
+#: cms/templates/signup.html:74
 msgid "Year when education was Completed"
 msgstr "Год окончания учебного заведения"
 
-#: cms/templates/signup.html:84 lms/templates/register.html:222
+#: cms/templates/signup.html:84
 msgid "Diploma qualification"
 msgstr "Квалификация по диплому"
 
-#: cms/templates/signup.html:88 lms/templates/register.html:226
+#: cms/templates/signup.html:88
 msgid "Diploma specialty"
 msgstr "Специальность по диплому"
 
-#: cms/templates/signup.html:92 lms/templates/register.html:230
+#: cms/templates/signup.html:92
 msgid "Type of educational institution"
 msgstr "Тип образовательного учреждения"
 
-#: cms/templates/signup.html:101 lms/templates/register.html:239
+#: cms/templates/signup.html:101
 msgid "Number of educational institution"
 msgstr "Номер образовательного учреждения"
 
-#: cms/templates/signup.html:105 lms/templates/register.html:243
+#: cms/templates/signup.html:105
 msgid "Name of educational institution"
 msgstr "Название образовательного учреждения"
 
-#: cms/templates/signup.html:109 lms/templates/register.html:247
+#: cms/templates/signup.html:109
 msgid "StatGrad login of educational institution"
 msgstr "Логин образовательного учреждения в системе Статград"
 
-#: cms/templates/signup.html:113 lms/templates/register.html:251
+#: cms/templates/signup.html:113
 msgid "Okrug of educational institution"
 msgstr "Округ образовательного учреждения"
 
-#: cms/templates/signup.html:122 lms/templates/register.html:260
+#: cms/templates/signup.html:122
 msgid "Occupation at educational institution"
 msgstr "Должность по месту работы"
 
-#: cms/templates/signup.html:131 lms/templates/register.html:269
+#: cms/templates/signup.html:131
 msgid "Another occupation at educational institution"
 msgstr "Вторая должность по месту работы"
 
-#: cms/templates/signup.html:140 lms/templates/register.html:278
+#: cms/templates/signup.html:140
 msgid "Educational experience at educational institution"
 msgstr "Стаж педагогический (полных лет)"
 
-#: cms/templates/signup.html:144 lms/templates/register.html:282
+#: cms/templates/signup.html:144
 msgid "Managing experience at educational institution"
 msgstr "Стаж руководящей работы (полных лет)"
 
-#: cms/templates/signup.html:148 lms/templates/register.html:286
+#: cms/templates/signup.html:148
 msgid "Qualification category"
 msgstr "Квалификационная категория"
 
-#: cms/templates/signup.html:157 lms/templates/register.html:295
+#: cms/templates/signup.html:157
 msgid "Qualification category year"
 msgstr "Год присвоения категории"
 
-#: cms/templates/signup.html:161 lms/templates/register.html:299
+#: cms/templates/signup.html:161
 msgid "Contact phone"
 msgstr "Контактный телефон"
 
@@ -3616,6 +3613,7 @@ msgid "Error: {msg}"
 msgstr "Ошибка: {msg}"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:194
+#: common/lib/xmodule/xmodule/master_class_module.py:37
 msgid "Display Name"
 msgstr "Отображаемое имя:"
 
@@ -3807,6 +3805,76 @@ msgstr ""
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:318
 msgid "Markdown source of this module"
 msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:38
+#, fuzzy
+msgid "Display name for this module"
+msgstr "Вывести оценки для задания"
+
+#: common/lib/xmodule/xmodule/master_class_module.py:43
+msgid "Max places"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:44
+msgid "Number of text boxes available for students to input words/sentences."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:50
+msgid "Autopass score"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:51
+msgid "Maximum number of words to be displayed in generated word cloud."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:59
+<<<<<<< HEAD
+#, fuzzy
+msgid "Whether this student has been register for this master class."
+msgstr "Может ли студент сдавать файлы в качестве ответа."
+
+#: common/lib/xmodule/xmodule/master_class_module.py:64
+msgid "All registrations from all students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:68
+#, fuzzy
+msgid "Passed registrations."
+msgstr "Форма регистрации"
+=======
+msgid "Whether this student has been register for this master class."
+msgstr "Является ли это студент был зарегистрированны на этом мастер-классе."
+
+#: common/lib/xmodule/xmodule/master_class_module.py:64
+msgid "All registrations from all students."
+msgstr "Все регистрации от всех студентов."
+
+#: common/lib/xmodule/xmodule/master_class_module.py:68
+msgid "Passed registrations."
+msgstr "Прошедшие регистрацию."
+>>>>>>> feature/master-class
+
+#: common/lib/xmodule/xmodule/master_class_module.py:89
+msgid ""
+"You have been registered for this master class. We will provide addition "
+"information soon."
+msgstr ""
+<<<<<<< HEAD
+=======
+"Вы зарегистрированны на мастер-класс. Мы сообщим дополнительную информацию в "
+"скором времени."
+>>>>>>> feature/master-class
+
+#: common/lib/xmodule/xmodule/master_class_module.py:91
+msgid ""
+"You are pending for registration for this master class. Please visit this "
+"page later for result."
+msgstr ""
+<<<<<<< HEAD
+=======
+"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
+"данную страницу позже для результатов."
+>>>>>>> feature/master-class
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:632
 msgid "Could not contact the graders.  Please notify course staff."
@@ -5058,10 +5126,6 @@ msgstr "изменить"
 #: lms/templates/dashboard.html:175
 #: lms/templates/courseware/instructor_dashboard.html:133
 #: lms/templates/university_profile/edge.html:175
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:124
-#: lms/templates/university_profile/edge.html.BASE.21781.html:119
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:118
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:118
 msgid "Email"
 msgstr "Эл. почта"
 
@@ -5633,10 +5697,6 @@ msgstr "Посмотрите наш раздел помощи для ответ�
 
 #: lms/templates/login_modal.html:9 lms/templates/provider_login.html:37
 #: lms/templates/university_profile/edge.html:183
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:132
-#: lms/templates/university_profile/edge.html.BASE.21781.html:127
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:126
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:126
 msgid "Log In"
 msgstr "Войти"
 
@@ -5655,6 +5715,54 @@ msgstr "войти с помощью OpenID"
 #: lms/templates/main.html:25 lms/templates/navigation.html:49
 msgid "Home"
 msgstr "Главная страница"
+
+<<<<<<< HEAD
+#: lms/templates/master_class.html:23
+#, fuzzy
+msgid "Passed registration:"
+msgstr "Форма регистрации"
+
+#: lms/templates/master_class.html:24
+msgid "Total places:"
+msgstr ""
+
+#: lms/templates/master_class.html:29
+#, fuzzy
+msgid "Staff Inforamtion"
+msgstr "Основная информация"
+
+#: lms/templates/master_class.html:30
+msgid "Students pending registration"
+msgstr ""
+
+#: lms/templates/master_class.html:38
+msgid "Students passed registration"
+msgstr ""
+=======
+#: lms/templates/master_class.html:17 lms/templates/register.html:201
+msgid "Register"
+msgstr "Регистрация"
+
+#: lms/templates/master_class.html:23
+msgid "Passed registration:"
+msgstr "Прошедшие регистрацию:"
+
+#: lms/templates/master_class.html:24
+msgid "Total places:"
+msgstr "Всего мест:"
+
+#: lms/templates/master_class.html:29
+msgid "Staff Inforamtion"
+msgstr "Информация для преподавателей"
+
+#: lms/templates/master_class.html:30
+msgid "Students pending registration"
+msgstr "Студенты ожидащие регистрацию"
+
+#: lms/templates/master_class.html:38
+msgid "Students passed registration"
+msgstr "Студенты прошедшие регистарцию"
+>>>>>>> feature/master-class
 
 #: lms/templates/mathjax_accessible.html:5
 msgid ""
@@ -5753,15 +5861,11 @@ msgstr "Курсы"
 msgid "Schools"
 msgstr "Школы"
 
-#: lms/templates/navigation.html:110 lms/templates/navigation.html:114
-msgid "Register Now"
-msgstr "Зарегистрируйтесь сейчас"
-
-#: lms/templates/navigation.html:123 lms/templates/navigation.html:125
+#: lms/templates/navigation.html:112 lms/templates/navigation.html:114
 msgid "Log in"
 msgstr "Вход в систему"
 
-#: lms/templates/navigation.html:134
+#: lms/templates/navigation.html:123
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}"
@@ -5862,15 +5966,15 @@ msgstr "Будет отображаться в дискуссиях и фору�
 msgid "example: username@domain.com"
 msgstr "пример: username@domain.com"
 
-#: lms/templates/register-shib.html:150 lms/templates/register.html:306
+#: lms/templates/register-shib.html:150
 msgid "Account Acknowledgements"
 msgstr "Подтверждения"
 
-#: lms/templates/register-shib.html:159 lms/templates/register.html:315
+#: lms/templates/register-shib.html:159
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr "Я согласен с {link_start}условиями предоставления услуг{link_end}"
 
-#: lms/templates/register-shib.html:175 lms/templates/register.html:331
+#: lms/templates/register-shib.html:175
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "Я согласен с {link_start}кодексом чести{link_end}"
 
@@ -5882,9 +5986,10 @@ msgstr "Обновить учетную запись"
 msgid "Register for {platform_name}"
 msgstr "Регистрация в {platform_name}"
 
-#: lms/templates/register.html:78
-msgid "Create my {platform_name} Account"
-msgstr "Создать мой аккаунт в {platform_name}"
+#: lms/templates/register.html:78 lms/templates/register.html:201
+#: lms/templates/signup_modal.html:87
+msgid "Create My Account"
+msgstr "Создать учетную запись"
 
 #: lms/templates/register.html:93
 msgid "Welcome!"
@@ -5915,7 +6020,8 @@ msgstr ""
 msgid "Optional Personal Information"
 msgstr "Дополнительная информация о пользователе"
 
-#: lms/templates/register.html:345
+<<<<<<< HEAD
+#: lms/templates/register.html:201
 #: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
 #: lms/templates/university_profile/edge.html.BASE.21781.html:135
 #: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
@@ -5923,27 +6029,25 @@ msgstr "Дополнительная информация о пользоват�
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/register.html:345 lms/templates/signup_modal.html:87
-msgid "Create My Account"
-msgstr "Создать учетную запись"
-
-#: lms/templates/register.html:352
+=======
+>>>>>>> feature/master-class
+#: lms/templates/register.html:208
 msgid "Registration Help"
 msgstr "Помощь по регистрации"
 
-#: lms/templates/register.html:358
+#: lms/templates/register.html:214
 msgid "Already registered?"
 msgstr "Уже зарегистрированы?"
 
-#: lms/templates/register.html:361
+#: lms/templates/register.html:217
 msgid "Click here to log in."
 msgstr "Нажмите здесь для входа."
 
-#: lms/templates/register.html:372
+#: lms/templates/register.html:228
 msgid "Welcome to {platform_name}"
 msgstr "Добро пожаловать в {platform_name}"
 
-#: lms/templates/register.html:373
+#: lms/templates/register.html:229
 msgid ""
 "Registering with {platform_name} gives you access to all of our current and "
 "future free courses. Not ready to take a course just yet? Registering puts "
@@ -5953,11 +6057,11 @@ msgstr ""
 "бесплатным курсам. Пока не готовы взять курс? Регистрация добавит Вас в "
 "список рассыки, и Вы получите оповещения о новых курсах."
 
-#: lms/templates/register.html:378
+#: lms/templates/register.html:234
 msgid "Next Steps"
 msgstr "Следующие шаги"
 
-#: lms/templates/register.html:380
+#: lms/templates/register.html:236
 msgid ""
 "You will receive an activation email.  You must click on the activation link "
 "to complete the process.  Don't see the email?  Check your spam folder and "
@@ -5970,7 +6074,7 @@ msgstr ""
 "попадали в спам, так как Вы в дальнейшем будете получать письма от Ваших "
 "курсов."
 
-#: lms/templates/register.html:382
+#: lms/templates/register.html:238
 msgid ""
 "As part of joining {platform_name}, you will receive an activation email.  "
 "You must click on the activation link to complete the process.  Don't see "
@@ -5983,15 +6087,15 @@ msgstr ""
 "Вы в дальнейшем будете получать письма от Ваших курсов. В {platform_name} мы "
 "в основном общаемся с помощью email."
 
-#: lms/templates/register.html:389
+#: lms/templates/register.html:245
 msgid "Need help in registering with {platform_name}?"
 msgstr "Нужна помощь в регистрации в {platform_name}?"
 
-#: lms/templates/register.html:391
+#: lms/templates/register.html:247
 msgid "View our FAQs for answers to commonly asked questions."
 msgstr "Посмотрите раздел ЧаВо для ответов на типичные вопросы."
 
-#: lms/templates/register.html:393
+#: lms/templates/register.html:249
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
@@ -6418,9 +6522,8 @@ msgid "Register for Pearson VUE Test"
 msgstr "Зарегистрироваться на личный экзамен"
 
 #: lms/templates/test_center_register.html:324
-#, fuzzy
 msgid "Cancel Registration"
-msgstr "Форма регистрации"
+msgstr "Отменить регистрацию"
 
 #: lms/templates/test_center_register.html:336
 #: lms/templates/test_center_register.html:339
@@ -8023,10 +8126,6 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html:54
 msgid "Prompt"
 msgstr "Условие задачи"
-
-#: lms/templates/instructor/staff_grading.html:54
-msgid "(Show)"
-msgstr "Показать"
 
 #: lms/templates/instructor/staff_grading.html:67
 #: lms/templates/peer_grading/peer_grading_problem.html:32
@@ -11137,27 +11236,12 @@ msgstr ""
 "{tech_support_email}</a> для сообщений об ошибках или недоступности сайта."
 
 #: lms/templates/university_profile/edge.html:172
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:121
-#: lms/templates/university_profile/edge.html.BASE.21781.html:116
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:115
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:115
 msgid "Log in to your courses"
 msgstr "Войти в ваши курсы"
 
 #: lms/templates/university_profile/edge.html:189
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:138
-#: lms/templates/university_profile/edge.html.BASE.21781.html:133
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:132
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:132
 msgid "Register for classes"
 msgstr "Регистрация на курсы"
-
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:139
-#: lms/templates/university_profile/edge.html.BASE.21781.html:134
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:133
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:133
-msgid "Take free online courses from today's leading universities."
-msgstr ""
 
 #: lms/templates/verify_student/_modal_editname.html:6
 msgid "Edit Your Name"
@@ -11651,6 +11735,18 @@ msgstr ""
 msgid "You have decided to pay $ "
 msgstr ""
 
+#~ msgid "Register Now"
+#~ msgstr "Зарегистрируйтесь сейчас"
+
+#~ msgid "Create my {platform_name} Account"
+#~ msgstr "Создать мой аккаунт в {platform_name}"
+
+<<<<<<< HEAD
+#~ msgid "(Show)"
+#~ msgstr "Показать"
+
+=======
+>>>>>>> feature/master-class
 #~ msgid "e.g. 9999"
 #~ msgstr "например 9999"
 

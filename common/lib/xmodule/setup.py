@@ -53,6 +53,7 @@ setup(
             "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
             "foldit = xmodule.foldit_module:FolditDescriptor",
             "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
+            "master_class = xmodule.master_class_module:MasterClassDescriptor",
             "hidden = xmodule.hidden_module:HiddenDescriptor",
             "raw = xmodule.raw_module:RawDescriptor",
             "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",

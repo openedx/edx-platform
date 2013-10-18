@@ -1,0 +1,46 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<section
+    id="master_class_${element_id}"
+    class="${element_class}"
+    data-ajax-url="${ajax_url}"
+>
+    <h2 class="problem-header">${display_name}</h2>
+
+    <section class="input_class_section">
+        <input
+                id="input-class"
+                type="hidden"
+                value="1"
+            />
+        <section class="action">
+            <input class="save" type="button" value="${_('Register')}" />
+        </section>
+    </section>
+    <p>
+    <section id="result_class_section_${element_id}" class="result_class_section">
+        <p><span class="message"></span></p>
+        <h3>${_('Passed registration:')} <span class="total_register"></span></h3>
+        <h3>${_('Total places:')} <span class="total_places"></span></h3>
+        <div class="master_class"></div>
+    </section>
+    <p>
+    % if is_staff:
+    <h3>${_('Staff Inforamtion')}</h3>
+    <h4>${_('Students pending registration')}</h4>
+    <ul>
+     % for row in all_registrations:
+        % if row not in passed_registrations:
+        <li>${row}</li>
+        % endif
+     % endfor
+    </ul>
+    <h4>${_('Students passed registration')}</h4>
+    <ul>
+     % for row in passed_registrations:
+        <li>${row}</li>
+     % endfor
+    </ul>
+    % endif
+
+</section>
