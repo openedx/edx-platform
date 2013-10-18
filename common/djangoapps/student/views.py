@@ -200,7 +200,7 @@ def cert_info(user, course):
     'survey_url': url, only if show_survey_button is True
     'grade': if status is not 'processing'
     """
-    if not course.has_ended():
+    if not course.may_certify():
         return {}
 
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
@@ -291,6 +291,15 @@ def _cert_info(user, course, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
     """
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.regenerating: 'generating',
+        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.notpassing: 'notpassing',
+        CertificateStatuses.restricted: 'restricted',
+    }
+
     default_status = 'processing'
 
     default_info = {'status': default_status,
@@ -301,15 +310,6 @@ def _cert_info(user, course, cert_status):
 
     if cert_status is None:
         return default_info
-
-    # simplify the status for the template using this lookup table
-    template_state = {
-        CertificateStatuses.generating: 'generating',
-        CertificateStatuses.regenerating: 'generating',
-        CertificateStatuses.downloadable: 'ready',
-        CertificateStatuses.notpassing: 'notpassing',
-        CertificateStatuses.restricted: 'restricted',
-    }
 
     status = template_state.get(cert_status['status'], default_status)
 
