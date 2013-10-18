@@ -9,6 +9,7 @@
             videoCaption = state.videoCaption;
             videoSpeedControl = state.videoSpeedControl;
             videoControl = state.videoControl;
+            $.fn.scrollTo.reset();
         }
 
         beforeEach(function () {
@@ -20,7 +21,6 @@
 
         afterEach(function () {
             YT.Player = undefined;
-            $.fn.scrollTo.reset();
             $('.subtitles').remove();
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
