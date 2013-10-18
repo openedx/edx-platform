@@ -378,6 +378,7 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+DOC_STORE_CONFIG = None
 
 # Should we initialize the modulestores at startup, or wait until they are
 # needed?
