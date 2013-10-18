@@ -108,9 +108,6 @@ urlpatterns = patterns('',  # nopep8
 # User creation and updating views
 urlpatterns += patterns(
     '',
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
-        'contentstore.views.update_checklist', name='checklists_updates'),
     url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
@@ -140,6 +137,7 @@ urlpatterns += patterns(
     url(r'^course$', 'index'),
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>.+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
 )
 
 js_info_dict = {
