@@ -91,21 +91,30 @@ class MasterClassModule(MasterClassFields, XModule):
             message = _("You are pending for registration for this master class. Please visit this page later for result.")
         if (total_register is None):
             total_register = 0
+        additional_data = {}
+        if self.runtime.user_is_staff:
+            additional_data['all_registrations'] = self.all_registrations
+            additional_data['passed_registrations'] = self.passed_registrations
+            additional_data['is_staff'] = self.runtime.user_is_staff
         if self.submitted:
-            return json.dumps({
+            data = {
                 'status': 'success',
                 'submitted': True,
                 'total_places': self.total_places,
                 'total_register': total_register,
                 'message': message
-            })
+            }
+            data.update(additional_data)
+            return json.dumps(data)
         else:
-            return json.dumps({
+            data = {
                 'status': 'success',
                 'submitted': False,
                 'total_places': self.total_places,
                 'total_register': total_register,
-            })
+            }
+            data.update(additional_data)
+            return json.dumps(data)
 
     def handle_ajax(self, dispatch, data):
         """Ajax handler.
@@ -132,10 +141,25 @@ class MasterClassModule(MasterClassFields, XModule):
 
             self.submitted = True
 
-
             return self.get_state()
         elif dispatch == 'get_state':
             return self.get_state()
+        elif dispatch == 'register':
+            logging.error(data)
+            if self.runtime.user_is_staff:
+                for email in data.getlist('emails[]'):
+                    if (len(self.passed_registrations) < self.total_places):
+                        if (self.all_registrations.count(email) > 0):
+                            self.passed_registrations.append(email)
+                            self.all_registrations.remove(email)
+                    else:
+                        break
+                return self.get_state()
+            else:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
         else:
             return json.dumps({
                 'status': 'fail',
@@ -155,9 +179,9 @@ class MasterClassModule(MasterClassFields, XModule):
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
             'submitted': self.submitted,
+            'is_staff': self.runtime.user_is_staff,
             'all_registrations': self.all_registrations,
-            'passed_registrations': self.passed_registrations,
-            'is_staff': self.runtime.user_is_staff
+            'passed_registrations': self.passed_registrations
         }
         self.content = self.system.render_template('master_class.html', context)
         return self.content
