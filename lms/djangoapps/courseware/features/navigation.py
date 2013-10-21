@@ -88,6 +88,9 @@ def view_course_multiple_sequences(step):
 
 @step(u'I navigate to a section')
 def when_i_navigate_to_a_section(step):
+    # Prevent jQuery menu animations from interferring with the clicks
+    world.disable_jquery_animations()
+
     # Open the 2nd section
     world.css_click(css_selector='div.chapter', index=1)
     subsection_css = 'a[href*="Test_Subsection_2/"]'
@@ -176,6 +179,9 @@ def wait_for_problem(display_name):
     """
     Wait for the problem with `display_name` to appear on the page.
     """
+    # Wait for the problem to reload
+    world.wait_for_ajax_complete()
+
     wait_func = lambda _: world.css_has_text(
         'h2.problem-header', display_name, strip=True
     )
