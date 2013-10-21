@@ -78,4 +78,4 @@ class CourseTestCase(ModuleStoreTestCase):
 
         client = Client()
         client.login(username=uname, password=password)
-        return client
+        return client, nonstaff
