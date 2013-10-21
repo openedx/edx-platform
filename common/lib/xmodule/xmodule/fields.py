@@ -118,7 +118,7 @@ class Timedelta(Field):
         return ' '.join(values)
 
 
-class IsoTime(Field):
+class RelativeTime(Field):
     """
     Field for start_time and end_time video module properties.
 
@@ -134,8 +134,8 @@ class IsoTime(Field):
     In database we previously had float type for start_time and end_time fields,
     so we are checking it also.
 
-    Python object of IsoTime is datetime.timedelta.
-    JSONed representation of IsoTime is "HH:MM:SS"
+    Python object of RelativeTime is datetime.timedelta.
+    JSONed representation of RelativeTime is "HH:MM:SS"
     """
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
@@ -151,7 +151,7 @@ class IsoTime(Field):
             obj_time = time.strptime(value, '%H:%M:%S')
         except ValueError as e:
             raise ValueError(
-                "Incorrect IsoTime value {} was set in XML or serialized."
+                "Incorrect RelativeTime value {} was set in XML or serialized."
                 "Original parse message is {}".format(value, e.message)
             )
         return datetime.timedelta(
@@ -177,7 +177,7 @@ class IsoTime(Field):
         if isinstance(value, basestring):
             return self._isotime_to_timedelta(value)
 
-        msg = "IsoTime Field {0} has bad value '{1}'".format(self._name, value)
+        msg = "RelativeTime Field {0} has bad value '{1}'".format(self._name, value)
         raise TypeError(msg)
 
     def to_json(self, value):
@@ -201,9 +201,9 @@ class IsoTime(Field):
         if isinstance(value, datetime.timedelta):
             if value.total_seconds() > 86400:  # sanity check
                 raise ValueError(
-                    "IsoTime max value is 23:59:59=86400.0 seconds, "
+                    "RelativeTime max value is 23:59:59=86400.0 seconds, "
                     "but {} seconds is passed".format(value.total_seconds())
                 )
             return str(value)
 
-        raise TypeError("IsoTime: cannot convert {!r} to json".format(value))
+        raise TypeError("RelativeTime: cannot convert {!r} to json".format(value))

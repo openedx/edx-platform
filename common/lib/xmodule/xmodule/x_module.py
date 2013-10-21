@@ -13,7 +13,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
-from xmodule.fields import IsoTime
+from xmodule.fields import RelativeTime
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.errortracker import exc_info_to_str
@@ -709,8 +709,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
-            elif isinstance(field, IsoTime):
-                editor_type = "IsoTime"
+            elif isinstance(field, RelativeTime):
+                editor_type = "RelativeTime"
             metadata_fields[field.name]['type'] = editor_type
             metadata_fields[field.name]['options'] = [] if values is None else values
 

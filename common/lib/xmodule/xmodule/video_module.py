@@ -29,7 +29,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
-from xmodule.fields import IsoTime
+from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
@@ -80,13 +80,13 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-    start_time = IsoTime(  # datetime.timedelta object
+    start_time = RelativeTime(  # datetime.timedelta object
         help="Start time for the video.",
         display_name="Start Time",
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
-    end_time = IsoTime(  # datetime.timedelta object
+    end_time = RelativeTime(  # datetime.timedelta object
         help="End time for the video.",
         display_name="End Time",
         scope=Scope.settings,

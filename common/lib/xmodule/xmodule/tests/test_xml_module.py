@@ -10,7 +10,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xblock.runtime import DbModel
 
-from xmodule.fields import Date, Timedelta, IsoTime
+from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
@@ -389,10 +389,10 @@ class TestDeserializeTimedelta(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-class TestDeserializeIsoTime(TestDeserialize):
+class TestDeserializeRelativeTime(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
 
-    test_field = IsoTime
+    test_field = RelativeTime
 
     def test_deserialize(self):
         """

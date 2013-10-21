@@ -38,8 +38,9 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
                     }
                     else if(model.getType() === MetadataModel.VIDEO_LIST_TYPE) {
                         new VideoList(data);
-                    else if(model.getType() === MetadataModel.ISO_TIME_TYPE) {
-                        new Metadata.IsoTime(data);
+                    }
+                    else if(model.getType() === MetadataModel.RELATIVE_TIME_TYPE) {
+                        new Metadata.RelativeTime(data);
                     }
                     else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
@@ -293,7 +294,7 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
         }
     });
 
-    Metadata.IsoTime = Metadata.AbstractEditor.extend({
+    Metadata.RelativeTime = AbstractEditor.extend({
 
         events : {
             "change input" : "updateModel",
@@ -304,7 +305,7 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
         templateName: "metadata-string-entry",
 
         initialize: function () {
-            Metadata.AbstractEditor.prototype.initialize.apply(this);
+            AbstractEditor.prototype.initialize.apply(this);
 
             // This list of definitions is used for creating appropriate
             // time format mask;
