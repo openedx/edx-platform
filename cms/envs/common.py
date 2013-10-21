@@ -422,3 +422,4 @@ TRACKING_BACKENDS = {
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 TRACKING_ENABLED = True
+
