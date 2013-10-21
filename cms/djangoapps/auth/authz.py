@@ -37,9 +37,7 @@ def get_course_groupname_for_role(location, role):
         groupnames.append('{0}_{1}'.format(role, location.course))
     elif isinstance(location, CourseLocator):
         old_location = loc_mapper().translate_locator_to_location(location)
-        if old_location is None:
-            groupnames.append('{0}_{1}'.format(role, location.as_old_location_course_id))
-        else:
+        if old_location:
             groupnames.append('{0}_{1}'.format(role, old_location.course_id))
 
     for groupname in groupnames:
