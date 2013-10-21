@@ -35,7 +35,7 @@ requirejs.config({
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
 
-        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
+        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
         "tender": "//edxedge.tenderapp.com/tender_widget.js"
 
@@ -116,7 +116,19 @@ requirejs.config({
             exports: "tinymce"
         },
         "mathjax": {
-            exports: "MathJax"
+            exports: "MathJax",
+            init: ->
+              MathJax.Hub.Config
+                tex2jax:
+                  inlineMath: [
+                    ["\\(","\\)"],
+                    ['[mathjaxinline]','[/mathjaxinline]']
+                  ]
+                  displayMath: [
+                    ["\\[","\\]"],
+                    ['[mathjax]','[/mathjax]']
+                  ]
+              MathJax.Hub.Configured();
         },
         "xmodule": {
             exports: "XModule"

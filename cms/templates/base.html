@@ -71,7 +71,7 @@ var require = {
 
         // externally hosted files
         "tender": "//edxedge.tenderapp.com/tender_widget",
-        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
+        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         // youtube URL does not end in ".js". We add "?noext" to the path so
         // that require.js adds the ".js" to the query component of the URL,
         // and leaves the path component intact.
@@ -159,7 +159,22 @@ var require = {
             exports: "tinymce"
         },
         "mathjax": {
-            exports: "MathJax"
+            exports: "MathJax",
+            init: function() {
+              MathJax.Hub.Config({
+                tex2jax: {
+                  inlineMath: [
+                    ["\\(","\\)"],
+                    ['[mathjaxinline]','[/mathjaxinline]']
+                  ],
+                  displayMath: [
+                    ["\\[","\\]"],
+                    ['[mathjax]','[/mathjax]']
+                  ]
+                }
+              });
+              MathJax.Hub.Configured();
+            }
         },
         "xblock/core": {
             exports: "XBlock",
