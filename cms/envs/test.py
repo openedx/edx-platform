@@ -91,6 +91,7 @@ CONTENTSTORE = {
     'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'test_xcontent',
+        'collection': 'dont_trip',
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
     'ADDITIONAL_OPTIONS': {
