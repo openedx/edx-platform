@@ -11,7 +11,7 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 
-from xmodule_modifiers import wrap_xmodule
+from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
@@ -164,7 +164,7 @@ def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
     html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xmodule('xmodule_edit.html', html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

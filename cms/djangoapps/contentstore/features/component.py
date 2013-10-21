@@ -42,7 +42,7 @@ def add_a_multi_step_component(step, is_advanced, category):
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
-    selector = 'li.component section.xmodule_display'
+    selector = 'li.component section.xblock-student_view'
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):

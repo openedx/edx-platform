@@ -12,7 +12,7 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 class SendEmail
   constructor: (@$container) ->
     # gather elements
-    @$emailEditor = XModule.loadModule($('.xmodule_edit'));
+    @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
     @$send_to = @$container.find("select[name='send_to']'")
     @$subject = @$container.find("input[name='subject']'")
     @$btn_send = @$container.find("input[name='send']'")
@@ -51,16 +51,16 @@ class SendEmail
             dataType: 'json'
             url: @$btn_send.data 'endpoint'
             data: send_data
-            success: (data) => 
+            success: (data) =>
               @display_response success_message
-              
-            error: std_ajax_err => 
+
+            error: std_ajax_err =>
               @fail_with_error gettext('Error sending email.')
 
         else
           @$task_response.empty()
           @$request_response_error.empty()
-              
+
   fail_with_error: (msg) ->
     console.warn msg
     @$task_response.empty()

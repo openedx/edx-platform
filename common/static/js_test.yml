@@ -35,6 +35,7 @@ lib_paths:
     - js/vendor/jquery.timeago.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
+    - coffee/src/jquery.immediateDescendents.js
 
 # Paths to source JavaScript files
 src_paths:

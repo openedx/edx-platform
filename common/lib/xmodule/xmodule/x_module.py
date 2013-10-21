@@ -85,12 +85,43 @@ class HTMLSnippet(object):
             .format(self.__class__))
 
 
+def shim_xmodule_js(fragment):
+    """
+    Set up the XBlock -> XModule shim on the supplied :class:`xblock.fragment.Fragment`
+    """
+    if not fragment.js_init_fn:
+        fragment.initialize_js('XBlockToXModuleShim')
+
+
 class XModuleMixin(XBlockMixin):
     """
     Fields and methods used by XModules internally.
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
+
+    # Attributes for inspection of the descriptor
+
+    # This indicates whether the xmodule is a problem-type.
+    # It should respond to max_score() and grade(). It can be graded or ungraded
+    # (like a practice problem).
+    has_score = False
+
+    # Class level variable
+
+    # True if this descriptor always requires recalculation of grades, for
+    # example if the score can change via an extrnal service, not just when the
+    # student interacts with the module on the page.  A specific example is
+    # FoldIt, which posts grade-changing updates through a separate API.
+    always_recalculate_grades = False
+
+    # The default implementation of get_icon_class returns the icon_class
+    # attribute of the class
+    #
+    # This attribute can be overridden by subclasses, and
+    # the function can also be overridden if the icon class depends on the data
+    # in the module
+    icon_class = 'other'
 
     display_name = String(
         display_name="Display Name",
@@ -335,13 +366,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         See the HTML module for a simple example.
     """
 
-    # The default implementation of get_icon_class returns the icon_class
-    # attribute of the class
-    #
-    # This attribute can be overridden by subclasses, and
-    # the function can also be overridden if the icon class depends on the data
-    # in the module
-    icon_class = 'other'
 
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
@@ -516,20 +540,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     entry_point = "xmodule.v1"
     module_class = XModule
 
-    # Attributes for inspection of the descriptor
-
-    # This indicates whether the xmodule is a problem-type.
-    # It should respond to max_score() and grade(). It can be graded or ungraded
-    # (like a practice problem).
-    has_score = False
-
-    # Class level variable
-
-    # True if this descriptor always requires recalculation of grades, for
-    # example if the score can change via an extrnal service, not just when the
-    # student interacts with the module on the page.  A specific example is
-    # FoldIt, which posts grade-changing updates through a separate API.
-    always_recalculate_grades = False
 
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
@@ -862,9 +872,13 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         return result
 
     def render(self, block, view_name, context=None):
-        if isinstance(block, (XModule, XModuleDescriptor)) and view_name == 'student_view':
+        if view_name == 'student_view':
             assert block.xmodule_runtime is not None
-            return block.xmodule_runtime.render(block._xmodule, view_name, context)
+            if isinstance(block, (XModule, XModuleDescriptor)):
+                to_render = block._xmodule
+            else:
+                to_render = block
+            return block.xmodule_runtime.render(to_render, view_name, context)
         else:
             return super(DescriptorSystem, self).render(block, view_name, context)
 

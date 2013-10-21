@@ -64,7 +64,7 @@ namespace :'test:js' do
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
+    task :dev, [:env] => [:clean_test_files, :'assets:coffee:_watch'] do |t, args|
         if args[:env].nil?
             puts "Error: No test suite specified.  Try one of these instead:"
             print_js_test_cmds('dev')

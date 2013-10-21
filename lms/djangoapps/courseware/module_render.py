@@ -25,7 +25,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xmodule
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
 import static_replace
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -340,7 +340,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(partial(wrap_xmodule, 'xmodule_display.html'))
+        block_wrappers.append(wrap_xblock)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
