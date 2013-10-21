@@ -12,6 +12,7 @@ plantInterval = -> window.InstructorDashboard.util.plantInterval.apply this, arg
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 load_IntervalManager = -> window.InstructorDashboard.util.IntervalManager
 create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
+PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 
 # get jquery element and assert its existance
@@ -47,7 +48,7 @@ class StudentAdmin
     @$btn_rescore_problem_all     = @$section.find "input[name='rescore-problem-all']"
     @$btn_task_history_all        = @$section.find "input[name='task-history-all']"
     @$table_task_history_all      = @$section.find ".task-history-all-table"
-    @$table_running_tasks         = @$section.find ".running-tasks-table"
+    @instructor_tasks             = new (PendingInstructorTasks()) @$section
 
     # response areas
     @$request_response_error_progress = find_and_assert @$section, ".student-specific-container .request-response-error"
@@ -239,24 +240,6 @@ class StudentAdmin
           create_task_list_table @$table_task_history_all, data.tasks
         error: std_ajax_err => @$request_response_error_all.text gettext("Error listing task history for this student and problem.")
 
-    # start polling for task list
-    # if the list is in the DOM
-    if @$table_running_tasks.length > 0
-      # reload every 20 seconds.
-      TASK_LIST_POLL_INTERVAL = 20000
-      @reload_running_tasks_list()
-      @task_poller = new (load_IntervalManager()) TASK_LIST_POLL_INTERVAL, =>
-        @reload_running_tasks_list()
-
-  # Populate the running tasks list
-  reload_running_tasks_list: =>
-    list_endpoint = @$table_running_tasks.data 'endpoint'
-    $.ajax
-      dataType: 'json'
-      url: list_endpoint
-      success: (data) => create_task_list_table @$table_running_tasks, data.tasks
-      error: std_ajax_err => console.warn "error listing all instructor tasks"
-
   # wraps a function, but first clear the error displays
   clear_errors_then: (cb) ->
     @$request_response_error_progress.empty()
@@ -272,10 +255,10 @@ class StudentAdmin
     @$request_response_error_all.empty()
 
   # handler for when the section title is clicked.
-  onClickTitle: -> @task_poller?.start()
+  onClickTitle: -> @instructor_tasks.task_poller?.start()
 
   # handler for when the section is closed
-  onExit: -> @task_poller?.stop()
+  onExit: -> @instructor_tasks.task_poller?.stop()
 
 
 # export for use

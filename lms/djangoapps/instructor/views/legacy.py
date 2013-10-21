@@ -1589,14 +1589,16 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
             success, task_message = get_task_completion_info(instructor_task)
             status = "Complete" if success else "Incomplete"
             # generate row for this task:
-            row = [str(instructor_task.task_type),
-                   str(instructor_task.task_id),
-                   str(instructor_task.requester),
-                   instructor_task.created.isoformat(' '),
-                   duration_sec,
-                   str(instructor_task.task_state),
-                   status,
-                   task_message]
+            row = [
+                str(instructor_task.task_type),
+                str(instructor_task.task_id),
+                str(instructor_task.requester),
+                instructor_task.created.isoformat(' '),
+                duration_sec,
+                str(instructor_task.task_state),
+                status,
+                task_message
+            ]
             datatable['data'].append(row)
 
         if problem_url is None:
