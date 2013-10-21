@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from student.models import CourseEnrollment
 from student.models import UserProfile, Registration
 from external_auth.models import ExternalAuthMap
+from external_auth.views import generate_password
 
 from courseware.access import get_access_group_name
 from courseware.courses import get_course_by_id
@@ -24,6 +25,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import IntegrityError
 from django.http import HttpResponse
+from django.utils.html import escape
 from django.contrib.admin.views.decorators import staff_member_required
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -33,13 +35,6 @@ from xmodule.modulestore.store_utilities import delete_course
 import track.views
 
 log = logging.getLogger(__name__)
-
-
-def escape(s):
-    """
-    escape HTML special characters in string
-    """
-    return str(s).replace('<', '&lt;').replace('>', '&gt;')
 
 def git_info_for_course(cdir):
     gdir = settings.DATA_DIR / cdir
@@ -68,7 +63,14 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
         if not acscript or not os.path.exists(acscript):
             msg = "<font color='red'>{0}</font>".format(_('Must configure CMS_ADD_COURSE_SCRIPT in settings first!'))
             return msg
-        cmd = '{0} "{1}"'.format(acscript, gitloc)
+        
+        # Attempt to use the same cms settings as we have in lms (cms has import, and lms does not)
+        bsi = os.environ['DJANGO_SETTINGS_MODULE'].rfind('.')
+        cms_settings = 'cms.envs{0}'.format(os.environ['DJANGO_SETTINGS_MODULE'][bsi:])
+
+        cmd = 'DJANGO_SETTINGS_MODULE={3} PYTHONPATH=$PYTHONPATH:{2} {0} "{1}"'.format(
+            acscript, gitloc, getattr(settings, 'REPO_ROOT'), cms_settings)
+
         logging.debug(_('Adding course with command: {0}').format(cmd))
         ret = subprocess.Popen(cmd, shell=True, executable='/bin/bash',
                                stdout=subprocess.PIPE,
@@ -135,9 +137,6 @@ def fix_external_auth_map_passwords():
         msg = _('All ok!')
     return msg
 
-def GenPasswd(length=8, chars=string.letters + string.digits):
-    return ''.join([choice(chars) for i in range(length)])
-
 def create_user(uname, name, do_mit=False):
 
     if not uname:
@@ -168,7 +167,7 @@ def create_user(uname, name, do_mit=False):
         if not '@' in email:
             msg += _('email address required (not username)')
             return msg
-    password = GenPasswd(12)
+    password = generate_password()
     user = User(username=uname, email=email, is_active=True)
     user.set_password(password)
     try:
@@ -340,7 +339,7 @@ def sysadmin_dashboard(request):
                          User.objects.all()])
         return return_csv('users_{0}.csv'.format(request.META['SERVER_NAME'
                           ]), datatable)
-    ### TODO, make ext auth work independant of password so this isn't needed
+
     elif _('Check and repair external Auth Map') in action:
         msg += '<pre>'
         msg += fix_external_auth_map_passwords()
@@ -372,6 +371,7 @@ def sysadmin_dashboard(request):
                          ), data=data)
         return return_csv('staff_{0}.csv'.format(request.META['SERVER_NAME'
                           ]), datatable)
+
     elif action == _('Delete course from site'):
         course_id = request.POST.get('course_id', '').strip()
         ok = False
