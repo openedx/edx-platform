@@ -5,6 +5,7 @@ Unit tests for instructor.api methods.
 import unittest
 import json
 import requests
+import datetime
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -761,6 +762,18 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 400)
 
 
+class MockCompletionInfo(object):
+    """Mock for get_task_completion_info"""
+    times_called = 0
+
+    def mock_get_task_completion_info(self, *args):  # pylint: disable=unused-argument
+        """Mock for get_task_completion_info"""
+        self.times_called += 1
+        if self.times_called % 2 == 0:
+            return (True, 'Task Completed')
+        return (False, 'Task Errored In Some Way')
+
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -769,15 +782,44 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     class FakeTask(object):
         """ Fake task object """
-        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        FEATURES = [
+            'task_type',
+            'task_input',
+            'task_id',
+            'requester',
+            'task_state',
+            'created',
+            'status',
+            'task_message',
+            'duration_sec',
+            'task_output'
+        ]
 
-        def __init__(self):
+        def __init__(self, completion):
             for feature in self.FEATURES:
                 setattr(self, feature, 'expected')
+            # Make 'created' into a datetime
+            setattr(self, 'created', datetime.datetime(2013, 10, 25, 11, 42, 35))
+            # set 'status' and 'task_message' attrs
+            success, task_message = completion()
+            if success:
+                setattr(self, 'status', "Complete")
+            else:
+                setattr(self, 'status', "Incomplete")
+            setattr(self, 'task_message', task_message)
+            # Set 'task_output' attr, which will be parsed to the 'duration_sec' attr.
+            setattr(self, 'task_output', '{"duration_ms": 1035000}')
+            setattr(self, 'duration_sec', 1035000 / 1000.0)
+
 
         def to_dict(self):
             """ Convert fake task to dictionary representation. """
-            return {key: 'expected' for key in self.FEATURES}
+            attr_dict = {key: getattr(self, key) for key in self.FEATURES}
+            attr_dict['created'] = attr_dict['created'].isoformat()
+            # Don't actually want task_output in the attribute dictionary, as this
+            # is not explicitly extracted in extract_task_features
+            del attr_dict['task_output']
+            return attr_dict
 
     def setUp(self):
         self.instructor = AdminFactory.create()
@@ -797,58 +839,77 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ),
             state=json.dumps({'attempts': 10}),
         )
+        mock_factory = MockCompletionInfo()
+        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(6)]
 
-        self.tasks = [self.FakeTask() for _ in xrange(6)]
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
 
     @patch.object(instructor_task.api, 'get_running_instructor_tasks')
     def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {})
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-            'unique_student_identifier': self.student.email,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+                'unique_student_identifier': self.student.email,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+
+        self.assertEqual(actual_tasks, expected_tasks)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

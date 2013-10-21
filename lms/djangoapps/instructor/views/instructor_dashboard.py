@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course_by_id, get_cms_course_link_by_id
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -57,6 +57,10 @@ def instructor_dashboard_2(request, course_id):
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link_by_id(course_id)
+
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
     max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
@@ -66,6 +70,7 @@ def instructor_dashboard_2(request, course_id):
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
+        'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
     }
