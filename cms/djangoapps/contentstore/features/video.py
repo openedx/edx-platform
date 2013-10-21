@@ -203,14 +203,14 @@ def click_button(_step, button_type):
     world.css_click(BUTTONS[button])
 
 
-@step('I see a range on slider with styles "left" set to (.+) and "width" set to (.+)$')
+@step('I see a range on slider with styles "left" set to (.+) px and "width" set to (.+) px$')
 def see_a_range_slider_with_proper_range(_step, left, width):
     left = int(left.strip())
     width = int(width.strip())
 
     world.wait_for_visible(".slider-range")
-    slider_range = world.css_find(".slider-range")[0]
+    slider_range = world.browser.driver.find_element_by_css_selector(".slider-range")
 
-    assert "left: {}%;".format(left) in slider_range.outer_html
-    assert "width: {}%;".format(width) in slider_range.outer_html
+    assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
+    assert int(round(float(slider_range.value_of_css_property("width")[:-2]))) == width
 

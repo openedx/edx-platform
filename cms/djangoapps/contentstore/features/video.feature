@@ -86,4 +86,4 @@ Feature: CMS.Video Component
     And I set value "24" to the field "End Time"
     And I save changes
     And I click button "Play"
-    Then I see a range on slider with styles "left" set to 10 and "width" set to 10
+    Then I see a range on slider with styles "left" set to 70 px and "width" set to 70 px
