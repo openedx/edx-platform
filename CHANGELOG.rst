@@ -53,6 +53,9 @@ editing capability for a course's list of tabs.
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
 
+Studio: add restful interface for paging assets (no UX yet, but just add /start/45/max/50 to end of url to get
+items 45-95, e.g.)
+
 LMS: First round of improvements to New (beta) Instructor Dash:
 improvements, fixes, and internationalization to the Student Info section.
 
@@ -357,6 +360,22 @@ XModules: Show errors with full descriptors.
 Studio: Add feedback to end user if there is a problem exporting a course
 
 Studio: Improve link re-writing on imports into a different course-id
+
+---------- split mongo backend refactoring changelog section ------------
+
+Studio: course catalog and course outline pages new use course id syntax w/ restful api style
+
+Common: 
+  separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
+  in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
+  
+Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
+
+Common: location mapper: added a bunch of new helper functions for generating old location style info from a CourseLocator
+
+Common: locators: allow - ~ and . in course, branch, and block ids.
+
+---------- end split mongo backend section ---------
 
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.
