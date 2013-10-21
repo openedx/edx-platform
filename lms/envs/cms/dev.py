@@ -38,11 +38,12 @@ MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': modulestore_options
+        'OPTIONS': modulestore_options,
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'OPTIONS': modulestore_options    
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+        'OPTIONS': modulestore_options,
     },
 }
 
