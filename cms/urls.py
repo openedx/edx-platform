@@ -39,8 +39,6 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
-        'contentstore.views.upload_asset', name='upload_asset'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
         'contentstore.views.manage_users', name='manage_users'),
@@ -73,10 +71,8 @@ urlpatterns = patterns('',  # nopep8
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)(/start/(?P<start>\d+))?(/max/(?P<maxresults>\d+))?$',
-        'contentstore.views.asset_index', name='asset_index'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
-        'contentstore.views.assets.update_asset', name='update_asset'),
+#    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
+#        'contentstore.views.assets.update_asset', name='update_asset'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
@@ -108,9 +104,6 @@ urlpatterns = patterns('',  # nopep8
 # User creation and updating views
 urlpatterns += patterns(
     '',
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
-        'contentstore.views.update_checklist', name='checklists_updates'),
     url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
@@ -140,6 +133,8 @@ urlpatterns += patterns(
     url(r'^course$', 'index'),
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>.+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'^assets/(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<name>[^/]+)/(?P<asset_id>[^/]+)?(/start/(?P<start>\d+))?(/max/(?P<maxresults>\d+))?.*', 'assets_handler')
 )
 
 js_info_dict = {

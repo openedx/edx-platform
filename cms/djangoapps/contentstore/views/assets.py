@@ -21,12 +21,49 @@ from xmodule.exceptions import NotFoundError
 
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
+from django.http import HttpResponseNotFound
 import json
 from django.utils.translation import ugettext as _
 from pymongo import DESCENDING
 
 
-__all__ = ['asset_index', 'upload_asset']
+__all__ = ['assets_handler', 'upload_asset']
+
+@login_required
+@ensure_csrf_cookie
+def assets_handler(request, org, course, name, asset_id=None, start=None, maxresults=None):
+    """                                  TODO update DOCS!
+    The restful handler for course specific requests.
+    It provides the course tree with the necessary information for identifying and labeling the parts. The root
+    will typically be a 'course' object but may not be especially as we support modules.
+
+    GET
+        html: return html page overview for the given course
+        json: return json representing the course branch's index entry as well as dag w/ all of the children
+        replaced w/ json docs where each doc has {'_id': , 'display_name': , 'children': }
+    POST
+        json: create (or update?) this course or branch in this course for this user, return resulting json
+        descriptor (same as in GET course/...). Leaving off /branch/draft would imply create the course w/ default
+        branches. Cannot change the structure contents ('_id', 'display_name', 'children') but can change the
+        index entry.
+    PUT
+        json: update this course (index entry not xblock) such as repointing head, changing display name, org,
+        course_id, prettyid. Return same json as above.
+    DELETE
+        json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
+    """
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            raise NotImplementedError('coming soon')
+        elif request.method == 'POST' and asset_id is None:
+            # Add a new asset
+            return upload_asset(request, org, course, name)
+        else:
+            return update_asset(request, org, course, name, asset_id)
+    elif request.method == 'GET':  # assume html
+        return asset_index(request, org, course, name, start, maxresults)
+    else:
+        return HttpResponseNotFound()
 
 
 @login_required
@@ -42,10 +79,10 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
+    upload_asset_callback_url = reverse('contentstore.views.assets_handler', kwargs={
         'org': org,
         'course': course,
-        'coursename': name
+        'name': name
     })
 
     course_module = modulestore().get_item(location)
@@ -78,7 +115,7 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
         'context_course': course_module,
         'asset_list': json.dumps(asset_json),
         'upload_asset_callback_url': upload_asset_callback_url,
-        'update_asset_callback_url': reverse('update_asset', kwargs={
+        'update_asset_callback_url': reverse('contentstore.views.assets_handler', kwargs={
             'org': org,
             'course': course,
             'name': name

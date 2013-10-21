@@ -25,14 +25,14 @@ from xmodule.modulestore.xml_importer import import_from_xml
 class AssetsTestCase(CourseTestCase):
     def setUp(self):
         super(AssetsTestCase, self).setUp()
-        self.url = reverse("asset_index", kwargs={
+        self.url = reverse("contentstore.views.assets_handler", kwargs={
             'org': self.course.location.org,
             'course': self.course.location.course,
             'name': self.course.location.name,
         })
 
     def test_basic(self):
-        resp = self.client.get(self.url)
+        resp = self.client.get(self.url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 200)
 
     def test_static_url_generation(self):
@@ -43,14 +43,14 @@ class AssetsTestCase(CourseTestCase):
 
 class AssetsToyCourseTestCase(CourseTestCase):
     """
-    Tests the assets returned from asset_index for the toy test course.
+    Tests the assets returned from assets_handler (full page content) for the toy test course.
     """
     def test_toy_assets(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=contentstore(), verbose=True)
-        url = reverse("asset_index", kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+        url = reverse("contentstore.views.assets_handler", kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
 
-        resp = self.client.get(url)
+        resp = self.client.get(url, HTTP_ACCEPT='text/html')
         # Test a small portion of the asset data passed to the client.
         self.assertContains(resp, "new AssetCollection([{")
         self.assertContains(resp, "/c4x/edX/toy/asset/handouts_sample_handout.txt")
@@ -62,10 +62,10 @@ class UploadTestCase(CourseTestCase):
     """
     def setUp(self):
         super(UploadTestCase, self).setUp()
-        self.url = reverse("upload_asset", kwargs={
+        self.url = reverse("contentstore.views.assets_handler", kwargs={
             'org': self.course.location.org,
             'course': self.course.location.course,
-            'coursename': self.course.location.name,
+            'name': self.course.location.name,
         })
 
     @skip("CorruptGridFile error on continuous integration server")
@@ -80,8 +80,8 @@ class UploadTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 400)
 
     def test_get(self):
-        resp = self.client.get(self.url)
-        self.assertEquals(resp.status_code, 405)
+        with self.assertRaises(NotImplementedError):
+            self.client.get(self.url)
 
 
 class AssetToJsonTestCase(TestCase):
@@ -128,7 +128,7 @@ class LockAssetTestCase(CourseTestCase):
             """ Helper method for posting asset update. """
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             location = Location(['c4x', 'edX', 'toy', 'asset', 'sample_static.txt'])
-            url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+            url = reverse('contentstore.views.assets_handler', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
 
             resp = self.client.post(url, json.dumps(assets._get_asset_json("sample_static.txt", upload_date, location, None, lock)), "application/json")
             self.assertEqual(resp.status_code, 201)
@@ -216,18 +216,18 @@ class TestAssetIndex(CourseTestCase):
         """
         # get all
         asset_url = reverse(
-            'asset_index',
+            "contentstore.views.assets_handler",
             kwargs={
                 'org': self.course.location.org,
                 'course': self.course.location.course,
                 'name': self.course.location.name
             }
         )
-        resp = self.client.get(asset_url)
+        resp = self.client.get(asset_url, HTTP_ACCEPT='text/html')
         self.check_page_content(resp.content, 100)
         # get first page of 10
-        resp = self.client.get(asset_url + "/max/10")
+        resp = self.client.get(asset_url + "/max/10", HTTP_ACCEPT='text/html')
         last_date = self.check_page_content(resp.content, 10)
         # get next of 20
-        resp = self.client.get(asset_url + "/start/10/max/20")
-        last_date = self.check_page_content(resp.content, 20, last_date)
+        resp = self.client.get(asset_url + "/start/10/max/20", HTTP_ACCEPT='text/html')
+        self.check_page_content(resp.content, 20, last_date)
