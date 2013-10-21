@@ -263,56 +263,6 @@ class CourseLocator(Locator):
                              version_guid=self.version_guid,
                              branch=self.branch)
 
-    OLD_COURSE_ID_RE = re.compile(r'^(?P<org>[^.]+)\.?(?P<old_course_id>.+)?\.(?P<run>[^.]+)$')
-    @property
-    def as_old_location_course_id(self):
-        """
-        The original Location type presented its course id as org/course/run. This function
-        assumes the course_id starts w/ org, has an arbitrarily long 'course' identifier, and then
-        ends w/ run all separated by periods.
-
-        If this object does not have a course_id, this function returns None.
-        """
-        if self.course_id is None:
-            return None
-        parsed = self.OLD_COURSE_ID_RE.match(self.course_id)
-        # check whether there are 2 or > 2 'fields'
-        if parsed.group('old_course_id'):
-            return '/'.join(parsed.groups())
-        else:
-            return parsed.group('org') + '/' + parsed.group('run')
-
-    def _old_location_field_helper(self, field):
-        """
-        Parse course_id to get the old location field named field out
-        """
-        if self.course_id is None:
-            return None
-        parsed = self.OLD_COURSE_ID_RE.match(self.course_id)
-        return parsed.group(field)
-
-    @property
-    def as_old_location_org(self):
-        """
-        Presume the first part of the course_id is the org and return it.
-        """
-        return self._old_location_field_helper('org')
-
-    @property
-    def as_old_location_course(self):
-        """
-        Presume the middle part, if any, of the course_id is the old location scheme's
-        course id and return it.
-        """
-        return self._old_location_field_helper('old_course_id')
-
-    @property
-    def as_old_location_run(self):
-        """
-        Presume the last part of the course_id is the old location scheme's run and return it.
-        """
-        return self._old_location_field_helper('run')
-
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
