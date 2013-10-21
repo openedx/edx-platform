@@ -25,7 +25,6 @@ escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
 
-@login_required
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise cc.utils.CommentClientError or
