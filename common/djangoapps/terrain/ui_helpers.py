@@ -560,3 +560,17 @@ def retry_on_exception(func, max_attempts=5, ignored_exceptions=StaleElementRefe
             attempt += 1
 
     assert_true(attempt < max_attempts, 'Ran out of attempts to execute {}'.format(func))
+
+
+@world.absorb
+def disable_jquery_animations():
+    """
+    Disable JQuery animations on the page.  Any state changes
+    will occur immediately to the final state.
+    """
+
+    # Ensure that jquery is loaded
+    world.wait_for_js_to_load()
+
+    # Disable jQuery animations
+    world.browser.execute_script("jQuery.fx.off = true;")
