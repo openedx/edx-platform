@@ -348,10 +348,10 @@ def get_course_settings(request, org, course, name):
         'about_page_editable': not settings.MITX_FEATURES.get(
             'ENABLE_MKTG_SITE', False
         ),
-        'upload_asset_url': reverse('upload_asset', kwargs={
+        'upload_asset_url': reverse("contentstore.views.assets_handler", kwargs={
             'org': org,
             'course': course,
-            'coursename': name,
+            'name': name,
         })
     })
 
@@ -659,10 +659,10 @@ def textbook_index(request, org, course, name):
             )
             return JsonResponse(course_module.pdf_textbooks)
     else:
-        upload_asset_url = reverse('upload_asset', kwargs={
+        upload_asset_url = reverse("contentstore.views.assets_handler", kwargs={
             'org': org,
             'course': course,
-            'coursename': name,
+            'name': name,
         })
         textbook_url = reverse('textbook_index', kwargs={
             'org': org,

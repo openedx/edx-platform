@@ -603,7 +603,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        url = reverse('contentstore.views.assets_handler', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
 
@@ -654,7 +654,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
+        url = reverse('contentstore.views.assets_handler', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
 

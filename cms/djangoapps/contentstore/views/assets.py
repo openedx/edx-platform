@@ -31,8 +31,8 @@ __all__ = ['assets_handler', 'upload_asset']
 
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, org, course, name, asset_id=None):
-    """                                  TODO update
+def assets_handler(request, org, course, name, asset_id=None, start=None, maxresults=None):
+    """                                  TODO update DOCS!
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
     will typically be a 'course' object but may not be especially as we support modules.
@@ -61,7 +61,7 @@ def assets_handler(request, org, course, name, asset_id=None):
         else:
             return update_asset(request, org, course, name, asset_id)
     elif request.method == 'GET':  # assume html
-        return asset_index(request, org, course, name)
+        return asset_index(request, org, course, name, start, maxresults)
     else:
         return HttpResponseNotFound()
 
@@ -82,7 +82,7 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
     upload_asset_callback_url = reverse('contentstore.views.assets_handler', kwargs={
         'org': org,
         'course': course,
-        'coursename': name
+        'name': name
     })
 
     course_module = modulestore().get_item(location)
@@ -115,7 +115,7 @@ def asset_index(request, org, course, name, start=None, maxresults=None):
         'context_course': course_module,
         'asset_list': json.dumps(asset_json),
         'upload_asset_callback_url': upload_asset_callback_url,
-        'update_asset_callback_url': reverse('update_asset', kwargs={
+        'update_asset_callback_url': reverse('contentstore.views.assets_handler', kwargs={
             'org': org,
             'course': course,
             'name': name

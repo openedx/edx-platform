@@ -39,8 +39,6 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
-#    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
-#        'contentstore.views.upload_asset', name='upload_asset'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
         'contentstore.views.manage_users', name='manage_users'),
@@ -73,8 +71,8 @@ urlpatterns = patterns('',  # nopep8
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
-        'contentstore.views.assets.update_asset', name='update_asset'),
+#    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
+#        'contentstore.views.assets.update_asset', name='update_asset'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
@@ -136,7 +134,7 @@ urlpatterns += patterns(
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>.+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
-    # TODO: assets
+    url(r'^assets/(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<name>[^/]+)/(?P<asset_id>[^/]+)?(/start/(?P<start>\d+))?(/max/(?P<maxresults>\d+))?.*', 'assets_handler')
 )
 
 js_info_dict = {
