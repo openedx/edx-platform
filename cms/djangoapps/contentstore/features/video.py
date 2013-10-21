@@ -9,8 +9,10 @@ BUTTONS = {
     'CC': '.hide-subtitles',
     'volume': '.volume',
     'Play': '.video_control.play',
-    'Save': 'save-button',
 }
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 
 @step('I have created a Video component$')
@@ -176,25 +178,39 @@ def caption_line_has_class(_step, index, className):
     world.css_has_class(SELECTOR, className.strip())
 
 
-@step('Enter (?:a|an) (.+) time of (.+) seconds$')
-def enter_start_end_time(_step, type_of_time, time):
-    type_of_time = type_of_time.strip()
-    time = int(time.strip())
+@step('I set value "([^"]*)" to the field "([^"]*)"$')
+def set_value_transcripts_field(_step, value, field_name):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+
+    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
+    world.css_fill(field_id, value.strip())
 
 
-@step('I click (.+) button$')
-def click_a_button(_step, button):
-    button = button.strip(button)
-    world.browser.find_by_css(BUTTONS[button]).click()
+@step('I save changes$')
+def save_changes(_step):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    save_css = 'a.save-button'
+    world.css_click(save_css)
 
 
-@step('I close the component editor$')
-def close_component_editor(_step):
-    _step.given('I click Save button')
+@step('I click button "([^"]*)"$')
+def click_button(_step, button_type):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    button = button_type.strip()
+    world.css_click(BUTTONS[button])
 
 
-@step('I see a range on slider starting at (.+) and running for (.+) %$')
+@step('I see a range on slider with styles "left" set to (.+) and "width" set to (.+)$')
 def see_a_range_slider_with_proper_range(_step, left, width):
     left = int(left.strip())
     width = int(width.strip())
+
+    world.wait_for_visible(".slider-range")
+    slider_range = world.css_find(".slider-range")[0]
+
+    assert "left: {}%;".format(left) in slider_range.outer_html
+    assert "width: {}%;".format(width) in slider_range.outer_html
 

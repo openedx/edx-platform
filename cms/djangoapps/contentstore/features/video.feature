@@ -82,8 +82,8 @@ Feature: CMS.Video Component
   Scenario: When start end end times are specified, a range on slider is shown
     Given I have created a Video component
     And I edit the component
-    And Enter a start time of 10 seconds
-    And Enter an end time of 20 seconds
-    And I close the component editor
-    And I click Play button
-    Then I see a range on slider starting at 20 and running for 40 %
+    And I set value "12" to the field "Start Time"
+    And I set value "24" to the field "End Time"
+    And I save changes
+    And I click button "Play"
+    Then I see a range on slider with styles "left" set to 10 and "width" set to 10
