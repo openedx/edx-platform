@@ -5,6 +5,7 @@ import json
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.django import editable_modulestore
 from django.core.urlresolvers import reverse
+from student.models import CourseEnrollment
 
 class TestOrphan(CourseTestCase):
     """
@@ -70,3 +71,18 @@ class TestOrphan(CourseTestCase):
             self.client.get(url, HTTP_ACCEPT='application/json').content
         )
         self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
+
+    def test_not_permitted(self):
+        """
+        Test that auth restricts get and delete appropriately
+        """
+        test_user_client, test_user = self.createNonStaffAuthedUserClient()
+        CourseEnrollment.enroll(test_user, self.course.location.course_id)
+        url = reverse(
+            'orphan',
+            kwargs={'course_id': '{}.{}'.format(self.course.location.org, self.course.location.course)}
+        )
+        response = test_user_client.get(url)
+        self.assertEqual(response.status_code, 403)
+        response = test_user_client.delete(url)
+        self.assertEqual(response.status_code, 403)

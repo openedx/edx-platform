@@ -65,7 +65,7 @@ class CourseTestCase(ModuleStoreTestCase):
 
     def createNonStaffAuthedUserClient(self):
         """
-        Create a non-staff user, log them in, and return the client to use for testing.
+        Create a non-staff user, log them in, and return the client, user to use for testing.
         """
         uname = 'teststudent'
         password = 'foo'
