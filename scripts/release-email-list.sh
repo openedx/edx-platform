@@ -42,7 +42,7 @@ for EMAIL in $RESPONSIBLE; do
 
     EMAIL_COL="$EMAIL"
     for HASH in $ALL_COMMITS; do
-        git log --format="tformat:|$EMAIL_COL|%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" -n 1 $HASH
+        git --no-pager log --format="tformat:|$EMAIL_COL|%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" -n 1 $HASH
         EMAIL_COL=" "
     done
 done
