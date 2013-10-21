@@ -61,6 +61,8 @@ def checklists_handler(request, tag=None, course_id=None, branch=None, version_g
             return render_to_response('checklists.html',
                                       {
                                           'handler_url': handler_url,
+                                          # context_course is used by analytics
+                                          'context_course': course_module,
                                           'checklists': expanded_checklists
                                       })
     elif json_request:
