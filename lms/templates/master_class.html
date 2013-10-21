@@ -26,21 +26,18 @@
     </section>
     <p>
     % if is_staff:
+    <section id="staff_information_section_${element_id}" class="staff_information_section sr">
     <h3>${_('Staff Inforamtion')}</h3>
     <h4>${_('Students pending registration')}</h4>
-    <ul>
-     % for row in all_registrations:
-        % if row not in passed_registrations:
-        <li>${row}</li>
-        % endif
-     % endfor
+    <ul id="all_registrations" class="email_list">
+
     </ul>
     <h4>${_('Students passed registration')}</h4>
-    <ul>
-     % for row in passed_registrations:
-        <li>${row}</li>
-     % endfor
+    <ul id="passed_registrations" class="email_list">
+
     </ul>
+
+    </section>
     % endif
 
 </section>
