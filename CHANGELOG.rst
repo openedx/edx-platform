@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Bug fix for text loss in Course Updates when the text exists
+before the first tag.
+
 Blades: Hovering over CC button in video player, when transcripts are hidden,
 will cause them to show up. Moving the mouse from the CC button will auto hide
 them. You can hover over the CC button and then move the mouse to the
