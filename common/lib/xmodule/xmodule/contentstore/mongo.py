@@ -16,8 +16,15 @@ import json
 
 
 class MongoContentStore(ContentStore):
-    def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', **kwargs):
+    # pylint: disable=W0613
+    def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', collection=None, **kwargs):
+        """
+        Establish the connection with the mongo backend and connect to the collections
+
+        :param collection: ignores but provided for consistency w/ other doc_store_config patterns
+        """
         logging.debug('Using MongoDB for static content serving at host={0} db={1}'.format(host, db))
+
         _db = Connection(host=host, port=port, **kwargs)[db]
 
         if user is not None and password is not None:
