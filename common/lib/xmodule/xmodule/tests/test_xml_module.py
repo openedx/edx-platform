@@ -10,7 +10,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xblock.runtime import DbModel
 
-from xmodule.fields import Date, Timedelta
+from xmodule.fields import Date, Timedelta, IsoTime
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
@@ -387,6 +387,28 @@ class TestDeserializeTimedelta(TestDeserialize):
         self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
             '"1 day 12 hours 59 minutes 59 seconds"')
         self.assertDeserializeNonString()
+
+
+class TestDeserializeIsoTime(TestDeserialize):
+    """ Tests deserialize as related to Timedelta type. """
+
+    test_field = IsoTime
+
+    def test_deserialize(self):
+        """
+        There is nono check for
+
+        self.assertDeserializeEqual('10:20:30', '10:20:30')
+        self.assertDeserializeNonString()
+
+        because these two tests work only because json.loads fires exception,
+        and xml_module.deserialized_field catches it and returns same value
+        so there is nothing field-specific here.
+        But othere modules do it, so I'm leaving this comment for PR reviewers.
+        """
+
+        # test that from_json produces no exceptions
+        self.assertDeserializeEqual('10:20:30', '"10:20:30"')
 
 
 class TestXmlAttributes(XModuleXmlImportTest):
