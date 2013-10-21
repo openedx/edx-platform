@@ -41,7 +41,6 @@ reports/
 
 ### Installation artifacts
 *.egg-info
-Gemfile.lock
 .pip_download_cache/
 .prereqs_cache
 .vagrant/
