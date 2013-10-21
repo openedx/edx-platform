@@ -23,8 +23,7 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
     ----------
     category: component type (discussion, html, problem, video)
     component_type: for components with multiple templates, the link text in the menu
-    is_advanced: for html and problem, is the desired component under the
-                 advanced menu
+    is_advanced: for problems, is the desired component under the advanced menu?
     """
     assert_in(category, ['problem', 'html', 'video', 'discussion'])
 
@@ -40,6 +39,8 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
     # because it's ok if there are currently zero of them.
     module_count_before =  len(world.browser.find_by_css(module_css))
 
+    # Disable the jquery animation for the transition to the menus.
+    world.disable_jquery_animations()
     world.css_click(component_button_css)
 
     if category in ('problem', 'html'):
@@ -50,17 +51,13 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
         module_count_before + 1))
 
 
-@world.absorb
-def click_new_component_button(step, component_button_css):
-    step.given('I have clicked the new unit button')
-    world.css_click(component_button_css)
-
-
 def _click_advanced():
     css = 'ul.problem-type-tabs a[href="#tab2"]'
     world.css_click(css)
-    my_css = 'ul.problem-type-tabs li.ui-state-active a[href="#tab2"]'
-    assert(world.css_find(my_css))
+
+    # Wait for the advanced tab items to be displayed
+    tab2_css = 'div.ui-tabs-panel#tab2'
+    world.wait_for_visible(tab2_css)
 
 
 def _find_matching_link(category, component_type):

@@ -6,7 +6,7 @@ from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
 from course_import import import_file, go_to_import
-
+from selenium.webdriver.common.keys import Keys
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -47,9 +47,7 @@ def i_can_modify_the_display_name(_step):
     # Verifying that the display name can be a string containing a floating point value
     # (to confirm that we don't throw an error because it is of the wrong type).
     index = world.get_setting_entry_index(DISPLAY_NAME)
-    world.css_fill('.wrapper-comp-setting .setting-input', '3.4', index=index)
-    if world.is_firefox():
-        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
+    set_field_value(index, '3.4')
     verify_modified_display_name()
 
 
@@ -62,9 +60,7 @@ def my_display_name_change_is_persisted_on_save(step):
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(_step):
     index = world.get_setting_entry_index(DISPLAY_NAME)
-    world.css_fill('.wrapper-comp-setting .setting-input', "updated ' \" &", index=index)
-    if world.is_firefox():
-        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
+    set_field_value(index, "updated ' \" &")
     verify_modified_display_name_with_special_chars()
 
 
@@ -136,11 +132,10 @@ def set_the_weight_to_abc(step, bad_weight):
 
 @step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
 def set_the_max_attempts(step, max_attempts_set):
-    # on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
+    # on firefox with selenium, the behaviour is different.
+    # eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
-    world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
-    if world.is_firefox():
-        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
+    set_field_value(index, max_attempts_set)
     world.save_component_and_reopen(step)
     value = world.css_value('input.setting-input', index=index)
     assert value != "", "max attempts is blank"
@@ -276,12 +271,23 @@ def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'Blank Advanced Problem', False)
 
 
+def set_field_value(index, value):
+    """
+    Set the field to the specified value.
+
+    Note: we cannot use css_fill here because the value is not set
+    until after you move away from that field.
+    Instead we will find the element, set its value, then hit the Tab key
+    to get to the next field.
+    """
+    elem = world.css_find('div.wrapper-comp-setting input.setting-input')[index]
+    elem.value = value
+    elem.type(Keys.TAB)
+
+
 def set_weight(weight):
     index = world.get_setting_entry_index(PROBLEM_WEIGHT)
-    world.css_fill('.wrapper-comp-setting .setting-input', weight, index=index)
-    if world.is_firefox():
-        world.trigger_event('.wrapper-comp-setting .setting-input', index=index, event='blur')
-        world.trigger_event('a.save-button', event='focus')
+    set_field_value(index, weight)
 
 
 def open_high_level_source():
