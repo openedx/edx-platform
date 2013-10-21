@@ -62,6 +62,9 @@ MITX_FEATURES = {
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
+
+    # Turns on or off the 'sysadmin' page used by MITx instances
+    'ENABLE_MITX_SYSADMIN_PAGE': False
 }
 ENABLE_JASMINE = False
 
@@ -81,6 +84,11 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+########## DIRECTORY WHERE DELETED COURSE CONTENT IS BACKED UP ##############
+
+# for example:
+# DELETED_COURSE_BACKUPS_DIR = ENV_ROOT / "data_backup"
+DELETED_COURSE_BACKUPS_DIR = None    # no backups
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
