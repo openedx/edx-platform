@@ -85,6 +85,10 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+# STATIC_ROOT specifies the directory where static files are
+# collected
+STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT))
+
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
