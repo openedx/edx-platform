@@ -9,6 +9,7 @@ import re
 import requests
 
 from collections import defaultdict, OrderedDict
+from functools import partial
 from markupsafe import escape
 from requests.status_codes import codes
 from StringIO import StringIO
@@ -58,6 +59,7 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
+from lms.lib.xblock.runtime import handler_prefix
 
 log = logging.getLogger(__name__)
 
@@ -475,7 +477,7 @@ def instructor_dashboard(request, course_id):
                     except IndexError:
                         log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
                 datatable['data'] = ddata
-                    
+
                 datatable['title'] = 'Grades for assignment "%s"' % aname
 
                 if 'Export CSV' in action:
@@ -830,9 +832,13 @@ def instructor_dashboard(request, course_id):
     email_editor = None
     # HTML editor for email
     if idash_mode == 'Email' and is_studio_course:
-        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
+        html_module = HtmlDescriptor(
+            course.system,
+            DictFieldData({'data': html_message}),
+            ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+        )
         fragment = html_module.render('studio_view')
-        fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+        fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:

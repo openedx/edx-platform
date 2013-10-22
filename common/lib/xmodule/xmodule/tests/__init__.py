@@ -38,6 +38,14 @@ open_ended_grading_interface = {
     }
 
 
+class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+    """
+    ModuleSystem for testing
+    """
+    def handler_url(self, block, handler, suffix='', query=''):
+        return str(block.scope_ids.usage_id) + '/' + handler + '/' + suffix + '?' + query
+
+
 def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
@@ -51,9 +59,8 @@ def get_test_system(course_id=''):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    return ModuleSystem(
+    return TestModuleSystem(
         static_url='/static',
-        ajax_url='courses/course_id/modx/a_location',
         track_function=Mock(),
         get_module=Mock(),
         render_template=mock_render_template,
@@ -102,15 +109,6 @@ class ModelsTest(unittest.TestCase):
         vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
-
-class PostData(object):
-    """Class which emulate postdata."""
-    def __init__(self, dict_data):
-        self.dict_data = dict_data
-
-    def getlist(self, key):
-        """Get data by key from `self.dict_data`."""
-        return self.dict_data.get(key)
 
 
 class LogicTest(unittest.TestCase):

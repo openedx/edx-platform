@@ -175,9 +175,9 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
             'courseware.views.jump_to_id', name="jump_to_id"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.modx_dispatch',
-            name='modx_dispatch'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+            'courseware.module_render.handle_xblock_callback',
+            name='xblock_handler'),
 
 
         # Software Licenses

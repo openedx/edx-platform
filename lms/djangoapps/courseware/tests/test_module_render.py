@@ -12,6 +12,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import courseware.module_render as render
@@ -22,6 +23,7 @@ from courseware.model_data import FieldDataCache
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
 
 from .factories import UserFactory
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -30,7 +32,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests of courseware.module_render
     """
     def setUp(self):
-        self.location = ['i4x', 'edX', 'toy', 'chapter', 'Overview']
+        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
         self.course_id = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
@@ -83,59 +85,6 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # note if the URL mapping changes then this assertion will break
         self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
 
-    def test_modx_dispatch(self):
-        self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
-                          'invalid Location', 'dummy')
-        mock_request = MagicMock()
-        mock_request.FILES.keys.return_value = ['file_id']
-        mock_request.FILES.getlist.return_value = ['file'] * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)
-        self.assertEquals(render.modx_dispatch(mock_request, 'dummy', self.location, 'dummy').content,
-                          json.dumps({'success': 'Submission aborted! Maximum %d files may be submitted at once' %
-                                      settings.MAX_FILEUPLOADS_PER_INPUT}))
-        mock_request_2 = MagicMock()
-        mock_request_2.FILES.keys.return_value = ['file_id']
-        inputfile = MagicMock()
-        inputfile.size = 1 + settings.STUDENT_FILEUPLOAD_MAX_SIZE
-        inputfile.name = 'name'
-        filelist = [inputfile]
-        mock_request_2.FILES.getlist.return_value = filelist
-        self.assertEquals(render.modx_dispatch(mock_request_2, 'dummy', self.location,
-                                               'dummy').content,
-                          json.dumps({'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
-                                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
-        mock_request_3 = MagicMock()
-        mock_request_3.POST.copy.return_value = {'position': 1}
-        mock_request_3.FILES = False
-        mock_request_3.user = self.mock_user
-        inputfile_2 = MagicMock()
-        inputfile_2.size = 1
-        inputfile_2.name = 'name'
-        self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
-                                                   self.location, self.course_id), HttpResponse)
-        self.assertRaises(
-            Http404,
-            render.modx_dispatch,
-            mock_request_3,
-            'goto_position',
-            self.location,
-            'bad_course_id'
-        )
-        self.assertRaises(
-            Http404,
-            render.modx_dispatch,
-            mock_request_3,
-            'goto_position',
-            ['i4x', 'edX', 'toy', 'chapter', 'bad_location'],
-            self.course_id
-        )
-        self.assertRaises(
-            Http404,
-            render.modx_dispatch,
-            mock_request_3,
-            'bad_dispatch',
-            self.location,
-            self.course_id
-        )
 
     def test_xqueue_callback_success(self):
         """
@@ -185,17 +134,164 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(render.get_score_bucket(11, 10), 'incorrect')
         self.assertEquals(render.get_score_bucket(-1, 10), 'incorrect')
 
-    def test_anonymous_modx_dispatch(self):
+    def test_anonymous_handle_xblock_callback(self):
         dispatch_url = reverse(
-            'modx_dispatch',
+            'xblock_handler',
             args=[
                 'edX/toy/2012_Fall',
-                'i4x://edX/toy/videosequence/Toy_Videos',
+                quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
+                'xmodule_handler',
                 'goto_position'
             ]
         )
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test the handle_xblock_callback function
+    """
+
+    def setUp(self):
+        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        self.course_id = 'edX/toy/2012_Fall'
+        self.toy_course = modulestore().get_course(self.course_id)
+        self.mock_user = UserFactory()
+        self.mock_user.id = 1
+        self.request_factory = RequestFactory()
+
+        # Construct a mock module for the modulestore to return
+        self.mock_module = MagicMock()
+        self.mock_module.id = 1
+        self.dispatch = 'score_update'
+
+        # Construct a 'standard' xqueue_callback url
+        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_id,
+                                                                   userid=str(self.mock_user.id),
+                                                                   mod_id=self.mock_module.id,
+                                                                   dispatch=self.dispatch))
+
+    def _mock_file(self, name='file', size=10):
+        """Create a mock file object for testing uploads"""
+        mock_file = MagicMock(
+            size=size,
+            read=lambda: 'x' * size
+        )
+        # We can't use `name` as a kwarg to Mock to set the name attribute
+        # because mock uses `name` to name the mock itself
+        mock_file.name = name
+        return mock_file
+
+    def test_invalid_location(self):
+        with self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                None,
+                'dummy/course/id',
+                'invalid Location',
+                'dummy_handler'
+                'dummy_dispatch'
+            )
+
+    def test_too_many_files(self):
+        request = self.request_factory.post(
+            'dummy_url',
+            data={'file_id': (self._mock_file(), ) * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)}
+        )
+        request.user = self.mock_user
+        self.assertEquals(
+            render.handle_xblock_callback(
+                request,
+                'dummy/course/id',
+                quote_slashes(str(self.location)),
+                'dummy_handler'
+            ).content,
+            json.dumps({
+                'success': 'Submission aborted! Maximum %d files may be submitted at once' %
+                           settings.MAX_FILEUPLOADS_PER_INPUT
+            })
+        )
+
+    def test_too_large_file(self):
+        inputfile = self._mock_file(size=1 + settings.STUDENT_FILEUPLOAD_MAX_SIZE)
+        request = self.request_factory.post(
+            'dummy_url',
+            data={'file_id': inputfile}
+        )
+        request.user = self.mock_user
+        self.assertEquals(
+            render.handle_xblock_callback(
+                request,
+                'dummy/course/id',
+                quote_slashes(str(self.location)),
+                'dummy_handler'
+            ).content,
+            json.dumps({
+                'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
+                           (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
+            })
+        )
+
+    def test_xmodule_dispatch(self):
+        request = self.request_factory.post('dummy_url', data={'position': 1})
+        request.user = self.mock_user
+        response = render.handle_xblock_callback(
+            request,
+            self.course_id,
+            quote_slashes(str(self.location)),
+            'xmodule_handler',
+            'goto_position',
+        )
+        self.assertIsInstance(response, HttpResponse)
+
+    def test_bad_course_id(self):
+        request = self.request_factory.post('dummy_url')
+        request.user = self.mock_user
+        with self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                'bad_course_id',
+                quote_slashes(str(self.location)),
+                'xmodule_handler',
+                'goto_position',
+            )
+
+    def test_bad_location(self):
+        request = self.request_factory.post('dummy_url')
+        request.user = self.mock_user
+        with self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                self.course_id,
+                quote_slashes(str(Location('i4x', 'edX', 'toy', 'chapter', 'bad_location'))),
+                'xmodule_handler',
+                'goto_position',
+            )
+
+    def test_bad_xmodule_dispatch(self):
+        request = self.request_factory.post('dummy_url')
+        request.user = self.mock_user
+        with self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                self.course_id,
+                quote_slashes(str(self.location)),
+                'xmodule_handler',
+                'bad_dispatch',
+            )
+
+    def test_missing_handler(self):
+        request = self.request_factory.post('dummy_url')
+        request.user = self.mock_user
+        with self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                self.course_id,
+                quote_slashes(str(self.location)),
+                'bad_handler',
+                'bad_dispatch',
+            )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

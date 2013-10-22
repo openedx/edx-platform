@@ -31,8 +31,8 @@ urlpatterns = patterns('',  # nopep8
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
 
-    url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-        'contentstore.views.preview_dispatch', name='preview_dispatch'),
+    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
+        'contentstore.views.preview_handler', name='preview_handler'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
         'contentstore.views.course_info', name='course_info'),
