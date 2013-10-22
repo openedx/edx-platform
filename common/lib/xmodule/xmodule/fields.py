@@ -151,7 +151,7 @@ class RelativeTime(Field):
             obj_time = time.strptime(value, '%H:%M:%S')
         except ValueError as e:
             raise ValueError(
-                "Incorrect RelativeTime value {} was set in XML or serialized."
+                "Incorrect RelativeTime value {!r} was set in XML or serialized. "
                 "Original parse message is {}".format(value, e.message)
             )
         return datetime.timedelta(
@@ -177,7 +177,7 @@ class RelativeTime(Field):
         if isinstance(value, basestring):
             return self._isotime_to_timedelta(value)
 
-        msg = "RelativeTime Field {0} has bad value '{1}'".format(self._name, value)
+        msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self._name, value)
         raise TypeError(msg)
 
     def to_json(self, value):
