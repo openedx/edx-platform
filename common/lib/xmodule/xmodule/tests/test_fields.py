@@ -157,13 +157,8 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.to_json(100.0)
         )
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaisesRegexp(ValueError, "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"):
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=90000))
-
-        self.assertEqual(
-            cm.exception.message,
-            "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"
-        )
 
         with self.assertRaises(TypeError):
             RelativeTimeTest.delta.to_json("123")
