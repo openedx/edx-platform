@@ -108,6 +108,29 @@ define('MasterClassMain', ['logme'], function (logme) {
 
     }; // End-of: MasterClassMain.prototype.submitAnswer = function () {
 
+     MasterClassMain.prototype.submitRegister = function (caller) {
+        var _this = this,
+            data = {'emails': []};
+
+        // Populate the data to be sent to the server with user's words.
+        data.emails.push($(caller).val());
+
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + 'register', $.param(data),
+            function (response) {
+                if (response.status !== 'success') {
+                    logme('ERROR: ' + response.error);
+
+                    return;
+                }
+
+                _this.showMasterClass(response);
+            }
+        );
+    };
+
     /**
      * @function showMasterClass
      *
@@ -148,7 +171,8 @@ define('MasterClassMain', ['logme'], function (logme) {
             // Color words in different colors.
         var fill = 
             // Caсhing of DOM element
-            cloudSectionEl = this.masterClassEl.find('.result_class_section');
+            cloudSectionEl = this.masterClassEl.find('.result_class_section'),
+            staffSectionEl = this.masterClassEl.find('.staff_information_section');
 
         gettext("You have been registered for this master class. We will provide addition information soon.")
         gettext("You are pending for registration for this master class. Please visit this page later for result.")
@@ -161,6 +185,42 @@ define('MasterClassMain', ['logme'], function (logme) {
             .find('.total_register').html(response.total_register);
 
         $(cloudSectionEl.attr('id') + ' .master_class').empty();
+
+        if (response.is_staff) {
+            staffSectionEl.removeClass('sr')
+            var all_registrations = staffSectionEl.find('#all_registrations'),
+                passed_registrations = staffSectionEl.find('#passed_registrations');
+            $(all_registrations).empty()
+            $(passed_registrations).empty()
+            $.each(response.all_registrations, function(key, value)
+                {
+                    var li = $('<li/>')
+                        .addClass('ui-menu-item')
+                        .appendTo(all_registrations);
+                    $('<input/>').addClass('add-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
+                    $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
+                    $('<a/>')
+                        .addClass('ui-all')
+                        .text(value)
+                        .appendTo(li);
+                });
+            $.each(response.passed_registrations, function(key, value)
+                {
+                    var li = $('<li/>')
+                        .addClass('ui-menu-item')
+                        .appendTo(passed_registrations);
+                    $('<a/>')
+                        .addClass('ui-all')
+                        .text(value)
+                        .appendTo(li);
+                });
+            var _this = this
+            $(all_registrations).find('input.add-button').each( function(index, elem) {
+            $(elem).on('click', function () {
+                _this.submitRegister(this);
+                });
+            });
+        }
 
     }; // End-of: MasterClassMain.prototype.drawMasterClass = function (words, bounds) {
 
