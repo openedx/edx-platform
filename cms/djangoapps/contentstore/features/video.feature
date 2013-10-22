@@ -87,4 +87,9 @@ Feature: CMS.Video Component
     And I set value "24" to the field "End Time"
     And I save changes
     And I click button "Play"
-    Then I see a range on slider with styles "left" set to 70 px and "width" set to 70 px
+
+    # The below line is a bit flaky. Numbers 73 and 73 were determined rather
+    # accidentally. They might change in the future as Video player gets CSS
+    # updates. If this test starts failing, 99.9% cause of failure is the line
+    # below.
+    Then I see a range on slider with styles "left" set to 73 px and "width" set to 73 px

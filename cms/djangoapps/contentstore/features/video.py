@@ -209,6 +209,7 @@ def see_a_range_slider_with_proper_range(_step, left, width):
     width = int(width.strip())
 
     world.wait_for_visible(".slider-range")
+    world.wait(4)
     slider_range = world.browser.driver.find_element_by_css_selector(".slider-range")
 
     assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
