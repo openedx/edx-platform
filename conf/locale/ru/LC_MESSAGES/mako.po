@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-18 17:55+0400\n"
-"PO-Revision-Date: 2013-10-18 17:54+0300\n"
-"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
+"POT-Creation-Date: 2013-10-22 18:34+0400\n"
+"PO-Revision-Date: 2013-10-22 18:15+0400\n"
+"Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.5.7\n"
 "Generated-By: Babel 0.9.6\n"
 "X-POOTLE-MTIME: 1379946749.0\n"
 
@@ -170,13 +170,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:67
+#: cms/static/coffee/src/views/module_edit.js:77
 #, python-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:121
-#: cms/static/coffee/src/views/unit.js:68 cms/static/js/base.js:841
+#: cms/static/coffee/src/views/module_edit.js:131
+#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:841
 #: cms/static/js/models/section.js:26 cms/static/js/views/asset_view.js:84
 #: cms/static/js/views/course_info_edit.js:121
 #: cms/static/js/views/course_info_edit.js:330
@@ -185,36 +185,36 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/module_edit.js:130
+#: cms/static/coffee/src/views/module_edit.js:140
 msgid "There was an error saving your changes. Please try again."
 msgstr ""
 "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
 
-#: cms/static/coffee/src/views/tabs.js:88
+#: cms/static/coffee/src/views/tabs.js:96
 msgid "Delete Component Confirmation"
 msgstr "Подтверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:89
+#: cms/static/coffee/src/views/tabs.js:97
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr ""
 "Вы действительно хотите удалить этот компонент? Это действие не можетбыть "
 "отменено."
 
-#: cms/static/coffee/src/views/tabs.js:92
+#: cms/static/coffee/src/views/tabs.js:100
 #: cms/static/js/views/course_info_edit.js:178
 msgid "OK"
 msgstr "OK"
 
-#: cms/static/coffee/src/views/tabs.js:103
-#: cms/static/coffee/src/views/unit.js:168 cms/static/js/base.js:402
+#: cms/static/coffee/src/views/tabs.js:111
+#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:402
 #: cms/static/js/views/course_info_edit.js:186
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:116
-#: cms/static/coffee/src/views/unit.js:191 cms/static/js/base.js:418
+#: cms/static/coffee/src/views/tabs.js:124
+#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:418
 #: cms/static/js/views/asset_view.js:71
 #: cms/static/js/views/course_info_edit.js:204
 #: cms/static/js/views/textbook.js:48
@@ -232,15 +232,15 @@ msgstr "Удаление&hellip;"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: cms/static/coffee/src/views/unit.js:159
+#: cms/static/coffee/src/views/unit.js:177
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:160
+#: cms/static/coffee/src/views/unit.js:178
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Действие по удалению этого компонента не может быть отменено."
 
-#: cms/static/coffee/src/views/unit.js:163
+#: cms/static/coffee/src/views/unit.js:181
 msgid "Yes, delete this component"
 msgstr "Да, удалить этот компонент"
 
@@ -1606,6 +1606,10 @@ msgstr "Адрес электронной почты"
 #: cms/templates/login.html:29 lms/templates/login.html:137
 #: lms/templates/login_modal.html:33
 #: lms/templates/university_profile/edge.html:184
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:133
+#: lms/templates/university_profile/edge.html.BASE.21781.html:128
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:127
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:127
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
@@ -1614,6 +1618,10 @@ msgstr "Забыли пароль?"
 #: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
 #: lms/templates/register.html:129 lms/templates/signup_modal.html:45
 #: lms/templates/university_profile/edge.html:179
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:128
+#: lms/templates/university_profile/edge.html.BASE.21781.html:123
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:122
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:122
 msgid "Password"
 msgstr "Пароль"
 
@@ -4137,8 +4145,8 @@ msgstr ""
 "прогресса."
 
 #: lms/djangoapps/bulk_email/tasks.py:147
-msgid "\"{title}\" Course Staff <{email}>"
-msgstr "\"{title}\" Преподаватель курса <{email}>"
+msgid "{title} Course Staff <{email}>"
+msgstr "{title} Преподаватель курса <{email}>"
 
 #: lms/djangoapps/courseware/features/video.py:114 lms/templates/video.html:39
 msgid "ERROR: No playable video sources found!"
@@ -5100,6 +5108,10 @@ msgstr "изменить"
 #: lms/templates/dashboard.html:175
 #: lms/templates/courseware/instructor_dashboard.html:133
 #: lms/templates/university_profile/edge.html:175
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:124
+#: lms/templates/university_profile/edge.html.BASE.21781.html:119
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:118
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:118
 msgid "Email"
 msgstr "Эл. почта"
 
@@ -5671,6 +5683,10 @@ msgstr "Посмотрите наш раздел помощи для ответ�
 
 #: lms/templates/login_modal.html:9 lms/templates/provider_login.html:37
 #: lms/templates/university_profile/edge.html:183
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:132
+#: lms/templates/university_profile/edge.html.BASE.21781.html:127
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:126
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:126
 msgid "Log In"
 msgstr "Войти"
 
@@ -5691,6 +5707,10 @@ msgid "Home"
 msgstr "Главная страница"
 
 #: lms/templates/master_class.html:17 lms/templates/register.html:201
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
+#: lms/templates/university_profile/edge.html.BASE.21781.html:135
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
 msgid "Register"
 msgstr "Регистрация"
 
@@ -5702,15 +5722,15 @@ msgstr "Прошедшие регистрацию:"
 msgid "Total places:"
 msgstr "Всего мест:"
 
-#: lms/templates/master_class.html:29
+#: lms/templates/master_class.html:30
 msgid "Staff Inforamtion"
 msgstr "Информация для преподавателей"
 
-#: lms/templates/master_class.html:30
+#: lms/templates/master_class.html:31
 msgid "Students pending registration"
 msgstr "Студенты ожидащие регистрацию"
 
-#: lms/templates/master_class.html:38
+#: lms/templates/master_class.html:35
 msgid "Students passed registration"
 msgstr "Студенты прошедшие регистарцию"
 
@@ -5969,14 +5989,6 @@ msgstr ""
 #: lms/templates/register.html:174
 msgid "Optional Personal Information"
 msgstr "Дополнительная информация о пользователе"
-
-#: lms/templates/register.html:201
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
-#: lms/templates/university_profile/edge.html.BASE.21781.html:135
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
-msgid "Register"
-msgstr "Регистрация"
 
 #: lms/templates/register.html:208
 msgid "Registration Help"
@@ -6770,6 +6782,10 @@ msgid ""
 "automatically, and will be returned within 30 minutes if the original is "
 "already graded, or when the original is graded if not."
 msgstr ""
+"Обратите внимание на то, что дупликаты ответов будут оценены автоматически. "
+"Автоматическая оценка будет произведена в течение 30 минут с момента "
+"отсылки, либо, в случае отсутствия оценки оригинального ответа, когда будет "
+"получена оценка для оригинального ответа."
 
 #: lms/templates/combinedopenended/combined_open_ended_legend.html:4
 msgid "Legend"
@@ -6966,11 +6982,11 @@ msgstr "Дополнительные ресурсы"
 #: lms/templates/courseware/course_navigation.html:42
 #: lms/templates/courseware/course_navigation.html:58
 msgid "Staff view"
-msgstr "Для персонала"
+msgstr "Для преподавателей"
 
 #: lms/templates/courseware/course_navigation.html:56
 msgid "Student view"
-msgstr "Вид студента"
+msgstr "Для студентов"
 
 #: lms/templates/courseware/courseware-error.html:16
 msgid ""
@@ -11183,12 +11199,27 @@ msgstr ""
 "{tech_support_email}</a> для сообщений об ошибках или недоступности сайта."
 
 #: lms/templates/university_profile/edge.html:172
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:121
+#: lms/templates/university_profile/edge.html.BASE.21781.html:116
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:115
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:115
 msgid "Log in to your courses"
 msgstr "Войти в ваши курсы"
 
 #: lms/templates/university_profile/edge.html:189
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:138
+#: lms/templates/university_profile/edge.html.BASE.21781.html:133
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:132
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:132
 msgid "Register for classes"
 msgstr "Регистрация на курсы"
+
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:139
+#: lms/templates/university_profile/edge.html.BASE.21781.html:134
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:133
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:133
+msgid "Take free online courses from today's leading universities."
+msgstr ""
 
 #: lms/templates/verify_student/_modal_editname.html:6
 msgid "Edit Your Name"
