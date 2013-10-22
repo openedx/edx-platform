@@ -123,8 +123,8 @@ function () {
             end = this.config.end;
         }
 
-        left = parseInt(100 * (start / params.duration), 10);
-        width = parseInt(100 * ((end - start) / params.duration), 10);
+        left = (100 * (start / params.duration)).toFixed(1);
+        width = (100 * ((end - start) / params.duration)).toFixed(1);
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />')
