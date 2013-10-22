@@ -717,6 +717,7 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
             'js/src/utility.js',
+            'js/src/accessibility_tools.js',
         ],
         'output_filename': 'js/lms-application.js',
 

@@ -103,11 +103,33 @@
       });
       return false;
     });
+
+    accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
+
+    accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
+
+    accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
+
+
+    $(".email-settings").each(function(index){
+      $(this).attr("id", "unenroll-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#email-settings-modal .close-modal", "#email-settings-modal", "#dashboard-main");
+    });
+
+    $(".unenroll").each(function(index){
+      $(this).attr("id", "email-settings-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
+    });
+
   })(this)
   </script>
 </%block>
 
-<section class="container dashboard">
+<section class="container dashboard" id="dashboard-main" aria-hidden="false">
 
   %if message:
     <section class="dashboard-banner">
@@ -193,12 +215,12 @@
   </section>
 </section>
 
-<section id="email-settings-modal" class="modal">
+<section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2 id="email-settings-title">${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}</h2>
+      <h2 id="email-settings-title">${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
       <hr/>
     </header>
 
@@ -212,12 +234,12 @@
   </div>
 </section>
 
-<section id="unenroll-modal" class="modal unenroll-modal">
+<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}</h2>
+      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
       <hr/>
     </header>
 
@@ -233,12 +255,12 @@
   </div>
 </section>
 
-<section id="password_reset_complete" class="modal">
+<section id="password_reset_complete" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2 id="password-reset-email">${_('Password Reset Email Sent')}</h2>
+      <h2 id="password-reset-email">${_('Password Reset Email Sent')}<span class="sr">, ${_("modal open")}</span></h2>
       <hr/>
     </header>
     <div>
@@ -251,12 +273,12 @@
   </div>
 </section>
 
-<section id="change_email" class="modal">
+<section id="change_email" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change_email_title">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2><span id="change_email_title">${_("Change Email")}</span></h2>
+      <h2><span id="change_email_title">${_("Change Email")}</span><span class="sr">, ${_("modal open")}</span></h2>
       <hr/>
     </header>
     <div id="change_email_body">
@@ -281,12 +303,12 @@
   </div>
 </section>
 
-<section id="apply_name_change" class="modal">
+<section id="apply_name_change" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change-name-title">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2 id="change-name-title">${_("Change your name")}</h2>
+      <h2 id="change-name-title">${_("Change your name")}<span class="sr">, ${_("modal open")}</span></h2>
       <hr/>
     </header>
     <div id="change_name_body">
