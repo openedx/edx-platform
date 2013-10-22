@@ -4,8 +4,9 @@ Xml parsing tests for XModules
 import pprint
 from mock import Mock
 
-from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
+from xmodule.x_module import XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.modulestore.xml import create_block_from_xml
 
 
 class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable=abstract-method
@@ -28,8 +29,8 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         )
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
-        """Parse `xml` as an XModuleDescriptor, and add it to `self._descriptors`"""
-        descriptor = XModuleDescriptor.load_from_xml(xml, self, self.org, self.course, self.default_class)
+        """Parse `xml` as an XBlock, and add it to `self._descriptors`"""
+        descriptor = create_block_from_xml(xml, self, self.org, self.course, self.default_class)
         self._descriptors[descriptor.location.url()] = descriptor
         return descriptor
 
@@ -39,8 +40,8 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
 
 
 class XModuleXmlImportTest(object):
-    """Base class for tests that use basic `XModuleDescriptor.load_from_xml` xml parsing"""
+    """Base class for tests that use basic XML parsing"""
     def process_xml(self, xml_import_data):
-        """Use the `xml_import_data` to import an :class:`XModuleDescriptor` from xml"""
+        """Use the `xml_import_data` to import an :class:`XBlock` from XML."""
         system = InMemorySystem(xml_import_data)
         return system.process_xml(xml_import_data.xml_string)

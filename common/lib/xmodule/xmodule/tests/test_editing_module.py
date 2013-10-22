@@ -46,8 +46,8 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = system.construct_xblock_from_class(
             TabsEditingDescriptor,
-            field_data=DictFieldData({}),
             scope_ids=ScopeIds(None, None, None, None),
+            field_data=DictFieldData({}),
         )
 
     def test_get_css(self):

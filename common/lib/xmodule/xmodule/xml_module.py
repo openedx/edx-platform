@@ -217,8 +217,7 @@ class XmlDescriptor(XModuleDescriptor):
             # give the class a chance to fix it up. The file will be written out
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
-            if not system.resources_fs.exists(filepath) and hasattr(
-                    cls, 'backcompat_paths'):
+            if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -339,12 +338,11 @@ class XmlDescriptor(XModuleDescriptor):
 
         return system.construct_xblock_from_class(
             cls,
-            field_data,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            field_data,
         )
 
     @classmethod
@@ -380,7 +378,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         # Get the definition
         xml_object = self.definition_to_xml(resource_fs)
-        self.__class__.clean_metadata_from_xml(xml_object)
+        self.clean_metadata_from_xml(xml_object)
 
         # Set the tag so we get the file path right
         xml_object.tag = self.category
@@ -403,7 +401,7 @@ class XmlDescriptor(XModuleDescriptor):
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
-            filepath = self.__class__._format_filepath(self.category, url_path)
+            filepath = self._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))

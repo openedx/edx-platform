@@ -1,7 +1,7 @@
 class @TrackChanges
   reset_button_sel: '.reset-changes'
   undo_button_sel: '.undo-change'
-  tracked_elements_sel: 'span.del, span.ins'
+  tracked_changes_sel: '.track-changes span.del, .track-changes span.ins'
   tracked_feedback_sel: '.feedback-area.track-changes'
   submit_button_sel: '.submit-button'
   tracker: null
@@ -11,7 +11,7 @@ class @TrackChanges
     @reset_button = @$(@reset_button_sel)
     @undo_button = @$(@undo_button_sel)
     @submit_button = @$(@submit_button_sel)
-    @tracked_elements = @$(@tracked_elements_sel)
+    @tracked_changes = @$(@tracked_changes_sel)
     @tracked_feedback = @$(@tracked_feedback_sel)
     
     @reset_button.click @reset_changes
@@ -47,13 +47,15 @@ class @TrackChanges
 
   reset_changes: (event) =>
     event.preventDefault()
-    @tracker.rejectAll()
+    if confirm "Are you sure you want to reset your changes?"
+      @tracker.rejectAll()
   
   undo_change: (event) =>
     event.preventDefault()
     keyOfLatestChange = 0
-    @tracked_elements.each ->
-      key = parseInt(@attr('data-cid'))
+    @tracked_changes = @$(@tracked_changes_sel)
+    @tracked_changes.each ->
+      key = $(@).data('cid')
       if key > keyOfLatestChange
         keyOfLatestChange = key
     @tracker.rejectChange('[data-cid="'+ keyOfLatestChange + '"]')

@@ -36,15 +36,13 @@ echo
 echo '||Author||Changes||Commit Link||Testing Notes||'
 
 for EMAIL in $RESPONSIBLE; do
-    AUTHORED_BY="$LOG_CMD --author=<${EMAIL}>"
-    COMMITTED_BY="$LOG_CMD --committer=<${EMAIL}>"
-    COMMITTED_NOT_AUTHORED="$COMMITTED_BY $($AUTHORED_BY --format='tformat:^%h')"
+    AUTHORED_BY=$($LOG_CMD --author="<${EMAIL}>" --format='tformat:%h')
+    COMMITTED_BY=$($LOG_CMD --committer="<${EMAIL}>" --format='tformat:%h')
+    ALL_COMMITS=$(for HASH in $AUTHORED_BY $COMMITTED_BY; do echo $HASH; done | sort | uniq)
 
-    $AUTHORED_BY --format="tformat:|$EMAIL|%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" | head -n 1
-    $AUTHORED_BY --format="tformat:| |%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" | tail  -n +2
-
-    if [[ $($COMMITTED_NOT_AUTHORED) != "" ]]; then
-        $COMMITTED_NOT_AUTHORED --format="tformat:|$EMAIL|%s|[commit|https://github.com/edx/edx-platform/commit/%h]|Committed, didn't author|" | head -n 1
-        $COMMITTED_NOT_AUTHORED --format="tformat:| |%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" | tail -n +2
-    fi
+    EMAIL_COL="$EMAIL"
+    for HASH in $ALL_COMMITS; do
+        git --no-pager log --format="tformat:|$EMAIL_COL|%s|[commit|https://github.com/edx/edx-platform/commit/%h]| |" -n 1 $HASH
+        EMAIL_COL=" "
+    done
 done

@@ -12,7 +12,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from util.json_request import expect_json, JsonResponse
 from ..utils import get_modulestore
 from .access import has_access
-from .requests import _xmodule_recurse
+from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 
 __all__ = ['save_item', 'create_item', 'delete_item']
@@ -90,7 +90,10 @@ def save_item(request):
             if value is None:
                 field.delete_from(existing_item)
             else:
-                value = field.from_json(value)
+                try:
+                    value = field.from_json(value)
+                except ValueError:
+                    return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.

@@ -1,15 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
 //
-//  Simple image input 
+//  Simple image input
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 // click on image, return coordinates
 // put a dot at location of click, on imag
 
-// window.image_input_click = function(id,event){
-
-function image_input_click(id,event){
+window.image_input_click = function(id,event){
     iidiv = document.getElementById("imageinput_"+id);
     pos_x = event.offsetX?(event.offsetX):event.pageX-iidiv.offsetLeft;
     pos_y = event.offsetY?(event.offsetY):event.pageY-iidiv.offsetTop;
@@ -21,4 +19,4 @@ function image_input_click(id,event){
     document.getElementById("cross_"+id).style.top = cy;
     document.getElementById("cross_"+id).style.visibility = "visible" ;
     document.getElementById("input_"+id).value =result;
-}
+};

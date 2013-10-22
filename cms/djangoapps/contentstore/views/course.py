@@ -12,11 +12,11 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods, require_POST
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
 from mitxmako.shortcuts import render_to_response
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.content import StaticContent
 
@@ -48,7 +48,8 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
-__all__ = ['course_index', 'create_new_course', 'course_info',
+from xmodule.modulestore.locator import BlockUsageLocator
+__all__ = ['create_new_course', 'course_info', 'course_handler',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
            'course_config_advanced_page',
@@ -59,24 +60,83 @@ __all__ = ['course_index', 'create_new_course', 'course_info',
 
 
 @login_required
+def course_handler(request, course_url):
+    """
+    The restful handler for course specific requests.
+    It provides the course tree with the necessary information for identifying and labeling the parts. The root
+    will typically be a 'course' object but may not be especially as we support modules.
+
+    GET
+        html: return html page overview for the given course
+        json: return json representing the course branch's index entry as well as dag w/ all of the children
+        replaced w/ json docs where each doc has {'_id': , 'display_name': , 'children': }
+    POST
+        json: create (or update?) this course or branch in this course for this user, return resulting json
+        descriptor (same as in GET course/...). Leaving off /branch/draft would imply create the course w/ default
+        branches. Cannot change the structure contents ('_id', 'display_name', 'children') but can change the
+        index entry.
+    PUT
+        json: update this course (index entry not xblock) such as repointing head, changing display name, org,
+        course_id, prettyid. Return same json as above.
+    DELETE
+        json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
+    """
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            raise NotImplementedError('coming soon')
+        elif not has_access(request.user, BlockUsageLocator(course_url)):
+            raise PermissionDenied()
+        elif request.method == 'POST':
+            raise NotImplementedError()
+        elif request.method == 'PUT':
+            raise NotImplementedError()
+        elif request.method == 'DELETE':
+            raise NotImplementedError()
+        else:
+            return HttpResponseBadRequest()
+    elif request.method == 'GET':  # assume html
+        return course_index(request, course_url)
+    else:
+        return HttpResponseNotFound()
+
+
+@login_required
 @ensure_csrf_cookie
-def course_index(request, org, course, name):
+def old_course_index_shim(request, org, course, name):
+    """
+    A shim for any unconverted uses of course_index
+    """
+    old_location = Location(['i4x', org, course, 'course', name])
+    locator = loc_mapper().translate_location(old_location.course_id, old_location, False, True)
+    return course_index(request, locator)
+
+
+@login_required
+@ensure_csrf_cookie
+def course_index(request, course_url):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    location = BlockUsageLocator(course_url)
+    # TODO: when converting to split backend, if location does not have a usage_id,
+    # we'll need to get the course's root block_id
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    lms_link = get_lms_link_for_item(location)
+
+    old_location = loc_mapper().translate_locator_to_location(location)
+
+    lms_link = get_lms_link_for_item(old_location)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': org,
-        'course': course,
-        'coursename': name
+        'org': location.as_old_location_org,
+        'course': location.as_old_location_course,
+        'coursename': location.as_old_location_run
     })
 
-    course = modulestore().get_item(location, depth=3)
+    course = modulestore().get_item(old_location, depth=3)
     sections = course.get_children()
 
     return render_to_response('overview.html', {

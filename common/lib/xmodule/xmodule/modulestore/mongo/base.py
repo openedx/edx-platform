@@ -21,7 +21,6 @@ from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from operator import attrgetter
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -81,7 +80,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 return self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def set(self, key, value):
         if key.scope == Scope.children:
@@ -94,7 +93,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 self._data[key.field_name] = value
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def delete(self, key):
         if key.scope == Scope.children:
@@ -108,7 +107,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             else:
                 del self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def has(self, key):
         if key.scope in (Scope.children, Scope.parent):
@@ -193,7 +192,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                 field_data = DbModel(kvs)
                 scope_ids = ScopeIds(None, category, location, location)
-                module = self.construct_xblock_from_class(class_, field_data, scope_ids)
+                module = self.construct_xblock_from_class(class_, scope_ids, field_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
@@ -246,7 +245,9 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-metadata_cache_key = attrgetter('org', 'course')
+def metadata_cache_key(location):
+    """Turn a `Location` into a useful cache key."""
+    return u"{0.org}/{0.course}".format(location)
 
 
 class MongoModuleStore(ModuleStoreBase):
@@ -255,25 +256,35 @@ class MongoModuleStore(ModuleStoreBase):
     """
 
     # TODO (cpennington): Enable non-filesystem filestores
-    def __init__(self, host, db, collection, fs_root, render_template,
-                 port=27017, default_class=None,
+    # pylint: disable=C0103
+    # pylint: disable=W0201
+    def __init__(self, doc_store_config, fs_root, render_template,
+                 default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, mongo_options=None, **kwargs):
+                 **kwargs):
+        """
+        :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
+        """
 
         super(MongoModuleStore, self).__init__(**kwargs)
 
-        if mongo_options is None:
-            mongo_options = {}
+        def do_connection(
+            db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+        ):
+            """
+            Create & open the connection, authenticate, and provide pointers to the collection
+            """
+            self.collection = pymongo.connection.Connection(
+                host=host,
+                port=port,
+                tz_aware=tz_aware,
+                **kwargs
+            )[db][collection]
 
-        self.collection = pymongo.connection.Connection(
-            host=host,
-            port=port,
-            tz_aware=True,
-            **mongo_options
-        )[db][collection]
+            if user is not None and password is not None:
+                self.collection.database.authenticate(user, password)
 
-        if user is not None and password is not None:
-            self.collection.database.authenticate(user, password)
+        do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -281,7 +292,8 @@ class MongoModuleStore(ModuleStoreBase):
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1)))
+            zip(('_id.' + field for field in Location._fields), repeat(1))
+        )
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -621,12 +633,11 @@ class MongoModuleStore(ModuleStoreBase):
         dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
         xmodule = system.construct_xblock_from_class(
             xblock_class,
-            dbmodel,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both.
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            dbmodel,
         )
         # decache any pending field settings from init
         xmodule.save()

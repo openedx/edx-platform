@@ -533,7 +533,7 @@ class @CombinedOpenEnded
   gentle_alert: (msg) =>
     if @$el.find(@oe_alert_sel).length
       @$el.find(@oe_alert_sel).remove()
-    alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
+    alert_elem = "<div class='open-ended-alert' role='alert'>" + msg + "</div>"
     @$el.find('.open-ended-action').after(alert_elem)
     @$el.find(@oe_alert_sel).css(opacity: 0).animate(opacity: 1, 700)
 

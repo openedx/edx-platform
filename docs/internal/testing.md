@@ -128,11 +128,11 @@ other module level tests include
 
 To run a single django test class:
 
-    rake test_lms[courseware.tests.tests:testViewAuth]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest]
 
 To run a single django test:
 
-    rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
+    rake test_lms[lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login]
 
 To re-run all failing django tests from lms or cms:
 
@@ -230,6 +230,8 @@ To run tests faster by not collecting static files, you can use
 Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
 as well as the port listed in cms/djangoapps/contentstore/feature/upload.py
+
+During acceptance test execution, Django log files are written to `test_root/log/lms_acceptance.log` and `test_root/log/cms_acceptance.log`.
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 

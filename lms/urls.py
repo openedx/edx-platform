@@ -35,6 +35,10 @@ urlpatterns = ('',  # nopep8
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
+    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
+        name='manage_user_standing'),
+    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
+        name="disable_account_ajax"),
 
     url(r'^accounts/import$', 'student.views.accounts_import', name="accounts_import"),
     url(r'^accounts/import_users$', 'student.views.import_users', name="import_users"),

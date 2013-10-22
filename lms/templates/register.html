@@ -12,6 +12,7 @@
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
+
 <%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
 
 <%block name="js_extra">
@@ -135,7 +136,7 @@
 
         <div class="message">
           <h3 class="message-title">${_("Welcome {username}").format(username=extauth_id)}</h3>
-          <p class="message-copy">${_("Enter a public username:")}</p>
+          <p class="message-copy">${_("Enter a Public Display Name:")}</p>
         </div>
 
         <ol class="list-input">
@@ -150,9 +151,9 @@
           % endif
 
           <li class="field required text" id="field-username">
-            <label for="username">${_('Public Username')}</label>
+            <label for="username">${_('Public Display Name')}</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip" />
-            <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')}</span>
+            <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
           % if ask_for_fullname:
@@ -160,7 +161,7 @@
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
 
           % endif

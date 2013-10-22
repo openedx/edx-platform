@@ -1,0 +1,115 @@
+"""
+These are tests for disabling and enabling student accounts, and for making sure
+that students with disabled accounts are unable to access the courseware.
+"""
+from student.tests.factories import UserFactory, UserStandingFactory
+from student.models import UserStanding
+from django.test import TestCase, Client
+from django.core.urlresolvers import reverse, NoReverseMatch
+from nose.plugins.skip import SkipTest
+
+
+class UserStandingTest(TestCase):
+    """test suite for user standing view for enabling and disabling accounts"""
+
+    def setUp(self):
+        # create users
+        self.bad_user = UserFactory.create(
+            username='bad_user',
+        )
+        self.good_user = UserFactory.create(
+            username='good_user',
+        )
+        self.non_staff = UserFactory.create(
+            username='non_staff',
+        )
+        self.admin = UserFactory.create(
+            username='admin',
+            is_staff=True,
+        )
+
+        # create clients
+        self.bad_user_client = Client()
+        self.good_user_client = Client()
+        self.non_staff_client = Client()
+        self.admin_client = Client()
+
+        for user, client in [
+            (self.bad_user, self.bad_user_client),
+            (self.good_user, self.good_user_client),
+            (self.non_staff, self.non_staff_client),
+            (self.admin, self.admin_client),
+        ]:
+            client.login(username=user.username, password='test')
+
+        UserStandingFactory.create(
+            user=self.bad_user,
+            account_status=UserStanding.ACCOUNT_DISABLED,
+            changed_by=self.admin
+        )
+
+        # set different stock urls for lms and cms
+        # to test disabled accounts' access to site
+        try:
+            self.some_url = reverse('dashboard')
+        except NoReverseMatch:
+            self.some_url = reverse('index')
+
+        # since it's only possible to disable accounts from lms, we're going
+        # to skip tests for cms
+
+    def test_disable_account(self):
+        self.assertEqual(
+            UserStanding.objects.filter(user=self.good_user).count(), 0
+        )
+        try:
+            response = self.admin_client.post(reverse('disable_account_ajax'), {
+                'username': self.good_user.username,
+                'account_action': 'disable',
+            })
+        except NoReverseMatch:
+            raise SkipTest()
+        self.assertEqual(
+            UserStanding.objects.get(user=self.good_user).account_status,
+            UserStanding.ACCOUNT_DISABLED
+        )
+
+    def test_disabled_account_403s(self):
+        response = self.bad_user_client.get(self.some_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_reenable_account(self):
+        try:
+            response = self.admin_client.post(reverse('disable_account_ajax'), {
+                'username': self.bad_user.username,
+                'account_action': 'reenable'
+            })
+        except NoReverseMatch:
+            raise SkipTest()
+        self.assertEqual(
+            UserStanding.objects.get(user=self.bad_user).account_status,
+            UserStanding.ACCOUNT_ENABLED
+        )
+
+    def test_non_staff_cant_access_disable_view(self):
+        try:
+            response = self.non_staff_client.get(reverse('manage_user_standing'), {
+                'user': self.non_staff,
+            })
+        except NoReverseMatch:
+            raise SkipTest()
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_staff_cant_disable_account(self):
+        try:
+            response = self.non_staff_client.post(reverse('disable_account_ajax'), {
+                'username': self.good_user.username,
+                'user': self.non_staff,
+                'account_action': 'disable'
+            })
+        except NoReverseMatch:
+            raise SkipTest()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            UserStanding.objects.filter(user=self.good_user).count(), 0
+        )

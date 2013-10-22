@@ -1,55 +1,47 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="base.html" />
 <%block name="title">${_("Schedule &amp; Details Settings")}</%block>
-<%block name="bodyclass">is-signedin course schedule settings feature-upload</%block>
+<%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils
+  from contentstore import utils
+  from django.utils.translation import ugettext as _
 %>
 
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-  <script src="${static.url('js/vendor/tzAbbr.js')}"></script>
-
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
 
   <script type="text/template" id="upload-dialog-tpl">
     <%static:include path="js/upload-dialog.underscore" />
   </script>
 
   <script type="text/javascript">
-    $(document).ready(function(){
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
-      // hilighting labels when fields are focused in
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-        });
-      var model = new CMS.Models.Settings.CourseDetails();
-      model.urlRoot = '${details_url}';
-      model.fetch({
-        success: function(model) {
-          var editor = new CMS.Views.Settings.Details({
-              el: $('.settings-details'),
-              model: model
-          });
-          editor.render();
-        },
-        reset: true
+require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
+  function(doc, $, CourseDetailsModel, MainView) {
+    // hilighting labels when fields are focused in
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
       });
-
-      CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+    var model = new CourseDetailsModel();
+    model.urlRoot = '${details_url}';
+    model.fetch({
+      success: function(model) {
+        var editor = new MainView({
+            el: $('.settings-details'),
+            model: model
+        });
+        editor.render();
+      },
+      reset: true
     });
-
+});
   </script>
 </%block>
 

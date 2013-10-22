@@ -4,6 +4,7 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
+      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
@@ -42,17 +43,21 @@ if Backbone?
     renderVoted: =>
       if window.user.voted(@model)
         @$("[data-role=discussion-vote]").addClass("is-cast")
+        @$("[data-role=discussion-vote] span.sr").html("votes (click to remove your vote)")
       else
         @$("[data-role=discussion-vote]").removeClass("is-cast")
+        @$("[data-role=discussion-vote] span.sr").html("votes (click to vote)")
         
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     renderPinned: =>
@@ -70,7 +75,12 @@ if Backbone?
       @renderVoted()
       @renderFlagged()
       @renderPinned()
-      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
+      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"] + '<span class ="sr"></span>')
+      if window.user.voted(@model)
+        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to remove your vote)")
+      else
+        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to vote)")
+
 
     convertMath: ->
       element = @$(".post-body")

@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 <%block name="title">${_("Sign In")}</%block>
-<%block name="bodyclass">not-signedin signin</%block>
+<%block name="bodyclass">not-signedin view-signin</%block>
 
 <%block name="content">
 
@@ -56,17 +58,14 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-(function() {
-  function getCookie(name) {
-    return $.cookie(name);
-  }
+require(["jquery", "jquery.cookie", "utility"], function($) {
   function postJSON(url, data, callback) {
     $.ajax({type:'POST',
       url: url,
       dataType: 'json',
       data: data,
       success: callback,
-      headers : {'X-CSRFToken':getCookie('csrftoken')}
+      headers : {'X-CSRFToken':$.cookie('csrftoken')}
     });
   }
 
@@ -93,6 +92,6 @@
       }
     );
   });
-})(this)
+});
 </script>
 </%block>
