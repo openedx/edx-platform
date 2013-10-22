@@ -28,20 +28,21 @@ class TestOrphan(unittest.TestCase):
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    }, **db_config)
+    })
 
     split_course_id = 'test_org.test_course.runid'
 
     def setUp(self):
-        self.modulestore_options['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
+        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
 
         self.userid = random.getrandbits(32)
         super(TestOrphan, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
+            self.db_config,
             **self.modulestore_options
         )
         self.addCleanup(self.tearDownSplit)
-        self.old_mongo = MongoModuleStore(**self.modulestore_options)
+        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
         self.addCleanup(self.tearDownMongo)
         self.course_location = None
         self._create_course()
