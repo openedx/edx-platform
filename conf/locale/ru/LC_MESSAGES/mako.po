@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-18 17:34+0400\n"
-"PO-Revision-Date: 2013-10-14 17:14+0400\n"
+"POT-Creation-Date: 2013-10-18 17:55+0400\n"
+"PO-Revision-Date: 2013-10-18 17:54+0300\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3824,7 +3824,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:59
 msgid "Whether this student has been register for this master class."
-msgstr "Является ли это студент был зарегистрированны на этом мастер-классе."
+msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:64
 msgid "All registrations from all students."
@@ -3839,7 +3839,7 @@ msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
 msgstr ""
-"Вы зарегистрированны на мастер-класс. Мы сообщим дополнительную информацию в "
+"Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:91
@@ -5971,6 +5971,13 @@ msgid "Optional Personal Information"
 msgstr "Дополнительная информация о пользователе"
 
 #: lms/templates/register.html:201
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
+#: lms/templates/university_profile/edge.html.BASE.21781.html:135
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
+msgid "Register"
+msgstr "Регистрация"
+
 #: lms/templates/register.html:208
 msgid "Registration Help"
 msgstr "Помощь по регистрации"
