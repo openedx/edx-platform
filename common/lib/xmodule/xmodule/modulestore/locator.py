@@ -13,7 +13,7 @@ from bson.errors import InvalidId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 
 from .parsers import parse_url, parse_course_id, parse_block_ref
-from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, URL_VERSION_PREFIX
+from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
 import re
 from xmodule.modulestore import Location
 
@@ -190,8 +190,8 @@ class CourseLocator(Locator):
             self.init_from_version_guid(version_guid)
         if course_id or branch:
             self.init_from_course_id(course_id, branch)
-        assert self.version_guid or self.course_id, \
-            "Either version_guid or course_id should be set."
+        if self.version_guid is None and self.course_id is None:
+            raise ValueError("Either version_guid or course_id should be set: {}".format(url))
 
     def __unicode__(self):
         """
@@ -200,10 +200,10 @@ class CourseLocator(Locator):
         if self.course_id:
             result = self.course_id
             if self.branch:
-                result += BRANCH_PREFIX + self.branch
+                result += '/' + BRANCH_PREFIX + self.branch
             return result
         elif self.version_guid:
-            return URL_VERSION_PREFIX + str(self.version_guid)
+            return VERSION_PREFIX + str(self.version_guid)
         else:
             # raise InsufficientSpecificationError("missing course_id or version_guid")
             return '<InsufficientSpecificationError: missing course_id or version_guid>'
@@ -263,22 +263,42 @@ class CourseLocator(Locator):
                              version_guid=self.version_guid,
                              branch=self.branch)
 
+    def url_reverse(self, prefix, postfix):
+        """
+        Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
+        :param prefix: the beginning of the url (will be forced to begin and end with / if non-empty)
+        :param postfix: the part to append to the url (will be forced to begin w/ / if non-empty)
+        """
+        if prefix:
+            if not prefix.endswith('/'):
+                prefix += '/'
+            if not prefix.startswith('/'):
+                prefix = '/' + prefix
+        else:
+            prefix = '/'
+        if postfix and not postfix.startswith('/'):
+            postfix = '/' + postfix
+        elif postfix is None:
+            postfix = ''
+        return prefix + unicode(self) + postfix
+
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
         either a valid version_guid or course_id (with optional branch), or both.
         """
         if isinstance(url, Locator):
-            url = url.url()
-        if not isinstance(url, basestring):
+            parse = url.__dict__
+        elif not isinstance(url, basestring):
             raise TypeError('%s is not an instance of basestring' % url)
-        parse = parse_url(url, tag_optional=True)
-        if not parse:
-            raise ValueError('Could not parse "%s" as a url' % url)
+        else:
+            parse = parse_url(url, tag_optional=True)
+            if not parse:
+                raise ValueError('Could not parse "%s" as a url' % url)
         self._set_value(
             parse, 'version_guid', lambda (new_guid): self.set_version_guid(self.as_object_id(new_guid))
         )
-        self._set_value(parse, 'id', lambda (new_id): self.set_course_id(new_id))
+        self._set_value(parse, 'course_id', lambda (new_id): self.set_course_id(new_id))
         self._set_value(parse, 'branch', lambda (new_branch): self.set_branch(new_branch))
 
     def init_from_version_guid(self, version_guid):
@@ -313,9 +333,9 @@ class CourseLocator(Locator):
                     raise ValueError("%s does not have a valid course_id" % course_id)
 
             parse = parse_course_id(course_id)
-            if not parse:
+            if not parse or parse['course_id'] is None:
                 raise ValueError('Could not parse "%s" as a course_id' % course_id)
-            self.set_course_id(parse['id'])
+            self.set_course_id(parse['course_id'])
             rev = parse['branch']
             if rev:
                 self.set_branch(rev)
@@ -396,11 +416,12 @@ class BlockUsageLocator(CourseLocator):
             self.init_block_ref_from_course_id(course_id)
         if usage_id:
             self.init_block_ref(usage_id)
-        CourseLocator.__init__(self,
-                               url=url,
-                               version_guid=version_guid,
-                               course_id=course_id,
-                               branch=branch)
+        super(BlockUsageLocator, self).__init__(
+            url=url,
+            version_guid=version_guid,
+            course_id=course_id,
+            branch=branch
+        )
 
     def is_initialized(self):
         """
@@ -459,10 +480,12 @@ class BlockUsageLocator(CourseLocator):
 
     def init_block_ref_from_course_id(self, course_id):
         if isinstance(course_id, CourseLocator):
+            # FIXME the parsed course_id should never contain a block ref
             course_id = course_id.course_id
             assert course_id, "%s does not have a valid course_id"
         parse = parse_course_id(course_id)
-        assert parse, 'Could not parse "%s" as a course_id' % course_id
+        if parse is None:
+            raise ValueError('Could not parse "%s" as a course_id' % course_id)
         self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
 
     def __unicode__(self):
@@ -470,7 +493,7 @@ class BlockUsageLocator(CourseLocator):
         Return a string representing this location.
         """
         rep = super(BlockUsageLocator, self).__unicode__()
-        return rep + BLOCK_PREFIX + unicode(self.usage_id)
+        return rep + '/' + BLOCK_PREFIX + unicode(self.usage_id)
 
 
 class DefinitionLocator(Locator):
@@ -478,7 +501,7 @@ class DefinitionLocator(Locator):
     Container for how to locate a description (the course-independent content).
     """
 
-    URL_RE = re.compile(r'^defx://' + URL_VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
+    URL_RE = re.compile(r'^defx://' + VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
     def __init__(self, definition_id):
         if isinstance(definition_id, basestring):
             regex_match = self.URL_RE.match(definition_id)
@@ -491,7 +514,7 @@ class DefinitionLocator(Locator):
         Return a string representing this location.
         unicode(self) returns something like this: "version/519665f6223ebd6980884f2b"
         '''
-        return URL_VERSION_PREFIX + str(self.definition_id)
+        return VERSION_PREFIX + str(self.definition_id)
 
     def url(self):
         """

@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from bson.objectid import ObjectId
 from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
-from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX, URL_VERSION_PREFIX
+from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 from xmodule.modulestore import Location
 import random
@@ -36,12 +36,12 @@ class LocatorTest(TestCase):
         self.assertRaises(
             OverSpecificationError,
             CourseLocator,
-            url='edx://mit.eecs.6002x' + BRANCH_PREFIX + 'published',
+            url='edx://mit.eecs.6002x/' + BRANCH_PREFIX + 'published',
             branch='draft')
         self.assertRaises(
             OverSpecificationError,
             CourseLocator,
-            course_id='mit.eecs.6002x' + BRANCH_PREFIX + 'published',
+            course_id='mit.eecs.6002x/' + BRANCH_PREFIX + 'published',
             branch='draft')
 
     def test_course_constructor_underspecified(self):
@@ -59,8 +59,8 @@ class LocatorTest(TestCase):
         testobj_1 = CourseLocator(version_guid=test_id_1)
         self.check_course_locn_fields(testobj_1, 'version_guid', version_guid=test_id_1)
         self.assertEqual(str(testobj_1.version_guid), test_id_1_loc)
-        self.assertEqual(str(testobj_1), URL_VERSION_PREFIX + test_id_1_loc)
-        self.assertEqual(testobj_1.url(), 'edx://' + URL_VERSION_PREFIX + test_id_1_loc)
+        self.assertEqual(str(testobj_1), VERSION_PREFIX + test_id_1_loc)
+        self.assertEqual(testobj_1.url(), 'edx://' + VERSION_PREFIX + test_id_1_loc)
 
         # Test using a given string
         test_id_2_loc = '519665f6223ebd6980884f2b'
@@ -68,8 +68,8 @@ class LocatorTest(TestCase):
         testobj_2 = CourseLocator(version_guid=test_id_2)
         self.check_course_locn_fields(testobj_2, 'version_guid', version_guid=test_id_2)
         self.assertEqual(str(testobj_2.version_guid), test_id_2_loc)
-        self.assertEqual(str(testobj_2), URL_VERSION_PREFIX + test_id_2_loc)
-        self.assertEqual(testobj_2.url(), 'edx://' + URL_VERSION_PREFIX + test_id_2_loc)
+        self.assertEqual(str(testobj_2), VERSION_PREFIX + test_id_2_loc)
+        self.assertEqual(testobj_2.url(), 'edx://' + VERSION_PREFIX + test_id_2_loc)
 
     def test_course_constructor_bad_course_id(self):
         """
@@ -77,19 +77,19 @@ class LocatorTest(TestCase):
         """
         for bad_id in (' mit.eecs',
                        'mit.eecs ',
-                       URL_VERSION_PREFIX + 'mit.eecs',
-                       BLOCK_PREFIX + 'block/mit.eecs',
+                       VERSION_PREFIX + 'mit.eecs',
+                       BLOCK_PREFIX + 'black/mit.eecs',
                        'mit.ee cs',
                        'mit.ee,cs',
                        'mit.ee/cs',
                        'mit.ee&cs',
                        'mit.ee()cs',
                        BRANCH_PREFIX + 'this',
-                       'mit.eecs' + BRANCH_PREFIX,
-                       'mit.eecs' + BRANCH_PREFIX + 'this' + BRANCH_PREFIX + 'that',
-                       'mit.eecs' + BRANCH_PREFIX + 'this' + BRANCH_PREFIX,
-                       'mit.eecs' + BRANCH_PREFIX + 'this ',
-                       'mit.eecs' + BRANCH_PREFIX + 'th%is ',
+                       'mit.eecs/' + BRANCH_PREFIX,
+                       'mit.eecs/' + BRANCH_PREFIX + 'this/' + BRANCH_PREFIX + 'that',
+                       'mit.eecs/' + BRANCH_PREFIX + 'this/' + BRANCH_PREFIX,
+                       'mit.eecs/' + BRANCH_PREFIX + 'this ',
+                       'mit.eecs/' + BRANCH_PREFIX + 'th%is ',
                        ):
             self.assertRaises(ValueError, CourseLocator, course_id=bad_id)
             self.assertRaises(ValueError, CourseLocator, url='edx://' + bad_id)
@@ -107,7 +107,7 @@ class LocatorTest(TestCase):
         self.check_course_locn_fields(testobj, 'course_id', course_id=testurn)
 
     def test_course_constructor_redundant_002(self):
-        testurn = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published'
+        testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published'
         expected_urn = 'mit.eecs.6002x'
         expected_rev = 'published'
         testobj = CourseLocator(course_id=testurn, url='edx://' + testurn)
@@ -119,7 +119,7 @@ class LocatorTest(TestCase):
         # Test parsing a url when it starts with a version ID and there is also a block ID.
         # This hits the parsers parse_guid method.
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url="edx://" + URL_VERSION_PREFIX + test_id_loc + BLOCK_PREFIX + "hw3")
+        testobj = CourseLocator(url="edx://{}{}/{}hw3".format(VERSION_PREFIX, test_id_loc, BLOCK_PREFIX))
         self.check_course_locn_fields(
             testobj,
             'test_block constructor',
@@ -128,14 +128,14 @@ class LocatorTest(TestCase):
 
     def test_course_constructor_url_course_id_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs-honors.6002x' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs-honors.6002x/' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID and version GUID',
                                       course_id='mit.eecs-honors.6002x',
                                       version_guid=ObjectId(test_id_loc))
 
     def test_course_constructor_url_course_id_branch_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs.~6002x' + BRANCH_PREFIX + 'draft-1' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs.~6002x/' + BRANCH_PREFIX + 'draft-1/' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID branch, and version GUID',
                                       course_id='mit.eecs.~6002x',
                                       branch='draft-1',
@@ -150,7 +150,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj.url(), 'edx://' + testurn)
 
     def test_course_constructor_course_id_with_branch(self):
-        testurn = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published'
+        testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published'
         expected_id = 'mit.eecs.6002x'
         expected_branch = 'published'
         testobj = CourseLocator(course_id=testurn)
@@ -166,7 +166,7 @@ class LocatorTest(TestCase):
     def test_course_constructor_course_id_separate_branch(self):
         test_id = 'mit.eecs.6002x'
         test_branch = 'published'
-        expected_urn = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published'
+        expected_urn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published'
         testobj = CourseLocator(course_id=test_id, branch=test_branch)
         self.check_course_locn_fields(testobj, 'course_id with separate branch',
                                       course_id=test_id,
@@ -181,7 +181,7 @@ class LocatorTest(TestCase):
         """
         The same branch appears in the course_id and the branch field.
         """
-        test_id = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published'
+        test_id = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published'
         test_branch = 'published'
         expected_id = 'mit.eecs.6002x'
         expected_urn = test_id
@@ -196,7 +196,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj.url(), 'edx://' + expected_urn)
 
     def test_block_constructor(self):
-        testurn = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published' + BLOCK_PREFIX + 'HW3'
+        testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         expected_id = 'mit.eecs.6002x'
         expected_branch = 'published'
         expected_block_ref = 'HW3'
@@ -217,7 +217,7 @@ class LocatorTest(TestCase):
     def test_block_constructor_url_version_prefix(self):
         test_id_loc = '519665f6223ebd6980884f2b'
         testobj = BlockUsageLocator(
-            url='edx://mit.eecs.6002x' + VERSION_PREFIX + test_id_loc + BLOCK_PREFIX + 'lab2'
+            url='edx://mit.eecs.6002x/{}{}/{}lab2'.format(VERSION_PREFIX, test_id_loc, BLOCK_PREFIX)
         )
         self.check_block_locn_fields(
             testobj, 'error parsing URL with version and block',
@@ -237,7 +237,9 @@ class LocatorTest(TestCase):
     def test_block_constructor_url_kitchen_sink(self):
         test_id_loc = '519665f6223ebd6980884f2b'
         testobj = BlockUsageLocator(
-            url='edx://mit.eecs.6002x' + BRANCH_PREFIX + 'draft' + VERSION_PREFIX + test_id_loc + BLOCK_PREFIX + 'lab2'
+            url='edx://mit.eecs.6002x/{}draft/{}{}/{}lab2'.format(
+                BRANCH_PREFIX, VERSION_PREFIX, test_id_loc, BLOCK_PREFIX
+            )
         )
         self.check_block_locn_fields(
             testobj, 'error parsing URL with branch, version, and block',
@@ -248,7 +250,7 @@ class LocatorTest(TestCase):
         )
 
     def test_repr(self):
-        testurn = 'mit.eecs.6002x' + BRANCH_PREFIX + 'published' + BLOCK_PREFIX + 'HW3'
+        testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         testobj = BlockUsageLocator(course_id=testurn)
         self.assertEqual('BlockUsageLocator("mit.eecs.6002x/branch/published/block/HW3")', repr(testobj))
 
@@ -283,10 +285,32 @@ class LocatorTest(TestCase):
             Locator.to_locator_or_location("hello.world.not.a.url")
         self.assertIsNone(Locator.parse_url("unknown://foo.bar/baz"))
 
+    def test_url_reverse(self):
+        """
+        Test the url_reverse method
+        """
+        locator = CourseLocator(course_id="a.fancy_course-id", branch="branch_1.2-3")
+        self.assertEqual(
+            '/expression/{}/format'.format(unicode(locator)),
+            locator.url_reverse('expression', 'format')
+        )
+        self.assertEqual(
+            '/expression/{}/format'.format(unicode(locator)),
+            locator.url_reverse('/expression', '/format')
+        )
+        self.assertEqual(
+            '/expression/{}'.format(unicode(locator)),
+            locator.url_reverse('expression/', None)
+        )
+        self.assertEqual(
+            '/expression/{}'.format(unicode(locator)),
+            locator.url_reverse('/expression/', '')
+        )
+
     def test_description_locator_url(self):
         object_id = '{:024x}'.format(random.randrange(16 ** 24))
         definition_locator = DefinitionLocator(object_id)
-        self.assertEqual('defx://' + URL_VERSION_PREFIX + object_id, definition_locator.url())
+        self.assertEqual('defx://' + VERSION_PREFIX + object_id, definition_locator.url())
         self.assertEqual(definition_locator, DefinitionLocator(definition_locator.url()))
 
     def test_description_locator_version(self):

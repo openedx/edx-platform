@@ -247,7 +247,8 @@ class TestLocationMapper(unittest.TestCase):
         new_style_course_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         prob_locator = BlockUsageLocator(
             course_id=new_style_course_id,
-            usage_id='problem2'
+            usage_id='problem2',
+            branch='published'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertIsNone(prob_location, 'found entry in empty map table')
@@ -265,7 +266,9 @@ class TestLocationMapper(unittest.TestCase):
         # default branch
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         # explicit branch
-        prob_locator = BlockUsageLocator(prob_locator, branch='draft')
+        prob_locator = BlockUsageLocator(
+            course_id=prob_locator.course_id, branch='draft', usage_id=prob_locator.usage_id
+        )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', 'draft'))
         prob_locator = BlockUsageLocator(
@@ -276,12 +279,13 @@ class TestLocationMapper(unittest.TestCase):
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
             course_id=new_style_course_id,
-            usage_id='chapter48f'
+            usage_id='chapter48f',
+            branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
         # explicit branch
-        chap_locator = BlockUsageLocator(chap_locator, branch='draft')
+        chap_locator.branch = 'draft'
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
@@ -382,7 +386,7 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(new_usage_id, new_usage_id2)
         # it should be in the distractor now
         new_location = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id, usage_id=new_usage_id2)
+            BlockUsageLocator(course_id=new_style_course_id, usage_id=new_usage_id2, branch='published')
         )
         self.assertEqual(new_location, location)
         # add one close to the existing chapter (cause name collision)
@@ -391,11 +395,15 @@ class TestLocationMapper(unittest.TestCase):
         self.assertRegexpMatches(new_usage_id, r'^chapter48f\d')
         # retrievable from both courses
         new_location = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id, usage_id=new_usage_id)
+            BlockUsageLocator(course_id=new_style_course_id, usage_id=new_usage_id, branch='published')
         )
         self.assertEqual(new_location, location)
         new_location = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id='{}.{}.{}'.format(org, course, 'baz_run'), usage_id=new_usage_id)
+            BlockUsageLocator(
+                course_id='{}.{}.{}'.format(org, course, 'baz_run'),
+                usage_id=new_usage_id,
+                branch='published'
+            )
         )
         self.assertEqual(new_location, location)
 
@@ -443,11 +451,11 @@ class TestLocationMapper(unittest.TestCase):
         # change in all courses to same value
         loc_mapper().update_block_location_translator(location, 'problem1')
         trans_loc = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id, usage_id='problem1')
+            BlockUsageLocator(course_id=new_style_course_id, usage_id='problem1', branch='published')
         )
         self.assertEqual(trans_loc, location)
         trans_loc = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id2, usage_id='problem1')
+            BlockUsageLocator(course_id=new_style_course_id2, usage_id='problem1', branch='published')
         )
         self.assertEqual(trans_loc, location)
         # try to change to overwrite used usage_id
@@ -457,12 +465,12 @@ class TestLocationMapper(unittest.TestCase):
         # just change the one course
         loc_mapper().update_block_location_translator(location, 'chapter2', '{}/{}/{}'.format(org, course, 'baz_run'))
         trans_loc = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id, usage_id='chapter2')
+            BlockUsageLocator(course_id=new_style_course_id, usage_id='chapter2', branch='published')
         )
         self.assertEqual(trans_loc.name, '48f23a10395384929234')
         # but this still points to the old
         trans_loc = loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id2, usage_id='chapter2')
+            BlockUsageLocator(course_id=new_style_course_id2, usage_id='chapter2', branch='published')
         )
         self.assertEqual(trans_loc.name, '1')
 
@@ -496,10 +504,10 @@ class TestLocationMapper(unittest.TestCase):
         # delete from all courses
         loc_mapper().delete_block_location_translator(location)
         self.assertIsNone(loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id, usage_id='problem1')
+            BlockUsageLocator(course_id=new_style_course_id, usage_id='problem1', branch='published')
         ))
         self.assertIsNone(loc_mapper().translate_locator_to_location(
-            BlockUsageLocator(course_id=new_style_course_id2, usage_id='problem2')
+            BlockUsageLocator(course_id=new_style_course_id2, usage_id='problem2', branch='published')
         ))
         # delete from one course
         location = location.replace(name='abc123')

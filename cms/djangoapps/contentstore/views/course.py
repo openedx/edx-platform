@@ -60,7 +60,7 @@ __all__ = ['create_new_course', 'course_info', 'course_handler',
 
 
 @login_required
-def course_handler(request, course_url):
+def course_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
@@ -84,7 +84,10 @@ def course_handler(request, course_url):
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
-        elif not has_access(request.user, BlockUsageLocator(course_url)):
+        elif not has_access(
+            request.user,
+            BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        ):
             raise PermissionDenied()
         elif request.method == 'POST':
             raise NotImplementedError()
@@ -95,7 +98,7 @@ def course_handler(request, course_url):
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        return course_index(request, course_url)
+        return course_index(request, course_id, branch, version_guid, block)
     else:
         return HttpResponseNotFound()
 
@@ -108,18 +111,18 @@ def old_course_index_shim(request, org, course, name):
     """
     old_location = Location(['i4x', org, course, 'course', name])
     locator = loc_mapper().translate_location(old_location.course_id, old_location, False, True)
-    return course_index(request, locator)
+    return course_index(request, locator.course_id, locator.branch, locator.version_guid, locator.usage_id)
 
 
 @login_required
 @ensure_csrf_cookie
-def course_index(request, course_url):
+def course_index(request, course_id, branch, version_guid, block):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = BlockUsageLocator(course_url)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
     # TODO: when converting to split backend, if location does not have a usage_id,
     # we'll need to get the course's root block_id
     if not has_access(request.user, location):

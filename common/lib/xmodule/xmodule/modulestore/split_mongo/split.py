@@ -234,7 +234,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             version_guid = index['versions'][course_locator.branch]
             if course_locator.version_guid is not None and version_guid != course_locator.version_guid:
                 # This may be a bit too touchy but it's hard to infer intent
-                raise VersionConflictError(course_locator, CourseLocator(course_locator, version_guid=version_guid))
+                raise VersionConflictError(course_locator, version_guid)
         else:
             # TODO should this raise an exception if branch was provided?
             version_guid = course_locator.version_guid
@@ -1005,7 +1005,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 self._update_head(index_entry, xblock.location.branch, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
-            return self.get_item(BlockUsageLocator(xblock.location, version_guid=new_id))
+            return self.get_item(
+                BlockUsageLocator(
+                    course_id=xblock.location.course_id,
+                    usage_id=xblock.location.usage_id,
+                    branch=xblock.location.branch,
+                    version_guid=new_id
+                )
+            )
         else:
             return xblock
 
@@ -1364,10 +1371,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             else:
                 raise VersionConflictError(
                     locator,
-                    CourseLocator(
-                        course_id=index_entry['_id'],
-                        version_guid=index_entry['versions'][locator.branch],
-                        branch=locator.branch))
+                    index_entry['versions'][locator.branch]
+                )
 
     def _version_structure(self, structure, user_id):
         """
