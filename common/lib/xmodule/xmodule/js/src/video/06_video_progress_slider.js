@@ -117,11 +117,7 @@ function () {
         // If end is set to null, then we set it to the end of the video. We
         // know that start is not a the beginning, therefore we must build a
         // range.
-        if (!this.config.end) {
-            end = params.duration;
-        } else {
-            end = this.config.end;
-        }
+        end = this.config.end || params.duration;
 
         left = (100 * (start / params.duration)).toFixed(1);
         width = (100 * ((end - start) / params.duration)).toFixed(1);
