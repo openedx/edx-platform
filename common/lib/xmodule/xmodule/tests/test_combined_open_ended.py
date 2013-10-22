@@ -987,16 +987,19 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     script_clean = u'alert("xss!")'
     img_dirty = u'<img alt="cats" height="200" onclick="eval()" src="http://example.com/lolcats.jpg" width="200">'
     img_clean = u'<img alt="cats" height="200" src="http://example.com/lolcats.jpg" width="200">'
-    embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200">'
+    embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200"/>'
     embed_clean = u'<embed height="200" id="cats" src="http://example.com/lolcats.swf" width="200">'
-    iframe_dirty = u'<img class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200">'
-    iframe_clean = u'<img class="cats" height="200" src="http://example.com/lolcats" width="200">'
+    iframe_dirty = u'<iframe class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200"/>'
+    iframe_clean = u'<iframe class="cats" height="200" src="http://example.com/lolcats" width="200"></iframe>'
 
     text = u'I am a \u201c\xfcber student\u201d'
     text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
     text_lessthan_encode = u'This used to be broken &lt; by the other parser. 3&gt;5'
     text_linebreaks = u"St\xfcdent submission:\nI like lamp."
     text_brs = u"St\xfcdent submission:<br/>I like lamp."
+
+    link_text = u'I love going to www.lolcatz.com'
+    link_atag = u'I love going to <a href="http://www.lolcatz.com" target="_blank">www.lolcatz.com</a>'
 
     def test_script(self):
         """
@@ -1039,3 +1042,27 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
         tests the replace_newlines function
         """
         self.assertEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
+
+    def test_linkify(self):
+        """
+        tests the replace_newlines function
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
+
+    def test_combined(self):
+        """
+        tests a combination of inputs
+        """
+        test_input = u"{}\n{}\n{}\n\n{}{}\n{}".format(self.link_text,
+                                                      self.text,
+                                                      self.script_dirty,
+                                                      self.embed_dirty,
+                                                      self.text_lessthan_noencd,
+                                                      self.img_dirty)
+        test_output = u"{}<br/>{}<br/>{}<br/><br/>{}{}<br/>{}".format(self.link_atag,
+                                                                      self.text,
+                                                                      self.script_clean,
+                                                                      self.embed_clean,
+                                                                      self.text_lessthan_encode,
+                                                                      self.img_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(test_input), test_output)
