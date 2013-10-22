@@ -111,4 +111,5 @@ git+https://github.com/mitocw/django-cas.git
 
 # Only for memory debugging
 dowser==0.1
+Cython==0.19.2
 meliae==0.4.0
