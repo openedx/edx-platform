@@ -59,9 +59,9 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
         return msg
 
     if is_using_mongo:
-        acscript = getattr(settings, 'CMS_ADD_COURSE_SCRIPT', '')
+        acscript = getattr(settings, 'GIT_ADD_COURSE_SCRIPT', '')
         if not acscript or not os.path.exists(acscript):
-            msg = "<font color='red'>{0}</font>".format(_('Must configure CMS_ADD_COURSE_SCRIPT in settings first!'))
+            msg = "<font color='red'>{0} - {1}</font>".format(_('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
             return msg
         
         # Attempt to use the same cms settings as we have in lms (cms has import, and lms does not)
@@ -439,7 +439,7 @@ def sysadmin_dashboard(request):
     return render_to_response('sysadmin_dashboard.html', context)
     
 #-----------------------------------------------------------------------------
-
+@staff_member_required
 def view_git_logs(request, course_id=None):
 
     import mongoengine  # don't import that until we need it, here
