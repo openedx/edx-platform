@@ -144,7 +144,7 @@ def _send_course_email(email_id, to_list, course_title, course_url, image_url, t
     subject = "[" + course_title + "] " + msg.subject
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = _(u'{title} Course Staff <{email}>').format(title = course_title_no_quotes, email = settings.DEFAULT_BULK_FROM_EMAIL)
+    from_addr = u'"{title}" Преподаватель курса <{email}>'.format(title = course_title_no_quotes, email = settings.DEFAULT_BULK_FROM_EMAIL)
 
     course_email_template = CourseEmailTemplate.get_template()
 
