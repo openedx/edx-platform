@@ -127,15 +127,15 @@ function () {
         width = (100 * ((end - start) / params.duration)).toFixed(1);
 
         if (!this.videoProgressSlider.sliderRange) {
-            this.videoProgressSlider.sliderRange = $('<div />')
-                .addClass('ui-slider-range')
-                .addClass('ui-widget-header')
-                .addClass('ui-corner-all')
-                .addClass('slider-range')
-                .css({
-                    left: left + '%',
-                    width: width + '%'
-                });
+            this.videoProgressSlider.sliderRange = $('<div />', {
+                class: 'ui-slider-range ' +
+                       'ui-widget-header ' +
+                       'ui-corner-all ' +
+                       'slider-range'
+            }).css({
+                left: left + '%',
+                width: width + '%'
+            });
 
             this.videoProgressSlider.sliderProgress
                 .after(this.videoProgressSlider.sliderRange);
