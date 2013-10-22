@@ -2,13 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2013-10-18 17:34+0400\n"
-"PO-Revision-Date: 2013-10-14 17:14+0400\n"
-=======
 "POT-Creation-Date: 2013-10-18 17:55+0400\n"
 "PO-Revision-Date: 2013-10-18 17:54+0300\n"
->>>>>>> feature/master-class
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3828,22 +3823,8 @@ msgid "Maximum number of words to be displayed in generated word cloud."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:59
-<<<<<<< HEAD
-#, fuzzy
 msgid "Whether this student has been register for this master class."
-msgstr "Может ли студент сдавать файлы в качестве ответа."
-
-#: common/lib/xmodule/xmodule/master_class_module.py:64
-msgid "All registrations from all students."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/master_class_module.py:68
-#, fuzzy
-msgid "Passed registrations."
-msgstr "Форма регистрации"
-=======
-msgid "Whether this student has been register for this master class."
-msgstr "Является ли это студент был зарегистрированны на этом мастер-классе."
+msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:64
 msgid "All registrations from all students."
@@ -3852,29 +3833,22 @@ msgstr "Все регистрации от всех студентов."
 #: common/lib/xmodule/xmodule/master_class_module.py:68
 msgid "Passed registrations."
 msgstr "Прошедшие регистрацию."
->>>>>>> feature/master-class
 
 #: common/lib/xmodule/xmodule/master_class_module.py:89
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
 msgstr ""
-<<<<<<< HEAD
-=======
-"Вы зарегистрированны на мастер-класс. Мы сообщим дополнительную информацию в "
+"Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
->>>>>>> feature/master-class
 
 #: common/lib/xmodule/xmodule/master_class_module.py:91
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
 msgstr ""
-<<<<<<< HEAD
-=======
 "Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
 "данную страницу позже для результатов."
->>>>>>> feature/master-class
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:632
 msgid "Could not contact the graders.  Please notify course staff."
@@ -5716,29 +5690,6 @@ msgstr "войти с помощью OpenID"
 msgid "Home"
 msgstr "Главная страница"
 
-<<<<<<< HEAD
-#: lms/templates/master_class.html:23
-#, fuzzy
-msgid "Passed registration:"
-msgstr "Форма регистрации"
-
-#: lms/templates/master_class.html:24
-msgid "Total places:"
-msgstr ""
-
-#: lms/templates/master_class.html:29
-#, fuzzy
-msgid "Staff Inforamtion"
-msgstr "Основная информация"
-
-#: lms/templates/master_class.html:30
-msgid "Students pending registration"
-msgstr ""
-
-#: lms/templates/master_class.html:38
-msgid "Students passed registration"
-msgstr ""
-=======
 #: lms/templates/master_class.html:17 lms/templates/register.html:201
 msgid "Register"
 msgstr "Регистрация"
@@ -5762,7 +5713,6 @@ msgstr "Студенты ожидащие регистрацию"
 #: lms/templates/master_class.html:38
 msgid "Students passed registration"
 msgstr "Студенты прошедшие регистарцию"
->>>>>>> feature/master-class
 
 #: lms/templates/mathjax_accessible.html:5
 msgid ""
@@ -6020,7 +5970,6 @@ msgstr ""
 msgid "Optional Personal Information"
 msgstr "Дополнительная информация о пользователе"
 
-<<<<<<< HEAD
 #: lms/templates/register.html:201
 #: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
 #: lms/templates/university_profile/edge.html.BASE.21781.html:135
@@ -6029,8 +5978,6 @@ msgstr "Дополнительная информация о пользоват�
 msgid "Register"
 msgstr "Регистрация"
 
-=======
->>>>>>> feature/master-class
 #: lms/templates/register.html:208
 msgid "Registration Help"
 msgstr "Помощь по регистрации"
@@ -11741,12 +11688,9 @@ msgstr ""
 #~ msgid "Create my {platform_name} Account"
 #~ msgstr "Создать мой аккаунт в {platform_name}"
 
-<<<<<<< HEAD
 #~ msgid "(Show)"
 #~ msgstr "Показать"
 
-=======
->>>>>>> feature/master-class
 #~ msgid "e.g. 9999"
 #~ msgstr "например 9999"
 

@@ -45,7 +45,7 @@ def get_course_updates(location):
                 # could enforce that update[0].tag == 'h2'
                 content = update[0].tail
             else:
-                content = "\n".join([html.tostring(ele) for ele in update[1:]])
+                content = "\n".join([html.tostring(ele, encoding=unicode) for ele in update[1:]])
 
             # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
             course_upd_collection.append({"id": location_base + "/" + str(len(course_html_parsed) - idx),
@@ -101,13 +101,13 @@ def update_course_updates(location, update, passed_id=None):
         passed_id = course_updates.location.url() + "/" + str(idx)
 
     # update db record
-    course_updates.data = html.tostring(course_html_parsed)
+    course_updates.data = html.tostring(course_html_parsed, encoding=unicode)
     modulestore('direct').update_item(location, course_updates.data)
 
     if (len(new_html_parsed) == 1):
         content = new_html_parsed[0].tail
     else:
-        content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
+        content = "\n".join([html.tostring(ele, encoding=unicode) for ele in new_html_parsed[1:]])
 
     return {"id": passed_id,
             "date": update['date'],
@@ -145,7 +145,7 @@ def delete_course_update(location, update, passed_id):
             course_html_parsed.remove(element_to_delete)
 
         # update db record
-        course_updates.data = html.tostring(course_html_parsed)
+        course_updates.data = html.tostring(course_html_parsed, encoding=unicode)
         store = modulestore('direct')
         store.update_item(location, course_updates.data)
 
