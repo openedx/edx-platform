@@ -1001,3 +1001,65 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         self.assertTrue(response['success'])
         self.assertIn(self.answer_link, response['student_response'])
         self.assertIn(self.autolink_tag, response['student_response'])
+
+
+class OpenEndedModuleUtilTest(unittest.TestCase):
+    """
+    Tests for the util functions of OpenEndedModule.  Currently just for the html_sanitizer and <br/> inserter
+    """
+    script_dirty = u'<script>alert("xss!")</script>'
+    script_clean = u'alert("xss!")'
+    img_dirty = u'<img alt="cats" height="200" onclick="eval()" src="http://example.com/lolcats.jpg" width="200">'
+    img_clean = u'<img alt="cats" height="200" src="http://example.com/lolcats.jpg" width="200">'
+    embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200">'
+    embed_clean = u'<embed height="200" id="cats" src="http://example.com/lolcats.swf" width="200">'
+    iframe_dirty = u'<img class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200">'
+    iframe_clean = u'<img class="cats" height="200" src="http://example.com/lolcats" width="200">'
+
+    text = u'I am a \u201c\xfcber student\u201d'
+    text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
+    text_lessthan_encode = u'This used to be broken &lt; by the other parser. 3&gt;5'
+    text_linebreaks = u"St\xfcdent submission:\nI like lamp."
+    text_brs = u"St\xfcdent submission:<br/>I like lamp."
+
+    def test_script(self):
+        """
+        Basic test for stripping <script>
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
+
+    def test_img(self):
+        """
+        Basic test for passing through img, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
+
+    def test_embed(self):
+        """
+        Basic test for passing through embed, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
+
+    def test_iframe(self):
+        """
+        Basic test for passing through iframe, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
+
+    def test_text(self):
+        """
+        Test for passing through text unchanged, including unicode
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text), self.text)
+
+    def test_lessthan(self):
+        """
+        Tests that `<` in text context is handled properly
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
+
+    def test_linebreaks(self):
+        """
+        tests the replace_newlines function
+        """
+        self.assertEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
