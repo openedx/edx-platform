@@ -20,6 +20,7 @@ import datetime
 import mongoengine  # used to store import log
 import json
 import StringIO
+import logging
 
 from path import path
 
@@ -28,6 +29,8 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
+
+log = logging.getLogger(__name__)
 
 GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
@@ -62,16 +65,17 @@ class CourseImportLog(mongoengine.Document):
 def add_repo(repo, rdir_in):
 
     if not os.path.isdir(GIT_REPO_DIR):
-        print(_("Path {0} doesn't exist, please create it, or configure a " \
+        log.critical(_("Path {0} doesn't exist, please create it, or configure a " \
                 "different path with GIT_REPO_DIR").format(GIT_REPO_DIR))
         sys.exit(1)
 
     # -----------------------------------------------------------------------------
     # pull from git
-    m = re.match('git@[^ ]+\.git', repo)
-    if not m:
-        print(_('Oops, not a git ssh url?'))
-        print(_('Expecting something like git@github.com:mitocw/edx4edx_lite.git'))
+    if not (repo.endswith('.git') or repo.startswith('http:') or
+       repo.startswith('https:') or repo.startswith('git:')):
+
+        log.error(_('Oops, not a git ssh url?'))
+        log.error(_('Expecting something like git@github.com:mitocw/edx4edx_lite.git'))
         sys.exit(-1)
 
     if rdir_in:
@@ -80,21 +84,21 @@ def add_repo(repo, rdir_in):
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
 
-    print('rdir = {0}'.format(rdir))
+    log.debug('rdir = {0}'.format(rdir))
 
     rdirp = '{0}/{1}'.format(GIT_REPO_DIR, rdir)
     if os.path.exists(rdirp):
-        print(_('directory already exists, doing a git pull instead of git clone'))
+        log.info(_('directory already exists, doing a git pull instead of git clone'))
         cmd = 'cd {0}/{1}; git pull'.format(GIT_REPO_DIR, rdir)
     else:
         cmd = 'cd {0}; git clone "{1}"'.format(GIT_REPO_DIR, repo)
 
-    print(cmd)
+    log.debug(cmd)
     ret_git = os.popen(cmd).read()
-    print(ret_git)
+    log.debug(ret_git)
 
     if not os.path.exists('{0}/{1}'.format(GIT_REPO_DIR, rdir)):
-        print(_('git clone failed!'))
+        log.error(_('git clone failed!'))
         sys.exit(-1)
 
     # get commit id
@@ -110,45 +114,48 @@ def add_repo(repo, rdir_in):
 
     ret_git += '   \nBranch: {0}'.format(branch)
 
-    # -----------------------------------------------------------------------------
-    # 
+    # Get XML logging logger and capture debug to parse results
     output = StringIO.StringIO()
+    import_logger = logging.getLogger('xmodule.modulestore.xml_importer')
+    import_log_handler = logging.StreamHandler(output)
+    import_log_handler.setLevel(logging.DEBUG)
+    import_logger.addHandler(import_log_handler)
     try:
-        management.call_command('import', GIT_REPO_DIR, rdir, nostatic=not GIT_IMPORT_STATIC, stdout=output)
+        management.call_command('import', GIT_REPO_DIR, rdir, 
+                                nostatic=not GIT_IMPORT_STATIC)
     except CommandError, e:
-        print(_('Unable to run import command (likely because using lms settings), switch to cms settings.'))
-        print(_('Error was {0}').format(str(e)))
+        log.critical(_('Unable to run import command (likely because using lms ' \
+                'settings), switch to cms settings.'))
+        log.critical(_('Error was {0}').format(str(e)))
         sys.exit(1)
 
-    ret_import = output.getvalue()
-    print(ret_import)
-
+    ret_import = output.getvalue()    
+    
     course_id = 'unknown'
     location = 'unknown'
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
-
     m = re.search('(?ms)===> IMPORTING course to location ([^ \n]+)',
                   ret_import)
     if m:
         location = m.group(1).strip()
-        print('location = {0}'.format(location))
+        log.debug('location = {0}'.format(location))
         course_id = location.replace('i4x://', '').replace('/course/', '/'
                 ).split('\n')[0].strip()
 
         cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_id.split('/')[1])
-        print(_('Studio course dir = {0}').format(cdir))
+        log.debug(_('Studio course dir = {0}').format(cdir))
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
-            print(_('   -> exists, but is not symlink'))
-            print(os.popen('ls -l {0}'.format(cdir)).read())
-            print(os.popen('rmdir {0}'.format(cdir)).read())
+            log.debug(_('   -> exists, but is not symlink'))
+            log.debug(os.popen('ls -l {0}'.format(cdir)).read())
+            log.debug(os.popen('rmdir {0}'.format(cdir)).read())
 
         if not os.path.exists(cdir):
-            print(_('   -> creating symlink'))
-            print(os.popen('ln -s {0} {1}'.format(rdirp, cdir)).read())
-            print(os.popen('ls -l {0}'.format(cdir)).read())
+            log.debug(_('   -> creating symlink'))
+            log.debug(os.popen('ln -s {0} {1}'.format(rdirp, cdir)).read())
+            log.debug(os.popen('ls -l {0}'.format(cdir)).read())
 
 
     # -----------------------------------------------------------------------------
@@ -161,9 +168,9 @@ def add_repo(repo, rdir_in):
                                   password=mongo_db['password']
                               )
     except mongoengine.connection.ConnectionError, e:
-        print(_('Unable to connect to mongodb to save log, please check ' \
+        log.critical(_('Unable to connect to mongodb to save log, please check ' \
                 'MONGODB_LOG settings'))
-        print(_('Error was: {0}').format(str(e)))
+        log.critical(_('Error was: {0}').format(str(e)))
         sys.exit(1)
 
 
