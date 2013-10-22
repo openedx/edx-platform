@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-18 17:55+0400\n"
-"PO-Revision-Date: 2013-10-22 18:09+0400\n"
+"PO-Revision-Date: 2013-10-22 18:15+0400\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -6967,11 +6967,11 @@ msgstr "Дополнительные ресурсы"
 #: lms/templates/courseware/course_navigation.html:42
 #: lms/templates/courseware/course_navigation.html:58
 msgid "Staff view"
-msgstr "Для персонала"
+msgstr "Для преподавателей"
 
 #: lms/templates/courseware/course_navigation.html:56
 msgid "Student view"
-msgstr "Вид студента"
+msgstr "Для студентов"
 
 #: lms/templates/courseware/courseware-error.html:16
 msgid ""
