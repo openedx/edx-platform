@@ -35,7 +35,7 @@
           $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+          xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')}"
         ).stop().css("display", "block");
       }
     });
@@ -56,11 +56,10 @@
                {"new_email" : new_email, "password" : new_password},
                function(data) {
                  if (data.success) {
-                   $("#change_email_title").html("Please verify your new email");
-                   $("#change_email_form").html("<p>You'll receive a confirmation in your " +
-                                                "in-box. Please click the link in the " +
-                                                "email to confirm the email change.</p>");
-                   $("#change_email_form").html("<p>${_('You\'ll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.')}</p>");
+                   $("#change_email_title").html("${_('Please verify your new email')}");
+                   $("#change_email_form").html("<p>${_(('You\'ll receive a confirmation in your in-box.'
+                                                    ' Please click the link in the email to confirm'
+                                                    ' the email change.'))}</p>");
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -77,7 +76,6 @@
              function(data) {
                if(data.success) {
                  location.reload();
-                 // $("#change_name_body").html("<p>Name changed.</p>");
                } else {
                  $("#change_name_error").html(data.error).stop().css("display", "block");
                }
