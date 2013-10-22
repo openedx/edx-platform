@@ -186,8 +186,7 @@ function () {
             (!this.videoProgressSlider.frozen)
         ) {
             this.videoProgressSlider.slider
-                .slider('option', 'max', params.duration);
-            this.videoProgressSlider.slider
+                .slider('option', 'max', params.duration)
                 .slider('option', 'value', params.time);
         }
     }
