@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-18 17:55+0400\n"
-"PO-Revision-Date: 2013-10-18 17:54+0300\n"
-"Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
+"PO-Revision-Date: 2013-10-22 17:06+0400\n"
+"Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.5.7\n"
 "Generated-By: Babel 0.9.6\n"
 "X-POOTLE-MTIME: 1379946749.0\n"
 
@@ -5690,7 +5690,12 @@ msgstr "войти с помощью OpenID"
 msgid "Home"
 msgstr "Главная страница"
 
-#: lms/templates/master_class.html:17 lms/templates/register.html:201
+#: lms/templates/register.html:201
+#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
+#: lms/templates/university_profile/edge.html.BASE.21781.html:135
+#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
+#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
+#: lms/templates/master_class.html:17
 msgid "Register"
 msgstr "Регистрация"
 
@@ -5969,14 +5974,6 @@ msgstr ""
 #: lms/templates/register.html:174
 msgid "Optional Personal Information"
 msgstr "Дополнительная информация о пользователе"
-
-#: lms/templates/register.html:201
-#: lms/templates/university_profile/edge.html.BACKUP.21781.html:140
-#: lms/templates/university_profile/edge.html.BASE.21781.html:135
-#: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
-#: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
-msgid "Register"
-msgstr "Регистрация"
 
 #: lms/templates/register.html:208
 msgid "Registration Help"
@@ -6770,6 +6767,10 @@ msgid ""
 "automatically, and will be returned within 30 minutes if the original is "
 "already graded, or when the original is graded if not."
 msgstr ""
+"Обратите внимание на то, что ответы дупликаты ответов будут оценены "
+"автоматически. Автоматическая оценка будет произведена в течение 30 минут с "
+"момента отсылки, либо, в случае отсутствия оценки оригинального ответа, "
+"когда будет получена оценка для оригинального ответа."
 
 #: lms/templates/combinedopenended/combined_open_ended_legend.html:4
 msgid "Legend"
