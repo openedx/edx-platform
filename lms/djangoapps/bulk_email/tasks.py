@@ -346,7 +346,7 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     # task that is resubmitted, but just in case we fail to do so there, we check here as well.
     # There is also a possibility that this task will be run twice by Celery, for the same reason.
     # To deal with that, we need to confirm that the task has not already been completed.
-    check_subtask_is_valid(entry_id, current_task_id)
+    check_subtask_is_valid(entry_id, current_task_id, subtask_status)
 
     send_exception = None
     new_subtask_status = None
