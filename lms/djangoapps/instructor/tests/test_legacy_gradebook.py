@@ -84,7 +84,6 @@ class TestGradebook(ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestDefaultGradingPolicy(TestGradebook):
 
-    @skip
     def test_all_users_listed(self):
         for user in self.users:
             self.assertIn(user.username, unicode(self.response.content, 'utf-8'))

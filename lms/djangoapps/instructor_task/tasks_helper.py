@@ -150,6 +150,17 @@ def _get_current_task():
     """
     return current_task
 
+def launch_memory_usage_server(port=9000):
+    import cherrypy
+    import dowser
+
+    cherrypy.tree.mount(dowser.Root())
+    cherrypy.config.update({
+        'environment': 'embedded',
+        'server.socket_port': port
+    })
+
+    cherrypy.engine.start()
 
 def run_main_task(entry_id, task_fcn, action_name):
     """
@@ -174,6 +185,7 @@ def run_main_task(entry_id, task_fcn, action_name):
           'duration_ms': how long the task has (or had) been running.
 
     """
+    launch_memory_usage_server()
 
     # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
     # There's no point in catching it here.
@@ -208,7 +220,7 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # write out a dump of memory usage at the end of this, to see what is left
     # around.  Enable it if it hasn't been explicitly disabled.
-    if action_name == 'graded' and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', False):
+    if action_name == 'graded' and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
         filename = "meliae_dump_{}.dat".format(task_id)
         # Hardcode the name of a dump directory to try to use.
         # If if doesn't exist, just continue to use the "local" directory.
@@ -216,10 +228,11 @@ def run_main_task(entry_id, task_fcn, action_name):
         if exists(dirname):
             filename = dirname + filename
         TASK_LOG.info('Dumping memory information to %s', filename)
-        scanner.dump_all_objects(filename)
+        # scanner.dump_all_objects(filename)
 
     # log and exit, returning task_progress info as task result:
     TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
+
     return task_progress
 
 
@@ -291,7 +304,8 @@ def perform_enrolled_student_update(update_fcn, _entry_id, course_id, _task_inpu
 
         # update task status:
         task_progress = get_task_progress()
-        _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+        if num_attempted % 1000 == 0:
+            _get_current_task().update_state(state=PROGRESS, meta=task_progress)
 
     return task_progress
 
@@ -553,160 +567,6 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
     track_function('problem_delete_state', {})
     return UPDATE_STATUS_SUCCEEDED
-
-
-# def update_students(entry_id, update_fcn, action_name, filter_fcn, xmodule_instance_args):
-#     """
-#     Performs generic update by visiting StudentModule instances with the update_fcn provided.
-#
-#     The `entry_id` is the primary key for the InstructorTask entry representing the task.  This function
-#     updates the entry on success and failure of the _perform_module_state_update function it
-#     wraps.  It is setting the entry's value for task_state based on what Celery would set it to once
-#     the task returns to Celery:  FAILURE if an exception is encountered, and SUCCESS if it returns normally.
-#     Other arguments are pass-throughs to _perform_module_state_update, and documented there.
-#
-#     If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
-#
-#           'attempted': number of attempts made
-#           'updated': number of attempts that "succeeded"
-#           'total': number of possible subtasks to attempt
-#           'action_name': user-visible verb to use in status messages.  Should be past-tense.
-#               Pass-through of input `action_name`.
-#           'duration_ms': how long the task has (or had) been running.
-#
-#     Before returning, this is also JSON-serialized and stored in the task_output column of the InstructorTask entry.
-#
-#     If an exception is raised internally, it is caught and recorded in the InstructorTask entry.
-#     This is also a JSON-serialized dict, stored in the task_output column, containing the following keys:
-#
-#            'exception':  type of exception object
-#            'message': error message from exception object
-#            'traceback': traceback information (truncated if necessary)
-#
-#     Once the exception is caught, it is raised again and allowed to pass up to the
-#     task-running level, so that it can also set the failure modes and capture the error trace in the
-#     result object that Celery creates.
-#
-#     """
-#
-#     # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
-#     # There's no point in catching it here.
-#     entry = InstructorTask.objects.get(pk=entry_id)
-#
-#     # get inputs to use in this task from the entry:
-#     task_id = entry.task_id
-#     course_id = entry.course_id
-#
-#     # TODO: no input expected.  Should we check?
-#     # task_input = json.loads(entry.task_input)
-#     # module_state_key = task_input.get('problem_url')
-#     # student_ident = task_input['student'] if 'student' in task_input else None
-#     # fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
-#     # TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
-#     fmt = 'Starting to update students as task "{task_id}": course "{course_id}": nothing {action} yet'
-#     TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, action=action_name))
-#
-#     # Now that we have an entry we can try to catch failures:
-#     task_progress = None
-#     try:
-#         # Check that the task_id submitted in the InstructorTask matches the current task
-#         # that is running.
-#         request_task_id = _get_current_task().request.id
-#         if task_id != request_task_id:
-#             # TODO: Provide course information here?!
-#             fmt = 'Requested task "{task_id}" did not match actual task "{actual_id}"'
-#             # TODO: state_key not in message!
-#             # message = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, actual_id=request_task_id)
-#             message = fmt.format(task_id=task_id, course_id=course_id, actual_id=request_task_id)
-#             TASK_LOG.error(message)
-#             raise UpdateProblemModuleStateError(message)
-#
-#         # Now do the work:
-#         with dog_stats_api.timer('instructor_tasks.module.time.overall', tags=['action:{name}'.format(name=action_name)]):
-#             task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
-#                                                          action_name, filter_fcn, xmodule_instance_args)
-#         # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
-#         # But we do this within the try, in case creating the task_output causes an exception to be
-#         # raised.
-#         entry.task_output = InstructorTask.create_output_for_success(task_progress)
-#         entry.task_state = SUCCESS
-#         entry.save_now()
-#
-#     except Exception:
-#         # try to write out the failure to the entry before failing
-#         _, exception, traceback = exc_info()
-#         traceback_string = format_exc(traceback) if traceback is not None else ''
-#         TASK_LOG.warning("background task (%s) failed: %s %s", task_id, exception, traceback_string)
-#         entry.task_output = InstructorTask.create_output_for_failure(exception, traceback_string)
-#         entry.task_state = FAILURE
-#         entry.save_now()
-#         raise
-#
-#     # log and exit, returning task_progress info as task result:
-#     fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'
-#     TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, progress=task_progress))
-#     return task_progress
-#
-#
-# import json
-# import time
-#
-# from json import JSONEncoder
-# from courseware import grades, models
-# from courseware.courses import get_course_by_id
-# from django.contrib.auth.models import User
-#
-#
-# class MyEncoder(JSONEncoder):
-#
-#     def _iterencode(self, obj, markers=None):
-#         if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
-#             gen = self._iterencode_dict(obj._asdict(), markers)
-#         else:
-#             gen = JSONEncoder._iterencode(self, obj, markers)
-#         for chunk in gen:
-#             yield chunk
-#
-#
-# def offline_grade_calculation(course_id):
-#     '''
-#     Compute grades for all students for a specified course, and save results to the DB.
-#     '''
-#
-#     tstart = time.time()
-#     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
-#
-#     enc = MyEncoder()
-#
-#     class DummyRequest(object):
-#         META = {}
-#         def __init__(self):
-#             return
-#         def get_host(self):
-#             return 'edx.mit.edu'
-#         def is_secure(self):
-#             return False
-#
-#     request = DummyRequest()
-#
-#     print "%d enrolled students" % len(enrolled_students)
-#     course = get_course_by_id(course_id)
-#
-#     for student in enrolled_students:
-#         gradeset = grades.grade(student, request, course, keep_raw_scores=True)
-#         gs = enc.encode(gradeset)
-#         ocg, created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_id)
-#         ocg.gradeset = gs
-#         ocg.save()
-#         print "%s done" % student      # print statement used because this is run by a management command
-#
-#     tend = time.time()
-#     dt = tend - tstart
-#
-#     ocgl = models.OfflineComputedGradeLog(course_id=course_id, seconds=dt, nstudents=len(enrolled_students))
-#     ocgl.save()
-#     print ocgl
-#     print "All Done!"
 
 
 class GradingJSONEncoder(JSONEncoder):

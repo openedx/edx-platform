@@ -529,7 +529,6 @@ class TestOfflineGradeInstructorTask(TestInstructorTasks):
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(update_offline_grades, task_entry.id, task_entry.task_id)
 
-    @skip
     def test_grade_with_some_state(self):
         input_state = json.dumps({'done': True})
         num_students = 10
