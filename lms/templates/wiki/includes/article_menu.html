@@ -9,7 +9,7 @@
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-home icon"></span>
     View
-    ${"<span class='sr'>(active)</span>" if selected_tab == "view" else ""}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "view" else ""}
   </a>
 </li>
 
@@ -18,7 +18,7 @@
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
       <span class="icon-edit icon"></span>
       Edit
-    ${"<span class='sr'>(active)</span>" if selected_tab == "edit" else ""}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "edit" else ""}
     </a>
   </li>
 %endif
@@ -27,7 +27,7 @@
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-changes icon"></span>
     Changes
-    ${"<span class='sr'>(active)</span>" if selected_tab == "history" else ""}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "history" else ""}
   </a>
 </li>
 
@@ -37,7 +37,7 @@
       <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
         <span class="${plugin.article_tab[1]} icon"></span>
         ${plugin.article_tab[0]}
-    ${"<span class='sr'>(active)</span>" if selected_tab == plugin.slug else ""}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == plugin.slug else ""}
       </a>
     </li>
   %endif
@@ -53,7 +53,7 @@ ${_("This should be enabled for all non-anonymous users once the notifications a
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-settings icon"></span>
     ${_("Settings")}
-    ${"<span class='sr'>(active)</span>" if selected_tab == "settings" else ""}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "settings" else ""}
   </a>
 </li>
 %endif
