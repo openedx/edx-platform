@@ -65,11 +65,11 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
             return msg
         
         # Attempt to use the same cms settings as we have in lms (cms has import, and lms does not)
-        bsi = os.environ['DJANGO_SETTINGS_MODULE'].rfind('.')
-        cms_settings = 'cms.envs{0}'.format(os.environ['DJANGO_SETTINGS_MODULE'][bsi:])
+        # bsi = os.environ['DJANGO_SETTINGS_MODULE'].rfind('.')
+        # cms_settings = 'cms.envs{0}'.format(os.environ['DJANGO_SETTINGS_MODULE'][bsi:])
 
-        cmd = 'DJANGO_SETTINGS_MODULE={3} PYTHONPATH=$PYTHONPATH:{2} {0} "{1}"'.format(
-            acscript, gitloc, getattr(settings, 'REPO_ROOT'), cms_settings)
+        cmd = 'PYTHONPATH=$PYTHONPATH:{2} {0} "{1}"'.format(
+            acscript, gitloc, getattr(settings, 'REPO_ROOT'))
 
         logging.debug(_('Adding course with command: {0}').format(cmd))
         ret = subprocess.Popen(cmd, shell=True, executable='/bin/bash',
