@@ -4,15 +4,75 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="bodyclass">register verification-process step-photos</%block>
-<%block name="title"><title>${_("Verification Submission Confirmation")}</title></%block>
+<%block name="bodyclass">register verification-process is-not-verified step-confirmation</%block>
+<%block name="title"><title>${_("Re-Verification Submission Confirmation")}</title></%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
 </%block>
 <%block name="content">
-<p>Successfully reverified!</p>
 
-<p><a href="${reverse('dashboard')}">Return to Dashboard</a></p>
+<div class="container">
+  <section class="wrapper">
+
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">${_("Your Progress")}</h3>
+
+        <ol class="progress-steps">
+          <li class="progress-step is-completed" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name">${_("Re-Take Photo")}</span>
+          </li>
+
+          <li class="progress-step is-completed" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">${_("Re-Take ID Photo")}</span>
+          </li>
+
+          <li class="progress-step is-completed" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">${_("Review")}</span>
+          </li>
+
+          <li class="progress-step is-current progress-step-icon" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Confirmation")}</span>
+          </li>
+        </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
+    </div>
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <section class="content-confirmation">
+          <div class="wrapper-view">
+            <div class="view">
+              <h3 class="title">${_("Your Credentials Have Been Updated")}</h3>
+
+              <div class="instruction">
+                <p>${_("We've captured your re-submitted information and will review it to verify your identity shortly. You should receive an update to your veriication status within 1-2 days. In the meantime, you still have access to all of your course content.")}</p>
+              </div>
+
+              <ol class="list-nav">
+                <li class="nav-item">
+                  <a class="action action-primary" href="${reverse('dashboard')}">${_("Return to Your Dashboard")}</a>
+                </li>
+              </ol>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+        </section>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_reverification_support.html" />
+  </section>
+</div>
 </%block>
