@@ -196,7 +196,7 @@ class RelativeTime(Field):
         if isinstance(value, float):  # backward compatibility
             if value > 86400:
                 value = 86400
-            return self._str(datetime.timedelta(seconds=value))
+            return self.timedelta_to_string(datetime.timedelta(seconds=value))
 
         if isinstance(value, datetime.timedelta):
             if value.total_seconds() > 86400:  # sanity check
@@ -204,18 +204,18 @@ class RelativeTime(Field):
                     "RelativeTime max value is 23:59:59=86400.0 seconds, "
                     "but {} seconds is passed".format(value.total_seconds())
                 )
-            return self._str(value)
+            return self.timedelta_to_string(value)
 
         raise TypeError("RelativeTime: cannot convert {!r} to json".format(value))
 
-    def _str(self, value):
+    def timedelta_to_string(self, value):
         """
         Makes first 'H' in str representation non-optional.
 
          str(timedelta) has [H]H:MM:SS format, which is not suitable
-         for front-end (and IsoTime standart), so we forse HH:MM:SS format.
+         for front-end (and ISO time standard), so we force HH:MM:SS format.
          """
-        string = str(value)
-        if len(string) == 7:
-            string = '0' + string
-        return string
+        stringified = str(value)
+        if len(stringified) == 7:
+            stringified = '0' + stringified
+        return stringified
