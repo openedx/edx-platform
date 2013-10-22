@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-18 17:55+0400\n"
+"POT-Creation-Date: 2013-10-22 18:34+0400\n"
 "PO-Revision-Date: 2013-10-22 18:15+0400\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -5712,7 +5712,6 @@ msgstr "Главная страница"
 #: lms/templates/university_profile/edge.html.BASE.21781.html:135
 #: lms/templates/university_profile/edge.html.LOCAL.21781.html:134
 #: lms/templates/university_profile/edge.html.REMOTE.21781.html:134
-#: lms/templates/master_class.html:17
 msgid "Register"
 msgstr "Регистрация"
 
