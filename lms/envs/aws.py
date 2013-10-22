@@ -102,6 +102,10 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+# STATIC_ROOT specifies the directory where static files are
+# collected
+STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT))
+
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
 CC_MERCHANT_NAME = ENV_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
