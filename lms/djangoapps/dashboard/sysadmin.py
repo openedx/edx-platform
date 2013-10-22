@@ -137,7 +137,7 @@ def fix_external_auth_map_passwords():
         msg = _('All ok!')
     return msg
 
-def create_user(uname, name, do_mit=False):
+def create_user(uname, name, password=None, do_mit=False):
 
     if not uname:
         return _('Must provide username')
@@ -162,14 +162,20 @@ def create_user(uname, name, do_mit=False):
                      ).format(email)
             return msg
         make_eamap = True
+        new_password = generate_password()
     else:
+        if not password:
+            return _('Password must be supplied if not using certificates')
+
         email = uname
+
         if not '@' in email:
             msg += _('email address required (not username)')
             return msg
-    password = generate_password()
+        new_password = password
+
     user = User(username=uname, email=email, is_active=True)
-    user.set_password(password)
+    user.set_password(new_password)
     try:
         user.save()
     except IntegrityError:
@@ -349,7 +355,9 @@ def sysadmin_dashboard(request):
     elif _('Create user') in action:
         uname = request.POST.get('student_uname', '').strip()
         name = request.POST.get('student_fullname', '').strip()
-        msg += create_user(uname, name, 
+        password = request.POST.get('student_password', '').strip()
+
+        msg += create_user(uname, name, password,
                            do_mit=settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'])
     elif _('Delete user') in action:
         uname = request.POST.get('student_uname', '').strip()
@@ -417,12 +425,13 @@ def sysadmin_dashboard(request):
         msg += get_course_from_git(gitloc, is_using_mongo, def_ms, datatable)
 
     else:	# default to showing status summary
-        msg += '<h2>{0}</h2>'.format(_('Courses loaded in the modulestore'))
-        msg += '<ol>'
-        for cdir, course in courses.items():
-            msg += '<li>{0} ({1})</li>'.format(escape(cdir),
-                    course.location.url())
-        msg += '</ol>'
+        if hasattr(courses, 'items'):
+            msg += '<h2>{0}</h2>'.format(_('Courses loaded in the modulestore'))
+            msg += '<ol>'
+            for cdir, course in courses.items():
+                msg += '<li>{0} ({1})</li>'.format(escape(cdir),
+                                                course.location.url())
+            msg += '</ol>'
 
     # ----------------------------------------
     # context for rendering
