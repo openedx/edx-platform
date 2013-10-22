@@ -137,7 +137,7 @@ urlpatterns += patterns(
     url(r'^course$', 'index'),
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
-    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>.+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
 )
 
 js_info_dict = {
