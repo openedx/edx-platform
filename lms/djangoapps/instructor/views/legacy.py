@@ -1,17 +1,16 @@
 """
 Instructor Views
 """
-from collections import defaultdict
 import csv
 import json
 import logging
-from markupsafe import escape
 import os
 import re
 import requests
-from requests.status_codes import codes
-from collections import OrderedDict
 
+from collections import defaultdict, OrderedDict
+from markupsafe import escape
+from requests.status_codes import codes
 from StringIO import StringIO
 
 from django.conf import settings
