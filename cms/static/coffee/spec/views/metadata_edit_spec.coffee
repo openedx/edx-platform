@@ -85,10 +85,10 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           default_value: "00:00:00",
           display_name: "Time",
           explicitly_set: true,
-          field_name: "iso_time",
+          field_name: "relative_time",
           help: "Specifies the name for this component.",
           options: [],
-          type: MetadataModel.ISO_TIME_TYPE,
+          type: MetadataModel.RELATIVE_TIME_TYPE,
           value: "12:12:12"
       }
 
