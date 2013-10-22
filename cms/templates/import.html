@@ -144,8 +144,8 @@
 <%block name="jsextra">
 <script>
 require(
-        ["js/views/import", "jquery", "jquery.fileupload"],
-        function(CourseImport, $) {
+        ["js/views/import", "jquery", "gettext", "jquery.fileupload"],
+        function(CourseImport, $, gettext) {
 
 var file;
 var bar = $('.progress-bar');
@@ -188,6 +188,10 @@ $('#fileupload').fileupload({
                     CourseImport.stopGetStatus = true;
                     window.onbeforeunload = null;
                     if (xhr.status != 200) {
+                        if (!result.responseText) {
+                            alert(gettext("Your import may have failed. Please check your course and try again if necessary."));
+                            return;
+                        }
                         var serverMsg = $.parseJSON(result.responseText);
                         var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg.ErrMsg : "" ;
                         if (serverMsg.hasOwnProperty("Stage")) {
