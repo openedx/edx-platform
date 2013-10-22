@@ -46,19 +46,19 @@ class CapaShuffleTest(unittest.TestCase):
         xml_str = textwrap.dedent("""
             <problem>
                 <p>What is the correct answer?</p>
-                <multiplechoiceresponse gradiance="true" targetedSolutions="true">
+                <multiplechoiceresponse answer-pool="true" targeted-feedback="true">
                   <choicegroup type="MultipleChoice">
-                    <choice correct="false" solutionid="solution1w">wrong-1</choice>
-                    <choice correct="false" solutionid="solution2w">wrong-2</choice>
-                    <choice correct="true" solutionid="solution1">correct-1</choice>
-                    <choice correct="false" solutionid="solution3w">wrong-3</choice>
-                    <choice correct="false" solutionid="solution4w">wrong-4</choice>
-                    <choice correct="true" solutionid="solution2">correct-2</choice>
+                    <choice correct="false" solution-id="solution1w">wrong-1</choice>
+                    <choice correct="false" solution-id="solution2w">wrong-2</choice>
+                    <choice correct="true" solution-id="solution1">correct-1</choice>
+                    <choice correct="false" solution-id="solution3w">wrong-3</choice>
+                    <choice correct="false" solution-id="solution4w">wrong-4</choice>
+                    <choice correct="true" solution-id="solution2">correct-2</choice>
                   </choicegroup>
                 </multiplechoiceresponse>
 
                 <solutionset>
-                    <solution solutionid="solution1">
+                    <solution solution-id="solution1">
                     <div class="detailed-solution" >
                         <p>Explanation</p>
 
@@ -67,7 +67,7 @@ class CapaShuffleTest(unittest.TestCase):
                     </div>
                     </solution>
 
-                    <solution solutionid="solution2">
+                    <solution solution-id="solution2">
                     <div class="detailed-solution" >
                         <p>Explanation</p>
 
@@ -75,7 +75,7 @@ class CapaShuffleTest(unittest.TestCase):
                     </div>
                     </solution>
 
-                    <solution solutionid="solution1w">
+                    <solution solution-id="solution1w">
                     <div class="detailed-solution" >
                         <p>Explanation</p>
 
@@ -83,7 +83,7 @@ class CapaShuffleTest(unittest.TestCase):
                     </div>
                     </solution>
 
-                    <solution solutionid="solution2w">
+                    <solution solution-id="solution2w">
                     <div class="detailed-solution" >
                         <p>Explanation</p>
 

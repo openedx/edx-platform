@@ -444,7 +444,7 @@ class LoncapaProblem(object):
                 choicegroup.append(choice)
         return shuffled
 
-    def randomly_grab_gradiance_choices(self, choices):
+    def sample_from_answer_pool(self, choices):
         """
         Returns a list with 2 items:
             1. the solutionID corresponding with the chosen correct answer
@@ -471,7 +471,7 @@ class LoncapaProblem(object):
         ix = rnd.randint(0, len(correctChoices) - 1)
         correctChoice = correctChoices[ix]
         subsetChoices.append(correctChoice)
-        solutionID = correctChoice.get('solutionid')
+        solutionID = correctChoice.get('solution-id')
 
         # Add incorrect choices
         toAdd = 3
@@ -491,47 +491,62 @@ class LoncapaProblem(object):
 
         return [solutionID, subsetChoices]
 
-    def gradianced_tree(self, tree):
+    def answer_pool_tree(self, tree):
         """
-        Implements gradiance-style problems for problems with the attribute 'gradiance' set to true
+        Allows for problem questions with a pool of answers, from which answer options shown to the student
+        and randomly selected so that there is always 1 correct answer and 3 incorrect answers.
+        
+        The <multiplechoiceresponse> tag must have an attribute 'answer-pool' set to true
+          - if so, this method will return a modified version of the tree
+          - if not, this method will return 'None'
+
+        These problems are colloquially known as "Gradiance" problems.
         """
-        # import ipdb
-        # ipdb.set_trace()
 
-        gradianceProblemsQuery = '//multiplechoiceresponse[@gradiance="true"]'
+        query = '//multiplechoiceresponse[@answer-pool="true"]'
 
-        # There are no gradiance questions (by question, I mean multiplechoiceresponse tags)
-        if not tree.xpath(gradianceProblemsQuery):
+        # There are no questions with an answer pool
+        if not tree.xpath(query):
             return None
 
-        for multChoiceResponse in tree.xpath(gradianceProblemsQuery):
+        for multChoiceResponse in tree.xpath(query):
             # Does this multChoiceResponse have targeted solutions?
             # Targeted solutions = display an explanation based on the user's selected answer, not the correct answer
-            # Note: One could also imagine being able to show BOTH a nudge corresponding to the student's answer
-            #       as well as the explanation of the correct answer
-            hasTargetedSolutions = multChoiceResponse.get('targetedSolutions') == 'true'
+            #
+            # If 'targeted-feedback' is 'true', then ONLY targeted solutions will display
+            # If 'targeted-feedback' is 'both', then BOTH the targeted solution and correct solution will display
+            #
+            # Note: If the instructor wants correct answer solutions to display before user-chosen answers, then
+            # those <solution> tags should appear first within the <solutionset>
+            hasTargetedSolutions = multChoiceResponse.get('targeted-feedback') == 'true'
+            showBothSolutions = multChoiceResponse.get('targeted-feedback') == 'both'
 
-            # TODO: BELOW IS BAD... NEED TO FIND BY KEY!!
-            studentChoices = self.student_answers.values()
-            studentChoice = None
-            solutionIDForStudentChoice = None
-            if len(studentChoices) > 0:
-                studentChoice = studentChoices[0]
-            # TODO: ABOVE IS BAD... NEED TO FIND BY KEY!!
-
-            # Grab the first choicegroup (there should only be one for gradiance problems)
+            # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
             choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
+            choicegroupID = choicegroup.get('id')
             choicesList = list(choicegroup.iter('choice'))
+            
+            studentAnswer = None
+            solutionIDForStudentAnswer = None
+
+            # Find the student answer key that matches our <choicegroup> id
+            keysOfStudentAnswers = self.student_answers.keys()
+            for key in keysOfStudentAnswers:
+                if key == choicegroupID:
+                    studentAnswer = self.student_answers[key]
+                    break
 
             for choice in choicesList:
                 choicegroup.remove(choice)
 
-            [solutionID, subsetChoices] = self.randomly_grab_gradiance_choices(choicesList)
+            # Sample from the answer pool to get the subset choices and solution id
+            [solutionID, subsetChoices] = self.sample_from_answer_pool(choicesList)
 
             for choice in subsetChoices:
                 choicegroup.append(choice)
-                if choice.get('name') == studentChoice:
-                    solutionIDForStudentChoice = choice.get('solutionid')
+                # Keep track of the solution-id that corresponds to the student's answer
+                if choice.get('name') == studentAnswer:
+                    solutionIDForStudentAnswer = choice.get('solution-id')
 
             # import ipdb
             # ipdb.set_trace()
@@ -541,28 +556,16 @@ class LoncapaProblem(object):
                 solutionset = solutionset[0]
                 solutions = solutionset.xpath('./solution')
                 for solution in solutions:
-                    if not hasTargetedSolutions:
-                        if solution.get('solutionid') != solutionID:
-                            solutionset.remove(solution)
-                    else:
-                        if solutionIDForStudentChoice is None or solution.get('solutionid') != solutionIDForStudentChoice:
-                            solutionset.remove(solution)
+                    isNotStudentAnswerSolution = solution.get('solution-id') != solutionIDForStudentAnswer
+                    isNotCorrectAnswerSolution = solution.get('solution-id') != solutionID
 
-
-            # tree.remove(solution[0])
-
-            # Grab the solutions and only pick the one that matches the correct choice randomly chosen
-            # solution = multChoiceResponse.xpath('//solution')[0]
-            # solutionsList = list(solution.iter('div')) # TODO: it might not be a safe assumption to make...
-
-            # for solutionDIV in solutionsList:
-            #     solution.remove(solutionDIV)
-
-            # for solutionDIV in solutionsList:
-            #     # If solutionDIV does not have the correct solutionID, remove that <div> element
-            #     if solutionDIV.get('solutionid') == solutionID:
-            #         solution.append(solutionDIV)
-            #         # print "\n\n\n\n\nSOLUTION:", solutionID, "\n\n\n\n"
+                    if hasTargetedSolutions and isNotStudentAnswerSolution:
+                        solutionset.remove(solution)
+                    elif showBothSolutions and isNotStudentAnswerSolution and isNotCorrectAnswerSolution:
+                        solutionset.remove(solution)
+                    # By default, show the correct answer solution
+                    elif not hasTargetedSolutions and not showBothSolutions and isNotCorrectAnswerSolution:
+                        solutionset.remove(solution)
 
         return tree
 
@@ -573,13 +576,13 @@ class LoncapaProblem(object):
         #import ipdb
         #ipdb.set_trace()
         shuffled = self.shuffled_tree(self.tree)
-        gradiancedTree = self.gradianced_tree(self.tree)
+        treeUsingAnswerPool = self.answer_pool_tree(self.tree)
         
         if shuffled is not None:  # shuffling happened
             process_this = shuffled
             ###self._preprocess_problem(process_this)
-        elif gradiancedTree is not None: # this was a gradiance problem
-            process_this = gradiancedTree
+        elif treeUsingAnswerPool is not None: # this was a problem using a pool of answers
+            process_this = treeUsingAnswerPool
         else:
             process_this = self.tree
 
