@@ -145,7 +145,7 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_to_json(self):
         self.assertEqual(
-            "1:02:03",
+            "01:02:03",
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
         )
         self.assertEqual(
@@ -153,7 +153,7 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.to_json(None)
         )
         self.assertEqual(
-            "0:01:40",
+            "00:01:40",
             RelativeTimeTest.delta.to_json(100.0)
         )
 
@@ -170,7 +170,7 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_str(self):
         self.assertEqual(
-            "1:02:03",
+            "01:02:03",
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
         )
         self.assertEqual(
