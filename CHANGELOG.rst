@@ -5,7 +5,28 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Bug fix for text loss in Course Updates when the text exists
+before the first tag.
+
+Blades: Hovering over CC button in video player, when transcripts are hidden,
+will cause them to show up. Moving the mouse from the CC button will auto hide
+them. You can hover over the CC button and then move the mouse to the
+transcripts which will allow you to select some video position in 1 click.
+
+Blades: Add possibility to use multiple LTI tools per page.
+
+Blades: LTI module can now load external content in a new window.
+
 LMS: Disable data download buttons on the instructor dashboard for large courses
+
+Common: Adds ability to disable a student's account. Students with disabled
+accounts will be prohibited from site access.
+
+LMS: Fix issue with CourseMode expiration dates
+
+LMS: Ported bulk emailing to the beta instructor dashboard.
+
+LMS: Add monitoring of bulk email subtasks to display progress on instructor dash.
 
 LMS: Refactor and clean student dashboard templates.
 
@@ -22,6 +43,8 @@ Studio: Switched to loading Javascript using require.js
 
 Studio: Better feedback during the course import process
 
+Studio: Improve drag and drop on the course overview and subsection views.
+
 LMS: Add split testing functionality for internal use.
 
 CMS: Add edit_course_tabs management command, providing a primitive
@@ -29,6 +52,9 @@ editing capability for a course's list of tabs.
 
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
+
+Studio: add restful interface for paging assets (no UX yet, but just add /start/45/max/50 to end of url to get
+items 45-95, e.g.)
 
 LMS: First round of improvements to New (beta) Instructor Dash:
 improvements, fixes, and internationalization to the Student Info section.
@@ -72,6 +98,11 @@ Blades: Took videoalpha out of alpha, replacing the old video player
 Common: Allow instructors to input complicated expressions as answers to
 `NumericalResponse`s. Prior to the change only numbers were allowed, now any
 answer from '1/3' to 'sqrt(12)*(1-1/3^2+1/5/3^2)' are valid.
+
+Studio/LMS: Allow for 'preview' and 'published' in a single LMS instance. Use
+middlware components to retain the incoming Django request and put in thread
+local storage. It is recommended that all developers define a 'preview.localhost'
+which maps to the same IP address as localhost in his/her HOSTS file.
 
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at
@@ -329,6 +360,22 @@ XModules: Show errors with full descriptors.
 Studio: Add feedback to end user if there is a problem exporting a course
 
 Studio: Improve link re-writing on imports into a different course-id
+
+---------- split mongo backend refactoring changelog section ------------
+
+Studio: course catalog and course outline pages new use course id syntax w/ restful api style
+
+Common: 
+  separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
+  in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
+  
+Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
+
+Common: location mapper: added a bunch of new helper functions for generating old location style info from a CourseLocator
+
+Common: locators: allow - ~ and . in course, branch, and block ids.
+
+---------- end split mongo backend section ---------
 
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.

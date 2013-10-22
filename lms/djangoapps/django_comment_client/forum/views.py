@@ -115,11 +115,8 @@ def inline_discussion(request, course_id, discussion_id):
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-        # TODO (vshnayder): since none of this code seems to be aware of the fact that
-        # sometimes things go wrong, I suspect that the js client is also not
-        # checking for errors on request.  Check and fix as needed.
         log.error("Error loading inline discussion threads.")
-        raise Http404
+        raise
 
     annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
@@ -180,7 +177,7 @@ def forum_form_discussion(request, course_id):
         return render_to_response('discussion/maintenance.html', {})
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading forum discussion threads: %s", str(err))
-        raise Http404
+        raise
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
@@ -247,7 +244,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
         log.error("Error loading single thread.")
-        raise Http404
+        raise
 
     if request.is_ajax():
         courseware_context = get_courseware_context(thread, course)
@@ -272,7 +269,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             threads.append(thread.to_dict())
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
             log.error("Error loading single thread.")
-            raise Http404
+            raise
 
         course = get_course_with_access(request.user, course_id, 'load_forum')
 
@@ -370,10 +367,11 @@ def user_profile(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
+    except User.DoesNotExist:
         raise Http404
 
 
+@login_required
 def followed_threads(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
@@ -413,5 +411,5 @@ def followed_threads(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
+    except User.DoesNotExist:
         raise Http404

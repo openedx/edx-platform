@@ -1,8 +1,11 @@
+from contextlib import contextmanager
 from dogapi import dog_stats_api
 import json
 import logging
 import requests
 import settings
+from time import time
+from uuid import uuid4
 
 log = logging.getLogger(__name__)
 
@@ -28,21 +31,47 @@ def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
 
 
+@contextmanager
+def request_timer(request_id, method, url):
+    start = time()
+    yield
+    end = time()
+    duration = end - start
+    dog_stats_api.histogram('comment_client.request.time', duration, end)
+    log.info(
+        "comment_client_request_log: request_id={request_id}, method={method}, "
+        "url={url}, duration={duration}".format(
+            request_id=request_id,
+            method=method,
+            url=url,
+            duration=duration
+        )
+    )
+
+
 def perform_request(method, url, data_or_params=None, *args, **kwargs):
     if data_or_params is None:
         data_or_params = {}
-    data_or_params['api_key'] = settings.API_KEY
+    headers = {'X-Edx-Api-Key': settings.API_KEY}
+    request_id = uuid4()
+    request_id_dict = {'request_id': request_id}
     try:
-        with dog_stats_api.timer('comment_client.request.time'):
-            if method in ['post', 'put', 'patch']:
-                response = requests.request(method, url, data=data_or_params, timeout=5)
-            else:
-                response = requests.request(method, url, params=data_or_params, timeout=5)
+        if method in ['post', 'put', 'patch']:
+            data = data_or_params
+            params = request_id_dict
+        else:
+            data = None
+            params = merge_dict(data_or_params, request_id_dict)
+        with request_timer(request_id, method, url):
+            response = requests.request(
+                method,
+                url,
+                data=data,
+                params=params,
+                headers=headers,
+                timeout=5
+            )
     except Exception as err:
-        # remove API key if it is in the params
-        if 'api_key' in data_or_params:
-            log.info('Deleting API key from params')
-            del data_or_params['api_key']
         log.exception("Trying to call {method} on {url} with params {params}".format(
             method=method, url=url, params=data_or_params))
         # Reraise with a single exception type

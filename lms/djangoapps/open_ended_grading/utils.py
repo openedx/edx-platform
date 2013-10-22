@@ -12,8 +12,6 @@ from django.conf import settings
 
 from mitxmako.shortcuts import render_to_string
 
-from xblock.field_data import DictFieldData
-
 import logging
 
 log = logging.getLogger(__name__)
@@ -36,7 +34,6 @@ system = ModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
-    xmodule_field_data=DictFieldData({}),
 )
 
 

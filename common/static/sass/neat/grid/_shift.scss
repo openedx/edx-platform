@@ -1,5 +1,4 @@
 @mixin shift($n-columns: 1) {
-
   $direction: get-direction($layout-direction, $default-layout-direction);
   $opposite-direction: get-opposite-direction($direction);
 

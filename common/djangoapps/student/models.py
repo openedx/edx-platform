@@ -33,6 +33,27 @@ from pytz import UTC
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
+class UserStanding(models.Model):
+    """
+    This table contains a student's account's status.
+    Currently, we're only disabling accounts; in the future we can imagine
+    taking away more specific privileges, like forums access, or adding
+    more specific karma levels or probationary stages.
+    """
+    ACCOUNT_DISABLED = "disabled"
+    ACCOUNT_ENABLED = "enabled"
+    USER_STANDING_CHOICES = (
+        (ACCOUNT_DISABLED, u"Account Disabled"),
+        (ACCOUNT_ENABLED, u"Account Enabled"),
+    )
+
+    user = models.ForeignKey(User, db_index=True, related_name='standing', unique=True)
+    account_status = models.CharField(
+        blank=True, max_length=31, choices=USER_STANDING_CHOICES
+    )
+    changed_by = models.ForeignKey(User, blank=True)
+    standing_last_changed_at = models.DateTimeField(auto_now=True)
+
 
 class UserProfile(models.Model):
     """This is where we store all the user demographic fields. We have a

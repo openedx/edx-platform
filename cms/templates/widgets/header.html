@@ -2,6 +2,7 @@
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
 %>
 
 <div class="wrapper-header wrapper" id="view-top">
@@ -12,10 +13,13 @@
       <h1 class="branding"><a href="/"><img src="${static.url("img/logo-edx-studio.png")}" alt="edX Studio" /></a></h1>
 
       % if context_course:
-      <% ctx_loc = context_course.location %>
+      <% 
+            ctx_loc = context_course.location
+            index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
+      %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
-        <a class="course-link" href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
+        <a class="course-link" href="${index_url}">
           <span class="course-org">${context_course.display_org_with_default | h}</span><span class="course-number">${context_course.display_number_with_default | h}</span>
           <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
@@ -31,7 +35,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-courseware-outline">
-                    <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Outline")}</a>
+                    <a href="${index_url}">${_("Outline")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-updates">
                     <a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Updates")}</a>

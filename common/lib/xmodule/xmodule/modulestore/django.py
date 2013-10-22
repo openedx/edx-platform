@@ -7,10 +7,13 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 from importlib import import_module
 
+import re
+
 from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError
 from django.dispatch import Signal
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
+from xmodule.util.django import get_current_request_hostname
 
 # We may not always have the request_cache module available
 try:
@@ -35,7 +38,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, options):
+def create_modulestore_instance(engine, doc_store_config, options):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -63,18 +66,52 @@ def create_modulestore_instance(engine, options):
         request_cache=request_cache,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
+        doc_store_config=doc_store_config,
         **_options
     )
 
 
-def modulestore(name='default'):
+def get_default_store_name_for_current_request():
+    """
+    This method will return the appropriate default store mapping for the current Django request,
+    else 'default' which is the system default
+    """
+    store_name = 'default'
+
+    # see what request we are currently processing - if any at all - and get hostname for the request
+    hostname = get_current_request_hostname()
+
+    # get mapping information which is defined in configurations
+    mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
+   
+    # compare hostname against the regex expressions set of mappings
+    # which will tell us which store name to use
+    if hostname and mappings:
+        for key in mappings.keys():
+            if re.match(key, hostname):
+                store_name = mappings[key]
+                return store_name
+
+    return store_name
+
+
+def modulestore(name=None):
     """
     This returns an instance of a modulestore of given name. This will wither return an existing
     modulestore or create a new one
     """
+
+    if not name:
+        # If caller did not specify name then we should
+        # determine what should be the default
+        name = get_default_store_name_for_current_request()
+
     if name not in _MODULESTORES:
-        _MODULESTORES[name] = create_modulestore_instance(settings.MODULESTORE[name]['ENGINE'],
-                                                          settings.MODULESTORE[name]['OPTIONS'])
+        _MODULESTORES[name] = create_modulestore_instance(
+            settings.MODULESTORE[name]['ENGINE'],
+            settings.MODULESTORE[name].get('DOC_STORE_CONFIG', {}),
+            settings.MODULESTORE[name].get('OPTIONS', {})
+        )
         # inject loc_mapper into newly created modulestore if it needs it
         if name == 'split' and _loc_singleton is not None:
             _MODULESTORES['split'].loc_mapper = _loc_singleton
@@ -108,6 +145,9 @@ def clear_existing_modulestores():
     This is useful for flushing state between unit tests.
     """
     _MODULESTORES.clear()
+    # pylint: disable=W0603
+    global _loc_singleton
+    _loc_singleton = None
 
 
 def editable_modulestore(name='default'):

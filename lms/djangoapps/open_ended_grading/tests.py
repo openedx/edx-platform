@@ -16,6 +16,7 @@ from xmodule.open_ended_grading_classes import peer_grading_service, controller_
 from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorDescriptor
 from xblock.fields import ScopeIds
 
 from open_ended_grading import staff_grading_service, views, utils
@@ -251,13 +252,14 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xmodule_field_data=lambda d: d._field_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             mixins=settings.XBLOCK_MIXINS,
+            error_descriptor_class=ErrorDescriptor,
         )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
-        self.peer_module = self.descriptor.xmodule(self.system)
+        self.descriptor.xmodule_runtime = self.system
+        self.peer_module = self.descriptor
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 

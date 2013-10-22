@@ -25,7 +25,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xmodule
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
 import static_replace
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -219,6 +219,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if not has_access(user, descriptor, 'load', course_id):
         return None
 
+    student_data = DbModel(DjangoKeyValueStore(field_data_cache))
+    descriptor._field_data = lms_field_data(descriptor._field_data, student_data)
+
     # Setup system context for module instance
     ajax_url = reverse(
         'modx_dispatch',
@@ -294,10 +297,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xmodule_field_data(descriptor):
-        student_data = DbModel(DjangoKeyValueStore(field_data_cache))
-        return lms_field_data(descriptor._field_data, student_data)
-
     def publish(event):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
@@ -341,7 +340,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(partial(wrap_xmodule, 'xmodule_display.html'))
+        block_wrappers.append(wrap_xblock)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -405,7 +404,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xmodule_field_data=xmodule_field_data,
         publish=publish,
         anonymous_student_id=unique_id_for_user(user),
         course_id=course_id,
@@ -426,27 +424,17 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    try:
-        module = descriptor.xmodule(system)
-    except:
-        log.exception("Error creating module from descriptor {0}".format(descriptor))
-
-        # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-        if has_access(user, descriptor.location, 'staff', course_id):
-            err_descriptor_class = ErrorDescriptor
-        else:
-            err_descriptor_class = NonStaffErrorDescriptor
-
-        err_descriptor = err_descriptor_class.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        )
-
-        # Make an error module
-        return err_descriptor.xmodule(system)
-
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
-    return module
+
+    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+    if has_access(user, descriptor.location, 'staff', course_id):
+        system.error_descriptor_class = ErrorDescriptor
+    else:
+        system.error_descriptor_class = NonStaffErrorDescriptor
+
+    descriptor.xmodule_runtime = system
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    return descriptor
 
 
 def find_target_student_module(request, user_id, course_id, mod_id):

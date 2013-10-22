@@ -1,15 +1,17 @@
+import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
 # TODO: This should be removed once the CMS is running via wsgi on all production servers
 import cms.startup as startup
+from xmodule.modulestore import parsers
 startup.run()
 
 # There is a course creators admin table.
 from ratelimitbackend import admin
 admin.autodiscover()
 
-urlpatterns = ('',  # nopep8
+urlpatterns = patterns('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^listing', 'contentstore.views.index', name='index'),
     url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
@@ -25,8 +27,6 @@ urlpatterns = ('',  # nopep8
     url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
-        'contentstore.views.course_index', name='course_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
         'contentstore.views.import_course', name='import_course'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import_status/(?P<name>[^/]+)$',
@@ -70,13 +70,10 @@ urlpatterns = ('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$',
         'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
-    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.static_pages',
-        name='static_pages'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)(/start/(?P<start>\d+))?(/max/(?P<maxresults>\d+))?$',
         'contentstore.views.asset_index', name='asset_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
         'contentstore.views.assets.update_asset', name='update_asset'),
@@ -109,7 +106,8 @@ urlpatterns = ('',  # nopep8
 )
 
 # User creation and updating views
-urlpatterns += (
+urlpatterns += patterns(
+    '',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
         'contentstore.views.update_checklist', name='checklists_updates'),
@@ -128,22 +126,38 @@ urlpatterns += (
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 )
 
+# restful api
+urlpatterns += patterns(
+    'contentstore.views',
+    # index page, course outline page, and course structure json access
+    # replaces url(r'^listing', 'contentstore.views.index', name='index'),
+    # ? url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course')
+    # TODO remove shim and this pattern once import_export and test_contentstore no longer use
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
+        'course.old_course_index_shim', name='course_index'
+    ),
+
+    url(r'^course$', 'index'),
+    # (?ix) == ignore case and verbose (multiline regex)
+    url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+)
+
 js_info_dict = {
     'domain': 'djangojs',
     'packages': ('cms',),
 }
 
-urlpatterns += (
+urlpatterns += patterns('',
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
-    urlpatterns += (
+    urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
     )
 
-urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
 
 # enable automatic login
 if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
@@ -157,8 +171,6 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
-
-urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
 #pylint: disable=C0103

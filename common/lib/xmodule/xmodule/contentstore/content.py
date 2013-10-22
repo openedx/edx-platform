@@ -168,7 +168,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, location):
+    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 

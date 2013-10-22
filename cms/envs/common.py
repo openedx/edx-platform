@@ -154,6 +154,7 @@ MIDDLEWARE_CLASSES = (
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -218,6 +219,11 @@ STATICFILES_DIRS = [
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
+# We want i18n to be turned off in production, at least until we have full localizations.
+# Thus we want the Django translation engine to be disabled. Otherwise even without
+# localization files, if the user's browser is set to a language other than us-en,
+# strings like "login" and "password" will be translated and the rest of the page will be
+# in English, which is confusing.
 USE_I18N = False
 USE_L10N = True
 
@@ -250,25 +256,6 @@ PIPELINE_CSS = {
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
-    'main': {
-        'source_filenames': sorted(
-            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
-            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
-        ) + ['js/hesitate.js', 'js/base.js', 'js/views/feedback.js',
-             'js/models/course.js',
-             'js/models/section.js', 'js/views/section.js',
-             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
-             'js/models/uploads.js', 'js/views/uploads.js',
-             'js/models/textbook.js', 'js/views/textbook.js',
-             'js/src/utility.js',
-             'js/models/settings/course_grading_policy.js',
-             'js/models/asset.js', 'js/models/assets.js',
-             'js/views/assets.js',
-             'js/views/import.js',
-             'js/views/assets_view.js', 'js/views/asset_view.js'],
-        'output_filename': 'js/cms-application.js',
-        'test_order': 0
-    },
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
@@ -379,6 +366,7 @@ INSTALLED_APPS = (
 
     # Tracking
     'track',
+    'eventtracking.django',
 
     # Monitoring
     'datadog',
@@ -433,3 +421,5 @@ TRACKING_BACKENDS = {
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_ENABLED = True
+

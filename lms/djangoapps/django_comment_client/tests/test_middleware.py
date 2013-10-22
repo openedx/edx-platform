@@ -20,8 +20,14 @@ class AjaxExceptionTestCase(TestCase):
         self.request0.META['HTTP_X_REQUESTED_WITH'] = "SHADOWFAX"
 
     def test_process_exception(self):
-        self.assertIsInstance(self.a.process_exception(self.request1, self.exception1), middleware.JsonError)
-        self.assertIsInstance(self.a.process_exception(self.request1, self.exception2), middleware.JsonError)
+        response1 = self.a.process_exception(self.request1, self.exception1)
+        self.assertIsInstance(response1, middleware.JsonError)
+        self.assertEqual(500, response1.status_code)
+
+        response2 = self.a.process_exception(self.request1, self.exception2)
+        self.assertIsInstance(response2, middleware.JsonError)
+        self.assertEqual(500, response2.status_code)
+
         self.assertIsNone(self.a.process_exception(self.request1, self.exception0))
         self.assertIsNone(self.a.process_exception(self.request0, self.exception1))
         self.assertIsNone(self.a.process_exception(self.request0, self.exception0))

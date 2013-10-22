@@ -1,7 +1,7 @@
-define ["backbone", "jquery", "underscore", "gettext", "xmodule",
+define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "jquery.inputnumber"],
-(Backbone, $, _, gettext, XModule, NotificationView, MetadataView, MetadataCollection) ->
+        "jquery.inputnumber", "xmodule"],
+(Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
     className: 'component'
@@ -21,11 +21,11 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
     $component_editor: => @$el.find('.component-editor')
 
     loadDisplay: ->
-      XModule.loadModule(@$el.find('.xmodule_display'))
+      XBlock.initializeBlock(@$el.find('.xblock-student_view'))
 
     loadEdit: ->
       if not @module
-        @module = XModule.loadModule(@$el.find('.xmodule_edit'))
+        @module = XBlock.initializeBlock(@$el.find('.xblock-studio_view'))
         # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
         metadataEditor = @$el.find('.metadata_edit')
         metadataData = metadataEditor.data('metadata')
@@ -92,7 +92,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
         title: gettext('Saving&hellip;')
       saving.show()
       @model.save(data).done( =>
-      #   # showToastMessage("Your changes have been saved.", null, 3)
         @module = null
         @render()
         @$el.removeClass('editing')

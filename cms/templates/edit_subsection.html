@@ -21,9 +21,11 @@
         <label>${_("Display Name:")}</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
-        <div class="sortable-unit-list">
-        <label>${_("Units:")}</label>
-          ${units.enum_units(subsection, subsection_units=subsection_units)}
+        <div class="wrapper-dnd">
+          <div class="sortable-unit-list">
+            <label>${_("Units:")}</label>
+              ${units.enum_units(subsection, subsection_units=subsection_units)}
+          </div>
         </div>
       </article>
     </div>
@@ -112,9 +114,8 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
     // but we really should change that behavior.
     if (!window.graderTypes) {
-        window.graderTypes = new CourseGraderCollection();
+        window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
         window.graderTypes.course_location = new Location('${parent_location}');
-        window.graderTypes.reset(${course_graders|n});
     }
 
     $(".gradable-status").each(function(index, ele) {

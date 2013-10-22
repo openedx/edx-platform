@@ -17,6 +17,10 @@
   </script>
 
   <script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+
 require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
   function(doc, $, CourseDetailsModel, MainView) {
     // hilighting labels when fields are focused in
@@ -37,8 +41,6 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
       },
       reset: true
     });
-
-    CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 });
   </script>
 </%block>

@@ -25,7 +25,7 @@ describe 'Problem', ->
 
     it 'set the element from html', ->
       @problem999 = new Problem ("
-        <section class='xmodule_display xmodule_CapaModule' data-type='Problem'>
+        <section class='xblock xblock-student_view xmodule_display xmodule_CapaModule' data-type='Problem'>
           <section id='problem_999'
                    class='problems-wrapper'
                    data-problem-id='i4x://edX/999/problem/Quiz'
@@ -36,14 +36,14 @@ describe 'Problem', ->
       expect(@problem999.element_id).toBe 'problem_999'
 
     it 'set the element from loadFixtures', ->
-      @problem1 = new Problem($('.xmodule_display'))
+      @problem1 = new Problem($('.xblock-student_view'))
       expect(@problem1.element_id).toBe 'problem_1'
 
   describe 'bind', ->
     beforeEach ->
       spyOn window, 'update_schematics'
       MathJax.Hub.getAllJax.andReturn [@stubbedJax]
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
 
     it 'set mathjax typeset', ->
       expect(MathJax.Hub.Queue).toHaveBeenCalled()
@@ -78,7 +78,7 @@ describe 'Problem', ->
 
   describe 'renderProgressState', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       #@renderProgressState = @problem.renderProgressState
 
     describe 'with a status of "none"', ->
@@ -97,7 +97,7 @@ describe 'Problem', ->
 
   describe 'render', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @bind = @problem.bind
       spyOn @problem, 'bind'
 
@@ -130,7 +130,7 @@ describe 'Problem', ->
 
   describe 'check', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
@@ -139,12 +139,12 @@ describe 'Problem', ->
 
     it 'log the problem_graded event, after the problem is done grading.', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-        response = 
+        response =
           success: 'correct'
           contents: 'mock grader response'
         callback(response)
       @problem.check()
-      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.url
+      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
 
     it 'submit the answer for check', ->
       spyOn $, 'postWithPrefix'
@@ -177,7 +177,7 @@ describe 'Problem', ->
 
   describe 'reset', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
 
     it 'log the problem_reset event', ->
       @problem.answers = 'foo=1&bar=2'
@@ -198,7 +198,7 @@ describe 'Problem', ->
 
   describe 'show', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @problem.el.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
     describe 'when the answer has not yet shown', ->
@@ -331,7 +331,7 @@ describe 'Problem', ->
 
   describe 'save', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_save event', ->
@@ -353,7 +353,7 @@ describe 'Problem', ->
 
   describe 'refreshMath', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       $('#input_example_1').val 'E=mc^2'
       @problem.refreshMath target: $('#input_example_1').get(0)
 
@@ -363,7 +363,7 @@ describe 'Problem', ->
 
   describe 'updateMathML', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
@@ -383,7 +383,7 @@ describe 'Problem', ->
 
   describe 'refreshAnswers', ->
     beforeEach ->
-      @problem = new Problem($('.xmodule_display'))
+      @problem = new Problem($('.xblock-student_view'))
       @problem.el.html '''
         <textarea class="CodeMirror" />
         <input id="input_1_1" name="input_1_1" class="schematic" value="one" />

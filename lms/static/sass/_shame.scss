@@ -230,3 +230,22 @@
 footer .references {
   @include footer_references_style;
 }
+
+// ====================
+
+// modal semantic button resetting - overriding the poorly scoped button mixin styling
+.close-modal, button.close-modal {
+  @extend %ui-reset-button;
+
+  &:focus {
+    border: none !important;
+    outline: thin dotted !important;
+  }
+}
+
+// ====================
+
+// poor cascade made worse by CSS splitting requires us to redefine the dashboard views' visual top padding
+.dashboard {
+  padding-top: 60px;
+}

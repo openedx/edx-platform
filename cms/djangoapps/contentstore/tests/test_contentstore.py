@@ -58,7 +58,7 @@ from student.models import CourseEnrollment
 from contentstore.utils import delete_course_and_groups
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 class MongoCollectionFindWrapper(object):
@@ -101,7 +101,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
@@ -792,7 +792,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             source_location.tag, source_location.org, source_location.course, 'html', 'nonportable'])
         html_module = module_store.get_instance(source_location.course_id, html_module_location)
 
-        self.assertTrue(isinstance(html_module.data, basestring))
+        self.assertIsInstance(html_module.data, basestring)
         new_data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
             source_location.org, source_location.course))
         module_store.update_item(html_module_location, new_data)
@@ -1273,6 +1273,47 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # export out to a tempdir
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
+    def test_export_course_without_content_store(self):
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        # Create toy course
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        # Add a sequence
+
+        stub_location = Location(['i4x', 'edX', 'toy', 'sequential', 'vertical_sequential'])
+        sequential = module_store.get_item(stub_location)
+        module_store.update_children(sequential.location, sequential.children)
+
+        # Get course and export it without a content_store
+
+        course = module_store.get_item(location)
+        course.save()
+
+        root_dir = path(mkdtemp_clean())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_to_xml(module_store, None, location, root_dir, 'test_export_no_content_store')
+
+        # Delete the course from module store and reimport it
+
+        delete_course(module_store, content_store, location, commit=True)
+
+        import_from_xml(
+            module_store, root_dir, ['test_export_no_content_store'],
+            draft_store=None,
+            static_content_store=None,
+            target_location_namespace=course.location
+        )
+
+        # Verify reimported course
+
+        items = module_store.get_items(stub_location)
+        self.assertEqual(len(items), 1)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
@@ -1313,7 +1354,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def tearDown(self):
         mongo = MongoClient()
-        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        mongo.drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
     def test_create_course(self):
@@ -1484,7 +1525,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
+            '<article class="courseware-overview" data-id="i4x://MITx/999/course/Robot_Super_Course">',
             status_code=200,
             html=True
         )
@@ -1588,14 +1629,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
 
-        # static_pages
-        resp = self.client.get(reverse('static_pages',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'coursename': loc.name}))
-        self.assertEqual(resp.status_code, 200)
-
-        # static_pages
+        # asset_index
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,

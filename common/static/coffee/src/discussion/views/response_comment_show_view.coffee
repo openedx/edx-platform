@@ -1,9 +1,6 @@
 if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
 
-    events:
-      "click .discussion-flag-abuse": "toggleFlagAbuse"
-
     tagName: "li"
 
     initialize: ->
@@ -48,9 +45,15 @@ if Backbone?
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
+        @$(".discussion-flag-abuse").attr("data-tooltip", "Misuse Reported")
+        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")
         @$("[data-role=thread-flag]").addClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
+        @$(".discussion-flag-abuse").attr("data-tooltip", "Report Misuse")
+        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
 
     updateModelDetails: =>
       @renderFlagged()

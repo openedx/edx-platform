@@ -25,9 +25,8 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
   // but we really should change that behavior.
   if (!window.graderTypes) {
-    window.graderTypes = new CourseGraderCollection();
+    window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
     window.graderTypes.course_location = new Location('${parent_location}');
-    window.graderTypes.reset(${course_graders|n});
   }
 
   $(".gradable-status").each(function(index, ele) {
@@ -82,7 +81,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
         </div>
         <div class="item-actions">
           <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" data-tooltip="${_('Drag to re-order')}" class="drag-handle"></a>
+          <span data-tooltip="${_('Drag to re-order')}" class="drag-handle"></span>
         </div>
       </header>
     </section>
@@ -138,74 +137,90 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
-        % for section in sections:
-        <section class="courseware-section branch" data-id="${section.location}">
-          <header>
-          <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
-            <div class="item-details" data-id="${section.location}">
-              <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
-              <div class="section-published-date">
-                <%
-                  if section.start is not None:
-                      start_date_str = section.start.strftime('%m/%d/%Y')
-                      start_time_str = section.start.strftime('%H:%M')
-                  else:
-                      start_date_str = ''
-                      start_time_str = ''
-                %>
-                %if section.start is None:
-                  <span class="published-status">${_("This section has not been released.")}</span>
-                  <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">${_("Schedule")}</a>
-                %else:
-                  <span class="published-status"><strong>${_("Will Release:")}</strong>
-                  ${date_utils.get_default_time_display(section.start)}</span>
-                  <a href="#" class="edit-button" data-date="${start_date_str}"
-                    data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
-                %endif
-              </div>
-            </div>
+      <div class="wrapper-dnd">
+        <article class="courseware-overview" data-id="${context_course.location.url()}">
+          % for section in sections:
+          <section class="courseware-section branch is-draggable" data-id="${section.location}" data-parent-id="${context_course.location.url()}">
 
-            <div class="item-actions">
-              <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
-            </div>
-          </header>
-          <div class="subsection-list">
-            <div class="list-header">
-              <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
-                <span class="new-folder-icon"></span>${_("New Subsection")}
-              </a>
-            </div>
-            <ol data-section-id="${section.location.url()}">
-              % for subsection in section.get_children():
-              <li class="branch collapsed id-holder" data-id="${subsection.location}">
-                <div class="section-item">
-                  <div class="details">
-                    <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
-                    <a href="${reverse('edit_subsection', args=[subsection.location])}">
-                      <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
-                    </a>
-                  </div>
+            <%include file="widgets/_ui-dnd-indicator-before.html" />
 
-                  <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
-                  </div>
+            <header>
+            <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
-                  <div class="item-actions">
-                    <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
-                    <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
-                  </div>
+              <div class="item-details" data-id="${section.location}">
+                <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
+                <div class="section-published-date">
+                  <%
+                    if section.start is not None:
+                        start_date_str = section.start.strftime('%m/%d/%Y')
+                        start_time_str = section.start.strftime('%H:%M')
+                    else:
+                        start_date_str = ''
+                        start_time_str = ''
+                  %>
+                  %if section.start is None:
+                    <span class="published-status">${_("This section has not been released.")}</span>
+                    <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">${_("Schedule")}</a>
+                  %else:
+                    <span class="published-status"><strong>${_("Will Release:")}</strong>
+                    ${date_utils.get_default_time_display(section.start)}</span>
+                    <a href="#" class="edit-button" data-date="${start_date_str}"
+                      data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
+                  %endif
                 </div>
-                ${units.enum_units(subsection)}
-              </li>
-              % endfor
-            </ol>
-          </div>
-        </section>
-        % endfor
-      </article>
+              </div>
+
+              <div class="item-actions">
+                <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle"></span>
+              </div>
+            </header>
+            <div class="subsection-list">
+              <div class="list-header">
+                <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
+                  <span class="new-folder-icon"></span>${_("New Subsection")}
+                </a>
+              </div>
+              <ol class="sortable-subsection-list" data-id="${section.location.url()}">
+                % for subsection in section.get_children():
+                <li class="courseware-subsection branch collapsed id-holder is-draggable" data-id="${subsection.location}" data-parent-id="${section.location.url()}">
+
+                  <%include file="widgets/_ui-dnd-indicator-before.html" />
+
+                  <div class="section-item">
+                    <div class="details">
+                      <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
+                      <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                        <span class="folder-icon"></span>
+                        <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                      </a>
+                    </div>
+
+                    <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
+                    </div>
+
+                    <div class="item-actions">
+                      <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
+                      <span data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle"></span>
+                    </div>
+                  </div>
+                  ${units.enum_units(subsection)}
+
+                  <%include file="widgets/_ui-dnd-indicator-after.html" />
+                </li>
+                % endfor
+                <li class="ui-splint ui-splint-indicator">
+                  <%include file="widgets/_ui-dnd-indicator-initial.html" />
+                </li>
+              </ol>
+            </div>
+
+            <%include file="widgets/_ui-dnd-indicator-after.html" />
+          </section>
+          % endfor
+        </article>
+      </div>
     </div>
   </div>
   <footer></footer>

@@ -1,5 +1,7 @@
-define ["jquery", "underscore.string", "backbone", "js/views/feedback_notification", "jquery.cookie"],
-($, str, Backbone, NotificationView) ->
+define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
+        "js/views/feedback_notification",
+        "coffee/src/ajax_prefix", "jquery.cookie"],
+(domReady, $, str, Backbone, gettext, NotificationView) ->
   AjaxPrefix.addAjaxPrefix jQuery, ->
     $("meta[name='path_prefix']").attr('content')
 
@@ -36,5 +38,5 @@ define ["jquery", "underscore.string", "backbone", "js/views/feedback_notificati
     if onTouchBasedDevice()
       $('body').addClass 'touch-based-device'
 
-  $(main)
+  domReady(main)
   return main

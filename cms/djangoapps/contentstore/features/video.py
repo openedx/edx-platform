@@ -3,21 +3,27 @@
 from lettuce import world, step
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
+from selenium.webdriver.common.keys import Keys
+
+BUTTONS = {
+    'CC': '.hide-subtitles',
+    'volume': '.volume',
+}
 
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
+    world.create_course_with_unit()
     world.create_component_instance(
-        step, '.large-video-icon',
-        'video',
-        '.xmodule_VideoModule',
-        has_multiple_templates=False
+        step=step,
+        category='video',
     )
 
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
     _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
 
 @step('I have created a Video component with subtitles "([^"]*)"$')
 def i_created_a_video_with_subs_with_name(_step, sub_id):
@@ -115,3 +121,59 @@ def the_youtube_video_is_shown(_step):
     world.wait_for_xmodule()
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
+
+
+@step('Make sure captions are (.+)$')
+def set_captions_visibility_state(_step, captions_state):
+    if captions_state == 'closed':
+        if world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+    else:
+        if not world.css_visible('.subtitles'):
+            world.browser.find_by_css('.hide-subtitles').click()
+
+
+@step('I hover over button "([^"]*)"$')
+def hover_over_button(_step, button):
+    world.css_find(BUTTONS[button.strip()]).mouse_over()
+
+
+@step('Captions (?:are|become) "([^"]*)"$')
+def are_captions_visibile(_step, visibility_state):
+    _step.given('Captions become "{0}" after 0 seconds'.format(visibility_state))
+
+
+@step('Captions (?:are|become) "([^"]*)" after (.+) seconds$')
+def check_captions_visibility_state(_step, visibility_state, timeout):
+    timeout = int(timeout.strip())
+
+    # Captions become invisible by fading out. We must wait by a specified
+    # time.
+    world.wait(timeout)
+
+    if visibility_state == 'visible':
+        assert world.css_visible('.subtitles')
+    else:
+        assert not world.css_visible('.subtitles')
+
+
+def find_caption_line_by_data_index(index):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=index)
+    return world.css_find(SELECTOR).first
+
+
+@step('I focus on caption line with data-index (\d+)$')
+def focus_on_caption_line(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
+
+
+@step('I press "enter" button on caption line with data-index (\d+)$')
+def focus_on_caption_line(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
+
+
+@step('I see caption line with data-index (\d+) has class "([^"]*)"$')
+def caption_line_has_class(_step, index, className):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
+    world.css_has_class(SELECTOR, className.strip())
+

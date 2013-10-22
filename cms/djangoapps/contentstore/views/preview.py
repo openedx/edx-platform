@@ -6,9 +6,9 @@ from django.conf import settings
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
+from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -22,7 +22,7 @@ from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .requests import render_from_lms
+from .helpers import render_from_lms
 from .access import has_access
 from ..utils import get_course_for_item
 
@@ -77,11 +77,19 @@ def preview_component(request, location):
     component = modulestore().get_item(location)
     # Wrap the generated fragment in the xmodule_editor div so that the javascript
     # can bind to it correctly
-    component.runtime.wrappers.append(partial(wrap_xmodule, 'xmodule_edit.html'))
+    component.runtime.wrappers.append(wrap_xblock)
+
+    try:
+        content = component.render('studio_view').content
+    # catch exceptions indiscriminately, since after this point they escape the
+    # dungeon and surface as uneditable, unsaveable, and undeletable
+    # component-goblins.
+    except Exception as exc:                          # pylint: disable=W0703
+        content = render_to_string('html_error.html', {'message': str(exc)})
 
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': component.runtime.render(component, None, 'studio_view').content,
+        'editor': content
     })
 
 
@@ -95,17 +103,7 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
 
-    def preview_field_data(descriptor):
-        "Helper method to create a DbModel from a descriptor"
-        student_data = DbModel(SessionKeyValueStore(request))
-        return lms_field_data(descriptor._field_data, student_data)
-
     course_id = get_course_for_item(descriptor.location).location.course_id
-
-    if descriptor.location.category == 'static_tab':
-        wrapper_template = 'xmodule_tab_display.html'
-    else:
-        wrapper_template = 'xmodule_display.html'
 
     return ModuleSystem(
         static_url=settings.STATIC_URL,
@@ -118,7 +116,6 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xmodule_field_data=preview_field_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
@@ -127,7 +124,7 @@ def preview_module_system(request, preview_id, descriptor):
         # Set up functions to modify the fragment produced by student_view
         wrappers=(
             # This wrapper wraps the module in the template specified above
-            partial(wrap_xmodule, wrapper_template),
+            partial(wrap_xblock, display_name_only=descriptor.location.category == 'static_tab'),
 
             # This wrapper replaces urls in the output that start with /static
             # with the correct course-specific url for the static content
@@ -136,7 +133,8 @@ def preview_module_system(request, preview_id, descriptor):
                 getattr(descriptor, 'data_dir', descriptor.location.course),
                 course_id=descriptor.location.org + '/' + descriptor.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE',
             ),
-        )
+        ),
+        error_descriptor_class=ErrorDescriptor,
     )
 
 
@@ -148,17 +146,12 @@ def load_preview_module(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
-    system = preview_module_system(request, preview_id, descriptor)
-    try:
-        module = descriptor.xmodule(system)
-    except:
-        log.debug("Unable to load preview module", exc_info=True)
-        module = ErrorDescriptor.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        ).xmodule(system)
-
-    return module
+    student_data = DbModel(SessionKeyValueStore(request))
+    descriptor.bind_for_student(
+        preview_module_system(request, preview_id, descriptor),
+        lms_field_data(descriptor._field_data, student_data),  # pylint: disable=protected-access
+    )
+    return descriptor
 
 
 def get_preview_html(request, descriptor, idx):
@@ -167,4 +160,8 @@ def get_preview_html(request, descriptor, idx):
     specified by the descriptor and idx.
     """
     module = load_preview_module(request, str(idx), descriptor)
-    return module.runtime.render(module, None, "student_view").content
+    try:
+        content = module.render("student_view").content
+    except Exception as exc:                          # pylint: disable=W0703
+        content = render_to_string('html_error.html', {'message': str(exc)})
+    return content

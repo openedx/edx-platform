@@ -4,7 +4,9 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
@@ -15,6 +17,9 @@
   <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
+  <script type="text/javascript">
+    (function() {window.baseUrl = "${settings.STATIC_URL}";})(this);
+  </script>
   <%static:js group='module-descriptor-js'/>
 %if instructor_tasks is not None:
   <script type="text/javascript" src="${static.url('js/pending_tasks.js')}"></script>
@@ -198,7 +203,7 @@ function goto( mode)
 
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="Dump description of graded assignments configuration" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump description of graded assignments configuration">
     </p>
     <hr width="40%" style="align:left">
 
@@ -541,12 +546,21 @@ function goto( mode)
       <input type="submit" name="action" value="Send email">
     </div>
     <script type="text/javascript">
-      var emailEditor = XModule.loadModule($('.xmodule_edit'));
-      document.idashform.onsubmit = function() {
-        this.message.value = emailEditor.save()['data'];
-        return true;
-      }
+      $(document).ready(function(){
+        var emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
+        document.idashform.onsubmit = function() {
+          this.message.value = emailEditor.save()['data'];
+          return true;
+        }
+      });
     </script>
+
+    <p>These email actions run in the background, and status for active email tasks will appear in a table below.
+       To see status for all bulk email tasks submitted for this course, click on this button:
+    </p>
+    <p>
+      <input type="submit" name="action" value="Show Background Email Task History">
+    </p>
 %endif
 
     </form>

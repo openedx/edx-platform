@@ -6,11 +6,10 @@ from lettuce import world, step
 
 @step('I have created a Discussion Tag$')
 def i_created_discussion_tag(step):
+    world.create_course_with_unit()
     world.create_component_instance(
-        step, '.large-discussion-icon',
-        'discussion',
-        '.xmodule_DiscussionModule',
-        has_multiple_templates=False
+        step=step,
+        category='discussion',
     )
 
 
@@ -22,12 +21,3 @@ def i_see_only_the_settings_and_values(step):
             ['Display Name', "Discussion", False],
             ['Subcategory', "Topic-Level Student-Visible Label", False]
         ])
-
-
-@step('creating a discussion takes a single click')
-def discussion_takes_a_single_click(step):
-    component_css = '.xmodule_DiscussionModule'
-    assert world.is_css_not_present(component_css)
-
-    world.css_click("a[data-category='discussion']")
-    assert world.is_css_present(component_css)

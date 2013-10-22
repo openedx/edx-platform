@@ -5,7 +5,6 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
         @stubModule = jasmine.createSpy("Module")
         @stubModule.id = 'stub-id'
 
-
         setFixtures """
         <li class="component" id="stub-id">
           <div class="component-editor">
@@ -19,8 +18,8 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
             <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
             <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>
           </div>
-          <a href="#" class="drag-handle"></a>
-          <section class="xmodule_display xmodule_stub" data-type="StubModule">
+          <span class="drag-handle"></span>
+          <section class="xblock xblock-student_view xmodule_display xmodule_stub" data-type="StubModule">
             <div id="stub-module-content"/>
           </section>
         </li>
@@ -67,10 +66,9 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
 
         describe "loadDisplay", ->
           beforeEach ->
-            spyOn(XModule, 'loadModule')
+            spyOn(XBlock, 'initializeBlock')
             @moduleEdit.loadDisplay()
 
           it "loads the .xmodule-display inside the module editor", ->
-            expect(XModule.loadModule).toHaveBeenCalled()
-            expect(XModule.loadModule.mostRecentCall.args[0]).toBe($('.xmodule_display'))
-
+            expect(XBlock.initializeBlock).toHaveBeenCalled()
+            expect(XBlock.initializeBlock.mostRecentCall.args[0]).toBe($('.xblock-student_view'))

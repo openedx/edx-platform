@@ -2,60 +2,101 @@
 #pylint: disable=C0111
 
 from lettuce import world
-from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 
 
-@world.absorb
-def create_component_instance(step, component_button_css, category,
-                              expected_css, boilerplate=None,
-                              has_multiple_templates=True):
-
-    click_new_component_button(step, component_button_css)
-
-    if category in ('problem', 'html'):
-
-        def animation_done(_driver):
-            script = "$('div.new-component').css('display')"
-            return world.browser.evaluate_script(script) == 'none'
-
-        world.wait_for(animation_done)
-
-    if has_multiple_templates:
-        click_component_from_menu(category, boilerplate, expected_css)
-
-    if category in ('video',):
-        world.wait_for_xmodule()
-
-    assert_true(world.is_css_present(expected_css))
+def _is_expected_element_count(css, expected_number):
+    """
+    Returns whether the number of elements found on the page by css locator
+    the same number that you expected.
+    """
+    return len(world.css_find(css)) == expected_number
 
 
 @world.absorb
-def click_new_component_button(step, component_button_css):
-    step.given('I have clicked the new unit button')
-    world.wait_for_requirejs(
-        ["jquery", "js/models/course", "coffee/src/models/module",
-         "coffee/src/views/unit", "jquery.ui"]
-    )
+def create_component_instance(step, category, component_type=None, is_advanced=False):
+    """
+    Create a new component in a Unit.
+
+    Parameters
+    ----------
+    category: component type (discussion, html, problem, video)
+    component_type: for components with multiple templates, the link text in the menu
+    is_advanced: for problems, is the desired component under the advanced menu?
+    """
+    assert_in(category, ['problem', 'html', 'video', 'discussion'])
+
+    component_button_css = 'span.large-{}-icon'.format(category.lower())
+    if category == 'problem':
+        module_css = 'section.xmodule_CapaModule'
+    else:
+        module_css = 'section.xmodule_{}Module'.format(category.title())
+
+    # Count how many of that module is on the page. Later we will
+    # assert that one more was added.
+    # We need to use world.browser.find_by_css instead of world.css_find
+    # because it's ok if there are currently zero of them.
+    module_count_before =  len(world.browser.find_by_css(module_css))
+
+    # Disable the jquery animation for the transition to the menus.
+    world.disable_jquery_animations()
     world.css_click(component_button_css)
 
+    if category in ('problem', 'html'):
+        world.wait_for_invisible(component_button_css)
+        click_component_from_menu(category, component_type, is_advanced)
 
-@world.absorb
-def click_component_from_menu(category, boilerplate, expected_css):
+    world.wait_for(lambda _: _is_expected_element_count(module_css,
+        module_count_before + 1))
+
+
+def _click_advanced():
+    css = 'ul.problem-type-tabs a[href="#tab2"]'
+    world.css_click(css)
+
+    # Wait for the advanced tab items to be displayed
+    tab2_css = 'div.ui-tabs-panel#tab2'
+    world.wait_for_visible(tab2_css)
+
+
+def _find_matching_link(category, component_type):
     """
-    Creates a component from `instance_id`. For components with more
-    than one template, clicks on `elem_css` to create the new
-    component. Components with only one template are created as soon
-    as the user clicks the appropriate button, so we assert that the
-    expected component is present.
+    Find the link with the specified text. There should be one and only one.
     """
-    if boilerplate:
-        elem_css = "a[data-category='{}'][data-boilerplate='{}']".format(category, boilerplate)
-    else:
-        elem_css = "a[data-category='{}']:not([data-boilerplate])".format(category)
-    elements = world.css_find(elem_css)
-    assert_equal(len(elements), 1)
-    world.css_click(elem_css)
+
+    # The tab shows links for the given category
+    links = world.css_find('div.new-component-{} a'.format(category))
+
+    # Find the link whose text matches what you're looking for
+    matched_links = [link for link in links if link.text == component_type]
+
+    # There should be one and only one
+    assert_equal(len(matched_links), 1)
+    return matched_links[0]
+
+
+def click_component_from_menu(category, component_type, is_advanced):
+    """
+    Creates a component for a category with more
+    than one template, i.e. HTML and Problem.
+    For some problem types, it is necessary to click to
+    the Advanced tab.
+    The component_type is the link text, e.g. "Blank Common Problem"
+    """
+    if is_advanced:
+        # Sometimes this click does not work if you go too fast.
+        world.retry_on_exception(_click_advanced,
+            ignored_exceptions=AssertionError)
+
+    # Retry this in case the list is empty because you tried too fast.
+    link = world.retry_on_exception(
+        lambda: _find_matching_link(category, component_type),
+        ignored_exceptions=AssertionError
+    )
+
+    # Wait for the link to be clickable. If you go too fast it is not.
+    world.retry_on_exception(lambda: link.click())
 
 
 @world.absorb

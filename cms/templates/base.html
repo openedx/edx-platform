@@ -33,6 +33,7 @@
 window.baseUrl = "${settings.STATIC_URL}";
 var require = {
     baseUrl: baseUrl,
+    waitSeconds: 60,
     paths: {
         "domReady": "js/vendor/domReady",
         "gettext": "/i18n",
@@ -53,6 +54,7 @@ var require = {
         "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
         "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
+        "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
         "tzAbbr": "js/vendor/tzAbbr",
@@ -60,12 +62,20 @@ var require = {
         "underscore.string": "js/vendor/underscore.string.min",
         "backbone": "js/vendor/backbone-min",
         "backbone.associations": "js/vendor/backbone-associations-min",
-        "youtube": "js/load_youtube",
         "tinymce": "js/vendor/tiny_mce/tiny_mce",
         "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
-        "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
         "xmodule": "/xmodule/xmodule",
-        "utility": "js/src/utility"
+        "xblock": "coffee/src/xblock",
+        "utility": "js/src/utility",
+        "draggabilly": "js/vendor/draggabilly.pkgd",
+
+        // externally hosted files
+        "tender": "//edxedge.tenderapp.com/tender_widget",
+        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        // youtube URL does not end in ".js". We add "?noext" to the path so
+        // that require.js adds the ".js" to the query component of the URL,
+        // and leaves the path component intact.
+        "youtube": "//www.youtube.com/player_api?noext"
     },
     shim: {
         "gettext": {
@@ -136,6 +146,9 @@ var require = {
             deps: ["backbone"],
             exports: "Backbone.Associations"
         },
+        "youtube": {
+            exports: "YT"
+        },
         "codemirror": {
             exports: "CodeMirror"
         },
@@ -146,17 +159,51 @@ var require = {
             exports: "tinymce"
         },
         "mathjax": {
-            exports: "MathJax"
+            exports: "MathJax",
+            init: function() {
+              MathJax.Hub.Config({
+                tex2jax: {
+                  inlineMath: [
+                    ["\\(","\\)"],
+                    ['[mathjaxinline]','[/mathjaxinline]']
+                  ],
+                  displayMath: [
+                    ["\\[","\\]"],
+                    ['[mathjax]','[/mathjax]']
+                  ]
+                }
+              });
+              MathJax.Hub.Configured();
+            }
+        },
+        "xblock/core": {
+            exports: "XBlock",
+            deps: ["jquery", "jquery.immediateDescendents"]
+        },
+        "xblock/runtime.v1": {
+            exports: "XBlock",
+            deps: ["xblock/core"]
+        },
+
+        "coffee/src/main": {
+            deps: ["coffee/src/ajax_prefix"]
+        },
+        "coffee/src/logger": {
+            exports: "Logger",
+            deps: ["coffee/src/ajax_prefix"]
         }
     },
-    // load these automatically
-    deps: ["js/base", "coffee/src/main", "datepair"]
-    // we need "datepair" because it dynamically modifies the page when it is loaded -- yuck!
+    // load jquery and gettext automatically
+    deps: ["jquery", "gettext"],
+    callback: function() {
+        // load other scripts on every page, after jquery loads
+        require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair"]);
+        // we need "datepair" because it dynamically modifies the page
+        // when it is loaded -- yuck!
+    }
 };
 </script>
 <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
-<script type="text/javascript" src="${static.url("coffee/src/logger.js")}"></script>
-<script type="text/javascript" src="${static.url("coffee/src/ajax_prefix.js")}"></script>
 
 ## js templates
 <script id="system-feedback-tpl" type="text/template">
@@ -187,6 +234,9 @@ require(['js/models/course'], function(Course) {
       <%block name="content"></%block>
 
       % if user.is_authenticated():
+      <script type="text/javascript">
+        require(['js/sock']);
+      </script>
       <%include file="widgets/sock.html" />
       % endif
 

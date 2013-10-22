@@ -14,6 +14,7 @@ from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
+from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
 
 log = logging.getLogger(__name__)
 
@@ -28,32 +29,50 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xmodule(template, block, view, frag, context):  # pylint: disable=unused-argument
+def wrap_xblock(block, view, frag, context, display_name_only=False):  # pylint: disable=unused-argument
     """
-    Wraps the results of get_html in a standard <section> with identifying
+    Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
 
-    get_html: An XModule.get_html method or an XModuleDescriptor.get_html method
-    module: An XModule
-    template: A template that takes the variables:
-        content: the results of get_html,
-        display_name: the display name of the xmodule, if available (None otherwise)
-        class_: the module class name
-        module_name: the js_module_name of the module
+    :param block: An XBlock (that may be an XModule or XModuleDescriptor)
+    :param view: The name of the view that rendered the fragment being wrapped
+    :param frag: The :class:`Fragment` to be wrapped
+    :param context: The context passed to the view being rendered
+    :param display_name_only: If true, don't render the fragment content at all.
+        Instead, just render the `display_name` of `block`
     """
 
-    # If XBlock generated this class, then use the first baseclass
-    # as the name (since that's the original, unmixed class)
+    # If any mixins have been applied, then use the unmixed class
     class_name = getattr(block, 'unmixed_class', block.__class__).__name__
 
+    data = {}
+    css_classes = ['xblock', 'xblock-' + view]
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        if view == 'student_view':
+            # The block is acting as an XModule
+            css_classes.append('xmodule_display')
+        elif view == 'studio_view':
+            # The block is acting as an XModuleDescriptor
+            css_classes.append('xmodule_edit')
+
+        css_classes.append('xmodule_' + class_name)
+        data['type'] = block.js_module_name
+        shim_xmodule_js(frag)
+
+    if frag.js_init_fn:
+        data['init'] = frag.js_init_fn
+        data['runtime-version'] = frag.js_init_version
+        data['usage-id'] = block.scope_ids.usage_id
+        data['block-type'] = block.scope_ids.block_type
+
     template_context = {
-        'content': frag.content,
-        'display_name': block.display_name,
-        'class_': class_name,
-        'module_name': block.js_module_name,
+        'content': block.display_name if display_name_only else frag.content,
+        'classes': css_classes,
+        'data_attributes': ' '.join('data-{}="{}"'.format(key, value) for key, value in data.items()),
     }
 
-    return wrap_fragment(frag, render_to_string(template, template_context))
+    return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
 def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, context):  # pylint: disable=unused-argument
@@ -134,7 +153,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         return frag
 
     block_id = block.id
-    if block.descriptor.has_score:
+    if block.has_score:
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
     else:
@@ -142,7 +161,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         render_histogram = False
 
     if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-        [filepath, filename] = getattr(block.descriptor, 'xml_attributes', {}).get('filename', ['', None])
+        [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
         osfs = block.system.filestore
         if filename is not None and osfs.exists(filename):
             # if original, unmangled filename exists then use it (github
@@ -163,13 +182,13 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
     # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
     now = datetime.datetime.now(UTC())
     is_released = "unknown"
-    mstart = block.descriptor.start
+    mstart = block.start
 
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
     staff_context = {'fields': [(name, field.read_from(block)) for name, field in block.fields.items()],
-                     'xml_attributes': getattr(block.descriptor, 'xml_attributes', {}),
+                     'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
                      'xqa_key': block.xqa_key,
                      'source_file': source_file,

@@ -151,9 +151,10 @@ def i_see_new_course_image(_step):
     assert len(images) == 1
     img = images[0]
     expected_src = '/c4x/MITx/999/asset/image.jpg'
+
     # Don't worry about the domain in the URL
-    assert img['src'].endswith(expected_src), "Was looking for {expected}, found {actual}".format(
-        expected=expected_src, actual=img['src'])
+    success_func = lambda _: img['src'].endswith(expected_src)
+    world.wait_for(success_func)
 
 
 @step('the image URL should be present in the field')

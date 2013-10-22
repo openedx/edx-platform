@@ -3,7 +3,7 @@ $ ->
     window.$$contents = {}
   $.fn.extend
     loading: ->
-      @$_loading = $("<div class='loading-animation'></div>")
+      @$_loading = $("<div class='loading-animation'><span class='sr'>Loading content</span></div>")
       $(this).after(@$_loading)
     loaded: ->
       @$_loading.remove()
