@@ -1,0 +1,27 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%!
+  from django.core.urlresolvers import reverse
+  from courseware.courses import course_image_url, get_course_about_section
+  import waffle
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+%if verification_status == 'denied':
+<li class="status status--verification is-denied">
+  <span class="title"><div class="icon"></div>${_("Verification Status")}</span><span class="data">${verification_msg}</span>
+
+  <ul class="list--nav">
+    <li class="nav__item nav__item--reverify">
+      <a href="${reverse('verify_student_reverify')}" class="action">${_("Please submit new verification photos.")}</a>
+    </li>
+  </ul>
+
+  <div class="msg msg--warning">
+    <h3 class="msg__title">${_("Please Note:")}</h3>
+    <div class="msg__copy">
+      <p>${_("If you fail to pass a verification attempt before the course ends, you will not receive a verified certificate.")}</p>
+    </div>
+  </div>
+</li>
+%endif

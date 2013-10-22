@@ -75,6 +75,12 @@
           margin-bottom: 15px;
           padding-bottom: 17px;
 
+          &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+          }
+
           &:hover, &:focus {
             .title .icon {
               opacity: 1.0;
@@ -758,6 +764,66 @@
     a.email-settings {
       @extend a.unenroll;
       margin-right: 10px;
+    }
+  }
+
+  // account-related
+  .user-info {
+
+    // status
+    .status {
+
+      .list--nav {
+        margin: ($baseline/2) 0 0 0;
+        padding: 0;
+      }
+
+      .nav__item {
+        @extend %t-weight4;
+        @include font-size(13);
+        margin-left: 26px;
+      }
+    }
+  }
+
+  // status - verification
+  .status--verification {
+
+    .data {
+      white-space: normal !important;
+      text-overflow: no !important;
+      overflow: visible !important;
+    }
+
+    .list--nav {
+      margin-left: 26px;
+    }
+
+    // STATE: is denied
+    &.is-denied {
+
+      .data {
+        color: $error-color !important;
+      }
+    }
+  }
+
+  // message
+  .msg {
+    margin: ($baseline/2) 0 ($baseline/2) 26px;
+  }
+
+  .msg__title {
+    @extend %hd-lv5;
+    color: $lighter-base-font-color;
+  }
+
+  .msg__copy {
+    @extend %copy-metadata;
+    color: $lighter-base-font-color;
+
+    p {
+      @extend %t-copy;
     }
   }
 }

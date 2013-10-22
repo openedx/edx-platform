@@ -271,14 +271,18 @@
 %copy-link {
   border-bottom: 1px dotted transparent;
 
+<<<<<<< HEAD
   &:hover, &:active, &:focus {
+=======
+  &:hover, &:active {
+>>>>>>> LMS: revises semantics and styling for dashboard messages
     border-color: $link-color-d1;
   }
 }
 
 %copy-badge {
   @extend %t-title8;
-  @extend %t-weight5;
+  @extend %t-weight3;
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
   text-transform: uppercase;
