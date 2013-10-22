@@ -167,3 +167,13 @@ class RelativeTimeTest(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             RelativeTimeTest.delta.to_json("123")
+
+    def test_str(self):
+        self.assertEqual(
+            "1:02:03",
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
+        )
+        self.assertEqual(
+            "11:02:03",
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=39723))
+        )

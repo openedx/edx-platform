@@ -207,3 +207,15 @@ class RelativeTime(Field):
             return str(value)
 
         raise TypeError("RelativeTime: cannot convert {!r} to json".format(value))
+
+    def __str__(self):
+        """
+        Makes first H in str representation non-optional.
+
+         str(timedelta) has [H]H:MM:SS format, which is not suitable
+         for front-end (and IsoTime standart), so we forse HH:MM:SS
+         """
+        _str = super(RelativeTime, slef).__str__(self)
+        if len(_str) == 7:
+            _str = '0' + _str
+        return _str
