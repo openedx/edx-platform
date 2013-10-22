@@ -283,21 +283,6 @@ class LocatorTest(TestCase):
             Locator.to_locator_or_location("hello.world.not.a.url")
         self.assertIsNone(Locator.parse_url("unknown://foo.bar/baz"))
 
-    def test_as_old(self):
-        """
-        Test the as_old_location_xxx accessors
-        """
-        locator = CourseLocator(course_id='org.course.id.run', branch='mybranch')
-        self.assertEqual('org', locator.as_old_location_org)
-        self.assertEqual('course.id', locator.as_old_location_course)
-        self.assertEqual('run', locator.as_old_location_run)
-        self.assertEqual('org/course.id/run', locator.as_old_location_course_id)
-        locator = CourseLocator(course_id='org.course', branch='mybranch')
-        self.assertEqual('org', locator.as_old_location_org)
-        self.assertIsNone(locator.as_old_location_course)
-        self.assertEqual('course', locator.as_old_location_run)
-        self.assertEqual('org/course', locator.as_old_location_course_id)
-
     def test_description_locator_url(self):
         object_id = '{:024x}'.format(random.randrange(16 ** 24))
         definition_locator = DefinitionLocator(object_id)
