@@ -131,9 +131,9 @@ def course_index(request, course_url):
     lms_link = get_lms_link_for_item(old_location)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': location.as_old_location_org,
-        'course': location.as_old_location_course,
-        'coursename': location.as_old_location_run
+        'org': old_location.org,
+        'course': old_location.course,
+        'coursename': old_location.name
     })
 
     course = modulestore().get_item(old_location, depth=3)
