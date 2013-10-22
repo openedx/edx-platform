@@ -376,10 +376,10 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           @el.find('input').last().trigger('input')
           expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
 
-      describe "MetadataView.IsoTime allows the user to enter time string in HH:mm:ss format", ->
+      describe "MetadataView.RelativeTime allows the user to enter time string in HH:mm:ss format", ->
           beforeEach ->
               model = new MetadataModel(timeEntry)
-              @view = new MetadataView.IsoTime({model: model})
+              @view = new MetadataView.RelativeTime({model: model})
 
           it "uses a text input type", ->
               assertInputType(@view, 'text')
