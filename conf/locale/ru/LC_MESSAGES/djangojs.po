@@ -29,13 +29,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:67
+#: cms/static/coffee/src/views/module_edit.js:77
 #, c-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:121
-#: cms/static/coffee/src/views/unit.js:68 cms/static/js/base.js:841
+#: cms/static/coffee/src/views/module_edit.js:131
+#: cms/static/coffee/src/views/unit.js:86 cms/static/js/base.js:841
 #: cms/static/js/models/section.js:26 cms/static/js/views/asset_view.js:84
 #: cms/static/js/views/course_info_edit.js:121
 #: cms/static/js/views/course_info_edit.js:330
@@ -44,33 +44,33 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/module_edit.js:130
+#: cms/static/coffee/src/views/module_edit.js:140
 msgid "There was an error saving your changes. Please try again."
 msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
 
-#: cms/static/coffee/src/views/tabs.js:88
+#: cms/static/coffee/src/views/tabs.js:96
 msgid "Delete Component Confirmation"
 msgstr "Подверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:89
+#: cms/static/coffee/src/views/tabs.js:97
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы уверены, что хотите удалить этот компонент? Операция необратима."
 
-#: cms/static/coffee/src/views/tabs.js:92
+#: cms/static/coffee/src/views/tabs.js:100
 #: cms/static/js/views/course_info_edit.js:178
 msgid "OK"
 msgstr "ОК"
 
-#: cms/static/coffee/src/views/tabs.js:103
-#: cms/static/coffee/src/views/unit.js:168 cms/static/js/base.js:402
+#: cms/static/coffee/src/views/tabs.js:111
+#: cms/static/coffee/src/views/unit.js:186 cms/static/js/base.js:402
 #: cms/static/js/views/course_info_edit.js:186
 #: cms/static/js/views/textbook.js:38
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:116
-#: cms/static/coffee/src/views/unit.js:191 cms/static/js/base.js:418
+#: cms/static/coffee/src/views/tabs.js:124
+#: cms/static/coffee/src/views/unit.js:209 cms/static/js/base.js:418
 #: cms/static/js/views/asset_view.js:71
 #: cms/static/js/views/course_info_edit.js:204
 #: cms/static/js/views/textbook.js:48
@@ -80,15 +80,15 @@ msgstr "Удаление&hellip;"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: cms/static/coffee/src/views/unit.js:159
+#: cms/static/coffee/src/views/unit.js:177
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:160
+#: cms/static/coffee/src/views/unit.js:178
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Удаление этого компонента необратимо."
 
-#: cms/static/coffee/src/views/unit.js:163
+#: cms/static/coffee/src/views/unit.js:181
 msgid "Yes, delete this component"
 msgstr "Да, удалить"
 
@@ -373,13 +373,13 @@ msgstr "Файлы должны быть в формате PNG или JPEG."
 msgid "Submit"
 msgstr "Отправить"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:69
-#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:69
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:106
+#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:106
 msgid "points"
 msgstr "баллов"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:73
-#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:73
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:110
+#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:110
 #, c-format
 msgid "%s point possible"
 msgid_plural "%s points possible"
@@ -387,61 +387,61 @@ msgstr[0] "%s балл"
 msgstr[1] "%s балла"
 msgstr[2] "%s баллов"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:520
-#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:520
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:554
+#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:554
 msgid "unanswered"
 msgstr "не отвечен"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:550
-#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:550
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:584
+#: common/static/xmodule/modules/js/001-776132de16f34b3989be24dfaebad412.js:584
 msgid "Status: unsubmitted"
 msgstr "Статус: не сдан"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:265
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:265
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:351
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:351
 msgid "The problem state got out of sync.  Try reloading the page."
 msgstr ""
 "Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:327
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:327
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:413
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:413
 msgid "You need to pick a rating before you can submit."
 msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:372
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:661
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:372
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:661
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:458
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:458
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:747
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr ""
 "Ваши оценки не соответствуют критериям для того что приступить к следующему "
 "этапу."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:385
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:385
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:471
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:471
 msgid "Submit assessment"
 msgstr "Отправить задание"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:392
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:392
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:478
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:478
 msgid ""
 "Your response has been submitted.  Please check back later for your grade."
 msgstr ""
 "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
 "оценки."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:403
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:403
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:489
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:489
 msgid "Submit post-assessment"
 msgstr "Отправить ответ"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:446
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:446
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:532
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:532
 msgid "Answer saved, but not yet submitted."
 msgstr "Ваш ответ сохранен, но еще не отправлен."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:477
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:477
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:563
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:563
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
@@ -449,8 +449,8 @@ msgstr ""
 "Пожалуйста, подтвердите, что вы хотите отправить вашу работу. Вы не сможете "
 "вносить какие-либо изменения после отправки."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:502
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:502
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:588
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:588
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
@@ -458,19 +458,19 @@ msgstr ""
 "Вы пытаетесь загрузить слишком большой фаил для нашей системы. Пожалйста "
 "выберите фаил меньше 2MB или вставьте ссылку на ваш фаил в поле для ответа."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:613
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:613
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:699
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:699
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
 msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:659
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:659
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:745
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:745
 msgid "Moved to next step."
 msgstr "Перейти к следующему шагу."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:717
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:717
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:803
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:803
 msgid ""
 "File uploads are required for this question, but are not supported in this "
 "browser. Try the newest version of google chrome.  Alternatively, if you "
@@ -481,39 +481,40 @@ msgstr ""
 "поддерживается вашим браузером. Попробуйте обновить ваш браузер , либо вы "
 "можете загрузить ваш фаил в интернет и вставить ссылку в поле для ответа."
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:746
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:755
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:811
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:575
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:584
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:746
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:755
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:811
-#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:575
-#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:584
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:832
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:841
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:897
+#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:631
+#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:640
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:832
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:841
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:897
+#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:631
+#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:640
 msgid "Hide Question"
 msgstr "Скрыть задание"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:819
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:576
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:747
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:819
-#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:576
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:833
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:905
+#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:632
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:833
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:905
+#: common/static/xmodule/modules/js/002-3597609ac17433cb889c1309148f74e8.js:632
 msgid "Show Question"
 msgstr "Показать задание"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:826
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:826
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:912
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:912
 msgid "See full feedback"
 msgstr "Посмотреть полную обратную связь"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:828
-#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:828
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:914
+#: common/static/xmodule/modules/js/001-265a3649baf237aba2d9146706347c3e.js:914
 msgid "Respond to Feedback"
 msgstr "Ответить на обратную связь"
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:153
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:177
+#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:177
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -521,7 +522,8 @@ msgstr ""
 "Вы зарегистрированны на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:154
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:178
+#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:178
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
@@ -564,43 +566,43 @@ msgstr "Включить заголовки"
 msgid "Turn off captions"
 msgstr "Отключить заголовки"
 
-#: common/static/coffee/src/discussion/discussion_module_view.js:59
-#: common/static/coffee/src/discussion/discussion_module_view.js:78
+#: common/static/coffee/src/discussion/discussion_module_view.js:69
+#: common/static/coffee/src/discussion/discussion_module_view.js:88
 msgid "Hide Discussion"
 msgstr "Скрыть дискуссии"
 
-#: common/static/coffee/src/discussion/discussion_module_view.js:74
+#: common/static/coffee/src/discussion/discussion_module_view.js:84
 msgid "Show Discussion"
 msgstr "Показать дискуссии"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:80
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:152
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:88
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:156
 msgid "Misuse Reported"
 msgstr "Жалоба отправлена"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:84
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:156
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:92
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:160
 msgid "Report Misuse"
 msgstr "Пожаловаться"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:92
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:100
 msgid "Pinned"
 msgstr "Прикрепленно"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:96
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:104
 msgid "Pin Thread"
 msgstr "Прикрепить тему"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:210
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:218
 msgid "Pinning not currently available"
 msgstr "Прикрепление недоступно"
 
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:50
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js:54
 msgid "anonymous"
 msgstr "аноним"
 
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:66
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:66
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js:70
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:70
 msgid "staff"
 msgstr "преподаватель"
 
