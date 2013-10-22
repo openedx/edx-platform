@@ -264,10 +264,6 @@ SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True
 
-########################## GIT WORKFLOW ########################
-
-CMS_ADD_COURSE_SCRIPT = REPO_ROOT / "scripts/cms_git_add_course"
-
 ###################### Payment ##############################3
 
 CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
