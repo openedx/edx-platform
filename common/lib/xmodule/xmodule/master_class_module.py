@@ -85,7 +85,7 @@ class MasterClassModule(MasterClassFields, XModule):
         """Return success json answer for client."""
         total_register = len(self.passed_registrations)
         message = ""
-        if self.runtime.anonymous_student_id in self.passed_registrations:
+        if self.runtime.user.email in self.passed_registrations:
             message = _("You have been registered for this master class. We will provide addition information soon.")
         else:
             message = _("You are pending for registration for this master class. Please visit this page later for result.")
