@@ -82,10 +82,11 @@
 
 %copy-badge {
   @extend %t-title8;
-  @extend %t-weight5;
+  @extend %t-weight4;
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
   text-transform: uppercase;
+  letter-spacing: 0.1rem;
 }
 
 // ====================

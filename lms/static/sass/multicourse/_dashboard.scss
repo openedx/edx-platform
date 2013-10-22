@@ -419,22 +419,22 @@
       // STATE: course mode - verified
       &.verified {
         @extend %ui-depth2;
-        margin-top: ($baseline*2.5);
-        border-top: 1px solid $verified-color-lvl3;
-        padding-top: ($baseline*1.25);
-        background: $white;
+        position: relative;
 
-        // FIXME: bad, but needed selector!
-        .info > hgroup .date-block {
-          top: ($baseline*1.25);
+        .cover {
+          border-radius: ($baseline/10);
+          border: 1px solid $verified-color-lvl3;
+          border-bottom: 4px solid $verified-color-lvl3;
+          padding: ($baseline/10);
         }
 
         // course enrollment status message
         .sts-enrollment {
           display: inline-block;
           position: absolute;
-          top: -28px;
-          right: ($baseline/2);
+          top: 105px;
+          left: 55px;
+          bottom: ($baseline/2);
           text-align: center;
 
           .label {
@@ -454,8 +454,8 @@
             @extend %copy-badge;
             border-radius: 0;
             padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
-            color: $white;
             background: $verified-color-lvl3;
+            color: $white;
           }
         }
       }
