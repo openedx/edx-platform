@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import bleach
+from html5lib.tokenizer import HTMLTokenizer
 from xmodule.progress import Progress
 import capa.xqueue_interface as xqueue_interface
 from capa.util import *
@@ -53,7 +54,7 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 # Used by sanitize_html
 ALLOWED_HTML_ATTRS = {
     '*': ['id', 'class', 'height', 'width', 'alt'],
-    'a': ['href', 'title', 'rel'],
+    'a': ['href', 'title', 'rel', 'target'],
     'embed': ['src'],
     'iframe': ['src'],
     'img': ['src'],
@@ -222,7 +223,11 @@ class OpenEndedChild(object):
                                   tags=['embed', 'iframe', 'a', 'img', 'br'],
                                   attributes=ALLOWED_HTML_ATTRS,
                                   strip=True)
-        return OpenEndedChild.replace_newlines(clean_html)
+        autolinked = bleach.linkify(clean_html,
+                                    callbacks=[bleach.callbacks.target_blank],
+                                    skip_pre=True,
+                                    tokenizer=HTMLTokenizer)
+        return OpenEndedChild.replace_newlines(autolinked)
 
     @staticmethod
     def replace_newlines(html):
