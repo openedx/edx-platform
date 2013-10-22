@@ -396,15 +396,15 @@ class TestDeserializeRelativeTime(TestDeserialize):
 
     def test_deserialize(self):
         """
-        There is nono check for
+        There is no check for
 
         self.assertDeserializeEqual('10:20:30', '10:20:30')
         self.assertDeserializeNonString()
 
         because these two tests work only because json.loads fires exception,
-        and xml_module.deserialized_field catches it and returns same value
+        and xml_module.deserialized_field catches it and returns same value,
         so there is nothing field-specific here.
-        But othere modules do it, so I'm leaving this comment for PR reviewers.
+        But other modules do it, so I'm leaving this comment for PR reviewers.
         """
 
         # test that from_json produces no exceptions
