@@ -173,14 +173,14 @@
   a {
     @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
-    &:link, &:visited, &:hover, &:active {
+    &:link, &:visited, &:hover, &:active, &:focus {
       color: $link-color-d1;
       font-weight: 400;
       text-decoration: none !important; // needed but nasty
       font-family: $sans-serif;
     }
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       text-decoration: none !important; // needed but nasty
       border-bottom: 1px dotted $link-color-d1;
     }

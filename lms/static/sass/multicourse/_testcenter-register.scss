@@ -484,7 +484,7 @@
 						}
 					}
 
-					&:hover {
+					&:hover, &:focus {
 
 						.details, .item, .instructions {
 							opacity: 1.0;
@@ -546,7 +546,7 @@
 				  font-size: 13px;
 				  font-weight: bold;
 
-				  &:hover {
+				  &:hover, &:focus {
 				    text-decoration: none;
 				  }
 				}
@@ -681,7 +681,7 @@
 				font-weight: bold;
 				letter-spacing: 0;
 
-				&:hover {
+				&:hover, &:focus {
 				  text-decoration: none;
 				}
 			}
@@ -743,7 +743,7 @@
 						color: $red;
 						text-decoration: none;
 
-						&:hover, &:active {
+						&:hover, &:active, &:focus {
 							text-decoration: underline;
 						}
 					}

@@ -87,7 +87,7 @@ section.wiki {
     font-size: 0.72em;
     font-weight: 600;
 
-    &:hover {
+    &:hover, &:focus {
       text-decoration: none;
     }
   }
@@ -260,7 +260,7 @@ section.wiki {
         font-size: 0.9em;
         line-height: 25px;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #f6f6f6;
           text-decoration: none;
         }
@@ -302,7 +302,7 @@ section.wiki {
             background-position: -25px -99px;
           }
 
-          &:hover {
+          &:hover, &:focus {
             background: none;
           }
         }
@@ -349,7 +349,7 @@ section.wiki {
         background-position: 0 -99px;
       }
 
-      &:hover {
+      &:hover, &:focus {
         background-color: #f6f6f6;
         text-decoration: none;
       }
@@ -465,7 +465,7 @@ section.wiki {
     text-transform: none !important;
     letter-spacing: 0 !important;
 
-    &:hover {
+    &:hover, &:focus {
       color: $base-font-color;
       text-decoration: none;
     }
@@ -662,7 +662,7 @@ section.wiki {
       background: #f9f9f9;
       border-radius: 5px;
 
-      a:hover {
+      a:hover, a:focus {
         text-decoration: none;
       }
     }
@@ -823,7 +823,7 @@ section.wiki {
     a {
       color: #aaa;
 
-      &:hover {
+      &:hover, &:focus {
         color: #777;
       }
     }
@@ -1007,7 +1007,7 @@ section.wiki {
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
-        &:hover {
+        &:hover, &:focus {
           background: darken($pink, 12%);
         }
       }
@@ -1078,7 +1078,7 @@ section.wiki {
     text-transform: none !important;
     letter-spacing: 0 !important;
 
-    &:hover {
+    &:hover, &:focus {
       color: $base-font-color;
       text-decoration: none;
     }

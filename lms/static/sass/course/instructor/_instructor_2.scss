@@ -350,7 +350,7 @@ section.instructor-dashboard-content-2 {
       height: 10px;
       background: url('../images/moderator-delete-icon.png') left center no-repeat;
       opacity: 0.7;
-      &:hover  { opacity: 0.8; }
+      &:hover, &:focus  { opacity: 0.8; }
       &:active { opacity: 0.9; }
 
       // @include idashbutton($danger-red);
@@ -493,7 +493,7 @@ section.instructor-dashboard-content-2 {
     height: 17px;
     background: url('../images/info-icon-dark.png') left center no-repeat;
     opacity: 0.35;
-    &:hover  { opacity: 0.45; }
+    &:hover, &:focus  { opacity: 0.45; }
     &:active { opacity: 0.5; }
   }
 

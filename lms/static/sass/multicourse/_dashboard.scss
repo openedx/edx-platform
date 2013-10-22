@@ -75,7 +75,7 @@
           margin-bottom: 15px;
           padding-bottom: 17px;
 
-          &:hover {
+          &:hover, &:focus {
             .title .icon {
               opacity: 1.0;
             }
@@ -162,7 +162,7 @@
         border-radius: 11px;
         background: $dot-color;
 
-        &:hover {
+        &:hover, &:focus {
           background: $lighter-base-font-color;
         }
 
@@ -265,7 +265,7 @@
         padding: 5px 10px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-        &:hover {
+        &:hover, &:focus {
           color: $link-color;
           text-decoration: none;
         }
@@ -350,7 +350,7 @@
             line-height: 42px;
             font-weight: 300;
 
-            &:hover {
+            &:hover, &:focus {
               text-decoration: none;
             }
           }
@@ -405,12 +405,12 @@
             font: normal 15px/1.6rem $sans-serif;
             padding: 6px 32px 7px;
 
-            &:hover {
+            &:hover, &:focus {
               text-decoration: none;
             }
           }
 
-          &:hover {
+          &:hover, &:focus {
             text-decoration: none;
           }
         }
@@ -522,7 +522,7 @@
             &.disabled {
               cursor: default !important;
 
-              &:hover {
+              &:hover, &:focus {
                 background: #eee;
                 background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
                 background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
@@ -584,7 +584,7 @@
         font-weight: bold;
         letter-spacing: 0;
 
-        &:hover {
+        &:hover, &:focus {
           text-decoration: none;
         }
       }
@@ -624,7 +624,7 @@
       font-size: .8em;
       margin-top: 32px;
 
-      &:hover {
+      &:hover, &:focus {
         color: #333;
       }
     }
