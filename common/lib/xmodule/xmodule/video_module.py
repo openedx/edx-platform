@@ -81,13 +81,13 @@ class VideoFields(object):
         default=""
     )
     start_time = RelativeTime(  # datetime.timedelta object
-        help="Start time for the video.",
+        help="Start time for the video (HH:MM:SS).",
         display_name="Start Time",
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     end_time = RelativeTime(  # datetime.timedelta object
-        help="End time for the video.",
+        help="End time for the video (HH:MM:SS).",
         display_name="End Time",
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
