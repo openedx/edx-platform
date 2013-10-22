@@ -32,4 +32,4 @@ class @Conditional
           else
             $(element).show()
 
-        XModule.loadModules @el
+        XBlock.initializeBlocks @el

@@ -27,6 +27,33 @@ div.video {
     height: 0px;
   }
 
+  .wrapper-downloads {
+    margin: 0;
+    padding: 0;
+
+    .video-sources,
+    .video-tracks {
+      display: inline-block;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
+
+      a {
+        @include transition(all 0.25s ease-in-out 0s);
+        @include font-size(14);
+        display: inline-block;
+        border-radius: 3px 3px 3px 3px;
+        background-color: $very-light-text;
+        padding: ($baseline*.75);
+        color: $lighter-base-font-color;
+
+        &:hover {
+          background-color: $action-primary-active-bg;
+          color: $very-light-text;
+        }
+      }
+
+    }
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
@@ -47,10 +74,8 @@ div.video {
     }
 
     section.video-player {
-      height: 0;
       overflow: hidden;
-      padding-bottom: 56.25%;
-      position: relative;
+      min-height: 300px;
 
       div {
         &.hidden {
@@ -58,12 +83,9 @@ div.video {
         }
       }
 
-      object, iframe {
+      object, iframe, video {
         border: none;
         height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
         width: 100%;
       }
 
@@ -392,7 +414,7 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
-          
+
             &:hover, &:active {
               background-color: #444;
               color: #fff;
@@ -457,7 +479,7 @@ div.video {
           text-indent: -9999px;
           @include transition(none);
           width: 30px;
-          
+
           &:hover, &:active {
             background-color: #444;
             color: #fff;
@@ -551,6 +573,7 @@ div.video {
     margin: 0;
     font-size: 14px;
     list-style: none;
+    visibility: visible;
 
     li {
       border: 0;
@@ -673,15 +696,12 @@ div.video {
         display: table-cell;
         vertical-align: middle;
         float: none;
-      }
 
-      object, iframe {
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        overflow: hidden;
-        position: fixed;
-        top: 0;
+        object, iframe, video{
+          position: absolute;
+          width: auto;
+          height: auto;
+        }
       }
 
       section.video-controls {
@@ -703,6 +723,7 @@ div.video {
       position: fixed;
       right: 0;
       top: 0;
+      visibility: visible;
       @include transition(none);
 
       li {

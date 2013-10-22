@@ -1,8 +1,11 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-<input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }" >
-<input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv" data-endpoint="${ section_data['get_students_features_url'] }" >
+
+<h2>${_("Data Download")}</h2>
+
+<input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }">
+<input type="button" name="list-profiles" value="CSV" data-csv="true">
 <br>
 ## <input type="button" name="list-grades" value="Student grades">
 ## <input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv">
@@ -10,8 +13,7 @@
 ## <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
 ## <br>
 <input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }">
-<input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }">
-
+<input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}">
 
 <div class="data-display">
   <div class="data-display-text"></div>

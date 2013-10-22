@@ -113,16 +113,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         try:
             child = self.get_display_items()[0]
-            out = child.get_html()
+            out = child.render('student_view').content
             # The event listener uses the ajax url to find the child.
-            child_url = child.system.ajax_url
+            child_id = child.id
         except IndexError:
-            out = 'Error in loading crowdsourced hinter - can\'t find child problem.'
-            child_url = ''
+            out = u"Error in loading crowdsourced hinter - can't find child problem."
+            child_id = ''
 
         # Wrap the module in a <section>.  This lets us pass data attributes to the javascript.
-        out += '<section class="crowdsource-wrapper" data-url="' + self.system.ajax_url +\
-            '" data-child-url = "' + child_url + '"> </section>'
+        out += u'<section class="crowdsource-wrapper" data-url="{ajax_url}" data-child-id="{child_id}"> </section>'.format(
+            ajax_url=self.runtime.ajax_url,
+            child_id=child_id
+        )
 
         return out
 
@@ -172,7 +174,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             out.update({'op': 'error'})
         else:
             out.update({'op': dispatch})
-        return json.dumps({'contents': self.system.render_template('hinter_display.html', out)})
+        return json.dumps({'contents': self.runtime.render_template('hinter_display.html', out)})
 
     def get_hint(self, data):
         """

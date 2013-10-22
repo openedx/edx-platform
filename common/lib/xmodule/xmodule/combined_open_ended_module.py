@@ -497,7 +497,7 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     metadata_translations = {
         'is_graded': 'graded',
         'attempts': 'max_attempts',
-        }
+    }
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

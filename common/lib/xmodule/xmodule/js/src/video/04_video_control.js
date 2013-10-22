@@ -57,12 +57,20 @@ function () {
             state.videoControl.play();
         }
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.videoControl.fadeOutTimeout = state.config.fadeOutTimeout;
 
             state.videoControl.el.addClass('html5');
             state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
         }
+
+        // ARIA
+        // Let screen readers know that this anchor, representing the slider
+        // handle, behaves as a slider named 'video slider'.
+        state.videoControl.sliderEl.find('.ui-slider-handle').attr({
+            'role': 'slider',
+            'title': gettext('video slider')
+        });
     }
 
     // function _bindHandlers(state)
@@ -73,7 +81,7 @@ function () {
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.el.on('mousemove', state.videoControl.showControls);
             state.el.on('keydown', state.videoControl.showControls);
         }
@@ -162,19 +170,40 @@ function () {
 
     function toggleFullScreen(event) {
         event.preventDefault();
-        var fullScreenClassNameEl = this.el.add(document.documentElement);
+        var fullScreenClassNameEl = this.el.add(document.documentElement),
+            win = $(window),
+            text;
 
         if (this.videoControl.fullScreenState) {
-            this.videoControl.fullScreenState = false;
+            this.videoControl.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
-            this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', gettext('Fullscreen'));
+            text = gettext('Fill browser');
+
+            this.resizer
+                .setParams({
+                    container: this.videoEl.parent()
+                })
+                .setMode('width');
+
+            win.scrollTop(this.scrollPos);
         } else {
-            this.videoControl.fullScreenState = true;
+            this.scrollPos = win.scrollTop();
+            win.scrollTop(0);
+            this.videoControl.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
-            this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', gettext('Exit fullscreen'));
+            text = gettext('Exit full browser');
+
+            this.resizer
+                .setParams({
+                    container: window
+                })
+                .setMode('both');
+
         }
+
+        this.videoControl.fullScreenEl
+            .attr('title', text)
+            .text(text);
 
         this.trigger('videoCaption.resize', null);
     }

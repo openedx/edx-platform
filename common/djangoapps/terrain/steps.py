@@ -21,14 +21,16 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(r'I wait (?:for )?"(\d+)" seconds?$')
-def wait(step, seconds):
+@step(r'I wait (?:for )?"(\d+\.?\d*)" seconds?$')
+def wait_for_seconds(step, seconds):
     world.wait(seconds)
 
 
 @step('I reload the page$')
 def reload_the_page(step):
+    world.wait_for_ajax_complete()
     world.browser.reload()
+    world.wait_for_js_to_load()
 
 
 @step('I press the browser back button$')
@@ -143,9 +145,9 @@ def should_see_in_the_page(step, doesnt_appear, text):
     else:
         multiplier = 1
     if doesnt_appear:
-        assert world.browser.is_text_not_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_not_present(text, wait_time=5 * multiplier)
     else:
-        assert world.browser.is_text_present(text, wait_time=5*multiplier)
+        assert world.browser.is_text_present(text, wait_time=5 * multiplier)
 
 
 @step('I am logged in$')
@@ -175,6 +177,11 @@ def dialogs_are_closed(step):
 @step(u'visit the url "([^"]*)"')
 def visit_url(step, url):
     world.browser.visit(django_url(url))
+
+
+@step(u'wait for AJAX to (?:finish|complete)')
+def wait_ajax(_step):
+    wait_for_ajax_complete()
 
 
 @step('I will confirm all alerts')

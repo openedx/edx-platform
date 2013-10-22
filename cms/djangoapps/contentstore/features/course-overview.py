@@ -72,7 +72,7 @@ def i_click_the_text_span(step, text):
     span_locator = '.toggle-button-sections span'
     assert_true(world.browser.is_element_present_by_css(span_locator))
     # first make sure that the expand/collapse text is the one you expected
-    assert_equal(world.browser.find_by_css(span_locator).value, text)
+    assert_true(world.css_has_value(span_locator, text))
     world.css_click(span_locator)
 
 
@@ -91,8 +91,7 @@ def i_expand_a_section(step):
 @step(u'I see the "([^"]*)" link$')
 def i_see_the_span_with_text(step, text):
     span_locator = '.toggle-button-sections span'
-    assert_true(world.is_css_present(span_locator))
-    assert_equal(world.css_value(span_locator), text)
+    assert_true(world.css_has_value(span_locator, text))
     assert_true(world.css_visible(span_locator))
 
 
@@ -128,10 +127,10 @@ def change_grading_status(step):
 
 @step(u'I reorder subsections')
 def reorder_subsections(_step):
-    draggable_css = 'a.drag-handle'
+    draggable_css = '.subsection-drag-handle'
     ele = world.css_find(draggable_css).first
     ele.action_chains.drag_and_drop_by_offset(
         ele._element,
-        30,
-        0
+        0,
+        25
     ).perform()

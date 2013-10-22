@@ -163,6 +163,10 @@ PROBLEM_DICT = {
 
 
 def answer_problem(problem_type, correctness):
+    # Make sure that the problem has been completely rendered before
+    # starting to input an answer.
+    world.wait_for_ajax_complete()
+
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'

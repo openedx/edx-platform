@@ -177,7 +177,7 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None):
         """
-        Returns whether or not a user has satisfactorily proved their
+        Return whether or not a user has satisfactorily proved their
         identity. Depending on the policy, this can expire after some period of
         time, so a user might have to renew periodically.
         """
@@ -194,7 +194,11 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_has_valid_or_pending(cls, user, earliest_allowed_date=None):
         """
-        TODO: eliminate duplication with user_is_verified
+        Return whether the user has a complete verification attempt that is or
+        *might* be good. This means that it's approved, been submitted, or would
+        have been submitted but had an non-user error when it was being
+        submitted. It's basically any situation in which the user has signed off
+        on the contents of the attempt, and we have not yet received a denial.
         """
         valid_statuses = ['must_retry', 'submitted', 'approved']
         earliest_allowed_date = (
@@ -210,11 +214,8 @@ class PhotoVerification(StatusModel):
     @classmethod
     def active_for_user(cls, user):
         """
-        Return all PhotoVerifications that are still active (i.e. not
-        approved or denied).
-
-        Should there only be one active at any given time for a user? Enforced
-        at the DB level?
+        Return the most recent PhotoVerification that is marked ready (i.e. the
+        user has said they're set, but we haven't submitted anything yet).
         """
         # This should only be one at the most, but just in case we create more
         # by mistake, we'll grab the most recently created one.
@@ -259,11 +260,6 @@ class PhotoVerification(StatusModel):
             they uploaded are good. Note that we don't actually do a submission
             anywhere yet.
         """
-        # if not self.face_image_url:
-        #     raise VerificationException("No face image was uploaded.")
-        # if not self.photo_id_image_url:
-        #     raise VerificationException("No photo ID image was uploaded.")
-
         # At any point prior to this, they can change their names via their
         # student dashboard. But at this point, we lock the value into the
         # attempt.
@@ -366,7 +362,9 @@ class PhotoVerification(StatusModel):
                      reviewing_service=""):
         """
         Mark that this attempt could not be completed because of a system error.
-        Status should be moved to `must_retry`.
+        Status should be moved to `must_retry`. For example, if Software Secure
+        reported to us that they couldn't process our submission because they
+        couldn't decrypt the image we sent.
         """
         if self.status in ["approved", "denied"]:
             return  # If we were already approved or denied, just leave it.
@@ -414,6 +412,21 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
+        """
+        Upload an image of the user's face to S3. `img_data` should be a raw
+        bytestream of a PNG image. This method will take the data, encrypt it
+        using our FACE_IMAGE_AES_KEY, encode it with base64 and save it to S3.
+
+        Yes, encoding it to base64 adds compute and disk usage without much real
+        benefit, but that's what the other end of this API is expecting to get.
+        """
+        # Skip this whole thing if we're running acceptance tests or if we're
+        # developing and aren't interested in working on student identity
+        # verification functionality. If you do want to work on it, you have to
+        # explicitly enable these in your private settings.
+        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            return
+
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
         aes_key = aes_key_str.decode("hex")
 
@@ -422,6 +435,23 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @status_before_must_be("created")
     def upload_photo_id_image(self, img_data):
+        """
+        Upload an the user's photo ID image to S3. `img_data` should be a raw
+        bytestream of a PNG image. This method will take the data, encrypt it
+        using a randomly generated AES key, encode it with base64 and save it to
+        S3. The random key is also encrypted using Software Secure's public RSA
+        key and stored in our `photo_id_key` field.
+
+        Yes, encoding it to base64 adds compute and disk usage without much real
+        benefit, but that's what the other end of this API is expecting to get.
+        """
+        # Skip this whole thing if we're running acceptance tests or if we're
+        # developing and aren't interested in working on student identity
+        # verification functionality. If you do want to work on it, you have to
+        # explicitly enable these in your private settings.
+        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            return
+
         aes_key = random_aes_key()
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_aes_key = rsa_encrypt(aes_key, rsa_key_str)
@@ -436,6 +466,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     @status_before_must_be("must_retry", "ready", "submitted")
     def submit(self):
+        """
+        Submit our verification attempt to Software Secure for validation. This
+        will set our status to "submitted" if the post is successful, and
+        "must_retry" if the post fails.
+        """
         try:
             response = self.send_request()
             if response.ok:
@@ -448,6 +483,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.save()
         except Exception as error:
             log.exception(error)
+            self.status = "must_retry"
+            self.save()
 
     def image_url(self, name):
         """
@@ -459,7 +496,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     def _generate_key(self, prefix):
         """
-        face/4dd1add9-6719-42f7-bea0-115c008c4fca
+        Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
         """
         conn = S3Connection(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_ACCESS_KEY"],
@@ -517,7 +554,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return headers, body
 
     def request_message_txt(self):
-        """ This is the body of the request we send across """
+        """
+        This is the body of the request we send across. This is never actually
+        used in the code, but exists for debugging purposes -- you can call
+        `print attempt.request_message_txt()` on the console and get a readable
+        rendering of the request that would be sent across, without actually
+        sending anything.
+        """
         headers, body = self.create_request()
 
         header_txt = "\n".join(
@@ -528,7 +571,21 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return header_txt + "\n\n" + body_txt
 
     def send_request(self):
-        """ sends the request across to the endpoint """
+        """
+        Assembles a submission to Software Secure and sends it via HTTPS.
+
+        Returns a request.Response() object with the reply we get from SS.
+        """
+        # If AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING is True, we want to
+        # skip posting anything to Software Secure. We actually don't even
+        # create the message because that would require encryption and message
+        # signing that rely on settings.VERIFY_STUDENT values that aren't set
+        # in dev. So we just pretend like we successfully posted
+        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            fake_response = requests.Response()
+            fake_response.status_code = 200
+            return fake_response
+
         headers, body = self.create_request()
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],

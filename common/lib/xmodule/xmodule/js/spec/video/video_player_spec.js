@@ -10,6 +10,8 @@
       }
 
       state = new Video('#example');
+
+      state.videoEl = $('video, iframe');
       videoPlayer = state.videoPlayer;
       player = videoPlayer.player;
       videoControl = state.videoControl;
@@ -17,6 +19,19 @@
       videoProgressSlider = state.videoProgressSlider;
       videoSpeedControl = state.videoSpeedControl;
       videoVolumeControl = state.videoVolumeControl;
+
+      state.resizer = (function () {
+        var methods = [
+          'align', 'alignByWidthOnly', 'alignByHeightOnly', 'setParams', 'setMode'
+        ],
+          obj = {};
+
+        $.each(methods, function(index, method) {
+           obj[method] = jasmine.createSpy(method).andReturn(obj);
+        });
+
+        return obj;
+      })();
     }
 
     function initializeYouTube() {
@@ -83,7 +98,8 @@
 
         window.YT = {
             Player: function () { },
-            PlayerState: oldYT.PlayerState
+            PlayerState: oldYT.PlayerState,
+            ready: function(f){f();}
         };
 
         spyOn(window.YT, 'Player');
@@ -547,7 +563,7 @@
         });
 
         it('replace the full screen button tooltip', function() {
-          expect($('.add-fullscreen')).toHaveAttr('title', 'Exit fullscreen');
+          expect($('.add-fullscreen')).toHaveAttr('title', 'Exit full browser');
         });
 
         it('add the video-fullscreen class', function() {
@@ -556,6 +572,7 @@
 
         it('tell VideoCaption to resize', function() {
           expect(videoCaption.resize).toHaveBeenCalled();
+          expect(state.resizer.setMode).toHaveBeenCalled();
         });
       });
 
@@ -573,7 +590,7 @@
         });
 
         it('replace the full screen button tooltip', function() {
-          expect($('.add-fullscreen')).toHaveAttr('title', 'Fullscreen');
+          expect($('.add-fullscreen')).toHaveAttr('title', 'Fill browser');
         });
 
         it('remove the video-fullscreen class', function() {
@@ -582,6 +599,7 @@
 
         it('tell VideoCaption to resize', function() {
           expect(videoCaption.resize).toHaveBeenCalled();
+          expect(state.resizer.setMode).toHaveBeenCalledWith('width');
         });
       });
     });
@@ -683,8 +701,13 @@
       });
 
       it('set the player volume', function() {
+        var expectedValue = 60,
+            realValue;
+
         player.setVolume(60);
-        expect(player.getVolume()).toEqual(0.6);
+        realValue = Math.round(player.getVolume()*100);
+
+        expect(realValue).toEqual(expectedValue);
       });
     });
   });

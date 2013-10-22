@@ -13,14 +13,6 @@ class TestVideo(BaseTestXmodule):
     CATEGORY = "video"
     DATA = SOURCE_XML
 
-    def setUp(self):
-        # Since the VideoDescriptor changes `self._field_data`,
-        # we need to instantiate `self.item_module` through
-        # `self.item_descriptor` rather than directly constructing it
-        super(TestVideo, self).setUp()
-        self.item_module = self.item_descriptor.xmodule(self.runtime)
-        self.item_module.runtime.render_template = lambda template, context: context
-
     def test_handle_ajax_dispatch(self):
         responses = {
             user.username: self.clients[user.username].post(
@@ -40,7 +32,7 @@ class TestVideo(BaseTestXmodule):
     def test_video_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
 
-        context = self.item_module.get_html()
+        context = self.item_module.render('student_view').content
 
         sources = {
             'main': u'example.mp4',
@@ -53,7 +45,7 @@ class TestVideo(BaseTestXmodule):
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
-            'display_name': 'A Name',
+            'display_name': u'A Name',
             'end': 3610.0,
             'id': self.item_module.location.html_id(),
             'sources': sources,
@@ -66,8 +58,10 @@ class TestVideo(BaseTestXmodule):
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
-        self.maxDiff = None
-        self.assertEqual(context, expected_context)
+        self.assertEqual(
+            context,
+            self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+        )
 
 
 class TestVideoNonYouTube(TestVideo):
@@ -93,24 +87,24 @@ class TestVideoNonYouTube(TestVideo):
             the template generates an empty string for the YouTube streams.
         """
         sources = {
-            u'main': u'example.mp4',
+            'main': u'example.mp4',
             u'mp4': u'example.mp4',
             u'webm': u'example.webm',
             u'ogv': u'example.ogv'
         }
 
-        context = self.item_module.get_html()
+        context = self.item_module.render('student_view').content
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
-            'display_name': 'A Name',
+            'display_name': u'A Name',
             'end': 3610.0,
             'id': self.item_module.location.html_id(),
             'sources': sources,
             'start': 3603.0,
-            'sub': 'a_sub_file.srt.sjson',
+            'sub': u'a_sub_file.srt.sjson',
             'track': '',
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True),
@@ -118,4 +112,7 @@ class TestVideoNonYouTube(TestVideo):
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
-        self.assertEqual(context, expected_context)
+        self.assertEqual(
+            context,
+            self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+        )

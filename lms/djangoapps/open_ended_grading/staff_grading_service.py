@@ -9,8 +9,6 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
-from xblock.field_data import DictFieldData
-
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
@@ -70,12 +68,12 @@ class StaffGradingService(GradingService):
 
     def __init__(self, config):
         config['system'] = ModuleSystem(
+            static_url='/static',
             ajax_url=None,
             track_function=None,
             get_module = None,
             render_template=render_to_string,
             replace_urls=None,
-            xmodule_field_data=DictFieldData({})
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']

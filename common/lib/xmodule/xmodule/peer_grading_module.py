@@ -6,7 +6,7 @@ from lxml import etree
 from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
-from .x_module import XModule
+from .x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from .timeinfo import TimeInfo
@@ -106,7 +106,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         #We need to set the location here so the child modules can use it
         self.runtime.set('location', self.location)
-        if (self.system.open_ended_grading_interface):
+        if (self.runtime.open_ended_grading_interface):
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
         else:
             self.peer_gs = MockPeerGradingService()
@@ -662,3 +662,19 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
             return [self.system.load_item(self.link_to_location)]
         else:
             return []
+
+    # Proxy to PeerGradingModule so that external callers don't have to know if they're working
+    # with a module or a descriptor
+    closed = module_attr('closed')
+    get_instance_state = module_attr('get_instance_state')
+    get_next_submission = module_attr('get_next_submission')
+    is_student_calibrated = module_attr('is_student_calibrated')
+    peer_grading = module_attr('peer_grading')
+    peer_grading_closed = module_attr('peer_grading_closed')
+    peer_grading_problem = module_attr('peer_grading_problem')
+    peer_gs = module_attr('peer_gs')
+    query_data_for_location = module_attr('query_data_for_location')
+    save_calibration_essay = module_attr('save_calibration_essay')
+    save_grade = module_attr('save_grade')
+    show_calibration_essay = module_attr('show_calibration_essay')
+    _find_corresponding_module_for_location = module_attr('_find_corresponding_module_for_location')

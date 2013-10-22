@@ -11,7 +11,7 @@ class @Courseware
     new Courseware
 
   render: ->
-    XModule.loadModules()
+    XBlock.initializeBlocks($('.course-content'))
     $('.course-content .histogram').each ->
       id = $(this).attr('id').replace(/histogram_/, '')
       try

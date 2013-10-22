@@ -5,9 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 %if not user_logged_in:
-<%block name="bodyclass">
-  not-signedin
-</%block>
+<%block name="bodyclass">not-signedin view-activation</%block>
 %endif
 
 <%block name="content">

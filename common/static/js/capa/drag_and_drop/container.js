@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['logme'], function (logme) {
+define(['js/capa/drag_and_drop/logme'], function (logme) {
     return Container;
 
     function Container(state) {

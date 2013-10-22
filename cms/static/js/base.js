@@ -1,4 +1,6 @@
-if (!window.CmsUtils) window.CmsUtils = {};
+require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
+         "js/utils/cancel_on_escape", "jquery.ui", "jquery.timepicker", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, CancelOnEscape) {
 
 var $body;
 var $modal;
@@ -10,16 +12,11 @@ var $newComponentTypePicker;
 var $newComponentTemplatePickers;
 var $newComponentButton;
 
-$(document).ready(function() {
+domReady(function() {
     $body = $('body');
     $modal = $('.history-modal');
-    $modalCover = $('<div class="modal-cover">');
-    // cdodge: this looks funny, but on AWS instances, this base.js get's wrapped in a separate scope as part of Django static
-    // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
-    // scopes (namely the course-info tab)
-    window.$modalCover = $modalCover;
+    $modalCover = $('.modal-cover');
 
-    $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
@@ -95,10 +92,7 @@ $(document).ready(function() {
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
-    $('a.show-tender').bind('click', window.CmsUtils.smoothScrollTop);
-
-    // toggling footer additional support
-    $('.cta-show-sock').bind('click', toggleSock);
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling overview section details
     $(function() {
@@ -128,15 +122,6 @@ $(document).ready(function() {
     $('.delete-subsection-button').bind('click', deleteSubsection);
 
     $('.sync-date').bind('click', syncReleaseDate);
-
-    // import form setup
-    $('.import .file-input').bind('change', showImportSubmit);
-    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
-        e.preventDefault();
-        $('.import .file-input').click();
-    });
-
-    $('.new-course-button').bind('click', addNewCourse);
 
     // section date setting
     $('.set-publish-date').bind('click', setSectionScheduleDate);
@@ -169,10 +154,7 @@ function smoothScrollLink(e) {
     });
 }
 
-// On AWS instances, this base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-//  when we can access it from other scopes (namely Course Advanced Settings).
-window.CmsUtils.smoothScrollTop = function(e) {
+function smoothScrollTop(e) {
     (e).preventDefault();
 
     $.smoothScroll({
@@ -188,11 +170,6 @@ function linkNewWindow(e) {
     window.open($(e.target).attr('href'));
     e.preventDefault();
 }
-
-// On AWS instances, base.js gets wrapped in a separate scope as part of Django static
-// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
-// when we can access it from other scopes (namely the checklists)
-window.cmsLinkNewWindow = linkNewWindow;
 
 function toggleSections(e) {
     e.preventDefault();
@@ -230,20 +207,6 @@ function editSectionPublishDate(e) {
     }
     $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
     $modalCover.show();
-}
-
-function showImportSubmit(e) {
-    var filepath = $(this).val();
-    if (filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
-        $('.error-block').hide();
-        $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
-        $('.file-name-block').show();
-        $('.import .choose-file-button').hide();
-        $('.submit-button').show();
-        $('.progress').show();
-    } else {
-        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
-    }
 }
 
 function syncReleaseDate(e) {
@@ -330,9 +293,6 @@ function saveSubsection() {
         success: function() {
             $spinner.delay(500).fadeOut(150);
             $changedInput = null;
-        },
-        error: function() {
-            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -378,7 +338,7 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el, type) {
-    var confirm = new CMS.Views.Prompt.Warning({
+    var confirm = new PromptView.Warning({
         title: gettext('Delete this ' + type + '?'),
         message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
         actions: {
@@ -394,7 +354,7 @@ function _deleteItem($el, type) {
                         'id': id
                     });
 
-                    var deleting = new CMS.Views.Notification.Mini({
+                    var deleting = new NotificationView.Mini({
                         title: gettext('Deleting&hellip;')
                     });
                     deleting.show();
@@ -429,33 +389,8 @@ function hideModal(e) {
     // of the editor. Users must press Cancel or Save to exit the editor.
     // module_edit adds and removes the "is-fixed" class.
     if (!$modalCover.hasClass("is-fixed")) {
-        $modal.hide();
+        $(".modal, .edit-subsection-publish-settings").hide();
         $modalCover.hide();
-    }
-}
-
-function toggleSock(e) {
-    e.preventDefault();
-
-    var $btnLabel = $(this).find('.copy');
-    var $sock = $('.wrapper-sock');
-    var $sockContent = $sock.find('.wrapper-inner');
-
-    $sock.toggleClass('is-shown');
-    $sockContent.toggle('fast');
-
-    $.smoothScroll({
-        offset: -200,
-        easing: 'swing',
-        speed: 1000,
-        scrollElement: null,
-        scrollTarget: $sock
-    });
-
-    if ($sock.hasClass('is-shown')) {
-        $btnLabel.text(gettext('Hide Studio Help'));
-    } else {
-        $btnLabel.text(gettext('Looking for Help with Studio?'));
     }
 }
 
@@ -468,16 +403,6 @@ function toggleSubmodules(e) {
 function setVisibility(e) {
     $(this).find('.checked').removeClass('checked');
     $(e.target).closest('.option').addClass('checked');
-}
-
-function editComponent(e) {
-    e.preventDefault();
-    $(this).closest('.xmodule_edit').addClass('editing').find('.component-editor').slideDown(150);
-}
-
-function closeComponentEditor(e) {
-    e.preventDefault();
-    $(this).closest('.xmodule_edit').removeClass('editing').find('.component-editor').slideUp(150);
 }
 
 function showDateSetter(e) {
@@ -508,41 +433,7 @@ function hideAlert(e) {
     $(this).closest('.wrapper-alert').removeClass('is-shown');
 }
 
-function showToastMessage(message, $button, lifespan) {
-    var $toast = $('<div class="toast-notification"></div>');
-    var $closeBtn = $('<a href="#" class="close-button">×</a>');
-    $toast.append($closeBtn);
-    var $content = $('<div class="notification-content"></div>');
-    $content.html(message);
-    $toast.append($content);
-    if ($button) {
-        $button.addClass('action-button');
-        $button.bind('click', hideToastMessage);
-        $content.append($button);
-    }
-    $closeBtn.bind('click', hideToastMessage);
-
-    if ($('.toast-notification')[0]) {
-        var targetY = $('.toast-notification').offset().top + $('.toast-notification').outerHeight();
-        $toast.css('top', (targetY + 10) + 'px');
-    }
-
-    $body.prepend($toast);
-    $toast.fadeIn(200);
-
-    if (lifespan) {
-        $toast.timer = setTimeout(function() {
-            $toast.fadeOut(300);
-        }, lifespan * 1000);
-    }
-}
-
-function hideToastMessage(e) {
-    e.preventDefault();
-    $(this).closest('.toast-notification').remove();
-}
-
-function addNewSection(e, isTemplate) {
+function addNewSection(e) {
     e.preventDefault();
 
     $(e.target).addClass('disabled');
@@ -553,18 +444,8 @@ function addNewSection(e, isTemplate) {
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.section-name-form').bind('submit', saveNewSection);
     $cancelButton.bind('click', cancelNewSection);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
+    CancelOnEscape($cancelButton);
 }
-
-function checkForCancel(e) {
-    if (e.which == 27) {
-        $body.unbind('keyup', checkForCancel);
-        e.data.$cancelButton.click();
-    }
-}
-
 
 function saveNewSection(e) {
     e.preventDefault();
@@ -582,7 +463,7 @@ function saveNewSection(e) {
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': display_name,
+        'display_name': display_name
     },
 
     function(data) {
@@ -594,162 +475,6 @@ function cancelNewSection(e) {
     e.preventDefault();
     $('.new-courseware-section-button').removeClass('disabled');
     $(this).parents('section.new-section').remove();
-}
-
-function addNewCourse(e) {
-    e.preventDefault();
-    $('.new-course-button').addClass('is-disabled');
-    $('.new-course-save').addClass('is-disabled');
-    var $newCourse = $('.wrapper-create-course').addClass('is-shown');
-    var $cancelButton = $newCourse.find('.new-course-cancel');
-    var $courseName = $('.new-course-name');
-    $courseName.focus().select();
-    $('.new-course-save').on('click', saveNewCourse);
-    $cancelButton.bind('click', cancelNewCourse);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
-
-    // Check that a course (org, number, run) doesn't use any special characters
-    var validateCourseItemEncoding = function(item) {
-        var required = validateRequiredField(item);
-        if(required) {
-            return required;
-        }
-        if(item !== encodeURIComponent(item)) {
-            return gettext('Please do not use any spaces or special characters in this field.');
-        }
-        return '';
-    };
-
-    // Ensure that org/course_num/run < 65 chars.
-    var validateTotalCourseItemsLength = function() {
-        var totalLength = _.reduce(
-            ['.new-course-org', '.new-course-number', '.new-course-run'],
-            function(sum, ele) {
-                return sum + $(ele).val().length;
-        }, 0
-        );
-        if(totalLength > 65) {
-            $('.wrap-error').addClass('is-shown');
-            $('#course_creation_error').html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
-            $('.new-course-save').addClass('is-disabled');
-        }
-        else {
-            $('.wrap-error').removeClass('is-shown');
-        }
-    };
-
-    // Handle validation asynchronously
-    _.each(
-        ['.new-course-org', '.new-course-number', '.new-course-run'],
-        function(ele) {
-            var $ele = $(ele);
-            $ele.on('keyup', function(event) {
-                // Don't bother showing "required field" error when
-                // the user tabs into a new field; this is distracting
-                // and unnecessary
-                if(event.keyCode === 9) {
-                    return;
-                }
-                var error = validateCourseItemEncoding($ele.val());
-                setNewCourseFieldInErr($ele.parent('li'), error);
-                validateTotalCourseItemsLength();
-            });
-        }
-    );
-    var $name = $('.new-course-name');
-    $name.on('keyup', function() {
-        var error = validateRequiredField($name.val());
-        setNewCourseFieldInErr($name.parent('li'), error);
-        validateTotalCourseItemsLength();
-    });
-}
-
-function validateRequiredField(msg) {
-    return msg.length === 0 ? gettext('Required field.') : '';
-}
-
-function setNewCourseFieldInErr(el, msg) {
-    if(msg) {
-        el.addClass('error');
-        el.children('span.tip-error').addClass('is-showing').removeClass('is-hiding').text(msg);
-        $('.new-course-save').addClass('is-disabled');
-    }
-    else {
-        el.removeClass('error');
-        el.children('span.tip-error').addClass('is-hiding').removeClass('is-showing');
-        // One "error" div is always present, but hidden or shown
-        if($('.error').length === 1) {
-            $('.new-course-save').removeClass('is-disabled');
-        }
-    }
-};
-
-function saveNewCourse(e) {
-    e.preventDefault();
-
-    // One final check for empty values
-    var errors = _.reduce(
-        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
-        function(acc, ele) {
-            var $ele = $(ele);
-            var error = validateRequiredField($ele.val());
-            setNewCourseFieldInErr($ele.parent('li'), error);
-            return error ? true : acc;
-        },
-        false
-    );
-
-    if(errors) {
-        return;
-    }
-
-    var $newCourseForm = $(this).closest('#create-course-form');
-    var display_name = $newCourseForm.find('.new-course-name').val();
-    var org = $newCourseForm.find('.new-course-org').val();
-    var number = $newCourseForm.find('.new-course-number').val();
-    var run = $newCourseForm.find('.new-course-run').val();
-
-    analytics.track('Created a Course', {
-        'org': org,
-        'number': number,
-        'display_name': display_name,
-        'run': run
-    });
-
-    $.post('/create_new_course', {
-            'org': org,
-            'number': number,
-            'display_name': display_name,
-            'run': run
-        },
-        function(data) {
-            if (data.id !== undefined) {
-                window.location = '/' + data.id.replace(/.*:\/\//, '');
-            } else if (data.ErrMsg !== undefined) {
-                $('.wrap-error').addClass('is-shown');
-                $('#course_creation_error').html('<p>' + data.ErrMsg + '</p>');
-                $('.new-course-save').addClass('is-disabled');
-            }
-        }
-    );
-}
-
-function cancelNewCourse(e) {
-    e.preventDefault();
-    $('.new-course-button').removeClass('is-disabled');
-    $('.wrapper-create-course').removeClass('is-shown');
-    // Clear out existing fields and errors
-    _.each(
-        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
-        function(field) {
-            $(field).val('');
-        }
-    );
-    $('#course_creation_error').html('');
-    $('.wrap-error').removeClass('is-shown');
-    $('.new-course-save').off('click');
 }
 
 function addNewSubsection(e) {
@@ -769,9 +494,7 @@ function addNewSubsection(e) {
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
-    $body.bind('keyup', {
-        $cancelButton: $cancelButton
-    }, checkForCancel);
+    CancelOnEscape($cancelButton);
 }
 
 function saveNewSubsection(e) {
@@ -833,7 +556,7 @@ function saveSetSectionScheduleDate(e) {
         'start': datetime
     });
 
-    var saving = new CMS.Views.Notification.Mini({
+    var saving = new NotificationView.Mini({
         title: gettext("Saving&hellip;")
     });
     saving.show();
@@ -874,3 +597,8 @@ function saveSetSectionScheduleDate(e) {
         saving.hide();
     });
 }
+    // Add to window object for unit test (overview_spec).
+    window.saveSetSectionScheduleDate = saveSetSectionScheduleDate;
+    window.deleteSection = deleteSection;
+
+}); // end require()

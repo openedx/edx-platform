@@ -6,6 +6,7 @@ if Backbone?
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
+        "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
 
     $: (selector) ->
         @$el.find(selector)
@@ -23,6 +24,7 @@ if Backbone?
       @delegateEvents()
       if window.user.voted(@model)
         @$(".vote-btn").addClass("is-cast")
+        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
       @renderAttrs()
       @renderFlagged()
       @$el.find(".posted-details").timeago()
@@ -48,12 +50,14 @@ if Backbone?
       @$(".vote-btn").toggleClass("is-cast")
       if @$(".vote-btn").hasClass("is-cast")
         @vote()
+        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
       else
         @unvote()
+        @$(".vote-btn span.sr").html("votes (click to vote)")
 
     vote: ->
       url = @model.urlFor("upvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) + 1)
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) + 1) + '<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
@@ -64,7 +68,7 @@ if Backbone?
 
     unvote: ->
       url = @model.urlFor("unvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) - 1)
+      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) - 1)+'<span class="sr"></span>')
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-vote")
         url: url
@@ -101,10 +105,12 @@ if Backbone?
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
         
     updateModelDetails: =>

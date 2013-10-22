@@ -248,7 +248,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
-        Logger.log 'problem_graded', [@answers, response.contents], @url
+        Logger.log 'problem_graded', [@answers, response.contents], @id
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -271,7 +271,7 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      Logger.log 'problem_graded', [@answers, response.contents], @url
+      Logger.log 'problem_graded', [@answers, response.contents], @id
 
   reset: =>
     Logger.log 'problem_reset', @answers

@@ -28,8 +28,6 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
-from xblock.field_data import DictFieldData
-
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
 
@@ -63,19 +61,19 @@ class VideoFields(object):
         default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
-        help="The Youtube ID for the .75x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the .75x speed video.",
         display_name="Youtube ID for .75x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
-        help="The Youtube ID for the 1.25x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.25x speed video.",
         display_name="Youtube ID for 1.25x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
-        help="The Youtube ID for the 1.5x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.5x speed video.",
         display_name="Youtube ID for 1.5x speed",
         scope=Scope.settings,
         default=""
@@ -135,6 +133,7 @@ class VideoModule(VideoFields, XModule):
 
     js = {
         'js': [
+            resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
             resource_string(__name__, 'js/src/video/02_html5_video.js'),
@@ -156,10 +155,6 @@ class VideoModule(VideoFields, XModule):
         log.debug(u"GET {0}".format(data))
         log.debug(u"DISPATCH {0}".format(dispatch))
         raise Http404()
-
-    def get_instance_state(self):
-        """Return information about state (position)."""
-        return json.dumps({'position': self.position})
 
     def get_html(self):
         caption_asset_path = "/static/subs/"
@@ -247,12 +242,11 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         field_data = DbModel(kvs)
         video = system.construct_xblock_from_class(
             cls,
-            field_data,
-
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location)
+            ScopeIds(None, location.category, location, location),
+            field_data,
         )
         return video
 

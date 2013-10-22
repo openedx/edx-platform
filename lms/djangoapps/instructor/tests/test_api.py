@@ -6,7 +6,6 @@ import unittest
 import json
 import requests
 from urllib import quote
-from django.conf import settings
 from django.test import TestCase
 from nose.tools import raises
 from mock import Mock, patch
@@ -125,6 +124,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'list_forum_members',
             'update_forum_role_membership',
             'proxy_legacy_analytics',
+            'send_email',
         ]
         for endpoint in staff_level_endpoints:
             url = reverse(endpoint, kwargs={'course_id': self.course.id})
@@ -280,8 +280,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     This test does NOT test whether the actions had an effect on the
     database, that is the job of test_access.
     This tests the response and action switch.
-    Actually, modify_access does not having a very meaningful
-        response yet, so only the status code is tested.
+    Actually, modify_access does not have a very meaningful
+    response yet, so only the status code is tested.
     """
     def setUp(self):
         self.instructor = AdminFactory.create()
@@ -512,8 +512,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
-        url += "?student_email={}".format(
+        url += "?unique_student_identifier={}".format(
             quote(self.students[0].email.encode("utf-8"))
+        )
+        print url
+        response = self.client.get(url)
+        print response
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertIn('progress_url', res_json)
+
+    def test_get_student_progress_url_from_uname(self):
+        """ Test that progress_url is in the successful response. """
+        url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id})
+        url += "?unique_student_identifier={}".format(
+            quote(self.students[0].username.encode("utf-8"))
         )
         print url
         response = self.client.get(url)
@@ -579,7 +592,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 200)
@@ -608,7 +621,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': 'robot-not-a-real-module',
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -618,7 +631,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
             'delete_module': True,
         })
         print response.content
@@ -634,11 +647,11 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
     def test_reset_student_attempts_nonsense(self):
-        """ Test failure with both student_email and all_students. """
+        """ Test failure with both unique_student_identifier and all_students. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
             'all_students': True,
         })
         print response.content
@@ -650,7 +663,19 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    @patch.object(instructor_task.api, 'submit_rescore_problem_for_student')
+    def test_rescore_problem_single_from_uname(self, act):
+        """ Test rescoring of a single student. """
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'unique_student_identifier': self.student.username,
         })
         print response.content
         self.assertEqual(response.status_code, 200)
@@ -666,7 +691,74 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         })
         print response.content
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(act.called)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Checks that only instructors have access to email endpoints, and that
+    these endpoints are only accessible with courses that actually exist,
+    only with valid email messages.
+    """
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+        test_subject = u'\u1234 test subject'
+        test_message = u'\u6824 test message'
+        self.full_test_message = {
+            'send_to': 'staff',
+            'subject': test_subject,
+            'message': test_message,
+        }
+
+    def test_send_email_as_logged_in_instructor(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+
+    def test_send_email_but_not_logged_in(self):
+        self.client.logout()
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_not_staff(self):
+        self.client.logout()
+        student = UserFactory()
+        self.client.login(username=student.username, password='test')
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 403)
+
+    def test_send_email_but_course_not_exist(self):
+        url = reverse('send_email', kwargs={'course_id': 'GarbageCourse/DNE/NoTerm'})
+        response = self.client.post(url, self.full_test_message)
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_send_email_no_sendto(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'subject': 'test subject',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_subject(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_send_email_no_message(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id})
+        response = self.client.post(url, {
+            'send_to': 'staff',
+            'subject': 'test subject',
+        })
+        self.assertEqual(response.status_code, 400)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -747,7 +839,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_urlname': self.problem_urlname,
-            'student_email': self.student.email,
+            'unique_student_identifier': self.student.email,
         })
         print response.content
         self.assertEqual(response.status_code, 200)

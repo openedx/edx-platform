@@ -1,4 +1,3 @@
-
 from ast import literal_eval
 import json
 import unittest
@@ -11,8 +10,8 @@ from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from xmodule.conditional_module import ConditionalModule
-from xmodule.tests import DATA_DIR, get_test_system
+from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
 
 
 ORG = 'test_org'
@@ -25,20 +24,15 @@ class DummySystem(ImportSystem):
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
-        course_id = "/".join([ORG, COURSE, 'test_run'])
-        course_dir = "test_dir"
-        policy = {}
-        error_tracker = Mock()
-        parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
-            xmlstore,
-            course_id,
-            course_dir,
-            policy,
-            error_tracker,
-            parent_tracker,
+            xmlstore=xmlstore,
+            course_id='/'.join([ORG, COURSE, 'test_run']),
+            course_dir='test_dir',
+            error_tracker=Mock(),
+            parent_tracker=Mock(),
             load_error_modules=load_error_modules,
+            policy={},
         )
 
     def render_template(self, template, context):
@@ -58,49 +52,58 @@ class ConditionalFactory(object):
 
         if the source_is_error_module flag is set, create a real ErrorModule for the source.
         """
+        descriptor_system = get_test_descriptor_system()
+
         # construct source descriptor and module:
         source_location = Location(["i4x", "edX", "conditional_test", "problem", "SampleProblem"])
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data',
-                                                                 system,
-                                                                 org=source_location.org,
-                                                                 course=source_location.course,
-                                                                 error_msg='random error message')
-            source_module = source_descriptor.xmodule(system)
+            source_descriptor = NonStaffErrorDescriptor.from_xml(
+                'some random xml data',
+                system,
+                org=source_location.org,
+                course=source_location.course,
+                error_msg='random error message'
+            )
         else:
             source_descriptor = Mock()
             source_descriptor.location = source_location
-            source_module = Mock()
+
+        source_descriptor.runtime = descriptor_system
+        source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
         child_descriptor = Mock()
-        cond_descriptor = Mock()
-        cond_descriptor.get_required_module_descriptors = lambda: [source_descriptor, ]
-        cond_descriptor.get_children = lambda: [child_descriptor, ]
-        cond_descriptor.xml_attributes = {"attempted": "true"}
+        child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
+        child_descriptor.student_view = child_descriptor._xmodule.student_view
+        child_descriptor.displayable_items.return_value = [child_descriptor]
+        child_descriptor.runtime = descriptor_system
+        child_descriptor.xmodule_runtime = get_test_system()
+        child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
 
-        # create child module:
-        child_module = Mock()
-        child_module.get_html = lambda: '<p>This is a secret</p>'
-        child_module.displayable_items = lambda: [child_module]
-        module_map = {source_descriptor: source_module, child_descriptor: child_module}
-        system.get_module = lambda descriptor: module_map[descriptor]
+        descriptor_system.load_item = {'child': child_descriptor, 'source': source_descriptor}.get
 
         # construct conditional module:
         cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
-        field_data = DictFieldData({'data': '<conditional/>', 'location': cond_location})
-        cond_module = ConditionalModule(
-            cond_descriptor,
-            system,
+        field_data = DictFieldData({
+            'data': '<conditional/>',
+            'xml_attributes': {'attempted': 'true'},
+            'children': ['child'],
+        })
+
+        cond_descriptor = ConditionalDescriptor(
+            descriptor_system,
             field_data,
             ScopeIds(None, None, cond_location, cond_location)
         )
+        cond_descriptor.xmodule_runtime = system
+        system.get_module = lambda desc: desc
+        cond_descriptor.get_required_module_descriptors = Mock(return_value=[source_descriptor])
 
         # return dict:
-        return {'cond_module': cond_module,
-                'source_module': source_module,
-                'child_module': child_module}
+        return {'cond_module': cond_descriptor,
+                'source_module': source_descriptor,
+                'child_module': child_descriptor}
 
 
 class ConditionalModuleBasicTest(unittest.TestCase):
@@ -125,16 +128,20 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules = ConditionalFactory.create(self.test_system)
         # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
-        html = modules['cond_module'].get_html()
-        html_dict = literal_eval(html)
-        self.assertEqual(html_dict['element_id'], 'i4x-edX-conditional_test-conditional-SampleConditional')
-        self.assertEqual(html_dict['id'], 'i4x://edX/conditional_test/conditional/SampleConditional')
-        self.assertEqual(html_dict['depends'], 'i4x-edX-conditional_test-problem-SampleProblem')
+        html = modules['cond_module'].render('student_view').content
+        expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
+            'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
+            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
+            'id': 'i4x://edX/conditional_test/conditional/SampleConditional',
+            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
+        })
+        self.assertEquals(expected, html)
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
         modules['source_module'].is_attempted = "false"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
+        modules['cond_module'].save()
         print "ajax: ", ajax
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
@@ -142,6 +149,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         # now change state of the capa problem to make it completed
         modules['source_module'].is_attempted = "true"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
+        modules['cond_module'].save()
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
@@ -153,6 +161,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         '''
         modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
+        modules['cond_module'].save()
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
 
@@ -192,7 +201,9 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-            return descriptor.xmodule(self.test_system)
+            descriptor.xmodule_runtime = get_test_system()
+            descriptor.xmodule_runtime.get_module = inner_get_module
+            return descriptor
 
         # edx - HarvardX
         # cond_test - ER22x
@@ -205,20 +216,28 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         module = inner_get_module(location)
         print "module: ", module
-        print "module.conditions_map: ", module.conditions_map
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
-        html = module.get_html()
+        html = module.render('student_view').content
         print "html type: ", type(html)
         print "html: ", html
-        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-HarvardX-ER22x-conditional-condone', 'id': 'i4x://HarvardX/ER22x/conditional/condone', 'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'}"
+        html_expect = module.xmodule_runtime.render_template(
+            'conditional_ajax.html',
+            {
+                'ajax_url': 'courses/course_id/modx/a_location',
+                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
+                'id': 'i4x://HarvardX/ER22x/conditional/condone',
+                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
+            }
+        )
         self.assertEqual(html, html_expect)
 
         gdi = module.get_display_items()
         print "gdi=", gdi
 
         ajax = json.loads(module.handle_ajax('', ''))
+        module.save()
         print "ajax: ", ajax
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
@@ -230,6 +249,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         inner_module.save()
 
         ajax = json.loads(module.handle_ajax('', ''))
+        module.save()
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))

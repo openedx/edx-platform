@@ -25,7 +25,7 @@ from xmodule.modulestore.xml_importer import import_from_xml
 log = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 TEST_MODULESTORE = studio_store_config(settings.TEST_ROOT / "data")
 
@@ -80,7 +80,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def tearDown(self):
 
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
     def test_unlocked_asset(self):

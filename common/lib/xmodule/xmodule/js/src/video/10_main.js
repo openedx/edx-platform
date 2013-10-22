@@ -1,5 +1,42 @@
 (function (requirejs, require, define) {
 
+// In the case when the Video constructor will be called before
+// RequireJS finishes loading all of the Video dependencies, we will have
+// a mock function that will collect all the elements that must be
+// initialized as Video elements.
+//
+// Once RequireJS will load all of the necessary dependencies, main code
+// will invoke the mock function with the second parameter set to truthy value.
+// This will trigger the actual Video constructor on all elements that
+// are stored in a temporary list.
+window.Video = (function () {
+    // Temporary storage place for elements that must be initialized as Video
+    // elements.
+    var tempCallStack = [];
+
+    return function (element, processTempCallStack) {
+        // If mock function was called with second parameter set to truthy
+        // value, we invoke the real `window.Video` on all the stored elements
+        // so far.
+        if (processTempCallStack) {
+            $.each(tempCallStack, function (index, element) {
+                // By now, `window.Video` is the real constructor.
+                window.Video(element);
+            });
+
+            return;
+        }
+
+        // If normal call to `window.Video` constructor, store the element
+        // for later initializing.
+        tempCallStack.push(element);
+
+        // Real Video constructor returns the `state` object. The mock
+        // function will return an empty object.
+        return {};
+    };
+}());
+
 // Main module.
 require(
 [
@@ -23,7 +60,8 @@ function (
     VideoCaption
 ) {
     var previousState,
-        youtubeXhr = null;
+        youtubeXhr = null,
+        oldVideo = window.Video;
 
     // Because this constructor can be called multiple times on a single page (when
     // the user switches verticals, the page doesn't reload, but the content changes), we must
@@ -79,6 +117,10 @@ function (
     window.Video.clearYoutubeXhr = function () {
         youtubeXhr = null;
     };
+
+    // Invoke the mock Video constructor so that the elements stored within
+    // it can be processed by the real `window.Video` constructor.
+    oldVideo(null, true);
 });
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

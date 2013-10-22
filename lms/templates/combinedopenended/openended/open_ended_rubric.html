@@ -11,7 +11,7 @@
         % for i in range(len(categories)):
         <% category = categories[i] %>
         <% m = randint(0,1000) %>
-            <span class="rubric-category">${category['description']}</span>
+            <span class="rubric-category" tabindex="${i}">${category['description']}</span>
             <ul class="rubric-list">
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
