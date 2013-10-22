@@ -52,8 +52,8 @@ def git_info_for_course(cdir):
 
 def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
     msg = ''
-    if not gitloc.endswith('.git') or 'http:' in gitloc or 'https:' \
-        in gitloc:
+    if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
+       gitloc.startswith('https:') or gitloc.startswith('git:')):
         msg += \
             _("The git repo location should end with '.git', and be for SSH access")
         return msg
@@ -78,7 +78,7 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
         ret = ''.join(ret)
         msg = "<font color='red'>{0} {1}</font>".format(
                     _('Added course from'), gitloc)
-        msg += "<pre>{0}</pre>".format(ret.replace('<','&lt;'))
+        msg += "<pre>{0}</pre>".format(escape(ret))
         return msg
 
     cdir = (gitloc.rsplit('/', 1)[1])[:-4]
@@ -444,6 +444,22 @@ def view_git_logs(request, course_id=None):
 
     import mongoengine  # don't import that until we need it, here
 
+    # Set defaults even if it isn't defined in settings
+    mongo_db = {
+        'host': 'localhost',
+        'user': '',
+        'password': '',
+        'db': 'xlog',
+    }
+
+    # Allow overrides
+    if hasattr(settings, 'MONGODB_LOG'):
+        mongo_db['host'] = settings.MONGODB_LOG.get('host', mongo_db['host'])
+        mongo_db['user'] = settings.MONGODB_LOG.get('user', mongo_db['user'])
+        mongo_db['password'] = settings.MONGODB_LOG.get('password',
+                                                        mongo_db['password'])
+        mongo_db['db'] = settings.MONGODB_LOG.get('db', mongo_db['db'])
+
     class CourseImportLog(mongoengine.Document):
         course_id = mongoengine.StringField(max_length=128)
         location = mongoengine.StringField(max_length=168)
@@ -454,9 +470,15 @@ def view_git_logs(request, course_id=None):
         meta = {'indexes': ['course_id', 'created'],
                 'allow_inheritance': False}
 
-    DBNAME = 'xlog'
-
-    mongoengine.connect(DBNAME)
+    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'], mongo_db['db'])
+    try:
+        mdb = mongoengine.connect(mongo_db['db'], host=mongouri, 
+                                  username=mongo_db['user'], 
+                                  password=mongo_db['password']
+                              )
+    except mongoengine.connection.ConnectionError, e:
+        logging.critical(_('Unable to connect to mongodb to save log, please check ' \
+                'MONGODB_LOG settings'))
 
     if course_id is None:
         cilset = CourseImportLog.objects.all().order_by('-created')
