@@ -55,7 +55,7 @@ class StaticContent(object):
     @staticmethod
     def get_url_path_from_location(location):
         if location is not None:
-            return "/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+            return u"/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
         else:
             return None
 
