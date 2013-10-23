@@ -522,10 +522,11 @@ function goto( mode)
       <li class="field">
         <label for="id_subject">${_("Subject: ")}</label>
         %if subject:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
         %else:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
         %endif
+        <span class="tip">${_("(Max 128 characters)")}</span>
       </li>
 
       <li class="field">
