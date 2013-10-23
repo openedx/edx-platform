@@ -319,7 +319,7 @@ def get_d3_sequential_open_distribution(course_id):
 
             stack_data = []
             tooltip = "{0} student(s) opened Subsection {1}: {2}".format(
-                num_students, c_subsection, subsection_name
+                num_students, c_subsection, unicode(subsection_name).encode("utf-8")
             )
             stack_data.append({
                 'color': 0,
