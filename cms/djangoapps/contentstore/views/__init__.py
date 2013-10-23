@@ -16,6 +16,7 @@ from .preview import *
 from .public import *
 from .user import *
 from .tabs import *
+from .transcripts_ajax import *
 try:
     from .dev import *
 except ImportError:

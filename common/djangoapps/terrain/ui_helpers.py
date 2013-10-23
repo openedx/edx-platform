@@ -468,6 +468,11 @@ def click_link(partial_text, index=0):
 
 
 @world.absorb
+def click_link_by_text(text, index=0):
+    retry_on_exception(lambda: world.browser.find_link_by_text(text)[index].click())
+
+
+@world.absorb
 def css_text(css_selector, index=0, timeout=30):
     # Wait for the css selector to appear
     if is_css_present(css_selector):

@@ -43,11 +43,7 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
 @step('I have uploaded subtitles "([^"]*)"$')
 def i_have_uploaded_subtitles(_step, sub_id):
     _step.given('I go to the files and uploads page')
-
-    sub_id = sub_id.strip()
-    if not sub_id:
-        sub_id = 'OEoXaMPEzfM'
-    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id))
+    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id.strip()))
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
