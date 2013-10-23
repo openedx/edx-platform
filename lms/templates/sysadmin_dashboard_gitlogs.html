@@ -54,9 +54,8 @@ textarea {
 
     <h2>[ <a href="#" onclick="goto('Status');">${_('Status')}</a> |
           <a href="#" onclick="goto('Courses');">${_('Courses')}</a> |
-          <a href="#" onclick="goto('Enrollment');">${_('Enrollment')}</a> |
-          <a href="#" onclick="goto('Staffing');">${_('Staffing')}</a> |
-          <a href="${reverse('gitlogs')}" class="selectedmode">${_('GitLogs')}</a>
+         <a href="#" onclick="goto('Staffing and Enrollment');">${_('Staffing and Enrollment')}</a> |
+           <a href="${reverse('gitlogs')}" class="selectedmode">${_('GitLogs')}</a>
            ]
     </h2>
 
@@ -99,7 +98,7 @@ textarea {
 	</tr>
 	
 	<tr><td colspan="3">
-	    <pre>${cil.import_log}</pre>
+	    <pre>${cil.import_log | h}</pre>
 	</td></tr>
 
     % endfor

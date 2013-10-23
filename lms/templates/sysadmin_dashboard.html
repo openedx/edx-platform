@@ -56,8 +56,7 @@ function goto( mode)
 
     <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">${_('Status')}</a> |
           <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">${_('Courses')}</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_('Enrollment')}</a> |
-          <a href="#" onclick="goto('Staffing');" class="${modeflag.get('Staffing')}">${_('Staffing')}</a> |
+          <a href="#" onclick="goto('Staffing and Enrollment');" class="${modeflag.get('Staffing and Enrollment')}">${_('Staffing and Enrollment')}</a> |
           <a href="/gitlogs">${_('GitLogs')}</a>
            ]
     </h2>
@@ -105,14 +104,10 @@ function goto( mode)
  %endif
 
 ##----------------------------------------------------------------------------- 
-%if modeflag.get('Enrollment'):
+%if modeflag.get('Staffing and Enrollment'):
 
 <p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
-
-%endif
-
-##----------------------------------------------------------------------------- 
-%if modeflag.get('Staffing'):
+<hr />
 
 <h3>${_('Manage course staff and instructors')}</h3><br/>
 

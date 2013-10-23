@@ -1,12 +1,15 @@
+"""
+This module creates a sysadmin dashboard for managing and viewing
+courses.
+"""
 import csv
 import json
 import logging
 import os
-import string
-import subprocess
 import time
+import imp
+import StringIO
 
-from random import choice
 from datetime import datetime
 
 from django.conf import settings
@@ -21,12 +24,15 @@ from courseware.access import get_access_group_name
 from courseware.courses import get_course_by_id
 
 from django.contrib.auth import authenticate
+from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.utils.html import escape
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import Http404
+
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
@@ -36,7 +42,11 @@ import track.views
 
 log = logging.getLogger(__name__)
 
+
 def git_info_for_course(cdir):
+    """This pulls out some git info like the last commit"""
+
+    cmd = ''
     gdir = settings.DATA_DIR / cdir
     info = [gdir, '', '']
     if os.path.exists(gdir):
@@ -50,94 +60,122 @@ def git_info_for_course(cdir):
                 info[1] = k.split(' ', 1)[1].strip()
     return info
 
+
 def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
-    msg = ''
+    """This downloads and runs the checks for importing a course in git"""
+
+    msg = u''
     if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
        gitloc.startswith('https:') or gitloc.startswith('git:')):
         msg += \
-            _("The git repo location should end with '.git', and be for SSH access")
+            _("The git repo location should end with '.git', and be a valid url")
         return msg
 
     if is_using_mongo:
         acscript = getattr(settings, 'GIT_ADD_COURSE_SCRIPT', '')
         if not acscript or not os.path.exists(acscript):
-            msg = "<font color='red'>{0} - {1}</font>".format(_('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
+            msg = u"<font color='red'>{0} - {1}</font>".format(
+                _('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
             return msg
-        
-        # Attempt to use the same cms settings as we have in lms (cms has import, and lms does not)
-        # bsi = os.environ['DJANGO_SETTINGS_MODULE'].rfind('.')
-        # cms_settings = 'cms.envs{0}'.format(os.environ['DJANGO_SETTINGS_MODULE'][bsi:])
 
-        cmd = 'PYTHONPATH=$PYTHONPATH:{2} {0} "{1}"'.format(
-            acscript, gitloc, getattr(settings, 'REPO_ROOT'))
+        # import course script directly and call add_repo function
+        git_add_script = imp.load_source('git_add_script', acscript)
+        logging.debug(
+            _('Adding course using add repo from {0} and repo {1}').format(
+                acscript, gitloc))
 
-        logging.debug(_('Adding course with command: {0}').format(cmd))
-        ret = subprocess.Popen(cmd, shell=True, executable='/bin/bash',
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE).communicate()
-        ret = ''.join(ret)
-        msg = "<font color='red'>{0} {1}</font>".format(
-                    _('Added course from'), gitloc)
-        msg += "<pre>{0}</pre>".format(escape(ret))
+        # Grab logging output for debugging imports
+        output = StringIO.StringIO()
+
+        import_logger = logging.getLogger(
+            'xmodule.modulestore.xml_importer')
+        git_logger = logging.getLogger('git_add_script')
+        xml_logger = logging.getLogger('xmodule.modulestore.xml')
+
+        import_log_handler = logging.StreamHandler(output)
+        import_log_handler.setLevel(logging.DEBUG)
+
+        for logger in [import_logger, git_logger, xml_logger, ]:
+            logger.addHandler(import_log_handler)
+
+        git_add_script.add_repo(gitloc, None)
+
+        ret = output.getvalue()
+
+        # Remove handler hijacks
+        for logger in [import_logger, git_logger, xml_logger, ]:
+            logger.removeHandler(import_log_handler)
+        msg = u"<font color='red'>{0} {1}</font>".format(
+            _('Added course from'), gitloc)
+        msg += _("<pre>{0}</pre>").format(escape(ret))
         return msg
 
     cdir = (gitloc.rsplit('/', 1)[1])[:-4]
     gdir = settings.DATA_DIR / cdir
     if os.path.exists(gdir):
-        msg += _("The course {0} already exists in the data directory! (reloading anyway)").format(cdir)
+        msg += _("The course {0} already exists in the data directory! "
+                 "(reloading anyway)").format(cdir)
+        cmd = 'cd {0}; git pull'.format(settings.DATA_DIR, gitloc)
     else:
         cmd = 'cd {0}; git clone {1}'.format(settings.DATA_DIR, gitloc)
-        msg += '<pre>%s</pre>' % escape(os.popen(cmd).read())
+        msg += u'<pre>%s</pre>' % escape(os.popen(cmd).read())
     if not os.path.exists(gdir):
         msg += _('Failed to clone repository to {0}').format(gdir)
         return msg
-    def_ms.try_load_course(cdir)  # load into modulestore
+    def_ms.try_load_course(os.path.abspath(gdir))  # load into modulestore
     errlog = def_ms.errored_courses.get(cdir, '')
     if errlog:
-        msg += '<hr width="50%%"><pre>{0}</pre>'.format(escape(errlog))
+        msg += u'<hr width="50%"><pre>{0}</pre>'.format(escape(errlog))
     else:
-        course = def_ms.courses[cdir]
-        msg += _('Loaded course %s (%s)<br/>Errors:').format(cdir,
-                course.display_name)
+        course = def_ms.courses[os.path.abspath(gdir)]
+        msg += _('Loaded course {0} {1}<br/>Errors:').format(cdir,
+                                                             course.display_name)
         errors = def_ms.get_item_errors(course.location)
         if not errors:
-            msg += 'None'
+            msg += u'None'
         else:
-            msg += '<ul>'
+            msg += u'<ul>'
             for (summary, err) in errors:
                 msg += \
-                    '<li><pre>{0}: {1}</pre></li>'.format(escape(summary),
-                        escape(err))
-            msg += '</ul>'
+                    u'<li><pre>{0}: {1}</pre></li>'.format(escape(summary),
+                                                           escape(err))
+            msg += u'</ul>'
         datatable['data'].append([course.display_name, cdir]
                                  + git_info_for_course(cdir))
     return msg
 
 
 def fix_external_auth_map_passwords():
+    """
+    This corrects any passwords that have drifted from eamp to
+    internal django auth
+    """
+
     msg = ''
     for eamap in ExternalAuthMap.objects.all():
-        u = eamap.user
-        pw = eamap.internal_password
-        if u is None:
+        euser = eamap.user
+        epass = eamap.internal_password
+        if euser is None:
             continue
         try:
-            testuser = authenticate(username=u.username, password=pw)
-        except Exception, err:
+            testuser = authenticate(username=euser.username, password=epass)
+        except (TypeError, PermissionDenied), err:
             msg += _('Failed in authenticating {0}, error {1}\n'
-                     ).format(u, err)
+                     ).format(euser, err)
             continue
         if testuser is None:
-            msg += _('Failed in authenticating {0}').format(u)
+            msg += _('Failed in authenticating {0}\n').format(euser)
             msg += _('fixed password')
-            u.set_password(pw)
-            u.save()
+            euser.set_password(epass)
+            euser.save()
             continue
     if not msg:
         msg = _('All ok!')
     return msg
 
+
 def create_user(uname, name, password=None, do_mit=False):
+    """ Creates a user (both SSL and regular)"""
 
     if not uname:
         return _('Must provide username')
@@ -146,18 +184,18 @@ def create_user(uname, name, password=None, do_mit=False):
 
     make_eamap = False
 
-    msg = ''
+    msg = u''
     if do_mit:
         if not '@' in uname:
             email = '{0}@MIT.EDU'.format(uname)
         else:
             email = uname
         if not email.endswith('@MIT.EDU'):
-            msg += 'email must end in @MIT.EDU'
+            msg += u'email must end in @MIT.EDU'
             return msg
         mit_domain = 'ssl:MIT'
         if ExternalAuthMap.objects.filter(external_id=email,
-                external_domain=mit_domain):
+                                          external_domain=mit_domain):
             msg += _('Failed - email {0} already exists as external_id'
                      ).format(email)
             return msg
@@ -183,12 +221,12 @@ def create_user(uname, name, password=None, do_mit=False):
                  ).format(user)
         return msg
 
-    r = Registration()
-    r.register(user)
+    reg = Registration()
+    reg.register(user)
 
-    up = UserProfile(user=user)
-    up.name = name
-    up.save()
+    profile = UserProfile(user=user)
+    profile.name = name
+    profile.save()
 
     if make_eamap:
         credentials = \
@@ -198,9 +236,9 @@ def create_user(uname, name, password=None, do_mit=False):
             external_email=email,
             external_domain=mit_domain,
             external_name=name,
-            internal_password=password,
+            internal_password=new_password,
             external_credentials=json.dumps(credentials),
-            )
+        )
         eamap.user = user
         eamap.dtsignup = datetime.now()
         eamap.save()
@@ -208,34 +246,36 @@ def create_user(uname, name, password=None, do_mit=False):
     msg += _('User {0} created successfully!').format(user)
     return msg
 
+
 def delete_user(uname):
+    """Deletes a user from django auth"""
+
     if not uname:
         return _('Must provide username')
     if '@' in uname:
         try:
-            u = User.objects.get(email=uname)
-        except Exception, err:
+            user = User.objects.get(email=uname)
+        except User.DoesNotExist, err:
             msg = _('Cannot find user with email address {0}'
                     ).format(uname)
             return msg
     else:
         try:
-            u = User.objects.get(username=uname)
-        except Exception, err:
-            msg = _('Cannot find user with username {0} - {1}').format(uname,
-                                                                       err.msg)
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist, err:
+            msg = _('Cannot find user with username {0} - {1}'
+                    ).format(uname, err.msg)
             return msg
-    u.delete()
+    user.delete()
     return _('Deleted user {0}').format(uname)
 
-def return_csv(fn, datatable, fp=None):
 
-    if fp is None:
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = \
-            'attachment; filename={0}'.format(fn)
-    else:
-        response = fp
+def return_csv(filename, datatable):
+    """Convenient function for handling the http response of a csv"""
+
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+
     writer = csv.writer(response, dialect='excel', quotechar='"',
                         quoting=csv.QUOTE_ALL)
     writer.writerow(datatable['header'])
@@ -244,15 +284,21 @@ def return_csv(fn, datatable, fp=None):
         writer.writerow(encoded_row)
     return response
 
+
 def get_staff_group(course):
+    """Gets staff members for course"""
 
     return get_group(course, 'staff')
 
+
 def get_instructor_group(course):
+    """Gets instructors for course"""
 
     return get_group(course, 'instructor')
 
+
 def get_group(course, groupname):
+    """Gets the course group"""
 
     grpname = get_access_group_name(course, groupname)
     try:
@@ -262,22 +308,21 @@ def get_group(course, groupname):
         group.save()
     return group
 
+
 @staff_member_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def sysadmin_dashboard(request):
     """
     Sysadmin dashboard.
-    
     Provides:
-        
         1. enrollment numbers
         2. loading new courses from github
         3. reloading XML from files
-
     """
+    # pylint: disable-msg=R0915
 
-    msg = ''
+    msg = u''
     plots = []
     datatable = {}
 
@@ -293,21 +338,26 @@ def sysadmin_dashboard(request):
     # the sysadmin dashboard page is modal: status, courses, enrollment,
     # staffing, gitlogs
     # keep that state in request.session (defaults to status mode)
-    dash_mode = request.POST.get('dash_mode','')
+    dash_mode = request.POST.get('dash_mode', '')
     if dash_mode:
         request.session['dash_mode'] = dash_mode
     else:
-        dash_mode = request.session.get('dash_mode', 'Status')
+        dash_mode = request.session.get('dash_mode', _('Status'))
 
     # default datatable depends on dash_mode
-    if dash_mode == 'Status':
+    if dash_mode == _('Status'):
         datatable = dict(header=[_('Statistic'), _('Value')],
                          title=_('Site statistics'))
         datatable['data'] = [[_('Total number of users'),
                              User.objects.all().count()]]
-    elif dash_mode == 'Courses':
+    elif dash_mode == _('Courses'):
         data = []
-        for (cdir, course) in courses.items():
+
+        if hasattr(courses, 'items'):
+            course_iter = courses.items()
+        else:
+            course_iter = courses
+        for (cdir, course) in course_iter:
             data.append([course.display_name, cdir]
                         + git_info_for_course(cdir))
 
@@ -316,10 +366,14 @@ def sysadmin_dashboard(request):
                          _('last editor')],
                          title=_('Information about all courses'),
                          data=data)
-    elif dash_mode == 'Enrollment' or dash_mode == 'Staffing':
+    elif dash_mode == _('Staffing and Enrollment'):
         data = []
 
-        for (cdir, course) in courses.items():
+        if hasattr(courses, 'items'):
+            course_iter = courses.items()
+        else:
+            course_iter = courses
+        for (cdir, course) in course_iter:
             datum = [course.display_name, course.id]
             datum += \
                 [CourseEnrollment.objects.filter(course_id=course.id).count()]
@@ -329,10 +383,9 @@ def sysadmin_dashboard(request):
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
-                         _('# enrolled'), _('# staff'), _('instructors'
-                         )],
-                         title=_('Enrollment information for all courses'
-                         ), data=data)
+                                 _('# enrolled'), _('# staff'), _('instructors')],
+                         title=_('Enrollment information for all courses'),
+                         data=data)
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -342,16 +395,14 @@ def sysadmin_dashboard(request):
         datatable = dict(header=[_('username'), _('email')],
                          title=_('List of all users'),
                          data=[[u.username, u.email] for u in
-                         User.objects.all()])
-        return return_csv('users_{0}.csv'.format(request.META['SERVER_NAME'
-                          ]), datatable)
-
+                               User.objects.all()])
+        return return_csv('users_{0}.csv'.format(
+            request.META['SERVER_NAME']), datatable)
     elif _('Check and repair external Auth Map') in action:
-        msg += '<pre>'
+        msg += u'<pre>'
         msg += fix_external_auth_map_passwords()
-        msg += '</pre>'
+        msg += u'</pre>'
         datatable = {}
-
     elif _('Create user') in action:
         uname = request.POST.get('student_uname', '').strip()
         name = request.POST.get('student_fullname', '').strip()
@@ -362,76 +413,82 @@ def sysadmin_dashboard(request):
     elif _('Delete user') in action:
         uname = request.POST.get('student_uname', '').strip()
         msg += delete_user(uname)
-
     elif _('Download staff and instructor list (csv file)') in action:
         data = []
-        roles = ['instructor','staff']
+        roles = ['instructor', 'staff']
 
-        for cdir, course in courses.items():
+        if hasattr(courses, 'items'):
+            course_iter = courses.items()
+        else:
+            course_iter = courses
+        for (cdir, course) in course_iter:
             for role in roles:
-                for u in get_group(course, role).user_set.all():
-                    datum = [course.id, role, u.username, u.email,
-                             u.profile.name]
+                for user in get_group(course, role).user_set.all():
+                    datum = [course.id, role, user.username, user.email,
+                             user.profile.name]
                     data.append(datum)
-        datatable = dict(header=[_('course_id'), _('role'), _('username'
-                         ), _('email'), _('full_name')],
-                         title=_('List of all course staff and instructors'
-                         ), data=data)
-        return return_csv('staff_{0}.csv'.format(request.META['SERVER_NAME'
-                          ]), datatable)
-
+        datatable = dict(header=[_('course_id'),
+                                 _('role'), _('username'),
+                                 _('email'), _('full_name')],
+                         title=_('List of all course staff and instructors'),
+                         data=data)
+        return return_csv('staff_{0}.csv'.format(
+            request.META['SERVER_NAME']), datatable)
     elif action == _('Delete course from site'):
         course_id = request.POST.get('course_id', '').strip()
-        ok = False
+        course_found = False
         if course_id in courses:
-            ok = True
+            course_found = True
             course = courses[course_id]
         else:
             try:
                 course = get_course_by_id(course_id)
-                ok = True
-            except Exception, err:
+                course_found = True
+            except Http404, err:
                 msg += \
                     _('Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
                       ).format(course_id, escape(err))
 
-        if ok and not is_using_mongo:
-            cdir = course.metadata.get('data_dir',
-                    course.location.course)
+        if course_found and not is_using_mongo:
+            cdir = course.data_dir
             def_ms.courses.pop(cdir)
 
             # now move the directory (don't actually delete it)
-            nd = cdir + '_deleted_{0}'.format(int(time.time()))
-            os.rename(settings.DATA_DIR / cdir, settings.DATA_DIR / nd)
-            os.system('chmod -x {0}'.format((settings.DATA_DIR / nd)))
+            new_dir = cdir + '_deleted_{0}'.format(int(time.time()))
+            os.rename(settings.DATA_DIR / cdir, settings.DATA_DIR / new_dir)
 
-            msg += "<font color='red'>Deleted {0} = {1} ({3})</font>".format(cdir, course.id, course.display_name)
+            msg += u"<font color='red'>Deleted {0} = {1} ({2})</font>".format(
+                cdir, course.id, course.display_name)
 
-        elif ok and is_using_mongo:
+        elif course_found and is_using_mongo:
             # delete course that is stored with mongodb backend
             loc = course.location
-            cs = contentstore()
+            content_store = contentstore()
             commit = True
-            delete_course(def_ms, cs, loc, commit)
+            delete_course(def_ms, content_store, loc, commit)
             # don't delete user permission groups, though
             msg += \
-                "<font color='red'>{0} {1} = {2} ({3})</font>".format(_('Deleted'
-                    ), loc, course.id, course.display_name)
+                u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
+                    _('Deleted'), loc, course.id, course.display_name)
 
     elif action == _('Load new course from github'):
-        gitloc = request.POST.get('repo_location', ''
-                                  ).strip().replace(' ', '').replace(';'
-                , '')
+        gitloc = request.POST.get('repo_location', '').strip().replace(
+            ' ', '').replace(';', '')
         msg += get_course_from_git(gitloc, is_using_mongo, def_ms, datatable)
 
-    else:	# default to showing status summary
+    # default to showing status summary
+    else:
         if hasattr(courses, 'items'):
-            msg += '<h2>{0}</h2>'.format(_('Courses loaded in the modulestore'))
-            msg += '<ol>'
-            for cdir, course in courses.items():
-                msg += '<li>{0} ({1})</li>'.format(escape(cdir),
-                                                course.location.url())
-            msg += '</ol>'
+            course_iter = courses.items()
+        else:
+            course_iter = courses
+        msg += u'<h2>{0}</h2>'.format(
+            _('Courses loaded in the modulestore'))
+        msg += u'<ol>'
+        for (cdir, course) in course_iter:
+            msg += u'<li>{0} ({1})</li>'.format(
+                escape(cdir), course.location.url())
+        msg += u'</ol>'
 
     # ----------------------------------------
     # context for rendering
@@ -443,13 +500,16 @@ def sysadmin_dashboard(request):
         'djangopid': os.getpid(),
         'modeflag': {dash_mode: 'selectedmode'},
         'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
-        }
+    }
 
     return render_to_response('sysadmin_dashboard.html', context)
-    
-#-----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+
 @staff_member_required
 def view_git_logs(request, course_id=None):
+    """Shows logs of imports that happened as a result of a git import"""
 
     import mongoengine  # don't import that until we need it, here
 
@@ -463,13 +523,13 @@ def view_git_logs(request, course_id=None):
 
     # Allow overrides
     if hasattr(settings, 'MONGODB_LOG'):
-        mongo_db['host'] = settings.MONGODB_LOG.get('host', mongo_db['host'])
-        mongo_db['user'] = settings.MONGODB_LOG.get('user', mongo_db['user'])
-        mongo_db['password'] = settings.MONGODB_LOG.get('password',
-                                                        mongo_db['password'])
-        mongo_db['db'] = settings.MONGODB_LOG.get('db', mongo_db['db'])
+        for config_item in ['host', 'user', 'password', 'db', ]:
+            mongo_db[config_item] = settings.MONGODB_LOG.get(
+                config_item, mongo_db[config_item])
 
     class CourseImportLog(mongoengine.Document):
+        """Mongoengine model for git log"""
+
         course_id = mongoengine.StringField(max_length=128)
         location = mongoengine.StringField(max_length=168)
         import_log = mongoengine.StringField(max_length=20 * 65535)
@@ -479,22 +539,25 @@ def view_git_logs(request, course_id=None):
         meta = {'indexes': ['course_id', 'created'],
                 'allow_inheritance': False}
 
-    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'], mongo_db['db'])
+    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
+                                          mongo_db['db'])
+
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri, 
-                                  username=mongo_db['user'], 
-                                  password=mongo_db['password']
-                              )
+        mdb = mongoengine.connect('test_xlog', host=mongouri,
+                                  username=mongo_db['user'],
+                                  password=mongo_db['password'])
     except mongoengine.connection.ConnectionError, e:
-        logging.critical(_('Unable to connect to mongodb to save log, please check ' \
-                'MONGODB_LOG settings'))
+        logging.critical(_('Unable to connect to mongodb to save log, please check '
+                           'MONGODB_LOG settings. error: {0}').format(str(e)))
 
     if course_id is None:
         cilset = CourseImportLog.objects.all().order_by('-created')
     else:
         log.debug('course_id={0}'.format(course_id))
-        cilset = CourseImportLog.objects.filter(course_id=course_id).order_by('-created')
+        cilset = CourseImportLog.objects.filter(
+            course_id=course_id).order_by('-created')
         log.debug('cilset length={0}'.format(len(cilset)))
+    mdb.disconnect()
     context = {'cilset': cilset, 'course_id': course_id}
 
     return render_to_response('sysadmin_dashboard_gitlogs.html',

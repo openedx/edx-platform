@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 #
+# pylint: disable-msg=C0111
 # python script to pull a git repo and import into cms / edge mongodb content database.
 #
 # usage:
 #
-#    python cms_git_add_course <git-ssh-url> [<directory>]
+#    python git_add_course.py <git-ssh-url> [<directory>]
 #
 # argument is git ssh url, like: git@github.com:mitocw/edx4edx_lite.git
 # if the directory is given, that is used and presumed to contain the git repo
@@ -14,43 +14,29 @@
 
 import os
 import sys
-import string
 import re
 import datetime
 import mongoengine  # used to store import log
-import json
 import StringIO
 import logging
-
-from path import path
 
 from django.utils.translation import ugettext as _
 
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
-GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
+GIT_REPO_DIR = getattr(settings,
+                       'GIT_REPO_DIR', '/opt/edx/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
 
-# Set defaults even if it isn't defined in settings
-mongo_db = {
-    'host': 'localhost',
-    'user': '',
-    'password': '',
-    'db': 'xlog',
-}
-
-# Allow overrides
-if hasattr(settings, 'MONGODB_LOG'):
-    mongo_db['host'] = settings.MONGODB_LOG.get('host', mongo_db['host'])
-    mongo_db['user'] = settings.MONGODB_LOG.get('user', mongo_db['user'])
-    mongo_db['password'] = settings.MONGODB_LOG.get('password', mongo_db['password'])
-    mongo_db['db'] = settings.MONGODB_LOG.get('db', mongo_db['db'])
 
 class CourseImportLog(mongoengine.Document):
+    """Mongoengine model for git log"""
+    # pylint: disable-msg=R0924
 
     course_id = mongoengine.StringField(max_length=128)
     location = mongoengine.StringField(max_length=168)
@@ -63,10 +49,25 @@ class CourseImportLog(mongoengine.Document):
 
 
 def add_repo(repo, rdir_in):
+    """This will add a git repo into the mongo modulestore"""
+
+    # Set defaults even if it isn't defined in settings
+    mongo_db = {
+        'host': 'localhost',
+        'user': '',
+        'password': '',
+        'db': 'xlog',
+    }
+
+    # Allow overrides
+    if hasattr(settings, 'MONGODB_LOG'):
+        for config_item in ['host', 'user', 'password', 'db', ]:
+            mongo_db[config_item] = settings.MONGODB_LOG.get(
+                config_item, mongo_db[config_item])
 
     if not os.path.isdir(GIT_REPO_DIR):
-        log.critical(_("Path {0} doesn't exist, please create it, or configure a " \
-                "different path with GIT_REPO_DIR").format(GIT_REPO_DIR))
+        log.critical(_("Path {0} doesn't exist, please create it, or configure a "
+                       "different path with GIT_REPO_DIR").format(GIT_REPO_DIR))
         sys.exit(1)
 
     # -----------------------------------------------------------------------------
@@ -121,28 +122,27 @@ def add_repo(repo, rdir_in):
     import_log_handler.setLevel(logging.DEBUG)
     import_logger.addHandler(import_log_handler)
     try:
-        management.call_command('import', GIT_REPO_DIR, rdir, 
+        management.call_command('import', GIT_REPO_DIR, rdir,
                                 nostatic=not GIT_IMPORT_STATIC)
-    except CommandError, e:
-        log.critical(_('Unable to run import command (likely because using lms ' \
-                'settings), switch to cms settings.'))
-        log.critical(_('Error was {0}').format(str(e)))
+    except CommandError, ex:
+        log.critical(_('Unable to run import command.'))
+        log.critical(_('Error was {0}').format(str(ex)))
         sys.exit(1)
 
-    ret_import = output.getvalue()    
-    
+    ret_import = output.getvalue()
+
     course_id = 'unknown'
     location = 'unknown'
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
-    m = re.search('(?ms)===> IMPORTING course to location ([^ \n]+)',
+    match = re.search('(?ms)===> IMPORTING course to location ([^ \n]+)',
                   ret_import)
-    if m:
-        location = m.group(1).strip()
+    if match:
+        location = match.group(1).strip()
         log.debug('location = {0}'.format(location))
-        course_id = location.replace('i4x://', '').replace('/course/', '/'
-                ).split('\n')[0].strip()
+        course_id = location.replace('i4x://', '').replace(
+            '/course/', '/').split('\n')[0].strip()
 
         cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_id.split('/')[1])
         log.debug(_('Studio course dir = {0}').format(cdir))
@@ -154,25 +154,24 @@ def add_repo(repo, rdir_in):
 
         if not os.path.exists(cdir):
             log.debug(_('   -> creating symlink'))
-            log.debug(os.popen('ln -s {0} {1}'.format(rdirp, cdir)).read())
+            log.debug(os.popen('ln -s {0} {1}'.format(rdirp,
+                      cdir)).read())
             log.debug(os.popen('ls -l {0}'.format(cdir)).read())
-
 
     # -----------------------------------------------------------------------------
     # store import-command-run output in mongo
 
-    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'], mongo_db['db'])
+    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
+                                          mongo_db['db'])
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri, 
-                                  username=mongo_db['user'], 
-                                  password=mongo_db['password']
-                              )
-    except mongoengine.connection.ConnectionError, e:
-        log.critical(_('Unable to connect to mongodb to save log, please check ' \
-                'MONGODB_LOG settings'))
-        log.critical(_('Error was: {0}').format(str(e)))
+        mdb = mongoengine.connect(mongo_db['db'], host=mongouri,
+                                  username=mongo_db['user'],
+                                  password=mongo_db['password'])
+    except mongoengine.connection.ConnectionError, ex:
+        log.critical(_('Unable to connect to mongodb to save log, please '
+                       'check MONGODB_LOG settings'))
+        log.critical(_('Error was: {0}').format(str(ex)))
         sys.exit(1)
-
 
     cil = CourseImportLog(
         course_id=course_id,
@@ -184,20 +183,26 @@ def add_repo(repo, rdir_in):
     )
     cil.save()
 
-    print(_('saved CourseImportLog for {0}').format(cil.course_id))
+    print _('saved CourseImportLog for {0}').format(cil.course_id)
     mdb.disconnect()
 
 if __name__ == '__main__':
+    # pylint: disable-msg=C0103
 
     if len(sys.argv) < 2:
         print(_('This script requires at least one argument, the git URL'))
         sys.exit(1)
-    
+
     if len(sys.argv) > 3:
         print(_('This script requires no more than two arguments.'))
         sys.exit(1)
 
     rdir_in = None
+
+    # check that we are using mongo modulestore
+    if not 'mongo' in str(modulestore().__class__):
+        print _('This script requires a mongo module store')
+        sys.exit(1)
 
     if len(sys.argv) > 2:
         rdir_in = sys.argv[2]
