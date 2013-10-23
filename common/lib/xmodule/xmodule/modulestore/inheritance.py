@@ -21,6 +21,13 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "may differ from the global due date if an instructor has granted "
+             "an extension to the student.",
+        default=None,
+        scope=Scope.user_state,
+    )
     giturl = String(help="url root for course data git repository", scope=Scope.settings)
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     graceperiod = Timedelta(

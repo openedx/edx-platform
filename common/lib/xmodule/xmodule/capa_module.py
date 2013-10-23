@@ -22,6 +22,7 @@ from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
+from .utils import get_extended_due_date
 
 log = logging.getLogger("mitx.courseware")
 
@@ -95,6 +96,13 @@ class CapaFields(object):
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "may differ from the global due date if an instructor has granted "
+             "an extension to the student.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings
@@ -186,7 +194,7 @@ class CapaModule(CapaFields, XModule):
         """
         XModule.__init__(self, *args, **kwargs)
 
-        due_date = self.due
+        due_date = get_extended_due_date(self)
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod

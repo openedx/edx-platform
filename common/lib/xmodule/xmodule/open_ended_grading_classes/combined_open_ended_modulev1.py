@@ -131,7 +131,9 @@ class CombinedOpenEndedV1Module():
             'peer_grade_finished_submissions_when_none_pending', False
         )
 
-        due_date = instance_state.get('due', None)
+        due_date = instance_state.get('extended_due', None)
+        if due_date is None:
+            due_date = instance_state.get('due', None)
 
         grace_period_string = instance_state.get('graceperiod', None)
         try:
