@@ -104,7 +104,9 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
-STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT))
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE)
 
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
