@@ -109,3 +109,20 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     });
   });
 };
+
+// handle things properly for clicks
+jQuery('#skip-link a').click(function() {
+    var href = jQuery(this).attr('href');
+    if(href) {
+        jQuery(href).focus();
+    }
+});
+// and for the enter key
+jQuery('#skip-link a').keypress(function(e) {
+    if(e.which == 13) {
+        var href = jQuery(this).attr('href');
+        if(href) {
+            jQuery(href).focus();
+        }
+    }
+});

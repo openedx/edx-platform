@@ -285,3 +285,19 @@ mark {
 #feedback_form textarea[name="details"] {
   height: 150px;
 }
+
+
+/* show skip links on focus */
+#skip-link a{
+  position:absolute;
+  &:focus {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    background-color: #fff;
+    border: 2px solid black;
+    padding: 3px;
+    z-index: 1005;
+  }
+}
+

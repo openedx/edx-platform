@@ -29,6 +29,7 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
+  <div id="skip-link"><a href="#content">Skip to Content</a></div>
 <script type="text/javascript">
 window.baseUrl = "${settings.STATIC_URL}";
 var require = {
@@ -69,6 +70,7 @@ var require = {
         "xmodule": "/xmodule/xmodule",
         "xblock": "coffee/src/xblock",
         "utility": "js/src/utility",
+        "accessibility": "js/src/accessibility_tools",
         "draggabilly": "js/vendor/draggabilly.pkgd",
 
         // externally hosted files
@@ -207,7 +209,7 @@ var require = {
     deps: ["jquery", "gettext"],
     callback: function() {
         // load other scripts on every page, after jquery loads
-        require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair"]);
+        require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
         // we need "datepair" because it dynamically modifies the page
         // when it is loaded -- yuck!
     }
@@ -242,7 +244,9 @@ require(['js/models/course'], function(Course) {
 
       <div id="page-alert"></div>
 
+      <div id="content">
       <%block name="content"></%block>
+      </div>
 
       % if user.is_authenticated():
       <script type="text/javascript">
