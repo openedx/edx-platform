@@ -126,7 +126,7 @@ class RelativeTime(Field):
     should be python datetime.timedelta object, to be consistent with
     common time representation.
 
-    At the same time, serialized representation should be"HH:MM:SS"
+    At the same time, serialized representation should be "HH:MM:SS"
     This format is convenient to use in XML (and it is used now),
     and also it is used in frond-end studio editor of video module as format
     for start and end time fields.
@@ -162,7 +162,7 @@ class RelativeTime(Field):
 
     def from_json(self, value):
         """
-        Convert value in 'HH:MM:SS' format to datetime.timedelta.
+        Convert value is in 'HH:MM:SS' format to datetime.timedelta.
 
         If not value, returns 0.
         If value is float (backward compatibility issue), convert to timedelta.
