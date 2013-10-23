@@ -176,7 +176,7 @@ class CourseDetailsViewTest(CourseTestCase):
         payload['end_date'] = CourseDetailsViewTest.convert_datetime_to_iso(details.end_date)
         payload['enrollment_start'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_start)
         payload['enrollment_end'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_end)
-        resp = self.client.post(url, json.dumps(payload), "application/json")
+        resp = self.client.ajax_post(url, payload)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
     @staticmethod
@@ -462,6 +462,6 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "short_label": "yo momma",
             "weight": 17.3,
         }
-        resp = self.client.post(self.url, grader)
+        resp = self.client.ajax_post(self.url, grader)
         self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)

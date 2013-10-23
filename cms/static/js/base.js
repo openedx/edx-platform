@@ -230,7 +230,7 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/create_item', {
+    $.postJSON('/create_item', {
         'parent_location': parent,
         'category': category,
         'display_name': 'New Unit'
@@ -279,7 +279,7 @@ function _deleteItem($el, type) {
                     });
                     deleting.show();
 
-                    $.post('/delete_item',
+                    $.postJSON('/delete_item',
                            {'id': id,
                             'delete_children': true,
                             'delete_all_versions': true},

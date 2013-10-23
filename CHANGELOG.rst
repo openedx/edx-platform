@@ -33,6 +33,27 @@ in the set contentstore.views.item.DETACHED_CATEGORIES nor 'course'.
 Studio: Bug fix for text loss in Course Updates when the text exists
 before the first tag.
 
+Common: expect_json decorator now puts the parsed json payload into a json attr
+on the request instead of overwriting the POST attr
+
+---------- split mongo backend refactoring changelog section ------------
+
+Studio: course catalog, assets, checklists, course outline pages now use course 
+id syntax w/ restful api style
+
+Common:
+  separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
+  in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
+
+Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
+
+Common: location mapper: added a bunch of new helper functions for generating 
+old location style info from a CourseLocator
+
+Common: locators: allow - ~ and . in course, branch, and block ids.
+
+---------- end split mongo backend section ---------
+
 Blades: Hovering over CC button in video player, when transcripts are hidden,
 will cause them to show up. Moving the mouse from the CC button will auto hide
 them. You can hover over the CC button and then move the mouse to the
@@ -387,22 +408,6 @@ XModules: Show errors with full descriptors.
 Studio: Add feedback to end user if there is a problem exporting a course
 
 Studio: Improve link re-writing on imports into a different course-id
-
----------- split mongo backend refactoring changelog section ------------
-
-Studio: course catalog and course outline pages new use course id syntax w/ restful api style
-
-Common:
-  separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
-  in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
-
-Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
-
-Common: location mapper: added a bunch of new helper functions for generating old location style info from a CourseLocator
-
-Common: locators: allow - ~ and . in course, branch, and block ids.
-
----------- end split mongo backend section ---------
 
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.

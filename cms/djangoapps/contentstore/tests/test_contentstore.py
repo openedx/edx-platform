@@ -6,7 +6,6 @@ import mock
 
 from textwrap import dedent
 
-from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,7 +19,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.dispatch import Signal
 from contentstore.utils import get_modulestore
-from contentstore.tests.utils import parse_json
+from contentstore.tests.utils import parse_json, AjaxEnabledTestClient
 
 from auth.authz import add_user_to_creator_group
 
@@ -98,7 +97,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # Save the data that we've just changed to the db.
         self.user.save()
 
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
@@ -420,7 +419,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             if tab['type'] == 'static_tab':
                 reverse_tabs.insert(0, 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
 
-        self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs': reverse_tabs}), "application/json")
+        self.client.ajax_post(reverse('reorder_static_tabs'), {'tabs': reverse_tabs})
 
         course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
 
@@ -755,7 +754,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 expected_children = []
                 for child_loc_url in source_item.children:
                     child_loc = Location(child_loc_url)
-                    child_loc = child_loc._replace(
+                    child_loc = child_loc.replace(
                         tag=dest_location.tag,
                         org=dest_location.org,
                         course=dest_location.course
@@ -1333,7 +1332,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.user.is_staff = True
         self.user.save()
 
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=uname, password=password)
 
         self.course_data = {
@@ -1344,8 +1343,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         }
 
     def tearDown(self):
-        mongo = MongoClient()
-        mongo.drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
     def test_create_course(self):
@@ -1394,7 +1392,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
-        self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
@@ -1403,7 +1401,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         course_id = _get_course_id(self.course_data)
         initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['ErrMsg'], error_message)
@@ -1413,7 +1411,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
-        self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
@@ -1422,13 +1420,13 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
         self.course_data['number'] = 'capital'
-        self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post(reverse('create_new_course'), self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
         self.course_data['org'] = cache_current
 
-        self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post(reverse('create_new_course'), self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = self.course_data['number'].upper()
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
@@ -1437,14 +1435,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Test that a new course can be created whose name is a substring of an existing course
         """
-        self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post(reverse('create_new_course'), self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = '{}a'.format(self.course_data['number'])
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         self.course_data['number'] = cache_current
         self.course_data['org'] = 'a{}'.format(self.course_data['org'])
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
 
     def test_create_course_with_bad_organization(self):
@@ -1487,7 +1485,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Checks that the course did not get created due to a PermissionError.
         """
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 403)
 
     def test_course_index_view_with_no_courses(self):
@@ -1546,7 +1544,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'display_name': 'Section One',
         }
 
-        resp = self.client.post(reverse('create_item'), section_data)
+        resp = self.client.ajax_post(reverse('create_item'), section_data)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -1564,7 +1562,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'category': 'problem'
         }
 
-        resp = self.client.post(reverse('create_item'), problem_data)
+        resp = self.client.ajax_post(reverse('create_item'), problem_data)
 
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
@@ -1934,7 +1932,7 @@ def _create_course(test, course_data):
     course_id = _get_course_id(course_data)
     new_location = loc_mapper().translate_location(course_id, CourseDescriptor.id_to_location(course_id), False, True)
 
-    response = test.client.post(reverse('create_new_course'), course_data)
+    response = test.client.ajax_post(reverse('create_new_course'), course_data)
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)

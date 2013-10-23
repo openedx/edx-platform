@@ -43,7 +43,7 @@ def initialize_course_tabs(course):
 @expect_json
 def reorder_static_tabs(request):
     "Order the static tabs in the requested order"
-    tabs = request.POST['tabs']
+    tabs = request.json['tabs']
     course = get_course_for_item(tabs[0])
 
     if not has_access(request.user, course.location):
