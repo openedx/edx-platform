@@ -83,10 +83,11 @@ Feature: CMS.Video Component
     Given I have created a Video component
     And Make sure captions are closed
     And I edit the component
+    And I open tab "Advanced"
     And I set value "12" to the field "Start Time"
     And I set value "24" to the field "End Time"
     And I save changes
-    And I click button "Play"
+    And I click video button "Play"
 
     # The below line is a bit flaky. Numbers 73 and 73 were determined rather
     # accidentally. They might change in the future as Video player gets CSS

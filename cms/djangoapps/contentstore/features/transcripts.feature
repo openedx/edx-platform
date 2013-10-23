@@ -78,7 +78,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t__eq_exist" source to field number 1
         Then I see status message "not found"
         And I see button "import"
-        And I click button "import"
+        And I click transcript button "import"
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
         And I see button "download_to_edit"
@@ -111,7 +111,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t_neq_exist" source to field number 1
         And I see status message "replace"
         And I see button "replace"
-        And I click button "replace"
+        And I click transcript button "replace"
         And I see status message "found"
         And I see value "t_neq_exist" in the field "HTML5 Transcript"
 
@@ -153,7 +153,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t__eq_exist" source to field number 1
         Then I see status message "not found"
         And I see button "import"
-        And I click button "import"
+        And I click transcript button "import"
         Then I see status message "found"
 
         And I enter a "t_not_exist.mp4" source to field number 2
@@ -205,7 +205,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t__eq_exist" source to field number 1
         Then I see status message "not found"
         And I see button "import"
-        And I click button "import"
+        And I click transcript button "import"
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
@@ -287,7 +287,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t__eq_exist" source to field number 1
         Then I see status message "not found"
         And I see button "import"
-        And I click button "import"
+        And I click transcript button "import"
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
@@ -309,7 +309,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t__eq_exist" source to field number 1
         Then I see status message "not found"
         And I see button "import"
-        And I click button "import"
+        And I click transcript button "import"
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
@@ -364,7 +364,7 @@ Feature: Video Component Editor
 
         And I see choose button "test_transcripts.mp4" number 1
         And I see choose button "t_not_exist.webm" number 2
-        And I click button "choose" number 2
+        And I click transcript button "choose" number 2
         And I see value "test_transcripts|t_not_exist" in the field "HTML5 Transcript"
 
     #21
@@ -384,13 +384,13 @@ Feature: Video Component Editor
         And I enter a "video_name_2.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
-        And I click button "use_existing"
+        And I click transcript button "use_existing"
         And I see value "video_name_2" in the field "HTML5 Transcript"
 
         And I enter a "video_name_3.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
-        And I click button "use_existing"
+        And I click transcript button "use_existing"
         And I see value "video_name_3" in the field "HTML5 Transcript"
 
     #22
@@ -410,7 +410,7 @@ Feature: Video Component Editor
         And I enter a "video_name_2.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
-        And I click button "use_existing"
+        And I click transcript button "use_existing"
         And I see value "video_name_2" in the field "HTML5 Transcript"
 
         And I enter a "video_name_3.mp4" source to field number 1
@@ -420,7 +420,7 @@ Feature: Video Component Editor
         And I enter a "video_name_4.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
-        And I click button "use_existing"
+        And I click transcript button "use_existing"
         And I see value "video_name_4" in the field "HTML5 Transcript"
 
     #23
@@ -443,7 +443,7 @@ Feature: Video Component Editor
         And I enter a "video_name_3.webm" source to field number 2
         Then I see status message "use existing"
         And I see button "use_existing"
-        And I click button "use_existing"
+        And I click transcript button "use_existing"
         And I see value "video_name_2|video_name_3" in the field "HTML5 Transcript"
 
     #24 Uploading subtitles with different file name than file

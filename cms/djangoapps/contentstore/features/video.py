@@ -5,7 +5,7 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
 
-BUTTONS = {
+VIDEO_BUTTONS = {
     'CC': '.hide-subtitles',
     'volume': '.volume',
     'Play': '.video_control.play',
@@ -135,7 +135,7 @@ def set_captions_visibility_state(_step, captions_state):
 
 @step('I hover over button "([^"]*)"$')
 def hover_over_button(_step, button):
-    world.css_find(BUTTONS[button.strip()]).mouse_over()
+    world.css_find(VIDEO_BUTTONS[button.strip()]).mouse_over()
 
 
 @step('Captions (?:are|become) "([^"]*)"$')
@@ -178,31 +178,6 @@ def caption_line_has_class(_step, index, className):
     world.css_has_class(SELECTOR, className.strip())
 
 
-@step('I set value "([^"]*)" to the field "([^"]*)"$')
-def set_value_transcripts_field(_step, value, field_name):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
-    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
-    world.css_fill(field_id, value.strip())
-
-
-@step('I save changes$')
-def save_changes(_step):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-    save_css = 'a.save-button'
-    world.css_click(save_css)
-
-
-@step('I click button "([^"]*)"$')
-def click_button(_step, button_type):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-    button = button_type.strip()
-    world.css_click(BUTTONS[button])
-
-
 @step('I see a range on slider with styles "left" set to (.+) px and "width" set to (.+) px$')
 def see_a_range_slider_with_proper_range(_step, left, width):
     left = int(left.strip())
@@ -214,4 +189,12 @@ def see_a_range_slider_with_proper_range(_step, left, width):
 
     assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
     assert int(round(float(slider_range.value_of_css_property("width")[:-2]))) == width
+
+
+@step('I click video button "([^"]*)"$')
+def click_button_video(_step, button_type):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    button = button_type.strip()
+    world.css_click(VIDEO_BUTTONS[button])
 
