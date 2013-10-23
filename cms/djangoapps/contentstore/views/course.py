@@ -49,6 +49,8 @@ from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
+import re
+import bson
 __all__ = ['create_new_course', 'course_info', 'course_handler',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -197,15 +199,17 @@ def create_new_course(request):
                 'course number so that it is unique.'),
         })
 
-    course_search_location = [
-        'i4x',
-        dest_location.org,
-        dest_location.course,
-        'course',
-        None
-    ]
-    courses = modulestore().get_items(course_search_location)
-    if len(courses) > 0:
+    # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
+    # file for new locators. get_items should accept a query rather than requiring it be a legal location
+    course_search_location = bson.son.SON({
+        '_id.tag': 'i4x',
+        # cannot pass regex to Location constructor; thus this hack
+        '_id.org': re.compile(dest_location.org, re.IGNORECASE),
+        '_id.course': re.compile(dest_location.course, re.IGNORECASE),
+        '_id.category': 'course',
+    })
+    courses = modulestore().collection.find(course_search_location, fields=('_id'))
+    if courses.count() > 0:
         return JsonResponse({
             'ErrMsg': _('There is already a course defined with the same '
                 'organization and course number. Please '

@@ -1436,6 +1436,20 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
 
+    def test_create_course_case_change(self):
+        """Test new course creation - error path due to case insensitive name equality"""
+        self.course_data['number'] = 'capital'
+        self.client.post(reverse('create_new_course'), self.course_data)
+        cache_current = self.course_data['org']
+        self.course_data['org'] = self.course_data['org'].lower()
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
+        self.course_data['org'] = cache_current
+
+        self.client.post(reverse('create_new_course'), self.course_data)
+        cache_current = self.course_data['number']
+        self.course_data['number'] = self.course_data['number'].upper()
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
+
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'

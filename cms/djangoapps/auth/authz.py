@@ -195,7 +195,7 @@ def is_user_in_course_group_role(user, location, role, check_staff=True):
         # all "is_staff" flagged accounts belong to all groups
         if check_staff and user.is_staff:
             return True
-        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        return user.groups.filter(name=get_course_groupname_for_role(location, role)).exists()
 
     return False
 
