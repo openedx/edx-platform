@@ -101,7 +101,9 @@
       });
       return false;
     });
+  })(this);
 
+  $(function(){
     accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
 
     accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
@@ -122,8 +124,7 @@
       var trigger = "#" + $(this).attr("id");
       accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
     });
-
-  })(this)
+  });
   </script>
 </%block>
 
