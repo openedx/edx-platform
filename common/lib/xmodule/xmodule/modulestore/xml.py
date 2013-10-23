@@ -179,7 +179,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Normally, we don't want lots of exception traces in our logs from common
                 # content problems.  But if you're debugging the xml loading code itself,
                 # uncomment the next line.
-                log.exception(msg)
+                #   log.exception(msg)
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -204,7 +204,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             descriptor.save()
             return descriptor
 
-        render_template = lambda: ''
+        render_template = lambda template, context: u''
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...

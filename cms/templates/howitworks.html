@@ -1,9 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 
 <%block name="title">${_("Welcome")}</%block>
-<%block name="bodyclass">not-signedin index howitworks</%block>
+<%block name="bodyclass">not-signedin index view-howitworks</%block>
 
 <%block name="content">
 
@@ -27,7 +30,7 @@
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature1">
-            <img src="/static/img/thumb-hiw-feature1.png" alt="${_('Studio Helps You Keep Your Courses Organized')}" />
+            <img src="${static.url("img/thumb-hiw-feature1.png")}" alt="${_('Studio Helps You Keep Your Courses Organized')}" />
             <figcaption class="sr">${_("Studio Helps You Keep Your Courses Organized")}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
@@ -61,7 +64,7 @@
       <li class="feature">
         <figure class="img zoom">
         <a rel="modal" href="#hiw-feature2">
-          <img src="/static/img/thumb-hiw-feature2.png" alt="${_('Learning is More than Just Lectures')}" />
+          <img src="${static.url("img/thumb-hiw-feature2.png")}" alt="${_('Learning is More than Just Lectures')}" />
           <figcaption class="sr">${_("Learning is More than Just Lectures")}</figcaption>
           <span class="action-zoom">
             <i class="icon-zoom-in"></i>
@@ -95,7 +98,7 @@
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature3">
-            <img src="/static/img/thumb-hiw-feature3.png" alt="${_('Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.')}" />
+            <img src="${static.url("img/thumb-hiw-feature3.png")}" alt="${_('Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.')}" />
             <figcaption class="sr">${_("Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.")}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
@@ -149,7 +152,7 @@
 <div class="content-modal" id="hiw-feature1">
   <h3 class="title">${_("Outlining Your Course")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature1.png" alt="" />
+    <img src="${static.url("img/hiw-feature1.png")}" alt="" />
     <figcaption class="description">${_("Simple two-level outline to organize your couse. Drag and drop, and see your course at a glance.")}</figcaption>
   </figure>
 
@@ -162,7 +165,7 @@
 <div class="content-modal" id="hiw-feature2">
   <h3 class="title">${_("More than Just Lectures")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature2.png" alt="" />
+    <img src="${static.url("img/hiw-feature2.png")}" alt="" />
     <figcaption class="description">${_("Quickly create videos, text snippets, inline discussions, and a variety of problem types.")}</figcaption>
   </figure>
 
@@ -175,7 +178,7 @@
 <div class="content-modal" id="hiw-feature3">
   <h3 class="title">${_("Publishing on Date")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature3.png" alt="" />
+    <img src="${static.url("img/hiw-feature3.png")}" alt="" />
     <figcaption class="description">${_("Simply set the date of a section or subsection, and Studio will publish it to your students for you.")}</figcaption>
   </figure>
 

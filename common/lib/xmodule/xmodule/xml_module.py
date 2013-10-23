@@ -378,7 +378,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         # Get the definition
         xml_object = self.definition_to_xml(resource_fs)
-        self.__class__.clean_metadata_from_xml(xml_object)
+        self.clean_metadata_from_xml(xml_object)
 
         # Set the tag so we get the file path right
         xml_object.tag = self.category
@@ -401,7 +401,7 @@ class XmlDescriptor(XModuleDescriptor):
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
-            filepath = self.__class__._format_filepath(self.category, url_path)
+            filepath = self._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))

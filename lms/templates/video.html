@@ -77,7 +77,7 @@
                             </div>
                         </div>
                         <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                        <a href="#" class="quality_control" title="${_('HD')}" role="button" aria-disabled="false">${_('HD')}</a>
+                        <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
                         <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
                     </div>
@@ -85,20 +85,23 @@
             </section>
         </article>
 
-        <ol class="subtitles" tabindex="0" title="Captions"><li></li></ol>
+        <ol class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point')}"><li></li></ol>
     </div>
 
     <div class="focus_grabber last"></div>
-</div>
-
+<ul class="wrapper-downloads">
 % if sources.get('main'):
-    <div class="video-sources">
-        <p>${(_('Download video') + ' <a href="%s">' + _('here') + '</a>.') % sources.get('main')}</p>
-    </div>
+    <li class="video-sources">
+        ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+    </li>
 % endif
 
 % if track:
-    <div class="video-tracks">
-        <p>${(_('Download subtitles') + ' <a href="%s">' + _('here') + '</a>.') % track}</p>
-    </div>
+    <li class="video-tracks">
+        ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+    </li>
 % endif
+</ul>
+</div>
+
+

@@ -52,6 +52,7 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -61,7 +62,7 @@ from courseware.access import has_access
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
-from bulk_email.models import Optout
+from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 
 import track.views
@@ -301,8 +302,14 @@ def dashboard(request):
 
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
-
+    # only show email settings for Mongo course and when bulk email is turned on
+    show_email_settings_for = frozenset(
+        course.id for course, _enrollment in courses if (
+            settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
+            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            CourseAuthorization.instructor_email_enabled(course.id)
+        )
+    )
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -318,7 +325,7 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
-               'exam_registrations': exam_registrations,
+               'show_email_settings_for': show_email_settings_for,
                }
 
     return render_to_response('dashboard.html', context)

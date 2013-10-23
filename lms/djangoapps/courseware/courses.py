@@ -106,24 +106,24 @@ def course_image_url(course):
     if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
-        loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+        loc = course.location.replace(tag='c4x', category='asset', name=course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
         return _path
 
 
-def find_file(fs, dirs, filename):
+def find_file(filesystem, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.
 
-    fs: an OSFS filesystem
+    filesystem: an OSFS filesystem
     dirs: a list of path objects
     filename: a string
 
     Returns d / filename if found in dir d, else raises ResourceNotFoundError.
     """
-    for d in dirs:
-        filepath = path(d) / filename
-        if fs.exists(filepath):
+    for directory in dirs:
+        filepath = path(directory) / filename
+        if filesystem.exists(filepath):
             return filepath
     raise ResourceNotFoundError("Could not find {0}".format(filename))
 
@@ -167,7 +167,7 @@ def get_course_about_section(course, section_key):
 
             request = get_request_for_thread()
 
-            loc = course.location._replace(category='about', name=section_key)
+            loc = course.location.replace(category='about', name=section_key)
 
             # Use an empty cache
             field_data_cache = FieldDataCache([], course.id, request.user)
@@ -185,7 +185,7 @@ def get_course_about_section(course, section_key):
             html = ''
 
             if about_module is not None:
-                html = about_module.runtime.render(about_module, None, 'student_view').content
+                html = about_module.render('student_view').content
 
             return html
 
@@ -231,7 +231,7 @@ def get_course_info_section(request, course, section_key):
     html = ''
 
     if info_module is not None:
-        html = info_module.runtime.render(info_module, None, 'student_view').content
+        html = info_module.render('student_view').content
 
     return html
 
@@ -255,13 +255,13 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            fs = course.system.resources_fs
+            filesys = course.system.resources_fs
             # first look for a run-specific version
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
-            filepath = find_file(fs, dirs, section_key + ".html")
-            with fs.open(filepath) as htmlFile:
+            filepath = find_file(filesys, dirs, section_key + ".html")
+            with filesys.open(filepath) as html_file:
                 return replace_static_urls(
-                    htmlFile.read().decode('utf-8'),
+                    html_file.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
                     course_id=course.location.course_id,
                     static_asset_path=course.static_asset_path,

@@ -124,7 +124,7 @@ if Backbone?
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"></div>')
+      @$(".more-pages").html('<div class="loading-animation"><span class="sr">Loading more threads</span></div>')
       @$(".more-pages").addClass("loading")
       options = {}
       switch @mode
@@ -405,7 +405,7 @@ if Backbone?
         type: "GET"
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"></div></li>')
+          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">Loading thread list</span></div></li>')
         loadedCallback: =>
           if callback
             callback.apply @, [value]

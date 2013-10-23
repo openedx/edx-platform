@@ -409,6 +409,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         raise UpdateProblemModuleStateError(msg)
 
     result = instance.rescore_problem()
+    instance.save()
     if 'success' not in result:
         # don't consider these fatal, but false means that the individual call didn't complete:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "

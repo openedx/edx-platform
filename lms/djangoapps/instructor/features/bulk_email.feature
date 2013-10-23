@@ -1,5 +1,5 @@
 @shard_2
-Feature: Bulk Email
+Feature: LMS.Bulk Email
     As an instructor or course staff,
     In order to communicate with students and staff
     I want to send email to staff and students in a course.
@@ -17,4 +17,3 @@ Feature: Bulk Email
     | staff         |  myself        |
     | staff         |  course staff  |
     | staff         |  students, staff, and instructors  |
-    

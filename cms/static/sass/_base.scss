@@ -528,9 +528,9 @@ p, ul, ol, dl {
 .new-subsection-item,
 .new-policy-item {
   @include grey-button;
-  margin: 5px 8px;
-  padding: 3px 10px 4px 10px;
-  font-size: 10px;
+  @include font-size(10);
+  margin: ($baseline/2);
+  padding: 3px ($baseline/2) 4px ($baseline/2);
 
   .new-folder-icon,
   .new-policy-icon,

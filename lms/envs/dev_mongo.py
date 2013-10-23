@@ -13,11 +13,13 @@ GITHUB_REPO_ROOT = ENV_ROOT / "data"
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
+        'DOC_STORE_CONFIG': {
             'host': 'localhost',
             'db': 'xmodule',
             'collection': 'modulestore',
+        },
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
             'fs_root': GITHUB_REPO_ROOT,
             'render_template': 'mitxmako.shortcuts.render_to_string',
         }

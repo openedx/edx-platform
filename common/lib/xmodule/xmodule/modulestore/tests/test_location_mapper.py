@@ -324,6 +324,24 @@ class TestLocationMapper(unittest.TestCase):
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123'))
 
+    def test_special_chars(self):
+        """
+        Test locations which have special characters
+        """
+        # afaik, location.check_list prevents $ in all fields
+        org = 'foo.org.edu'
+        course = 'bar.course-4'
+        name = 'baz.run_4-3'
+        old_style_course_id = '{}/{}/{}'.format(org, course, name)
+        location = Location('i4x', org, course, 'course', name)
+        prob_locator = loc_mapper().translate_location(
+            old_style_course_id,
+            location,
+            add_entry_if_missing=True
+        )
+        reverted_location = loc_mapper().translate_locator_to_location(prob_locator)
+        self.assertEqual(location, reverted_location)
+
     def test_add_block(self):
         """
         Test add_block_location_translator(location, old_course_id=None, usage_id=None)

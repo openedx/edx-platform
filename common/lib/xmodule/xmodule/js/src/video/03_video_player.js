@@ -3,8 +3,8 @@
 // VideoPlayer module.
 define(
 'video/03_video_player.js',
-['video/02_html5_video.js'],
-function (HTML5Video) {
+['video/02_html5_video.js', 'video/00_resizer.js' ],
+function (HTML5Video, Resizer) {
 
     // VideoPlayer() function - what this module "exports".
     return function (state) {
@@ -146,11 +146,6 @@ function (HTML5Video) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
-        // Remember for future page loads that we should use Flash mode.
-        $.cookie('current_player_mode', 'flash', {
-            'expires': 3650,
-            'path': '/'
-        });
         state.currentPlayerMode = 'flash';
 
         console.log('[Video info]: Changing YouTube player mode to "flash".');
@@ -343,7 +338,8 @@ function (HTML5Video) {
     }
 
     function onReady() {
-        var availablePlaybackRates, baseSpeedSubs, _this;
+        var availablePlaybackRates, baseSpeedSubs, _this,
+            player, videoWidth, videoHeight;
 
         this.videoPlayer.log('load_video');
 
@@ -420,7 +416,28 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        /* The following has been commented out to make sure autoplay is 
+        if (this.videoType === 'html5') {
+            player = this.videoEl = this.videoPlayer.player.videoEl;
+            videoWidth = player[0].videoWidth || player.width();
+            videoHeight = player[0].videoHeight || player.height();
+        } else {
+            player = this.videoEl = this.el.find('iframe');
+            videoWidth = player.attr('width') || player.width();
+            videoHeight = player.attr('height') || player.height();
+        }
+
+        this.resizer = new Resizer({
+                element: this.videoEl,
+                elementRatio: videoWidth/videoHeight,
+                container: this.videoEl.parent()
+            })
+            .setMode('width');
+
+        this.trigger('videoCaption.resize', null);
+        $(window).bind('resize', _.debounce(this.resizer.align, 100));
+
+
+        /* The following has been commented out to make sure autoplay is
            disabled for students.
         if (
             !onTouchBasedDevice() &&

@@ -216,10 +216,6 @@ function () {
             // currently doing.
             this.videoEl = $(this.video);
 
-            this.videoEl.css({
-                'width': '100%'
-            });
-
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
             // this.callStateChangeCallback();
 
@@ -318,6 +314,6 @@ function () {
 
     // HTML5Video object - what this module exports.
     return HTML5Video;
-})
+});
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

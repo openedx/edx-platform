@@ -14,6 +14,8 @@ from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverS
 
 from .parsers import parse_url, parse_course_id, parse_block_ref
 from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, URL_VERSION_PREFIX
+import re
+from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +90,59 @@ class Locator(object):
             raise OverSpecificationError('%s cannot be both %s and %s' %
                                          (property_name, current, new))
         setattr(self, property_name, new)
+
+    @staticmethod
+    def to_locator_or_location(location):
+        """
+        Convert the given locator like thing to the appropriate type of object, or, if already
+        that type, just return it. Returns an old Location, BlockUsageLocator,
+        or DefinitionLocator.
+
+        :param location: can be a Location, Locator, string, tuple, list, or dict.
+        """
+        if isinstance(location, (Location, Locator)):
+            return location
+        if isinstance(location, basestring):
+            return Locator.parse_url(location)
+        if isinstance(location, (list, tuple)):
+            return Location(location)
+        if isinstance(location, dict) and 'name' in location:
+            return Location(location)
+        if isinstance(location, dict):
+            return BlockUsageLocator(**location)
+        raise ValueError(location)
+
+    URL_TAG_RE = re.compile(r'^(\w+)://')
+    @staticmethod
+    def parse_url(url):
+        """
+        Parse the url into one of the Locator types (must have a tag indicating type)
+        Return the new instance. Supports i4x, cvx, edx, defx
+
+        :param url: the url to parse
+        """
+        parsed = Locator.URL_TAG_RE.match(url)
+        if parsed is None:
+            raise ValueError(parsed)
+        parsed = parsed.group(1)
+        if parsed in ['i4x', 'c4x']:
+            return Location(url)
+        elif parsed == 'edx':
+            return BlockUsageLocator(url)
+        elif parsed == 'defx':
+            return DefinitionLocator(url)
+        return None
+
+    @classmethod
+    def as_object_id(cls, value):
+        """
+        Attempts to cast value as a bson.objectid.ObjectId.
+        If cast fails, raises ValueError
+        """
+        try:
+            return ObjectId(value)
+        except InvalidId:
+            raise ValueError('"%s" is not a valid version_guid' % value)
 
 
 class CourseLocator(Locator):
@@ -208,19 +263,6 @@ class CourseLocator(Locator):
                              version_guid=self.version_guid,
                              branch=self.branch)
 
-    @classmethod
-    def as_object_id(cls, value):
-        """
-        Attempts to cast value as a bson.objectid.ObjectId.
-        If cast fails, raises ValueError
-        """
-        if isinstance(value, ObjectId):
-            return value
-        try:
-            return ObjectId(value)
-        except InvalidId:
-            raise ValueError('"%s" is not a valid version_guid' % value)
-
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
@@ -230,7 +272,7 @@ class CourseLocator(Locator):
             url = url.url()
         if not isinstance(url, basestring):
             raise TypeError('%s is not an instance of basestring' % url)
-        parse = parse_url(url)
+        parse = parse_url(url, tag_optional=True)
         if not parse:
             raise ValueError('Could not parse "%s" as a url' % url)
         self._set_value(
@@ -349,7 +391,7 @@ class BlockUsageLocator(CourseLocator):
         """
         self._validate_args(url, version_guid, course_id)
         if url:
-            self.init_block_ref_from_url(url)
+            self.init_block_ref_from_str(url)
         if course_id:
             self.init_block_ref_from_course_id(course_id)
         if usage_id:
@@ -401,11 +443,18 @@ class BlockUsageLocator(CourseLocator):
                 raise ValueError('Could not parse "%s" as a block_ref' % block_ref)
             self.set_usage_id(parse['block'])
 
-    def init_block_ref_from_url(self, url):
-        if isinstance(url, Locator):
-            url = url.url()
-        parse = parse_url(url)
-        assert parse, 'Could not parse "%s" as a url' % url
+    def init_block_ref_from_str(self, value):
+        """
+        Create a block locator from the given string which may be a url or just the repr (no tag)
+        """
+        if hasattr(value, 'usage_id'):
+            self.init_block_ref(value.usage_id)
+            return
+        if not isinstance(value, basestring):
+            return None
+        parse = parse_url(value, tag_optional=True)
+        if parse is None:
+            raise ValueError('Could not parse "%s" as a url' % value)
         self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
 
     def init_block_ref_from_course_id(self, course_id):
@@ -429,8 +478,13 @@ class DefinitionLocator(Locator):
     Container for how to locate a description (the course-independent content).
     """
 
+    URL_RE = re.compile(r'^defx://' + URL_VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
     def __init__(self, definition_id):
-        self.definition_id = definition_id
+        if isinstance(definition_id, basestring):
+            regex_match = self.URL_RE.match(definition_id)
+            if regex_match is not None:
+                definition_id = self.as_object_id(regex_match.group(1))
+        self.definition_id = self.as_object_id(definition_id)
 
     def __unicode__(self):
         '''
@@ -442,9 +496,9 @@ class DefinitionLocator(Locator):
     def url(self):
         """
         Return a string containing the URL for this location.
-        url(self) returns something like this: 'edx://version/519665f6223ebd6980884f2b'
+        url(self) returns something like this: 'defx://version/519665f6223ebd6980884f2b'
         """
-        return 'edx://' + unicode(self)
+        return 'defx://' + unicode(self)
 
     def version(self):
         """

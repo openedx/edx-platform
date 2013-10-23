@@ -37,15 +37,16 @@ class TemplateTestCase(unittest.TestCase):
         self.template_path = os.path.join(capa_path,
                                           'templates',
                                           self.TEMPLATE_NAME)
-        template_file = open(self.template_path)
-        self.template = MakoTemplate(template_file.read())
-        template_file.close()
+        with open(self.template_path) as f:
+            self.template = MakoTemplate(f.read())
 
     def render_to_xml(self, context_dict):
         """
         Render the template using the `context_dict` dict.
         Returns an `etree` XML element.
         """
+        # add dummy STATIC_URL to template context
+        context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
             xml_str = self.template.render_unicode(**context_dict)
         except:

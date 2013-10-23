@@ -182,7 +182,6 @@ function () {
 
             this.videoCaption.hideSubtitlesEl.on({
                 mousemove: this.videoCaption.autoShowCaptions,
-                focus: this.videoCaption.autoShowCaptions,
 
                 mouseout: this.videoCaption.autoHideCaptions,
                 blur: this.videoCaption.autoHideCaptions
@@ -247,7 +246,7 @@ function () {
                     'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
                 );
 
-                _this.videoCaption.hideCaptions(true);
+                _this.videoCaption.hideCaptions(true, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
@@ -433,14 +432,18 @@ function () {
         // outline has to be drawn (tabbing) or not (mouse click).
         this.videoCaption.isMouseFocus = false;
 
+        // Set top and bottom spacing heigh and make sure they are taken out of
+        // the tabbing order.
         this.videoCaption.subtitlesEl
             .prepend(
                 $('<li class="spacing">')
                     .height(this.videoCaption.topSpacingHeight())
+                    .attr('tabindex', -1)
             )
             .append(
                 $('<li class="spacing">')
                     .height(this.videoCaption.bottomSpacingHeight())
+                    .attr('tabindex', -1)
             );
 
         this.videoCaption.rendered = true;
@@ -677,6 +680,7 @@ function () {
         event.preventDefault();
 
         if (this.el.hasClass('closed')) {
+            this.videoCaption.autoShowCaptions();
             this.videoCaption.hideCaptions(false);
         } else {
             this.videoCaption.hideCaptions(true);
@@ -700,28 +704,32 @@ function () {
 
     function hideCaptions(hide_captions, update_cookie) {
         var hideSubtitlesEl = this.videoCaption.hideSubtitlesEl,
-            type;
+            type, text;
+
+        if (typeof update_cookie === 'undefined') {
+            update_cookie = true;
+        }
 
         if (hide_captions) {
             type = 'hide_transcript';
             this.captionsHidden = true;
 
-            hideSubtitlesEl
-                .attr('title', gettext('Turn on captions'))
-                .text(gettext('Turn on captions'));
-
             this.el.addClass('closed');
+
+            text = gettext('Turn on captions');
         } else {
             type = 'show_transcript';
             this.captionsHidden = false;
 
-            hideSubtitlesEl
-                .attr('title', gettext('Turn off captions'))
-                .text(gettext('Turn off captions'));
-
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
+
+            text = gettext('Turn off captions');
         }
+
+        hideSubtitlesEl
+            .attr('title', text)
+            .text(gettext(text));
 
         if (this.videoPlayer) {
             this.videoPlayer.log(type, {
@@ -729,12 +737,18 @@ function () {
             });
         }
 
+        if (this.resizer) {
+            this.resizer.alignByWidthOnly();
+        }
+
         this.videoCaption.setSubtitlesHeight();
 
-        $.cookie('hide_captions', hide_captions, {
-            expires: 3650,
-            path: '/'
-        });
+        if (update_cookie) {
+            $.cookie('hide_captions', hide_captions, {
+                expires: 3650,
+                path: '/'
+            });
+        }
     }
 
     function captionHeight() {

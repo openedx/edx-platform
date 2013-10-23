@@ -18,15 +18,6 @@
     <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
   </p>
   </div>
-  <br>
-
-  <!-- These buttons don't appear to be working
-  <p>
-    ${_("Click to enroll or unenroll this student from the course:")}
-  <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enrollment_url'] }">
-  <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['enrollment_url'] }">
-  </p>
-  -->
 
   <hr>
 </div>
@@ -59,7 +50,6 @@
   </p>
 
   <p>
-    <!-- Doesn't give any type of notification upon success -->
   <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
 
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
@@ -89,7 +79,7 @@
 
 %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
   <div class="course-specific-container action-type-container">
-    <H2>${_('Course-specific grade adjustment')}</h2>
+    <h2>${_('Course-specific grade adjustment')}</h2>
     <div class="request-response-error"></div>
 
     <p>

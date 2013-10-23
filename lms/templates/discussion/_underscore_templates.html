@@ -6,7 +6,7 @@
         <div class="thread-content-wrapper"></div>
         
         <ol class="responses">
-            <li class="loading"><div class="loading-animation"></div></li>
+            <li class="loading"><div class="loading-animation"><span class="sr">Loading content</span></div></li>
         </ol>
         <div class="post-status-closed bottom-post-status" style="display: none">
           ${_("This thread is closed.")}
@@ -48,7 +48,7 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">
+      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
         
         
@@ -129,8 +129,8 @@
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">                
-      <i class="icon icon-flag"></i><span class="flag-label">Report Misuse</span></div>
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
+      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
     </div>
     <ul class="moderator-actions response-local">
         <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
@@ -154,8 +154,8 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">                
-      <i class="icon icon-flag"></i><span class="flag-label"></span></div> 
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse')}" role="button" aria-pressed="false" tabindex="0">
+      <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>

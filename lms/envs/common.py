@@ -184,6 +184,13 @@ MITX_FEATURES = {
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Automatically approve student identity verification attempts
+    'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
+
+    # Disable instructor dash buttons for downloading course data
+    # when enrollment exceeds this number
+    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 }
 
 # Used for A/B testing
@@ -265,6 +272,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
+
+    # Shoppingcart processor (detects if request.user has a cart)
+    'shoppingcart.context_processor.user_has_cart_context_processor',
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -350,6 +360,7 @@ if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_ENABLED = True
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -367,6 +378,11 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+DOC_STORE_CONFIG = None
+
+# Should we initialize the modulestores at startup, or wait until they are
+# needed?
+INIT_MODULESTORE_ON_STARTUP = True
 
 ############# XBlock Configuration ##########
 
@@ -445,6 +461,12 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+
+# We want i18n to be turned off in production, at least until we have full localizations.
+# Thus we want the Django translation engine to be disabled. Otherwise even without
+# localization files, if the user's browser is set to a language other than us-en,
+# strings like "login" and "password" will be translated and the rest of the page will be
+# in English, which is confusing.
 USE_I18N = False
 USE_L10N = True
 
@@ -571,6 +593,7 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -609,10 +632,9 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-# 'js/vendor/RequireJS.js' - Require JS wrapper.
-# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-    'js/vendor/RequireJS.js',
+    'js/vendor/require.js',
+    'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
     'js/vendor/jquery.min.js',
     'js/vendor/jquery-ui.min.js',
@@ -890,6 +912,7 @@ INSTALLED_APPS = (
     'static_template_view',
     'staticbook',
     'track',
+    'eventtracking.django',
     'util',
     'certificates',
     'instructor',

@@ -45,9 +45,24 @@ def register_by_course_id(course_id, username='robot', password='test', is_staff
     create_user(username, password)
     user = User.objects.get(username=username)
     if is_staff:
-        u.is_staff = True
-        u.save()
-    CourseEnrollment.enroll(u, course_id)
+        user.is_staff = True
+        user.save()
+    CourseEnrollment.enroll(user, course_id)
+
+
+@world.absorb
+def add_to_course_staff(username, course_num):
+    """
+    Add the user with `username` to the course staff group
+    for `course_num`.
+    """
+    # Based on code in lms/djangoapps/courseware/access.py
+    group_name = "instructor_{}".format(course_num)
+    group, _ = Group.objects.get_or_create(name=group_name)
+    group.save()
+
+    user = User.objects.get(username=username)
+    user.groups.add(group)
 
 
 @world.absorb

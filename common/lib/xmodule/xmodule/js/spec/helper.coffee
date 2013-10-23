@@ -1,5 +1,6 @@
 # Stub Youtube API
 window.YT =
+  Player: ->
   PlayerState:
     UNSTARTED: -1
     ENDED: 0
@@ -7,6 +8,7 @@ window.YT =
     PAUSED: 2
     BUFFERING: 3
     CUED: 5
+  ready: (f) -> f()
 
 window.STATUS = window.YT.PlayerState
 
@@ -58,7 +60,7 @@ window.jQuery.ajaxWithPrefix = (url, settings) ->
     oldAjaxWithPrefix.apply @, arguments
 
 # Time waitsFor() should wait for before failing a test.
-window.WAIT_TIMEOUT = 1000
+window.WAIT_TIMEOUT = 5000
 
 jasmine.getFixtures().fixturesPath += 'fixtures'
 

@@ -92,23 +92,12 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        var onPlayerReadyFunc;
-        if (
-            (
-                (state.videoType === 'youtube') &&
-                (window.YT) &&
-                (window.YT.Player)
-            ) ||
-            (state.videoType === 'html5')
-        ) {
-            VideoPlayer(state);
+        if(state.videoType === 'youtube') {
+            YT.ready(function() {
+                VideoPlayer(state);
+            })
         } else {
-            if (state.videoType === 'youtube') {
-                onPlayerReadyFunc = 'onYouTubePlayerAPIReady';
-            } else {
-                onPlayerReadyFunc = 'onHTML5PlayerAPIReady';
-            }
-            window[onPlayerReadyFunc] = _.bind(VideoPlayer, window, state);
+            VideoPlayer(state);
         }
     }
 
@@ -149,25 +138,7 @@ function (VideoPlayer) {
     //     support HTML5. When we have this setting in cookies, we can select
     //     the proper mode from the start (not having to change mode later on).
     function _setPlayerMode(state) {
-        (function (currentPlayerMode) {
-            if (
-                (currentPlayerMode === 'html5') ||
-                (currentPlayerMode === 'flash')
-            ) {
-                state.currentPlayerMode = currentPlayerMode;
-            } else {
-                $.cookie('current_player_mode', 'html5', {
-                    expires: 3650,
-                    path: '/'
-                });
-                state.currentPlayerMode = 'html5';
-            }
-
-            console.log(
-                '[Video info]: YouTube player mode is "' +
-                state.currentPlayerMode + '".'
-            );
-        }($.cookie('current_player_mode')));
+        state.currentPlayerMode = 'html5';
     }
 
     // function _parseYouTubeIDs(state)

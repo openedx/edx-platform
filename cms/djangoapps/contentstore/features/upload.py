@@ -10,8 +10,7 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from splinter.request_handler.status_code import HttpResponseError
-from nose.tools import assert_equal, assert_not_equal # pylint: disable=E0611
+from nose.tools import assert_equal, assert_not_equal  # pylint: disable=E0611
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'
@@ -25,12 +24,13 @@ def go_to_uploads(_step):
     world.css_click(uploads_css)
 
 
-@step(u'I upload the file "([^"]*)"$')
-def upload_file(_step, file_name):
+@step(u'I upload the( test)? file "([^"]*)"$')
+def upload_file(_step, is_test_file, file_name):
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
 
-    _write_test_file(file_name, "test file")
+    if not is_test_file:
+        _write_test_file(file_name, "test file")
 
     # uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
@@ -79,7 +79,7 @@ def check_upload(_step, file_name):
 @step(u'The url for the file "([^"]*)" is valid$')
 def check_url(_step, file_name):
     r = get_file(file_name)
-    assert_equal(r.status_code , 200)
+    assert_equal(r.status_code, 200)
 
 
 @step(u'I delete the file "([^"]*)"$')
@@ -89,6 +89,8 @@ def delete_file(_step, file_name):
     delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
 
+    world.wait_for_present(".wrapper-prompt.is-shown")
+    world.wait(0.2)  # wait for css animation
     prompt_confirm_css = 'li.nav-item > a.action-primary'
     world.css_click(prompt_confirm_css)
 
@@ -189,7 +191,7 @@ def view_asset(_step, status):
     # Note that world.visit would trigger a 403 error instead of displaying "Unauthorized"
     # Instead, we can drop back into the selenium driver get command.
     world.browser.driver.get(url)
-    assert_equal(world.css_text('body'),expected_text)
+    assert_equal(world.css_text('body'), expected_text)
 
 
 @step('I see a confirmation that the file was deleted$')

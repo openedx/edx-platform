@@ -56,14 +56,14 @@
 
   @for $i from 1 to $grid-columns*2 {
     @if is-even($i) {
-      $values: append($values, $transparent $column-offset);
-      $values: append($values, $color $column-offset);
+      $values: append($values, $transparent $column-offset, comma);
+      $values: append($values, $color $column-offset, comma);
       $column-offset: $column-offset + $column-width;
     }
 
     @else {
-      $values: append($values, $color $column-offset);
-      $values: append($values, $transparent $column-offset);
+      $values: append($values, $color $column-offset, comma);
+      $values: append($values, $transparent $column-offset, comma);
       $column-offset: $column-offset + $gutter-width;
     }
   }

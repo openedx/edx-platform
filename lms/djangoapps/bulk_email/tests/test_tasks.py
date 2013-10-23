@@ -11,11 +11,15 @@ from itertools import cycle, chain, repeat
 from mock import patch, Mock
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
 from boto.ses.exceptions import (
+    SESAddressNotVerifiedError,
+    SESIdentityNotVerifiedError,
+    SESDomainNotConfirmedError,
+    SESAddressBlacklistedError,
     SESDailyQuotaExceededError,
     SESMaxSendingRateExceededError,
-    SESAddressBlacklistedError,
-    SESIllegalAddressError,
+    SESDomainEndsWithDotError,
     SESLocalAddressCharacterError,
+    SESIllegalAddressError,
 )
 from boto.exception import AWSConnectionError
 
@@ -271,6 +275,10 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         self._test_email_address_failures(SESLocalAddressCharacterError(554, "Email address contains a bad character"))
 
+    def test_ses_domain_ends_with_dot(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SESDomainEndsWithDotError(554, "Email address ends with a dot"))
+
     def _test_retry_after_limited_retry_error(self, exception):
         """Test that celery handles connection failures by retrying."""
         # If we want the batch to succeed, we need to send fewer emails
@@ -396,3 +404,12 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_failure_on_ses_quota_exceeded(self):
         self._test_immediate_failure(SESDailyQuotaExceededError(403, "You're done for the day!"))
+
+    def test_failure_on_ses_address_not_verified(self):
+        self._test_immediate_failure(SESAddressNotVerifiedError(403, "Who *are* you?"))
+
+    def test_failure_on_ses_identity_not_verified(self):
+        self._test_immediate_failure(SESIdentityNotVerifiedError(403, "May I please see an ID!"))
+
+    def test_failure_on_ses_domain_not_confirmed(self):
+        self._test_immediate_failure(SESDomainNotConfirmedError(403, "You're out of bounds!"))

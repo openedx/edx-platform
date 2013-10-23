@@ -92,7 +92,7 @@ class @Sequence
       @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
-      XModule.loadModules(@$('#seq_content'))
+      XBlock.initializeBlocks(@$('#seq_content'))
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
