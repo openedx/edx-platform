@@ -111,8 +111,8 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/mitocw/django-cas.git
 
 # Only for memory debugging
-setuptools
+# setuptools
 
 # dowser==0.1
-# Cython==0.19.2
+Cython==0.19.2
 # meliae==0.4.0
