@@ -13,8 +13,8 @@ html5lib==0.95
 boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
-# distribute>=0.6.28, <0.7
-distribute>=0.7
+distribute>=0.6.28, <0.7
+# distribute>=0.7
 django-celery==3.0.17
 django-countries==1.5
 django-filter==0.6.0
@@ -111,6 +111,6 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/mitocw/django-cas.git
 
 # Only for memory debugging
-dowser==0.1
-Cython==0.19.2
+# dowser==0.1
+# Cython==0.19.2
 # meliae==0.4.0

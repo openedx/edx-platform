@@ -9,7 +9,7 @@ from time import time
 from sys import exc_info
 from traceback import format_exc
 from os.path import exists
-import meliae.scanner as scanner
+# import meliae.scanner as scanner
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
@@ -185,7 +185,7 @@ def run_main_task(entry_id, task_fcn, action_name):
           'duration_ms': how long the task has (or had) been running.
 
     """
-    launch_memory_usage_server()
+    # launch_memory_usage_server()
 
     # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
     # There's no point in catching it here.
@@ -220,15 +220,15 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # write out a dump of memory usage at the end of this, to see what is left
     # around.  Enable it if it hasn't been explicitly disabled.
-    if action_name == 'graded': # and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
-        filename = "meliae_dump_{}.dat".format(task_id)
+    #if action_name == 'graded': # and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
+        #filename = "meliae_dump_{}.dat".format(task_id)
         # Hardcode the name of a dump directory to try to use.
         # If if doesn't exist, just continue to use the "local" directory.
-        dirname = '/mnt/memdump/'
-        if exists(dirname):
-            filename = dirname + filename
-        TASK_LOG.info('Dumping memory information to %s', filename)
-        scanner.dump_all_objects(filename)
+        #dirname = '/mnt/memdump/'
+        #if exists(dirname):
+        #    filename = dirname + filename
+        #TASK_LOG.info('Dumping memory information to %s', filename)
+        # scanner.dump_all_objects(filename)
 
     # log and exit, returning task_progress info as task result:
     TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
