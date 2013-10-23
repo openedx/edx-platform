@@ -84,6 +84,15 @@ Because of the fact that Timed Transcripts is module specific functionality, Mod
 On tab switching and when save action is invoked, JavaScript code synchronize collections (Metadata Collection and Transcripts Collection). You can see synchronization logic in the edx-platform/cms/static/js/views/transcripts/editor.js:72-219. In this case, Metadata fields always have the actual data.
 
 
+Special cases
+=============
+
+1. Status message `Timed Transcript Conflict` (Choose) where one of 2 transcripts files should be chosen **-->** click `Save` button without choosing **-->** open Editor **-->** status message `Timed Transcript Found` will be shown and transcripts file will be chosen in random order.
+
+2. status message `Timed Transcript Conflict` (Choose) where one of 2 transcripts files should be chosen **-->** open `Advanced` tab without choosing **-->** get back to `Basic` tab **-->** status message `Timed Transcript Found` will be shown and transcripts file will be chosen in random order.
+
+3. The same issues with `Timed Transcript Not Updated` (Use existing).
+
 API
 ===
 
