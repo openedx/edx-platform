@@ -83,17 +83,29 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
             discussion_target="Discussion 2"
         )
 
+    def test_empty(self):
+        utils.add_courseware_context([], self.course)
+
     def test_missing_commentable_id(self):
-        thread = {"commentable_id": "non-inline"}
-        self.assertEqual(utils.get_courseware_context(thread, self.course), None)
+        orig = {"commentable_id": "non-inline"}
+        modified = dict(orig)
+        utils.add_courseware_context([modified], self.course)
+        self.assertEqual(modified, orig)
 
     def test_basic(self):
-        def test_discussion(discussion, expected_title):
-            thread = {"commentable_id": discussion.discussion_id}
-            courseware_context = utils.get_courseware_context(thread, self.course)
-            self.assertEqual(set(courseware_context.keys()), set(["courseware_url", "courseware_title"]))
+        threads = [
+            {"commentable_id": self.discussion1.discussion_id},
+            {"commentable_id": self.discussion2.discussion_id}
+        ]
+        utils.add_courseware_context(threads, self.course)
+
+        def assertThreadCorrect(thread, discussion, expected_title):  #pylint: disable=C0103
             self.assertEqual(
-                courseware_context["courseware_url"],
+                set(thread.keys()),
+                set(["commentable_id", "courseware_url", "courseware_title"])
+            )
+            self.assertEqual(
+                thread.get("courseware_url"),
                 reverse(
                     "jump_to",
                     kwargs={
@@ -102,13 +114,10 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                     }
                 )
             )
-            self.assertEqual(
-                courseware_context["courseware_title"],
-                expected_title
-            )
+            self.assertEqual(thread.get("courseware_title"), expected_title)
 
-        test_discussion(self.discussion1, "Chapter / Discussion 1")
-        test_discussion(self.discussion2, "Subsection / Discussion 2")
+        assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
+        assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

@@ -9,6 +9,9 @@ LMS: Improve forum error handling so that errors in the logs are
 clearer and HTTP status codes from the comments service indicating
 client error are correctly passed through to the client.
 
+LMS: Improve performance of page load and thread list load for 
+discussion tab
+
 LMS: The wiki markup cheatsheet dialog is now accessible to people with
 disabilites.  (LMS-1303)
 
