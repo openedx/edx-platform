@@ -252,6 +252,7 @@ def create_course_with_unit():
     log_into_studio()
     world.css_click('a.course-link')
 
+    world.wait_for_js_to_load()
     css_selectors = [
         'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
     ]
