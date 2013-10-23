@@ -5,7 +5,7 @@ from time import time
 import json
 
 from celery.utils.log import get_task_logger
-from celery.states import SUCCESS, READY_STATES
+from celery.states import SUCCESS, READY_STATES, RETRY
 
 from django.db import transaction
 from django.core.cache import cache
@@ -94,6 +94,16 @@ def increment_subtask_status(subtask_result, succeeded=0, failed=0, skipped=0, r
         new_result['state'] = state
 
     return new_result
+
+
+def _get_retry_count(subtask_status):
+    """
+    Calculate the total number of retries.
+    """
+    count = 0
+    for keyname in ['retried_nomax', 'retried_withmax']:
+        count += subtask_status.get(keyname, 0)
+    return count
 
 
 def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
@@ -187,7 +197,7 @@ def _release_subtask_lock(task_id):
     cache.delete(key)
 
 
-def check_subtask_is_valid(entry_id, current_task_id):
+def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
     """
     Confirms that the current subtask is known to the InstructorTask and hasn't already been completed.
 
@@ -210,8 +220,8 @@ def check_subtask_is_valid(entry_id, current_task_id):
     # Confirm that the InstructorTask actually defines subtasks.
     entry = InstructorTask.objects.get(pk=entry_id)
     if len(entry.subtasks) == 0:
-        format_str = "Unexpected task_id '{}': unable to find subtasks of instructor task '{}'"
-        msg = format_str.format(current_task_id, entry)
+        format_str = "Unexpected task_id '{}': unable to find subtasks of instructor task '{}': rejecting task {}"
+        msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
         raise DuplicateTaskException(msg)
 
@@ -219,8 +229,8 @@ def check_subtask_is_valid(entry_id, current_task_id):
     subtask_dict = json.loads(entry.subtasks)
     subtask_status_info = subtask_dict['status']
     if current_task_id not in subtask_status_info:
-        format_str = "Unexpected task_id '{}': unable to find status for subtask of instructor task '{}'"
-        msg = format_str.format(current_task_id, entry)
+        format_str = "Unexpected task_id '{}': unable to find status for subtask of instructor task '{}': rejecting task {}"
+        msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
         raise DuplicateTaskException(msg)
 
@@ -229,10 +239,23 @@ def check_subtask_is_valid(entry_id, current_task_id):
     subtask_status = subtask_status_info[current_task_id]
     subtask_state = subtask_status.get('state')
     if subtask_state in READY_STATES:
-        format_str = "Unexpected task_id '{}': already completed - status {} for subtask of instructor task '{}'"
-        msg = format_str.format(current_task_id, subtask_status, entry)
+        format_str = "Unexpected task_id '{}': already completed - status {} for subtask of instructor task '{}': rejecting task {}"
+        msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
         TASK_LOG.warning(msg)
         raise DuplicateTaskException(msg)
+
+    # Confirm that the InstructorTask doesn't think that this subtask is already being
+    # retried by another task.
+    if subtask_state == RETRY:
+        # Check to see if the input number of retries is less than the recorded number.
+        # If so, then this is an earlier version of the task, and a duplicate.
+        new_retry_count = _get_retry_count(new_subtask_status)
+        current_retry_count = _get_retry_count(subtask_status)
+        if new_retry_count < current_retry_count:
+            format_str = "Unexpected task_id '{}': already retried - status {} for subtask of instructor task '{}': rejecting task {}"
+            msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
+            TASK_LOG.warning(msg)
+            raise DuplicateTaskException(msg)
 
     # Now we are ready to start working on this.  Try to lock it.
     # If it fails, then it means that another worker is already in the
