@@ -173,6 +173,11 @@ MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 # Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
+# Translation overrides
+LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
+LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
+USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
+
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
