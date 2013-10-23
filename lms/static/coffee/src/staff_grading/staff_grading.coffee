@@ -294,7 +294,7 @@ class @StaffGrading
       submission_id: @submission_id
       location: @location
       submission_flagged: @flag_submission_checkbox.is(':checked')
-    @gentle_alert "Grades saved.  Fetching the next submission to grade."
+    @gentle_alert "Оценки сохранены. Получаем следующий ответ на проверку."
     @backend.post('save_grade', data, @ajax_callback)
 
   gentle_alert: (msg) =>
