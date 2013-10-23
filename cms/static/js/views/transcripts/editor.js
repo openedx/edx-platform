@@ -110,11 +110,19 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Get values from `Advanced` tab fields (`html5_sources`,
             // `youtube_id_1_0`) that should be synchronized.
-            values.html5Sources = getField(metadataCollection, 'html5_sources')
-                                    .getDisplayValue();
+            html5Sources = getField(metadataCollection, 'html5_sources')
+                                    .getDisplayValue();
 
-            values.youtube = getField(metadataCollection, 'youtube_id_1_0')
-                                    .getDisplayValue();
+            values.youtube = getField(metadataCollection, 'youtube_id_1_0')
+                                    .getDisplayValue();
+
+            values.html5Sources = _.filter(html5Sources, function (value) {
+                var link = Utils.parseLink(value),
+                    mode = link && link.mode;
+
+                return mode === 'html5' && mode;
+            });
+
 
             // The length of youtube video_id should be 11 characters.
             if (values.youtube.length === 11) {

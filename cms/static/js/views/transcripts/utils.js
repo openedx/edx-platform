@@ -317,8 +317,6 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
             return function (action, component_id, videoList, extraParams) {
                 var params, data;
 
-                console.log('[_command]: arguments = ', arguments);
-
                 if (extraParams) {
                     if ($.isPlainObject(extraParams)) {
                         params = extraParams;
