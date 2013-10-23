@@ -3,7 +3,7 @@ Test finding orphans via the view and django config
 """
 import json
 from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore.django import editable_modulestore, loc_mapper
 from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 
@@ -41,12 +41,12 @@ class TestOrphan(CourseTestCase):
         """
         Test that old mongo finds the orphans
         """
+        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        orphan_url = locator.url_reverse('orphan/', '')
+
         orphans = json.loads(
             self.client.get(
-                reverse(
-                    'orphan',
-                    kwargs={'course_id': '{}.{}'.format(self.course.location.org, self.course.location.course)}
-                ),
+                orphan_url,
                 HTTP_ACCEPT='application/json'
             ).content
         )
@@ -62,13 +62,11 @@ class TestOrphan(CourseTestCase):
         """
         Test that old mongo deletes the orphans
         """
-        url = reverse(
-            'orphan',
-            kwargs={'course_id': '{}.{}'.format(self.course.location.org, self.course.location.course)}
-        )
-        self.client.delete(url)
+        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        orphan_url = locator.url_reverse('orphan/', '')
+        self.client.delete(orphan_url)
         orphans = json.loads(
-            self.client.get(url, HTTP_ACCEPT='application/json').content
+            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
         )
         self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
 
@@ -78,11 +76,9 @@ class TestOrphan(CourseTestCase):
         """
         test_user_client, test_user = self.createNonStaffAuthedUserClient()
         CourseEnrollment.enroll(test_user, self.course.location.course_id)
-        url = reverse(
-            'orphan',
-            kwargs={'course_id': '{}.{}'.format(self.course.location.org, self.course.location.course)}
-        )
-        response = test_user_client.get(url)
+        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        orphan_url = locator.url_reverse('orphan/', '')
+        response = test_user_client.get(orphan_url)
         self.assertEqual(response.status_code, 403)
-        response = test_user_client.delete(url)
+        response = test_user_client.delete(orphan_url)
         self.assertEqual(response.status_code, 403)

@@ -23,12 +23,12 @@ class TestOrphan(unittest.TestCase):
         'db': 'test_xmodule',
     }
 
-    modulestore_options = dict({
+    modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    })
+    }
 
     split_course_id = 'test_org.test_course.runid'
 
@@ -41,25 +41,35 @@ class TestOrphan(unittest.TestCase):
             self.db_config,
             **self.modulestore_options
         )
-        self.addCleanup(self.tearDownSplit)
+        self.addCleanup(self.tear_down_split)
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
-        self.addCleanup(self.tearDownMongo)
+        self.addCleanup(self.tear_down_mongo)
         self.course_location = None
         self._create_course()
 
-    def tearDownSplit(self):
+    def tear_down_split(self):
+        """
+        Remove the test collections, close the db connection
+        """
         split_db = self.split_mongo.db
         split_db.drop_collection(split_db.course_index)
         split_db.drop_collection(split_db.structures)
         split_db.drop_collection(split_db.definitions)
         split_db.connection.close()
 
-    def tearDownMongo(self):
+    def tear_down_mongo(self):
+        """
+        Remove the test collections, close the db connection
+        """
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
         split_db.drop_collection(self.old_mongo.collection)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
+        """
+        Create the item of the given category and block id in split and old mongo, add it to the optional
+        parent. The parent category is only needed because old mongo requires it for the id.
+        """
         location = Location('i4x', 'test_org', 'test_course', category, name)
         self.old_mongo.create_and_save_xmodule(location, data, metadata, runtime)
         if isinstance(data, basestring):
@@ -125,7 +135,7 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.old_mongo.get_orphans('test_org.test_course', ['static_tab', 'about', 'course_info'], None)
+        orphans = self.old_mongo.get_orphans(self.course_location, ['static_tab', 'about', 'course_info'], None)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course_location.replace(category='chapter', name='OrphanChapter')
         self.assertIn(location.url(), orphans)

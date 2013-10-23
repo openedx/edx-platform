@@ -21,7 +21,7 @@ from .access import has_access
 from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 from django.views.decorators.http import require_http_methods
-from xmodule.modulestore.locator import CourseLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from student.models import CourseEnrollment
 
 __all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
@@ -204,13 +204,13 @@ def delete_item(request):
 
     return JsonResponse()
 
-
+# pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan(request, course_id):
+def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    View for handling orphan related requests. A get gets all of the current orphans.
-    DELETE, PUT and POST are meaningless for now.
+    View for handling orphan related requests. GET gets all of the current orphans.
+    DELETE removes all orphans (requires is_staff access)
 
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
@@ -218,15 +218,17 @@ def orphan(request, course_id):
     :param request:
     :param course_id: Locator syntax course_id
     """
-    course_loc = CourseLocator(course_id=course_id)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    # DHM: when split becomes back-end, move or conditionalize this conversion
+    old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
-        if has_access(request.user, course_loc):
-            return JsonResponse(modulestore().get_orphans(course_id, DETACHED_CATEGORIES, 'draft'))
+        if has_access(request.user, old_location):
+            return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(course_id, DETACHED_CATEGORIES, 'draft')
+            items = modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft')
             for item in items:
                 modulestore('draft').delete_item(item, True)
             return JsonResponse({'deleted': items})
