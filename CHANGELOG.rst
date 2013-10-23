@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: When start time and end time are specified for a video, a visual range
+will be shown on the time slider to highlight the place in the video that will
+be played.
+
 Studio: Bug fix for text loss in Course Updates when the text exists
 before the first tag.
 
@@ -367,10 +371,10 @@ Studio: Improve link re-writing on imports into a different course-id
 
 Studio: course catalog and course outline pages new use course id syntax w/ restful api style
 
-Common: 
+Common:
   separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
   in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
-  
+
 Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
 
 Common: location mapper: added a bunch of new helper functions for generating old location style info from a CourseLocator

@@ -38,7 +38,7 @@ SELECTORS = {
 }
 
 # button type , button css selector, button message
-BUTTONS = {
+TRANSCRIPTS_BUTTONS = {
     'import': ('.setting-import',  'Import from YouTube'),
     'download_to_edit': ('.setting-download', 'Download to Edit'),
     'disabled_download_to_edit': ('.setting-download.is-disabled', 'Download to Edit'),
@@ -127,9 +127,9 @@ def i_see_button(_step, not_see, button_type):
     button = button_type.strip()
 
     if not_see.strip():
-        assert world.is_css_not_present(BUTTONS[button][0])
+        assert world.is_css_not_present(TRANSCRIPTS_BUTTONS[button][0])
     else:
-        assert world.css_has_text(BUTTONS[button][0], BUTTONS[button][1])
+        assert world.css_has_text(TRANSCRIPTS_BUTTONS[button][0], TRANSCRIPTS_BUTTONS[button][1])
 
 
 @step('I (.*)see (.*)button "([^"]*)" number (\d+)$')
@@ -142,21 +142,21 @@ def i_see_button_with_custom_text(_step, not_see, button_type, custom_text, inde
     index = int(index.strip()) - 1
 
     if not_see.strip():
-        assert world.is_css_not_present(BUTTONS[button][0])
+        assert world.is_css_not_present(TRANSCRIPTS_BUTTONS[button][0])
     else:
-        assert world.css_has_text(BUTTONS[button][0], BUTTONS[button][1].format(custom_text), index)
+        assert world.css_has_text(TRANSCRIPTS_BUTTONS[button][0], TRANSCRIPTS_BUTTONS[button][1].format(custom_text), index)
 
 
-@step('I click button "([^"]*)"$')
-def click_button(_step, button_type):
+@step('I click transcript button "([^"]*)"$')
+def click_button_transcripts_variant(_step, button_type):
     world.wait(DELAY)
     world.wait_for_ajax_complete()
 
     button = button_type.strip()
-    world.css_click(BUTTONS[button][0])
+    world.css_click(TRANSCRIPTS_BUTTONS[button][0])
 
 
-@step('I click button "([^"]*)" number (\d+)$')
+@step('I click transcript button "([^"]*)" number (\d+)$')
 def click_button_index(_step, button_type, index):
     world.wait(DELAY)
     world.wait_for_ajax_complete()
@@ -164,7 +164,7 @@ def click_button_index(_step, button_type, index):
     button = button_type.strip()
     index = int(index.strip()) - 1
 
-    world.css_click(BUTTONS[button][0], index)
+    world.css_click(TRANSCRIPTS_BUTTONS[button][0], index)
 
 
 @step('I remove "([^"]+)" transcripts id from store')
