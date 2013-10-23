@@ -13,8 +13,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
-    url(r'^listing', 'contentstore.views.index', name='index'),
-    url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
@@ -50,12 +48,6 @@ urlpatterns = patterns('',  # nopep8
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
-        'contentstore.views.manage_users', name='manage_users'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)/(?P<email>[^/]+)$',
-        'contentstore.views.course_team_user', name='course_team_user'),
-
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
         'contentstore.views.course_info', name='course_info'),
@@ -130,17 +122,18 @@ urlpatterns += patterns(
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-
 )
 
 # restful api
 urlpatterns += patterns(
     'contentstore.views',
 
-    url(r'^course$', 'index'),
+    url(r'^course$', 'index', name='index'),
+    url(r'^request_course_creator$', 'request_course_creator'),
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan')
 )
 

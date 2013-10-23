@@ -1585,6 +1585,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
         loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
+        new_location = loc_mapper().translate_location(loc.course_id, loc, False, True)
+
         resp = self._show_course_overview(loc)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
@@ -1605,11 +1607,9 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
 
-        # manage users
-        resp = self.client.get(reverse('manage_users',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        # course team
+        url = new_location.url_reverse('course_team/', '')
+        resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
 
         # course info

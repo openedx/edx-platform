@@ -2,12 +2,13 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from auth.authz import is_user_in_course_group_role %>
 <%! import json %>
+<%! from xmodule.modulestore.django import loc_mapper %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
 
-
 <%block name="content">
+
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
@@ -59,15 +60,10 @@
       %endif
 
       <ol class="user-list">
+        <% new_location = loc_mapper().translate_location(context_course.location.course_id, context_course.location, False, True) %>
         % for user in staff:
-          <% api_url = reverse('course_team_user', kwargs=dict(
-               org=context_course.location.org,
-               course=context_course.location.course,
-               name=context_course.location.name,
-               email=user.email,
-             ))
-          %>
-        <li class="user-item" data-email="${user.email}" data-url="${api_url}">
+
+        <li class="user-item" data-email="${user.email}" data-url="${new_location.url_reverse('course_team/', user.email) }">
 
         <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
           % if is_instuctor:
@@ -166,13 +162,11 @@ require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
     function($, _, gettext, PromptView) {
 
   var staffEmails = ${json.dumps([user.email for user in staff])};
-  var tplUserURL = "${reverse('course_team_user', kwargs=dict(
-      org=context_course.location.org,
-      course=context_course.location.course,
-      name=context_course.location.name,
-      email="@@EMAIL@@",
-    ))}";
-  var unknownErrorMessage = gettext("Unknown")
+  var tplUserURL = "${loc_mapper().\
+      translate_location(context_course.location.course_id, context_course.location, False, True).\
+      url_reverse('course_team/', "@@EMAIL@@")}";
+
+  var unknownErrorMessage = gettext("Unknown");
 
   $(document).ready(function() {
     var $createUserForm = $('#create-user-form');

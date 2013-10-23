@@ -18,6 +18,7 @@
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             index_url = location.url_reverse('course/', '')
             checklists_url = location.url_reverse('checklists/', '')
+            course_team_url = location.url_reverse('course_team/', '')
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -69,7 +70,7 @@
                     <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
-                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a>
+                    <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a>
