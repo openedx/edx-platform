@@ -2,6 +2,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from xmodule.modulestore.django import loc_mapper
 %>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
@@ -179,7 +180,11 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
             </div>
             <ol>
               <li>
-                <a href="${reverse('course_index', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" class="section-item">${section.display_name_with_default}</a>
+                <%
+                  ctx_loc = context_course.location
+                  index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
+                %>
+                <a href="${index_url}" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">

@@ -56,6 +56,7 @@ from pymongo import MongoClient
 from student.models import CourseEnrollment
 
 from contentstore.utils import delete_course_and_groups
+from xmodule.modulestore.django import loc_mapper
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -710,10 +711,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
         self.assertGreater(len(items), 0)
 
-        resp = self.client.post(reverse('create_new_course'), course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
+        _create_course(self, course_data)
 
         content_store = contentstore()
 
@@ -776,7 +774,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         }
 
         module_store = modulestore('direct')
-        draft_store = modulestore('draft')
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
@@ -801,11 +798,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(new_data, html_module.data)
 
         # create the destination course
-
-        resp = self.client.post(reverse('create_new_course'), course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
+        _create_course(self, course_data)
 
         # do the actual cloning
         clone_course(module_store, content_store, source_location, dest_location)
@@ -1369,25 +1362,21 @@ class ContentStoreTest(ModuleStoreTestCase):
         test_course_data.update(self.course_data)
         if number_suffix:
             test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
-        resp = self.client.post(reverse('create_new_course'), test_course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertNotIn('ErrMsg', data)
-        self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
+        _create_course(self, test_course_data)
         # Verify that the creator is now registered in the course.
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self._get_course_id(test_course_data)))
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, _get_course_id(test_course_data)))
         return test_course_data
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+        self.assertTrue(are_permissions_roles_seeded(_get_course_id(test_course_data)))
 
     def test_forum_unseeding_on_delete(self):
         """Test new course creation and verify forum unseeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
-        course_id = self._get_course_id(test_course_data)
+        course_id = _get_course_id(test_course_data)
+        self.assertTrue(are_permissions_roles_seeded(course_id))
         delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
@@ -1397,17 +1386,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
 
         # unseed the forums for the first course
-        course_id = self._get_course_id(test_course_data)
+        course_id =_get_course_id(test_course_data)
         delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
-        second_course_id = self._get_course_id(second_course_data)
+        second_course_id = _get_course_id(second_course_data)
         # permissions should still be there for the other course
         self.assertTrue(are_permissions_roles_seeded(second_course_id))
-
-    def _get_course_id(self, test_course_data):
-        """Returns the course ID (org/number/run)."""
-        return "{org}/{number}/{run}".format(**test_course_data)
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
@@ -1418,7 +1403,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Checks that the course did not get created
         """
-        course_id = self._get_course_id(self.course_data)
+        course_id = _get_course_id(self.course_data)
         initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
@@ -1530,13 +1515,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test viewing the course overview page with an existing course"""
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
-        data = {
-            'org': 'MITx',
-            'course': '999',
-            'name': Location.clean('Robot Super Course'),
-        }
-
-        resp = self.client.get(reverse('course_index', kwargs=data))
+        loc = Location(['i4x', 'MITx', '999', 'course', Location.clean('Robot Super Course'), None])
+        resp = self._show_course_overview(loc)
         self.assertContains(
             resp,
             '<article class="courseware-overview" data-id="i4x://MITx/999/course/Robot_Super_Course">',
@@ -1591,11 +1571,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
         loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
-        resp = self.client.get(reverse('course_index',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
-
+        resp = self._show_course_overview(loc)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
 
@@ -1699,10 +1675,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
 
-        resp = self.client.post(reverse('create_new_course'), course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['id'], target_location.url())
+        _create_course(self, course_data)
 
         import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
 
@@ -1870,6 +1843,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         location = course.location._replace(tag='c4x', category='asset', name=course.course_image)
         content_store.find(location)
 
+    def _show_course_overview(self, location):
+        """
+        Show the course overview page.
+        """
+        new_location = loc_mapper().translate_location(location.course_id, location, False, True)
+        return self.client.get(new_location.url_reverse('course/', ''), HTTP_ACCEPT='text/html')
+
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class MetadataSaveTestCase(ModuleStoreTestCase):
@@ -1933,3 +1913,22 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
         # TODO: create the same test as `test_metadata_not_persistence`,
         # but check persistence for some other module.
         pass
+
+
+def _create_course(test, course_data):
+    """
+    Creates a course and verifies the URL returned in the response..
+    """
+    course_id = _get_course_id(course_data)
+    new_location = loc_mapper().translate_location(course_id, CourseDescriptor.id_to_location(course_id), False, True)
+
+    response = test.client.post(reverse('create_new_course'), course_data)
+    test.assertEqual(response.status_code, 200)
+    data = parse_json(response)
+    test.assertNotIn('ErrMsg', data)
+    test.assertEqual(data['url'], new_location.url_reverse("course/", ""))
+
+
+def _get_course_id(test_course_data):
+    """Returns the course ID (org/number/run)."""
+    return "{org}/{number}/{run}".format(**test_course_data)
