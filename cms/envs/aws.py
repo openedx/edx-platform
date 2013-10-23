@@ -88,7 +88,10 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
-STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT)) / git.revision
+
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+If STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / git.revision
 
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
