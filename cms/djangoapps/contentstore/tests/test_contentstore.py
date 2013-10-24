@@ -1450,6 +1450,20 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.course_data['number'] = self.course_data['number'].upper()
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
 
+    def test_course_substring(self):
+        """
+        Test that a new course can be created whose name is a substring of an existing course
+        """
+        self.client.post(reverse('create_new_course'), self.course_data)
+        cache_current = self.course_data['number']
+        self.course_data['number'] = '{}a'.format(self.course_data['number'])
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        self.course_data['number'] = cache_current
+        self.course_data['org'] = 'a{}'.format(self.course_data['org'])
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'

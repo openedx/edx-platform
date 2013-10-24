@@ -204,8 +204,8 @@ def create_new_course(request):
     course_search_location = bson.son.SON({
         '_id.tag': 'i4x',
         # cannot pass regex to Location constructor; thus this hack
-        '_id.org': re.compile(dest_location.org, re.IGNORECASE),
-        '_id.course': re.compile(dest_location.course, re.IGNORECASE),
+        '_id.org': re.compile('^{}$'.format(dest_location.org), re.IGNORECASE),
+        '_id.course': re.compile('^{}$'.format(dest_location.course), re.IGNORECASE),
         '_id.category': 'course',
     })
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
