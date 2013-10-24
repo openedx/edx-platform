@@ -24,6 +24,9 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 
+from .extensions import get_units_with_due_date_options
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
@@ -51,6 +54,10 @@ def instructor_dashboard_2(request, course_id):
         _section_data_download(course_id),
         _section_analytics(course_id),
     ]
+
+    if (settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES')
+        and access['instructor']):
+        sections.insert(3, _section_extensions(course))
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
@@ -144,6 +151,20 @@ def _section_student_admin(course_id, access):
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_extensions(course):
+    """ Provide data for the corresponding dashboard section """
+    section_data = {
+        'section_key': 'extensions',
+        'section_display_name': _('Extensions'),
+        'units_with_due_dates': get_units_with_due_date_options(course),
+        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id}),
+        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id}),
+        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id}),
+        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': course.id}),
     }
     return section_data
 
