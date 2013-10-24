@@ -4,9 +4,9 @@ Tests for contentstore/views/user.py.
 import json
 from .utils import CourseTestCase
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
 from auth.authz import get_course_groupname_for_role
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import loc_mapper
 
 
 class UsersTestCase(CourseTestCase):
@@ -23,34 +23,17 @@ class UsersTestCase(CourseTestCase):
         self.inactive_user.is_staff = False
         self.inactive_user.save()
 
-        self.index_url = reverse("manage_users", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-        })
-        self.detail_url = reverse("course_team_user", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-            "email": self.ext_user.email,
-        })
-        self.inactive_detail_url = reverse("course_team_user", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-            "email": self.inactive_user.email,
-        })
-        self.invalid_detail_url = reverse("course_team_user", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-            "email": "nonexistent@user.com",
-        })
+        self.location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+
+        self.index_url = self.location.url_reverse('course_team', '')
+        self.detail_url = self.location.url_reverse('course_team', self.ext_user.email)
+        self.inactive_detail_url = self.location.url_reverse('course_team', self.inactive_user.email)
+        self.invalid_detail_url = self.location.url_reverse('course_team', "nonexistent@user.com")
         self.staff_groupname = get_course_groupname_for_role(self.course.location, "staff")
         self.inst_groupname = get_course_groupname_for_role(self.course.location, "instructor")
 
     def test_index(self):
-        resp = self.client.get(self.index_url)
+        resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
         # ext_user is not currently a member of the course team, and so should
         # not show up on the page.
         self.assertNotContains(resp, self.ext_user.email)
@@ -60,7 +43,7 @@ class UsersTestCase(CourseTestCase):
         self.ext_user.groups.add(group)
         self.ext_user.save()
 
-        resp = self.client.get(self.index_url)
+        resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
         self.assertContains(resp, self.ext_user.email)
 
     def test_detail(self):
@@ -261,12 +244,7 @@ class UsersTestCase(CourseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        self_url = reverse("course_team_user", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-            "email": self.user.email,
-        })
+        self_url = self.location.url_reverse('course_team', self.user.email)
 
         resp = self.client.post(
             self_url,
@@ -298,12 +276,7 @@ class UsersTestCase(CourseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        self_url = reverse("course_team_user", kwargs={
-            "org": self.course.location.org,
-            "course": self.course.location.course,
-            "name": self.course.location.name,
-            "email": self.user.email,
-        })
+        self_url = self.location.url_reverse('course_team', self.user.email)
 
         resp = self.client.delete(self_url)
         self.assertEqual(resp.status_code, 204)

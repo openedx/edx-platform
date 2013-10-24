@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Change course overview page, checklists, and course staff management
+page URLs to a RESTful interface. Also removed "\listing", which duplicated
+"\index".
+
 Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
 be played.
