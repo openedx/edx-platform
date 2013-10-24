@@ -315,7 +315,7 @@ class OptionInput(InputTypeBase):
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1].decode('utf8') for x in list(lexer)]
+        tokens = [x[1:-1].decode('utf8') for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
