@@ -421,6 +421,24 @@ class SplitMongoModuleStore(ModuleStoreBase):
                     items.append(BlockUsageLocator(url=locator.as_course_locator(), usage_id=parent_id))
         return items
 
+    def get_orphans(self, course_id, detached_categories, branch):
+        """
+        Return a dict of all of the orphans in the course.
+
+        :param course_id:
+        """
+        course = self._lookup_course(CourseLocator(course_id=course_id, branch=branch))
+        items = set(course['structure']['blocks'].keys())
+        items.remove(course['structure']['root'])
+        for block_id, block_data in course['structure']['blocks'].iteritems():
+            items.difference_update(block_data.get('fields', {}).get('children', []))
+            if block_data['category'] in detached_categories:
+                items.discard(block_id)
+        return [
+            BlockUsageLocator(course_id=course_id, branch=branch, usage_id=block_id)
+            for block_id in items
+        ]
+
     def get_course_index_info(self, course_locator):
         """
         The index records the initial creation of the indexed course and tracks the current version

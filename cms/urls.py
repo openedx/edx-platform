@@ -130,6 +130,7 @@ urlpatterns += patterns(
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+
 )
 
 # restful api
@@ -140,6 +141,7 @@ urlpatterns += patterns(
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan')
 )
 
 js_info_dict = {
