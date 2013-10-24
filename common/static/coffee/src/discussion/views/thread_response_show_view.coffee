@@ -24,7 +24,7 @@ if Backbone?
       @delegateEvents()
       if window.user.voted(@model)
         @$(".vote-btn").addClass("is-cast")
-        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
+        @$(".vote-btn span.sr").html(gettext("votes (click to remove your vote)"))
       @renderAttrs()
       @renderFlagged()
       @$el.find(".posted-details").timeago()
@@ -40,7 +40,7 @@ if Backbone?
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.addClass("staff")
-        @$el.prepend('<div class="staff-banner">staff</div>')
+        @$el.prepend('<div class="staff-banner">' + gettext('staff') + '</div>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.addClass("community-ta")
         @$el.prepend('<div class="community-ta-banner">Community TA</div>')
@@ -50,10 +50,10 @@ if Backbone?
       @$(".vote-btn").toggleClass("is-cast")
       if @$(".vote-btn").hasClass("is-cast")
         @vote()
-        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
+        @$(".vote-btn span.sr").html(gettext("votes (click to remove your vote)"))
       else
         @unvote()
-        @$(".vote-btn span.sr").html("votes (click to vote)")
+        @$(".vote-btn span.sr").html(gettext("votes (click to vote)"))
 
     vote: ->
       url = @model.urlFor("upvote")
@@ -106,12 +106,12 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
         
     updateModelDetails: =>
       @renderFlagged()
