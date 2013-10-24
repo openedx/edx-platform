@@ -595,7 +595,7 @@ div.video {
 
     li {
       border: 0;
-      color: #666;
+      color: rgb(29,157,217);
       cursor: pointer;
       margin-bottom: 8px;
       padding: 0;
@@ -613,7 +613,7 @@ div.video {
       }
 
       &:hover {
-        color: $blue;
+        text-decoration: underline;
       }
 
       &:empty {

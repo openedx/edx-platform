@@ -26,7 +26,7 @@ div.calc-main {
     top: -45px;
     width: 16px;
 
-    &:hover {
+    &:hover, &:focus {
       opacity: 0.8;
     }
 

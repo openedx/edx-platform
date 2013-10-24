@@ -77,7 +77,7 @@ $white: rgb(255,255,255);
       }
     }
 
-    &:hover {
+    &:hover, &:focus {
 
       .note {
         color: shade($blue, 25%);
@@ -228,7 +228,7 @@ $white: rgb(255,255,255);
           border: 2px solid tint($light-gray,75%);
           padding: $baseline;
 
-          &:hover {
+          &:hover, &:focus {
             border-color: $blue;
           }
         }

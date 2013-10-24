@@ -25,7 +25,8 @@
     cursor: pointer;
 }
 
-#chat-toggle:hover {
+#chat-toggle:hover,
+#chat-toggle:focus {
     text-decoration: none;
 }
 

@@ -85,7 +85,7 @@ div.book-wrapper {
           color: $link-color;
           cursor: pointer;
 
-          &:hover {
+          &:hover, &:focus {
             background-color: transparent;
             color: $link-hover;
 
@@ -101,7 +101,7 @@ div.book-wrapper {
           position: relative;
           top: 4px;
 
-          &:hover {
+          &:hover, &:focus {
             filter: alpha(opacity=60);
             opacity: 0.6;
           }
@@ -161,7 +161,7 @@ div.book-wrapper {
             vertical-align: middle;
             width: 100%;
 
-            &:hover {
+            &:hover, &:focus {
               opacity: 1.0;
             }
 

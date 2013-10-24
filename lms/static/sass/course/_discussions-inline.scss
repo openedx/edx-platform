@@ -275,7 +275,7 @@
         padding-bottom: 2px;
         border-color: #333;
 
-        &:hover {
+        &:hover, &:focus {
           border-color: #222;
         }
       }
