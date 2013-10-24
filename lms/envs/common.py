@@ -484,6 +484,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # These are listed, eg at https://github.com/MITx/mitx/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
+GIT_ADD_COURSE_SCRIPT = REPO_ROOT / "scripts/git_add_course.py"
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it

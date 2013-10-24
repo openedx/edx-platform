@@ -1,13 +1,20 @@
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+  <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
 </%block>
-
+<script language="JavaScript" type="text/javascript">
+function goto( mode)
+{
+  document.dashform.dash_mode.value = mode;
+  document.dashform.submit() ;
+}
+</script>
 <style type="text/css">
 table.stat_table {
 	font-family: verdana,arial,sans-serif;
@@ -43,31 +50,44 @@ textarea {
 <div class="sysadmin-dashboard-wrapper">
 
   <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
-    <h1>git logs</h1>
+    <h1>${_('Sysadmin Dashboard')}</h1>
 
-% if course_id is None:
+    <h2>[ <a href="#" onclick="goto('Status');">${_('Status')}</a> |
+          <a href="#" onclick="goto('Courses');">${_('Courses')}</a> |
+         <a href="#" onclick="goto('Staffing and Enrollment');">${_('Staffing and Enrollment')}</a> |
+           <a href="${reverse('gitlogs')}" class="selectedmode">${_('GitLogs')}</a>
+           ]
+    </h2>
+
+    <form name="dashform" method="POST" action="${reverse('sysadmin')}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <input type="hidden" name="dash_mode" value="">
+
+    <h3>${_('Git Logs')}</h3>
+
+%if course_id is None:
 
     <table class="stat_table">
-    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
-
-    % for cil in cilset[:10]:
-
+	  <thead>
+		<tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>${_('Git Action')}</th></tr>
+	  </thead>
+	  <tbody>
+		%for cil in cilset[:10]:
         <tr>
-	    <td>${cil.created}</td>
-	    <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
-	    <td>${cil.git_log}</td>
-	</tr>
-
-    % endfor
-    
+	      <td>${cil.created}</td>
+	      <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
+	      <td>${cil.git_log}</td>
+		</tr>
+		%endfor
+	  </tbody>
     </table>
 
-% else:
+%else:
 
-    <h2>Recent git load activity for ${course_id}</h2>
+    <h2>${_('Recent git load activity for')} ${course_id}</h2>
 
     <table class="stat_table">
-    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
+    <tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>${_('git action')}</th></tr>
 
     % for cil in cilset[:2]:
 
@@ -78,7 +98,7 @@ textarea {
 	</tr>
 	
 	<tr><td colspan="3">
-	    <pre>${cil.import_log}</pre>
+	    <pre>${cil.import_log | h}</pre>
 	</td></tr>
 
     % endfor
