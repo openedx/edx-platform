@@ -15,7 +15,6 @@ common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
 
-import json
 import unittest
 
 from django.conf import settings
@@ -108,21 +107,6 @@ class VideoModuleLogicTest(LogicTest):
     raw_field_data = {
         'data': '<video />'
     }
-
-    def test_parse_time(self):
-        """Ensure that times are parsed correctly into seconds."""
-        output = VideoDescriptor._parse_time('00:04:07')
-        self.assertEqual(output, 247)
-
-    def test_parse_time_none(self):
-        """Check parsing of None."""
-        output = VideoDescriptor._parse_time(None)
-        self.assertEqual(output, '')
-
-    def test_parse_time_empty(self):
-        """Check parsing of the empty string."""
-        output = VideoDescriptor._parse_time('')
-        self.assertEqual(output, '')
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
