@@ -285,3 +285,23 @@ mark {
 #feedback_form textarea[name="details"] {
   height: 150px;
 }
+
+// ui - skipnav
+.nav-skip {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top:- ($baseline*30);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $border-color-4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus, &:active {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+}

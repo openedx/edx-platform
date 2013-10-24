@@ -109,3 +109,23 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     });
   });
 };
+
+// NOTE: This is a gross hack to make the skip links work for Webkit browsers
+// see http://stackoverflow.com/questions/6280399/skip-links-not-working-in-chrome/12720183#12720183
+
+// handle things properly for clicks
+$('.nav-skip').click(function() {
+    var href = $(this).attr('href');
+    if(href) {
+        $(href).attr('tabIndex', -1).focus();
+    }
+});
+// and for the enter key
+$('.nav-skip').keypress(function(e) {
+    if(e.which == 13) {
+        var href = $(this).attr('href');
+        if(href) {
+            $(href).attr('tabIndex', -1).focus();
+        }
+    }
+});
