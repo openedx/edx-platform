@@ -6,6 +6,8 @@
 <%!
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
+  from django.core.urlresolvers import reverse
 %>
 
 <%block name="header_extras">
@@ -132,8 +134,6 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
 
       <div class="bit">
       % if context_course:
-        <%! from xmodule.modulestore.django import loc_mapper %>
-        <%! from django.core.urlresolvers import reverse %>
         <%
           ctx_loc = context_course.location
           location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
