@@ -48,8 +48,12 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'ENGINE': 'django.db.backends.mysql',#        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'edx',
+        'USER': 'vagrant',
+        'PASSWORD': 'vagrant',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',#        'NAME': ENV_ROOT / "db" / "mitx.db",
     }
 }
 
@@ -194,7 +198,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ######################## MIT Certificates SSL Auth ############################
 
-MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
 
 ################################# CELERY ######################################
 
