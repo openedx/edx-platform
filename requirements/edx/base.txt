@@ -115,4 +115,4 @@ git+https://github.com/mitocw/django-cas.git
 
 # dowser==0.1
 Cython==0.19.2
-# meliae==0.4.0
+meliae==0.4.0
