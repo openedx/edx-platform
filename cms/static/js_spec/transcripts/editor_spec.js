@@ -161,9 +161,15 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 it('Correct data', function () {
                     transcripts.syncBasicTab(metadataCollection, metadataView);
 
-                    var collection = transcripts.collection.models,
-                        displayNameValue = collection[0].getValue(),
-                        videoUrlValue = collection[1].getValue();
+                    var collection = transcripts.collection.models;
+
+                    waitsFor(function() {
+                        var displayNameValue = collection[0].getValue();
+                        return (displayNameValue !== "" && displayNameValue != "video_id");
+                    }, "Defaults never loaded", 1000);
+
+                    var displayNameValue = collection[0].getValue();
+                    var videoUrlValue = collection[1].getValue();
 
                     expect(displayNameValue).toBe('default');
                     expect(videoUrlValue).toEqual([
