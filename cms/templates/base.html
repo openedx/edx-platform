@@ -30,13 +30,7 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-    <nav class="nav-skip">
-      <ul class="list-nav">
-        <li class="nav-item">
-          <a href="#content">${_("Skip to this view's content")}</a>
-        </li>
-      </ul>
-    </nav>
+    <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
     window.baseUrl = "${settings.STATIC_URL}";
