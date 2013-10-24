@@ -50,6 +50,7 @@ class CourseImportLog(mongoengine.Document):
 
 def add_repo(repo, rdir_in):
     """This will add a git repo into the mongo modulestore"""
+    # pylint: disable-msg=R0915
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -68,7 +69,7 @@ def add_repo(repo, rdir_in):
     if not os.path.isdir(GIT_REPO_DIR):
         log.critical(_("Path {0} doesn't exist, please create it, or configure a "
                        "different path with GIT_REPO_DIR").format(GIT_REPO_DIR))
-        sys.exit(1)
+        return -1
 
     # -----------------------------------------------------------------------------
     # pull from git
@@ -77,10 +78,10 @@ def add_repo(repo, rdir_in):
 
         log.error(_('Oops, not a git ssh url?'))
         log.error(_('Expecting something like git@github.com:mitocw/edx4edx_lite.git'))
-        sys.exit(-1)
+        return -1
 
     if rdir_in:
-        rdir = sys.argv[2]
+        rdir = rdir_in
         rdir = os.path.basename(rdir)
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
@@ -100,7 +101,7 @@ def add_repo(repo, rdir_in):
 
     if not os.path.exists('{0}/{1}'.format(GIT_REPO_DIR, rdir)):
         log.error(_('git clone failed!'))
-        sys.exit(-1)
+        return -1
 
     # get commit id
     commit_id = os.popen('cd {0}; git log -n 1 | head -1'.format(rdirp)).read().strip().split(' ')[1]
@@ -127,7 +128,7 @@ def add_repo(repo, rdir_in):
     except CommandError, ex:
         log.critical(_('Unable to run import command.'))
         log.critical(_('Error was {0}').format(str(ex)))
-        sys.exit(1)
+        return -1
 
     ret_import = output.getvalue()
 
@@ -137,7 +138,7 @@ def add_repo(repo, rdir_in):
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
     match = re.search('(?ms)===> IMPORTING course to location ([^ \n]+)',
-                  ret_import)
+                      ret_import)
     if match:
         location = match.group(1).strip()
         log.debug('location = {0}'.format(location))
@@ -160,7 +161,6 @@ def add_repo(repo, rdir_in):
 
     # -----------------------------------------------------------------------------
     # store import-command-run output in mongo
-
     mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
                                           mongo_db['db'])
     try:
@@ -171,8 +171,8 @@ def add_repo(repo, rdir_in):
         log.critical(_('Unable to connect to mongodb to save log, please '
                        'check MONGODB_LOG settings'))
         log.critical(_('Error was: {0}').format(str(ex)))
-        sys.exit(1)
-
+        return -1
+    logging.critical(mongoengine.connection.get_db())
     cil = CourseImportLog(
         course_id=course_id,
         location=location,
@@ -183,8 +183,9 @@ def add_repo(repo, rdir_in):
     )
     cil.save()
 
-    print _('saved CourseImportLog for {0}').format(cil.course_id)
+    log.debug(_('saved CourseImportLog for {0}').format(cil.course_id))
     mdb.disconnect()
+    return 0
 
 if __name__ == '__main__':
     # pylint: disable-msg=C0103
@@ -197,7 +198,7 @@ if __name__ == '__main__':
         print(_('This script requires no more than two arguments.'))
         sys.exit(1)
 
-    rdir_in = None
+    rdir_arg = None
 
     # check that we are using mongo modulestore
     if not 'mongo' in str(modulestore().__class__):
@@ -205,6 +206,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if len(sys.argv) > 2:
-        rdir_in = sys.argv[2]
+        rdir_arg = sys.argv[2]
 
-    add_repo(sys.argv[1], rdir_in)
+    if add_repo(sys.argv[1], rdir_arg) != 0:
+        sys.exit(1)

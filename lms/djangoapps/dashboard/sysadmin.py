@@ -37,10 +37,25 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.store_utilities import delete_course
+import mongoengine
 
 import track.views
 
 log = logging.getLogger(__name__)
+
+
+class CourseImportLog(mongoengine.Document):
+    """Mongoengine model for git log"""
+    # pylint: disable-msg=R0924
+
+    course_id = mongoengine.StringField(max_length=128)
+    location = mongoengine.StringField(max_length=168)
+    import_log = mongoengine.StringField(max_length=20 * 65535)
+    git_log = mongoengine.StringField(max_length=65535)
+    repo_dir = mongoengine.StringField(max_length=128)
+    created = mongoengine.DateTimeField()
+    meta = {'indexes': ['course_id', 'created'],
+            'allow_inheritance': False}
 
 
 def git_info_for_course(cdir):
@@ -510,8 +525,7 @@ def sysadmin_dashboard(request):
 @staff_member_required
 def view_git_logs(request, course_id=None):
     """Shows logs of imports that happened as a result of a git import"""
-
-    import mongoengine  # don't import that until we need it, here
+    # pylint: disable-msg=W0613
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -527,23 +541,11 @@ def view_git_logs(request, course_id=None):
             mongo_db[config_item] = settings.MONGODB_LOG.get(
                 config_item, mongo_db[config_item])
 
-    class CourseImportLog(mongoengine.Document):
-        """Mongoengine model for git log"""
-
-        course_id = mongoengine.StringField(max_length=128)
-        location = mongoengine.StringField(max_length=168)
-        import_log = mongoengine.StringField(max_length=20 * 65535)
-        git_log = mongoengine.StringField(max_length=65535)
-        repo_dir = mongoengine.StringField(max_length=128)
-        created = mongoengine.DateTimeField()
-        meta = {'indexes': ['course_id', 'created'],
-                'allow_inheritance': False}
-
     mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
                                           mongo_db['db'])
 
     try:
-        mdb = mongoengine.connect('test_xlog', host=mongouri,
+        mdb = mongoengine.connect(mongo_db['db'], host=mongouri,
                                   username=mongo_db['user'],
                                   password=mongo_db['password'])
     except mongoengine.connection.ConnectionError, e:

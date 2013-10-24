@@ -4,6 +4,7 @@ Provide tests for sysadmin dashboard feature in sysadmin.py
 
 import unittest
 import os
+import shutil
 
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -19,6 +20,9 @@ from django.contrib.auth.hashers import check_password
 from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from django.utils.html import escape
+from dashboard.sysadmin import CourseImportLog
+import mongoengine
 
 TEST_MONGODB_LOG = {
     'host': 'localhost',
@@ -28,14 +32,11 @@ TEST_MONGODB_LOG = {
 }
 
 
-@override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
-class TestSysadmin(ModuleStoreTestCase):
-    """
-    Check that landing page is the status page
-    """
+class SysadminBaseTestCase(ModuleStoreTestCase):
+    """ Base class with common methods used in XML and Mongo tests"""
 
     def setUp(self):
-        super(TestSysadmin, self).setUp()
+        super(SysadminBaseTestCase, self).setUp()
         self.user = User.objects.create_user('test_user', 'test_user+sysadmin@edx.org', 'foo')
         self.client = Client()
 
@@ -59,7 +60,12 @@ class TestSysadmin(ModuleStoreTestCase):
         # pylint: disable-msg=E1103
 
         def_ms = modulestore()
-        course = def_ms.courses.get('{0}/edx4edx_lite'.format(os.path.abspath(settings.DATA_DIR)), None)
+        try:
+            # using XML stor
+            course = def_ms.courses.get('{0}/edx4edx_lite'.format(os.path.abspath(settings.DATA_DIR)), None)
+        except AttributeError:
+            # Using mongo store
+            course = def_ms.get_course('MITx/edx4edx/edx4edx')
 
         # Delete git loaded course
         return self.client.post(reverse('sysadmin'),
@@ -67,7 +73,13 @@ class TestSysadmin(ModuleStoreTestCase):
                                  'course_id': course.id,
                                  'action': _('Delete course from site'), })
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
+
+@unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
+class TestSysadmin(SysadminBaseTestCase):
+    """
+    Check that landing page is the status page
+    """
+
     def test_staff_access(self):
         # pylint: disable-msg=E1103
 
@@ -99,7 +111,6 @@ class TestSysadmin(ModuleStoreTestCase):
         response = self.client.get(reverse('gitlogs'))
         self.assertFalse(hasattr(response.context, 'next'))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_user_mod(self):
         """Create and delete a user"""
 
@@ -139,7 +150,6 @@ class TestSysadmin(ModuleStoreTestCase):
 
         self.assertEqual(1, len(User.objects.all()))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_user_csv(self):
         """Download and validate user CSV"""
 
@@ -155,7 +165,6 @@ class TestSysadmin(ModuleStoreTestCase):
         self.assertIn('test_user', response.content)
         self.assertTrue(2, len(response.content.splitlines()))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_authmap_repair(self):
         """Run authmap check and repair"""
 
@@ -189,7 +198,6 @@ class TestSysadmin(ModuleStoreTestCase):
                                      'action': _('Check and repair external Auth Map'), })
         self.assertIn(_('All ok!'), response.content)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_xml_course_add_delete(self):
         """add and delete course from xml module store"""
 
@@ -216,7 +224,6 @@ class TestSysadmin(ModuleStoreTestCase):
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNone(course)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_git_pull(self):
         """Make sure we can pull"""
 
@@ -229,7 +236,6 @@ class TestSysadmin(ModuleStoreTestCase):
                       response.content.decode('utf-8'))
         self._rm_edx4edx()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_staff_csv(self):
         """Download and validate staff CSV"""
 
@@ -248,7 +254,6 @@ class TestSysadmin(ModuleStoreTestCase):
 
         self._rm_edx4edx()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_enrollment_page(self):
         """
         Adds a course and makes sure that it shows up on the staffing and
@@ -262,31 +267,29 @@ class TestSysadmin(ModuleStoreTestCase):
         self.assertIn('edx4edx', response.content)
         self._rm_edx4edx()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
-    def test_gitlogs(self):
-        self._setstaff_login()
-
-        response = self.client.get(reverse('gitlogs'))
-        # Check that our earlier import has a log with a link to details
-        self.assertIn('/gitlogs/MITx/edx4edx/edx4edx', response.content)
-
-        response = self.client.get(
-            reverse('gitlogs_detail', kwargs={'course_id': 'MITx/edx4edx/edx4edx'}))
-
-        self.assertIn('======&gt; IMPORTING course to location', response.content)
-
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
-class TestSysAdminMongoCourseImport(ModuleStoreTestCase):
+@unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
+class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
     Check that importing into the mongo module store works
     """
 
-    def setUp(self):
-        super(TestSysAdminMongoCourseImport, self).setUp()
-        self.user = User.objects.create_user('test_user', 'test_user+sysadmin@edx.org', 'foo')
-        self.client = Client()
+    @classmethod
+    def tearDownClass(cls):
+        super(TestSysAdminMongoCourseImport, cls).tearDownClass()
+        # Delete git repos and mongo objects
+        try:
+            shutil.rmtree(getattr(settings, 'GIT_REPO_DIR'))
+        except OSError:
+            pass
+
+        try:
+            mongoengine.connect(TEST_MONGODB_LOG['db'])
+            CourseImportLog.objects.all().delete()
+        except mongoengine.connection.ConnectionError:
+            pass
 
     def _setstaff_login(self):
         """ Makes the test user staff and logs them in"""
@@ -296,34 +299,64 @@ class TestSysAdminMongoCourseImport(ModuleStoreTestCase):
 
         self.client.login(username=self.user.username, password='foo')
 
-    @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
+    def test_missing_repo_dir(self):
+        """Ensure that we handle a missing repo dir"""
+
+        self._setstaff_login()
+
+        if os.path.isdir(getattr(settings, 'GIT_REPO_DIR')):
+            shutil.rmtree(getattr(settings, 'GIT_REPO_DIR'))
+
+        # Create git loaded course
+        response = self._add_edx4edx()
+        self.assertIn(escape(_("Path {0} doesn't exist, please create it, or configure a "
+                               "different path with GIT_REPO_DIR").format(settings.GIT_REPO_DIR)),
+                      response.content.decode('UTF-8'))
+
     def test_mongo_course_add_delete(self):
         """same as TestSysadmin.test_xml_course_add_delete, but use mongo store"""
 
         self._setstaff_login()
+        try:
+            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        except OSError:
+            pass
+
         def_ms = modulestore()
         self.assertIn('mongo', str(def_ms.__class__))
 
-        # Create git loaded course
-        self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Courses'),
-            'repo_location': 'https://github.com/mitocw/edx4edx_lite.git',
-            'action': _('Load new course from github'), })
-
+        self._add_edx4edx()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')
         self.assertIsNotNone(course)
 
-        # Delete git loaded course
-        self.client.post(reverse('sysadmin'),
-                         {'dash_mode': _('Courses'),
-                          'course_id': course.id,
-                          'action': _('Delete course from site'), })
+        self._rm_edx4edx()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')
         self.assertIsNone(course)
 
+    def test_gitlogs(self):
+        """Create a log entry and make sure it exists"""
+
+        self._setstaff_login()
+        try:
+            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        except OSError:
+            pass
+
+        self._add_edx4edx()
+        response = self.client.get(reverse('gitlogs'))
+        print(response.content)
+        print(CourseImportLog.objects.all())
+        # Check that our earlier import has a log with a link to details
+        self.assertIn('/gitlogs/MITx/edx4edx/edx4edx', response.content)
+
+        response = self.client.get(
+            reverse('gitlogs_detail', kwargs={'course_id': 'MITx/edx4edx/edx4edx'}))
+
+        self.assertIn('======&gt; IMPORTING course to location', response.content)
+
+        self._rm_edx4edx()
+
     @override_settings(GIT_ADD_COURSE_SCRIPT='')
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
     def test_no_script_set(self):
         """ Test if settings are right on mongo store import"""
 
