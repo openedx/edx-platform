@@ -114,14 +114,14 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
 // see http://stackoverflow.com/questions/6280399/skip-links-not-working-in-chrome/12720183#12720183
 
 // handle things properly for clicks
-jQuery('#skip-link a').click(function() {
+jQuery('.nav-skip a').click(function() {
     var href = jQuery(this).attr('href');
     if(href) {
         jQuery(href).attr('tabIndex', -1).focus();
     }
 });
 // and for the enter key
-jQuery('#skip-link a').keypress(function(e) {
+jQuery('.nav-skip a').keypress(function(e) {
     if(e.which == 13) {
         var href = jQuery(this).attr('href');
         if(href) {
