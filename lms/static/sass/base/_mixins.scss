@@ -83,6 +83,13 @@
   padding: 0;
   position: absolute;
   width: 1px;
+
+  &:focus {
+    @extend %ui-depth5;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 // extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases

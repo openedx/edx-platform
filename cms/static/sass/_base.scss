@@ -826,22 +826,14 @@ hr.divide {
   word-wrap: break-word;
 }
 
+// ui - semantic + visual divider
 hr.divider {
   @extend %cont-text-sr;
 }
 
-/* show skip links on focus */
-#skip-link a{
-  position:absolute;
-  &:focus {
-    width: auto;
-    height: auto;
-    overflow: visible;
-    background-color: #fff;
-    border: 2px solid black;
-    padding: 3px;
-    z-index: 1005;
-  }
+// ui - skipnav
+.nav-skip {
+  @extend %cont-text-sr;
 }
 
 // ====================

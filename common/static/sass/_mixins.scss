@@ -240,6 +240,13 @@
   padding: 0;
   position: absolute;
   width: 1px;
+
+  &:focus {
+    @extend %ui-depth5;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 // extends - content - wrapping
