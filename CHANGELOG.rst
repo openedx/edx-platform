@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Improve forum error handling so that errors in the logs are
+clearer and HTTP status codes from the comments service indicating
+client error are correctly passed through to the client.
+
 LMS: The wiki markup cheatsheet dialog is now accessible to people with
 disabilites.  (LMS-1303)
 
