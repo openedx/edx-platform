@@ -585,29 +585,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         '''
         This test will exercise the soft delete/restore functionality of the assets
         '''
-        content_store = contentstore()
-        trash_store = contentstore('trashcan')
-        module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
-
-        # look up original (and thumbnail) in content store, should be there after import
-        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
-        content = content_store.find(location, throw_on_not_found=False)
-        thumbnail_location = content.thumbnail_location
-        self.assertIsNotNone(content)
-
-        #
-        # cdodge: temporarily comment out assertion on thumbnails because many environments
-        # will not have the jpeg converter installed and this test will fail
-        #
-        # self.assertIsNotNone(thumbnail_location)
-
-        # go through the website to do the delete, since the soft-delete logic is in the view
-
-        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
-        resp = self.client.delete(url)
-        self.assertEqual(resp.status_code, 204)
-
+        content_store, trash_store, thumbnail_location = self._delete_asset_in_course()
         asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in store, but they should not be there any longer
@@ -637,29 +615,49 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
             self.assertIsNotNone(thumbnail)
 
+    def _delete_asset_in_course (self):
+        """
+        Helper method for:
+          1) importing course from xml
+          2) finding asset in course (verifying non-empty)
+          3) computing thumbnail location of asset
+          4) deleting the asset from the course
+        """
+
+        content_store = contentstore()
+        trash_store = contentstore('trashcan')
+        module_store = modulestore('direct')
+        _, course_items = import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
+
+        # look up original (and thumbnail) in content store, should be there after import
+        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+        content = content_store.find(location, throw_on_not_found=False)
+        thumbnail_location = content.thumbnail_location
+        self.assertIsNotNone(content)
+
+        #
+        # cdodge: temporarily comment out assertion on thumbnails because many environments
+        # will not have the jpeg converter installed and this test will fail
+        #
+        # self.assertIsNotNone(thumbnail_location)
+
+        # go through the website to do the delete, since the soft-delete logic is in the view
+        course = course_items[0]
+        location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
+        url = location.url_reverse('assets/', '/c4x/edX/toy/asset/sample_static.txt')
+        resp = self.client.delete(url)
+        self.assertEqual(resp.status_code, 204)
+
+        return content_store, trash_store, thumbnail_location
+
     def test_empty_trashcan(self):
         '''
         This test will exercise the emptying of the asset trashcan
         '''
-        content_store = contentstore()
-        trash_store = contentstore('trashcan')
-        module_store = modulestore('direct')
-
-        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
-
-        course_location = CourseDescriptor.id_to_location('edX/toy/6.002_Spring_2012')
-
-        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
-        content = content_store.find(location, throw_on_not_found=False)
-        self.assertIsNotNone(content)
-
-        # go through the website to do the delete, since the soft-delete logic is in the view
-
-        url = reverse('update_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall', 'asset_id': '/c4x/edX/toy/asset/sample_static.txt'})
-        resp = self.client.delete(url)
-        self.assertEqual(resp.status_code, 204)
+        _, trash_store, _ = self._delete_asset_in_course()
 
         # make sure there's something in the trashcan
+        course_location = CourseDescriptor.id_to_location('edX/toy/6.002_Spring_2012')
         all_assets = trash_store.get_all_content_for_course(course_location)
         self.assertGreater(len(all_assets), 0)
 
@@ -1633,11 +1631,11 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
 
-        # asset_index
-        resp = self.client.get(reverse('asset_index',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        # assets_handler (HTML for full page content)
+        new_location = loc_mapper().translate_location(loc.course_id, loc, False, True)
+        url = new_location.url_reverse('assets/', '')
+
+        resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page
