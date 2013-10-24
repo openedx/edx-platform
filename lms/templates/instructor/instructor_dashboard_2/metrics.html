@@ -17,6 +17,9 @@
     float: left;
     margin-right: 2.5%;
 }
+.metrics-left svg {
+	width: 100%;
+}
 .metrics-right {
     position: relative;
     width: 65%;
@@ -24,6 +27,9 @@
     float: left;
     margin-left: 2.5%;
     margin-bottom: 25px;
+}
+.metrics-right svg {
+	width: 100%;
 }
 
 .metrics-tooltip {
@@ -54,17 +60,15 @@ h3.attention {
 
 </style>
 
+<script>
+	${d3_stacked_bar_graph.body()}
+</script>
+
   %if not any (section_data.values()):
     <p>${_("There is no data available to display at this time.")}</p>
   %else:
     <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
-
-    <script>
-      ${d3_stacked_bar_graph.body()}
-    </script>
-
-    <div id="metrics"></div>
     
     <h3 class="attention">Loading the latest graphs for you; depending on your class size, this may take a few minutes.</h3>
 
@@ -87,7 +91,16 @@ h3.attention {
       </div>
     %endfor
       <script>
-        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+      	$(function () {
+      		var firstLoad = true;
+      		
+         	$('.instructor-nav a').click(function () {
+				if ($(this).data('section') === "metrics" && firstLoad) {
+	      			${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+	      			firstLoad = false;
+	      		}
+	   		});
+	   	});
       </script>
 
   %endif

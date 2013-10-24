@@ -30,6 +30,8 @@ from class_dashboard.dashboard_data import get_section_display_name, get_array_s
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
+    
+   # import pudb; pudb.set_trace()
 
     course = get_course_by_id(course_id, depth=None)
     is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)

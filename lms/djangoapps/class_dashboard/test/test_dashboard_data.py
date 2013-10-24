@@ -1,5 +1,3 @@
-
-
 from mock import Mock, patch
 import json
 
@@ -40,11 +38,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password='test')
-
-#        self.command = 'populate_studentmoduleexpand'
-#        self.script_id = "studentmoduleexpand"
         self.attempts = 3
-
         self.course = CourseFactory.create()
 
         section = ItemFactory.create(
