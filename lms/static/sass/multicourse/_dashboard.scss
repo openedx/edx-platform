@@ -227,6 +227,8 @@
     }
   }
 
+  // ====================
+
   // course listings
   .my-courses {
     float: left;
@@ -272,6 +274,8 @@
       }
     }
 
+    // ====================
+
     // UI: course list
     .listing-courses {
       @extend %ui-no-list;
@@ -288,6 +292,8 @@
         }
       }
     }
+
+    // ====================
 
     // UI: individual course item
     .course {
@@ -416,6 +422,8 @@
         }
       }
 
+      // ====================
+
       // STATE: course mode - verified
       &.verified {
         @extend %ui-depth2;
@@ -459,40 +467,111 @@
           }
         }
       }
-
     }
 
-    .message-status {
+    // ====================
+
+    // UI: message
+    .message {
       @include clearfix;
       border-radius: 3px;
       display: none;
       z-index: 10;
-      margin: 20px 0 10px;
-      padding: 15px 20px;
+      margin: $baseline 0 ($baseline/2) 0;
+      padding: ($baseline*0.75) $baseline;
       font-family: $sans-serif;
       background: tint($yellow,70%);
       border: 1px solid #ccc;
+
+      // STATE: shown
+      &.is-shown {
+        display: block;
+      }
+
+      a {
+        font-family: $sans-serif;
+      }
+
+      strong {
+        font-weight: 700;
+
+        a {
+          font-weight: 700;
+        }
+      }
+
+      .message-title,
+      .message-copy .title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/4);
+      }
+
+      .message-copy,
+      .message-copy .copy {
+        @extend %t-copy-sub1;
+        margin: 0;
+      }
+
+      // CASE: has actions
+      &.has-actions {
+        @include clearfix();
+
+        .message-copy {
+          float: left;
+          width: 50%;
+          margin-right: 5%;
+        }
+
+        .message-actions {
+          @extend %ui-no-list;
+          float: right;
+          width: 40%;
+          text-align: right;
+        }
+      }
+    }
+
+    // TYPE: upsell
+    .message-upsell {
+      background: $verified-color-lvl5;
+
+      .action-upgrade {
+        @extend %btn-verify-primary;
+        @include clearfix();
+
+        span {
+          color: $white; // nasty but needed override for poor <span> styling
+        }
+
+        .copy {
+          @extend %t-action3;
+          @extend %t-weight4;
+          display: block;
+          margin-bottom: ($baseline/4);
+        }
+
+        .copy-sub {
+          @extend %t-action4;
+          display: block;
+          opacity: 0.875;
+        }
+      }
+    }
+
+    // TYPE: status
+    .message-status {
+      background: tint($yellow,70%);
+      border-color: #ccc;
 
       .message-copy {
         font-family: $sans-serif;
         font-size: 13px;
         margin: 0;
 
-        a {
-          font-family: $sans-serif;
-        }
-
         .grade-value {
           font-size: 1.2rem;
           font-weight: bold;
-        }
-
-        strong {
-          font-weight: 700;
-
-          a {
-            font-weight: 700;
-          }
         }
       }
 
@@ -589,10 +668,6 @@
         }
       }
 
-      &.is-shown {
-        display: block;
-      }
-
       &.course-status-processing {
 
       }
@@ -613,7 +688,6 @@
         // background: #d9e7db;
       }
     }
-
 
     a.unenroll {
       float: right;

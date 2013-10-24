@@ -100,3 +100,16 @@
     // outline: thin dotted !important;
   }
 }
+
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
