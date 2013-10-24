@@ -52,6 +52,10 @@ class MockS3Connection(object):
     def create_bucket(self, bucket_name, **kwargs):
         return "edX Bucket"
 
+    def lookup(self, bucket_name):
+        return None
+
+
 class MockUploadedFile(object):
     """
     Create a mock uploaded file for image submission tests.
