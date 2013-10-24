@@ -135,13 +135,6 @@ urlpatterns += patterns(
 # restful api
 urlpatterns += patterns(
     'contentstore.views',
-    # index page, course outline page, and course structure json access
-    # replaces url(r'^listing', 'contentstore.views.index', name='index'),
-    # ? url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course')
-    # TODO remove shim and this pattern once import_export and test_contentstore no longer use
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
-        'course.old_course_index_shim', name='course_index'
-    ),
 
     url(r'^course$', 'index'),
     # (?ix) == ignore case and verbose (multiline regex)

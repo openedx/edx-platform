@@ -107,17 +107,6 @@ def course_handler(request, tag=None, course_id=None, branch=None, version_guid=
 
 @login_required
 @ensure_csrf_cookie
-def old_course_index_shim(request, org, course, name):
-    """
-    A shim for any unconverted uses of course_index
-    """
-    old_location = Location(['i4x', org, course, 'course', name])
-    locator = loc_mapper().translate_location(old_location.course_id, old_location, False, True)
-    return course_index(request, locator.course_id, locator.branch, locator.version_guid, locator.usage_id)
-
-
-@login_required
-@ensure_csrf_cookie
 def course_index(request, course_id, branch, version_guid, block):
     """
     Display an editable course overview.
@@ -164,7 +153,9 @@ def course_index(request, course_id, branch, version_guid, block):
 @expect_json
 def create_new_course(request):
     """
-    Create a new course
+    Create a new course.
+
+    Returns the URL for the course overview page.
     """
     if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
@@ -255,7 +246,8 @@ def create_new_course(request):
     # work.
     CourseEnrollment.enroll(request.user, new_course.location.course_id)
 
-    return JsonResponse({'id': new_course.location.url()})
+    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
+    return JsonResponse({'url': new_location.url_reverse("course/", "")})
 
 
 @login_required
