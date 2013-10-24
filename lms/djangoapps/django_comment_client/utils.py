@@ -20,8 +20,6 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-# TODO these should be cached via django's caching rather than in-memory globals
-_FULLMODULES = None
 _DISCUSSIONINFO = defaultdict(dict)
 
 
@@ -62,25 +60,12 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_full_modules():
-    global _FULLMODULES
-    if not _FULLMODULES:
-        _FULLMODULES = modulestore().modules
-    return _FULLMODULES
-
-
 def get_discussion_id_map(course):
     """
         return a dict of the form {category: modules}
     """
     initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
-
-
-def get_discussion_title(course, discussion_id):
-    initialize_discussion_info(course)
-    title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
-    return title
 
 
 def get_discussion_category_map(course):
