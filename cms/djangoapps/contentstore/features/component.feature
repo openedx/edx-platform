@@ -19,11 +19,19 @@ Feature: CMS.Component Adding
            | Component               |
            | Text                    |
            | Announcement            |
-           | E-text Written in LaTeX |
        Then I see HTML components in this order:
            | Component               |
            | Text                    |
            | Announcement            |
+
+    Scenario: I can add Latex HTML components
+       Given I am in Studio editing a new unit
+       Given I have enabled latex compiler
+       When I add this type of HTML component:
+           | Component               |
+           | E-text Written in LaTeX |
+       Then I see HTML components in this order:
+           | Component               |
            | E-text Written in LaTeX |
 
     Scenario: I can add Common Problem components
@@ -58,8 +66,21 @@ Feature: CMS.Component Adding
            | Drag and Drop                 |
            | Image Mapped Input            |
            | Math Expression Input         |
-           | Problem Written in LaTeX      |
            | Problem with Adaptive Hint    |
+
+
+    Scenario: I can add Advanced Latex Problem components
+       Given I am in Studio editing a new unit
+       Given I have enabled latex compiler
+       When I add a "<Component>" "Advanced Problem" component
+       Then I see a "<Component>" Problem component
+       # Flush out the database before the next example executes
+       And I reset the database
+
+    Examples:
+           | Component                     |
+           | Problem Written in LaTeX      |
+           | Problem with Adaptive Hint in Latex  |
 
     Scenario: I see a prompt on delete
         Given I am in Studio editing a new unit

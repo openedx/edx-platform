@@ -22,6 +22,7 @@ def i_see_only_the_html_display_name(step):
 @step('I have created an E-text Written in LaTeX$')
 def i_created_etext_in_latex(step):
     world.create_course_with_unit()
+    step.given('I have enabled latex compiler')
     world.create_component_instance(
         step=step,
         category='html',
