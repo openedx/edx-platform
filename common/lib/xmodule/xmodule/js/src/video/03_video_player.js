@@ -63,9 +63,9 @@ function (HTML5Video, Resizer) {
         var youTubeId;
 
         // The function is called just once to apply pre-defined configurations
-        // by student before video starts playing. Waits until the video's metadata
-        // is loaded, which normally happens just after the video starts playing.
-        // Just after that configurations can be applied.
+        // by student before video starts playing. Waits until the video's
+        // metadata is loaded, which normally happens just after the video
+        // starts playing. Just after that configurations can be applied.
         state.videoPlayer.ready = _.once(function () {
             state.videoPlayer.onSpeedChange(state.speed);
         });
@@ -79,6 +79,15 @@ function (HTML5Video, Resizer) {
 
         state.videoPlayer.currentTime = 0;
 
+        state.videoPlayer.initialSeekToStartTime = true;
+
+        state.videoPlayer.oneTimePauseAtEndTime = true;
+
+        // The initial value of the variable `seekToStartTimeOldSpeed`
+        // should always differ from the value returned by the duration
+        // function.
+        state.videoPlayer.seekToStartTimeOldSpeed = 'void';
+
         state.videoPlayer.playerVars = {
             controls: 0,
             wmode: 'transparent',
@@ -91,9 +100,6 @@ function (HTML5Video, Resizer) {
         if (state.currentPlayerMode !== 'flash') {
             state.videoPlayer.playerVars.html5 = 1;
         }
-
-        state.videoPlayer.playerVars.start = state.config.start;
-        state.videoPlayer.playerVars.end = state.config.end;
 
         // There is a bug which prevents YouTube API to correctly set the speed
         // to 1.0 from another speed in Firefox when in HTML5 mode. There is a
@@ -196,6 +202,24 @@ function (HTML5Video, Resizer) {
 
         if (isFinite(this.videoPlayer.currentTime)) {
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
+
+            // We need to pause the video is current time is smaller (or equal)
+            // than end time. Also, we must make sure that the end time is the
+            // one that was set in the configuration parameter. If it differs,
+            // this means that it was either reset to the end, or the duration
+            // changed it's value.
+            //
+            // In the case of YouTube Flash mode, we must remember that the
+            // start and end times are rescaled based on the current speed of
+            // the video.
+            if (
+                this.videoPlayer.endTime <= this.videoPlayer.currentTime &&
+                this.videoPlayer.oneTimePauseAtEndTime
+            ) {
+                this.videoPlayer.oneTimePauseAtEndTime = false;
+                this.videoPlayer.pause();
+                this.videoPlayer.endTime = this.videoPlayer.duration();
+            }
         }
     }
 
@@ -254,27 +278,43 @@ function (HTML5Video, Resizer) {
     // It is created on a onPlay event. Cleared on a onPause event.
     // Reinitialized on a onSeek event.
     function onSeek(params) {
+        var duration = this.videoPlayer.duration(),
+            newTime = params.time;
+
+        if (
+            (typeof newTime !== 'number') ||
+            (newTime > duration) ||
+            (newTime < 0)
+        ) {
+            return;
+        }
+
         this.videoPlayer.log(
             'seek_video',
             {
                 old_time: this.videoPlayer.currentTime,
-                new_time: params.time,
+                new_time: newTime,
                 type: params.type
             }
         );
 
-        this.videoPlayer.player.seekTo(params.time, true);
+        this.videoPlayer.startTime = 0;
+        this.videoPlayer.endTime = duration;
+
+        this.videoPlayer.player.seekTo(newTime, true);
 
         if (this.videoPlayer.isPlaying()) {
             clearInterval(this.videoPlayer.updateInterval);
             this.videoPlayer.updateInterval = setInterval(
                 this.videoPlayer.update, 200
             );
+
+            setTimeout(this.videoPlayer.update, 0);
         } else {
-            this.videoPlayer.currentTime = params.time;
+            this.videoPlayer.currentTime = newTime;
         }
 
-        this.videoPlayer.updatePlayTime(params.time);
+        this.videoPlayer.updatePlayTime(newTime);
     }
 
     function onEnded() {
@@ -469,21 +509,89 @@ function (HTML5Video, Resizer) {
     }
 
     function updatePlayTime(time) {
-        var duration;
+        var duration, durationChange;
 
         duration = this.videoPlayer.duration();
+
+        if (
+            duration > 0 &&
+            (
+                this.videoPlayer.seekToStartTimeOldSpeed !== this.speed ||
+                this.videoPlayer.initialSeekToStartTime
+            )
+        ) {
+            if (
+                this.videoPlayer.seekToStartTimeOldSpeed !== this.speed &&
+                this.videoPlayer.initialSeekToStartTime === false
+            ) {
+                durationChange = true;
+            } else {
+                durationChange = false;
+            }
+
+            this.videoPlayer.initialSeekToStartTime = false;
+            this.videoPlayer.seekToStartTimeOldSpeed = this.speed;
+
+            // We retrieve the original times. They could have been changed due
+            // to the fact of speed change (duration change). This happens when
+            // in YouTube Flash mode. There each speed is a different video,
+            // with a different length.
+            this.videoPlayer.startTime = this.config.startTime;
+            this.videoPlayer.endTime = this.config.endTime;
+
+            if (this.videoPlayer.startTime > duration) {
+                this.videoPlayer.startTime = 0;
+            } else {
+                if (this.currentPlayerMode === 'flash') {
+                    this.videoPlayer.startTime /= Number(this.speed);
+                }
+            }
+            if (
+                this.videoPlayer.endTime === null ||
+                this.videoPlayer.endTime > duration
+            ) {
+                this.videoPlayer.endTime = duration;
+            } else {
+                if (this.currentPlayerMode === 'flash') {
+                    this.videoPlayer.endTime /= Number(this.speed);
+                }
+            }
+
+            // If this is not a duration change (if it is, we continue playing
+            // from current time), then we need to seek the video to the start
+            // time.
+            //
+            // We seek only if start time differs from zero.
+            if (durationChange === false && this.videoPlayer.startTime > 0) {
+                if (this.videoType === 'html5') {
+                    this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
+                } else {
+                    this.videoPlayer.player.loadVideoById({
+                        videoId: this.youtubeId(),
+                        startSeconds: this.videoPlayer.startTime
+                    });
+                }
+            }
+
+            // Rebuild the slider start-end range (if it doesn't take up the
+            // whole slider).
+            if (!(
+                this.videoPlayer.startTime === 0 &&
+                this.videoPlayer.endTime === duration
+            )) {
+                this.trigger(
+                    'videoProgressSlider.updateStartEndTimeRegion',
+                    {
+                        duration: duration
+                    }
+                );
+            }
+        }
 
         this.trigger(
             'videoProgressSlider.updatePlayTime',
             {
                 time: time,
-                duration: duration
-            }
-        );
-
-        this.trigger(
-            'videoProgressSlider.updateStartEndTimeRegion',
-            {
                 duration: duration
             }
         );
@@ -506,10 +614,26 @@ function (HTML5Video, Resizer) {
         return playerState === PLAYING;
     }
 
+    /*
+     * Return the duration of the video in seconds.
+     *
+     * First, try to use the native player API call to get the duration.
+     * If the value returned by the native function is not valid, resort to
+     * the value stored in the metadata for the video. Note that the metadata
+     * is available only for YouTube videos.
+     *
+     * IMPORTANT! It has been observed that sometimes, after initial playback
+     * of the video, when operations "pause" and "play" are performed (in that
+     * sequence), the function will start returning a slightly different value.
+     *
+     * For example: While playing for the first time, the function returns 31.
+     * After pausing the video and then resuming once more, the function will
+     * start returning 31.950656.
+     *
+     * This instability is internal to the player API (or browser internals).
+     */
     function duration() {
-        var dur;
-
-        dur = this.videoPlayer.player.getDuration();
+        var dur = this.videoPlayer.player.getDuration();
 
         if (!isFinite(dur)) {
             dur = this.getDuration();

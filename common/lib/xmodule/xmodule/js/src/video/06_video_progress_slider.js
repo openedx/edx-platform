@@ -99,7 +99,7 @@ function () {
     }
 
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end;
+        var left, width, start, end, step;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
@@ -108,19 +108,28 @@ function () {
         }
 
         // If the range spans the entire length of video, we don't do anything.
-        if (!this.config.start && !this.config.end) {
+        if (!this.videoPlayer.startTime && !this.videoPlayer.endTime) {
             return;
         }
 
-        start = this.config.start;
+        start = this.videoPlayer.startTime;
 
         // If end is set to null, then we set it to the end of the video. We
         // know that start is not a the beginning, therefore we must build a
         // range.
-        end = this.config.end || params.duration;
+        end = this.videoPlayer.endTime || params.duration;
 
-        left = (100 * (start / params.duration)).toFixed(1);
-        width = (100 * ((end - start) / params.duration)).toFixed(1);
+        // Because JavaScript has weird rounding rules when a series of
+        // mathematical operations are performed in a single statement, we will
+        // split everything up into smaller statements.
+        //
+        // This will ensure that visually, the start-end range aligns nicely
+        // with actual starting and ending point of the video.
+        step = 100.0 / params.duration;
+        left = start * step;
+        width = end * step - left;
+        left = left.toFixed(1);
+        width = width.toFixed(1);
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {

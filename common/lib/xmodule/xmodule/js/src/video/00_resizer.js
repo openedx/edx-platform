@@ -23,7 +23,9 @@ function () {
             }
 
             if (!config.element) {
-                console.log('Required parameter `element` is not passed.');
+                console.log(
+                    '[Video info]: Required parameter `element` is not passed.'
+                );
             }
 
             return this;
@@ -55,7 +57,7 @@ function () {
             };
         };
 
-        var align = function() {
+        var align = function () {
             var data = getData();
 
             switch (mode) {
