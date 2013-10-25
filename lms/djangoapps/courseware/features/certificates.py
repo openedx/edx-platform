@@ -6,6 +6,8 @@ from lettuce.django import django_url
 from course_modes.models import CourseMode
 from nose.tools import assert_equal
 
+UPSELL_LINK_CSS = '.message-upsell a.action-upgrade[href*="edx/999/Certificates"]'
+
 def create_cert_course():
     world.clear_courses()
     org = 'edx'
@@ -249,19 +251,20 @@ def see_the_course_on_my_dashboard(step):
 
 @step(u'I see the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
-    course_link_css = 'div.verified-upsell a[href*="edx/999/Certificates"'
+    course_link_css = UPSELL_LINK_CSS
     assert world.is_css_present(course_link_css)
 
 
 @step(u'I do not see the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
-    course_link_css = 'div.verified-upsell a[href*="edx/999/Certificates"'
+    course_link_css = UPSELL_LINK_CSS
     assert not world.is_css_present(course_link_css)
 
 
 @step(u'I select the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
-     world.css_click('div.verified-upsell a[href*="edx/999/Certificates"')
+    course_link_css = UPSELL_LINK_CSS
+    world.css_click(course_link_css)
 
 
 @step(u'I see that I am on the verified track')
