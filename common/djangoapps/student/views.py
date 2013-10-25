@@ -2,7 +2,6 @@
 Student Views
 """
 import datetime
-from datetime import date
 import json
 import logging
 import random
@@ -51,6 +50,8 @@ from verify_student.models import SoftwareSecurePhotoVerification
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
+from shoppingcart.models import CertificateItem
+
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
@@ -66,7 +67,6 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
-from shoppingcart.models import (Order, OrderItem, CertificateItem)
 
 import track.views
 
@@ -302,7 +302,6 @@ def dashboard(request):
     # exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     courses = []
-    refund_status = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
             courses.append((course_from_id(enrollment.course_id), enrollment))
@@ -343,7 +342,7 @@ def dashboard(request):
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in courses
-        if (has_access(request.user, course, 'refund') and (_enrollment.mode == "verified")))
+                                       if (has_access(request.user, course, 'refund') and (_enrollment.mode == "verified")))
 
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
@@ -351,6 +350,7 @@ def dashboard(request):
         external_auth_map = ExternalAuthMap.objects.get(user=user)
     except ExternalAuthMap.DoesNotExist:
         pass
+
     context = {'courses': courses,
                'course_optouts': course_optouts,
                'message': message,
@@ -432,8 +432,6 @@ def change_enrollment(request):
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-        course = course_from_id(course_id)
-
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
 
@@ -475,41 +473,39 @@ def change_enrollment(request):
     elif action == "unenroll":
         try:
             course = course_from_id(course_id)
-        except ItemNotFoundError:
-            log.warning("User {0} tried to unenroll from non-existent course {1}"
-                        .format(user.username, course_id))
-            return HttpResponseBadRequest(_("Course id is invalid"))
+            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, course_id)
 
-        course = course_from_id(course_id)
-        verified = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-        # did they sign up for verified certs?
-        if(verified):
-
-            # If the user is allowed a refund, do so
-            if has_access(user, course, 'refund'):
-                subject = _("[Refund] User-Requested Refund")
-                # todo: make this reference templates/student/refund_email.html
-                message = "Important info here."
-                to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-                from_email = "support@edx.org"
-                try:
-                    send_mail(subject, message, from_email, to_email, fail_silently=False)
-                except:
-                    log.warning('Unable to send reimbursement request to billing', exc_info=True)
-                    js['value'] = _('Could not send reimbursement request.')
-                    return HttpResponse(json.dumps(js))
+            # did they sign up for verified certs?
+            if(enrollment_mode=='verified'):
+                # If the user is allowed a refund, do so
+                if has_access(user, course, 'refund'):
+                    subject = _("[Refund] User-Requested Refund")
+                    # todo: make this reference templates/student/refund_email.html
+                    message = "Important info here."
+                    to_email = [settings.PAYMENT_SUPPORT_EMAIL]
+                    from_email = "support@edx.org"
+                    try:
+                        send_mail(subject, message, from_email, to_email, fail_silently=False)
+                    except:
+                        log.warning('Unable to send reimbursement request to billing', exc_info=True)
+                        js['value'] = _('Could not send reimbursement request.')
+                        return HttpResponse(json.dumps(js))
                 # email has been sent, let's deal with the order now
                 CertificateItem.refund_cert(user, course_id)
-        CourseEnrollment.unenroll(user, course_id)
-
-        org, course_num, run = course_id.split("/")
-        dog_stats_api.increment(
-            "common.student.unenrollment",
-            tags=["org:{0}".format(org),
-                  "course:{0}".format(course_num),
-                  "run:{0}".format(run)]
-        )
-        return HttpResponse()
+            CourseEnrollment.unenroll(user, course_id)
+            org, course_num, run = course_id.split("/")
+            dog_stats_api.increment(
+                "common.student.unenrollment",
+                tags=["org:{0}".format(org),
+                      "course:{0}".format(course_num),
+                      "run:{0}".format(run)]
+            )
+            return HttpResponse()
+        except CourseEnrollment.DoesNotExist:
+            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+        except ItemNotFoundError:
+            log.warning("User {0} tried to unenroll from non-existent course {1}".format(user.username, course_id))
+            return HttpResponseBadRequest(_("Course id is invalid"))
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
@@ -924,7 +920,7 @@ def create_account(request, post_override=None):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
-    # don't send email if we are doing load testing or random user generation for some reason
+    # dont send email if we are doing load testing or random user generation for some reason
     if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):

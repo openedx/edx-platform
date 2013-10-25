@@ -368,7 +368,6 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         cart.purchase()
-        enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         # now that it's there, let's try refunding it
         order = CertificateItem.refund_cert(target_user=self.user, target_course_id=self.course_id)
         self.assertEquals(order.status, 'refunded')
@@ -383,5 +382,4 @@ class CertificateItemTest(ModuleStoreTestCase):
             cart = Order.get_cart_for_user(user=self.user)
             CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
             cart.purchase()
-            enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertRaises(MultipleObjectsReturned)

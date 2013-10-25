@@ -114,12 +114,12 @@ class AccessTestCase(TestCase):
         one_day_extra = datetime.timedelta(days=1)
 
         # User is allowed to receive refund if it is within two weeks of course start date
-        c = Mock(enrollment_start=(today-one_day_extra), id='edX/tests/Whenever')
+        c = Mock(enrollment_start=(today - one_day_extra), id='edX/tests/Whenever')
         self.assertTrue(access._has_access_course_desc(u, c, 'refund'))
 
-        c = Mock(enrollment_start=(today-grace_period), id='edX/test/Whenever')
+        c = Mock(enrollment_start=(today - grace_period), id='edX/test/Whenever')
         self.assertTrue(access._has_access_course_desc(u, c, 'refund'))
 
         # After two weeks, user may no longer receive a refund
-        c = Mock(enrollment_start=(today-grace_period-one_day_extra), id='edX/test/Whenever')
+        c = Mock(enrollment_start=(today - grace_period - one_day_extra), id='edX/test/Whenever')
         self.assertFalse(access._has_access_course_desc(u, c, 'refund'))

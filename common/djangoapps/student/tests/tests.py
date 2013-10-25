@@ -35,6 +35,7 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
 import shoppingcart
+from shoppingcart.models import CertificateItem
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
@@ -435,15 +436,20 @@ class CertificateItemTest(ModuleStoreTestCase):
     COURSE_ORG = "EDX"
 
     def setUp(self):
-        # Create course
+        # Create course, user, and enroll them as a verified student
         self.req_factory = RequestFactory()
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
         self.user = User.objects.create(username="test", email="test@test.org")
+        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
 
+    # Student is verified and paid; we should be able to refund them
     def test_unenroll_and_refund(self):
         request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id, 'enrollment_action': 'unenroll'})
         request.user = self.user
         response = change_enrollment(request)
         self.assertEqual(response.status_code, 200)
-        # add more later; see if this even works
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user,self.course.id))
+        target_certs = CertificateItem.objects.filger(course_id=self.course.id, user_id=self.user, status='refunded')
+        self.assertTrue(target_certs[0].status == 'refunded')
+

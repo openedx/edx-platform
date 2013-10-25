@@ -9,7 +9,7 @@ from boto.exception import BotoServerError  # this is a super-class of SESError 
 
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import (ObjectDoesNotExist, MultipleObjectsReturned)
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -405,18 +405,21 @@ class CertificateItem(OrderItem):
 
     @classmethod
     def refund_cert(cls, target_user, target_course_id):
+        """
+        When refunded, this should find a verified certificate purchase for target_user in target_course_id, change that
+        certificate's status to "refunded", save that result, and return the refunded certificate.
+
+        Note the actual mechanics of refunding money occurs elsewhere; this simply changes the relevant certificate's
+        status for the refund.
+        """
         try:
-            target_cert = CertificateItem.objects.get(course_id=target_course_id, user_id=target_user, status='purchased', mode='verified')
+            # If there's duplicate entries, just grab the first one and refund it (though in most cases we should only get one)
+            target_certs = CertificateItem.objects.filter(course_id=target_course_id, user_id=target_user, status='purchased', mode='verified')
+            target_cert = target_certs[0]
             target_cert.status = 'refunded'
-            # todo return success
+            target_cert.save()
             return target_cert
-        except MultipleObjectsReturned:
-            # this seems like a thing that shouldn't happen
-            log.exception("Multiple entries for single verified cert found")
-            # but we can recover; select one item and refund it
-            # todo
-        except ObjectDoesNotExist:
-            # todo log properly
+        except IndexError or ObjectDoesNotExist:
             log.exception("No certificate found")
             # handle the exception
 
