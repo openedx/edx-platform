@@ -255,7 +255,7 @@ def perform_enrolled_student_update(update_fcn, _entry_id, course_id, _task_inpu
     # enrolled_students is too large to fit comfortably in memory, and subsequent
     # course grading requests lead to memory fragmentation.  So we will err here on the
     # side of smaller memory allocations at the cost of additional lookups.
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:1000]
 
     # Give the option of updating an individual student. If not specified,
     # then updates all students who have enrolled in the course
