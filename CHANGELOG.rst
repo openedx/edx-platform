@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Disallow users to enter video url's in http.
+
 Blades: Fix bug when the speed can only be changed when the video is playing.
 
 LMS: Change bulk email implementation to use less memory, and to better handle

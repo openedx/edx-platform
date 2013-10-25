@@ -22,8 +22,8 @@ Feature: Video Component Editor
         And I edit the component
 
         #User inputs html5 links with equal extension
-        And I enter a "123.webm" source to field number 1
-        And I enter a "456.webm" source to field number 2
+        And I enter a "https://domain.org/123.webm" source to field number 1
+        And I enter a "https://domain.org/456.webm" source to field number 2
         Then I see error message "file_type"
         # Currently we are working with 2nd field. It means, that if 2nd field
         # contain incorrect value, 1st and 3rd fields should be disabled until
@@ -34,6 +34,8 @@ Feature: Video Component Editor
 
         #User input URL with incorrect format
         And I enter a "htt://link.c" source to field number 1
+        Then I see error message "url_format"
+        And I enter a "http://domain.org/123.mp4" source to field number 1
         Then I see error message "url_format"
         # Currently we are working with 1st field. It means, that if 1st field
         # contain incorrect value, 2nd and 3rd fields should be disabled until
@@ -120,7 +122,7 @@ Feature: Video Component Editor
         Given I have created a Video component
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "not found"
         And I see value "" in the field "HTML5 Transcript"
 
@@ -129,7 +131,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
         And I see value "t_not_exist" in the field "HTML5 Transcript"
 
@@ -141,7 +143,7 @@ Feature: Video Component Editor
         And I enter a "http://youtu.be/t_not_exist" source to field number 1
         Then I see status message "found"
 
-        And I enter a "test_video_name.mp4" source to field number 2
+        And I enter a "https://domain.org/test_video_name.mp4" source to field number 2
         Then I see status message "found"
         And I see value "t_not_exist" in the field "HTML5 Transcript"
 
@@ -156,7 +158,7 @@ Feature: Video Component Editor
         And I click transcript button "import"
         Then I see status message "found"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "found"
         And I see value "t__eq_exist" in the field "HTML5 Transcript"
 
@@ -170,12 +172,12 @@ Feature: Video Component Editor
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 3
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
@@ -188,11 +190,11 @@ Feature: Video Component Editor
         Then I see status message "not found"
         And I see button "disabled_download_to_edit"
         And I see button "upload_new_timed_transcripts"
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "upload_new_timed_transcripts"
         And I see button "disabled_download_to_edit"
-        And I enter a "t_not_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 3
         Then I see status message "not found"
         And I see button "disabled_download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -209,12 +211,12 @@ Feature: Video Component Editor
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 3
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -229,12 +231,12 @@ Feature: Video Component Editor
         And I see button "disabled_download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "disabled_download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_neq_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_neq_exist.webm" source to field number 3
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -249,12 +251,12 @@ Feature: Video Component Editor
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_neq_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_neq_exist.webm" source to field number 3
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
@@ -269,12 +271,12 @@ Feature: Video Component Editor
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_neq_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_neq_exist.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 3
         Then I see status message "not found"
         And I see button "import"
         And I see button "upload_new_timed_transcripts"
@@ -291,12 +293,12 @@ Feature: Video Component Editor
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_neq_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_neq_exist.mp4" source to field number 2
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 3
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -313,12 +315,12 @@ Feature: Video Component Editor
         Then I see status message "found"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_not_exist.mp4" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 2
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "t_neq_exist.webm" source to field number 3
+        And I enter a "https://domain.org/t_neq_exist.webm" source to field number 3
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -328,7 +330,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t__eq_exist"
         And I edit the component
 
-        And I enter a "t__eq_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t__eq_exist.mp4" source to field number 1
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -343,7 +345,7 @@ Feature: Video Component Editor
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "test_transcripts.webm" source to field number 3
+        And I enter a "https://domain.org/test_transcripts.webm" source to field number 3
         Then I see status message "found"
 
     #20
@@ -351,7 +353,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "test_transcripts.mp4" source to field number 1
+        And I enter a "https://domain.org/test_transcripts.mp4" source to field number 1
         Then I see status message "not found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -359,7 +361,7 @@ Feature: Video Component Editor
         Then I see status message "uploaded_successfully"
         And I see value "test_transcripts" in the field "HTML5 Transcript"
 
-        And I enter a "t_not_exist.webm" source to field number 2
+        And I enter a "https://domain.org/t_not_exist.webm" source to field number 2
         Then I see status message "replace"
 
         And I see choose button "test_transcripts.mp4" number 1
@@ -372,7 +374,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -381,13 +383,13 @@ Feature: Video Component Editor
         And I save changes
         And I edit the component
 
-        And I enter a "video_name_2.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_2.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
         And I click transcript button "use_existing"
         And I see value "video_name_2" in the field "HTML5 Transcript"
 
-        And I enter a "video_name_3.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_3.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
         And I click transcript button "use_existing"
@@ -398,7 +400,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -407,17 +409,17 @@ Feature: Video Component Editor
         And I save changes
         And I edit the component
 
-        And I enter a "video_name_2.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_2.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
         And I click transcript button "use_existing"
         And I see value "video_name_2" in the field "HTML5 Transcript"
 
-        And I enter a "video_name_3.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_3.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
 
-        And I enter a "video_name_4.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_4.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
         And I click transcript button "use_existing"
@@ -428,7 +430,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -436,11 +438,11 @@ Feature: Video Component Editor
         And I save changes
         And I edit the component
 
-        And I enter a "video_name_2.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_2.mp4" source to field number 1
         Then I see status message "use existing"
         And I see button "use_existing"
 
-        And I enter a "video_name_3.webm" source to field number 2
+        And I enter a "https://domain.org/video_name_3.webm" source to field number 2
         Then I see status message "use existing"
         And I see button "use_existing"
         And I click transcript button "use_existing"
@@ -451,7 +453,7 @@ Feature: Video Component Editor
         Given I have created a Video component
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         And I see status message "not found"
         And I upload the transcripts file "test_transcripts.srt"
         Then I see status message "uploaded_successfully"
@@ -471,7 +473,7 @@ Feature: Video Component Editor
         Given I have created a Video component
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         Then I see status message "not found"
 
     #26
@@ -479,10 +481,10 @@ Feature: Video Component Editor
         Given I have created a Video component
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         And I see status message "not found"
 
-        And I enter a "video_name_2.webm" source to field number 2
+        And I enter a "https://domain.org/video_name_2.webm" source to field number 2
         And I see status message "not found"
         And I upload the transcripts file "test_transcripts.srt"
         Then I see status message "uploaded_successfully"
@@ -518,7 +520,7 @@ Feature: Video Component Editor
         Then I see status message "not found"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "video_name_1.mp4" source to field number 2
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 2
         Then I see status message "not found"
         And I see button "upload_new_timed_transcripts"
 
@@ -538,7 +540,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         Then I see status message "not found"
 
         And I open tab "Advanced"
@@ -556,7 +558,7 @@ Feature: Video Component Editor
         Given I have created a Video component
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         Then I see status message "not found"
         And I upload the transcripts file "chinese_transcripts.srt"
 
@@ -570,7 +572,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         Then I see status message "not found"
 
         And I open tab "Advanced"
@@ -590,7 +592,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
 
         And I open tab "Advanced"
@@ -610,7 +612,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "t_not_exist.mp4" source to field number 1
+        And I enter a "https://domain.org/t_not_exist.mp4" source to field number 1
         Then I see status message "found"
 
         And I save changes
@@ -633,7 +635,7 @@ Feature: Video Component Editor
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "video_name_1.mp4" source to field number 1
+        And I enter a "https://domain.org/video_name_1.mp4" source to field number 1
         Then I see status message "not found"
 
         And I upload the transcripts file "chinese_transcripts.srt"

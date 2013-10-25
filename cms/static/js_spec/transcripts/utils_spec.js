@@ -24,17 +24,13 @@ function ($, _, Utils, _str) {
 
             } (videoId)),
             html5FileName = 'file_name',
-            html5LinksList =  (function (videoName) {
+            html5LinksList = (function (videoName) {
                 var videoTypes = ['mp4', 'webm'],
                     links = [
-                        'http://somelink.com/%s.%s?param=1&param=2#hash',
-                        'http://somelink.com/%s.%s#hash',
-                        'http://somelink.com/%s.%s?param=1&param=2',
-                        'http://somelink.com/%s.%s',
-                        'ftp://somelink.com/%s.%s',
-                        'https://somelink.com/%s.%s',
-                        'somelink.com/%s.%s',
-                         '%s.%s'
+                        'https://somelink.com/%s.%s?param=1&param=2#hash',
+                        'https://somelink.com/%s.%s#hash',
+                        'https://somelink.com/%s.%s?param=1&param=2',
+                        'https://somelink.com/%s.%s'
                     ],
                     data = {};
 
@@ -190,7 +186,12 @@ function ($, _, Utils, _str) {
                     'http://google.com/somevideo_mp4',
                     'http://google.com/somevideo:mp4',
                     'http://google.com/somevideo',
-                    'http://google.com/somevideo.webm_'
+                    'http://google.com/somevideo.webm_',
+                    'http://somelink.com/video_name.mp4?param=1&param=2#hash',
+                    'http://somelink.com/video_name.webm',
+                    'ftp://somelink.com/video_name.mp4',
+                    'somelink.com/video_name.webm',
+                    'video_name.mp4'
                 ];
 
                 $.each(html5WrongUrls, function (index, link) {

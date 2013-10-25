@@ -41,9 +41,9 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 options: [],
                 type: MetadataModel.VIDEO_LIST_TYPE,
                 value: [
-                    'http://youtu.be/12345678901',
-                    'video.mp4',
-                    'video.webm'
+                    'https://youtu.be/12345678901',
+                    'https://domain.com/video.mp4',
+                    'https://domain.com/video.webm'
                 ]
             },
             response = JSON.stringify({
@@ -408,8 +408,8 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
 
             view.setValueInEditor([
                 'http://youtu.be/12345678901',
-                'video.mp4',
-                'video'
+                'https://domain.com/video.mp4',
+                'https://domain.com/video'
             ]);
             expect(view).assertIsCorrectVideoList(value);
         });
