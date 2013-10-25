@@ -471,7 +471,7 @@ class LoncapaProblem(object):
         ix = rnd.randint(0, len(correctChoices) - 1)
         correctChoice = correctChoices[ix]
         subsetChoices.append(correctChoice)
-        solutionID = correctChoice.get('solution-id')
+        solutionID = correctChoice.get('explanation-id')
 
         # Add incorrect choices
         toAdd = 3
@@ -513,13 +513,8 @@ class LoncapaProblem(object):
             # Does this multChoiceResponse have targeted solutions?
             # Targeted solutions = display an explanation based on the user's selected answer, not the correct answer
             #
-            # If 'targeted-feedback' is 'true', then ONLY targeted solutions will display
-            # If 'targeted-feedback' is 'both', then BOTH the targeted solution and correct solution will display
-            #
-            # Note: If the instructor wants correct answer solutions to display before user-chosen answers, then
-            # those <solution> tags should appear first within the <solutionset>
-            hasTargetedSolutions = multChoiceResponse.get('targeted-feedback') == 'true'
-            showBothSolutions = multChoiceResponse.get('targeted-feedback') == 'both'
+            # If 'targeted-feedback' is 'true', then targeted feedback will show on the screen after a student incorrectly answers
+            showTargetedFeedback = multChoiceResponse.get('targeted-feedback') == 'true'
 
             # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
             choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
@@ -527,7 +522,7 @@ class LoncapaProblem(object):
             choicesList = list(choicegroup.iter('choice'))
             
             studentAnswer = None
-            solutionIDForStudentAnswer = None
+            explanationIDForStudentAnswer = None
 
             # Find the student answer key that matches our <choicegroup> id
             keysOfStudentAnswers = self.student_answers.keys()
@@ -544,27 +539,32 @@ class LoncapaProblem(object):
 
             for choice in subsetChoices:
                 choicegroup.append(choice)
-                # Keep track of the solution-id that corresponds to the student's answer
+                # Keep track of the explanation-id that corresponds to the student's answer
                 if choice.get('name') == studentAnswer:
-                    solutionIDForStudentAnswer = choice.get('solution-id')
+                    explanationIDForStudentAnswer = choice.get('explanation-id')
 
             # import ipdb
             # ipdb.set_trace()
 
+            # Filter out targetedfeedback that doesn't correspond to the answer the student selected
+            # Note: following-sibling will grab all following siblings, so we just want the first in the list
+            targetedfeedbackset = multChoiceResponse.xpath('./following-sibling::targetedfeedbackset')
+            if len(targetedfeedbackset) != 0:
+                targetedfeedbackset = targetedfeedbackset[0]
+                targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
+                for targetedfeedback in targetedfeedbacks:
+                    # Don't show targeted feedback if the student hasn't answer the problem, if we haven't indicated we want to
+                    # show targeted feedback, or if the target feedback doesn't match the student's (incorrect) answer
+                    if not self.done or not showTargetedFeedback or targetedfeedback.get('explanation-id') != explanationIDForStudentAnswer:
+                        targetedfeedbackset.remove(targetedfeedback)
+
+            # Filter out solutions that don't correspond to the correct answer we selected to show
             solutionset = multChoiceResponse.xpath('./following-sibling::solutionset')
-            if len(solutionset) > 0:
+            if len(solutionset) != 0:
                 solutionset = solutionset[0]
                 solutions = solutionset.xpath('./solution')
                 for solution in solutions:
-                    isNotStudentAnswerSolution = solution.get('solution-id') != solutionIDForStudentAnswer
-                    isNotCorrectAnswerSolution = solution.get('solution-id') != solutionID
-
-                    if hasTargetedSolutions and isNotStudentAnswerSolution:
-                        solutionset.remove(solution)
-                    elif showBothSolutions and isNotStudentAnswerSolution and isNotCorrectAnswerSolution:
-                        solutionset.remove(solution)
-                    # By default, show the correct answer solution
-                    elif not hasTargetedSolutions and not showBothSolutions and isNotCorrectAnswerSolution:
+                    if solution.get('explanation-id') != solutionID:
                         solutionset.remove(solution)
 
         return tree
