@@ -108,7 +108,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
             )
 
         test_discussion(self.discussion1, "Chapter / Discussion 1")
-        test_discussion(self.discussion2, " Subsection / Discussion 2")
+        test_discussion(self.discussion2, "Subsection / Discussion 2")
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

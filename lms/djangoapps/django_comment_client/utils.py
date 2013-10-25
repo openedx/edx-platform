@@ -20,8 +20,6 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-_DISCUSSIONINFO = defaultdict(dict)
-
 
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
@@ -60,17 +58,30 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_discussion_id_map(course):
-    """
-        return a dict of the form {category: modules}
-    """
-    initialize_discussion_info(course)
-    return _DISCUSSIONINFO[course.id]['id_map']
+def _get_discussion_modules(course):
+    all_modules = modulestore().get_items(
+        ['i4x', course.location.org, course.location.course, 'discussion', None],
+        course_id=course.id
+    )
+
+    def has_required_keys(module):
+        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+            if getattr(module, key) is None:
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                return False
+        return True
+
+    return filter(has_required_keys, all_modules)
 
 
-def get_discussion_category_map(course):
-    initialize_discussion_info(course)
-    return _filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
+def _get_discussion_id_map(course):
+    def get_entry(module):
+        discussion_id = module.discussion_id
+        title = module.discussion_target
+        last_category = module.discussion_category.split("/")[-1].strip()
+        return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
+
+    return dict(map(get_entry, _get_discussion_modules(course)))
 
 
 def _filter_unstarted_categories(category_map):
@@ -123,33 +134,18 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def initialize_discussion_info(course):
+def get_discussion_category_map(course):
     course_id = course.id
 
-    discussion_id_map = {}
     unexpanded_category_map = defaultdict(list)
 
-    # get all discussion models within this course_id
-    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
-                                          'discussion', None], course_id=course_id)
+    modules = _get_discussion_modules(course)
 
-    for module in all_modules:
-        skip_module = False
-        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                skip_module = True
-
-        if skip_module:
-            continue
-
+    for module in modules:
         id = module.discussion_id
-        category = module.discussion_category
         title = module.discussion_target
         sort_key = module.sort_key
-        category = " / ".join([x.strip() for x in category.split("/")])
-        last_category = category.split("/")[-1]
-        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
+        category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
         #Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
@@ -201,9 +197,7 @@ def initialize_discussion_info(course):
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
-    _DISCUSSIONINFO[course.id]['category_map'] = category_map
-    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now(UTC())
+    return _filter_unstarted_categories(category_map)
 
 
 class JsonResponse(HttpResponse):
@@ -354,7 +348,7 @@ def extend_content(content):
 
 
 def get_courseware_context(content, course):
-    id_map = get_discussion_id_map(course)
+    id_map = _get_discussion_id_map(course)
     id = content['commentable_id']
     content_info = None
     if id in id_map:
