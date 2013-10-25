@@ -179,8 +179,8 @@
             <% show_courseware_link = (course.id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
-            <% course_modes = all_course_modes.get(course.id) %>
-            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_modes=course_modes" />
+            <% course_mode_info = all_course_modes.get(course.id) %>
+            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info" />
       % endfor
 
       </ul>
