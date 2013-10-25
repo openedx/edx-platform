@@ -87,7 +87,7 @@ def generate_items_for_subtask(item_queryset, item_fields, total_num_items, item
         raise ValueError(error_msg)
 
 
-def create_subtask_status(task_id, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
+class SubtaskStatus(object):
     """
     Create and return a dict for tracking the status of a subtask.
 
@@ -111,63 +111,59 @@ def create_subtask_status(task_id, succeeded=0, failed=0, skipped=0, retried_nom
     indicating the reason for failure.
     Also, we should count up "not attempted" separately from attempted/failed.
     """
-    attempted = succeeded + failed
-    current_result = {
-        'task_id': task_id,
-        'attempted': attempted,
-        'succeeded': succeeded,
-        'skipped': skipped,
-        'failed': failed,
-        'retried_nomax': retried_nomax,
-        'retried_withmax': retried_withmax,
-        'state': state if state is not None else QUEUING,
-    }
-    return current_result
 
+    def __init__(self, task_id, attempted=None, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
+        self.task_id = task_id
+        if attempted is not None:
+            self.attempted = attempted
+        else:
+            self.attempted = succeeded + failed
+        self.succeeded = succeeded
+        self.failed = failed
+        self.skipped = skipped
+        self.retried_nomax = retried_nomax
+        self.retried_withmax = retried_withmax
+        self.state = state if state is not None else QUEUING
 
-def increment_subtask_status(subtask_result, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
-    """
-    Update the result of a subtask with additional results.
+    @classmethod
+    def from_dict(self, d):
+        options = dict(d)
+        task_id = options['task_id']
+        del options['task_id']
+        return SubtaskStatus.create(task_id, **options)
 
-    Create and return a dict for tracking the status of a subtask.
+    @classmethod
+    def create(self, task_id, **options):
+        newobj = self(task_id, **options)
+        return newobj
 
-    Keys for input `subtask_result` and returned subtask_status are:
+    def to_dict(self):
+        return self.__dict__
 
-      'task_id' : id of subtask.  This is used to pass task information across retries.
-      'attempted' : number of attempts -- should equal succeeded plus failed
-      'succeeded' : number that succeeded in processing
-      'skipped' : number that were not processed.
-      'failed' : number that failed during processing
-      'retried_nomax' : number of times the subtask has been retried for conditions that
-          should not have a maximum count applied
-      'retried_withmax' : number of times the subtask has been retried for conditions that
-          should have a maximum count applied
-      'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
+    def increment(self, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
+        """
+        Update the result of a subtask with additional results.
 
-    Kwarg arguments are incremented to the corresponding key in `subtask_result`.
-    The exception is for `state`, which if specified is used to override the existing value.
-    """
-    new_result = dict(subtask_result)
-    new_result['attempted'] += (succeeded + failed)
-    new_result['succeeded'] += succeeded
-    new_result['failed'] += failed
-    new_result['skipped'] += skipped
-    new_result['retried_nomax'] += retried_nomax
-    new_result['retried_withmax'] += retried_withmax
-    if state is not None:
-        new_result['state'] = state
+        Kwarg arguments are incremented to the existing values.
+        The exception is for `state`, which if specified is used to override the existing value.
+        """
+        self.attempted += (succeeded + failed)
+        self.succeeded += succeeded
+        self.failed += failed
+        self.skipped += skipped
+        self.retried_nomax += retried_nomax
+        self.retried_withmax += retried_withmax
+        if state is not None:
+            self.state = state
 
-    return new_result
+    def get_retry_count(self):
+        return self.retried_nomax + self.retried_withmax
 
+    def __repr__(self):
+        return 'SubtaskStatus<%r>' % (self.to_dict(),)
 
-def _get_retry_count(subtask_status):
-    """
-    Calculate the total number of retries.
-    """
-    count = 0
-    for keyname in ['retried_nomax', 'retried_withmax']:
-        count += subtask_status.get(keyname, 0)
-    return count
+    def __unicode__(self):
+        return unicode(repr(self))
 
 
 def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
@@ -216,7 +212,8 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
     # Write out the subtasks information.
     num_subtasks = len(subtask_id_list)
     # Note that may not be necessary to store initial value with all those zeroes!
-    subtask_status = {subtask_id: create_subtask_status(subtask_id) for subtask_id in subtask_id_list}
+    # Write out as a dict, so it will go more smoothly into json.
+    subtask_status = {subtask_id: (SubtaskStatus.create(subtask_id)).to_dict() for subtask_id in subtask_id_list}
     subtask_dict = {
         'total': num_subtasks,
         'succeeded': 0,
@@ -300,8 +297,8 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
 
     # Confirm that the InstructorTask doesn't think that this subtask has already been
     # performed successfully.
-    subtask_status = subtask_status_info[current_task_id]
-    subtask_state = subtask_status.get('state')
+    subtask_status = SubtaskStatus.from_dict(subtask_status_info[current_task_id])
+    subtask_state = subtask_status.state
     if subtask_state in READY_STATES:
         format_str = "Unexpected task_id '{}': already completed - status {} for subtask of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
@@ -313,8 +310,8 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
     if subtask_state == RETRY:
         # Check to see if the input number of retries is less than the recorded number.
         # If so, then this is an earlier version of the task, and a duplicate.
-        new_retry_count = _get_retry_count(new_subtask_status)
-        current_retry_count = _get_retry_count(subtask_status)
+        new_retry_count = new_subtask_status.get_retry_count()
+        current_retry_count = subtask_status.get_retry_count()
         if new_retry_count < current_retry_count:
             format_str = "Unexpected task_id '{}': already retried - status {} for subtask of instructor task '{}': rejecting task {}"
             msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
@@ -374,7 +371,7 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
             raise ValueError(msg)
 
         # Update status:
-        subtask_status_info[current_task_id] = new_subtask_status
+        subtask_status_info[current_task_id] = new_subtask_status.to_dict()
 
         # Update the parent task progress.
         # Set the estimate of duration, but only if it
@@ -390,10 +387,10 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
         # In future, we can make this more responsive by updating status
         # between retries, by comparing counts that change from previous
         # retry.
-        new_state = new_subtask_status['state']
+        new_state = new_subtask_status.state
         if new_subtask_status is not None and new_state in READY_STATES:
             for statname in ['attempted', 'succeeded', 'failed', 'skipped']:
-                task_progress[statname] += new_subtask_status[statname]
+                task_progress[statname] += getattr(new_subtask_status, statname)
 
         # Figure out if we're actually done (i.e. this is the last task to complete).
         # This is easier if we just maintain a counter, rather than scanning the
