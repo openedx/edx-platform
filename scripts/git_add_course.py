@@ -161,12 +161,12 @@ def add_repo(repo, rdir_in):
 
     # -----------------------------------------------------------------------------
     # store import-command-run output in mongo
-    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
-                                          mongo_db['db'])
+    mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
+        mongo_db['user'], mongo_db['password'],
+        mongo_db['host'], mongo_db['db'])
+
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri,
-                                  username=mongo_db['user'],
-                                  password=mongo_db['password'])
+        mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
     except mongoengine.connection.ConnectionError, ex:
         log.critical(_('Unable to connect to mongodb to save log, please '
                        'check MONGODB_LOG settings'))

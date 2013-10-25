@@ -541,13 +541,12 @@ def view_git_logs(request, course_id=None):
             mongo_db[config_item] = settings.MONGODB_LOG.get(
                 config_item, mongo_db[config_item])
 
-    mongouri = 'mongodb://{0}/{1}'.format(mongo_db['host'],
-                                          mongo_db['db'])
+    mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
+        mongo_db['user'], mongo_db['password'],
+        mongo_db['host'], mongo_db['db'])
 
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri,
-                                  username=mongo_db['user'],
-                                  password=mongo_db['password'])
+        mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
     except mongoengine.connection.ConnectionError, e:
         logging.critical(_('Unable to connect to mongodb to save log, please check '
                            'MONGODB_LOG settings. error: {0}').format(str(e)))
