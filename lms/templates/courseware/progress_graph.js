@@ -24,7 +24,10 @@ $(function () {
     
   <%
   colors = ["#b72121", "#600101", "#666666", "#333333"]
-  categories = {}
+  chapters = {}
+
+  ##FIXME
+  show_grade_breakdown = False
 
   tickIndex = 1
   sectionSpacer = 0.25
@@ -36,47 +39,71 @@ $(function () {
   droppedScores = [] #These are the datapoints to indicate assignments which are not factored into the total score
   dropped_score_tooltips = []
 
-  for section in grade_summary['section_breakdown']:
-      if section.get('prominent', False):
-          tickIndex += sectionSpacer
+  category_weights = {}
+  for section in grade_summary['grade_breakdown']:
+    category_weights[section['category']] = section['weight']
+
+
+  for chapter in courseware_summary:
+    total = 0
+    earned = 0
+    for section in chapter['sections']:    
             
-      if section['category'] not in categories:
-          colorIndex = len(categories) % len(colors)
-          categories[ section['category'] ] = {'label' : section['category'], 
+      if chapter['display_name'] not in chapters:
+          colorIndex = len(chapters) % len(colors)
+          chapters[ chapter['display_name'] ] = {'label' : chapter['display_name'], 
                                               'data' : [], 
                                               'color' : colors[colorIndex]}
       
-      categoryData = categories[ section['category'] ]
+      categoryData = chapters[ chapter['display_name'] ]
     
-      categoryData['data'].append( [tickIndex, section['percent']] )
-      ticks.append( [tickIndex, section['label'] ] )
+      categoryData['data'].append( [tickIndex, section['section_total'].earned/(section['section_total'].possible + 0.05)] )
+      ticks.append( [tickIndex, section['display_name'] ] )
     
-      if section['category'] in detail_tooltips:
-          detail_tooltips[ section['category'] ].append( section['detail'] )
+      if chapter['display_name'] in detail_tooltips:
+          detail_tooltips[ chapter['display_name'] ].append( section['display_name'] + " (" + str(section['section_total'].earned) + "/" + str(section['section_total'].possible) + ")" )
       else:
-          detail_tooltips[ section['category'] ] = [ section['detail'], ]
+          detail_tooltips[ chapter['display_name']] = [ section['display_name'] + " (" + str(section['section_total'].earned) + "/" + str(section['section_total'].possible) + ")", ]
           
       if 'mark' in section:
           droppedScores.append( [tickIndex, 0.05] )
           dropped_score_tooltips.append( section['mark']['detail'] )
         
       tickIndex += 1
+
+      earned += section['section_total'].earned * category_weights[section['format']]
+      total += section['section_total'].possible * category_weights[section['format']]
     
-      if section.get('prominent', False):
-          tickIndex += sectionSpacer
+    tickIndex += sectionSpacer
+    
+    categoryData = chapters[ chapter['display_name'] ]
+    
+    categoryData['data'].append( [tickIndex, earned/(total + 0.05)] )
+      
+
+    ticks.append( [tickIndex, chapter['display_name'] ] )
+    
+    if chapter['display_name'] in detail_tooltips:
+          detail_tooltips[ chapter['display_name'] ].append( section['display_name'] + " (" + str(earned) + "/" + str(total) + ")" )
+    else:
+          detail_tooltips[ chapter['display_name']] = [ section['display_name'] + " (" + str(earned) + "/" + str(total) + ")", ]
+
+    tickIndex += 1
+      
+    tickIndex += sectionSpacer
           
   ## ----------------------------- Grade overviewew bar ------------------------- ##
   tickIndex += sectionSpacer
   
-  series = categories.values()
+  series = chapters.values()
   overviewBarX = tickIndex
-  extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
+  extraColorIndex = len(chapters) #Keeping track of the next color to use for chapters not in chapters[]
   
   if show_grade_breakdown:    
     for section in grade_summary['grade_breakdown']:
-        if section['percent'] > 0:
-            if section['category'] in categories:
-                color = categories[ section['category'] ]['color']
+        if 1 > 0:
+            if section['category'] in chapters:
+                color = chapters[ section['category'] ]['color']
             else:
                 color = colors[ extraColorIndex % len(colors) ]
                 extraColorIndex += 1
