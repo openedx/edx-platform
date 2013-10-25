@@ -1,5 +1,7 @@
 (function (requirejs, require, define) {
 
+// Test.
+
 // In the case when the Video constructor will be called before
 // RequireJS finishes loading all of the Video dependencies, we will have
 // a mock function that will collect all the elements that must be
