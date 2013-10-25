@@ -45,6 +45,7 @@ import csv
 from bulk_email.models import CourseEmail
 
 from .extensions import (
+    dump_due_date_extensions_for_student,
     dump_students_with_due_date_extensions,
     set_due_date_extension)
 
@@ -984,7 +985,13 @@ def show_unit_extensions(request, course_id):
 @require_query_params('student')
 def show_student_extensions(request, course_id):
     student = get_student_from_identifier(request.GET.get('student'))
-    return HttpResponseBadRequest(json.dumps({'error': 'Not implemented'}))
+    course = get_course_by_id(course_id)
+    error, data = dump_due_date_extensions_for_student(course, student)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+    header = data['header']
+    data['data'] = [dict(zip(header, row)) for row in data['data']]
+    return JsonResponse(data)
 
 
 def _split_input_list(str_list):

@@ -81,6 +81,20 @@ class Extensions
         data: send_data
         error: (xhr) => @fail_with_error "Error getting due dates", xhr
         success: (data) => @display_grid data
+
+    @$show_student_extensions.click =>
+      @clear_display()
+      @$grid_table.text 'Loading...'
+
+      url = @$show_student_extensions.data 'endpoint'
+      send_data =
+        student: @$student_input.val()
+      $.ajax
+        dataType: 'json'
+        url: url
+        data: send_data
+        error: (xhr) => @fail_with_error "Error getting due dates", xhr
+        success: (data) => @display_grid data
       
   # handler for when the section title is clicked.
   onClickTitle: ->
@@ -102,6 +116,7 @@ class Extensions
 
   display_grid: (data) ->
     @clear_display()
+    @$grid_text.text data.title
 
     # display on a SlickGrid
     options =
