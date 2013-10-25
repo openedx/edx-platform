@@ -5,11 +5,14 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-Common: Add skip links for accessibility to CMS and LMS (LMS-1311)
+LMS: The wiki markup cheatsheet dialog is now accessible to people with
+disabilites.  (LMS-1303)
 
-Studio: Change course overview page, checklists, assets, and course staff management
-page URLs to a RESTful interface. Also removed "\listing", which duplicated
-"\index".
+Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
+
+Studio: Change course overview page, checklists, assets, and course staff
+management page URLs to a RESTful interface. Also removed "\listing", which
+duplicated "\index".
 
 Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
@@ -71,8 +74,8 @@ editing capability for a course's list of tabs.
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
 
-Studio: add restful interface for paging assets (no UX yet, but just add /start/45/max/50 to end of url to get
-items 45-95, e.g.)
+Studio: add restful interface for paging assets (no UX yet, but just add
+/start/45/max/50 to end of url to get items 45-95, e.g.)
 
 LMS: First round of improvements to New (beta) Instructor Dash:
 improvements, fixes, and internationalization to the Student Info section.
