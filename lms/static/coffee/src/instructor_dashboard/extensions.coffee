@@ -35,8 +35,14 @@ class Extensions
     @$task_response.hide()
     @$task_error.hide()
 
+    # Gather grid elements
+    $grid_display = @$section.find '.data-display'
+    @$grid_text = $grid_display.find '.data-display-text'
+    @$grid_table = $grid_display.find '.data-display-table'
+
     # Click handlers
     @$change_due_date.click =>
+      @clear_display()
       send_data =
         student: @$student_input.val()
         url: @$url_input.val()
@@ -48,11 +54,39 @@ class Extensions
         data: send_data
         success: (data) => @display_response data
         error: (xhr) => @fail_with_error "Error changing due date", xhr
-        
+
+    @$reset_due_date.click =>
+      @clear_display()
+      send_data =
+        student: @$student_input.val()
+        url: @$url_input.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$reset_due_date.data 'endpoint'
+        data: send_data
+        success: (data) => @display_response data
+        error: (xhr) => @fail_with_error "Error reseting due date", xhr
+
+    @$show_unit_extensions.click =>
+      @clear_display()
+      @$grid_table.text 'Loading...'
+
+      url = @$show_unit_extensions.data 'endpoint'
+      send_data =
+        url: @$url_input.val()
+      $.ajax
+        dataType: 'json'
+        url: url
+        data: send_data
+        error: (xhr) => @fail_with_error "Error getting due dates", xhr
+        success: (data) => @display_grid data
+      
   # handler for when the section title is clicked.
   onClickTitle: ->
 
   fail_with_error: (msg, xhr) ->
+    @clear_display()
     data = $.parseJSON xhr.responseText
     msg += ": " + data['error']
     console.warn msg
@@ -61,11 +95,32 @@ class Extensions
     @$task_error.text msg
     @$task_error.show()
 
-  display_response: (data_from_server) ->
+  display_response: (data) ->
     @$task_error.empty().hide()
-    @$task_response.empty().text data_from_server
+    @$task_response.empty().text data
     @$task_response.show()
 
+  display_grid: (data) ->
+    @clear_display()
+
+    # display on a SlickGrid
+    options =
+      enableCellNavigation: true
+      enableColumnReorder: false
+      forceFitColumns: true
+
+    columns = ({id: col, field: col, name: col} for col in data.header)
+    grid_data = data.data
+
+    $table_placeholder = $ '<div/>', class: 'slickgrid', style: 'min-height: 400px'
+    @$grid_table.append $table_placeholder
+    grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
+
+  clear_display: ->
+    @$grid_text.empty()
+    @$grid_table.empty()
+    @$task_error.empty().hide()
+    @$task_response.empty().hide()
 
 # export for use
 # create parent namespaces if they do not already exist.

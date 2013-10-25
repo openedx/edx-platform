@@ -30,8 +30,13 @@
          data-endpoint="${section_data['reset_due_date_url']}">
 </p>
 <p>
-  <input type="button" name="show-unit-extensions" value="${_("Dump list of students with due date extensions")}"
+  <input type="button" name="show-unit-extensions" value="${_("List students with due date extensions")}"
          data-endpoint="${section_data['show_unit_extensions_url']}">
-  <input type="submit" name="show-student-extensions" value="${_("Dump due date extensions for student")}"
+  <input type="button" name="show-student-extensions" value="${_("List date extensions for student")}"
          data-endpoint="${section_data['show_student_extensions_url']}">
 </p>
+
+<div class="data-display">
+  <div class="data-display-text"></div>
+  <div class="data-display-table"></div>
+</div>

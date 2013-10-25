@@ -45,6 +45,7 @@ import csv
 from bulk_email.models import CourseEmail
 
 from .extensions import (
+    dump_students_with_due_date_extensions,
     set_due_date_extension)
 
 log = logging.getLogger(__name__)
@@ -943,8 +944,25 @@ def change_due_date(request, course_id):
 @require_level('staff')
 @require_query_params('student', 'url')
 def reset_due_date(request, course_id):
+    course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
-    return HttpResponseBadRequest(json.dumps({'error': 'Not implemented'}))
+    url = request.GET.get('url')
+    error, unit = set_due_date_extension(course, url, student, None)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+    studentname = '{0} {1} ({2})'.format(
+        student.first_name, student.last_name, student.username)
+    unitname = getattr(unit, 'display_name', None)
+    if unitname:
+        unitname = '{0} ({1})'.format(unitname, unit.location.url())
+    due_date = unit.due
+    msg = (
+        'Successfully reset due date for student {0} for {1} '
+        'to {2}').format(studentname, unitname,
+                         due_date.strftime('%Y-%m-%d %H:%M'))
+
+    return JsonResponse(msg)
 
 
 @ensure_csrf_cookie
@@ -952,7 +970,15 @@ def reset_due_date(request, course_id):
 @require_level('staff')
 @require_query_params('url')
 def show_unit_extensions(request, course_id):
-    return HttpResponseBadRequest(json.dumps({'error': 'Not implemented'}))
+    course = get_course_by_id(course_id)
+    url = request.GET.get('url')
+    error, data = dump_students_with_due_date_extensions(course, url)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+    data['header'] = header = [
+        col.lower().replace(' ', '_') for col in data['header']]
+    data['data'] = [dict(zip(header, row)) for row in data['data']]
+    return JsonResponse(data)
 
 
 @ensure_csrf_cookie
