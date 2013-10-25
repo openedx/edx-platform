@@ -751,6 +751,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     handle_ajax = module_attr('handle_ajax')
     max_score = module_attr('max_score')
     student_view = module_attr('student_view')
+    get_child_descriptors = module_attr('get_child_descriptors')
 
     # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
     def studio_view(self, _context):

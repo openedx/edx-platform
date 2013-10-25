@@ -21,7 +21,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.xblock.field_data import lms_field_data
+from lms.xblock.field_data import LmsFieldData
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -107,7 +107,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = lms_field_data(self.item_descriptor._field_data, student_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
         self.item_module = self.item_descriptor
