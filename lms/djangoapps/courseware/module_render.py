@@ -38,7 +38,7 @@ from xblock.runtime import KeyValueStore
 from xblock.fields import Scope
 from util.sandboxing import can_execute_unsafe_code
 from util.json_request import JsonResponse
-from lms.xblock.field_data import lms_field_data
+from lms.xblock.field_data import LmsFieldData
 
 log = logging.getLogger(__name__)
 
@@ -220,7 +220,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         return None
 
     student_data = DbModel(DjangoKeyValueStore(field_data_cache))
-    descriptor._field_data = lms_field_data(descriptor._field_data, student_data)
+    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
     # Setup system context for module instance
     ajax_url = reverse(

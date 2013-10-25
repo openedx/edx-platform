@@ -16,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
 
-from lms.xblock.field_data import lms_field_data
+from lms.xblock.field_data import LmsFieldData
 
 from util.sandboxing import can_execute_unsafe_code
 
@@ -149,7 +149,7 @@ def load_preview_module(request, preview_id, descriptor):
     student_data = DbModel(SessionKeyValueStore(request))
     descriptor.bind_for_student(
         preview_module_system(request, preview_id, descriptor),
-        lms_field_data(descriptor._field_data, student_data),  # pylint: disable=protected-access
+        LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
     )
     return descriptor
 
