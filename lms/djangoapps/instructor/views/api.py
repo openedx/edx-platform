@@ -926,8 +926,7 @@ def change_due_date(request, course_id):
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
-    studentname = '{0} {1} ({2})'.format(
-        student.first_name, student.last_name, student.username)
+    studentname = student.profile.name
     unitname = getattr(unit, 'display_name', None)
     if unitname:
         unitname = '{0} ({1})'.format(unitname, unit.location.url())
@@ -951,8 +950,7 @@ def reset_due_date(request, course_id):
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
-    studentname = '{0} {1} ({2})'.format(
-        student.first_name, student.last_name, student.username)
+    studentname = student.profile.name
     unitname = getattr(unit, 'display_name', None)
     if unitname:
         unitname = '{0} ({1})'.format(unitname, unit.location.url())
@@ -975,8 +973,7 @@ def show_unit_extensions(request, course_id):
     error, data = dump_students_with_due_date_extensions(course, url)
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
-    data['header'] = header = [
-        col.lower().replace(' ', '_') for col in data['header']]
+    header = data['header']
     data['data'] = [dict(zip(header, row)) for row in data['data']]
     return JsonResponse(data)
 

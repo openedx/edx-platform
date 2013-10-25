@@ -92,7 +92,7 @@ def dump_students_with_due_date_extensions(course, url):
             continue
         extended_due = date_field.from_json(extended_due)
         extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
-        fullname = '%s %s' % (sm.student.first_name, sm.student.last_name)
+        fullname = sm.student.profile.name
         data.append((sm.student.username, fullname, extended_due))
     data.sort(key=lambda x: x[0])
     return None, {

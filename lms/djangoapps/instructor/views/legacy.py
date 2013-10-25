@@ -541,8 +541,7 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
-                studentname = '{0} {1} ({2})'.format(
-                    student.first_name, student.last_name, student.username)
+                studentname = student.profile.name
                 unitname = getattr(unit, 'display_name', None)
                 if unitname:
                     unitname = '{0} ({1})'.format(unitname, unit.location.url())
@@ -570,8 +569,7 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">{0}</font> '.format(error)
                 log.debug(error)
             else:
-                studentname = '{0} {1} ({2})'.format(
-                    student.first_name, student.last_name, student.username)
+                studentname = student.profile.name
                 unitname = getattr(unit, 'display_name', None)
                 if unitname:
                     unitname = '{0} ({1})'.format(unitname, unit.location.url())
