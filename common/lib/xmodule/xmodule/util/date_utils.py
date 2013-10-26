@@ -2,9 +2,7 @@
 Convenience methods for working with datetime objects
 """
 from datetime import timedelta
-from pytz import timezone as _timezone
-from django.conf import settings
-from django.template.defaultfilters import date as _date
+
 
 def get_default_time_display(dtime):
     """
@@ -16,17 +14,16 @@ def get_default_time_display(dtime):
     """
     if dtime is None:
         return u""
-    
     if dtime.tzinfo is not None:
         try:
             timezone = u" " + dtime.tzinfo.tzname(dtime)
         except NotImplementedError:
             timezone = dtime.strftime('%z')
-        settings_time_zone = _timezone(settings.TIME_ZONE)
-        dtime = dtime.astimezone(settings_time_zone)
     else:
         timezone = u" UTC"
-    return unicode(_date(dtime, "l, d E Y H:i e "))
+    return unicode(dtime.strftime(u"%b %d, %Y at %H:%M{tz}")).format(
+        tz=timezone).strip()
+
 
 def get_time_display(dtime, format_string=None):
     """
