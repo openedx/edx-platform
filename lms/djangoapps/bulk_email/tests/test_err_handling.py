@@ -75,7 +75,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertIsInstance(exc, SMTPDataError)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.SubtaskStatus.increment')
+    @patch('bulk_email.tasks.update_subtask_status')
     @patch('bulk_email.tasks.send_course_email.retry')
     def test_data_err_fail(self, retry, result, get_conn):
         """
@@ -99,11 +99,11 @@ class TestEmailErrors(ModuleStoreTestCase):
         # We shouldn't retry when hitting a 5xx error
         self.assertFalse(retry.called)
         # Test that after the rejected email, the rest still successfully send
-        ((_initial_results), kwargs) = result.call_args
-        self.assertEquals(kwargs['skipped'], 0)
+        ((_entry_id, _current_task_id, subtask_status), _kwargs) = result.call_args
+        self.assertEquals(subtask_status.skipped, 0)
         expected_fails = int((settings.BULK_EMAIL_EMAILS_PER_TASK + 3) / 4.0)
-        self.assertEquals(kwargs['failed'], expected_fails)
-        self.assertEquals(kwargs['succeeded'], settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
+        self.assertEquals(subtask_status.failed, expected_fails)
+        self.assertEquals(subtask_status.succeeded, settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.send_course_email.retry')

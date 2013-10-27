@@ -91,7 +91,7 @@ class SubtaskStatus(object):
     """
     Create and return a dict for tracking the status of a subtask.
 
-    Subtask status keys are:
+    SubtaskStatus values are:
 
       'task_id' : id of subtask.  This is used to pass task information across retries.
       'attempted' : number of attempts -- should equal succeeded plus failed
@@ -104,8 +104,8 @@ class SubtaskStatus(object):
           should have a maximum count applied
       'state' : celery state of the subtask (e.g. QUEUING, PROGRESS, RETRY, FAILURE, SUCCESS)
 
-    Object must be JSON-serializable, so that it can be passed as an argument
-    to tasks.
+    Object is not JSON-serializable, so to_dict and from_dict methods are provided so that
+    it can be passed as a serializable argument to tasks.
 
     In future, we may want to include specific error information
     indicating the reason for failure.
@@ -113,6 +113,7 @@ class SubtaskStatus(object):
     """
 
     def __init__(self, task_id, attempted=None, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
+        """Construct a SubtaskStatus object."""
         self.task_id = task_id
         if attempted is not None:
             self.attempted = attempted
@@ -127,6 +128,7 @@ class SubtaskStatus(object):
 
     @classmethod
     def from_dict(self, d):
+        """Construct a SubtaskStatus object from a dict representation."""
         options = dict(d)
         task_id = options['task_id']
         del options['task_id']
@@ -134,10 +136,16 @@ class SubtaskStatus(object):
 
     @classmethod
     def create(self, task_id, **options):
+        """Construct a SubtaskStatus object."""
         newobj = self(task_id, **options)
         return newobj
 
     def to_dict(self):
+        """
+        Output a dict representation of a SubtaskStatus object.
+
+        Use for creating a JSON-serializable representation for use by tasks.
+        """
         return self.__dict__
 
     def increment(self, succeeded=0, failed=0, skipped=0, retried_nomax=0, retried_withmax=0, state=None):
@@ -157,12 +165,15 @@ class SubtaskStatus(object):
             self.state = state
 
     def get_retry_count(self):
+        """Returns the number of retries of any kind."""
         return self.retried_nomax + self.retried_withmax
 
     def __repr__(self):
+        """Return print representation of a SubtaskStatus object."""
         return 'SubtaskStatus<%r>' % (self.to_dict(),)
 
     def __unicode__(self):
+        """Return unicode version of a SubtaskStatus object representation."""
         return unicode(repr(self))
 
 
@@ -185,7 +196,7 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
 
     The "subtasks" field also contains a 'status' key, that contains a dict that stores status
     information for each subtask.  The value for each subtask (keyed by its task_id)
-    is its subtask status, as defined by create_subtask_status().
+    is its subtask status, as defined by SubtaskStatus.to_dict().
 
     This information needs to be set up in the InstructorTask before any of the subtasks start
     running.  If not, there is a chance that the subtasks could complete before the parent task
@@ -263,7 +274,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
     Confirms that the current subtask is known to the InstructorTask and hasn't already been completed.
 
     Problems can occur when the parent task has been run twice, and results in duplicate
-    subtasks being created for the same InstructorTask entry.  This can happen when Celery
+    subtasks being created for the same InstructorTask entry.  This maybe happens when Celery
     loses its connection to its broker, and any current tasks get requeued.
 
     If a parent task gets requeued, then the same InstructorTask may have a different set of
@@ -277,6 +288,9 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
     The other worker is allowed to finish, and this raises an exception.
 
     Raises a DuplicateTaskException exception if it's not a task that should be run.
+
+    If this succeeds, it requires that update_subtask_status() is called to release the lock on the
+    task.
     """
     # Confirm that the InstructorTask actually defines subtasks.
     entry = InstructorTask.objects.get(pk=entry_id)
@@ -353,8 +367,8 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
 
     The "subtasks" field also contains a 'status' key, that contains a dict that stores status
     information for each subtask.  At the moment, the value for each subtask (keyed by its task_id)
-    is the value of `status`, but could be expanded in future to store information about failure
-    messages, progress made, etc.
+    is the value of the SubtaskStatus.to_dict(), but could be expanded in future to store information
+    about failure messages, progress made, etc.
     """
     TASK_LOG.info("Preparing to update status for email subtask %s for instructor task %d with status %s",
                   current_task_id, entry_id, new_subtask_status)
