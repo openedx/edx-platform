@@ -269,12 +269,16 @@
   // elements - controls
   .action-primary {
     @extend %btn-primary-blue;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   .action-confirm {
     @extend %btn-verify-primary;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   // ====================
