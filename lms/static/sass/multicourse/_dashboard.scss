@@ -537,7 +537,7 @@
       background: $verified-color-lvl5;
 
       .action-upgrade {
-        @extend %btn-verify-primary;
+        @extend %btn-primary-green;
         @include clearfix();
 
         span {
