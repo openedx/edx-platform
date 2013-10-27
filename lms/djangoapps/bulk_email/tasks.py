@@ -40,12 +40,10 @@ from courseware.access import _course_staff_group_name, _course_instructor_group
 from courseware.courses import get_course, course_image_url
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
-    create_subtask_ids,
-    generate_items_for_subtask,
     SubtaskStatus,
-    update_subtask_status,
-    initialize_subtask_info,
+    queue_subtasks_for_query,
     check_subtask_is_valid,
+    update_subtask_status,
 )
 
 log = get_task_logger(__name__)
@@ -154,10 +152,8 @@ def _get_course_email_context(course):
 def perform_delegate_email_batches(entry_id, course_id, task_input, action_name):
     """
     Delegates emails by querying for the list of recipients who should
-    get the mail, chopping up into batches of settings.BULK_EMAIL_EMAILS_PER_TASK size,
-    and queueing up worker jobs.
-
-    Returns the number of batches (workers) kicked off.
+    get the mail, chopping up into batches of no more than settings.BULK_EMAIL_EMAILS_PER_TASK
+    in size, and queueing up worker jobs.
     """
     entry = InstructorTask.objects.get(pk=entry_id)
     # Get inputs to use in this task from the entry.
@@ -208,55 +204,37 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     to_option = email_obj.to_option
     global_email_context = _get_course_email_context(course)
 
-    # Figure out the number of needed subtasks, getting id values to use for each.
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
-    total_num_emails = recipient_qset.count()
-    subtask_id_list = create_subtask_ids(total_num_emails, settings.BULK_EMAIL_EMAILS_PER_QUERY, settings.BULK_EMAIL_EMAILS_PER_TASK)
-
-    # Update the InstructorTask  with information about the subtasks we've defined.
-    log.info("Task %s: Preparing to update task for sending %d emails for course %s, email %s, to_option %s",
-             task_id, total_num_emails, course_id, email_id, to_option)
-    progress = initialize_subtask_info(entry, action_name, total_num_emails, subtask_id_list)
-
-    # Construct a generator that will return the recipients to use for each subtask.
-    # Pass in the desired fields to fetch for each recipient.
-    recipient_fields = ['profile__name', 'email']
-    recipient_generator = generate_items_for_subtask(
-        recipient_qset,
-        recipient_fields,
-        total_num_emails,
-        settings.BULK_EMAIL_EMAILS_PER_QUERY,
-        settings.BULK_EMAIL_EMAILS_PER_TASK,
-    )
-
-    # Now create the subtasks, and start them running.  This allows all the subtasks
-    # in the list to be submitted at the same time.
-    num_subtasks = len(subtask_id_list)
-    log.info("Task %s: Preparing to generate and queue %s subtasks for course %s, email %s, to_option %s",
-             task_id, num_subtasks, course_id, email_id, to_option)
-    num_subtasks = 0
-    for recipient_list in recipient_generator:
-        subtask_id = subtask_id_list[num_subtasks]
-        num_subtasks += 1
-        subtask_status_dict = SubtaskStatus.create(subtask_id).to_dict()
+    def _create_send_email_subtask(to_list, initial_subtask_status):
+        """Creates a subtask to send email to a given recipient list."""
+        subtask_id = initial_subtask_status.task_id
         new_subtask = send_course_email.subtask(
             (
                 entry_id,
                 email_id,
-                recipient_list,
+                to_list,
                 global_email_context,
-                subtask_status_dict,
+                initial_subtask_status.to_dict(),
             ),
             task_id=subtask_id,
             routing_key=settings.BULK_EMAIL_ROUTING_KEY,
         )
-        new_subtask.apply_async()
+        return new_subtask
 
-    # Sanity check: we expect the subtask to be properly summing to the original count:
-    if num_subtasks != len(subtask_id_list):
-        error_msg = "Task {}: number of tasks generated {} not equal to original total {}".format(task_id, num_subtasks, len(subtask_id_list))
-        log.error(error_msg)
-        raise ValueError(error_msg)
+    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
+    recipient_fields = ['profile__name', 'email']
+
+    log.info("Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
+             task_id, course_id, email_id, to_option)
+
+    progress = queue_subtasks_for_query(
+        entry,
+        action_name,
+        _create_send_email_subtask,
+        recipient_qset,
+        recipient_fields,
+        settings.BULK_EMAIL_EMAILS_PER_QUERY,
+        settings.BULK_EMAIL_EMAILS_PER_TASK
+    )
 
     # We want to return progress here, as this is what will be stored in the
     # AsyncResult for the parent task as its return value.
@@ -332,7 +310,7 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
             )
     except Exception:
         # Unexpected exception. Try to write out the failure to the entry before failing.
-        log.exception("Send-email task %s: failed unexpectedly!", current_task_id)
+        log.exception("Send-email task %s for email %s: failed unexpectedly!", current_task_id, email_id)
         # We got here for really unexpected reasons.  Since we don't know how far
         # the task got in emailing, we count all recipients as having failed.
         # It at least keeps the counts consistent.
@@ -342,22 +320,23 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
 
     if send_exception is None:
         # Update the InstructorTask object that is storing its progress.
-        log.info("Send-email task %s: succeeded", current_task_id)
+        log.info("Send-email task %s for email %s: succeeded", current_task_id, email_id)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
     elif isinstance(send_exception, RetryTaskError):
         # If retrying, a RetryTaskError needs to be returned to Celery.
         # We assume that the the progress made before the retry condition
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
-        log.warning("Send-email task %s: being retried", current_task_id)
+        log.warning("Send-email task %s for email %s: being retried", current_task_id, email_id)
         raise send_exception  # pylint: disable=E0702
     else:
-        log.error("Send-email task %s: failed: %s", current_task_id, send_exception)
+        log.error("Send-email task %s for email %s: failed: %s", current_task_id, email_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
         raise send_exception  # pylint: disable=E0702
 
-    log.info("Send-email task %s: returning status %s", current_task_id, new_subtask_status)
-    return new_subtask_status
+    # return status in a form that can be serialized by Celery into JSON:
+    log.info("Send-email task %s for email %s: returning status %s", current_task_id, email_id, new_subtask_status)
+    return new_subtask_status.to_dict()
 
 
 def _filter_optouts_from_recipients(to_list, course_id):
