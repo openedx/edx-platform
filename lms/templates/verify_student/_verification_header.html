@@ -17,7 +17,11 @@
 
       <span class="sts-track">
         <span class="sts-track-value">
-          <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+          %if upgrade:
+            <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+          %else:
+            <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+          %endif
         </span>
       </span>
     </span>

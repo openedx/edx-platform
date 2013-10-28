@@ -11,10 +11,17 @@
       </li>
 
       <li class="help-item help-item-coldfeet">
-        <h3 class="title">${_("Change your mind?")}</h3>
-        <div class="copy">
-          <p>${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
-        </div>
+        %if upgrade:
+          <h3 class="title">${_("Change your mind?")}</h3>
+          <div class="copy">
+            <p>${_("You can always continue to audit the course without verifying.")}</p>
+          </div>
+        %else:
+           <h3 class="title">${_("Change your mind?")}</h3>
+          <div class="copy">
+            <p>${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+          </div>
+        %endif
       </li>
 
       <li class="help-item help-item-technical">
