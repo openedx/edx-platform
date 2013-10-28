@@ -20,7 +20,6 @@ USE_I18N = True
 TEMPLATE_DEBUG = True
 
 
-MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 MITX_FEATURES['DISABLE_START_DATES'] = False
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
@@ -270,7 +269,7 @@ if SEGMENT_IO_LMS_KEY:
 CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
 CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = os.environ.get('CYBERSOURCE_MERCHANT_ID', '')
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = os.environ.get('CYBERSOURCE_SERIAL_NUMBER', '')
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_PURCHASE_ENDPOINT', '')
 
 
 ########################## USER API ########################

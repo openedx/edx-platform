@@ -141,9 +141,13 @@
         % endif
       % endif
 
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
-
-
+      % if enrollment.mode != "verified":
+      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('refund-info').innerHTML=''">${_('Unregister')}</a>
+      % elif show_refund_option:
+      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('refund-info').innerHTML='You will be refunded for the amount you paid'">${_('Unregister')}</a>
+      % else:
+      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('refund-info').innerHTML='The refund deadline for this course has passed, so you will not receive money back'">${_('Unregister')}</a>
+      % endif
 
 % if show_email_settings:
         <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
@@ -158,20 +162,12 @@
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
-
     <header>
-      % if enrollment.mode != "verified":
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      % elif show_refund_option:
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?  You will be refunded for the amount paid for the verified certificate.').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      % else:
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?  The deadline for verified certificate refunds has passed, so you will not receive any money back.').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      % endif
+      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      refund
       <hr/>
     </header>
-
     <div id="unenroll_error" class="modal-form-error"></div>
-
     <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />

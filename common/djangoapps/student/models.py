@@ -17,7 +17,6 @@ import json
 import logging
 import uuid
 
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -29,6 +28,9 @@ from django.forms import ModelForm, forms
 import comment_client as cc
 from pytz import UTC
 
+import django.dispatch
+
+verified_unenroll_done = django.dispatch.Signal(providing_args=["user", "user_email", "course_id"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")

@@ -7,6 +7,9 @@ from model_utils.managers import InheritanceManager
 from collections import namedtuple
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
+from django.dispatch import receiver
+from student.models import verified_unenroll_done
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -22,7 +25,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
 from mitxmako.shortcuts import render_to_string
+from student.views import course_from_id
 from student.models import CourseEnrollment
+
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
@@ -38,12 +43,6 @@ ORDER_STATUSES = (
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
-
-
-def course_from_id(course_id):
-    """Return the CourseDescriptor corresponding to this course_id"""
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    return modulestore().get_instance(course_id, course_loc)
 
 
 class Order(models.Model):
@@ -404,24 +403,38 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @classmethod
-    def refund_cert(cls, target_user, target_course_id):
+    @receiver(verified_unenroll_done)
+    def refund_cert_callback(sender, **kwargs):
         """
-        When refunded, this should find a verified certificate purchase for target_user in target_course_id, change that
-        certificate's status to "refunded", save that result, and return the refunded certificate.
-
-        Note the actual mechanics of refunding money occurs elsewhere; this simply changes the relevant certificate's
-        status for the refund.
+        When a CourseEnrollment object whose mode is 'verified' has its is_active field set to false (i.e. when a student
+        is unenrolled), this callback ensures that the associated CertificateItem is marked as refunded, and that an
+        appropriate email is sent to billing.
         """
         try:
+            course_id = kwargs['course_id']
+            user = kwargs['user']
+            user_email = kwargs['user_email']
+
             # If there's duplicate entries, just grab the first one and refund it (though in most cases we should only get one)
-            target_certs = CertificateItem.objects.filter(course_id=target_course_id, user_id=target_user, status='purchased', mode='verified')
+            target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=user, status='purchased', mode='verified')
             target_cert = target_certs[0]
             target_cert.status = 'refunded'
             target_cert.save()
+
+            order_number = target_cert.order_id
+
+            # send billing an email so they can handle refunding
+            subject = _("[Refund] User-Requested Refund")
+            message = "User " + str(user) + "(" + str(user_email) + ") has requested a refund on Order #" + str(order_number) + "."
+            to_email = [settings.PAYMENT_SUPPORT_EMAIL]
+            from_email = "support@edx.org"
+            send_mail(subject, message, from_email, to_email, fail_silently=False)
+
             return target_cert
-        except IndexError or ObjectDoesNotExist:
+
+        except IndexError:
             log.exception("No certificate found")
-            # handle the exception
+            raise IndexError
 
     @classmethod
     @transaction.commit_on_success

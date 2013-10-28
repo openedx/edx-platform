@@ -35,7 +35,8 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
 import shoppingcart
-from shoppingcart.models import CertificateItem
+
+from course_modes.models import CourseMode
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
@@ -426,9 +427,9 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class CertificateItemTest(ModuleStoreTestCase):
+class RefundUnenrollmentTests(ModuleStoreTestCase):
     """
-    Tests for paid certificate functionality (verified student), involves shoppingcart
+    Tests views for unenrollment with refunds
     """
     # test data
     COURSE_SLUG = "100"
@@ -437,19 +438,36 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     def setUp(self):
         # Create course, user, and enroll them as a verified student
+        self.user = UserFactory.create()
+        self.course_id = "org/test/Test_Course"
+        self.cost = 40
+        CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
+        course_mode = CourseMode(course_id=self.course_id,
+                                 mode_slug="honor",
+                                 mode_display_name="honor cert",
+                                 min_price=self.cost)
+        course_mode.save()
+        course_mode = CourseMode(course_id=self.course_id,
+                                 mode_slug="verified",
+                                 mode_display_name="verified cert",
+                                 min_price=self.cost)
+        course_mode.save()
+
         self.req_factory = RequestFactory()
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
-        self.user = User.objects.create(username="test", email="test@test.org")
-        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+
+        course_enrollment = CourseEnrollment.create_enrollment(self.user, self.course_id, 'verified', is_active=True)
+        course_enrollment.save()
 
     # Student is verified and paid; we should be able to refund them
     def test_unenroll_and_refund(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id, 'enrollment_action': 'unenroll'})
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course_id, 'enrollment_action': 'unenroll'})
         request.user = self.user
         response = change_enrollment(request)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user,self.course.id))
-        target_certs = CertificateItem.objects.filger(course_id=self.course.id, user_id=self.user, status='refunded')
-        self.assertTrue(target_certs[0].status == 'refunded')
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
+    def test_unenroll_but_no_course(self):
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': 'non/existent/course', 'enrollment_action': 'unenroll'})
+        request.user = self.user
+        response = change_enrollment(request)
+        self.assertEqual(response.status_code, 400)

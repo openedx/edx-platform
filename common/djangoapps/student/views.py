@@ -43,13 +43,12 @@ from student.models import (
     TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
+    verified_unenroll_done
 )
 from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification
-
 from certificates.models import CertificateStatuses, certificate_status_for_student
-
 from shoppingcart.models import CertificateItem
 
 from xmodule.course_module import CourseDescriptor
@@ -74,6 +73,7 @@ from dogapi import dog_stats_api
 from pytz import UTC
 
 from util.json_request import JsonResponse
+
 
 log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -476,22 +476,11 @@ def change_enrollment(request):
             enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, course_id)
 
             # did they sign up for verified certs?
-            if(enrollment_mode=='verified'):
+            if(enrollment_mode == 'verified'):
                 # If the user is allowed a refund, do so
                 if has_access(user, course, 'refund'):
-                    subject = _("[Refund] User-Requested Refund")
-                    # todo: make this reference templates/student/refund_email.html
-                    message = "Important info here."
-                    to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-                    from_email = "support@edx.org"
-                    try:
-                        send_mail(subject, message, from_email, to_email, fail_silently=False)
-                    except:
-                        log.warning('Unable to send reimbursement request to billing', exc_info=True)
-                        js['value'] = _('Could not send reimbursement request.')
-                        return HttpResponse(json.dumps(js))
-                # email has been sent, let's deal with the order now
-                CertificateItem.refund_cert(user, course_id)
+                    # triggers the callback to mark the certificate as refunded
+                    verified_unenroll_done.send(sender=request, user=user, user_email=user.email, course_id=course_id)
             CourseEnrollment.unenroll(user, course_id)
             org, course_num, run = course_id.split("/")
             dog_stats_api.increment(

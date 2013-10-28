@@ -17,10 +17,9 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
                                  OrderItemSubclassPK)
 from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, verified_unenroll_done
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
-from django.core.exceptions import (ObjectDoesNotExist, MultipleObjectsReturned)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -362,24 +361,17 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertEquals(cert_item.single_item_receipt_template,
                           'shoppingcart/receipt.html')
 
-    def test_refund_cert_single_cert(self):
+    def test_refund_cert_callback(self):
         # enroll and buy; dup from test_existing_enrollment
         CourseEnrollment.enroll(self.user, self.course_id)
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         cart.purchase()
         # now that it's there, let's try refunding it
-        order = CertificateItem.refund_cert(target_user=self.user, target_course_id=self.course_id)
-        self.assertEquals(order.status, 'refunded')
+        verified_unenroll_done.send(sender=self, user=self.user, user_email=self.user.email, course_id=self.course_id)
+        target_certs = CertificateItem.objects.filter(course_id=self.course_id, user_id=self.user, status='refunded', mode='verified')
+        self.assertTrue(target_certs[0])
 
     def test_refund_cert_no_cert_exists(self):
-        order = CertificateItem.refund_cert(target_user=self.user, target_course_id=self.course_id)
-        self.assertRaises(ObjectDoesNotExist)
-
-    def test_refund_cert_duplicate_certs_exist(self):
-        for i in range(0, 2):
-            CourseEnrollment.enroll(self.user, self.course_id)
-            cart = Order.get_cart_for_user(user=self.user)
-            CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
-            cart.purchase()
-        self.assertRaises(MultipleObjectsReturned)
+        with self.assertRaises(IndexError):
+            verified_unenroll_done.send(sender=self, user=self.user, user_email=self.user.email, course_id=self.course_id)

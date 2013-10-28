@@ -108,18 +108,18 @@ class AccessTestCase(TestCase):
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
 
     def test__has_access_refund(self):
-        u = Mock()
+        user = Mock()
         today = datetime.datetime.now(UTC())
         grace_period = datetime.timedelta(days=14)
         one_day_extra = datetime.timedelta(days=1)
 
         # User is allowed to receive refund if it is within two weeks of course start date
-        c = Mock(enrollment_start=(today - one_day_extra), id='edX/tests/Whenever')
-        self.assertTrue(access._has_access_course_desc(u, c, 'refund'))
+        course = Mock(enrollment_start=(today - one_day_extra), id='edX/tests/Whenever')
+        self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
 
-        c = Mock(enrollment_start=(today - grace_period), id='edX/test/Whenever')
-        self.assertTrue(access._has_access_course_desc(u, c, 'refund'))
+        course = Mock(enrollment_start=(today - grace_period), id='edX/test/Whenever')
+        self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
 
         # After two weeks, user may no longer receive a refund
-        c = Mock(enrollment_start=(today - grace_period - one_day_extra), id='edX/test/Whenever')
-        self.assertFalse(access._has_access_course_desc(u, c, 'refund'))
+        course = Mock(enrollment_start=(today - grace_period - one_day_extra), id='edX/test/Whenever')
+        self.assertFalse(access._has_access_course_desc(user, course, 'refund'))
