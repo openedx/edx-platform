@@ -1,4 +1,4 @@
-from .utils import CommentClientError, perform_request
+from .utils import CommentClientRequestError, perform_request
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
 import models
@@ -48,7 +48,7 @@ class Comment(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_flag_abuse_comment(voteable.id)
         else:
-            raise CommentClientError("Can only flag/unflag threads or comments")
+            raise CommentClientRequestError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)
@@ -59,7 +59,7 @@ class Comment(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_unflag_abuse_comment(voteable.id)
         else:
-            raise CommentClientError("Can flag/unflag for threads or comments")
+            raise CommentClientRequestError("Can flag/unflag for threads or comments")
         params = {'user_id': user.id}
 
         if removeAll:
