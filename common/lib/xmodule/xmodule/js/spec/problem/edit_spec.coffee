@@ -314,6 +314,10 @@ describe 'MarkdownEditingDescriptor', ->
         
         bad tests require drivel
         </div>
+        
+        [code]
+        Code should be nicely monospaced.
+        [/code]
         """)
       expect(data).toEqual("""<problem>
         <p>Not a header</p>
@@ -382,5 +386,9 @@ describe 'MarkdownEditingDescriptor', ->
         
         <p>bad tests require drivel</p>
         </div>
+        
+        <pre><code>
+        Code should be nicely monospaced.
+        </code></pre>
         </problem>""")
     # failure tests
