@@ -43,19 +43,14 @@ Feature: CMS.Component Adding
            | Numerical Input      |
            | Text Input           |
 
-    Scenario: I can add Advanced Problem components
+    Scenario Outline: I can add Advanced Problem components
        Given I am in Studio editing a new unit
-       When I add this type of Advanced Problem component:
-           | Component                     |
-           | Blank Advanced Problem        |
-           | Circuit Schematic Builder     |
-           | Custom Python-Evaluated Input |
-           | Drag and Drop                 |
-           | Image Mapped Input            |
-           | Math Expression Input         |
-           | Problem Written in LaTeX      |
-           | Problem with Adaptive Hint    |
-       Then I see Problem components in this order:
+       When I add a "<Component>" "Advanced Problem" component
+       Then I see a "<Component>" Problem component
+       # Flush out the database before the next example executes
+       And I reset the database
+
+    Examples:
            | Component                     |
            | Blank Advanced Problem        |
            | Circuit Schematic Builder     |

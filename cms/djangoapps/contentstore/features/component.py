@@ -63,6 +63,17 @@ def see_a_multi_step_component(step, category):
             assert_in(step_hash['Component'].upper(), actual_text)
 
 
+@step(u'I see a "([^"]*)" Problem component$')
+def see_a_problem_component(step, category):
+    component_css = 'section.xmodule_CapaModule'
+    assert_true(world.is_css_present(component_css),
+        'No problem was added to the unit.')
+
+    problem_css = 'li.component section.xblock-student_view'
+    actual_text = world.css_text(problem_css)
+    assert_in(category.upper(), actual_text)
+
+
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
 def add_component_category(step, component, category):
     assert category in ('single step', 'HTML', 'Problem', 'Advanced Problem')
