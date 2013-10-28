@@ -1,7 +1,6 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Course Import")}</%block>
@@ -28,8 +27,7 @@
           <p>${_("During the initial stages of the import process, please do not navigate away from this page.")}</p>
       </div>
 
-      <form id="fileupload" method="post" enctype="multipart/form-data"
-          class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
+      <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
 
@@ -158,7 +156,7 @@ var chooseBtn = $('.choose-file-button');
 
 var allStats = $('#status-infos');
 
-var feedbackUrl = "${reverse('import_status', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name='fillerName'))}"
+var feedbackUrl = "${import_status_url}";
 
 var defaults = [
     '${_("There was an error during the upload process.")}\n',

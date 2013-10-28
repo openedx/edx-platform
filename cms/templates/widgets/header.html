@@ -20,6 +20,7 @@
             checklists_url = location.url_reverse('checklists/', '')
             course_team_url = location.url_reverse('course_team/', '')
             assets_url = location.url_reverse('assets/', '')
+            import_url = location.url_reverse('import/', '')
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -91,7 +92,7 @@
                     <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>
                   <li class="nav-item nav-course-tools-import">
-                    <a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Import")}</a>
+                    <a href="${import_url}">${_("Import")}</a>
                   </li>
                   <li class="nav-item nav-course-tools-export">
                     <a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Export")}</a>
