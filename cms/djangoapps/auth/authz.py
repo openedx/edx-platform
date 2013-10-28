@@ -10,6 +10,7 @@ from django.conf import settings
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import CourseLocator, Locator
+from xmodule.modulestore.django import loc_mapper
 
 
 # define a couple of simple roles, we just need ADMIN and EDITOR now for our purposes
@@ -35,7 +36,9 @@ def get_course_groupname_for_role(location, role):
     if isinstance(location, Location):
         groupnames.append('{0}_{1}'.format(role, location.course))
     elif isinstance(location, CourseLocator):
-        groupnames.append('{0}_{1}'.format(role, location.as_old_location_course_id))
+        old_location = loc_mapper().translate_locator_to_location(location)
+        if old_location:
+            groupnames.append('{0}_{1}'.format(role, old_location.course_id))
 
     for groupname in groupnames:
         if Group.objects.filter(name=groupname).exists():
@@ -192,7 +195,7 @@ def is_user_in_course_group_role(user, location, role, check_staff=True):
         # all "is_staff" flagged accounts belong to all groups
         if check_staff and user.is_staff:
             return True
-        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        return user.groups.filter(name=get_course_groupname_for_role(location, role)).exists()
 
     return False
 

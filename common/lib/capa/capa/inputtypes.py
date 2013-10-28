@@ -309,13 +309,13 @@ class OptionInput(InputTypeBase):
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
         # parse the set of possible options
-        lexer = shlex.shlex(options[1:-1])
+        lexer = shlex.shlex(options[1:-1].encode('utf8'))
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1] for x in list(lexer)]
+        tokens = [x[1:-1].decode('utf8') for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]

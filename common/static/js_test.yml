@@ -69,6 +69,6 @@ spec_paths:
 # You can access these within JavaScript code
 # at the URL: document.location.href + "/include/"
 # plus the path to the file (relative to this YAML file)
-#fixture_paths:
-#    - path/to/fixture
+fixture_paths:
+    - js/fixtures
 

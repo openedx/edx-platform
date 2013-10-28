@@ -461,6 +461,7 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = ()
 
 # We want i18n to be turned off in production, at least until we have full localizations.
 # Thus we want the Django translation engine to be disabled. Otherwise even without
@@ -717,6 +718,7 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
             'js/src/utility.js',
+            'js/src/accessibility_tools.js',
         ],
         'output_filename': 'js/lms-application.js',
 

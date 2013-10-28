@@ -66,7 +66,7 @@ header.global {
           margin-right: 0px;
         }
 
-        &:hover {
+        &:hover, &:focus {
           color: $base-font-color;
         }
       }
@@ -98,7 +98,7 @@ header.global {
           margin-right: 0px;
         }
 
-        &:hover, &.active {
+        &:hover, &:focus, &.active {
           background: $button-bg-hover-color;
         }
       }
@@ -156,7 +156,7 @@ header.global {
           width: 26px;
         }
 
-        &:hover {
+        &:hover, &:focus {
           .avatar {
             opacity: 0.8;
           }
@@ -224,7 +224,7 @@ header.global {
             white-space: nowrap;
             width: 100%;
 
-            &:hover {
+            &:hover, &:focus {
               color: $base-font-color;
               text-decoration: none;
             }
@@ -256,7 +256,7 @@ header.global {
         color: $lighter-base-font-color;
         font-weight: 600;
 
-        &:hover, &:active {
+        &:hover, &:focus, &:active {
           text-decoration: none;
           color: $link-color;
         }

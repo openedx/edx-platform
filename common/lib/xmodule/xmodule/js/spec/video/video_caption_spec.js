@@ -522,7 +522,8 @@
             });
         });
 
-        describe('scrollCaption', function () {
+        // Disabled 10/23/13 due to flakiness in master
+        xdescribe('scrollCaption', function () {
             beforeEach(function () {
                 initialize();
             });

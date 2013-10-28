@@ -1,16 +1,27 @@
 import re
 
 # Prefix for the branch portion of a locator URL
-BRANCH_PREFIX = "/branch/"
+BRANCH_PREFIX = r"branch/"
 # Prefix for the block portion of a locator URL
-BLOCK_PREFIX = "/block/"
+BLOCK_PREFIX = r"block/"
 # Prefix for the version portion of a locator URL, when it is preceded by a course ID
-VERSION_PREFIX = "/version/"
-# Prefix for version when it begins the URL (no course ID).
-URL_VERSION_PREFIX = 'version/'
+VERSION_PREFIX = r"version/"
 
-URL_RE = re.compile(r'^(edx://)?(.+)$', re.IGNORECASE)
 ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.]'
+
+URL_RE_SOURCE = r"""
+    (?P<tag>edx://)?
+    ((?P<course_id>{ALLOWED_ID_CHARS}+)/?)?
+    ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
+    ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
+    ({BLOCK_PREFIX}(?P<block>{ALLOWED_ID_CHARS}+))?
+    """.format(
+        ALLOWED_ID_CHARS=ALLOWED_ID_CHARS, BRANCH_PREFIX=BRANCH_PREFIX,
+        VERSION_PREFIX=VERSION_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX
+    )
+
+URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE)
+
 
 def parse_url(string, tag_optional=False):
     """
@@ -21,9 +32,9 @@ def parse_url(string, tag_optional=False):
     Examples:
         'edx://version/0123FFFF'
         'edx://mit.eecs.6002x'
-        'edx://mit.eecs.6002x;published'
-        'edx://mit.eecs.6002x;published/block/HW3'
-        'edx://mit.eecs.6002x;published/version/000eee12345/block/HW3'
+        'edx://mit.eecs.6002x/branch/published'
+        'edx://mit.eecs.6002x/branch/published/block/HW3'
+        'edx://mit.eecs.6002x/branch/published/version/000eee12345/block/HW3'
 
     This returns None if string cannot be parsed.
 
@@ -37,12 +48,10 @@ def parse_url(string, tag_optional=False):
     match = URL_RE.match(string)
     if not match:
         return None
-    if match.group(1) is None and not tag_optional:
+    matched_dict = match.groupdict()
+    if matched_dict['tag'] is None and not tag_optional:
         return None
-    path = match.group(2)
-    if path.startswith(URL_VERSION_PREFIX):
-        return parse_guid(path[len(URL_VERSION_PREFIX):])
-    return parse_course_id(path)
+    return matched_dict
 
 
 BLOCK_RE = re.compile(r'^' + ALLOWED_ID_CHARS + r'+$', re.IGNORECASE)
@@ -58,34 +67,6 @@ def parse_block_ref(string):
     if len(string) > 0 and BLOCK_RE.match(string):
         return {'block': string}
     return None
-
-
-GUID_RE = re.compile(
-    r'^(?P<version_guid>[A-F0-9]+)(' + BLOCK_PREFIX + '(?P<block>' + ALLOWED_ID_CHARS + r'+))?$',
-    re.IGNORECASE
-)
-
-
-def parse_guid(string):
-    """
-    A version_guid is a string of hex digits (0-F).
-
-    If string is a version_guid, returns a dict with key 'version_guid' and the value,
-    otherwise returns None.
-    """
-    m = GUID_RE.match(string)
-    if m is not None:
-        return m.groupdict()
-    else:
-        return None
-
-
-COURSE_ID_RE = re.compile(
-    r'^(?P<id>' + ALLOWED_ID_CHARS + r'+)(' +
-    BRANCH_PREFIX + r'(?P<branch>' + ALLOWED_ID_CHARS + r'+))?(' +
-    VERSION_PREFIX + r'(?P<version_guid>[A-F0-9]+))?(' +
-    BLOCK_PREFIX + r'(?P<block>' + ALLOWED_ID_CHARS + r'+))?$', re.IGNORECASE
-)
 
 
 def parse_course_id(string):
@@ -122,7 +103,7 @@ def parse_course_id(string):
     Block is optional: if missing returned_dict['block'] is None.
     Else returns None.
     """
-    match = COURSE_ID_RE.match(string)
+    match = URL_RE.match(string)
     if not match:
         return None
     return match.groupdict()

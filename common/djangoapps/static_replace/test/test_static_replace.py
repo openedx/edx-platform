@@ -90,6 +90,20 @@ def test_raw_static_check():
     assert_equals(path, replace_static_urls(path, text))
 
 
+@patch('static_replace.staticfiles_storage')
+@patch('static_replace.modulestore')
+def test_static_url_with_query(mock_modulestore, mock_storage):
+    """
+    Make sure urls with query have the parameter section unaltered
+    """
+    mock_storage.exists.return_value = False
+    mock_modulestore.return_value = Mock(MongoModuleStore)
+
+    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
+    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
+    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_ID))
+
+
 def test_regex():
     yes = ('"/static/foo.png"',
            '"/static/foo.png"',

@@ -18,29 +18,25 @@
 <script type="text/javascript">
 require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
          "js/views/assets", "js/views/feedback_prompt",
-         "js/views/feedback_notification", "jquery.fileupload"],
-        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView) {
+         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
+        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
 
     var assets = new AssetCollection(${asset_list});
-    assets.url = "${update_asset_callback_url}";
+    assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset_table_body')});
-    var $modal = $(".upload-modal");
-    var $modalCover = $(".modal-cover");
-
 
     var hideModal = function (e) {
         if (e) {
             e.preventDefault();
         }
         $('.file-input').unbind('change.startUpload');
-        $modal.hide();
-        $modalCover.hide();
-    }
+        ModalUtils.hideModal();
+    };
 
     var showUploadModal = function (e) {
         e.preventDefault();
         resetUploadModal();
-        $modal.show();
+        ModalUtils.showModal();
         $('.file-input').bind('change', startUpload);
         $('.upload-modal .file-chooser').fileupload({
             dataType: 'json',
@@ -63,8 +59,6 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
             }
 
         });
-
-        $modalCover.show();
     };
 
     var showFileSelectionMenu = function(e) {
@@ -198,7 +192,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
             <label>URL:</label>
             <input type="text" class="embeddable-xml-input" value='' readonly>
         </div>
-        <form class="file-chooser" action="${upload_asset_callback_url}"
+        <form class="file-chooser" action="${asset_callback_url}"
               method="post" enctype="multipart/form-data">
             <a href="#" class="choose-file-button">${_("Choose File")}</a>
             <input type="file" class="file-input" name="file" multiple>

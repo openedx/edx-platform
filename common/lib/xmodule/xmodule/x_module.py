@@ -13,6 +13,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
+from xmodule.fields import RelativeTime
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.errortracker import exc_info_to_str
@@ -708,6 +709,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
+            elif isinstance(field, RelativeTime):
+                editor_type = "RelativeTime"
             metadata_fields[field.name]['type'] = editor_type
             metadata_fields[field.name]['options'] = [] if values is None else values
 
@@ -748,6 +751,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     handle_ajax = module_attr('handle_ajax')
     max_score = module_attr('max_score')
     student_view = module_attr('student_view')
+    get_child_descriptors = module_attr('get_child_descriptors')
 
     # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
     def studio_view(self, _context):

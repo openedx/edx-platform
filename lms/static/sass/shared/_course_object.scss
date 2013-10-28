@@ -232,7 +232,7 @@
             margin-right: 10px;
             padding-right: 10px;
 
-            &:hover {
+            &:hover, &:focus {
               color: $link-color;
             }
           }
@@ -244,7 +244,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         background: $course-profile-bg;
         border-color: $border-color-1;
         box-shadow: 0 1px 16px 0 rgba($shadow-color, 0.4);

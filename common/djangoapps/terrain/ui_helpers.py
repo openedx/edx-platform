@@ -21,23 +21,23 @@ from nose.tools import assert_true  # pylint: disable=E0611
 REQUIREJS_WAIT = {
     # Settings - Schedule & Details
     re.compile('^Schedule & Details Settings \|'): [
-        "jquery", "js/models/course",
+        "jquery", "js/base", "js/models/course",
         "js/models/settings/course_details", "js/views/settings/main"],
 
     # Settings - Advanced Settings
     re.compile('^Advanced Settings \|'): [
-        "jquery", "js/models/course", "js/models/settings/advanced",
+        "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
     # Individual Unit (editing)
     re.compile('^Individual Unit \|'): [
-        "coffee/src/models/module", "coffee/src/views/unit",
+        "js/base", "coffee/src/models/module", "coffee/src/views/unit",
         "coffee/src/views/module_edit"],
 
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile('^Course Outline \|'): [
-        "js/models/course", "js/models/location", "js/models/section",
+        "js/base", "js/models/course", "js/models/location", "js/models/section",
         "js/views/overview", "js/views/section_edit"],
 
     # Dashboard
@@ -465,6 +465,11 @@ def css_fill(css_selector, text, index=0):
 def click_link(partial_text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click())
     wait_for_js_to_load()
+
+
+@world.absorb
+def click_link_by_text(text, index=0):
+    retry_on_exception(lambda: world.browser.find_link_by_text(text)[index].click())
 
 
 @world.absorb

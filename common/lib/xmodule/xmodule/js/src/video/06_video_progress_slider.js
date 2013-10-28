@@ -28,21 +28,29 @@ function () {
 
     // function _makeFunctionsPublic(state)
     //
-    //     Functions which will be accessible via 'state' object. When called, these functions will
-    //     get the 'state' object as a context.
+    //     Functions which will be accessible via 'state' object. When called,
+    //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
         state.videoProgressSlider.onStop         = _.bind(onStop, state);
-        state.videoProgressSlider.updatePlayTime = _.bind(updatePlayTime, state);
+        state.videoProgressSlider.updatePlayTime = _.bind(
+            updatePlayTime, state
+        );
+
         //Added for tests -- JM
         state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
+
+        state.videoProgressSlider.updateStartEndTimeRegion = _.bind(
+            updateStartEndTimeRegion, state
+        );
     }
 
     // function _renderElements(state)
     //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+    //     Create any necessary DOM elements, attach them, and set their
+    //     initial configuration. Also make the created DOM elements available
+    //     via the 'state' object. Much easier to work this way - you don't
+    // have to do repeated jQuery element selects.
     function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;
@@ -53,8 +61,9 @@ function () {
     }
 
     function _buildHandle(state) {
-        state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
-        
+        state.videoProgressSlider.handle = state.videoProgressSlider.el
+            .find('.ui-slider-handle');
+
         // ARIA
         // We just want the knob to be selectable with keyboard
         state.videoProgressSlider.el.attr('tabindex', -1);
@@ -64,28 +73,84 @@ function () {
             'role': 'slider',
             'title': 'video position',
             'aria-disabled': false,
-            'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
+            'aria-valuetext': getTimeDescription(state.videoProgressSlider
+                .slider.slider('option', 'value'))
         });
     }
 
     // ***************************************************************
     // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // These are available via the 'state' object. Their context ('this'
+    // keyword) is the 'state' object. The magic private function that makes
+    // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
     function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
-            range: 'min',
-            slide: state.videoProgressSlider.onSlide,
-            stop: state.videoProgressSlider.onStop
-        });
+        state.videoProgressSlider.slider = state.videoProgressSlider.el
+            .slider({
+                range: 'min',
+                slide: state.videoProgressSlider.onSlide,
+                stop: state.videoProgressSlider.onStop
+            });
+
+        state.videoProgressSlider.sliderProgress = state.videoProgressSlider
+            .slider
+            .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
+    }
+
+    function updateStartEndTimeRegion(params) {
+        var left, width, start, end;
+
+        // We must have a duration in order to determine the area of range.
+        // It also must be non-zero.
+        if (!params.duration) {
+            return;
+        }
+
+        // If the range spans the entire length of video, we don't do anything.
+        if (!this.config.start && !this.config.end) {
+            return;
+        }
+
+        start = this.config.start;
+
+        // If end is set to null, then we set it to the end of the video. We
+        // know that start is not a the beginning, therefore we must build a
+        // range.
+        end = this.config.end || params.duration;
+
+        left = (100 * (start / params.duration)).toFixed(1);
+        width = (100 * ((end - start) / params.duration)).toFixed(1);
+
+        if (!this.videoProgressSlider.sliderRange) {
+            this.videoProgressSlider.sliderRange = $('<div />', {
+                class: 'ui-slider-range ' +
+                       'ui-widget-header ' +
+                       'ui-corner-all ' +
+                       'slider-range'
+            }).css({
+                left: left + '%',
+                width: width + '%'
+            });
+
+            this.videoProgressSlider.sliderProgress
+                .after(this.videoProgressSlider.sliderRange);
+        } else {
+            this.videoProgressSlider.sliderRange
+                .css({
+                    left: left + '%',
+                    width: width + '%'
+                });
+        }
     }
 
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
 
-        this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+        this.trigger(
+            'videoPlayer.onSlideSeek',
+            {'type': 'onSlideSeek', 'time': ui.value}
+        );
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -98,7 +163,10 @@ function () {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+        this.trigger(
+            'videoPlayer.onSlideSeek',
+            {'type': 'onSlideSeek', 'time': ui.value}
+        );
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -110,23 +178,27 @@ function () {
         }, 200);
     }
 
-    //Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera noticed
+    // Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera
+    // noticed
     function updatePlayTime(params) {
-        if ((this.videoProgressSlider.slider) && (!this.videoProgressSlider.frozen)) {
-            /*this.videoProgressSlider.slider
+        if (
+            (this.videoProgressSlider.slider) &&
+            (!this.videoProgressSlider.frozen)
+        ) {
+            this.videoProgressSlider.slider
                 .slider('option', 'max', params.duration)
-                .slider('value', params.time);*/
-            this.videoProgressSlider.slider.slider('option', 'max', params.duration);
-            this.videoProgressSlider.slider.slider('option', 'value', params.time);
+                .slider('option', 'value', params.time);
         }
     }
 
-    // Returns a string describing the current time of video in hh:mm:ss format.
+    // Returns a string describing the current time of video in hh:mm:ss
+    // format.
     function getTimeDescription(time) {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
             hrStr, minStr, secStr;
+
         seconds = seconds % 60;
         minutes = minutes % 60;
 
@@ -136,30 +208,36 @@ function () {
 
         if (hours) {
             hrStr += (hours < 2 ? ' hour ' : ' hours ');
-            if (minutes) {  
+
+            if (minutes) {
                 minStr += (minutes < 2 ? ' minute ' : ' minutes ');
             } else {
                 minStr += ' 0 minutes ';
             }
-            if (seconds) {   
-                secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            } else {
-                secStr += ' 0 seconds ';
-            }    
-            return hrStr + minStr + secStr;
-        } else if (minutes) {
-            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-            if (seconds) {   
+
+            if (seconds) {
                 secStr += (seconds < 2 ? ' second ' : ' seconds ');
             } else {
                 secStr += ' 0 seconds ';
             }
+
+            return hrStr + minStr + secStr;
+        } else if (minutes) {
+            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+
+            if (seconds) {
+                secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            } else {
+                secStr += ' 0 seconds ';
+            }
+
             return minStr + secStr;
         } else if (seconds) {
             secStr += (seconds < 2 ? ' second ' : ' seconds ');
+
             return secStr;
         }
-        
+
         return '0 seconds';
     }
 

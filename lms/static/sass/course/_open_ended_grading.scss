@@ -44,7 +44,8 @@
             padding: 5px 0px;
             font-size: 1.1em;
         }
-        .notification-link:hover
+        .notification-link:hover,
+        .notification-link:focus
         {
             background-color: #eee;
         }

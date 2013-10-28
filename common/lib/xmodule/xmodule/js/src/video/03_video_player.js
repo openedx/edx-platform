@@ -34,9 +34,7 @@ function (HTML5Video, Resizer) {
         state.videoPlayer.onPause       = _.bind(onPause, state);
         state.videoPlayer.onPlay        = _.bind(onPlay, state);
 
-        state.videoPlayer.onUnstarted = _.bind(
-            onUnstarted, state
-        );
+        state.videoPlayer.onUnstarted   = _.bind(onUnstarted, state);
 
         state.videoPlayer.handlePlaybackQualityChange = _.bind(
             handlePlaybackQualityChange, state
@@ -86,13 +84,8 @@ function (HTML5Video, Resizer) {
             state.videoPlayer.playerVars.html5 = 1;
         }
 
-        if (state.config.start) {
-            state.videoPlayer.playerVars.start = state.config.start;
-            state.videoPlayer.playerVars.wmode = 'window';
-        }
-        if (state.config.end) {
-          state.videoPlayer.playerVars.end = state.config.end;
-        }
+        state.videoPlayer.playerVars.start = state.config.start;
+        state.videoPlayer.playerVars.end = state.config.end;
 
         // There is a bug which prevents YouTube API to correctly set the speed
         // to 1.0 from another speed in Firefox when in HTML5 mode. There is a
@@ -474,6 +467,13 @@ function (HTML5Video, Resizer) {
             'videoProgressSlider.updatePlayTime',
             {
                 time: time,
+                duration: duration
+            }
+        );
+
+        this.trigger(
+            'videoProgressSlider.updateStartEndTimeRegion',
+            {
                 duration: duration
             }
         );

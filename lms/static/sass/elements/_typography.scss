@@ -271,7 +271,7 @@
 %copy-link {
   border-bottom: 1px dotted transparent;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     border-color: $link-color-d1;
   }
 }

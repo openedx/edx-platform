@@ -1,26 +1,36 @@
+"""Views for items (modules)."""
+
 import logging
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from util.json_request import expect_json, JsonResponse
+
+from ..transcripts_utils import manage_video_subtitles_save
+
 from ..utils import get_modulestore
+
 from .access import has_access
 from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
+from django.views.decorators.http import require_http_methods
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from student.models import CourseEnrollment
 
-__all__ = ['save_item', 'create_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
+
+log = logging.getLogger(__name__)
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
-log = logging.getLogger(__name__)
 
 @login_required
 @expect_json
@@ -52,8 +62,13 @@ def save_item(request):
             inspect.currentframe().f_back.f_code.co_name,
             inspect.currentframe().f_back.f_code.co_filename
         )
-        return HttpResponseBadRequest()
+        return JsonResponse({"error": "Request missing required attribute 'id'."}, 400)
 
+    try:
+        old_item = modulestore().get_item(item_location)
+    except (ItemNotFoundError, InvalidLocationError):
+        log.error("Can't find item by location.")
+        return JsonResponse({"error": "Can't find item by location"}, 404)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -101,12 +116,16 @@ def save_item(request):
         # commit to datastore
         store.update_metadata(item_location, own_metadata(existing_item))
 
+        if existing_item.category == 'video':
+            manage_video_subtitles_save(old_item, existing_item)
+
     return JsonResponse()
 
 
 @login_required
 @expect_json
 def create_item(request):
+    """View for create items."""
     parent_location = Location(request.POST['parent_location'])
     category = request.POST['category']
 
@@ -149,6 +168,7 @@ def create_item(request):
 @login_required
 @expect_json
 def delete_item(request):
+    """View for removing items."""
     item_location = request.POST['id']
     item_location = Location(item_location)
 
@@ -183,3 +203,34 @@ def delete_item(request):
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return JsonResponse()
+
+# pylint: disable=W0613
+@login_required
+@require_http_methods(("GET", "DELETE"))
+def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+    """
+    View for handling orphan related requests. GET gets all of the current orphans.
+    DELETE removes all orphans (requires is_staff access)
+
+    An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
+    from the root via children
+
+    :param request:
+    :param course_id: Locator syntax course_id
+    """
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    # DHM: when split becomes back-end, move or conditionalize this conversion
+    old_location = loc_mapper().translate_locator_to_location(location)
+    if request.method == 'GET':
+        if has_access(request.user, old_location):
+            return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
+        else:
+            raise PermissionDenied()
+    if request.method == 'DELETE':
+        if request.user.is_staff:
+            items = modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft')
+            for item in items:
+                modulestore('draft').delete_item(item, True)
+            return JsonResponse({'deleted': items})
+        else:
+            raise PermissionDenied()
