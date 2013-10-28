@@ -586,9 +586,7 @@ section.wiki {
   }
 
   #cheatsheetModal {
-    width: 950px;
-    margin-left: -450px;
-    margin-top: -100px;
+    width: 972px;
 
     .left-column {
       margin-right: 10px;
@@ -598,23 +596,6 @@ section.wiki {
     .right-column {
       float: left;
       width: 450px;
-    }
-
-    .close-btn {
-      display: block;
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 30px;
-      height: 30px;
-      border-radius: 30px;
-      border: 1px solid #ccc;
-      @include linear-gradient(top, #eee, #d2d2d2);
-      font-size: 22px;
-      line-height: 28px;
-      color: #333;
-      text-align: center;
-      box-shadow: 0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, .2);
     }
   }
 
