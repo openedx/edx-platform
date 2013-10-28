@@ -1,11 +1,20 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  import waffle
 %>
 
 <%namespace name='static' file='../static_content.html'/>
+
+%if verification_status == 'approved':
+
+%endif
+
+<%doc>
+This is for 'pending' statuses, where we are waiting for a response
+</%doc>
+%if verification_status in ('must_retry', 'submitted'):
+
+%endif
 
 %if verification_status == 'denied':
 <li class="status status-verification is-denied">
