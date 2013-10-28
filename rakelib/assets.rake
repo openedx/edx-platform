@@ -31,9 +31,9 @@ def coffee_cmd(watch=false, debug=false)
         end
     end
     if watch
-        "node_modules/.bin/coffee --compile --watch . "
+        "node_modules/.bin/coffee --compile --watch lms/ cms/ common/"
     else
-        "node_modules/.bin/coffee --compile `find . -name *.coffee` "
+        "node_modules/.bin/coffee --compile `find lms/ cms/ common/ -type f -name *.coffee` "
     end
 end
 
