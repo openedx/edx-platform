@@ -588,9 +588,6 @@ class LoncapaProblem(object):
 
         html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
 
-        # import ipdb
-        # ipdb.set_trace()
-
         return html
 
     # def get_htmlBAD(self):
@@ -870,10 +867,7 @@ class LoncapaProblem(object):
                 self._extract_html, response_msg=overall_msg
             )
 
-        # import ipdb
-        # ipdb.set_trace()
-
-        # let each custom renderer render itself:
+        # let each custom renderer render itself (this includes 'solution' and 'math' tags)
         if problemtree.tag in customrender.registry.registered_tags():
             renderer_class = customrender.registry.get_class_for_tag(problemtree.tag)
             renderer = renderer_class(self.system, problemtree)
