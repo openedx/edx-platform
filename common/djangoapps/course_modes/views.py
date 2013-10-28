@@ -34,7 +34,7 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
-        
+
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
 
@@ -43,7 +43,7 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         # registered users who are not trying to upgrade do not need to re-register
-        if enrollment_mode != None and upgrade == False:
+        if enrollment_mode is not None and upgrade is False:
             return redirect(reverse('dashboard'))
 
         modes = CourseMode.modes_for_course_dict(course_id)
@@ -132,6 +132,7 @@ class ChooseModeView(View):
         """
         choices = {
             "Select Audit": "audit",
-            "Select Certificate": "verified"
+            "Select Certificate": "verified",
+            "Upgrade Your Registration": "verified"
         }
         return choices.get(user_choice)
