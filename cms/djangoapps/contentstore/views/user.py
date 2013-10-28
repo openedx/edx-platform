@@ -12,7 +12,6 @@ from mitxmako.shortcuts import render_to_response
 from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore import Location
 from xmodule.error_module import ErrorDescriptor
 from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
@@ -25,6 +24,11 @@ from course_creators.views import (
 from .access import has_access
 
 from student.models import CourseEnrollment
+from xmodule.modulestore.locator import BlockUsageLocator
+from django.http import HttpResponseNotFound
+
+
+__all__ = ['index', 'request_course_creator', 'course_team_handler']
 
 
 @login_required
@@ -47,12 +51,13 @@ def index(request):
 
     def format_course_for_view(course):
         # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
-        course_url = loc_mapper().translate_location(
+        course_loc = loc_mapper().translate_location(
             course.location.course_id, course.location, published=False, add_entry_if_missing=True
         )
         return (
             course.display_name,
-            reverse("contentstore.views.course_handler", kwargs={'course_url': course_url}),
+            # note, couldn't get django reverse to work; so, wrote workaround
+            course_loc.url_reverse('course/', ''),
             get_lms_link_for_item(
                 course.location
             ),
@@ -64,7 +69,7 @@ def index(request):
     return render_to_response('index.html', {
         'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
-        'request_course_creator_url': reverse('request_course_creator'),
+        'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
         'csrf': csrf(request)['csrf_token']
     })
@@ -82,16 +87,42 @@ def request_course_creator(request):
 
 @login_required
 @ensure_csrf_cookie
-def manage_users(request, org, course, name):
-    '''
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
+def course_team_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, email=None):
+    """
+    The restful handler for course team users.
+
+    GET
+        html: return html page for managing course team
+        json: return json representation of a particular course team member (email is required).
+    POST or PUT
+        json: modify the permissions for a particular course team member (email is required, as well as role in the payload).
+    DELETE:
+        json: remove a particular course team member from the course team (email is required).
+    """
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        return _course_team_user(request, location, email)
+    elif request.method == 'GET':  # assume html
+        return _manage_users(request, location)
+    else:
+        return HttpResponseNotFound()
+
+
+def _manage_users(request, location):
+    """
     This view will return all CMS users who are editors for the specified course
-    '''
-    location = Location('i4x', org, course, 'course', name)
+    """
+    old_location = loc_mapper().translate_locator_to_location(location)
+
     # check that logged in user has permissions to this item
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
         raise PermissionDenied()
 
-    course_module = modulestore().get_item(location)
+    course_module = modulestore().get_item(old_location)
 
     staff_groupname = get_course_groupname_for_role(location, "staff")
     staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
@@ -106,11 +137,8 @@ def manage_users(request, org, course, name):
     })
 
 
-@login_required
-@ensure_csrf_cookie
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def course_team_user(request, org, course, name, email):
-    location = Location('i4x', org, course, 'course', name)
+def _course_team_user(request, location, email):
+    old_location = loc_mapper().translate_locator_to_location(location)
     # check that logged in user has permissions to this item
     if has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         # instructors have full permissions
@@ -145,7 +173,7 @@ def course_team_user(request, org, course, name, email):
         # what's the highest role that this user has?
         groupnames = set(g.name for g in user.groups.all())
         for role in roles:
-            role_groupname = get_course_groupname_for_role(location, role)
+            role_groupname = get_course_groupname_for_role(old_location, role)
             if role_groupname in groupnames:
                 msg["role"] = role
                 break
@@ -161,7 +189,7 @@ def course_team_user(request, org, course, name, email):
     # make sure that the role groups exist
     groups = {}
     for role in roles:
-        groupname = get_course_groupname_for_role(location, role)
+        groupname = get_course_groupname_for_role(old_location, role)
         group, __ = Group.objects.get_or_create(name=groupname)
         groups[role] = group
 
@@ -207,7 +235,7 @@ def course_team_user(request, org, course, name, email):
         user.groups.add(groups["instructor"])
         user.save()
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, location.course_id)
+        CourseEnrollment.enroll(user, old_location.course_id)
     elif role == "staff":
         # if we're trying to downgrade a user from "instructor" to "staff",
         # make sure we have at least one other instructor in the course team.
@@ -222,7 +250,7 @@ def course_team_user(request, org, course, name, email):
         user.groups.add(groups["staff"])
         user.save()
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, location.course_id)
+        CourseEnrollment.enroll(user, old_location.course_id)
 
     return JsonResponse()
 

@@ -61,7 +61,7 @@ class TestCourseIndex(CourseTestCase):
         Test the error conditions for the access
         """
         locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        outline_url = reverse('contentstore.views.course_handler', kwargs={'course_url': unicode(locator)})
+        outline_url = locator.url_reverse('course/', '')
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.createNonStaffAuthedUserClient()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')
@@ -73,12 +73,9 @@ class TestCourseIndex(CourseTestCase):
         """
         course_staff_client, course_staff = self.createNonStaffAuthedUserClient()
         for course in [self.course, self.odd_course]:
-            permission_url = reverse("course_team_user", kwargs={
-                "org": course.location.org,
-                "course": course.location.course,
-                "name": course.location.name,
-                "email": course_staff.email,
-            })
+            new_location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
+            permission_url = new_location.url_reverse("course_team/", course_staff.email)
+
             self.client.post(
                 permission_url,
                 data=json.dumps({"role": "staff"}),

@@ -11,7 +11,9 @@ from path import path
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -19,15 +21,29 @@ from xmodule.modulestore.xml_importer import import_from_xml
 
 DATA_DIR = 'common/test/data/'
 
+TEST_COURSE_ID = 'edX/simple/2012_Fall'
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class CommandTestCase(ModuleStoreTestCase):
-    """Parent class with helpers for testing management commands"""
+
+class CommandsTestBase(object):
+    """
+    Base class for testing different django commands.
+
+    Must be subclassed using override_settings set to the modulestore
+    to be tested.
+
+    """
+
+    def setUp(self):
+        self.loaded_courses = self.load_courses()
 
     def load_courses(self):
         """Load test courses and return list of ids"""
         store = modulestore()
-        import_from_xml(store, DATA_DIR, ['toy', 'simple'])
+
+        courses = store.get_courses()
+        if TEST_COURSE_ID not in [c.id for c in courses]:
+            import_from_xml(store, DATA_DIR, ['toy', 'simple'])
+
         return [course.id for course in store.get_courses()]
 
     def call_command(self, name, *args, **kwargs):
@@ -37,13 +53,6 @@ class CommandTestCase(ModuleStoreTestCase):
         out.seek(0)
         return out.read()
 
-
-class CommandsTestCase(CommandTestCase):
-    """Test case for management commands"""
-
-    def setUp(self):
-        self.loaded_courses = self.load_courses()
-
     def test_dump_course_ids(self):
         kwargs = {'modulestore': 'default'}
         output = self.call_command('dump_course_ids', **kwargs)
@@ -51,11 +60,7 @@ class CommandsTestCase(CommandTestCase):
         self.assertEqual(self.loaded_courses, dumped_courses)
 
     def test_dump_course_structure(self):
-        dumped_courses = self.call_command('dump_course_ids').split('\n')
-        self.assertEqual(self.loaded_courses, dumped_courses)
-
-    def test_dump_course_structure(self):
-        args = ['edX/simple/2012_Fall']
+        args = [TEST_COURSE_ID]
         kwargs = {'modulestore': 'default'}
         output = self.call_command('dump_course_structure', *args, **kwargs)
 
@@ -91,10 +96,15 @@ class CommandsTestCase(CommandTestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_export_course_stdout(self):
+        output = self.run_export_course('-')
+        with tarfile.open(fileobj=StringIO(output)) as tar_file:
+            self.check_export_file(tar_file)
+
     def run_export_course(self, filename):  # pylint: disable=missing-docstring
         args = ['edX/simple/2012_Fall', filename]
         kwargs = {'modulestore': 'default'}
-        self.call_command('export_course', *args, **kwargs)
+        return self.call_command('export_course', *args, **kwargs)
 
     def check_export_file(self, tar_file):  # pylint: disable=missing-docstring
         names = tar_file.getnames()
@@ -110,3 +120,27 @@ class CommandsTestCase(CommandTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class CommandsXMLTestCase(CommandsTestBase, ModuleStoreTestCase):
+    """
+    Test case for management commands using the xml modulestore.
+
+    """
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class CommandsMongoTestCase(CommandsTestBase, ModuleStoreTestCase):
+    """
+    Test case for management commands using the mongo modulestore.
+
+    """
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CommandsMixedTestCase(CommandsTestBase, ModuleStoreTestCase):
+    """
+    Test case for management commands. Using the mixed modulestore.
+
+    """

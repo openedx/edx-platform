@@ -25,6 +25,9 @@ def mock_render_to_string(template_name, context):
 
 def mock_render_to_response(template_name, context):
     """Return an HttpResponse with content that encodes template_name and context"""
+    # View confirm_email_change uses @transaction.commit_manually.
+    # This simulates any db access in the templates.
+    UserProfile.objects.exists()
     return HttpResponse(mock_render_to_string(template_name, context))
 
 

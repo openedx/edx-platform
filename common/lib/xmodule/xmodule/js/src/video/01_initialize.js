@@ -75,6 +75,8 @@ function (VideoPlayer) {
         state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
         state.parseVideoSources   = _.bind(parseVideoSources, state);
         state.getVideoMetadata    = _.bind(getVideoMetadata, state);
+
+        state.checkStartEndTimes  = _.bind(checkStartEndTimes, state);
     }
 
     // function _renderElements(state)
@@ -277,6 +279,10 @@ function (VideoPlayer) {
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
+        // Make sure that start end end times are valid. If not, they will be
+        // set to `null` and will not be used later on.
+        this.checkStartEndTimes();
+
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
         tempYtTestTimeout = parseInt(data['ytTestTimeout'], 10);
@@ -357,6 +363,30 @@ function (VideoPlayer) {
                     _setConfigurations(_this);
                     _renderElements(_this);
                 });
+        }
+    }
+
+    /*
+     * function checkStartEndTimes()
+     *
+     * Validate config.start and config.end times.
+     *
+     * We can check at this time if the times are proper integers, and if they
+     * make general sense. I.e. if start time is => 0 and <= end time.
+     *
+     * An invalid start time will be reset to 0. An invalid end time will be
+     * set to `null`. It the task for the appropriate player API to figure out
+     * if start time and/or end time are greater than the length of the video.
+     */
+    function checkStartEndTimes() {
+        this.config.start = parseInt(this.config.start, 10);
+        if ((!isFinite(this.config.start)) || (this.config.start < 0)) {
+            this.config.start = 0;
+        }
+
+        this.config.end = parseInt(this.config.end, 10);
+        if ((!isFinite(this.config.end)) || (this.config.end < this.config.start)) {
+            this.config.end = null;
         }
     }
 

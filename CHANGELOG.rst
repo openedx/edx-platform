@@ -5,6 +5,37 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Change bulk email implementation to use less memory, and to better handle
+duplicate tasks in celery.
+
+LMS: Improve forum error handling so that errors in the logs are
+clearer and HTTP status codes from the comments service indicating
+client error are correctly passed through to the client.
+
+LMS: Improve performance of page load and thread list load for 
+discussion tab
+
+LMS: The wiki markup cheatsheet dialog is now accessible to people with
+disabilites.  (LMS-1303)
+
+Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
+
+Studio: Change course overview page, checklists, assets, and course staff
+management page URLs to a RESTful interface. Also removed "\listing", which
+duplicated "\index".
+
+Blades: When start time and end time are specified for a video, a visual range
+will be shown on the time slider to highlight the place in the video that will
+be played.
+
+Studio: added restful interface for finding orphans in courses. 
+An orphan is an xblock to which no children relation points and whose type is not 
+in the set contentstore.views.item.DETACHED_CATEGORIES nor 'course'.
+    GET http://host/orphan/org.course returns json array of ids. 
+        Requires course author access.
+    DELETE http://orphan/org.course deletes all the orphans in that course. 
+        Requires is_staff access
+
 Studio: Bug fix for text loss in Course Updates when the text exists
 before the first tag.
 
@@ -53,8 +84,8 @@ editing capability for a course's list of tabs.
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
 
-Studio: add restful interface for paging assets (no UX yet, but just add /start/45/max/50 to end of url to get
-items 45-95, e.g.)
+Studio: add restful interface for paging assets (no UX yet, but just add
+/start/45/max/50 to end of url to get items 45-95, e.g.)
 
 LMS: First round of improvements to New (beta) Instructor Dash:
 improvements, fixes, and internationalization to the Student Info section.
@@ -63,6 +94,8 @@ LMS: Improved accessibility of parts of forum navigation sidebar.
 
 LMS: enhanced accessibility labeling and aria support for the discussion forum
 new post dropdown as well as response and comment area labeling.
+
+Blades: Add Studio timed transcripts editor to video player.
 
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
@@ -365,10 +398,10 @@ Studio: Improve link re-writing on imports into a different course-id
 
 Studio: course catalog and course outline pages new use course id syntax w/ restful api style
 
-Common: 
+Common:
   separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
   in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
-  
+
 Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
 
 Common: location mapper: added a bunch of new helper functions for generating old location style info from a CourseLocator

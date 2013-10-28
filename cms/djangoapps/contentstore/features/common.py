@@ -252,6 +252,7 @@ def create_course_with_unit():
     log_into_studio()
     world.css_click('a.course-link')
 
+    world.wait_for_js_to_load()
     css_selectors = [
         'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
     ]
@@ -283,24 +284,33 @@ def button_disabled(step, value):
     assert world.css_has_class(button_css, 'is-disabled')
 
 
+def _do_studio_prompt_action(intent, action):
+    """
+    Wait for a studio prompt to appear and press the specified action button
+    See cms/static/js/views/feedback_prompt.js for implementation
+    """
+    assert intent in ['warning', 'error', 'confirmation', 'announcement',
+        'step-required', 'help', 'mini']
+    assert action in ['primary', 'secondary']
+
+    world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
+
+    action_css = 'li.nav-item > a.action-{}'.format(action)
+    world.trigger_event(action_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(action_css))
+
+    world.wait_for_ajax_complete()
+    world.wait_for_present('div.wrapper-prompt.is-hiding#prompt-{}'.format(intent))
+
+
+@world.absorb
+def confirm_studio_prompt():
+    _do_studio_prompt_action('warning', 'primary')
+
+
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
-
-    def click_button(btn_css):
-        world.css_click(btn_css)
-        return world.css_find(btn_css).visible == False
-
-    prompt_css = 'div.prompt.has-actions'
-    world.wait_for_visible(prompt_css)
-
-    btn_css = 'a.button.action-primary'
-    world.wait_for_visible(btn_css)
-
-    # Sometimes you can do a click before the prompt is up.
-    # Thus we need some retry logic here.
-    world.wait_for(lambda _driver: click_button(btn_css))
-
-    assert_false(world.css_find(btn_css).visible)
+    confirm_studio_prompt()
 
 
 @step(u'I am shown a prompt$')

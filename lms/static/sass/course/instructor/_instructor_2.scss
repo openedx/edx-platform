@@ -16,7 +16,7 @@
     position: absolute;
     top: 17px;
     right: 15px;
-    font-size: 11pt;
+    @include font-size(14);
   }
 
   // system feedback - messages
@@ -254,6 +254,12 @@ section.instructor-dashboard-content-2 {
       &:last-child {
         margin-bottom: 0;
       }
+      .tip {
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint(rgb(127,127,127),50%);
+        @include font-size(12);
+      }
     }
   }
 }
@@ -344,7 +350,7 @@ section.instructor-dashboard-content-2 {
       height: 10px;
       background: url('../images/moderator-delete-icon.png') left center no-repeat;
       opacity: 0.7;
-      &:hover  { opacity: 0.8; }
+      &:hover, &:focus  { opacity: 0.8; }
       &:active { opacity: 0.9; }
 
       // @include idashbutton($danger-red);
@@ -432,7 +438,7 @@ section.instructor-dashboard-content-2 {
 
   .last-updated {
     line-height: 2.2em;
-    font-size: 10pt;
+    @include font-size(10);
   }
 
   .display-graph .graph-placeholder {
@@ -470,7 +476,7 @@ section.instructor-dashboard-content-2 {
   }
 
   .title {
-    font-size: 16pt;
+    @include font-size(16);
   }
 
   .label {
@@ -487,7 +493,7 @@ section.instructor-dashboard-content-2 {
     height: 17px;
     background: url('../images/info-icon-dark.png') left center no-repeat;
     opacity: 0.35;
-    &:hover  { opacity: 0.45; }
+    &:hover, &:focus  { opacity: 0.45; }
     &:active { opacity: 0.5; }
   }
 

@@ -15,7 +15,7 @@ from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_comment
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
-from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
 import django_comment_client.utils as utils
 import comment_client as cc
 
@@ -29,8 +29,8 @@ log = logging.getLogger("edx.discussions")
 @newrelic.agent.function_trace()
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
-    This may raise cc.utils.CommentClientError or
-    cc.utils.CommentClientUnknownError if something goes wrong.
+    This may raise an appropriate subclass of cc.utils.CommentClientError
+    if something goes wrong.
     """
     default_query_params = {
         'page': 1,
@@ -113,13 +113,9 @@ def inline_discussion(request, course_id, discussion_id):
 
     course = get_course_with_access(request.user, course_id, 'load_forum')
 
-    try:
-        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-        cc_user = cc.User.from_django_user(request.user)
-        user_info = cc_user.to_dict()
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-        log.error("Error loading inline discussion threads.")
-        raise
+    threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+    cc_user = cc.User.from_django_user(request.user)
+    user_info = cc_user.to_dict()
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
@@ -181,9 +177,6 @@ def forum_form_discussion(request, course_id):
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        log.error("Error loading forum discussion threads: %s", str(err))
-        raise
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
@@ -191,11 +184,8 @@ def forum_form_discussion(request, course_id):
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context_to_threads"):
-        for thread in threads:
-            courseware_context = get_courseware_context(thread, course)
-            if courseware_context:
-                thread.update(courseware_context)
+    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        add_courseware_context(threads, course)
 
     if request.is_ajax():
         return utils.JsonResponse({
@@ -252,23 +242,17 @@ def single_thread(request, course_id, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
-    try:
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-        log.error("Error loading single thread.")
-        raise
+    thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
 
     if request.is_ajax():
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_courseware_context"):
-            courseware_context = get_courseware_context(thread, course)
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
         # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
-        if courseware_context:
-            content.update(courseware_context)
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context([content], course)
         return utils.JsonResponse({
             #'html': html,
             'content': content,
@@ -279,26 +263,21 @@ def single_thread(request, course_id, discussion_id, thread_id):
         with newrelic.agent.FunctionTrace(nr_transaction, "get_discussion_category_map"):
             category_map = utils.get_discussion_category_map(course)
 
-        try:
-            threads, query_params = get_threads(request, course_id)
-            threads.append(thread.to_dict())
-        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-            log.error("Error loading single thread.")
-            raise
+        threads, query_params = get_threads(request, course_id)
+        threads.append(thread.to_dict())
 
         course = get_course_with_access(request.user, course_id, 'load_forum')
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context_to_threads"):
-            for thread in threads:
-                courseware_context = get_courseware_context(thread, course)
-                if courseware_context:
-                    thread.update(courseware_context)
-                if thread.get('group_id') and not thread.get('group_name'):
-                    thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context(threads, course)
 
-                #patch for backward compatibility with comments service
-                if not "pinned" in thread:
-                    thread["pinned"] = False
+        for thread in threads:
+            if thread.get('group_id') and not thread.get('group_name'):
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+
+            #patch for backward compatibility with comments service
+            if not "pinned" in thread:
+                thread["pinned"] = False
 
         threads = [utils.safe_content(thread) for thread in threads]
 

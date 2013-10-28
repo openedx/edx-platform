@@ -1,14 +1,18 @@
-from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from django.core.urlresolvers import reverse
-from xmodule.capa_module import CapaDescriptor
+"""Tests for items views."""
+
 import json
-from xmodule.modulestore.django import modulestore
 import datetime
 from pytz import UTC
+from django.core.urlresolvers import reverse
+
+from contentstore.tests.utils import CourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.capa_module import CapaDescriptor
+from xmodule.modulestore.django import modulestore
 
 
 class DeleteItem(CourseTestCase):
+    """Tests for '/delete_item' url."""
     def setUp(self):
         """ Creates the test course with a static page in it. """
         super(DeleteItem, self).setUp()

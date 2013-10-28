@@ -126,11 +126,10 @@ Feature: LMS.Answer problems
     Scenario: I can view and hide the answer if the problem has it:
         Given I am viewing a "numerical" that shows the answer "always"
         When I press the button with the label "Show Answer(s)"
-        Then the button with the label "Hide Answer(s)" does appear
-        And the button with the label "Show Answer(s)" does not appear
+        Then the Show/Hide button label is "Hide Answer(s)"
         And I should see "4.14159" somewhere in the page
         When I press the button with the label "Hide Answer(s)"
-        Then the button with the label "Show Answer(s)" does appear
+        Then the Show/Hide button label is "Show Answer(s)"
         And I should not see "4.14159" anywhere on the page
 
     Scenario: I can see my score on a problem when I answer it and after I reset it
@@ -180,7 +179,6 @@ Feature: LMS.Answer problems
         Given I am viewing a "<ProblemType>" problem
         Then my "<ProblemType>" answer is marked "unanswered"
         When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
-	And I wait for "1" seconds
         And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
         Then my "<ProblemType>" answer is marked "unanswered"
         And I reset the problem
@@ -208,7 +206,6 @@ Feature: LMS.Answer problems
     Scenario: I can reset the correctness of a radiogroup problem after changing my answer
         Given I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
-	And I wait for "1" seconds
         Then my "<ProblemType>" answer is marked "<InitialCorrectness>"
         And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
         Then my "<ProblemType>" answer is NOT marked "<InitialCorrectness>"

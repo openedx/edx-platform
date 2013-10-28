@@ -1,5 +1,9 @@
-
-define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, MetadataModel) {
+define(
+    [
+        "backbone", "underscore", "js/models/metadata", "js/views/abstract_editor",
+        "js/views/transcripts/metadata_videolist", "jquery.maskedinput"
+    ],
+function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
 
     Metadata.Editor = Backbone.View.extend({
@@ -31,6 +35,12 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
                     }
                     else if(model.getType() === MetadataModel.LIST_TYPE) {
                         new Metadata.List(data);
+                    }
+                    else if(model.getType() === MetadataModel.VIDEO_LIST_TYPE) {
+                        new VideoList(data);
+                    }
+                    else if(model.getType() === MetadataModel.RELATIVE_TIME_TYPE) {
+                        new Metadata.RelativeTime(data);
                     }
                     else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
@@ -74,95 +84,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
         }
     });
 
-    Metadata.AbstractEditor = Backbone.View.extend({
-
-        // Model is MetadataModel
-        initialize : function() {
-            var self = this;
-            var templateName = _.result(this, 'templateName');
-            // Backbone model cid is only unique within the collection.
-            this.uniqueId = _.uniqueId(templateName + "_");
-
-            var tpl = document.getElementById(templateName).text;
-            if(!tpl) {
-                console.error("Couldn't load template: " + templateName);
-            }
-            this.template = _.template(tpl);
-            this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId}));
-            this.listenTo(this.model, 'change', this.render);
-            this.render();
-        },
-
-        /**
-         * The ID/name of the template. Subclasses must override this.
-         */
-        templateName: '',
-
-        /**
-         * Returns the value currently displayed in the editor/view. Subclasses should implement this method.
-         */
-        getValueFromEditor : function () {},
-
-        /**
-         * Sets the value currently displayed in the editor/view. Subclasses should implement this method.
-         */
-        setValueInEditor : function (value) {},
-
-        /**
-         * Sets the value in the model, using the value currently displayed in the view.
-         */
-        updateModel: function () {
-            this.model.setValue(this.getValueFromEditor());
-        },
-
-        /**
-         * Clears the value currently set in the model (reverting to the default).
-         */
-        clear: function () {
-            this.model.clear();
-        },
-
-        /**
-         * Shows the clear button, if it is not already showing.
-         */
-        showClearButton: function() {
-            if (!this.$el.hasClass('is-set')) {
-                this.$el.addClass('is-set');
-                this.getClearButton().removeClass('inactive');
-                this.getClearButton().addClass('active');
-            }
-        },
-
-        /**
-         * Returns the clear button.
-         */
-        getClearButton: function () {
-            return this.$el.find('.setting-clear');
-        },
-
-        /**
-         * Renders the editor, updating the value displayed in the view, as well as the state of
-         * the clear button.
-         */
-        render: function () {
-            if (!this.template) return;
-
-            this.setValueInEditor(this.model.getDisplayValue());
-
-            if (this.model.isExplicitlySet()) {
-                this.showClearButton();
-            }
-            else {
-                this.$el.removeClass('is-set');
-                this.getClearButton().addClass('inactive');
-                this.getClearButton().removeClass('active');
-            }
-
-            return this;
-        }
-    });
-
-    Metadata.String = Metadata.AbstractEditor.extend({
+    Metadata.String = AbstractEditor.extend({
 
         events : {
             "change input" : "updateModel",
@@ -181,7 +103,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
         }
     });
 
-    Metadata.Number = Metadata.AbstractEditor.extend({
+    Metadata.Number = AbstractEditor.extend({
 
         events : {
             "change input" : "updateModel",
@@ -191,7 +113,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
         },
 
         render: function () {
-            Metadata.AbstractEditor.prototype.render.apply(this);
+            AbstractEditor.prototype.render.apply(this);
             if (!this.initialized) {
                 var numToString = function (val) {
                     return val.toFixed(4);
@@ -279,7 +201,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
 
     });
 
-    Metadata.Option = Metadata.AbstractEditor.extend({
+    Metadata.Option = AbstractEditor.extend({
 
         events : {
             "change select" : "updateModel",
@@ -316,7 +238,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
         }
     });
 
-    Metadata.List = Metadata.AbstractEditor.extend({
+    Metadata.List = AbstractEditor.extend({
 
         events : {
             "click .setting-clear" : "clear",
@@ -355,7 +277,7 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
             // We don't call updateModel here since it's bound to the
             // change event
             var list = this.model.get('value') || [];
-            this.setValueInEditor(list.concat(['']))
+            this.setValueInEditor(list.concat(['']));
             this.$el.find('.create-setting').addClass('is-disabled');
         },
 
@@ -369,6 +291,62 @@ define(["backbone", "underscore", "js/models/metadata"], function(Backbone, _, M
 
         enableAdd: function() {
             this.$el.find('.create-setting').removeClass('is-disabled');
+        }
+    });
+
+    Metadata.RelativeTime = AbstractEditor.extend({
+
+        events : {
+            "change input" : "updateModel",
+            "keypress .setting-input" : "showClearButton"  ,
+            "click .setting-clear" : "clear"
+        },
+
+        templateName: "metadata-string-entry",
+
+        initialize: function () {
+            AbstractEditor.prototype.initialize.apply(this);
+
+            // This list of definitions is used for creating appropriate
+            // time format mask;
+            //
+            // For example, mask 'hH:mM:sS':
+            // min value: 00:00:00
+            // max value: 23:59:59
+            //
+            // With this mask user cannot set following values:
+            // 93:23:23, 23:60:60, 77:77:77, etc.
+            var definitions = {
+                h: '[0-2]',
+                H: '[0-3]',
+                m: '[0-5]',
+                s: '[0-5]',
+                M: '[0-9]',
+                S: '[0-9]'
+            };
+
+            $.each(definitions, function(key, value) {
+                $.mask.definitions[key] = value;
+            });
+
+            this.$el
+                .find('#' + this.uniqueId)
+                .mask('hH:mM:sS', { placeholder: '0' });
+        },
+
+        getValueFromEditor : function () {
+            var $input = this.$el.find('#' + this.uniqueId),
+                value = $input.val();
+
+            return value;
+        },
+
+        setValueInEditor : function (value) {
+            if (!value) {
+                value = '00:00:00';
+            }
+
+            this.$el.find('input').val(value);
         }
     });
 

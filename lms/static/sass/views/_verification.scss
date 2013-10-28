@@ -1560,7 +1560,7 @@
         @include font-size(24);
         color: $m-blue-d3;
 
-        &:hover {
+        &:hover, &:focus {
           color: $m-blue-d1;
           border: none;
         }

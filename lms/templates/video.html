@@ -44,48 +44,50 @@
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
-        <article class="video-wrapper">
-            <div class="video-player-pre"></div>
+      <a href="#transcript-captions" class="sr">Skip to clickable transcript video links.</a>
+      
+      <article class="video-wrapper">
+          <div class="video-player-pre"></div>
 
-            <section class="video-player">
-                <div id="${id}"></div>
-                <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
-            </section>
+          <section class="video-player">
+              <div id="${id}"></div>
+              <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
+          </section>
 
-            <div class="video-player-post"></div>
+          <div class="video-player-post"></div>
 
-            <section class="video-controls">
-                <div class="slider" title="Video position"></div>
+          <section class="video-controls">
+              <div class="slider" title="Video position"></div>
 
-                <div>
-                    <ul class="vcr">
-                        <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
-                        <li><div class="vidtime">0:00 / 0:00</div></li>
-                    </ul>
-                    <div class="secondary-controls">
-                        <div class="speeds">
-                            <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
-                                <h3>${_('Speed')}</h3>
-                                <p class="active"></p>
-                            </a>
-                            <ol class="video_speeds"></ol>
-                        </div>
-                        <div class="volume">
-                            <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
-                            <div class="volume-slider-container">
-                                <div class="volume-slider"></div>
-                            </div>
-                        </div>
-                        <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                        <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
+              <div>
+                  <ul class="vcr">
+                      <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
+                      <li><div class="vidtime">0:00 / 0:00</div></li>
+                  </ul>
+                  <div class="secondary-controls">
+                      <div class="speeds">
+                          <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
+                              <h3>${_('Speed')}</h3>
+                              <p class="active"></p>
+                          </a>
+                          <ol class="video_speeds"></ol>
+                      </div>
+                      <div class="volume">
+                          <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
+                          <div class="volume-slider-container">
+                              <div class="volume-slider"></div>
+                          </div>
+                      </div>
+                      <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
+                      <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
-                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
-                    </div>
-                </div>
-            </section>
-        </article>
+                      <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
+                  </div>
+              </div>
+          </section>
+      </article>
 
-        <ol class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point')}"><li></li></ol>
+      <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point')}"><li></li></ol>
     </div>
 
     <div class="focus_grabber last"></div>

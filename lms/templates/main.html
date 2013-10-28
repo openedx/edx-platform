@@ -78,6 +78,8 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
+
   <%include file="mathjax_accessible.html" />
 
 % if theme_enabled():
@@ -86,7 +88,7 @@
   <%include file="navigation.html" />
 % endif
 
-  <section class="content-wrapper">
+  <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>

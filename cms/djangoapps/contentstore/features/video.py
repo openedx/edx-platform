@@ -5,10 +5,14 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
 
-BUTTONS = {
+VIDEO_BUTTONS = {
     'CC': '.hide-subtitles',
     'volume': '.volume',
+    'Play': '.video_control.play',
 }
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 
 @step('I have created a Video component$')
@@ -43,11 +47,7 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
 @step('I have uploaded subtitles "([^"]*)"$')
 def i_have_uploaded_subtitles(_step, sub_id):
     _step.given('I go to the files and uploads page')
-
-    sub_id = sub_id.strip()
-    if not sub_id:
-        sub_id = 'OEoXaMPEzfM'
-    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id))
+    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id.strip()))
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
@@ -135,7 +135,7 @@ def set_captions_visibility_state(_step, captions_state):
 
 @step('I hover over button "([^"]*)"$')
 def hover_over_button(_step, button):
-    world.css_find(BUTTONS[button.strip()]).mouse_over()
+    world.css_find(VIDEO_BUTTONS[button.strip()]).mouse_over()
 
 
 @step('Captions (?:are|become) "([^"]*)"$')
@@ -176,4 +176,25 @@ def focus_on_caption_line(_step, index):
 def caption_line_has_class(_step, index, className):
     SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
     world.css_has_class(SELECTOR, className.strip())
+
+
+@step('I see a range on slider with styles "left" set to (.+) px and "width" set to (.+) px$')
+def see_a_range_slider_with_proper_range(_step, left, width):
+    left = int(left.strip())
+    width = int(width.strip())
+
+    world.wait_for_visible(".slider-range")
+    world.wait(4)
+    slider_range = world.browser.driver.find_element_by_css_selector(".slider-range")
+
+    assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
+    assert int(round(float(slider_range.value_of_css_property("width")[:-2]))) == width
+
+
+@step('I click video button "([^"]*)"$')
+def click_button_video(_step, button_type):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    button = button_type.strip()
+    world.css_click(VIDEO_BUTTONS[button])
 

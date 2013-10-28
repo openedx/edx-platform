@@ -6,8 +6,9 @@
 <%!
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
+  from django.core.urlresolvers import reverse
 %>
-
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
@@ -23,7 +24,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
   function(doc, $, CourseDetailsModel, MainView) {
-    // hilighting labels when fields are focused in
+    // highlighting labels when fields are focused in
     $("form :input").focus(function() {
       $("label[for='" + this.id + "']").addClass("is-focused");
     }).blur(function() {
@@ -214,7 +215,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                     </span>
 
                     <% ctx_loc = context_course.location %>
-                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href='${upload_asset_url}'>${_("files &amp; uploads")}</a></span>
 
                     % else:
                     <span class="wrapper-course-image">
@@ -280,22 +281,25 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
         <p>${_("Your course's schedule settings determine when students can enroll in and begin a course.")}</p>
 
         <p>${_("Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.")}</p>
-      </div>
+     </div>
 
-      <div class="bit">
-      % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+     <div class="bit">
+     % if context_course:
+          <%
+            ctx_loc = context_course.location
+            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+            course_team_url = location.url_reverse('course_team/', '')
+          %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
-      % endif
-      </div>
+     % endif
+     </div>
     </aside>
   </section>
 </div>

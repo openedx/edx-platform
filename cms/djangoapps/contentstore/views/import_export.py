@@ -27,7 +27,7 @@ from auth.authz import create_all_course_groups
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore import Location
 from xmodule.exceptions import SerializationError
 
@@ -240,14 +240,10 @@ def import_course(request, org, course, name):
             return JsonResponse({'Status': 'OK'})
     else:
         course_module = modulestore().get_item(location)
-
+        new_location = loc_mapper().translate_location(course_module.location.course_id, course_module.location, False, True)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': reverse('course_index', kwargs={
-                'org': location.org,
-                'course': location.course,
-                'name': location.name,
-            })
+            'successful_import_redirect_url': new_location.url_reverse("course/", "")
         })
 
 
@@ -286,6 +282,8 @@ def generate_export_course(request, org, course, name):
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
 
+    new_location = loc_mapper().translate_location(course_module.location.course_id, course_module.location, False, True)
+
     root_dir = path(mkdtemp())
 
     try:
@@ -317,11 +315,7 @@ def generate_export_course(request, org, course, name):
             'edit_unit_url': reverse('edit_unit', kwargs={
                 'location': parent.location
             }) if parent else '',
-            'course_home_url': reverse('course_index', kwargs={
-                'org': org,
-                'course': course,
-                'name': name
-            })
+            'course_home_url': new_location.url_reverse("course/", "")
         })
     except Exception, e:
         logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
@@ -331,11 +325,7 @@ def generate_export_course(request, org, course, name):
             'in_err': True,
             'unit': None,
             'raw_err_msg': str(e),
-            'course_home_url': reverse('course_index', kwargs={
-                'org': org,
-                'course': course,
-                'name': name
-            })
+            'course_home_url': new_location.url_reverse("course/", "")
         })
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))

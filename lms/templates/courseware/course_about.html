@@ -162,14 +162,14 @@
       % if get_course_about_section(course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_url(course)}" />
+          <img src="${course_image_url(course)}" alt="" />
           <div class="play-intro"></div>
         </div>
       </a>
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_url(course)}" />
+          <img src="${course_image_url(course)}" alt="" />
         </div>
       </div>
       % endif
@@ -203,19 +203,20 @@
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}">
+                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
               </a>
               <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}">
+                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % else:
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}">
+                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
               </a>
-              <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
+              <a href="http://www.facebook.com/EdxOnline" class="share">
+                <img src="${static.url('images/social/facebook-sharing.png')}" alt="Post a Facebook message to say you've registered for this course">
               </a>
               <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}">
+                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % endif
           </div>

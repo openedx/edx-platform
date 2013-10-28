@@ -88,11 +88,7 @@ def delete_file(_step, file_name):
     assert index != -1
     delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
-
-    world.wait_for_present(".wrapper-prompt.is-shown")
-    world.wait(0.2)  # wait for css animation
-    prompt_confirm_css = 'li.nav-item > a.action-primary'
-    world.css_click(prompt_confirm_css)
+    world.confirm_studio_prompt()
 
 
 @step(u'I should see only one "([^"]*)"$')

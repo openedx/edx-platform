@@ -34,6 +34,7 @@ from xblock.fields import Scope, ScopeIds
 from xmodule.modulestore import ModuleStoreBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+import re
 
 log = logging.getLogger(__name__)
 
@@ -697,7 +698,7 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = existing_tabs
             # Save any changes to the course to the MongoKeyValueStore
             course.save()
-            self.update_metadata(course.location, course.xblock_kvs._metadata)
+            self.update_metadata(course.location, course.get_explicitly_set_fields_by_scope(Scope.settings))
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -853,6 +854,24 @@ class MongoModuleStore(ModuleStoreBase):
         course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
         """
         return MONGO_MODULESTORE_TYPE
+
+    def get_orphans(self, course_location, detached_categories, _branch):
+        """
+        Return an array all of the locations for orphans in the course.
+        """
+        all_items = self.collection.find({
+            '_id.org': course_location.org,
+            '_id.course': course_location.course,
+            '_id.category': {'$nin': detached_categories}
+        })
+        all_reachable = set()
+        item_locs = set()
+        for item in all_items:
+            if item['_id']['category'] != 'course':
+                item_locs.add(Location(item['_id']).replace(revision=None).url())
+            all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
+        item_locs -= all_reachable
+        return list(item_locs)
 
     def _create_new_field_data(self, category, location, definition_data, metadata):
         """

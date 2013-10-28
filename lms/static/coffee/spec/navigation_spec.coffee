@@ -1,6 +1,6 @@
 describe 'Navigation', ->
   beforeEach ->
-    loadFixtures 'accordion.html'
+    loadFixtures 'coffee/fixtures/accordion.html'
     @navigation = new Navigation
 
   describe 'constructor', ->

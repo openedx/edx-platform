@@ -15,7 +15,7 @@ table {
 }
 
 a {
-  &:hover {
+  &:hover, &:focus {
     color: $pink;
     text-decoration: none !important;
   }

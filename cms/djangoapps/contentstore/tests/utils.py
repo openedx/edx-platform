@@ -61,10 +61,11 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
+        self.course_location = self.course.location
 
     def createNonStaffAuthedUserClient(self):
         """
-        Create a non-staff user, log them in, and return the client to use for testing.
+        Create a non-staff user, log them in, and return the client, user to use for testing.
         """
         uname = 'teststudent'
         password = 'foo'

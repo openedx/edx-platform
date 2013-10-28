@@ -20,8 +20,8 @@
 <script type="text/javascript">
 require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"],
         function(doc, $, ChecklistCollection, ChecklistView) {
-    var checklistCollection = new ChecklistCollection()
-    checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+    var checklistCollection = new ChecklistCollection();
+    checklistCollection.url = "${handler_url}";
 
     var editor = new ChecklistView({
         el: $('.course-checklists'),

@@ -212,3 +212,11 @@ def i_answer_prompts_with(step, prompt):
     In addition, this method changes the functionality of ONLY future alerts
     """
     world.browser.execute_script('window.prompt = function(){return %s;}') % prompt
+
+
+@step('I run ipdb')
+def run_ipdb(_step):
+    """Run ipdb as step for easy debugging"""
+    import ipdb
+    ipdb.set_trace()
+    assert True
