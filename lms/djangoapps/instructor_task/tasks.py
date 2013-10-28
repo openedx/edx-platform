@@ -19,6 +19,9 @@ a problem URL and optionally a student.  These are used to set up the initial va
 of the query for traversing StudentModule objects.
 
 """
+#from cStringIO import StringIO
+#from collections import OrderedDict
+
 from django.utils.translation import ugettext_noop
 from celery import task
 from functools import partial
@@ -149,3 +152,27 @@ def update_offline_grades(entry_id, xmodule_instance_args):
     update_fcn = partial(update_offline_grade, xmodule_instance_args)
     visit_fcn = partial(perform_enrolled_student_update, update_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
+
+#@task(base=BaseInstructorTask)  # pylint: disable=E1102
+#def push_grades_to_s3(entry_id, xmodule_instance_args):
+#    """
+#
+#    """
+#    action_name = 'graded'
+#    all_grades = OrderedDict()
+#
+#    def append_student_grades(_course, student):
+#        grades_for_student = somefunc(student)
+#        if grades_for_student:
+#            all_grades[student.username] = grades_for_student
+#
+#        grades_stream.write(grades_line.encode('utf-8'))
+#
+#        return True
+#
+#    visit_fcn = partial(perform_enrolled_student_update, append)
+#    result = run_main_task(entry_id, visit_fcn, action_name)
+#
+#    # Upload to s3
+#
+#    return result

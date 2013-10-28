@@ -255,7 +255,7 @@ def perform_enrolled_student_update(update_fcn, _entry_id, course_id, _task_inpu
     # enrolled_students is too large to fit comfortably in memory, and subsequent
     # course grading requests lead to memory fragmentation.  So we will err here on the
     # side of smaller memory allocations at the cost of additional lookups.
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:20000]
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:10000]
 
     # Give the option of updating an individual student. If not specified,
     # then updates all students who have enrolled in the course
@@ -302,10 +302,13 @@ def perform_enrolled_student_update(update_fcn, _entry_id, course_id, _task_inpu
                 # Logging of failures is left to the update_fcn itself.
                 num_updated += 1
 
-        # update task status:
+        # Update task status every 1K record processed.
         task_progress = get_task_progress()
         if num_attempted % 1000 == 0:
             _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+
+    # One last update
+    _get_current_task().update_state(state=PROGRESS, meta=task_progress)
 
     return task_progress
 
