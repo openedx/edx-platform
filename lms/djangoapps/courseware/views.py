@@ -27,8 +27,6 @@ from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
-from django_comment_client.utils import get_discussion_title
-
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
@@ -38,8 +36,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
-
-import comment_client
 
 log = logging.getLogger("mitx.courseware")
 
@@ -672,29 +668,6 @@ def mktg_course_about(request, course_id):
                                   'show_courseware_link': show_courseware_link,
                                   'course_modes': course_modes,
                               })
-
-
-def render_notifications(request, course, notifications):
-    context = {
-        'notifications': notifications,
-        'get_discussion_title': partial(get_discussion_title, request=request, course=course),
-        'course': course,
-    }
-    return render_to_string('courseware/notifications.html', context)
-
-
-@login_required
-def news(request, course_id):
-    course = get_course_with_access(request.user, course_id, 'load')
-
-    notifications = comment_client.get_notifications(request.user.id)
-
-    context = {
-        'course': course,
-        'content': render_notifications(request, course, notifications),
-    }
-
-    return render_to_response('courseware/news.html', context)
 
 
 @login_required
