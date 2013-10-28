@@ -11,6 +11,7 @@ import re
 from collections import OrderedDict
 import textwrap
 
+IGNORED_EMAILS = set(("vagrant@precise32.(none)",))
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PROJECT_ROOT = path(__file__).abspath().dirname()
 repo = Repo(PROJECT_ROOT)
@@ -65,7 +66,8 @@ def emails(commit_range):
     # %ae prints the authored_by email for the commit
     # %n prints a newline
     # %ce prints the committed_by email for the commit
-    return set(git.log(commit_range, format='%ae%n%ce').splitlines())
+    emails = set(git.log(commit_range, format='%ae%n%ce').splitlines())
+    return emails - IGNORED_EMAILS
 
 
 def commits_by_email(commit_range, include_merge=False):
