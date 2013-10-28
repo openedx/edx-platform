@@ -3,7 +3,15 @@
 <%inherit file="../main.html" />
 
 <%block name="bodyclass">register verification-process step-select-track ${'is-upgrading' if upgrade else ''}</%block>
-<%block name="title"><title>${_("Register for {} | Choose Your Track").format(course_name)}</title></%block>
+<%block name="title">
+  <title>
+    %if upgrade:
+      ${_("Upgrade Your Registration for {} | Choose Your Track").format(course_name)}
+    %else:
+      ${_("Register for {} | Choose Your Track").format(course_name)}
+    %endif
+  </title>
+</%block>
 
 <%block name="js_extra">
 <script type="text/javascript">
@@ -60,9 +68,16 @@ $(document).ready(function() {
             <div class="wrapper-copy">
               <span class="deco-ribbon"></span>
               <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
-              <div class="copy">
-                <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
-              </div>
+
+              %if upgrade:
+                <div class="copy">
+                  <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
+                </div>
+              %else:
+                <div class="copy">
+                  <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
+                </div>
+              %endif
             </div>
 
             <div class="field field-certificate-contribution">
@@ -118,16 +133,28 @@ $(document).ready(function() {
 
             <ul class="list-actions">
               <li class="action action-select">
-                <input type="submit" name="mode" value="Select Certificate" />
+                %if upgrade:
+                 <input type="submit" name="mode" value="Upgrade Your Registration" />
+                %else:
+                  <input type="submit" name="mode" value="Select Certificate" />
+                %endif
+
               </li>
             </ul>
           </div>
 
           <div class="help help-register">
             <h3 class="title">${_("Verified Registration Requirements")}</h3>
-            <div class="copy">
-              <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")}</p>
-            </div>
+
+            %if upgrade:
+              <div class="copy">
+                <p>${_("To upgrade your registration and work towards a Verified Certificate of Achievement, you will need a webcam, a credit or debit card, and an ID.")}</p>
+              </div>
+            %else:
+              <div class="copy">
+                <p>${_("To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID.")}</p>
+              </div>
+            %endif
 
             <h3 class="title">${_("What is an ID Verified Certificate?")}</h3>
             <div class="copy">
