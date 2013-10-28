@@ -271,11 +271,7 @@
 %copy-link {
   border-bottom: 1px dotted transparent;
 
-<<<<<<< HEAD
   &:hover, &:active, &:focus {
-=======
-  &:hover, &:active {
->>>>>>> LMS: revises semantics and styling for dashboard messages
     border-color: $link-color-d1;
   }
 }

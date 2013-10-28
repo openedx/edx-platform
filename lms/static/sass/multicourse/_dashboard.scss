@@ -787,6 +787,111 @@
   }
 
   // status - verification
+  .status-verification {
+
+    .status-title {
+      margin: 0 0 ($baseline/4) 26px;
+    }
+
+    .status-data {
+      margin: 0 0 ($baseline/2) 26px;
+      width: 80%;
+    }
+
+    .status-data-message {
+      @extend %t-copy-sub1;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/2);
+    }
+
+    .list-actions {
+      @extend %ui-no-list;
+
+      .action {
+        @extend %t-weight4;
+        display: block;
+        @include font-size(14);
+      }
+    }
+
+    .status-note {
+      @extend %t-copy-sub2;
+      position: relative;
+      margin-top: $baseline;
+      border-top: 1px solid $black-t0;
+      padding-top: ($baseline/2);
+
+      p {
+        @extend %t-copy-sub2;
+      }
+
+      .deco-arrow {
+        @include triangle(($baseline/2), $m-gray-d3, up);
+        position: absolute;
+        left: 45%;
+        top: -($baseline/2);
+      }
+    }
+
+    // CASE: is denied
+    &.is-denied {
+
+      .status-data-message {
+        color: $error-color;
+        border-bottom-color: rgba($error-color, 0.25);
+      }
+
+      .status-note {
+        color: desaturate($error-color, 65%);
+        border-top-color: rgba($error-color, 0.25);
+      }
+
+      .action-reverify {
+        @extend %btn-primary-error;
+        @extend %t-weight4;
+        display: block;
+        @include font-size(14);
+      }
+
+      .deco-arrow {
+        @include triangle(($baseline/2), $error-color, up);
+      }
+    }
+
+    // CASE: is accepted
+    &.is-accepted {
+
+      .status-data-message {
+        color: $verified-color-lvl1;
+        border-bottom-color: $verified-color-lvl4;
+      }
+
+      .status-note {
+        color: $m-gray-l1;
+        border-top-color: $verified-color-lvl4;
+      }
+
+      .deco-arrow {
+        @include triangle(($baseline/2), $verified-color-lvl4, up);
+      }
+    }
+
+    // CASE: is pending
+    &.is-pending {
+
+      .status-data-message {
+        color: $m-gray-d3;
+        border-bottom-color: $m-gray-l4;
+      }
+
+      .status-note {
+        color: $m-gray-l1;
+        border-top-color: $m-gray-d3;
+      }
+    }
+  }
+
+  // status - verification
   .status--verification {
 
     .data {

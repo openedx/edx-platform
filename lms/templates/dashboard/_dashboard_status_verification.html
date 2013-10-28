@@ -8,20 +8,51 @@
 <%namespace name='static' file='../static_content.html'/>
 
 %if verification_status == 'denied':
-<li class="status status--verification is-denied">
-  <span class="title"><div class="icon"></div>${_("Verification Status")}</span><span class="data">${verification_msg}</span>
+<li class="status status-verification is-denied">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
 
-  <ul class="list--nav">
-    <li class="nav__item nav__item--reverify">
-      <a href="${reverse('verify_student_reverify')}" class="action">${_("Please submit new verification photos.")}</a>
+  <div class="status-data">
+    <span class="status-data-message">${verification_msg}</span>
+
+    <ul class="list-actions">
+    <li class="action-item action-item-reverify">
+      <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Re-verify Yourself")}</a>
     </li>
-  </ul>
+    </ul>
 
-  <div class="msg msg--warning">
-    <h3 class="msg__title">${_("Please Note:")}</h3>
-    <div class="msg__copy">
-      <p>${_("If you fail to pass a verification attempt before the course ends, you will not receive a verified certificate.")}</p>
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("If you fail to pass a verification attempt before your course ends, you will not receive a verified certificate.")}</p>
     </div>
   </div>
 </li>
 %endif
+
+<li class="status status-verification is-accepted">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${_("Reviewed and Verified")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification status is good until October 31, 2013")}</p>
+    </div>
+  </div>
+</li>
+
+<li class="status status-verification is-pending">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${_("Pending")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification, submitted on October 29, 2013, is pending.")}</p>
+    </div>
+  </div>
+</li>
