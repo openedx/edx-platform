@@ -172,7 +172,6 @@ def add_repo(repo, rdir_in):
                        'check MONGODB_LOG settings'))
         log.critical(_('Error was: {0}').format(str(ex)))
         return -1
-    logging.critical(mongoengine.connection.get_db())
     cil = CourseImportLog(
         course_id=course_id,
         location=location,
