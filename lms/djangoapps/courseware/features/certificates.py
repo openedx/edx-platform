@@ -84,7 +84,9 @@ def click_verified_track_button():
 @step(u'I select the verified track for upgrade')
 def select_verified_track_upgrade(step):
     select_contribution(32)
-    click_verified_track_button()
+    world.wait_for_ajax_complete()
+    btn_css = 'input[value="Upgrade Your Registration"]'
+    world.css_click(btn_css)
     # TODO: might want to change this depending on the changes for upgrade
     assert world.is_css_present('section.progress')
 
@@ -263,7 +265,10 @@ def see_upsell_link_on_my_dashboard(step):
 
 @step(u'I select the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
+    # expand the upsell section
+    world.css_click('.message-upsell')
     course_link_css = UPSELL_LINK_CSS
+    # click the actual link
     world.css_click(course_link_css)
 
 
