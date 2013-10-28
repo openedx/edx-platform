@@ -166,7 +166,10 @@ def add_repo(repo, rdir_in):
         mongo_db['host'], mongo_db['db'])
 
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+        if mongo_db['user'] and mongo_db['password']:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+        else:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
     except mongoengine.connection.ConnectionError, ex:
         log.critical(_('Unable to connect to mongodb to save log, please '
                        'check MONGODB_LOG settings'))

@@ -111,6 +111,8 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
         import_log_handler.setLevel(logging.DEBUG)
 
         for logger in [import_logger, git_logger, xml_logger, ]:
+            logger.old_level = logger.level
+            logger.setLevel(logging.DEBUG)
             logger.addHandler(import_log_handler)
 
         git_add_script.add_repo(gitloc, None)
@@ -119,6 +121,7 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
 
         # Remove handler hijacks
         for logger in [import_logger, git_logger, xml_logger, ]:
+            logger.setLevel(logger.old_level)
             logger.removeHandler(import_log_handler)
         msg = u"<font color='red'>{0} {1}</font>".format(
             _('Added course from'), gitloc)
@@ -546,10 +549,13 @@ def view_git_logs(request, course_id=None):
         mongo_db['host'], mongo_db['db'])
 
     try:
-        mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
-    except mongoengine.connection.ConnectionError, e:
+        if mongo_db['user'] and mongo_db['password']:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+        else:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
+    except mongoengine.connection.ConnectionError, ex:
         logging.critical(_('Unable to connect to mongodb to save log, please check '
-                           'MONGODB_LOG settings. error: {0}').format(str(e)))
+                           'MONGODB_LOG settings. error: {0}').format(str(ex)))
 
     if course_id is None:
         cilset = CourseImportLog.objects.all().order_by('-created')
