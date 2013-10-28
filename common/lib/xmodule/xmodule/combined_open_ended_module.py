@@ -15,6 +15,7 @@ log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",
+    "video_id",
     "max_attempts",
     "graded",
     "accept_file_upload",
@@ -192,6 +193,12 @@ class CombinedOpenEndedFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         default="Open Response Assessment",
+        scope=Scope.settings
+    )
+    video_id = String(
+        display_name = "Video Response ID",
+        help="The youtube id of a video to include in the response if you are using the embedded video clips functionality.",
+        default="",
         scope=Scope.settings
     )
     current_task_number = Integer(
@@ -396,6 +403,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     js = {
             'coffee':
             [
+                resource_string(__name__, 'js/src/combinedopenended/video_clipper.coffee'),
                 resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                 resource_string(__name__, 'js/src/collapsible.coffee'),
                 resource_string(__name__, 'js/src/javascript_loader.coffee'),

@@ -264,9 +264,7 @@ class @CombinedOpenEnded
         @$('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
 
-
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
-
 
   rebind: () =>
     # rebind to the appropriate function for the current state
@@ -281,10 +279,13 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
+      @video_response_off()
     if @child_state == 'done'
       @rubric_wrapper.hide()
+      @video_response_off()
     if @child_type=="openended"
       @skip_button.hide()
+      @video_response_off()
     if @allow_reset=="True"
       @show_combined_rubric_current()
       @reset_button.show()
@@ -292,9 +293,11 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
+      @video_response_off()
       if @task_number<@task_count
         @gentle_alert "Your score did not meet the criteria to move to the next step."
     else if @child_state == 'initial'
+      @video_response_on()
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @confirm_save_answer
@@ -308,6 +311,7 @@ class @CombinedOpenEnded
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
       @submit_button.attr("disabled",true)
+      @video_response_off()
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
@@ -321,6 +325,7 @@ class @CombinedOpenEnded
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
+      @video_response_on()
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
@@ -333,6 +338,7 @@ class @CombinedOpenEnded
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
       @submit_button.hide()
+      @video_response_off()
       if @child_type=="openended"
         @skip_button.hide()
       if @task_number<@task_count
@@ -502,6 +508,7 @@ class @CombinedOpenEnded
           @has_been_reset = true
           @rebind()
           @reset_button.hide()
+          @video_response_reset()
         else
           @errors_area.html(response.error)
     else
@@ -684,3 +691,41 @@ class @CombinedOpenEnded
     if @rub.check_complete()
       @submit_button.attr("disabled",false)
       @submit_button.show()
+
+  video_response_on: () =>
+    onVideoClipperReadyTried = VideoClipper
+    window.onVideoClipperReady = =>
+      OmniPlayer.loaded.YT = true
+      coeVideoId = @coe.data('videoId')
+      if coeVideoId != null && coeVideoId != ""
+        textarea = $(@answer_area_sel)
+        @video_button = @submit_button.after('<input type="button"/>').next()
+        @video_button.attr
+          value: 'Snippet'
+          id: 'coe-video-button'
+
+        textarea.attr('id', 'coe-video-clipper')
+        new VideoClipper
+          textareaId: 'coe-video-clipper'
+          videoType: "YT"
+          videoId: coeVideoId
+          buttonId: 'coe-video-button'
+
+    if onVideoClipperReadyTried != undefined
+      window.onVideoClipperReady()
+
+  video_response_off: () =>
+    onVideoClipperReadyTried = VideoClipper
+    window.onVideoClipperReady = =>
+      OmniPlayer.loaded.YT = true
+      VideoClipper.cleanUp()
+      VideoClipper.generate()
+
+    if onVideoClipperReadyTried != undefined
+      window.onVideoClipperReady()
+
+  video_response_reset: () =>
+    @video_response_off()
+    @video_response_on()
+
+

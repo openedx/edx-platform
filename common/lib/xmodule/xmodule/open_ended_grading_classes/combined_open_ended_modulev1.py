@@ -94,6 +94,7 @@ class CombinedOpenEndedV1Module():
 
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
+        self.video_id = instance_state.get('video_id', "OEoXaMPEzfM")
 
         # We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -389,6 +390,7 @@ class CombinedOpenEndedV1Module():
             'task_number': self.current_task_number + 1,
             'status': self.get_status(False),
             'display_name': self.display_name,
+            'video_id': self.video_id,
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
