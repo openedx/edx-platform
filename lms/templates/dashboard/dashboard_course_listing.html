@@ -31,7 +31,7 @@
     % if enrollment.mode == "verified":
       <span class="sts-enrollment">
         <span class="label">${_("Enrolled as: ")}</span>
-        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
+        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
         <span class="sts-enrollment-value">${_("ID Verified")}</span>
       </span>
     % endif
@@ -109,21 +109,26 @@
       % endif
 
       %if course_mode_info['show_upsell']:
-        <div class="message message-upsell has-actions is-shown">
-            <div class="message-copy">
-              <h4 class="title">${_("Challenge Yourself!")}</h4>
-              <p class="copy">${_("Register for the {a_start} verified certificate {a_end} track").format(a_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), a_end="</a>")}</p>
+        <div class="message message-upsell has-actions is-expandable is-shown">
+
+            <div class="wrapper-tip">
+              <h4 class="message-title">${_("Challenge Yourself!")}</h4>
+              <p class="message-copy">${_("Take this course as an ID-verified student.")}</p>
             </div>
 
-            <ul class="message-actions">
-              <li class="action-item">
-                <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
-                  <span class="wrapper-copy">
-                    <span class="copy">${_("Upgrade to Verified Track")}</span>
-                  </span>
-                </a>
-              </li>
-            </ul>
+            <div class="wrapper-extended">
+                <p class="message-copy">${_("Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Learn more about the  {a_start} verified certificate {a_end} track").format(a_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), a_end="</a>")}</p>
+
+              <ul class="actions message-actions">
+                <li class="action-item">
+                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
+                    <span class="wrapper-copy">
+                      <span class="copy">${_("Upgrade to Verified Track")}</span>
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
         </div>
       %endif
 

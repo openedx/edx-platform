@@ -14,6 +14,14 @@
   <script type="text/javascript">
   (function() {
 
+    $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+
+    function toggleExpandMessage(e) {
+        (e).preventDefault();
+
+        $(this).closest('.message.is-expandable').toggleClass('is-expanded');
+    }
+
     $(".email-settings").click(function(event) {
       $("#email_settings_course_id").val( $(event.target).data("course-id") );
       $("#email_settings_course_number").text( $(event.target).data("course-number") );

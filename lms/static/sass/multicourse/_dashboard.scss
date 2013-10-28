@@ -500,6 +500,13 @@
         }
       }
 
+      .actions {
+        @include clearfix;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
       .message-title,
       .message-copy .title {
         @extend %t-title5;
@@ -513,47 +520,97 @@
         margin: 0;
       }
 
-      // CASE: has actions
-      &.has-actions {
-        @include clearfix();
+      // CASE: expandable
+      &.is-expandable {
 
-        .message-copy {
-          float: left;
-          width: 50%;
-          margin-right: 5%;
+        .wrapper-tip {
+
+          .message-title, .message-copy {
+            @include transition(color 0.25s ease-in-out 0);
+            margin-bottom: 0;
+          }
+
+          // STATE: hover
+          &:hover {
+            cursor: pointer;
+
+            .message-title, .message-copy {
+              color: $link-color;
+            }
+          }
         }
 
-        .message-actions {
-          @extend %ui-no-list;
-          float: right;
-          width: 40%;
-          text-align: right;
+        .wrapper-extended {
+          @include transition(opacity 0.25s ease-in-out 0);
+          display: none;
+          opacity: 0.0;
+        }
+
+        // STATE: is expanded
+        &.is-expanded {
+
+          .wrapper-extended {
+            display: block;
+            opacity: 1.0;
+          }
         }
       }
     }
 
     // TYPE: upsell
     .message-upsell {
-      background: $verified-color-lvl5;
+
+      .wrapper-tip {
+        @include clearfix();
+
+        .message-title {
+          float: left;
+        }
+
+        .message-copy {
+          float: right;
+        }
+      }
+
+      .wrapper-extended {
+        padding: ($baseline/2) 0;
+
+        .message-copy {
+          margin-bottom: $baseline;
+        }
+      }
 
       .action-upgrade {
         @extend %btn-primary-green;
         @include clearfix();
+        position: relative;
+        left: ($baseline/2);
+        padding: 8px $baseline 8px ($baseline*2);
+
+        .deco-graphic {
+          position: absolute;
+          top: -($baseline/4);
+          left: -($baseline*0.75);
+          width: ($baseline*2);
+        }
 
         span {
           color: $white; // nasty but needed override for poor <span> styling
         }
 
+        .copy, .copy-sub {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
         .copy {
           @extend %t-action3;
           @extend %t-weight4;
-          display: block;
-          margin-bottom: ($baseline/4);
+          margin-right: $baseline;
         }
 
         .copy-sub {
           @extend %t-action4;
-          display: block;
           opacity: 0.875;
         }
       }
@@ -565,8 +622,7 @@
       border-color: #ccc;
 
       .message-copy {
-        font-family: $sans-serif;
-        font-size: 13px;
+        @extend %t-copy-sub1;
         margin: 0;
 
         .grade-value {
@@ -576,10 +632,6 @@
       }
 
       .actions {
-         @include clearfix;
-        list-style: none;
-        margin: 0;
-        padding: 0;
 
         .action {
           float: left;
