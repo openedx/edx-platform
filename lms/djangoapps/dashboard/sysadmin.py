@@ -106,11 +106,12 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
             'xmodule.modulestore.xml_importer')
         git_logger = logging.getLogger('git_add_script')
         xml_logger = logging.getLogger('xmodule.modulestore.xml')
+        xml_seq_logger = logging.getLogger('xmodule.seq_module')
 
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 
-        for logger in [import_logger, git_logger, xml_logger, ]:
+        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
             logger.old_level = logger.level
             logger.setLevel(logging.DEBUG)
             logger.addHandler(import_log_handler)
@@ -120,7 +121,7 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
         ret = output.getvalue()
 
         # Remove handler hijacks
-        for logger in [import_logger, git_logger, xml_logger, ]:
+        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
             logger.setLevel(logger.old_level)
             logger.removeHandler(import_log_handler)
         msg = u"<font color='red'>{0} {1}</font>".format(
