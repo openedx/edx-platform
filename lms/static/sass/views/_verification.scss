@@ -432,10 +432,6 @@
     }
   }
 
-  .wrapper-msg-reverify {
-
-  }
-
   // ====================
 
   // UI: inline messages
@@ -632,6 +628,38 @@
 
   // ====================
 
+  // UI: reverification message
+  .wrapper-reverification {
+    border-bottom: ($baseline/10) solid $m-pink;
+    margin-bottom: $baseline;
+    padding-bottom: $baseline;
+    position: relative;
+
+    .deco-arrow {
+      @include triangle($baseline, $m-pink, down);
+      position: absolute;
+      bottom: -($baseline);
+      left: 50%;
+    }
+  }
+
+  .reverification {
+
+    .message {
+
+      .title {
+        @extend %hd-lv3;
+        color: $m-pink;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
+  }
+
+  // ====================
+
   // UI: slides
   .carousel {
 
@@ -708,6 +736,10 @@
                 border-bottom: none;
                 padding-bottom: 0;
               }
+            }
+
+            .help-item-emphasis {
+              @extend %t-weight4;
             }
           }
 
@@ -1930,6 +1962,10 @@
 // STATE: re-verifying
 .register.is-not-verified {
 
+  .help-item-emphasis {
+    color: $m-pink;
+  }
+
   // progress indicator
   .progress-sts {
     width: 72%;
@@ -2058,6 +2094,5 @@
         margin-bottom: $baseline;
       }
     }
->>>>>>> LMS: adds in styling and base UI for reverification flow
   }
 }

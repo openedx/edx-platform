@@ -53,20 +53,21 @@
 </div>
 %endif
 
-<div id="message-reverification" class="wrapper-msg wrapper-msg-error">
-  <div class="msg msg-error">
-    <i class="msg-icon icon-warning-sign"></i>
-    <div class="msg-content">
-      <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
-      <div class="copy">
-        <p>${_("There was an error with your previous verification")}. ${_("In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container">
   <section class="wrapper">
+
+    <div class="wrapper-reverification">
+      <section class="reverification">
+        <div class="message">
+          <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
+          <div class="copy">
+            <p>${_("There was an error with your previous verification. In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
+          </div>
+        </div>
+
+        <span class="deco-arrow"></span>
+      </section>
+    </div>
 
     <div class="wrapper-progress">
       <section class="progress">
@@ -241,10 +242,10 @@
                     <div class="copy">
                       <ul class="list-help">
                         <li class="help-item">${_("Make sure your ID is well-lit")}</li>
+                        <li class="help-item help-item-emphasis">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                         <li class="help-item">${_("Check that there isn't any glare")}</li>
                         <li class="help-item">${_("Ensure that you can see your photo and read your name")}</li>
                         <li class="help-item">${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
-                        <li class="help-item">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                         <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your ID")}</li>
                         <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
                       </ul>
