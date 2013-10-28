@@ -8,6 +8,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
+from django.utils.translation import ugettext as _
 
 from courseware.access import has_access
 from util.json_request import expect_json
@@ -276,9 +277,9 @@ def get_problem_list(request, course_id):
         else:
             problem_list = []
             # Make an error messages to reflect that we could not find anything to grade.
-            response['error'] = ("Cannot find any open response problems in this course.  "
+            response['error'] = (_("Cannot find any open response problems in this course.  "
                                  "Have you submitted answers to any open response assessment questions?  "
-                                 "If not, please do so and return to this page.")
+                                 "If not, please do so and return to this page."))
         valid_problem_list = []
         for i in xrange(0,len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
