@@ -243,7 +243,7 @@ class DashboardTest(TestCase):
             course_id=self.course.id,
             mode_slug='verified',
             mode_display_name='Verified',
-            expiration_date=datetime.now(pytz.UTC) + timedelta(days=1)
+            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)

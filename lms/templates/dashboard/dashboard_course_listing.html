@@ -120,12 +120,6 @@
                 <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
                   <span class="wrapper-copy">
                     <span class="copy">${_("Upgrade to Verified Track")}</span>
-
-                    %if course_mode_info['days_for_upsell']:
-                      <span class="copy-sub">
-                        ${_('{days} days left!').format(days=course_mode_info['days_for_upsell'])}
-                      </span>
-                    %endif
                   </span>
                 </a>
               </li>
