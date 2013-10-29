@@ -134,6 +134,10 @@ class XModuleMixin(XBlockMixin):
     )
 
     @property
+    def course_id(self):
+        return self.runtime.course_id
+
+    @property
     def id(self):
         return self.location.url()
 
@@ -743,6 +747,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
         return self.xmodule_runtime.xmodule_instance
 
+    course_id = module_attr('course_id')
     displayable_items = module_attr('displayable_items')
     get_display_items = module_attr('get_display_items')
     get_icon_class = module_attr('get_icon_class')
