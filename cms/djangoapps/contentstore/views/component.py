@@ -15,7 +15,7 @@ from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.util.date_utils import get_default_time_display
+from util.date_utils import get_default_time_display
 
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
