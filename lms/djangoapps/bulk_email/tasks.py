@@ -431,7 +431,7 @@ def _get_source_address(course_id, course_title):
     invalid_chars = re.compile(r"[^\w.-]")
     course_num = invalid_chars.sub('_', course_num)
 
-    from_addr = '"{0}" <{1}-{2}>'.format(course_title_no_quotes, course_num, settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
+    from_addr = u'"{0}" <{1}-{2}>'.format(course_title_no_quotes, course_num, settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
     return from_addr
 
 
@@ -783,5 +783,6 @@ def _statsd_tag(course_title):
     """
     Calculate the tag we will use for DataDog.
     """
-    tag = u"course_email:{0}".format(course_title)
+#    tag = u"course_email:{0}".format(course_title)
+    tag = "course_email:fake"
     return tag[:200]
