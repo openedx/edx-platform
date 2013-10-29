@@ -101,8 +101,8 @@ class IntervalManager
     @intervalID = null
 
   # Start or restart firing every `ms` milliseconds.
-  # Soes not fire immediately.
   start: ->
+    @fn()
     if @intervalID is null
       @intervalID = setInterval @fn, @ms
 

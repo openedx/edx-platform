@@ -27,6 +27,8 @@ find_and_assert = ($root, selector) ->
 
 class StudentAdmin
   constructor: (@$section) ->
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
     @$section.data 'wrapper', @
 
     # gather buttons
@@ -255,17 +257,15 @@ class StudentAdmin
     @$request_response_error_all.empty()
 
   # handler for when the section title is clicked.
-  onClickTitle: -> @instructor_tasks.task_poller?.start()
+  onClickTitle: -> @instructor_tasks.task_poller.start()
 
   # handler for when the section is closed
-  onExit: -> @instructor_tasks.task_poller?.stop()
+  onExit: -> @instructor_tasks.task_poller.stop()
 
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    StudentAdmin: StudentAdmin
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  StudentAdmin: StudentAdmin
