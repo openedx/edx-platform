@@ -62,6 +62,14 @@ function (HTML5Video, Resizer) {
     function _initialize(state) {
         var youTubeId;
 
+        // The function is called just once to apply pre-defined configurations
+        // by student before video starts playing. Waits until the video's metadata
+        // is loaded, which normally happens just after the video starts playing.
+        // Just after that configurations can be applied.
+        state.videoPlayer.ready = _.once(function () {
+            state.videoPlayer.onSpeedChange(state.speed);
+        });
+
         if (state.videoType === 'youtube') {
             state.videoPlayer.PlayerState = YT.PlayerState;
             state.videoPlayer.PlayerState.UNSTARTED = -1;
@@ -314,6 +322,8 @@ function (HTML5Video, Resizer) {
         if (this.config.show_captions) {
             this.trigger('videoCaption.play', null);
         }
+
+        this.videoPlayer.ready();
     }
 
     function onUnstarted() { }

@@ -181,13 +181,16 @@ function () {
     // Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera
     // noticed
     function updatePlayTime(params) {
+        var time = Math.floor(params.time),
+            duration = Math.floor(params.duration);
+
         if (
             (this.videoProgressSlider.slider) &&
             (!this.videoProgressSlider.frozen)
         ) {
             this.videoProgressSlider.slider
-                .slider('option', 'max', params.duration)
-                .slider('option', 'value', params.time);
+                .slider('option', 'max', duration)
+                .slider('option', 'value', time);
         }
     }
 

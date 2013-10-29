@@ -210,11 +210,11 @@ function () {
             // Attach a 'click' event on the <video> element. It will cause the video to pause/play.
             this.videoEl.on('click', function (event) {
                 if (_this.playerState === HTML5Video.PlayerState.PAUSED) {
-                    _this.video.play();
+                    _this.playVideo();
                     _this.playerState = HTML5Video.PlayerState.PLAYING;
                     _this.callStateChangeCallback();
                 } else if (_this.playerState === HTML5Video.PlayerState.PLAYING) {
-                    _this.video.pause();
+                    _this.pauseVideo();
                     _this.playerState = HTML5Video.PlayerState.PAUSED;
                     _this.callStateChangeCallback();
                 }
@@ -268,19 +268,6 @@ function () {
             this.video.addEventListener('ended', function () {
                 _this.playerState = HTML5Video.PlayerState.ENDED;
                 _this.callStateChangeCallback();
-            }, false);
-
-            // Register the 'timeupdate' event. This is the place where we control when the video ends.
-            // If an ending time was specified, then after the video plays through to this spot, pauses, we
-            // must make sure to update the ending time to the end of the video. This way, the user can watch
-            // any parts of it afterwards.
-            this.video.addEventListener('timeupdate', function (data) {
-                if (_this.end < _this.video.currentTime) {
-                    // When we call video.pause(), a 'pause' event will be formed, and we will catch it
-                    // in another handler (see above).
-                    _this.video.pause();
-                    _this.end = _this.video.duration;
-                }
             }, false);
 
             // Place the <video> element on the page.

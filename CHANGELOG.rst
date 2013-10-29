@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix bug when the speed can only be changed when the video is playing.
+
 LMS: Change bulk email implementation to use less memory, and to better handle
 duplicate tasks in celery.
 
@@ -12,7 +14,7 @@ LMS: Improve forum error handling so that errors in the logs are
 clearer and HTTP status codes from the comments service indicating
 client error are correctly passed through to the client.
 
-LMS: Improve performance of page load and thread list load for 
+LMS: Improve performance of page load and thread list load for
 discussion tab
 
 LMS: The wiki markup cheatsheet dialog is now accessible to people with
@@ -28,12 +30,12 @@ Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
 be played.
 
-Studio: added restful interface for finding orphans in courses. 
-An orphan is an xblock to which no children relation points and whose type is not 
+Studio: added restful interface for finding orphans in courses.
+An orphan is an xblock to which no children relation points and whose type is not
 in the set contentstore.views.item.DETACHED_CATEGORIES nor 'course'.
-    GET http://host/orphan/org.course returns json array of ids. 
+    GET http://host/orphan/org.course returns json array of ids.
         Requires course author access.
-    DELETE http://orphan/org.course deletes all the orphans in that course. 
+    DELETE http://orphan/org.course deletes all the orphans in that course.
         Requires is_staff access
 
 Studio: Bug fix for text loss in Course Updates when the text exists
