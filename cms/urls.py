@@ -1,4 +1,3 @@
-import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
@@ -33,11 +32,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
-        'contentstore.views.import_course', name='import_course'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import_status/(?P<name>[^/]+)$',
-        'contentstore.views.import_status', name='import_status'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
         'contentstore.views.export_course', name='export_course'),
@@ -129,7 +123,9 @@ urlpatterns += patterns(
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
-    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler')
+    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
+    url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
+    url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
 )
 
 js_info_dict = {

@@ -13,9 +13,9 @@ from uuid import uuid4
 from pymongo import MongoClient
 
 from .utils import CourseTestCase
-from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.conf import settings
+from xmodule.modulestore.django import loc_mapper
 
 from xmodule.contentstore.django import _CONTENTSTORE
 
@@ -32,11 +32,10 @@ class ImportTestCase(CourseTestCase):
 
     def setUp(self):
         super(ImportTestCase, self).setUp()
-        self.url = reverse("import_course", kwargs={
-            'org': self.course.location.org,
-            'course': self.course.location.course,
-            'name': self.course.location.name,
-        })
+        self.new_location = loc_mapper().translate_location(
+            self.course.location.course_id, self.course.location, False, True
+        )
+        self.url = self.new_location.url_reverse('import/', '')
         self.content_dir = path(tempfile.mkdtemp())
 
         def touch(name):
@@ -89,13 +88,13 @@ class ImportTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 415)
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
-        status_url = reverse("import_status", kwargs={
-            'org': self.course.location.org,
-            'course': self.course.location.course,
-            'name': os.path.split(self.bad_tar)[1],
-        })
-        resp_status = self.client.get(status_url)
-        log.debug(str(self.client.session["import_status"]))
+        resp_status = self.client.get(
+            self.new_location.url_reverse(
+                'import_status',
+                os.path.split(self.bad_tar)[1]
+            )
+        )
+
         self.assertEquals(json.loads(resp_status.content)["ImportStatus"], 2)
 
 
@@ -200,11 +199,11 @@ class ImportTestCase(CourseTestCase):
         # Check that `import_status` returns the appropriate stage (i.e.,
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
-        status_url = reverse("import_status", kwargs={
-            'org': self.course.location.org,
-            'course': self.course.location.course,
-            'name': os.path.split(self.good_tar)[1],
-        })
-        resp_status = self.client.get(status_url)
+        resp_status = self.client.get(
+            self.new_location.url_reverse(
+                'import_status',
+                os.path.split(self.good_tar)[1]
+            )
+        )
         import_status = json.loads(resp_status.content)["ImportStatus"]
         self.assertIn(import_status, (0, 3))

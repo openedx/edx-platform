@@ -1592,10 +1592,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # go to various pages
 
         # import page
-        resp = self.client.get(reverse('import_course',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get(new_location.url_reverse('import/', ''), HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
 
         # export page
@@ -1632,9 +1629,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # assets_handler (HTML for full page content)
-        new_location = loc_mapper().translate_location(loc.course_id, loc, False, True)
         url = new_location.url_reverse('assets/', '')
-
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
 
