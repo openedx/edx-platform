@@ -4,23 +4,10 @@
 
 (function() {
   var keyMap = CodeMirror.keyMap.accessible = {
-  	"Left": "goCharLeft", 
-  	"Right": "goCharRight", 
-  	"Up": "goLineUp", 
-  	"Down": "goLineDown",
-    "End": "goLineEnd", 
-    "Home": "goLineStartSmart", 
-    "PageUp": "goPageUp", 
-    "PageDown": "goPageDown",
-    "Delete": "delCharAfter", 
-    "Backspace": "delCharBefore", 
-    "Shift-Backspace": "delCharBefore",
     "Alt-Tab": "insertTab",
     "Alt-Shift-Tab": "insertTab",
     "Tab": false,
     "Shift-Tab": false, 
-    "Enter": "newlineAndIndent", 
-    "Insert": "toggleOverwrite", 
     fallthrough: "default"
   };
 })();
