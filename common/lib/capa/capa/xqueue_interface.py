@@ -48,7 +48,7 @@ def parse_xreply(xreply):
         xreply = json.loads(xreply)
     except ValueError, err:
         log.error(err)
-        return (1, 'unexpected reply from server')
+        return (1, _('unexpected reply from server'))
 
     return_code = xreply['return_code']
     content = xreply['content']
@@ -120,9 +120,9 @@ class XQueueInterface(object):
             r = self.session.post(url, data=data, files=files)
         except requests.exceptions.ConnectionError, err:
             log.error(err)
-            return (1, 'cannot connect to server')
+            return (1, _('cannot connect to server'))
 
         if r.status_code not in [200]:
-            return (1, 'unexpected HTTP status code [%d]' % r.status_code)
+            return (1, _('unexpected HTTP status code [%d]') % r.status_code)
 
         return parse_xreply(r.text)
