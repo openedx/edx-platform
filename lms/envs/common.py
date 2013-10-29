@@ -853,7 +853,7 @@ CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {},
-    HIGH_MEM_QUEUE = {},
+    HIGH_MEM_QUEUE: {},
 }
 
 # let logging work as configured:
