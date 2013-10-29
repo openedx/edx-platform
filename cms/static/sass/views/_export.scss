@@ -102,24 +102,5 @@
         line-height: 48px;
       }
     }
-
-    // downloading state
-    &.is-downloading {
-
-      .progress-bar {
-        display: block;
-      }
-
-      .button-export {
-        padding: 10px 50px 11px;
-        font-size: 17px;
-
-        &.disabled {
-
-          pointer-events: none;
-          cursor: default;
-        }
-      }
-    }
   }
 }

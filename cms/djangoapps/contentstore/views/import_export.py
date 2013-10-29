@@ -29,17 +29,17 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore import Location
 from xmodule.exceptions import SerializationError
+
 from xmodule.modulestore.locator import BlockUsageLocator
 from .access import has_access
 
-from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 from extract_tar import safetar_extractall
 
 
-__all__ = ['import_handler', 'import_status_handler', 'generate_export_course', 'export_course']
+__all__ = ['import_handler', 'import_status_handler', 'export_handler']
+
 
 log = logging.getLogger(__name__)
 
@@ -287,88 +287,102 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
 
 @ensure_csrf_cookie
 @login_required
-def generate_export_course(request, org, course, name):
+@require_http_methods(("GET",))
+def export_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    This method will serialize out a course to a .tar.gz file which contains a
-    XML-based representation of the course
+    The restful handler for exporting a course.
+
+    GET
+        html: return html page for import page
+        application/x-tgz: return tar.gz file containing exported course
+        json: not supported
+
+    Note that there are 2 ways to request the tar.gz file. The request header can specify
+    application/x-tgz via HTTP_ACCEPT, or a query parameter can be used (?_accept=application/x-tgz).
+
+    If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
+    which describes the error.
     """
-    location = get_location_and_verify_access(request, org, course, name)
-    course_module = modulestore().get_instance(location.course_id, location)
-    loc = Location(location)
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    new_location = loc_mapper().translate_location(course_module.location.course_id, course_module.location, False, True)
+    old_location = loc_mapper().translate_locator_to_location(location)
+    course_module = modulestore().get_item(old_location)
 
-    root_dir = path(mkdtemp())
+    # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
+    requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    try:
-        export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    except SerializationError, e:
-        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
-        unit = None
-        failed_item = None
-        parent = None
+    export_url = location.url_reverse('export/', '') + '?_accept=application/x-tgz'
+    if 'application/x-tgz' in requested_format:
+        name = old_location.name
+        export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+        root_dir = path(mkdtemp())
+
         try:
-            failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
-            parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
+            export_to_xml(modulestore('direct'), contentstore(), old_location, root_dir, name, modulestore())
 
-            if len(parent_locs) > 0:
-                parent = modulestore().get_item(parent_locs[0])
-                if parent.location.category == 'vertical':
-                    unit = parent
-        except:
-            # if we have a nested exception, then we'll show the more generic error message
-            pass
+        except SerializationError, e:
+            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+            unit = None
+            failed_item = None
+            parent = None
+            try:
+                failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
+                parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
 
+                if len(parent_locs) > 0:
+                    parent = modulestore().get_item(parent_locs[0])
+                    if parent.location.category == 'vertical':
+                        unit = parent
+            except:
+                # if we have a nested exception, then we'll show the more generic error message
+                pass
+
+            return render_to_response('export.html', {
+                'context_course': course_module,
+                'in_err': True,
+                'raw_err_msg': str(e),
+                'failed_module': failed_item,
+                'unit': unit,
+                'edit_unit_url': reverse('edit_unit', kwargs={
+                    'location': parent.location
+                }) if parent else '',
+                'course_home_url': location.url_reverse("course/", ""),
+                'export_url': export_url
+
+            })
+        except Exception, e:
+            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+            return render_to_response('export.html', {
+                'context_course': course_module,
+                'in_err': True,
+                'unit': None,
+                'raw_err_msg': str(e),
+                'course_home_url': location.url_reverse("course/", ""),
+                'export_url': export_url
+            })
+
+        logging.debug('tar file being generated at {0}'.format(export_file.name))
+        tar_file = tarfile.open(name=export_file.name, mode='w:gz')
+        tar_file.add(root_dir / name, arcname=name)
+        tar_file.close()
+
+        # remove temp dir
+        shutil.rmtree(root_dir / name)
+
+        wrapper = FileWrapper(export_file)
+        response = HttpResponse(wrapper, content_type='application/x-tgz')
+        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+        response['Content-Length'] = os.path.getsize(export_file.name)
+        return response
+
+    elif 'text/html' in requested_format:
         return render_to_response('export.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': '',
-            'in_err': True,
-            'raw_err_msg': str(e),
-            'failed_module': failed_item,
-            'unit': unit,
-            'edit_unit_url': reverse('edit_unit', kwargs={
-                'location': parent.location
-            }) if parent else '',
-            'course_home_url': new_location.url_reverse("course/", "")
-        })
-    except Exception, e:
-        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
-        return render_to_response('export.html', {
-            'context_course': course_module,
-            'successful_import_redirect_url': '',
-            'in_err': True,
-            'unit': None,
-            'raw_err_msg': str(e),
-            'course_home_url': new_location.url_reverse("course/", "")
+            'export_url': export_url
         })
 
-    logging.debug('tar file being generated at {0}'.format(export_file.name))
-    tar_file = tarfile.open(name=export_file.name, mode='w:gz')
-    tar_file.add(root_dir / name, arcname=name)
-    tar_file.close()
-
-    # remove temp dir
-    shutil.rmtree(root_dir / name)
-
-    wrapper = FileWrapper(export_file)
-    response = HttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
-    response['Content-Length'] = os.path.getsize(export_file.name)
-    return response
-
-
-@ensure_csrf_cookie
-@login_required
-def export_course(request, org, course, name):
-    """
-    This method serves up the 'Export Course' page
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    return render_to_response('export.html', {
-        'context_course': course_module,
-        'successful_import_redirect_url': ''
-    })
+    else:
+        # Only HTML or x-tgz request formats are supported (no JSON).
+        return HttpResponse(status=406)
