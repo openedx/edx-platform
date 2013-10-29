@@ -64,7 +64,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
 
     createItem: (parent, payload) ->
       payload.parent_location = parent
-      $.post(
+      $.postJSON(
           "/create_item"
           payload
           (data) =>

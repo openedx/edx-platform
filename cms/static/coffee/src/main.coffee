@@ -35,6 +35,19 @@ define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
       )
       msg.show()
 
+    $.postJSON = (url, data, callback) ->
+      # shift arguments if data argument was omitted
+      if $.isFunction(data)
+        callback = data
+        data = `undefined`
+      $.ajax
+        url: url
+        type: "POST"
+        contentType: "application/json; charset=utf-8"
+        dataType: "json"
+        data: JSON.stringify(data)
+        success: callback
+
     if onTouchBasedDevice()
       $('body').addClass 'touch-based-device'
 

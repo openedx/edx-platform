@@ -323,7 +323,6 @@ def _get_next(course_id, grader_id, location):
                            'error': STAFF_ERROR_MESSAGE})
 
 
-@expect_json
 def save_grade(request, course_id):
     """
     Save the grade and feedback for a submission, and, if all goes well, return

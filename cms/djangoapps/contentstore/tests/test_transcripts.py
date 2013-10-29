@@ -54,7 +54,7 @@ class Basetranscripts(CourseTestCase):
             'category': 'video',
             'type': 'video'
         }
-        resp = self.client.post(reverse('create_item'), data)
+        resp = self.client.ajax_post(reverse('create_item'), data)
         self.item_location = json.loads(resp.content).get('id')
         self.assertEqual(resp.status_code, 200)
 
@@ -200,7 +200,7 @@ class TestUploadtranscripts(Basetranscripts):
             'category': 'non_video',
             'type': 'non_video'
         }
-        resp = self.client.post(reverse('create_item'), data)
+        resp = self.client.ajax_post(reverse('create_item'), data)
         item_location = json.loads(resp.content).get('id')
         data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item_location, data)
@@ -411,7 +411,7 @@ class TestDownloadtranscripts(Basetranscripts):
             'category': 'videoalpha',
             'type': 'videoalpha'
         }
-        resp = self.client.post(reverse('create_item'), data)
+        resp = self.client.ajax_post(reverse('create_item'), data)
         item_location = json.loads(resp.content).get('id')
         subs_id = str(uuid4())
         data = textwrap.dedent("""
@@ -661,7 +661,7 @@ class TestChecktranscripts(Basetranscripts):
             'category': 'not_video',
             'type': 'not_video'
         }
-        resp = self.client.post(reverse('create_item'), data)
+        resp = self.client.ajax_post(reverse('create_item'), data)
         item_location = json.loads(resp.content).get('id')
         subs_id = str(uuid4())
         data = textwrap.dedent("""

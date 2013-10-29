@@ -134,7 +134,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 title: gettext('Deleting&hellip;'),
               deleting.show()
               $component = $(event.currentTarget).parents('.component')
-              $.post('/delete_item', {
+              $.postJSON('/delete_item', {
                 id: $component.data('id')
               }, =>
                 deleting.hide()
@@ -163,7 +163,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
     deleteDraft: (event) ->
       @wait(true)
 
-      $.post('/delete_item', {
+      $.postJSON('/delete_item', {
         id: @$el.data('id')
         delete_children: true
       }, =>
@@ -177,7 +177,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
     createDraft: (event) ->
       @wait(true)
 
-      $.post('/create_draft', {
+      $.postJSON('/create_draft', {
         id: @$el.data('id')
       }, =>
         analytics.track "Created Draft",
@@ -191,7 +191,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @wait(true)
       @saveDraft()
 
-      $.post('/publish_draft', {
+      $.postJSON('/publish_draft', {
         id: @$el.data('id')
       }, =>
         analytics.track "Published Draft",
@@ -211,7 +211,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
       @wait(true)
 
-      $.post(target_url, {
+      $.postJSON(target_url, {
         id: @$el.data('id')
       }, =>
         analytics.track "Set Unit Visibility",
