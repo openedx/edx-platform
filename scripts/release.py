@@ -11,6 +11,7 @@ import re
 from collections import OrderedDict
 import textwrap
 
+IGNORED_EMAILS = set(("vagrant@precise32.(none)",))
 JIRA_RE = re.compile(r"\b[A-Z]{2,}-\d+\b")
 PROJECT_ROOT = path(__file__).abspath().dirname()
 repo = Repo(PROJECT_ROOT)
@@ -57,7 +58,7 @@ def parse_ticket_references(text):
     return JIRA_RE.findall(text)
 
 
-def emails(from_commit, to_commit):
+def emails(commit_range):
     """
     Returns a set of all email addresses responsible for the commits between
     the two commit references.
@@ -65,10 +66,11 @@ def emails(from_commit, to_commit):
     # %ae prints the authored_by email for the commit
     # %n prints a newline
     # %ce prints the committed_by email for the commit
-    return set(git.log(from_commit, to_commit, format='%ae%n%ce').splitlines())
+    emails = set(git.log(commit_range, format='%ae%n%ce').splitlines())
+    return emails - IGNORED_EMAILS
 
 
-def commits_by_email(from_commit, to_commit, include_merge=False):
+def commits_by_email(commit_range, include_merge=False):
     """
     Return a ordered dictionary of {email: commit_list}
     The dictionary is alphabetically ordered by email address
@@ -77,10 +79,9 @@ def commits_by_email(from_commit, to_commit, include_merge=False):
     kwargs = {}
     if not include_merge:
         kwargs["no-merges"] = True
-    commit_range = "{0}..{1}".format(from_commit, to_commit)
 
     data = OrderedDict()
-    for email in sorted(emails(from_commit, to_commit)):
+    for email in sorted(emails(commit_range)):
         authored_commits = set(repo.iter_commits(
             commit_range, author=email, **kwargs
         ))
@@ -92,14 +93,14 @@ def commits_by_email(from_commit, to_commit, include_merge=False):
     return data
 
 
-def generate_table(from_commit, to_commit, include_merge=False):
+def generate_table(commit_range, include_merge=False):
     """
     Return a string corresponding to a commit table to embed in Confluence
     """
     header = "||Author||Summary||Commit||JIRA||Verified?||"
     commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
     rows = [header]
-    cbe = commits_by_email(from_commit, to_commit, include_merge)
+    cbe = commits_by_email(commit_range, include_merge)
     for email, commits in cbe.items():
         for i, commit in enumerate(commits):
             rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
@@ -112,7 +113,7 @@ def generate_table(from_commit, to_commit, include_merge=False):
     return "\n".join(rows)
 
 
-def generate_email(from_commit, to_commit, release_date=None):
+def generate_email(commit_range, release_date=None):
     """
     Returns a string roughly approximating an email.
     """
@@ -128,8 +129,12 @@ def generate_email(from_commit, to_commit, release_date=None):
 
         Please record your notes on https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
         and add any bugs found to the Release Candidate Bugs section.
+
+        If you are a non-affiliated open-source contributor to edx-platform,
+        the edX employee who merged in your pull request will manually verify
+        your change(s), and you may disregard this message.
     """.format(
-        emails=", ".join(sorted(emails(from_commit, to_commit))),
+        emails=", ".join(sorted(emails(commit_range))),
         date=release_date.isoformat(),
     )
     return textwrap.dedent(email).strip()
@@ -141,13 +146,14 @@ def main():
     if isinstance(args.date, basestring):
         # user passed in a custom date, so we need to parse it
         args.date = parse_datestring(args.date).date()
+    commit_range = "{0}..{1}".format(args.previous, args.current)
 
     if args.table:
-        print(generate_table(args.previous, args.current, include_merge=args.merge))
+        print(generate_table(commit_range, include_merge=args.merge))
         return
 
     print("EMAIL:")
-    print(generate_email(args.previous, args.current, release_date=args.date))
+    print(generate_email(commit_range, release_date=args.date))
     print("\n")
     print("Wiki Table:")
     print(
@@ -155,7 +161,7 @@ def main():
         "in your release wiki page"
     )
     print("\n")
-    print(generate_table(args.previous, args.current, include_merge=args.merge))
+    print(generate_table(commit_range, include_merge=args.merge))
 
 if __name__ == "__main__":
     main()
