@@ -1,9 +1,10 @@
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+  <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
 </%block>
@@ -50,20 +51,15 @@ function goto( mode)
 <section class="container">
 <div class="sysadmin-dashboard-wrapper">
 
-  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt"
->
-    <h1>Sysadmin Dashboard</h1>
+  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
+    <h1>${_('Sysadmin Dashboard')}</h1>
 
-    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">Status</a> |
-          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">Courses</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
-          <a href="#" onclick="goto('Staffing');" class="${modeflag.get('Staffing')}">Staffing</a> |
-          <a href="/gitlogs">GitLogs</a>
+    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">${_('Status')}</a> |
+          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">${_('Courses')}</a> |
+          <a href="#" onclick="goto('Staffing and Enrollment');" class="${modeflag.get('Staffing and Enrollment')}">${_('Staffing and Enrollment')}</a> |
+          <a href="/gitlogs">${_('GitLogs')}</a>
            ]
     </h2>
-
-  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
-  | <span id="mitxver">${mitx_version}</span></div>
 
     <form name="dashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -71,76 +67,91 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Status'):
+	<h3>${_('User Management')}</h3>
+	<ul class="list-input">
+	  <li class="field text" style="padding-bottom: 1.2em">
+		<label for="student_uname">${_('Email or username')}</label>
+		<input type="text" name="student_uname" size=40 />
+	  </li>
 
+	  <li class="field text">
+		<label for="student_fullname">${_('Full Name')}</label>
+		<input type="text" name="student_fullname" size=40 />
+	  </li>
+	  <li class="field text">
+		<label for="student_password">${_('Password')}</label>
+		<input type="password" name="student_password" size=40 />
+	  </li>
+	</ul>
+
+	<div class="form-actions">
+	  <p>
+		<input type="submit" name="action" value="${_('Delete user')}" />
+		<input type="submit" name="action" value="${_('Create user')}">
+	  </p>
+    </div>
+
+	<hr />
     <p>
-    Email or username: <input type="text" name="student_uname" size=40 >
-    <input type="submit" name="action" value="Delete user">
+    <input type="submit" name="action" value="${_('Download list of all users (csv file)')}" style="width: 300px;">
     </p>
 
     <p>
-    Full Name: <input type="text" name="student_fullname" size=40 >
-    <input type="submit" name="action" value="Create user">
-    </p>
-
-    <p>
-    <input type="submit" name="action" value="Download list of all users (csv file)">
-    </p>
-
-    <p>
-    <input type="submit" name="action" value="Check and repair external Auth Map">
+    <input type="submit" name="action" value="${_('Check and repair external Auth Map')}" style="width: 300px;">
     </p>
 
     <hr width="40%" style="align:left">
  %endif
 
 ##----------------------------------------------------------------------------- 
-%if modeflag.get('Enrollment'):
+%if modeflag.get('Staffing and Enrollment'):
 
-<p>Go to each individual course's Instructor dashboard to manage
-course enrollment.</p>
+<p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
+<hr />
 
-%endif
-
-##----------------------------------------------------------------------------- 
-%if modeflag.get('Staffing'):
-
-<h3>Manage course staff and instructors</h3><br/>
+<h3>${_('Manage course staff and instructors')}</h3><br/>
 
     <p>
-    <input type="submit" name="action" value="Download staff and instructor list (csv file)">
+    <input type="submit" name="action" value="${_('Download staff and instructor list (csv file)')}">
     </p>
-<!--
-    <p>You may upload a list of staff/instructors for all the courses.
-    The safest approach is to download the list, modify it, then upload.</p>
-    <p><font color="red">Careful!  The uploaded file <b>overwrites</b>
-    existing list, globally covering all courses!</font></p>
-    <p>
-    Staff and instructor list (CSV file): <input type="file" name="staff_file" >
-    <input type="submit" name="action" value="Upload staff and instructor list">
-    </p>
--->
 
 %endif
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Courses'):
-    <h3>Administer Courses</h3><br/>
+    <h3>${_('Administer Courses')}</h3><br/>
 
-    <p>
-    Repo location (ssh): <input type="text" name="repo_location" size=60 >
-    <input type="submit" name="action" value="Load new course from github">
-    </p>
-    <p>
-    Course ID or dir: <input type="text" name="course_id" size=60 >
-    <input type="submit" name="action" value="Delete course from site">
-    </p>
+    <ul class="list-input">
+	  <li class="field text">
+		<label for="repo_location">
+		  ${_('Repo location')}:
+		</label>
+		<input type="text" name="repo_location" style="width:60%" />
+	  </li>
+	</ul>
+	<div class="form-actions">
+	  <input type="submit" name="action" value="${_('Load new course from github')}">
+	</div>
+	<hr />
+    <ul class="list-input">
+	  <li class="field text">
+		<label for="course_id">
+		  ${_('Course ID or dir')}:
+		</label>
+		<input type="text" name="course_id" style="width:60%" />
+	  </li>
+	</ul>
+	<div class="form-actions">
+      <input type="submit" name="action" value="${_('Delete course from site')}">
+	</div>
+	<hr style="width:40%" />
 %endif
 
 ##----------------------------------------------------------------------------- 
     </form>
 
 %if msg:
-    <p></p><p>${msg}</p>
+    <p>${msg}</p>
 %endif
 ##----------------------------------------------------------------------------- 
 ##----------------------------------------------------------------------------- 
@@ -192,5 +203,7 @@ course enrollment.</p>
 %endif
 
   </section>
+  <div style="text-align:right; float: right"><span id="djangopid">${_('Django PID')}: ${djangopid}</span>
+  | <span id="mitxver">${_('Platform Version')}: ${mitx_version}</span></div>
 </div>
 </section>
