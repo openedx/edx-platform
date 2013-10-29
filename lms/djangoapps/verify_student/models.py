@@ -534,10 +534,14 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         Returns a list of error messages
         """
-        # Translates the category names into something more human readable
-        category_dict = {
-            "photoIdReasons": _("Photo ID Issues: "),
-            "generalReasons": u""
+        # Translates the category names and messages into something more human readable
+        message_dict = {
+            ("photoIdReasons", "Not provided"): _("No photo ID was provided."),
+            ("photoIdReasons", "Text not clear"): _("The text in your photo ID image was not clear."),
+            ("generalReasons", "Name mismatch"): _("The name associated with your account and the name on your ID do not match."),
+            ("generalReasons", "Expected name missing"): _("We were unable to send your name along with your photo."),
+            ("userPhotoReasons", "Image not clear"): _("The image of your face was not clear."),
+            ("userPhotoReasons", "Face out of view"): _("Your face was not in view for your face photo"),
         }
 
         try:
@@ -546,13 +550,15 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
             msg = []
             for category in msg_dict:
-                # translate the category into a human-readable name
-                category_name = category_dict[category]
-                msg.append(category_name + u", ".join(msg_dict[category]))
+                # find the messages associated with this category
+                category_msgs = msg_dict[category]
+                for category_msg in category_msgs:
+                    msg.append(message_dict[(category, category_msg)])
             return u", ".join(msg)
         except (ValueError, KeyError):
             # if we can't parse the message as JSON or the category doesn't
             # match one of our known categories, show a generic error
+            log.error('PhotoVerification: Error parsing this error message: %s', self.error_msg)
             return _("There was an error verifying your ID photos.")
 
     def image_url(self, name):
