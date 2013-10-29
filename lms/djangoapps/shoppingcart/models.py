@@ -413,7 +413,6 @@ class CertificateItem(OrderItem):
         try:
             course_id = kwargs['course_id']
             user = kwargs['user']
-            user_email = kwargs['user_email']
 
             # If there's duplicate entries, just grab the first one and refund it (though in most cases we should only get one)
             target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=user, status='purchased', mode='verified')
@@ -425,7 +424,7 @@ class CertificateItem(OrderItem):
 
             # send billing an email so they can handle refunding
             subject = _("[Refund] User-Requested Refund")
-            message = "User " + str(user) + "(" + str(user_email) + ") has requested a refund on Order #" + str(order_number) + "."
+            message = "User " + str(user) + "(" + str(user.email) + ") has requested a refund on Order #" + str(order_number) + "."
             to_email = [settings.PAYMENT_SUPPORT_EMAIL]
             from_email = "support@edx.org"
             send_mail(subject, message, from_email, to_email, fail_silently=False)
@@ -433,7 +432,7 @@ class CertificateItem(OrderItem):
             return target_cert
 
         except IndexError:
-            log.exception("No certificate found")
+            log.exception("Matching CertificateItem not found while trying to refund.  User %s, Course %s", user, course_id)
             raise IndexError
 
     @classmethod

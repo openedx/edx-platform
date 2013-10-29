@@ -1,14 +1,20 @@
 from mock import Mock
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from xmodule.modulestore import Location
 import courseware.access as access
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from .factories import CourseEnrollmentAllowedFactory
 import datetime
 from django.utils.timezone import UTC
 
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AccessTestCase(TestCase):
     def test__has_global_staff_access(self):
         u = Mock(is_staff=False)
@@ -108,18 +114,19 @@ class AccessTestCase(TestCase):
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
 
     def test__has_access_refund(self):
-        user = Mock()
+        user = UserFactory.create()
+        course = CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
         today = datetime.datetime.now(UTC())
         grace_period = datetime.timedelta(days=14)
         one_day_extra = datetime.timedelta(days=1)
 
         # User is allowed to receive refund if it is within two weeks of course start date
-        course = Mock(enrollment_start=(today - one_day_extra), id='edX/tests/Whenever')
+        course.enrollment_start = (today - one_day_extra)
         self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
 
-        course = Mock(enrollment_start=(today - grace_period), id='edX/test/Whenever')
+        course.enrollment_start = (today - grace_period)
         self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
 
         # After two weeks, user may no longer receive a refund
-        course = Mock(enrollment_start=(today - grace_period - one_day_extra), id='edX/test/Whenever')
+        course.enrollment_start = (today - grace_period - one_day_extra)
         self.assertFalse(access._has_access_course_desc(user, course, 'refund'))
