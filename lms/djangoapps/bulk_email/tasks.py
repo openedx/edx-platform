@@ -783,5 +783,6 @@ def _statsd_tag(course_title):
     """
     Calculate the tag we will use for DataDog.
     """
-    tag = u"course_email:{0}".format(course_title)
+#    tag = u"course_email:{0}".format(course_title)
+    tag = "course_email:fake"
     return tag[:200]
