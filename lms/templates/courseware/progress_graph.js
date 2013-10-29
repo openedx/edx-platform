@@ -48,7 +48,9 @@ $(function () {
     total = 0
     earned = 0
     for section in chapter['sections']:    
-            
+      if not section['graded'] or len(section['format']) < 1:
+          continue
+
       if chapter['display_name'] not in chapters:
           colorIndex = len(chapters) % len(colors)
           chapters[ chapter['display_name'] ] = {'label' : chapter['display_name'], 
@@ -73,6 +75,10 @@ $(function () {
 
       earned += section['section_total'].earned * category_weights[section['format']]
       total += section['section_total'].possible * category_weights[section['format']]
+    
+    
+    if chapter['display_name'] not in chapters:
+        continue
     
     tickIndex += sectionSpacer
     
@@ -159,7 +165,7 @@ $(function () {
     series: {stack: true,
               lines: {show: false, steps: false },
               bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
-    xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
+    xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 45},
     yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 100},
     grid: { hoverable: true, clickable: true, borderWidth: 1, markings: markings },
     legend: {show: false},
