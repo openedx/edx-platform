@@ -3,7 +3,10 @@
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
-<html>
+<!--[if IE 7]><html class="ie7 lte9 lte8 lte7"><![endif]-->
+<!--[if IE 8]><html class="ie8 lte9 lte8"><![endif]-->
+<!--[if IE 9]><html class="ie9 lte9"><![endif]-->
+<!--[if gt IE 9]><!--><html><!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -19,10 +22,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${MITX_ROOT_URL}">
 
-    <%static:css group='base-style'/>
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
-    <link rel="stylesheet" href="${static.url('js/vendor/CodeMirror/codemirror.css')}" type="text/css" media="all" />
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-app'/>
+    <%static:css group='style-xmodule'/>
 
     <%include file="widgets/segment-io.html" />
 
