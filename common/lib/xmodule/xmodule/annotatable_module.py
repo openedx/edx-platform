@@ -10,6 +10,8 @@ import textwrap
 
 log = logging.getLogger(__name__)
 
+def _(s):
+    return s;
 
 class AnnotatableFields(object):
     data = String(help="XML data for the annotation", scope=Scope.content,
@@ -32,10 +34,10 @@ class AnnotatableFields(object):
         </annotatable>
         """))
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default='Annotation',
+        default=_('Annotation'),
     )
 
 

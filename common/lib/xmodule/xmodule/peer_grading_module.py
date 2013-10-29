@@ -19,6 +19,8 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
+def _(s):
+    return s;
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
@@ -31,7 +33,7 @@ class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name=_("Show Single Problem"),
         help=_('When True, only the single problem specified by "Link to Problem Location" is shown. '
-               'When False, a panel is displayed with all problems available for peer grading.'),
+             'When False, a panel is displayed with all problems available for peer grading.'),
         default=False,
         scope=Scope.settings
     )

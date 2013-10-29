@@ -19,6 +19,8 @@ from xblock.fields import Boolean
 
 log = logging.getLogger(__name__)
 
+def _(s):
+    return s;
 
 class LTIError(Exception):
     pass
@@ -44,10 +46,10 @@ class LTIFields(object):
 
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
-    lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
-    launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
-    custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
-    open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
+    lti_id = String(help=_("Id of the tool"), default='', scope=Scope.settings)
+    launch_url = String(help=_("URL of the tool"), default='http://www.example.com', scope=Scope.settings)
+    custom_parameters = List(help=_("Custom parameters (vbid, book_location, etc..)"), scope=Scope.settings)
+    open_in_a_new_page = Boolean(help=_("Should LTI be opened in new page?"), default=True, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):

@@ -1437,7 +1437,7 @@ class CodeResponse(LoncapaResponse):
         if self.system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Error checking problem: no external queueing server is configured.')
+                     msg=_('Error checking problem: no external queueing server is configured.')
             return cmap
 
         # Prepare xqueue request
@@ -1497,8 +1497,8 @@ class CodeResponse(LoncapaResponse):
         cmap = CorrectMap()
         if error:
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Unable to deliver your submission to grader. (Reason: %s.)'
-                         ' Please try again later.' % msg)
+                     msg=_('Unable to deliver your submission to grader. (Reason: %s.)'
+                         ' Please try again later.') % msg)
         else:
             # Queueing mechanism flags:
             #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
@@ -1517,7 +1517,7 @@ class CodeResponse(LoncapaResponse):
          msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
-                        msg='Invalid grader reply. Please contact the course staff.')
+                        msg=_('Invalid grader reply. Please contact the course staff.'))
             return oldcmap
 
         correctness = 'correct' if correct else 'incorrect'

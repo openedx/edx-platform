@@ -35,85 +35,89 @@ from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
 log = logging.getLogger(__name__)
 
+def _(s):
+    return s;
+
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
-        display_name="Display Name", help="Display name for this module.",
-        default="Video",
+        display_name=_("Display Name"), help=_("Display name for this module."),
+        default=_("Video"),
         scope=Scope.settings
     )
     position = Integer(
-        help="Current position in the video",
+        help=_("Current position in the video"),
         scope=Scope.user_state,
         default=0
     )
     show_captions = Boolean(
-        help="This controls whether or not captions are shown by default.",
-        display_name="Show Transcript",
+        help=_("This controls whether or not captions are shown by default."),
+        display_name=_("Show Transcript"),
         scope=Scope.settings,
         default=True
     )
     # TODO: This should be moved to Scope.content, but this will
     # require data migration to support the old video module.
     youtube_id_1_0 = String(
-        help="This is the Youtube ID reference for the normal speed video.",
-        display_name="Youtube ID",
+        help=_("This is the Youtube ID reference for the normal speed video."),
+        display_name=_("Youtube ID"),
         scope=Scope.settings,
-        default="OEoXaMPEzfM"
+        # Translators: Youtube Video Id of localized http://www.youtube.com/watch?v=OEoXaMPEzfM
+        default=_("OEoXaMPEzfM")
     )
     youtube_id_0_75 = String(
-        help="Optional, for older browsers: the Youtube ID for the .75x speed video.",
-        display_name="Youtube ID for .75x speed",
+        help=_("Optional, for older browsers: the Youtube ID for the .75x speed video."),
+        display_name=_("Youtube ID for .75x speed"),
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
-        help="Optional, for older browsers: the Youtube ID for the 1.25x speed video.",
-        display_name="Youtube ID for 1.25x speed",
+        help=_("Optional, for older browsers: the Youtube ID for the 1.25x speed video."),
+        display_name=_("Youtube ID for 1.25x speed"),
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
-        help="Optional, for older browsers: the Youtube ID for the 1.5x speed video.",
-        display_name="Youtube ID for 1.5x speed",
+        help=_("Optional, for older browsers: the Youtube ID for the 1.5x speed video."),
+        display_name=("Youtube ID for 1.5x speed"),
         scope=Scope.settings,
         default=""
     )
     start_time = RelativeTime(  # datetime.timedelta object
-        help="Start time for the video (HH:MM:SS).",
-        display_name="Start Time",
+        help=_("Start time for the video (HH:MM:SS)."),
+        display_name=_("Start Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     end_time = RelativeTime(  # datetime.timedelta object
-        help="End time for the video (HH:MM:SS).",
-        display_name="End Time",
+        help=_("End time for the video (HH:MM:SS)."),
+        display_name=_("End Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
 
     source = String(
-        help="The external URL to download the video. This appears as a link beneath the video.",
-        display_name="Download Video",
+        help=_("The external URL to download the video. This appears as a link beneath the video."),
+        display_name=_("Download Video"),
         scope=Scope.settings,
         default=""
     )
     html5_sources = List(
-        help="A list of filenames to be used with HTML5 video. The first supported filetype will be displayed.",
-        display_name="Video Sources",
+        help=_("A list of filenames to be used with HTML5 video. The first supported filetype will be displayed."),
+        display_name=_("Video Sources"),
         scope=Scope.settings,
     )
     track = String(
-        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
-        display_name="Download Transcript",
+        help=_("The external URL to download the timed transcript track. This appears as a link beneath the video."),
+        display_name=_("Download Transcript"),
         scope=Scope.settings,
         default=""
     )
     sub = String(
-        help="The name of the timed transcript track (for non-Youtube videos).",
-        display_name="HTML5 Transcript",
+        help=_("The name of the timed transcript track (for non-Youtube videos)."),
+        display_name=_("HTML5 Transcript"),
         scope=Scope.settings,
         default=""
     )

@@ -18,20 +18,22 @@ from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
+def _(s):
+    return s;
 
 class HtmlFields(object):
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Text"
+        default=_("Text")
     )
-    data = String(help="Html contents to display for this module", default=u"", scope=Scope.content)
-    source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
+    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    source_code = String(help=_("Source code for LaTeX documents. This feature is not well-supported."), scope=Scope.settings)
     use_latex_compiler = Boolean(
-        help="Enable LaTeX templates?",
+        help=_("Enable LaTeX templates?"),
         default=False,
         scope=Scope.settings
     )
@@ -218,12 +220,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
 class AboutFields(object):
     display_name = String(
-        help="Display name for this module",
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default="overview",
+        default=_("overview"),
     )
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default="",
         scope=Scope.content
     )
@@ -250,17 +252,17 @@ class StaticTabFields(object):
     The overrides for Static Tabs
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
-        default="Empty",
+        default=_("Empty"),
     )
     data = String(
         default=textwrap.dedent("""\
             <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
         """),
         scope=Scope.content,
-        help="HTML for the additional pages"
+        help=_("HTML for the additional pages")
     )
 
 
@@ -285,7 +287,7 @@ class CourseInfoFields(object):
     Field overrides
     """
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default="<ol></ol>",
         scope=Scope.content
     )

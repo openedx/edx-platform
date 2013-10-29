@@ -22,6 +22,8 @@ from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
 
+def _(s):
+    return s;
 
 def dummy_track(_event_type, _event):
     pass
@@ -125,8 +127,8 @@ class XModuleMixin(XBlockMixin):
     icon_class = 'other'
 
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
