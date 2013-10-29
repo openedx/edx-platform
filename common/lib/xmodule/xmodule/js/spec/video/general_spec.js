@@ -240,7 +240,8 @@
             }
         });
 
-        describe('multiple YT on page', function () {
+        // Disabled 10/29/13 due to flakiness in master
+        xdescribe('multiple YT on page', function () {
             var state1, state2, state3;
 
             beforeEach(function () {
