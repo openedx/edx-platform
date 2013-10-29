@@ -68,6 +68,10 @@ body b {
   }
 }
 
+.ui-datepicker {
+  background: $white !important;
+}
+
 /* known things to do (paint the fence, sand the floor, wax on/off):
 
 * centralize and move form styling into forms.scss - cms/static/sass/views/_textbooks.scss and cms/static/sass/views/_settings.scss
