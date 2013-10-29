@@ -60,6 +60,13 @@ body b {
 
 // ====================
 
+// needed display property reinforcement since manual CSS abstraction happened
+#page-prompt {
+
+  .wrapper-prompt:before {
+    display: inline-block;
+  }
+}
 
 /* known things to do (paint the fence, sand the floor, wax on/off):
 
