@@ -6,13 +6,38 @@
 <%namespace name='static' file='../static_content.html'/>
 
 %if verification_status == 'approved':
+<li class="status status-verification is-accepted">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
 
+  <div class="status-data">
+    <span class="status-data-message">${_("Reviewed and Verified")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification status is good until October 31, 2013")}</p>
+    </div>
+  </div>
+</li>
 %endif
 
 <%doc>
 This is for 'pending' statuses, where we are waiting for a response
 </%doc>
 %if verification_status in ('must_retry', 'submitted'):
+<li class="status status-verification is-pending">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${_("Pending")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification, submitted on October 29, 2013, is pending.")}</p>
+    </div>
+  </div>
+</li>
 
 %endif
 
@@ -38,30 +63,4 @@ This is for 'pending' statuses, where we are waiting for a response
 </li>
 %endif
 
-<li class="status status-verification is-accepted">
-  <span class="title status-title">${_("ID-Verification Status")}</span>
 
-  <div class="status-data">
-    <span class="status-data-message">${_("Reviewed and Verified")}</span>
-
-    <div class="status-note">
-      <span class="deco-arrow"></span>
-
-      <p>${_("Your verification status is good until October 31, 2013")}</p>
-    </div>
-  </div>
-</li>
-
-<li class="status status-verification is-pending">
-  <span class="title status-title">${_("ID-Verification Status")}</span>
-
-  <div class="status-data">
-    <span class="status-data-message">${_("Pending")}</span>
-
-    <div class="status-note">
-      <span class="deco-arrow"></span>
-
-      <p>${_("Your verification, submitted on October 29, 2013, is pending.")}</p>
-    </div>
-  </div>
-</li>
