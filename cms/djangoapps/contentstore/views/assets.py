@@ -14,7 +14,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
-from xmodule.util.date_utils import get_default_time_display
+from util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied

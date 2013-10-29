@@ -1,7 +1,7 @@
 """Tests for xmodule.util.date_utils"""
 
 from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
-from xmodule.util.date_utils import get_default_time_display, get_time_display, almost_same_datetime
+from util.date_utils import get_default_time_display, get_time_display, almost_same_datetime
 from datetime import datetime, timedelta, tzinfo
 from pytz import UTC
 
