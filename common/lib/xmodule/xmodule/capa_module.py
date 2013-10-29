@@ -597,7 +597,7 @@ class CapaModule(CapaFields, XModule):
         )
 
         if dispatch not in handlers:
-            return 'Error'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
 

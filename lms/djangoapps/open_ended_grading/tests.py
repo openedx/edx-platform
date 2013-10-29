@@ -5,36 +5,34 @@ Tests for open ended grading interfaces
 """
 
 import json
-from mock import MagicMock, patch, Mock
-
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group, User
-from django.conf import settings
-from mitxmako.shortcuts import render_to_string
-
-from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
-from xmodule import peer_grading_module
-from xmodule.modulestore.django import modulestore
-from xmodule.x_module import ModuleSystem
-from xmodule.error_module import ErrorDescriptor
-from xblock.fields import ScopeIds
-
-from open_ended_grading import staff_grading_service, views, utils
-from courseware.access import _course_staff_group_name
-from student.models import unique_id_for_user
-
 import logging
 
-log = logging.getLogger(__name__)
+from django.conf import settings
+from django.contrib.auth.models import Group, User
+from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-
-from xmodule.tests import test_util_open_ended
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from mock import MagicMock, patch, Mock
 from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
+from xmodule import peer_grading_module
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
+from xmodule.tests import test_util_open_ended
+from xmodule.x_module import ModuleSystem
+
+from courseware.access import _course_staff_group_name
 from courseware.tests import factories
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from mitxmako.shortcuts import render_to_string
+from student.models import unique_id_for_user
+
+from open_ended_grading import staff_grading_service, views, utils
+
+log = logging.getLogger(__name__)
 
 
 class EmptyStaffGradingService(object):

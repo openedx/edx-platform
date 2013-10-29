@@ -1,7 +1,7 @@
 import logging
-import yaml
 import os
 import sys
+import yaml
 
 from functools import partial
 from lxml import etree
