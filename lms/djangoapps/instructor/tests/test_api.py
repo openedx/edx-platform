@@ -770,8 +770,8 @@ class MockCompletionInfo(object):
         """Mock for get_task_completion_info"""
         self.times_called += 1
         if self.times_called % 2 == 0:
-            return (True, 'Task Completed')
-        return (False, 'Task Errored In Some Way')
+            return True, 'Task Completed'
+        return False, 'Task Errored In Some Way'
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -791,34 +791,36 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'created',
             'status',
             'task_message',
-            'duration_sec',
-            'task_output'
+            'duration_sec'
         ]
 
         def __init__(self, completion):
             for feature in self.FEATURES:
                 setattr(self, feature, 'expected')
-            # Make 'created' into a datetime
-            setattr(self, 'created', datetime.datetime(2013, 10, 25, 11, 42, 35))
+            # created needs to be a datetime
+            self.created = datetime.datetime(2013, 10, 25, 11, 42, 35)
             # set 'status' and 'task_message' attrs
             success, task_message = completion()
             if success:
-                setattr(self, 'status', "Complete")
+                self.status = "Complete"
             else:
-                setattr(self, 'status', "Incomplete")
-            setattr(self, 'task_message', task_message)
+                self.status = "Incomplete"
+            self.task_message = task_message
             # Set 'task_output' attr, which will be parsed to the 'duration_sec' attr.
-            setattr(self, 'task_output', '{"duration_ms": 1035000}')
-            setattr(self, 'duration_sec', 1035000 / 1000.0)
+            self.task_output = '{"duration_ms": 1035000}'
+            self.duration_sec = 1035000 / 1000.0
 
+        def make_invalid_output(self):
+            """Munge task_output to be invalid json"""
+            self.task_output = 'HI MY NAME IS INVALID JSON'
+            # This should be given the value of 'unknown' if the task output
+            # can't be properly parsed
+            self.duration_sec = 'unknown'
 
         def to_dict(self):
             """ Convert fake task to dictionary representation. """
             attr_dict = {key: getattr(self, key) for key in self.FEATURES}
             attr_dict['created'] = attr_dict['created'].isoformat()
-            # Don't actually want task_output in the attribute dictionary, as this
-            # is not explicitly extracted in extract_task_features
-            del attr_dict['task_output']
             return attr_dict
 
     def setUp(self):
@@ -840,7 +842,8 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             state=json.dumps({'attempts': 10}),
         )
         mock_factory = MockCompletionInfo()
-        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(6)]
+        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(7)]
+        self.tasks[-1].make_invalid_output()
 
     def tearDown(self):
         """

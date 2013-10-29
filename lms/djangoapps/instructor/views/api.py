@@ -690,21 +690,25 @@ def list_instructor_tasks(request, course_id):
         """
         # Pull out information from the task
         features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
-        task_feature_dict = dict((feature, str(getattr(task, feature))) for feature in features)
+        task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
         # Some information (created, duration, status, task message) require additional formatting
         task_feature_dict['created'] = task.created.isoformat()
 
         # Get duration info, if known
         duration_sec = 'unknown'
         if hasattr(task, 'task_output') and task.task_output is not None:
-            task_output = json.loads(task.task_output)
-            if 'duration_ms' in task_output:
-                duration_sec = int(task_output['duration_ms'] / 1000.0)
+            try:
+                task_output = json.loads(task.task_output)
+            except ValueError:
+                log.error("Could not parse task output as valid json; task output: %s", task.task_output)
+            else:
+                if 'duration_ms' in task_output:
+                    duration_sec = int(task_output['duration_ms'] / 1000.0)
         task_feature_dict['duration_sec'] = duration_sec
 
         # Get progress status message & success information
         success, task_message = get_task_completion_info(task)
-        status = "Complete" if success else "Incomplete"
+        status = _("Complete") if success else _("Incomplete")
         task_feature_dict['status'] = status
         task_feature_dict['task_message'] = task_message
 

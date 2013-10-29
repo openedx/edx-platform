@@ -7,8 +7,6 @@ such that the value can be defined later than this assignment (file load order).
 ###
 
 # Load utilities
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
-std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 # A typical section object.
@@ -16,6 +14,12 @@ PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTas
 # which holds the section body container.
 class CourseInfo
   constructor: (@$section) ->
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
+    @$section.data 'wrapper', @
+
+    # gather elements
+    @instructor_tasks = new (PendingInstructorTasks()) @$section
     @$course_errors_wrapper = @$section.find '.course-errors-wrapper'
 
     # if there are errors
@@ -37,19 +41,15 @@ class CourseInfo
         else
           @$course_errors_wrapper.addClass 'open'
 
-    @instructor_tasks = new (PendingInstructorTasks()) @$section
-
   # handler for when the section title is clicked.
-  onClickTitle: -> @instructor_tasks.task_poller?.start()
+  onClickTitle: -> @instructor_tasks.task_poller.start()
 
   # handler for when the section is closed
-  onExit: -> @instructor_tasks.task_poller?.stop()
+  onExit: -> @instructor_tasks.task_poller.stop()
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    CourseInfo: CourseInfo
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  CourseInfo: CourseInfo

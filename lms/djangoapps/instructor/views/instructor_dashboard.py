@@ -95,7 +95,7 @@ def _section_course_info(course_id):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
-    (course_org, course_num, course_name) = course_id.split('/')
+    course_org, course_num, course_name = course_id.split('/')
 
     section_data = {
         'section_key': 'course_info',
