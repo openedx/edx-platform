@@ -9,7 +9,7 @@ from time import time
 from sys import exc_info
 from traceback import format_exc
 from os.path import exists
-import meliae.scanner as scanner
+# import meliae.scanner as scanner
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
@@ -220,15 +220,15 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # write out a dump of memory usage at the end of this, to see what is left
     # around.  Enable it if it hasn't been explicitly disabled.
-    if action_name == 'graded': # and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
-        filename = "meliae_dump_{}.dat".format(task_id)
-        # Hardcode the name of a dump directory to try to use.
-        # If if doesn't exist, just continue to use the "local" directory.
-        dirname = '/mnt/memdump/'
-        if exists(dirname):
-            filename = dirname + filename
-        TASK_LOG.info('Dumping memory information to %s', filename)
-        scanner.dump_all_objects(filename)
+    # if action_name == 'graded': # and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
+    #     filename = "meliae_dump_{}.dat".format(task_id)
+    #     # Hardcode the name of a dump directory to try to use.
+    #     # If if doesn't exist, just continue to use the "local" directory.
+    #     dirname = '/mnt/memdump/'
+    #     if exists(dirname):
+    #         filename = dirname + filename
+    #     TASK_LOG.info('Dumping memory information to %s', filename)
+    #     scanner.dump_all_objects(filename)
 
     # log and exit, returning task_progress info as task result:
     TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
@@ -419,6 +419,8 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         # update task status:
         task_progress = get_task_progress()
         _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+
+    _get_current_task().update_state(state=PROGRESS, meta=task_progress)
 
     return task_progress
 

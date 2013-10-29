@@ -22,6 +22,7 @@ of the query for traversing StudentModule objects.
 #from cStringIO import StringIO
 #from collections import OrderedDict
 
+from django.conf import settings
 from django.utils.translation import ugettext_noop
 from celery import task
 from functools import partial
@@ -135,7 +136,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def update_offline_grades(entry_id, xmodule_instance_args):
     """Updates grades stored offline for all students in a course.
 

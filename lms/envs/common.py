@@ -840,6 +840,7 @@ CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
 LOW_PRIORITY_QUEUE = 'edx.core.low'
+HIGH_MEM_QUEUE = 'edx.core.high_mem'
 
 CELERY_QUEUE_HA_POLICY = 'all'
 
@@ -851,7 +852,8 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE = {},
 }
 
 # let logging work as configured:
@@ -1044,3 +1046,6 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+
+# Grades download
+GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
