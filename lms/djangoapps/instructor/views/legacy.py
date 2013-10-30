@@ -197,7 +197,7 @@ def instructor_dashboard(request, course_id):
                 student = User.objects.get(email=unique_student_identifier)
             else:
                 student = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student.  "
+            msg += _u("Found a single student.  ")
         except User.DoesNotExist:
             student = None
             msg += "<font color='red'>" + _u("Couldn't find student with that email or username.") + "  </font>"
@@ -422,7 +422,7 @@ def instructor_dashboard(request, course_id):
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
-            msg += "<a href='{0}' target='_blank'> " + _u("Progress page for username: {1} with email address: {2}").format(progress_url, student.username, student.email) + "</a>."
+            msg += _u("<a href='{0}' target='_blank'>Progress page for username: {1} with email address: {2}").format(progress_url, student.username, student.email) + "</a>."
 
     #----------------------------------------
     # export grades to remote gradebook

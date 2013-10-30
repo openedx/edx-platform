@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-30 16:55+0400\n"
-"PO-Revision-Date: 2013-10-30 19:36+0300\n"
+"POT-Creation-Date: 2013-10-30 19:57+0400\n"
+"PO-Revision-Date: 2013-10-30 20:08+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3553,6 +3553,10 @@ msgstr "Аналитика"
 msgid "Course Statistics At A Glance"
 msgstr "Обзор статистики курса"
 
+#: lms/djangoapps/instructor/views/legacy.py:200
+msgid "Found a single student.  "
+msgstr "Найден один студент.  "
+
 #: lms/djangoapps/instructor/views/legacy.py:203
 msgid "Couldn't find student with that email or username."
 msgstr "Невозможно найти студента с таким почтовым адресом или именем пользователя"
@@ -3626,8 +3630,8 @@ msgid "Failed to create a background task for rescoring \"{key}\": {id}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py:425
-msgid "Progress page for username: {1} with email address: {2}"
-msgstr ""
+msgid "<a href='{0}' target='_blank'>Progress page for username: {1} with email address: {2}"
+msgstr "<a href='{0}' target='_blank'>Страница прогресса пользователя {1} с почтовым адресом {2}"
 
 #: lms/djangoapps/instructor/views/legacy.py:439
 msgid "Assignment Name"
