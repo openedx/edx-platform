@@ -133,7 +133,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
 
-        resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+        resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
         self.assertEqual(resp.status_code, 200)
 
         for expected in expected_types:
@@ -158,7 +158,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
         location = descriptor.location.replace(name='.' + descriptor.location.name)
 
-        resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
+        resp = self.client.get_html(reverse('edit_unit', kwargs={'location': location.url()}))
         self.assertEqual(resp.status_code, 400)
 
     def check_edit_unit(self, test_course_name):
@@ -167,7 +167,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
             print "Checking ", descriptor.location.url()
             print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
     def lockAnAsset(self, content_store, course_location):
@@ -457,7 +457,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         problem_module_location = Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None])
         url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
-        resp = self.client.get(url)
+        resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_video_module_caption_asset_path(self):
@@ -470,7 +470,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         video_module_location = Location(['i4x', 'edX', 'toy', 'video', 'sample_video', None])
         url = reverse('preview_component', kwargs={'location': video_module_location.url()})
-        resp = self.client.get(url)
+        resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'data-caption-asset-path="/c4x/edX/toy/asset/subs_"')
 
@@ -831,7 +831,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
 
     def test_bad_contentstore_request(self):
-        resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
     def test_rewrite_nonportable_links_on_import(self):
@@ -1022,7 +1022,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             # the service in non-draft aware
             if getattr(descriptor, 'is_draft', False):
                 print "Checking {0}....".format(descriptor.location.url())
-                resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+                resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
                 self.assertEqual(resp.status_code, 200)
 
         # verify that we have the content in the draft store as well
@@ -1205,7 +1205,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handout_location = Location(['i4x', 'edX', 'toy', 'course_info', 'handouts'])
 
         # get module info
-        resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
+        resp = self.client.get_html(reverse('module_info', kwargs={'module_location': handout_location}))
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
@@ -1392,7 +1392,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
-        self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post('/course', self.course_data)
         self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
@@ -1401,7 +1401,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         course_id = _get_course_id(self.course_data)
         initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
-        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post('/course', self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['ErrMsg'], error_message)
@@ -1411,7 +1411,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
-        self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post('/course', self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
@@ -1420,13 +1420,13 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
         self.course_data['number'] = 'capital'
-        self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post('/course', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
         self.course_data['org'] = cache_current
 
-        self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post('/course', self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = self.course_data['number'].upper()
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
@@ -1435,14 +1435,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Test that a new course can be created whose name is a substring of an existing course
         """
-        self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        self.client.ajax_post('/course', self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = '{}a'.format(self.course_data['number'])
-        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post('/course', self.course_data)
         self.assertEqual(resp.status_code, 200)
         self.course_data['number'] = cache_current
         self.course_data['org'] = 'a{}'.format(self.course_data['org'])
-        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post('/course', self.course_data)
         self.assertEqual(resp.status_code, 200)
 
     def test_create_course_with_bad_organization(self):
@@ -1485,13 +1485,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Checks that the course did not get created due to a PermissionError.
         """
-        resp = self.client.ajax_post(reverse('create_new_course'), self.course_data)
+        resp = self.client.ajax_post('/course', self.course_data)
         self.assertEqual(resp.status_code, 403)
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
-        resp = self.client.get(reverse('index'))
+        resp = self.client.get_html('/course')
         self.assertContains(
             resp,
             '<h1 class="page-header">My Courses</h1>',
@@ -1513,7 +1513,7 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
         CourseFactory.create(display_name='Robot Super Educational Course')
-        resp = self.client.get(reverse('index'))
+        resp = self.client.get_html('/course')
         self.assertContains(
             resp,
             '<h3 class="course-title">Robot Super Educational Course</h3>',
@@ -1590,7 +1590,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # go to various pages
 
         # import page
-        resp = self.client.get(new_location.url_reverse('import/', ''), HTTP_ACCEPT='text/html')
+        resp = self.client.get_html(new_location.url_reverse('import/', ''))
         self.assertEqual(resp.status_code, 200)
 
         # export page
@@ -1602,7 +1602,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # course team
         url = new_location.url_reverse('course_team/', '')
-        resp = self.client.get(url, HTTP_ACCEPT='text/html')
+        resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
 
         # course info
@@ -1628,18 +1628,18 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # assets_handler (HTML for full page content)
         url = new_location.url_reverse('assets/', '')
-        resp = self.client.get(url, HTTP_ACCEPT='text/html')
+        resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.get(reverse('edit_subsection',
+        resp = self.client.get_html(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
         self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.get(reverse('edit_unit',
+        resp = self.client.get_html(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
         self.assertEqual(resp.status_code, 200)
 
@@ -1853,7 +1853,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         Show the course overview page.
         """
         new_location = loc_mapper().translate_location(location.course_id, location, False, True)
-        return self.client.get(new_location.url_reverse('course/', ''), HTTP_ACCEPT='text/html')
+        return self.client.get_html(new_location.url_reverse('course/', ''))
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -1927,7 +1927,7 @@ def _create_course(test, course_data):
     course_id = _get_course_id(course_data)
     new_location = loc_mapper().translate_location(course_id, CourseDescriptor.id_to_location(course_id), False, True)
 
-    response = test.client.ajax_post(reverse('create_new_course'), course_data)
+    response = test.client.ajax_post('/course', course_data)
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)

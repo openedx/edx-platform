@@ -212,7 +212,6 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
             <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
               <div class="form-actions">
                 <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon-cog icon-inline icon-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
               </div>
