@@ -35,7 +35,7 @@ class SendEmail
           send_to = gettext("everyone who is staff or instructor on this course")
         else
           send_to = gettext("ALL (everyone who is enrolled in this course as student, staff, or instructor)")
-          success_message = gettext("Your email was successfully queued for sending.  Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.")
+          success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
         subject = gettext(@$subject.val())
         confirm_message = gettext("You are about to send an email titled \"#{subject}\" to #{send_to}.  Is this OK?")
         if confirm confirm_message

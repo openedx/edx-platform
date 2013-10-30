@@ -40,12 +40,18 @@
   </li>
   </ul>
  <div class="submit-email-action">
-  ${_("Please try not to email students more than once a day. Before sending your email, consider:")}
+  <p class="copy">${_("Please try not to email students more than once per week. Before sending your email, consider:")}</p>
   <ul class="list-advice">
    <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
   </ul>
  </div>
+ <div class="submit-email-warning">
+   <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+     ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+   <b>${_("A queued email CANNOT be cancelled.")}</b></p>
+</div>
+ <br />
   <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
   <div class="request-response-error"></div>
 </div>
