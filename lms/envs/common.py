@@ -21,7 +21,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614
+# pylint: disable=W0401, W0611, W0614, C0103
 
 import sys
 import os
@@ -174,7 +174,7 @@ MITX_FEATURES = {
     'ENABLE_CHAT': False,
 
     # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES' : False,
+    'MULTIPLE_ENROLLMENT_ROLES': False,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
@@ -222,10 +222,11 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
-node_paths = [COMMON_ROOT / "static/js/vendor",
-              COMMON_ROOT / "static/coffee/src",
-              system_node_path
-              ]
+node_paths = [
+    COMMON_ROOT / "static/js/vendor",
+    COMMON_ROOT / "static/coffee/src",
+    system_node_path,
+]
 NODE_PATH = ':'.join(node_paths)
 
 
@@ -648,10 +649,11 @@ main_vendor_js = [
     'js/vendor/annotator.tags.min.js'
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
+notes_js = ['coffee/src/notes.js']
+instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -710,7 +712,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -763,6 +765,11 @@ PIPELINE_JS = {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
         'test_order': 7
+    },
+    'instructor_dash': {
+        'source_filenames': instructor_dash_js,
+        'output_filename': 'js/instructor_dash.js',
+        'test_order': 9,
     },
 }
 
@@ -990,7 +997,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy_edx',
 
     # Verified Certificates
-    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
 
@@ -1023,7 +1030,7 @@ def enable_theme(theme_name):
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
-    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
 ######################## CAS authentication ###########################
