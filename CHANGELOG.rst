@@ -16,6 +16,12 @@ Blades: Fix bug when the speed can only be changed when the video is playing.
 LMS: Change bulk email implementation to use less memory, and to better handle
 duplicate tasks in celery.
 
+LMS: When a topic is selected in the forums navigation sidebar, fetch
+the thread list using the /threads endpoint of the comments service
+instead of /search/threads, which does not sort and paginate
+correctly. This requires at least version 31ef160 of
+cs_comments_service.
+
 LMS: Improve forum error handling so that errors in the logs are
 clearer and HTTP status codes from the comments service indicating
 client error are correctly passed through to the client.
