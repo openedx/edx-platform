@@ -1,2 +1,4 @@
-class CMS.Models.Module extends Backbone.Model
-  url: '/save_item'
+define ["backbone"], (Backbone) ->
+  class Module extends Backbone.Model
+    url: '/save_item'
+

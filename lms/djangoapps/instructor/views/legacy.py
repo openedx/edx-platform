@@ -23,13 +23,14 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from xmodule_modifiers import wrap_xmodule
+from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 
+from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
@@ -46,7 +47,8 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students)
+                                 submit_reset_problem_attempts_for_all_students,
+                                 submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
 from class_dashboard import dashboard_data
 from mitxmako.shortcuts import render_to_response
@@ -108,12 +110,15 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get('idash_mode', 'Grades')
 
+    enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
+
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
-        datatable = {'header': ['Statistic', 'Value'],
-                     'title': _u('Course Statistics At A Glance'),
-                     }
-        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
+        datatable = {
+            'header': ['Statistic', 'Value'],
+            'title': _u('Course Statistics At A Glance'),
+        }
+        data = [['# Enrolled', enrollment_number]]
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
@@ -472,7 +477,14 @@ def instructor_dashboard(request, course_id):
             else:
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': ['External email', aname]}
-                datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']]
+                ddata = []
+                for x in allgrades['students']:	  # do one by one in case there is a student who has only partial grades
+                    try:
+                        ddata.append([x.email, x.grades[aidx]])
+                    except IndexError:
+                        log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
+                datatable['data'] = ddata
+                    
                 datatable['title'] = 'Grades for assignment "%s"' % aname
 
                 if 'Export CSV' in action:
@@ -721,28 +733,36 @@ def instructor_dashboard(request, course_id):
         email_to_option = request.POST.get("to_option")
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
-        text_message = html_to_text(html_message)
 
-        email = CourseEmail(
-            course_id=course_id,
-            sender=request.user,
-            to_option=email_to_option,
-            subject=email_subject,
-            html_message=html_message,
-            text_message=text_message
-        )
+        try:
+            # Create the CourseEmail object.  This is saved immediately, so that
+            # any transaction that has been pending up to this point will also be
+            # committed.
+            email = CourseEmail.create(course_id, request.user, email_to_option, email_subject, html_message)
 
-        email.save()
+            # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+            submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
-        tasks.delegate_email_batches.delay(
-            email.id,
-            request.user.id
-        )
+        except Exception as err:
+            # Catch any errors and deliver a message to the user
+            error_msg = "Failed to send email! ({0})".format(err)
+            msg += "<font color='red'>" + error_msg + "</font>"
+            log.exception(error_msg)
 
-        if email_to_option == "all":
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
-            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+            # If sending the task succeeds, deliver a success message to the user.
+            if email_to_option == "all":
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
+            else:
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
+
+    elif "Show Background Email Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
+        msg += message
+
+    elif "Show Background Email Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
+        msg += message
 
     #----------------------------------------
     # psychometrics
@@ -818,23 +838,27 @@ def instructor_dashboard(request, course_id):
     else:
         instructor_tasks = None
 
-    # determine if this is a studio-backed course so we can 1) provide a link to edit this course in studio
-    # 2) enable course email
+    # determine if this is a studio-backed course so we can provide a link to edit this course in studio
     is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
-
-    email_editor = None
-    # HTML editor for email
-    if idash_mode == 'Email' and is_studio_course:
-        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
-        email_editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
 
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link_by_id(course_id)
 
-    # Flag for whether or not we display the email tab (depending upon
-    # what backing store this course using (Mongo vs. XML))
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course:
+    email_editor = None
+    # HTML editor for email
+    if idash_mode == 'Email' and is_studio_course:
+        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
+        fragment = html_module.render('studio_view')
+        fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+        email_editor = fragment.content
+
+    # Enable instructor email only if the following conditions are met:
+    # 1. Feature flag is on
+    # 2. We have explicitly enabled email for the given course via django-admin
+    # 3. It is NOT an XML course
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       CourseAuthorization.instructor_email_enabled(course_id) and is_studio_course:
         show_email_tab = True
 
     # display course stats only if there is no other table to display:
@@ -842,41 +866,48 @@ def instructor_dashboard(request, course_id):
     if not datatable:
         course_stats = get_course_stats_table()
 
+    # disable buttons for large courses
+    disable_buttons = False
+    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    if max_enrollment_for_buttons is not None:
+        disable_buttons = enrollment_number > max_enrollment_for_buttons
+
     #----------------------------------------
     # context for rendering
+    context = {
+        'course': course,
+        'staff_access': True,
+        'admin_access': request.user.is_staff,
+        'instructor_access': instructor_access,
+        'forum_admin_access': forum_admin_access,
+        'datatable': datatable,
+        'course_stats': course_stats,
+        'msg': msg,
+        'modeflag': {idash_mode: 'selectedmode'},
+        'studio_url': studio_url,
 
-    context = {'course': course,
-               'staff_access': True,
-               'admin_access': request.user.is_staff,
-               'instructor_access': instructor_access,
-               'forum_admin_access': forum_admin_access,
-               'datatable': datatable,
-               'course_stats': course_stats,
-               'msg': msg,
-               'modeflag': {idash_mode: 'selectedmode'},
-               'studio_url': studio_url,
+        'to_option': email_to_option,      # email
+        'subject': email_subject,          # email
+        'editor': email_editor,            # email
+        'email_msg': email_msg,            # email
+        'show_email_tab': show_email_tab,  # email
 
-               'to_option': email_to_option,      # email
-               'subject': email_subject,          # email
-               'editor': email_editor,            # email
-               'email_msg': email_msg,            # email
-               'show_email_tab': show_email_tab,  # email
+        'problems': problems,		# psychometrics
+        'plots': plots,			# psychometrics
+        'course_errors': modulestore().get_item_errors(course.location),
+        'instructor_tasks': instructor_tasks,
+        'offline_grade_log': offline_grades_available(course_id),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-               'problems': problems,		# psychometrics
-               'plots': plots,			# psychometrics
-               'course_errors': modulestore().get_item_errors(course.location),
-               'instructor_tasks': instructor_tasks,
-               'offline_grade_log': offline_grades_available(course_id),
-               'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-
-               'analytics_results': analytics_results,
-               'metrics_results': metrics_results,
-               }
+        'analytics_results': analytics_results,
+        'disable_buttons': disable_buttons
+    }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
@@ -1030,7 +1061,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         else:
             user = User.objects.get(username=username_or_email)
     except User.DoesNotExist:
-        msg = '<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
+        msg = u'<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
         user = None
 
     if user is not None:
@@ -1528,7 +1559,7 @@ def dump_grading_context(course):
     return msg
 
 
-def get_background_task_table(course_id, problem_url, student=None):
+def get_background_task_table(course_id, problem_url=None, student=None, task_type=None):
     """
     Construct the "datatable" structure to represent background task history.
 
@@ -1539,14 +1570,16 @@ def get_background_task_table(course_id, problem_url, student=None):
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    history_entries = get_instructor_task_history(course_id, problem_url, student, task_type)
     datatable = {}
     msg = ""
     # first check to see if there is any history at all
     # (note that we don't have to check that the arguments are valid; it
     # just won't find any entries.)
     if (history_entries.count()) == 0:
-        if student is not None:
+        if problem_url is None:
+            msg += '<font color="red">Failed to find any background tasks for course "{course}".</font>'.format(course=course_id)
+        elif student is not None:
             template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
             msg += template.format(course=course_id, problem=problem_url, student=student.username)
         else:
@@ -1583,7 +1616,9 @@ def get_background_task_table(course_id, problem_url, student=None):
                    task_message]
             datatable['data'].append(row)
 
-        if student is not None:
+        if problem_url is None:
+            datatable['title'] = "{course_id}".format(course_id=course_id)
+        elif student is not None:
             datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
                                                                                location=problem_url,
                                                                                student=student.username)

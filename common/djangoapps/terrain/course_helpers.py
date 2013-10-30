@@ -2,7 +2,7 @@
 # pylint: disable=W0621
 
 from lettuce import world
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import editable_modulestore
 from xmodule.contentstore.django import contentstore
@@ -41,13 +41,43 @@ def log_in(username='robot', password='test', email='robot@edx.org', name='Robot
 
 
 @world.absorb
-def register_by_course_id(course_id, is_staff=False):
-    create_user('robot', 'password')
-    u = User.objects.get(username='robot')
+def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
+    create_user(username, password)
+    user = User.objects.get(username=username)
     if is_staff:
-        u.is_staff = True
-        u.save()
-    CourseEnrollment.enroll(u, course_id)
+        user.is_staff = True
+        user.save()
+    CourseEnrollment.enroll(user, course_id)
+
+
+@world.absorb
+def add_to_course_staff(username, course_num):
+    """
+    Add the user with `username` to the course staff group
+    for `course_num`.
+    """
+    # Based on code in lms/djangoapps/courseware/access.py
+    group_name = "instructor_{}".format(course_num)
+    group, _ = Group.objects.get_or_create(name=group_name)
+    group.save()
+
+    user = User.objects.get(username=username)
+    user.groups.add(group)
+
+
+@world.absorb
+def add_to_course_staff(username, course_num):
+    """
+    Add the user with `username` to the course staff group
+    for `course_num`.
+    """
+    # Based on code in lms/djangoapps/courseware/access.py
+    group_name = "instructor_{}".format(course_num)
+    group, _ = Group.objects.get_or_create(name=group_name)
+    group.save()
+
+    user = User.objects.get(username=username)
+    user.groups.add(group)
 
 
 @world.absorb

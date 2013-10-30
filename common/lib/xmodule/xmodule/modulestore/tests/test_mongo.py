@@ -56,14 +56,19 @@ class TestMongoModuleStore(object):
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        doc_store_config = {
+            'host': HOST,
+            'db': DB,
+            'collection': COLLECTION,
+        }
+        store = MongoModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB)
         #
         # Also test draft store imports
         #
-        draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
         import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
@@ -113,7 +118,10 @@ class TestMongoModuleStore(object):
         pprint([Location(i['_id']).url() for i in ids])
 
     def test_mongo_modulestore_type(self):
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        store = MongoModuleStore(
+            {'host': HOST, 'db': DB, 'collection': COLLECTION},
+            FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
+        )
         assert_equals(store.get_modulestore_type('foo/bar/baz'), 'mongo')
 
     def test_get_courses(self):

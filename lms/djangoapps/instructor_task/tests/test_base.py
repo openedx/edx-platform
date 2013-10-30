@@ -88,7 +88,7 @@ class InstructorTaskTestCase(TestCase):
     def _create_progress_entry(self, student=None, task_state=PROGRESS):
         """Creates a InstructorTask entry representing a task in progress."""
         progress = {'attempted': 3,
-                    'updated': 2,
+                    'succeeded': 2,
                     'total': 5,
                     'action_name': 'rescored',
                     }
@@ -96,10 +96,10 @@ class InstructorTaskTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
-    the setup of a course and problem in order to access StudentModule state.
+    the setup of a course.
     """
     course = None
     current_user = None
@@ -120,6 +120,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         # add a sequence to the course to which the problems can be added
         self.problem_section = ItemFactory.create(parent_location=chapter.location,
                                                   category='sequential',
+                                                  metadata={'graded': True, 'format': 'Homework'},
                                                   display_name=TEST_SECTION_NAME)
 
     @staticmethod
@@ -130,12 +131,12 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
-            self.login(InstructorTaskModuleTestCase.get_user_email(username), "test")
+            self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
             self.current_user = username
 
     def _create_user(self, username, is_staff=False):
         """Creates a user and enrolls them in the test course."""
-        email = InstructorTaskModuleTestCase.get_user_email(username)
+        email = InstructorTaskCourseTestCase.get_user_email(username)
         thisuser = UserFactory.create(username=username, email=email, is_staff=is_staff)
         CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
         return thisuser
@@ -148,6 +149,31 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         """Creates a student for the test course."""
         return self._create_user(username, is_staff=False)
 
+    @staticmethod
+    def get_task_status(task_id):
+        """Use api method to fetch task status, using mock request."""
+        mock_request = Mock()
+        mock_request.REQUEST = {'task_id': task_id}
+        response = instructor_task_status(mock_request)
+        status = json.loads(response.content)
+        return status
+
+    def create_task_request(self, requester_username):
+        """Generate request that can be used for submitting tasks"""
+        request = Mock()
+        request.user = User.objects.get(username=requester_username)
+        request.get_host = Mock(return_value="testhost")
+        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
+        request.is_secure = Mock(return_value=False)
+        return request
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
+    """
+    Base test class for InstructorTask-related tests that require
+    the setup of a course and problem in order to access StudentModule state.
+    """
     @staticmethod
     def problem_location(problem_url_name):
         """
@@ -191,21 +217,3 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
                                          module_type=descriptor.location.category,
                                          module_state_key=descriptor.location.url(),
                                          )
-
-    @staticmethod
-    def get_task_status(task_id):
-        """Use api method to fetch task status, using mock request."""
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
-        return status
-
-    def create_task_request(self, requester_username):
-        """Generate request that can be used for submitting tasks"""
-        request = Mock()
-        request.user = User.objects.get(username=requester_username)
-        request.get_host = Mock(return_value="testhost")
-        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
-        request.is_secure = Mock(return_value=False)
-        return request

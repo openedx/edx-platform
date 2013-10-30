@@ -1,34 +1,35 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from xmodule.modulestore.django import loc_mapper
+%>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
-<%block name="bodyclass">is-signedin course unit</%block>
+<%block name="bodyclass">is-signedin course unit view-unit</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
-  $(document).ready(function() {
-    new CMS.Views.UnitEdit({
-      el: $('.main-wrapper'),
-      model: new CMS.Models.Module({
-        id: '${unit_location}',
-        state: '${unit_state}'
-      })
-    });
+require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/unit", "jquery.ui"],
+    function(doc, $, ModuleModel, UnitEditView, ui) {
+  window.unit_location_analytics = '${unit_location}';
 
-    $(document).ready(function() {
+  // tabs
+  $('.tab-group').tabs();
 
-      // tabs
-      $('.tab-group').tabs();
-    });
+  new UnitEditView({
+    el: $('.main-wrapper'),
+    model: new ModuleModel({
+      id: '${unit_location}',
+      state: '${unit_state}'
+    })
+  });
 
-    $('.new-component-template').each(function(){
-        $emptyEditor = $(this).find('.empty');
-        $(this).prepend($emptyEditor);
-      });
-    });
-
-    var unit_location_analytics = '${unit_location}';
+  $('.new-component-template').each(function(){
+      $emptyEditor = $(this).find('.empty');
+      $(this).prepend($emptyEditor);
+  });
+});
   </script>
 
 </%block>
@@ -179,7 +180,11 @@
             </div>
             <ol>
               <li>
-                <a href="${reverse('course_index', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" class="section-item">${section.display_name_with_default}</a>
+                <%
+                  ctx_loc = context_course.location
+                  index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
+                %>
+                <a href="${index_url}" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">

@@ -1,7 +1,7 @@
 // studio - views - unit
 // ====================
 
-body.course.unit {
+body.course.unit,.view-unit {
 
   .main-wrapper {
     margin-top: ($baseline*2);
@@ -355,6 +355,20 @@ body.course.unit {
 
           }
         }
+
+      .wrapper-alert-error {
+          margin-top: ($baseline*1.25);
+          box-shadow: none;
+          border-top: 5px solid $red-l1;
+
+          .copy,
+          .title {
+            color: $white;
+          }
+
+      }
+
+
       }
     }
 
@@ -415,6 +429,19 @@ body.course.unit {
         margin-left: 0;
       }
     }
+
+    // UI: DnD - specific elems/cases - unit
+    .courseware-unit {
+
+      // STATE: was dropped
+      &.was-dropped {
+
+        > .section-item {
+          background-color: $ui-update-color !important; // nasty, but needed for specificity
+        }
+      }
+    }
+
     // ====================
 
     // Component Editing

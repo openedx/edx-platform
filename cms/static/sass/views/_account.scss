@@ -1,7 +1,7 @@
 // studio - views - sign up/in
 // ====================
 
-body.signup, body.signin {
+.view-signup, .view-signin {
 
   .wrapper-content {
     margin: ($baseline*1.5) 0 0 0;
@@ -233,13 +233,6 @@ body.signup, body.signin {
 
     }
   }
-}
-
-.signup {
-
-}
-
-.signin {
 
   #field-password {
     position: relative;

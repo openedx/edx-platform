@@ -78,6 +78,7 @@ def select_the_verified_track(step):
     create_cert_course()
     register()
     select_contribution(32)
+    world.wait_for_ajax_complete()
     btn_css = 'input[value="Select Certificate"]'
     world.css_click(btn_css)
     assert world.is_css_present('section.progress')
@@ -174,6 +175,9 @@ def at_the_payment_page(step):
 
 @step(u'I submit valid payment information$')
 def submit_payment(step):
+    # First make sure that the page is done if it still executing
+    # an ajax query.
+    world.wait_for_ajax_complete()
     button_css = 'input[value=Submit]'
     world.css_click(button_css)
 

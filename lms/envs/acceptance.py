@@ -14,9 +14,10 @@ from .sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 import string
@@ -32,11 +33,11 @@ DOC_STORE_CONFIG = {
     'collection': 'acceptance_modulestore_%s' % seed(),
 }
 
-modulestore_options = dict({
+modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+}
 
 MODULESTORE = {
     'default': {
@@ -46,6 +47,7 @@ MODULESTORE = {
             'stores': {
                 'default': {
                     'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': modulestore_options
                 }
             }
@@ -57,7 +59,7 @@ MODULESTORE['direct'] = MODULESTORE['default']
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     }
@@ -74,6 +76,14 @@ DATABASES = {
     }
 }
 
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'track.backends.mongodb.MongoBackend'
+    }
+})
+
+BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
@@ -81,8 +91,17 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
+# Don't actually send any requests to Software Secure for student identity
+# verification.
+MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
+# Enable email on the instructor dash
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
+MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
+
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
@@ -108,7 +127,15 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware',)
+LETTUCE_APPS = ('courseware', 'instructor',)
+
+# Lettuce appears to have a bug that causes it to search
+# `instructor_task` when we specify the `instructor` app.
+# This causes some pretty cryptic errors as lettuce tries
+# to parse files in `instructor_task` as features.
+# As a quick workaround, explicitly exclude the `instructor_task` app.
+LETTUCE_AVOID_APPS = ('instructor_task',)
+
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid

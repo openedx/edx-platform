@@ -52,15 +52,15 @@ Eligibility:
 
 
 class CertificateStatuses(object):
-    unavailable = 'unavailable'
-    generating = 'generating'
-    regenerating = 'regenerating'
-    deleting = 'deleting'
-    deleted = 'deleted'
+    deleted      = 'deleted'
+    deleting     = 'deleting'
     downloadable = 'downloadable'
-    notpassing = 'notpassing'
-    restricted = 'restricted'
-    error = 'error'
+    error        = 'error'
+    generating   = 'generating'
+    notpassing   = 'notpassing'
+    regenerating = 'regenerating'
+    restricted   = 'restricted'
+    unavailable  = 'unavailable'
 
 
 class CertificateWhitelist(models.Model):

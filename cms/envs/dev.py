@@ -9,6 +9,7 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
+USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
@@ -22,23 +23,26 @@ DOC_STORE_CONFIG = {
     'collection': 'modulestore',
 }
 
-modulestore_options = dict({
+modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+}
 
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     },
     'split': {
         'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }
 }
@@ -48,7 +52,7 @@ MODULESTORE = {
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'xcontent',
     },

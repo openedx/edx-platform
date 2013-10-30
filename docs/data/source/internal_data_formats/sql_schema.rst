@@ -229,10 +229,10 @@ There is an important split in demographic data gathered for the students who si
 
     {
       "old_names" : [
-     ["David Ormsbee", "I want to add my middle name as well.", "2012-11-15T17:28:12.658126"],
-     ["Dave Ormsbee", "Dave's too informal for a certificate.", "2013-02-07T11:15:46.524331"]
+     ["Mike Smith", "Mike's too informal for a certificate.", "2012-11-15T17:28:12.658126"],
+     ["Michael Smith", "I want to add a middle name as well.", "2013-02-07T11:15:46.524331"]
       ],
-      "old_emails" : [["dormsbee@mitx.mit.edu", "2012-10-18T15:21:41.916389"]],
+      "old_emails" : [["mr_mike@email.com", "2012-10-18T15:21:41.916389"]],
       "6002x_exit_response" : {
      "rating": ["6"],
      "teach_ee": ["I do not teach EE."],

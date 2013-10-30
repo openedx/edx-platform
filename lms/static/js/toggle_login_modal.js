@@ -87,17 +87,19 @@
     }
   });
 
-  $("a[rel*=leanModal]").each(function(){
-    $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
-    embed = $($(this).attr('href')).find('iframe')
-    if(embed.length > 0) {
-      if(embed.attr('src').indexOf("?") > 0) {
-          embed.data('src', embed.attr('src') + '&autoplay=1&rel=0');
-          embed.attr('src', '');
-      } else {
-          embed.data('src', embed.attr('src') + '?autoplay=1&rel=0');
-          embed.attr('src', '');
-      }
-    }
+  $(document).ready(function($) {
+      $("a[rel*=leanModal]").each(function(){
+        $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
+        embed = $($(this).attr('href')).find('iframe')
+        if(embed.length > 0) {
+          if(embed.attr('src').indexOf("?") > 0) {
+              embed.data('src', embed.attr('src') + '&autoplay=1&rel=0');
+              embed.attr('src', '');
+          } else {
+              embed.data('src', embed.attr('src') + '?autoplay=1&rel=0');
+              embed.attr('src', '');
+          }
+        }
+      });
   });
 })(jQuery);

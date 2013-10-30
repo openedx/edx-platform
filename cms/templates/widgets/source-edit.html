@@ -26,9 +26,9 @@
 
   </div>
   </section>
-    
-  <script type="text/javascript" src="/static/js/vendor/CodeMirror/stex.js"></script>
+
   <script type = "text/javascript">
+require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   hlstrig = $('#hls-trig-${hlskey}');
   hlsmodal = $('#hls-modal-${hlskey}');
 
@@ -50,7 +50,7 @@
 
       ## setup file input
       ## need to insert this only after hls triggered, because otherwise it
-      ## causes other <form> elements to become multipart/form-data, 
+      ## causes other <form> elements to become multipart/form-data,
       ## thus breaking multiple-choice input forms, for example.
       $('#hls-finput').append('<input type="file" name="hlsfile" id="hlsfile" />');
 
@@ -68,7 +68,7 @@
   function setup_autoupload(el){
       el.find('#hlsfile').change(function() {
           var file = el.find('#hlsfile')[0].files[0];
-    
+
           var reader = new FileReader();
           reader.onload = function(event) {
               var contents = event.target.result;
@@ -132,7 +132,7 @@
           }
       });
   }
-  
+
   function process_return_${hlskey}(datadict) {
       // datadict is json of array with "xml" and "message"
       // if "xml" value is '' then the conversion failed
@@ -172,4 +172,5 @@
       hlsmodal.find('#hlsfile').trigger('click');
   });
 
+}); // end require()
   </script>

@@ -51,12 +51,15 @@ class OptionInputTest(unittest.TestCase):
 
         context = option_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'value': 'Down',
-                    'options': [('Up', 'Up'), ('Down', 'Down')],
-                    'status': 'answered',
-                    'msg': '',
-                    'inline': False,
-                    'id': 'sky_input'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'value': 'Down',
+            'options': [('Up', 'Up'), ('Down', 'Down')],
+            'status': 'answered',
+            'msg': '',
+            'inline': False,
+            'id': 'sky_input',
+        }
 
         self.assertEqual(context, expected)
 
@@ -72,6 +75,10 @@ class OptionInputTest(unittest.TestCase):
         check("('a', 'b')", ['a', 'b'])
         check("('a b','b')", ['a b', 'b'])
         check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
+        check(u"('б','в')", [u'б', u'в'])
+        check(u"('б', 'в')", [u'б', u'в'])
+        check(u"('б в','в')", [u'б в', u'в'])
+        check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
 
 
 class ChoiceGroupTest(unittest.TestCase):
@@ -98,18 +105,20 @@ class ChoiceGroupTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'sky_input',
-                    'value': 'foil3',
-                    'status': 'answered',
-                    'msg': '',
-                    'input_type': expected_input_type,
-                    'choices': [('foil1', '<text>This is foil One.</text>'),
-                                ('foil2', '<text>This is foil Two.</text>'),
-                                ('foil3', 'This is foil Three.'), ],
-                    'show_correctness': 'always',
-                    'submitted_message': 'Answer received.',
-                    'name_array_suffix': expected_suffix,   # what is this for??
-                    }
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'sky_input',
+            'value': 'foil3',
+            'status': 'answered',
+            'msg': '',
+            'input_type': expected_input_type,
+            'choices': [('foil1', '<text>This is foil One.</text>'),
+                        ('foil2', '<text>This is foil Two.</text>'),
+                        ('foil3', 'This is foil Three.'), ],
+            'show_correctness': 'always',
+            'submitted_message': 'Answer received.',
+            'name_array_suffix': expected_suffix,   # what is this for??
+        }
 
         self.assertEqual(context, expected)
 
@@ -148,14 +157,17 @@ class JavascriptInputTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'status': 'unanswered',
-                    'msg': '',
-                    'value': '3',
-                    'params': params,
-                    'display_file': display_file,
-                    'display_class': display_class,
-                    'problem_state': problem_state, }
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'status': 'unanswered',
+            'msg': '',
+            'value': '3',
+            'params': params,
+            'display_file': display_file,
+            'display_class': display_class,
+            'problem_state': problem_state,
+        }
 
         self.assertEqual(context, expected)
 
@@ -176,16 +188,19 @@ class TextLineTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'BumbleBee',
-                    'status': 'unanswered',
-                    'size': size,
-                    'msg': '',
-                    'hidden': False,
-                    'inline': False,
-                    'do_math': False,
-                    'trailing_text': '',
-                    'preprocessor': None}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'BumbleBee',
+            'status': 'unanswered',
+            'size': size,
+            'msg': '',
+            'hidden': False,
+            'inline': False,
+            'do_math': False,
+            'trailing_text': '',
+            'preprocessor': None,
+        }
         self.assertEqual(context, expected)
 
     def test_math_rendering(self):
@@ -204,17 +219,22 @@ class TextLineTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'BumbleBee',
-                    'status': 'unanswered',
-                    'size': size,
-                    'msg': '',
-                    'hidden': False,
-                    'inline': False,
-                    'trailing_text': '',
-                    'do_math': True,
-                    'preprocessor': {'class_name': preprocessorClass,
-                                     'script_src': script}}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'BumbleBee',
+            'status': 'unanswered',
+            'size': size,
+            'msg': '',
+            'hidden': False,
+            'inline': False,
+            'trailing_text': '',
+            'do_math': True,
+            'preprocessor': {
+                'class_name': preprocessorClass,
+                'script_src': script,
+            },
+        }
         self.assertEqual(context, expected)
 
     def test_trailing_text_rendering(self):
@@ -242,16 +262,19 @@ class TextLineTest(unittest.TestCase):
 
             context = the_input._get_render_context()  # pylint: disable=W0212
 
-            expected = {'id': 'prob_1_2',
-                        'value': 'BumbleBee',
-                        'status': 'unanswered',
-                        'size': size,
-                        'msg': '',
-                        'hidden': False,
-                        'inline': False,
-                        'do_math': False,
-                        'trailing_text': expected_text,
-                        'preprocessor': None}
+            expected = {
+                'STATIC_URL': '/dummy-static/',
+                'id': 'prob_1_2',
+                'value': 'BumbleBee',
+                'status': 'unanswered',
+                'size': size,
+                'msg': '',
+                'hidden': False,
+                'inline': False,
+                'do_math': False,
+                'trailing_text': expected_text,
+                'preprocessor': None,
+            }
             self.assertEqual(context, expected)
 
 
@@ -280,13 +303,16 @@ class FileSubmissionTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'status': 'queued',
-                    'msg': input_class.submitted_msg,
-                    'value': 'BumbleBee.py',
-                    'queue_len': '3',
-                    'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
-                    'required_files': '["cookies.py"]'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'status': 'queued',
+            'msg': input_class.submitted_msg,
+            'value': 'BumbleBee.py',
+            'queue_len': '3',
+            'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
+            'required_files': '["cookies.py"]',
+        }
 
         self.assertEqual(context, expected)
 
@@ -325,17 +351,20 @@ class CodeInputTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'print "good evening"',
-                    'status': 'queued',
-                    'msg': input_class.submitted_msg,
-                    'mode': mode,
-                    'linenumbers': linenumbers,
-                    'rows': rows,
-                    'cols': cols,
-                    'hidden': '',
-                    'tabsize': int(tabsize),
-                    'queue_len': '3'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'print "good evening"',
+            'status': 'queued',
+            'msg': input_class.submitted_msg,
+            'mode': mode,
+            'linenumbers': linenumbers,
+            'rows': rows,
+            'cols': cols,
+            'hidden': '',
+            'tabsize': int(tabsize),
+            'queue_len': '3',
+        }
 
         self.assertEqual(context, expected)
 
@@ -375,19 +404,22 @@ class MatlabTest(unittest.TestCase):
     def test_rendering(self):
         context = self.the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'print "good evening"',
-                    'status': 'queued',
-                    'msg': self.input_class.submitted_msg,
-                    'mode': self.mode,
-                    'rows': self.rows,
-                    'cols': self.cols,
-                    'queue_msg': '',
-                    'linenumbers': 'true',
-                    'hidden': '',
-                    'tabsize': int(self.tabsize),
-                    'button_enabled': True,
-                    'queue_len': '3'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'print "good evening"',
+            'status': 'queued',
+            'msg': self.input_class.submitted_msg,
+            'mode': self.mode,
+            'rows': self.rows,
+            'cols': self.cols,
+            'queue_msg': '',
+            'linenumbers': 'true',
+            'hidden': '',
+            'tabsize': int(self.tabsize),
+            'button_enabled': True,
+            'queue_len': '3',
+        }
 
         self.assertEqual(context, expected)
 
@@ -401,19 +433,22 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'print "good evening"',
-                    'status': 'queued',
-                    'msg': self.input_class.submitted_msg,
-                    'mode': self.mode,
-                    'rows': self.rows,
-                    'cols': self.cols,
-                    'queue_msg': 'message',
-                    'linenumbers': 'true',
-                    'hidden': '',
-                    'tabsize': int(self.tabsize),
-                    'button_enabled': True,
-                    'queue_len': '3'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'print "good evening"',
+            'status': 'queued',
+            'msg': self.input_class.submitted_msg,
+            'mode': self.mode,
+            'rows': self.rows,
+            'cols': self.cols,
+            'queue_msg': 'message',
+            'linenumbers': 'true',
+            'hidden': '',
+            'tabsize': int(self.tabsize),
+            'button_enabled': True,
+            'queue_len': '3',
+        }
 
         self.assertEqual(context, expected)
 
@@ -427,19 +462,22 @@ class MatlabTest(unittest.TestCase):
 
             the_input = self.input_class(test_system(), elt, state)
             context = the_input._get_render_context()  # pylint: disable=W0212
-            expected = {'id': 'prob_1_2',
-                        'value': 'print "good evening"',
-                        'status': status,
-                        'msg': '',
-                        'mode': self.mode,
-                        'rows': self.rows,
-                        'cols': self.cols,
-                        'queue_msg': '',
-                        'linenumbers': 'true',
-                        'hidden': '',
-                        'tabsize': int(self.tabsize),
-                        'button_enabled': False,
-                        'queue_len': '0'}
+            expected = {
+                'STATIC_URL': '/dummy-static/',
+                'id': 'prob_1_2',
+                'value': 'print "good evening"',
+                'status': status,
+                'msg': '',
+                'mode': self.mode,
+                'rows': self.rows,
+                'cols': self.cols,
+                'queue_msg': '',
+                'linenumbers': 'true',
+                'hidden': '',
+                'tabsize': int(self.tabsize),
+                'button_enabled': False,
+                'queue_len': '0',
+            }
 
             self.assertEqual(context, expected)
 
@@ -452,19 +490,22 @@ class MatlabTest(unittest.TestCase):
 
         the_input = self.input_class(test_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=W0212
-        expected = {'id': 'prob_1_2',
-                    'value': 'print "good evening"',
-                    'status': 'queued',
-                    'msg': self.input_class.plot_submitted_msg,
-                    'mode': self.mode,
-                    'rows': self.rows,
-                    'cols': self.cols,
-                    'queue_msg': '',
-                    'linenumbers': 'true',
-                    'hidden': '',
-                    'tabsize': int(self.tabsize),
-                    'button_enabled': True,
-                    'queue_len': '1'}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'print "good evening"',
+            'status': 'queued',
+            'msg': self.input_class.plot_submitted_msg,
+            'mode': self.mode,
+            'rows': self.rows,
+            'cols': self.cols,
+            'queue_msg': '',
+            'linenumbers': 'true',
+            'hidden': '',
+            'tabsize': int(self.tabsize),
+            'button_enabled': True,
+            'queue_len': '1',
+        }
 
         self.assertEqual(context, expected)
 
@@ -558,16 +599,19 @@ class SchematicTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': value,
-                    'status': 'unsubmitted',
-                    'msg': '',
-                    'initial_value': initial_value,
-                    'width': width,
-                    'height': height,
-                    'parts': parts,
-                    'analyses': analyses,
-                    'submit_analyses': submit_analyses}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': value,
+            'status': 'unsubmitted',
+            'msg': '',
+            'initial_value': initial_value,
+            'width': width,
+            'height': height,
+            'parts': parts,
+            'analyses': analyses,
+            'submit_analyses': submit_analyses,
+        }
 
         self.assertEqual(context, expected)
 
@@ -597,15 +641,18 @@ class ImageInputTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': value,
-                    'status': 'unsubmitted',
-                    'width': width,
-                    'height': height,
-                    'src': src,
-                    'gx': egx,
-                    'gy': egy,
-                    'msg': ''}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': value,
+            'status': 'unsubmitted',
+            'width': width,
+            'height': height,
+            'src': src,
+            'gx': egx,
+            'gy': egy,
+            'msg': '',
+        }
 
         self.assertEqual(context, expected)
 
@@ -648,12 +695,15 @@ class CrystallographyTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': value,
-                    'status': 'unsubmitted',
-                    'msg': '',
-                    'width': width,
-                    'height': height}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': value,
+            'status': 'unsubmitted',
+            'msg': '',
+            'width': width,
+            'height': height,
+        }
 
         self.assertEqual(context, expected)
 
@@ -686,14 +736,17 @@ class VseprTest(unittest.TestCase):
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': value,
-                    'status': 'unsubmitted',
-                    'msg': '',
-                    'width': width,
-                    'height': height,
-                    'molecules': molecules,
-                    'geometries': geometries}
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': value,
+            'status': 'unsubmitted',
+            'msg': '',
+            'width': width,
+            'height': height,
+            'molecules': molecules,
+            'geometries': geometries,
+        }
 
         self.assertEqual(context, expected)
 
@@ -715,13 +768,15 @@ class ChemicalEquationTest(unittest.TestCase):
         ''' Verify that the render context matches the expected render context'''
         context = self.the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'H2OYeah',
-                    'status': 'unanswered',
-                    'msg': '',
-                    'size': self.size,
-                    'previewer': '/static/js/capa/chemical_equation_preview.js',
-                    }
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'H2OYeah',
+            'status': 'unanswered',
+            'msg': '',
+            'size': self.size,
+            'previewer': '/dummy-static/js/capa/chemical_equation_preview.js',
+        }
         self.assertEqual(context, expected)
 
     def test_chemcalc_ajax_sucess(self):
@@ -801,13 +856,15 @@ class FormulaEquationTest(unittest.TestCase):
         context = self.the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {
+            'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'value': 'x^2+1/2',
             'status': 'unanswered',
             'reported_status': '',
             'msg': '',
             'size': self.size,
-            'previewer': '/static/js/capa/src/formula_equation_preview.js',
+            'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
+            'inline': False,
         }
         self.assertEqual(context, expected)
 
@@ -898,7 +955,7 @@ class DragAndDropTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        path_to_images = '/static/images/'
+        path_to_images = '/dummy-static/images/'
 
         xml_str = """
         <drag_and_drop_input id="prob_1_2" img="{path}about_1.png" target_outline="false">
@@ -925,15 +982,15 @@ class DragAndDropTest(unittest.TestCase):
 
         user_input = {  # order matters, for string comparison
                         "target_outline": "false",
-                        "base_image": "/static/images/about_1.png",
+                        "base_image": "/dummy-static/images/about_1.png",
                         "draggables": [
 {"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
-{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", "target_fields": []},
-{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/dummy-static/images/cc.jpg", "target_fields": []},
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/dummy-static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/dummy-static/images/mute.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/dummy-static/images/spinner.gif", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/dummy-static/images/volume.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": "", "target_fields": []}],
                         "one_per_target": "True",
                         "targets": [
@@ -945,12 +1002,14 @@ class DragAndDropTest(unittest.TestCase):
         the_input = lookup_tag('drag_and_drop_input')(test_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
-        expected = {'id': 'prob_1_2',
-                    'value': value,
-                    'status': 'unsubmitted',
-                    'msg': '',
-                    'drag_and_drop_json': json.dumps(user_input)
-                    }
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': value,
+            'status': 'unsubmitted',
+            'msg': '',
+            'drag_and_drop_json': json.dumps(user_input)
+        }
 
         # as we are dumping 'draggables' dicts while dumping user_input, string
         # comparison will fail, as order of keys is random.
@@ -996,6 +1055,7 @@ class AnnotationInputTest(unittest.TestCase):
         context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {
+            'STATIC_URL': '/dummy-static/',
             'id': 'annotation_input',
             'value': value,
             'status': 'answered',
@@ -1072,6 +1132,7 @@ class TestChoiceText(unittest.TestCase):
         ]
 
         expected = {
+            'STATIC_URL': '/dummy-static/',
             'msg': '',
             'input_type': expected_input_type,
             'choices': choices,

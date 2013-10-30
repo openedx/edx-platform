@@ -10,10 +10,12 @@ import oauthlib.oauth1
 import urllib
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
+from xblock.fields import Boolean
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +47,7 @@ class LTIFields(object):
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
+    open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
@@ -92,10 +95,10 @@ class LTIModule(LTIFields, XModule):
 
             <form
                     action="${launch_url}"
-                    name="ltiLaunchForm"
+                    name="ltiLaunchForm-${element_id}"
                     class="ltiLaunchForm"
                     method="post"
-                    target="ltiLaunchFrame"
+                    target="ltiLaunchFrame-${element_id}"
                     encType="application/x-www-form-urlencoded"
                 >
                     <input name="launch_presentation_return_url" value="" />
@@ -137,18 +140,59 @@ class LTIModule(LTIFields, XModule):
         Renders parameters to template.
         """
 
+        # LTI provides a list of default parameters that might be passed as
+        # part of the POST data. These parameters should not be prefixed.
+        # Likewise, The creator of an LTI link can add custom key/value parameters
+        # to a launch which are to be included with the launch of the LTI link.
+        # In this case, we will automatically add `custom_` prefix before this parameters.
+        # See http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html#_Toc316828520
+        PARAMETERS = [
+            "lti_message_type",
+            "lti_version",
+            "resource_link_id",
+            "resource_link_title",
+            "resource_link_description",
+            "user_id",
+            "user_image",
+            "roles",
+            "lis_person_name_given",
+            "lis_person_name_family",
+            "lis_person_name_full",
+            "lis_person_contact_email_primary",
+            "lis_person_sourcedid",
+            "role_scope_mentor",
+            "context_id",
+            "context_type",
+            "context_title",
+            "context_label",
+            "launch_presentation_locale",
+            "launch_presentation_document_target",
+            "launch_presentation_css_url",
+            "launch_presentation_width",
+            "launch_presentation_height",
+            "launch_presentation_return_url",
+            "tool_consumer_info_product_family_code",
+            "tool_consumer_info_version",
+            "tool_consumer_instance_guid",
+            "tool_consumer_instance_name",
+            "tool_consumer_instance_description",
+            "tool_consumer_instance_url",
+            "tool_consumer_instance_contact_email",
+        ]
+
         # Obtains client_key and client_secret credentials from current course:
         course_id = self.runtime.course_id
         course_location = CourseDescriptor.id_to_location(course_id)
         course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key = client_secret = ''
+
         for lti_passport in course.lti_passports:
             try:
-                lti_id, key, secret = lti_passport.split(':')
+                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
                 raise LTIError('Could not parse LTI passport: {0!r}. \
                     Should be "id:key:secret" string.'.format(lti_passport))
-            if lti_id == self.lti_id:
+            if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
 
@@ -156,27 +200,31 @@ class LTIModule(LTIFields, XModule):
         custom_parameters = {}
         for custom_parameter in self.custom_parameters:
             try:
-                param_name, param_value = custom_parameter.split('=', 1)
+                param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
             except ValueError:
                 raise LTIError('Could not parse custom parameter: {0!r}. \
                     Should be "x=y" string.'.format(custom_parameter))
 
-            # LTI specs:  'custom_' should be prepended before each custom parameter
-            custom_parameters[u'custom_' + unicode(param_name)] = unicode(param_value)
+            # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
+            if param_name not in PARAMETERS:
+                param_name = 'custom_' + param_name
+
+            custom_parameters[unicode(param_name)] = unicode(param_value)
 
         input_fields = self.oauth_params(
             custom_parameters,
             client_key,
             client_secret
         )
-
         context = {
             'input_fields': input_fields,
 
             # these params do not participate in oauth signing
-            'launch_url': self.launch_url,
+            'launch_url': self.launch_url.strip(),
             'element_id': self.location.html_id(),
-            'element_class': self.location.category,
+            'element_class': self.category,
+            'open_in_a_new_page': self.open_in_a_new_page,
+            'display_name': self.display_name,
         }
 
         return self.system.render_template('lti.html', context)
@@ -222,7 +270,7 @@ class LTIModule(LTIFields, XModule):
 
         try:
             __, headers, __ = client.sign(
-                unicode(self.launch_url),
+                unicode(self.launch_url.strip()),
                 http_method=u'POST',
                 body=body,
                 headers=headers)
@@ -254,8 +302,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
 
-class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor):
+class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
-    LTIModuleDescriptor provides no export/import to xml.
+    Descriptor for LTI Xmodule.
     """
     module_class = LTIModule

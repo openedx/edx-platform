@@ -1,6 +1,7 @@
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
-                            PendingEmailChange)
+                            PendingEmailChange, UserStanding,
+                            )
 from django.contrib.auth.models import Group
 from datetime import datetime
 from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
@@ -15,6 +16,13 @@ class GroupFactory(DjangoModelFactory):
     FACTORY_FOR = Group
 
     name = u'staff_MITx/999/Robot_Super_Course'
+
+class UserStandingFactory(DjangoModelFactory):
+    FACTORY_FOR = UserStanding
+
+    user = None
+    account_status = None
+    changed_by = None
 
 
 class UserProfileFactory(DjangoModelFactory):

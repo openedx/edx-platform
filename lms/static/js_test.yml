@@ -30,32 +30,29 @@ prepend_path: lms/static
 lib_paths:
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/coffee/src/logger.js
-    - xmodule_js/common_static/js/vendor/RequireJS.js
-    - xmodule_js/common_static/js/vendor/json2.js
+    - xmodule_js/common_static/js/vendor/jasmine-jquery.js
+    - xmodule_js/common_static/js/vendor/require.js
+    - js/RequireJS-namespace-undefine.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
-    - xmodule_js/common_static/js/vendor/jquery.qtip.min.js
-    - xmodule_js/common_static/js/vendor/swfobject/swfobject.js
-    - xmodule_js/common_static/js/vendor/jquery.ba-bbq.min.js
-    - xmodule_js/common_static/js/vendor/annotator.min.js
-    - xmodule_js/common_static/js/vendor/annotator.store.min.js
-    - xmodule_js/common_static/js/vendor/annotator.tags.min.js
-    - xmodule_js/common_static/js/vendor/jasmine-jquery.js
-    - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
-    - xmodule_js/src
-    - xmodule_js/common_static/js/test/add_ajax_prefix.js
+    - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
+    - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/src/capa/
+    - xmodule_js/src/video/
+    - xmodule_js/src/xmodule.js
 
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
-    - js
+    - js/src
 
 # Paths to spec (test) JavaScript files
 spec_paths:
-    - coffee/spec/helper.js
     - coffee/spec
+    - js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -68,12 +65,13 @@ spec_paths:
 #
 fixture_paths:
     - coffee/fixtures
+    - js/fixtures
 
 # Regular expressions used to exclude *.js files from
 # appearing in the test runner page.
 # Files are included by default, which means that they
 # are loaded using a <script> tag in the test runner page.
-# When loading many files, this can be slow, so 
+# When loading many files, this can be slow, so
 # exclude any files you don't need.
 #exclude_from_page:
 #    - path/to/lib/exclude/*
@@ -85,4 +83,4 @@ fixture_paths:
 # You can use this to exclude all files in a directory,
 # but make an exception for particular files.
 #include_in_page:
-#    - path/to/lib/exclude/exception_*.js
+#    - path/to/lib/include/*

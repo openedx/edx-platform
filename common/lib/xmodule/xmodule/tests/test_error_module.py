@@ -29,9 +29,9 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
     def test_error_module_xml_rendering(self):
         descriptor = error_module.ErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course, self.error_msg)
-        self.assertTrue(isinstance(descriptor, error_module.ErrorDescriptor))
-        module = descriptor.xmodule(self.system)
-        context_repr = module.get_html()
+        self.assertIsInstance(descriptor, error_module.ErrorDescriptor)
+        descriptor.xmodule_runtime = self.system
+        context_repr = self.system.render(descriptor, 'student_view').content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(self.valid_xml), context_repr)
 
@@ -43,9 +43,9 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
 
         error_descriptor = error_module.ErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
-        self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
-        module = error_descriptor.xmodule(self.system)
-        context_repr = module.get_html()
+        self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
+        error_descriptor.xmodule_runtime = self.system
+        context_repr = self.system.render(error_descriptor, 'student_view').content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(descriptor), context_repr)
 
@@ -60,13 +60,13 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
     def test_non_staff_error_module_create(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course)
-        self.assertTrue(isinstance(descriptor, error_module.NonStaffErrorDescriptor))
+        self.assertIsInstance(descriptor, error_module.NonStaffErrorDescriptor)
 
     def test_from_xml_render(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course)
-        module = descriptor.xmodule(self.system)
-        context_repr = module.get_html()
+        descriptor.xmodule_runtime = self.system
+        context_repr = self.system.render(descriptor, 'student_view').content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(repr(self.valid_xml), context_repr)
 
@@ -78,8 +78,8 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
 
         error_descriptor = error_module.NonStaffErrorDescriptor.from_descriptor(
             descriptor, self.error_msg)
-        self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
-        module = error_descriptor.xmodule(self.system)
-        context_repr = module.get_html()
+        self.assertIsInstance(error_descriptor, error_module.ErrorDescriptor)
+        error_descriptor.xmodule_runtime = self.system
+        context_repr = self.system.render(error_descriptor, 'student_view').content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(str(descriptor), context_repr)

@@ -14,15 +14,15 @@
     right: 2em;
   }
 
-	section.instructor-dashboard-content {
-		@extend .content;
+  section.instructor-dashboard-content {
+    @extend .content;
     padding: 40px;
     width: 100%;
 
     h1 {
       @extend .top-header;
     }
-	}
+  }
 
   // form fields
   .list-fields {
@@ -37,8 +37,19 @@
       &:last-child {
         margin-bottom: 0;
       }
+
+      .tip {
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint(rgb(127,127,127),50%);
+        @include font-size(12);
+      }
+
     }
+
   }
+
+  // ====================
 
   // system feedback - messages
   .msg {
@@ -51,13 +62,49 @@
     }
   }
 
-  .msg-confirm {
-    border-top: 2px solid green;
-    background: tint(green,90%);
+  // TYPE: warning
+  .msg-warning {
+    border-top: 2px solid $warning-color;
+    background: tint($warning-color,95%);
 
     .copy {
-      color: green;
+      color: $warning-color;
     }
+  }
+
+  // TYPE: confirm
+  .msg-confirm {
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+
+    .copy {
+      color: $confirm-color;
+    }
+  }
+
+  // TYPE: confirm
+  .msg-error {
+    border-top: 2px solid $error-color;
+    background: tint($error-color,95%);
+
+    .copy {
+      color: $error-color;
+    }
+  }
+
+  // ====================
+
+  // inline copy
+  .copy-confirm {
+    color: $confirm-color;
+  }
+
+  .copy-warning {
+    color: $warning-color;
+  }
+
+  .copy-error {
+    color: $error-color;
   }
 
   .list-advice {

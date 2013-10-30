@@ -1,5 +1,4 @@
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from lxml import html, etree
 import re
@@ -39,18 +38,12 @@ def get_course_updates(location):
     if course_html_parsed.tag == 'ol':
         # 0 is the newest
         for idx, update in enumerate(course_html_parsed):
-            if (len(update) == 0):
-                continue
-            elif (len(update) == 1):
-                # could enforce that update[0].tag == 'h2'
-                content = update[0].tail
-            else:
-                content = "\n".join([html.tostring(ele) for ele in update[1:]])
-
-            # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
-            course_upd_collection.append({"id": location_base + "/" + str(len(course_html_parsed) - idx),
-                                          "date": update.findtext("h2"),
-                                          "content": content})
+            if len(update) > 0:
+                content = _course_info_content(update)
+                # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
+                course_upd_collection.append({"id": location_base + "/" + str(len(course_html_parsed) - idx),
+                                              "date": update.findtext("h2"),
+                                              "content": content})
 
     return course_upd_collection
 
@@ -104,14 +97,22 @@ def update_course_updates(location, update, passed_id=None):
     course_updates.data = html.tostring(course_html_parsed)
     modulestore('direct').update_item(location, course_updates.data)
 
-    if (len(new_html_parsed) == 1):
-        content = new_html_parsed[0].tail
-    else:
-        content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
-
     return {"id": passed_id,
             "date": update['date'],
-            "content": content}
+            "content": _course_info_content(new_html_parsed)}
+
+
+def _course_info_content(html_parsed):
+    """
+    Constructs the HTML for the course info update, not including the header.
+    """
+    if len(html_parsed) == 1:
+        # could enforce that update[0].tag == 'h2'
+        content = html_parsed[0].tail
+    else:
+        content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
+        content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+    return content
 
 
 def delete_course_update(location, update, passed_id):

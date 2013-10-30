@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
 
@@ -45,11 +45,11 @@ def i_can_check_and_uncheck_tasks(step):
     verifyChecklist2Status(2, 7, 29)
 
 
-@step('They are correctly selected after reloading the page$')
-def tasks_correctly_selected_after_reload(step):
-    reload_the_page(step)
+@step('the tasks are correctly selected$')
+def tasks_correctly_selected(step):
     verifyChecklist2Status(2, 7, 29)
     # verify that task 7 is still selected by toggling its checkbox state and making sure that it deselects
+    world.browser.execute_script("window.scrollBy(0,1000)")
     toggleTask(1, 6)
     verifyChecklist2Status(1, 7, 14)
 
@@ -61,7 +61,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_in('Course Outline', world.css_text('.outline .page-header'))
+    assert world.is_css_present('body.view-outline')
     assert_equal(1, len(world.browser.windows))
 
 
@@ -109,13 +109,15 @@ def toggleTask(checklist, task):
 # TODO: figure out a way to do this in phantom and firefox
 # For now we will mark the scenerios that use this method as skipped
 def clickActionLink(checklist, task, actionText):
-    # toggle checklist item to make sure that the link button is showing
-    toggleTask(checklist, task)
-    action_link = world.css_find('#course-checklist' + str(checklist) + ' a')[task]
-
     # text will be empty initially, wait for it to populate
     def verify_action_link_text(driver):
-        return world.css_text('#course-checklist' + str(checklist) + ' a', index=task) == actionText
+        actualText = world.css_text('#course-checklist' + str(checklist) + ' a', index=task)
+        if actualText == actionText:
+            return True
+        else:
+            # toggle checklist item to make sure that the link button is showing
+            toggleTask(checklist, task)
+            return False
 
     world.wait_for(verify_action_link_text)
     world.css_click('#course-checklist' + str(checklist) + ' a', index=task)

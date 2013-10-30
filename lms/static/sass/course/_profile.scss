@@ -79,7 +79,7 @@ div.profile-wrapper {
           text-transform: uppercase;
           top: 9px;
 
-          &:hover {
+          &:hover, &:focus {
             color: #555;
           }
         }
@@ -110,7 +110,7 @@ div.profile-wrapper {
           text-transform: uppercase;
           top: 9px;
 
-          &:hover {
+          &:hover, &:focus {
             color: #555;
           }
         }

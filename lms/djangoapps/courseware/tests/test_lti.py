@@ -39,7 +39,7 @@ class TestLTI(BaseTestXmodule):
             u'oauth_consumer_key': u'',
             u'oauth_signature_method': u'HMAC-SHA1',
             u'oauth_version': u'1.0',
-            u'user_id': self.runtime.anonymous_student_id,
+            u'user_id': self.item_descriptor.xmodule_runtime.anonymous_student_id,
             u'role': u'student',
             u'oauth_signature': mocked_decoded_signature
         }
@@ -69,12 +69,16 @@ class TestLTI(BaseTestXmodule):
         """
         Makes sure that all parameters extracted.
         """
-        self.runtime.render_template = lambda template, context: context
-        generated_context = self.item_module.get_html()
+        generated_context = self.item_module.render('student_view').content
         expected_context = {
             'input_fields': self.correct_headers,
+            'display_name': self.item_module.display_name,
             'element_class': self.item_module.location.category,
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
+            'open_in_a_new_page': True,
         }
-        self.assertDictEqual(generated_context, expected_context)
+        self.assertEqual(
+            generated_context,
+            self.runtime.render_template('lti.html', expected_context),
+        )

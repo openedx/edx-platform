@@ -2,7 +2,7 @@ import unittest
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
@@ -16,6 +16,9 @@ class TemplateTests(unittest.TestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """
+
+    def setUp(self):
+        clear_existing_modulestores()
 
     def test_get_templates(self):
         found = templates.all_templates()

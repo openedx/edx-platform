@@ -1,13 +1,17 @@
+#=======================================================================================================================
+#
+# This code is somewhat duplicative of access.py in the LMS. We will unify the code as a separate story
+# but this implementation should be data compatible with the LMS implementation
+#
+#=======================================================================================================================
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.locator import CourseLocator, Locator
+from xmodule.modulestore.django import loc_mapper
 
-'''
-This code is somewhat duplicative of access.py in the LMS. We will unify the code as a separate story
-but this implementation should be data compatible with the LMS implementation
-'''
 
 # define a couple of simple roles, we just need ADMIN and EDITOR now for our purposes
 INSTRUCTOR_ROLE_NAME = 'instructor'
@@ -22,16 +26,24 @@ COURSE_CREATOR_GROUP_NAME = "course_creator_group"
 
 
 def get_course_groupname_for_role(location, role):
-    loc = Location(location)
+    location = Locator.to_locator_or_location(location)
+
     # hack: check for existence of a group name in the legacy LMS format <role>_<course>
     # if it exists, then use that one, otherwise use a <role>_<course_id> which contains
     # more information
-    groupname = '{0}_{1}'.format(role, loc.course)
+    groupnames = []
+    groupnames.append('{0}_{1}'.format(role, location.course_id))
+    if isinstance(location, Location):
+        groupnames.append('{0}_{1}'.format(role, location.course))
+    elif isinstance(location, CourseLocator):
+        old_location = loc_mapper().translate_locator_to_location(location)
+        if old_location:
+            groupnames.append('{0}_{1}'.format(role, old_location.course_id))
 
-    if len(Group.objects.filter(name=groupname)) == 0:
-        groupname = '{0}_{1}'.format(role, loc.course_id)
-
-    return groupname
+    for groupname in groupnames:
+        if Group.objects.filter(name=groupname).exists():
+            return groupname
+    return groupnames[0]
 
 
 def get_users_in_course_group_by_role(location, role):
@@ -183,7 +195,7 @@ def is_user_in_course_group_role(user, location, role, check_staff=True):
         # all "is_staff" flagged accounts belong to all groups
         if check_staff and user.is_staff:
             return True
-        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        return user.groups.filter(name=get_course_groupname_for_role(location, role)).exists()
 
     return False
 

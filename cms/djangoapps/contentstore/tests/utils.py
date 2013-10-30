@@ -61,3 +61,22 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
+        self.course_location = self.course.location
+
+    def createNonStaffAuthedUserClient(self):
+        """
+        Create a non-staff user, log them in, and return the client, user to use for testing.
+        """
+        uname = 'teststudent'
+        password = 'foo'
+        nonstaff = User.objects.create_user(uname, 'test+student@edx.org', password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        nonstaff.is_active = True
+        nonstaff.is_staff = False
+        nonstaff.save()
+
+        client = Client()
+        client.login(username=uname, password=password)
+        return client, nonstaff

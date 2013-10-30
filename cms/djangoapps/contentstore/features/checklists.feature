@@ -9,7 +9,8 @@ Feature: CMS.Course checklists
   Scenario: A course author can mark tasks as complete
     Given I have opened Checklists
     Then I can check and uncheck tasks in a checklist
-    And They are correctly selected after reloading the page
+    And I reload the page
+    Then the tasks are correctly selected
 
   # There are issues getting link to be active in browsers other than chrome
   @skip_firefox

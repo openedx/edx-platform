@@ -1,95 +1,7 @@
 // lms - views - verification flow
 // ====================
 
-// MISC: extends - type
-// application: canned headings
-%hd-lv1 {
-  @extend %t-title1;
-  @extend %t-weight1;
-  color: $m-gray-d4;
-  margin: 0 0 ($baseline*2) 0;
-}
-
-%hd-lv2 {
-  @extend %t-title4;
-  @extend %t-weight1;
-  margin: 0 0 ($baseline*0.75) 0;
-  border-bottom: 1px solid $m-gray-l3;
-  padding-bottom: ($baseline/2);
-  color: $m-gray-d4;
-}
-
-%hd-lv3 {
-  @extend %t-title6;
-  @extend %t-weight4;
-  margin: 0 0 ($baseline/4) 0;
-  color: $m-gray-d4;
-}
-
-%hd-lv4 {
-  @extend %t-title6;
-  @extend %t-weight2;
-  margin: 0 0 $baseline 0;
-  color: $m-gray-d4;
-}
-
-%hd-lv5 {
-  @extend %t-title7;
-  @extend %t-weight4;
-  margin: 0 0 ($baseline/4) 0;
-  color: $m-gray-d4;
-}
-
-// application: canned copy
-%copy-base {
-  @extend %t-copy-base;
-  color: $m-gray-d2;
-}
-
-%copy-lead1 {
-  @extend %t-copy-lead2;
-  color: $m-gray;
-}
-
-%copy-detail {
-  @extend %t-copy-sub1;
-  @extend %t-weight3;
-  color: $m-gray-d1;
-}
-
-%copy-metadata {
-  @extend %t-copy-sub2;
-  color: $m-gray-d1;
-
-
-  %copy-metadata-value {
-    @extend %t-weight2;
-  }
-
-  %copy-metadata-value {
-    @extend %t-weight4;
-  }
-}
-
-// application: canned links
-%copy-link {
-  border-bottom: 1px dotted transparent;
-
-  &:hover, &:active {
-    border-color: $link-color-d1;
-  }
-}
-
-%copy-badge {
-  @extend %t-title8;
-  @extend %t-weight5;
-  border-radius: ($baseline/5);
-  padding: ($baseline/2) $baseline;
-  text-transform: uppercase;
-}
-
-// ====================
-
+// MISC: extends - button
 %btn-verify-primary {
   @extend %btn-primary-green;
 }
@@ -751,6 +663,7 @@
 
             .action {
               @extend %btn-verify-primary;
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -1190,7 +1103,7 @@
     .form-register-choose {
       @include clearfix();
       width: flex-grid(12,12);
-      margin: $baseline 0;
+      margin: ($baseline*2) 0;
 
       .deco-divider {
         width: flex-grid(8,12);
@@ -1210,7 +1123,7 @@
       background: $m-gray-l4;
 
       &:last-child {
-        margin-bottom: none;
+        margin-bottom: 0;
       }
 
       .wrapper-copy, .list-actions {
@@ -1352,12 +1265,13 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
+        margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
         input {
           width: auto;
+          padding: 0;
         }
 
         &:last-child {
@@ -1646,7 +1560,7 @@
         @include font-size(24);
         color: $m-blue-d3;
 
-        &:hover {
+        &:hover, &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -1796,7 +1710,7 @@
         &:last-child {
           margin-bottom: 0;
           border-bottom: none;
-          padding-bottom: none;
+          padding-bottom: 0;
         }
 
         > .title {

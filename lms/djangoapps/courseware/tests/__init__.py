@@ -11,16 +11,17 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
+from mitxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope
-from xmodule.tests import get_test_system
+from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.xblock.field_data import lms_field_data
+from lms.xblock.field_data import LmsFieldData
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -48,11 +49,26 @@ class BaseTestXmodule(ModuleStoreTestCase):
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def xmodule_field_data(self, descriptor):
-        field_data = {}
-        field_data.update(self.MODEL_DATA)
-        student_data = DictFieldData(field_data)
-        return lms_field_data(descriptor._field_data, student_data)
+    def new_module_runtime(self):
+        """
+        Generate a new ModuleSystem that is minimally set up for testing
+        """
+        runtime = get_test_system(course_id=self.course.id)
+
+        # When asked for a module out of a descriptor, just create a new xmodule runtime,
+        # and inject it into the descriptor
+        def get_module(descr):
+            descr.xmodule_runtime = self.new_module_runtime()
+            return descr
+
+        runtime.get_module = get_module
+
+        return runtime
+
+    def new_descriptor_runtime(self):
+        runtime = get_test_descriptor_system()
+        runtime.get_block = modulestore().get_item
+        return runtime
 
     def setUp(self):
 
@@ -73,7 +89,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         # username = robot{0}, password = 'test'
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create()
             for i in range(self.USER_COUNT)
         ]
 
@@ -86,14 +102,15 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        self.runtime = get_test_system(course_id=self.course.id)
-        # Allow us to assert that the template was called in the same way from
-        # different code paths while maintaining the type returned by render_template
-        self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
+        self.runtime = self.new_descriptor_runtime()
 
-        self.runtime.xmodule_field_data = self.xmodule_field_data
+        field_data = {}
+        field_data.update(self.MODEL_DATA)
+        student_data = DictFieldData(field_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
-        self.item_module = self.item_descriptor.xmodule(self.runtime)
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+        self.item_module = self.item_descriptor
 
         self.item_url = Location(self.item_module.location).url()
 
@@ -114,6 +131,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
             args=(self.course.id, self.item_url, dispatch)
         )
 
-    def tearDown(self):
-        for user in self.users:
-            user.delete()
+
+class XModuleRenderingTestBase(BaseTestXmodule):
+
+    def new_module_runtime(self):
+        """
+        Create a runtime that actually does html rendering
+        """
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
+        runtime.render_template = render_to_string
+        return runtime

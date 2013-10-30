@@ -3,7 +3,8 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 </%block>
 
 <%block name="title"><title>${course.display_number_with_default | h} ${tab['name']}</title></%block>

@@ -1,18 +1,29 @@
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
+%>
 
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
       ## "edX Studio" should not be translated
-      <h1 class="branding"><a href="/"><img src="/static/img/logo-edx-studio.png" alt="edX Studio" /></a></h1>
+      <h1 class="branding"><a href="/"><img src="${static.url("img/logo-edx-studio.png")}" alt="edX Studio" /></a></h1>
 
       % if context_course:
-      <% ctx_loc = context_course.location %>
+      <% 
+            ctx_loc = context_course.location
+            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+            index_url = location.url_reverse('course/', '')
+            checklists_url = location.url_reverse('checklists/', '')
+            course_team_url = location.url_reverse('course_team/', '')
+            assets_url = location.url_reverse('assets/', '')
+      %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
-        <a class="course-link" href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
+        <a class="course-link" href="${index_url}">
           <span class="course-org">${context_course.display_org_with_default | h}</span><span class="course-number">${context_course.display_number_with_default | h}</span>
           <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
@@ -28,7 +39,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-courseware-outline">
-                    <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Outline")}</a>
+                    <a href="${index_url}">${_("Outline")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-updates">
                     <a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Updates")}</a>
@@ -37,7 +48,7 @@
                     <a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">${_("Static Pages")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Files &amp; Uploads")}</a>
+                    <a href="${assets_url}">${_("Files &amp; Uploads")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Textbooks")}</a>
@@ -60,7 +71,7 @@
                     <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
-                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a>
+                    <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a>
@@ -77,7 +88,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-tools-checklists">
-                    <a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Checklists")}</a>
+                    <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Import")}</a>

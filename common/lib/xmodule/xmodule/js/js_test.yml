@@ -36,7 +36,8 @@ lib_paths:
     - common_static/coffee/src/ajax_prefix.js
     - common_static/coffee/src/logger.js
     - common_static/js/vendor/jasmine-jquery.js
-    - common_static/js/vendor/RequireJS.js
+    - common_static/js/vendor/require.js
+    - RequireJS-namespace-undefine.js
     - common_static/js/vendor/jquery.min.js
     - common_static/js/vendor/jquery-ui.min.js
     - common_static/js/vendor/jquery.ui.draggable.js

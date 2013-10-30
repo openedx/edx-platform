@@ -14,9 +14,10 @@ from lms.envs.sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 
@@ -30,30 +31,33 @@ DOC_STORE_CONFIG = {
     'collection': 'acceptance_modulestore_%s' % seed(),
 }
 
-MODULESTORE_OPTIONS = dict({
+MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+}
 
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     },
@@ -110,3 +114,16 @@ if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
     LETTUCE_SERVER_PORT = choice(PORTS)
 else:
     LETTUCE_SERVER_PORT = randint(1024, 65535)
+
+
+# Set up Video information so that the cms will send
+# requests to a mock Youtube server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    VIDEO_PORT = choice(PORTS)
+    PORTS.remove(VIDEO_PORT)
+else:
+    VIDEO_PORT = randint(1024, 65535)
+
+# for testing Youtube
+YOUTUBE_API['url'] = "http://127.0.0.1:" + str(VIDEO_PORT) + '/test_transcripts_youtube/'
+

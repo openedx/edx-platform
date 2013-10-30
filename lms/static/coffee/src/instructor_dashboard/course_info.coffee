@@ -1,10 +1,13 @@
-# Course Info Section
-# This is the implementation of the simplest section
-# of the instructor dashboard.
+###
+Course Info Section
+This is the implementation of the simplest section
+of the instructor dashboard.
 
-# imports from other modules.
-# wrap in (-> ... apply) to defer evaluation
-# such that the value can be defined later than this assignment (file load order).
+imports from other modules.
+wrap in (-> ... apply) to defer evaluation
+such that the value can be defined later than this assignment (file load order).
+###
+
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 

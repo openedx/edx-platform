@@ -28,22 +28,28 @@ DOC_STORE_CONFIG = {
     'collection': 'modulestore',
 }
 
-modulestore_options = dict({
+modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': DATA_DIR,
     'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+}
 
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+        'OPTIONS': modulestore_options,
+    },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+        'OPTIONS': modulestore_options,
     },
 }
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'xcontent',
     }
@@ -58,3 +64,10 @@ INSTALLED_APPS += (
 DEBUG_TOOLBAR_PANELS += (
    'debug_toolbar_mongo.panel.MongoDebugPanel',
    )
+
+# HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS defines, as dictionary of regex's, a set of mappings of HTTP request hostnames to
+# what the 'default' modulestore to use while processing the request
+# for example 'preview.edx.org' should use the draft modulestore
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
+    'preview\.': 'draft'
+}

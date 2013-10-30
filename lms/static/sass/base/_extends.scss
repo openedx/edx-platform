@@ -84,3 +84,19 @@
     display: none;
   }
 }
+
+// ====================
+
+// needed utility extend for resetting poor basic <button> elem styling
+%ui-reset-button  {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  text-shadow: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+
+  &:focus {
+    // outline: thin dotted !important;
+  }
+}

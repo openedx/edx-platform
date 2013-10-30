@@ -64,32 +64,17 @@ def select_new_course(_step, whom):
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
-    # TODO: fix up this code. Selenium is not dealing well with css transforms,
-    # as it thinks that the notification and the buttons are always visible
 
-    # First wait for the notification to pop up
-    notification_css = 'div#page-notification div.wrapper-notification'
-    world.wait_for_visible(notification_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    # Now make sure the button is there
+    # Because the notification uses a CSS transition,
+    # Selenium will always report it as being visible.
+    # This makes it very difficult to successfully click
+    # the "Save" button at the UI level.
+    # Instead, we use JavaScript to reliably click
+    # the button.
     btn_css = 'div#page-notification a.action-%s' % name.lower()
-    world.wait_for_visible(btn_css)
-
-    # You would think that the above would have worked, but it doesn't.
-    # Brute force wait for now.
-    world.wait(.5)
-
-    if world.is_firefox():
-        # This is done to explicitly make the changes save on firefox.
-        # It will remove focus from the previously focused element
-        world.trigger_event(btn_css, event='focus')
-        world.browser.execute_script("$('{}').click()".format(btn_css))
-    else:
-        world.css_click(btn_css)
+    world.trigger_event(btn_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(btn_css))
+    world.wait_for_ajax_complete()
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -168,6 +153,18 @@ def log_into_studio(
     assert_in(uname, world.css_text('h2.title', timeout=10))
 
 
+def add_course_author(user, course):
+    """
+    Add the user to the instructor group of the course
+    so they will have the permissions to see it in studio
+    """
+    for role in ("staff", "instructor"):
+        groupname = get_course_groupname_for_role(course.location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        user.groups.add(group)
+    user.save()
+
+
 def create_a_course():
     course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
     world.scenario_dict['COURSE'] = course
@@ -176,13 +173,7 @@ def create_a_course():
     if not user:
         user = get_user_by_email('robot+studio@edx.org')
 
-    # Add the user to the instructor group of the course
-    # so they will have the permissions to see it in studio
-    for role in ("staff", "instructor"):
-        groupname = get_course_groupname_for_role(course.location, role)
-        group, __ = Group.objects.get_or_create(name=groupname)
-        user.groups.add(group)
-    user.save()
+    add_course_author(user, course)
 
     # Navigate to the studio dashboard
     world.visit('/')
@@ -233,12 +224,51 @@ def i_enabled_the_advanced_module(step, module):
     press_the_notification_button(step, 'Save')
 
 
-@step('I have clicked the new unit button')
-def open_new_unit(step):
-    step.given('I have opened a new course section in Studio')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    world.css_click('a.new-unit-item')
+@world.absorb
+def create_course_with_unit():
+    """
+    Prepare for tests by creating a course with a section, subsection, and unit.
+    Performs the following:
+        Clear out all courseware
+        Create a course with a section, subsection, and unit
+        Create a user and make that user a course author
+        Log the user into studio
+        Open the course from the dashboard
+        Expand the section and click on the New Unit link
+    The end result is the page where the user is editing the new unit
+    """
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    world.scenario_dict['COURSE'] = course
+    section = world.ItemFactory.create(parent_location=course.location)
+    world.ItemFactory.create(
+        parent_location=section.location,
+        category='sequential',
+        display_name='Subsection One',
+    )
+    user = create_studio_user(is_staff=False)
+    add_course_author(user, course)
+
+    log_into_studio()
+    world.css_click('a.course-link')
+
+    world.wait_for_js_to_load()
+    css_selectors = [
+        'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
+    ]
+    for selector in css_selectors:
+        world.css_click(selector)
+
+    world.wait_for_mathjax()
+    world.wait_for_xmodule()
+
+    assert world.is_css_present('ul.new-component-type')
+
+
+@step('I have clicked the new unit button$')
+@step(u'I am in Studio editing a new unit$')
+def edit_new_unit(step):
+    create_course_with_unit()
 
 
 @step('the save notification button is disabled')
@@ -254,29 +284,38 @@ def button_disabled(step, value):
     assert world.css_has_class(button_css, 'is-disabled')
 
 
+def _do_studio_prompt_action(intent, action):
+    """
+    Wait for a studio prompt to appear and press the specified action button
+    See cms/static/js/views/feedback_prompt.js for implementation
+    """
+    assert intent in ['warning', 'error', 'confirmation', 'announcement',
+        'step-required', 'help', 'mini']
+    assert action in ['primary', 'secondary']
+
+    world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
+
+    action_css = 'li.nav-item > a.action-{}'.format(action)
+    world.trigger_event(action_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(action_css))
+
+    world.wait_for_ajax_complete()
+    world.wait_for_present('div.wrapper-prompt.is-hiding#prompt-{}'.format(intent))
+
+
+@world.absorb
+def confirm_studio_prompt():
+    _do_studio_prompt_action('warning', 'primary')
+
+
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
-
-    def click_button(btn_css):
-        world.css_click(btn_css)
-        return world.css_find(btn_css).visible == False
-
-    prompt_css = 'div.prompt.has-actions'
-    world.wait_for_visible(prompt_css)
-
-    btn_css = 'a.button.action-primary'
-    world.wait_for_visible(btn_css)
-
-    # Sometimes you can do a click before the prompt is up.
-    # Thus we need some retry logic here.
-    world.wait_for(lambda _driver: click_button(btn_css))
-
-    assert_false(world.css_find(btn_css).visible)
+    confirm_studio_prompt()
 
 
-@step(u'I am shown a (.*)$')
-def i_am_shown_a_notification(step, notification_type):
-    assert world.is_css_present('.wrapper-%s' % notification_type)
+@step(u'I am shown a prompt$')
+def i_am_shown_a_notification(step):
+    assert world.is_css_present('.wrapper-prompt')
 
 
 def type_in_codemirror(index, text):
@@ -292,6 +331,7 @@ def type_in_codemirror(index, text):
     g._element.send_keys(text)
     if world.is_firefox():
         world.trigger_event('div.CodeMirror', index=index, event='blur')
+    world.wait_for_ajax_complete()
 
 
 def upload_file(filename):

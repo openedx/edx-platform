@@ -2,7 +2,6 @@
 Instructor API endpoint urls.
 """
 
-
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',  # nopep8
@@ -34,4 +33,6 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
     url(r'^proxy_legacy_analytics$',
         'instructor.views.api.proxy_legacy_analytics', name="proxy_legacy_analytics"),
+    url(r'^send_email$',
+        'instructor.views.api.send_email', name="send_email")
 )

@@ -11,7 +11,7 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_12",
+                "definition":{ "$oid" : "ad00000000000000dddd0000"},
                 "fields":{
                     "children":[
                         "chapter1",
@@ -65,7 +65,7 @@
             },
             "chapter1":{
                 "category":"chapter",
-                "definition":"chapter12345_1",
+                "definition":{ "$oid" : "cd00000000000000dddd0020"},
                 "fields":{
                     "children":[
                         
@@ -83,7 +83,7 @@
             },
             "chapter2":{
                 "category":"chapter",
-                "definition":"chapter12345_2",
+                "definition":{ "$oid" : "cd00000000000000dddd0022"},
                 "fields":{
                     "children":[
                         
@@ -101,7 +101,7 @@
             },
             "chapter3":{
                 "category":"chapter",
-                "definition":"chapter12345_3",
+                "definition":{ "$oid" : "cd00000000000000dddd0032"},
                 "fields":{
                     "children":[
                         "problem1",
@@ -120,7 +120,7 @@
             },
             "problem1":{
                 "category":"problem",
-                "definition":"problem12345_3_1",
+                "definition":{ "$oid" : "0d00000040000000dddd0031"},
                 "fields":{
                     "children":[
                         
@@ -139,7 +139,7 @@
             },
             "problem3_2":{
                 "category":"problem",
-                "definition":"problem12345_3_2",
+                "definition":{ "$oid" : "0d00000040000000dddd0032"},
                 "fields":{
                     "children":[
                         
@@ -169,7 +169,7 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_11",
+                "definition":{ "$oid" : "ad00000000000000dddd0001"},
                 "fields":{
                     "children":[
                         
@@ -233,7 +233,7 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_10",
+                "definition":{ "$oid" : "ad00000000000000dddd0010"},
                 "fields":{
                     "children":[
                         
@@ -287,7 +287,7 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_1",
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
                         
@@ -342,7 +342,7 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_0",
+                "definition":{ "$oid" : "2d00000000000000dddd0020"},
                 "fields":{
                     "children":[
                         
@@ -396,7 +396,7 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_1",
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
                         
@@ -450,7 +450,7 @@
         "blocks":{
             "head345679":{
                 "category":"course",
-                "definition":"head345679_1",
+                "definition":{ "$oid" : "3d00000000000000dddd0020"},
                 "fields":{
                     "children":[
                         

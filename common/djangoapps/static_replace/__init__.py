@@ -56,7 +56,7 @@ def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):
 
     text: The content over which to perform the subtitutions
     course_id: The course_id in which this rewrite happens
-    jump_to_id_base_url: 
+    jump_to_id_base_url:
         A app-tier (e.g. LMS) absolute path to the base of the handler that will perform the
         redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
         the end of this URL at re-write time
@@ -151,9 +151,11 @@ def replace_static_urls(text, data_directory, course_id=None, static_asset_path=
 
         return "".join([quote, url, quote])
 
-
     return re.sub(
-        _url_replace_regex('/static/(?!{data_dir})'.format(data_dir=static_asset_path or data_directory)),
+        _url_replace_regex('(?:{static_url}|/static/)(?!{data_dir})'.format(
+            static_url=settings.STATIC_URL,
+            data_dir=static_asset_path or data_directory
+        )),
         replace_static_url,
         text
     )

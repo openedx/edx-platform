@@ -256,6 +256,7 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
+            'STATIC_URL': self.system.STATIC_URL,
         }
         context.update((a, v) for (
             a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
@@ -308,13 +309,13 @@ class OptionInput(InputTypeBase):
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
         # parse the set of possible options
-        lexer = shlex.shlex(options[1:-1])
+        lexer = shlex.shlex(options[1:-1].encode('utf8'))
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1] for x in list(lexer)]
+        tokens = [x[1:-1].decode('utf8') for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -507,7 +508,8 @@ class JSInput(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            'applet_loader': '/static/js/capa/src/jsinput.js',
+            'applet_loader': '{static_url}js/capa/src/jsinput.js'.format(
+                static_url=self.system.STATIC_URL),
             'saved_state': self.value
         }
 
@@ -1014,7 +1016,10 @@ class ChemicalEquationInput(InputTypeBase):
         """
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
+        return {
+            'previewer': '{static_url}js/capa/chemical_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+        }
 
     def handle_ajax(self, dispatch, data):
         '''
@@ -1081,7 +1086,10 @@ class FormulaEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'), ]
+        return [
+            Attribute('size', '20'),
+            Attribute('inline', False),
+        ]
 
     def _extra_context(self):
         """
@@ -1095,8 +1103,9 @@ class FormulaEquationInput(InputTypeBase):
             reported_status = self.status
 
         return {
-            'previewer': '/static/js/capa/src/formula_equation_preview.js',
-            'reported_status': reported_status
+            'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
+                static_url=self.system.STATIC_URL),
+            'reported_status': reported_status,
         }
 
     def handle_ajax(self, dispatch, get):
@@ -1279,7 +1288,8 @@ class EditAMoleculeInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/editamolecule.js',
+            'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1315,7 +1325,8 @@ class DesignProtein2dInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/design-protein-2d.js',
+            'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context
@@ -1351,7 +1362,8 @@ class EditAGeneInput(InputTypeBase):
         """
             """
         context = {
-            'applet_loader': '/static/js/capa/edit-a-gene.js',
+            'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
+                static_url=self.system.STATIC_URL),
         }
 
         return context

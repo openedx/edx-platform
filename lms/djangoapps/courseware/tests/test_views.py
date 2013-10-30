@@ -1,9 +1,10 @@
 """
 Tests courseware views.py
 """
-from mock import MagicMock, patch
-import datetime
 import unittest
+from mock import MagicMock, patch
+from datetime import datetime
+from pytz import UTC
 
 from django.test import TestCase
 from django.http import Http404
@@ -18,12 +19,13 @@ from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from mitxmako.middleware import MakoMiddleware
 
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory
 
 import courseware.views as views
-from xmodule.modulestore import Location
-from pytz import UTC
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from course_modes.models import CourseMode
 import shoppingcart
@@ -73,7 +75,7 @@ class ViewsTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
-        self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
+        self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
         self.enrollment.created = self.date
@@ -108,7 +110,6 @@ class ViewsTestCase(TestCase):
         response = views.course_about(request, course.id)
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
-
 
     def test_user_groups(self):
         # depreciated function
@@ -254,98 +255,115 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
-    def test_accordion_due_date(self):
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class BaseDueDateTests(ModuleStoreTestCase):
+    """
+    Base class that verifies that due dates are rendered correctly on a page
+    """
+    __test__ = False
+
+    def get_text(self, course):  # pylint: disable=unused-argument
+        """Return the rendered text for the page to be verified"""
+        raise NotImplementedError
+
+    def set_up_course(self, **course_kwargs):
         """
-        Tests the formatting of due dates in the accordion view.
+        Create a stock course with a specific due date.
+
+        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        def get_accordion():
-            """ Returns the HTML for the accordion """
-            return views.render_accordion(
-                request, modulestore().get_course("edX/due_date/2013_fall"),
-                "c804fa32227142a1bd9d5bc183d4a20d", None, None
-            )
+        course = CourseFactory(**course_kwargs)
+        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory(category='vertical', parent_location=section.location)
+        ItemFactory(category='problem', parent_location=vertical.location)
 
-        request = self.request_factory.get("foo")
-        self.verify_due_date(request, get_accordion)
+        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
+        return course
 
-    def test_progress_due_date(self):
-        """
-        Tests the formatting of due dates in the progress page.
-        """
-        def get_progress():
-            """ Returns the HTML for the progress page """
-            return views.progress(request, "edX/due_date/2013_fall", self.user.id).content
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.user = UserFactory.create()
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
 
-        request = self.request_factory.get("foo")
-        self.verify_due_date(request, get_progress)
+        self.time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
+        self.time_without_utc = "due Sep 18, 2013 at 11:30"
 
-    def verify_due_date(self, request, get_text):
-        """
-        Verifies that due dates are formatted properly in text returned by get_text function.
-        """
-        def set_show_timezone(show_timezone):
-            """
-            Sets the show_timezone property and returns value from get_text function.
-
-            Note that show_timezone is deprecated and cannot be set by the user.
-            """
-            course.show_timezone = show_timezone
-            course.save()
-            return get_text()
-
-        def set_due_date_format(due_date_format):
-            """
-            Sets the due_date_display_format property and returns value from get_text function.
-            """
-            course.due_date_display_format = due_date_format
-            course.save()
-            return get_text()
-
-        request.user = self.user
-        # Clear out the modulestores, so we start with the test course in its default state.
-        clear_existing_modulestores()
-        course = modulestore().get_course("edX/due_date/2013_fall")
-
-        time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
-        time_without_utc = "due Sep 18, 2013 at 11:30"
-
+    def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
         # (and no due_date_display_format set). This is to test our backwards compatibility--
         # in course_module's init method, the date_display_format will be set accordingly to
         # remove the timezone.
-        text = get_text()
-        self.assertIn(time_without_utc, text)
-        self.assertNotIn(time_with_utc, text)
+        course = self.set_up_course(due_date_display_format=None, show_timezone=False)
+        text = self.get_text(course)
+        self.assertIn(self.time_without_utc, text)
+        self.assertNotIn(self.time_with_utc, text)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
-        # Clear out the due date format and verify you get the default (with timezone).
-        delattr(course, 'due_date_display_format')
-        course.save()
-        text = get_text()
-        self.assertIn(time_with_utc, text)
+    def test_defaults(self):
+        course = self.set_up_course()
+        text = self.get_text(course)
+        self.assertIn(self.time_with_utc, text)
 
+    def test_format_none(self):
         # Same for setting the due date to None
-        text = set_due_date_format(None)
-        self.assertIn(time_with_utc, text)
+        course = self.set_up_course(due_date_display_format=None)
+        text = self.get_text(course)
+        self.assertIn(self.time_with_utc, text)
 
+    def test_format_plain_text(self):
         # plain text due date
-        text = set_due_date_format("foobar")
-        self.assertNotIn(time_with_utc, text)
+        course = self.set_up_course(due_date_display_format="foobar")
+        text = self.get_text(course)
+        self.assertNotIn(self.time_with_utc, text)
         self.assertIn("due foobar", text)
 
+    def test_format_date(self):
+
         # due date with no time
-        text = set_due_date_format(u"%b %d %y")
-        self.assertNotIn(time_with_utc, text)
+        course = self.set_up_course(due_date_display_format=u"%b %d %y")
+        text = self.get_text(course)
+        self.assertNotIn(self.time_with_utc, text)
         self.assertIn("due Sep 18 13", text)
 
+    def test_format_hidden(self):
         # hide due date completely
-        text = set_due_date_format(u"")
+        course = self.set_up_course(due_date_display_format=u"")
+        text = self.get_text(course)
         self.assertNotIn("due ", text)
 
+    def test_format_invalid(self):
         # improperly formatted due_date_display_format falls through to default
         # (value of show_timezone does not matter-- setting to False to make that clear).
-        set_show_timezone(False)
-        text = set_due_date_format(u"%%%")
+        course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
+        text = self.get_text(course)
         self.assertNotIn("%%%", text)
-        self.assertIn(time_with_utc, text)
+        self.assertIn(self.time_with_utc, text)
+
+
+class TestProgressDueDate(BaseDueDateTests):
+    """
+    Test that the progress page displays due dates correctly
+    """
+    __test__ = True
+
+    def get_text(self, course):
+        """ Returns the HTML for the progress page """
+        return views.progress(self.request, course.id, self.user.id).content
+
+
+class TestAccordionDueDate(BaseDueDateTests):
+    """
+    Test that the accordion page displays due dates correctly
+    """
+    __test__ = True
+
+    def get_text(self, course):
+        """ Returns the HTML for the accordion """
+        return views.render_accordion(
+            self.request, course, course.get_children()[0].id, None, None
+        )

@@ -18,7 +18,7 @@ CACHE_SETTINGS = {
 
 # Configure settings so Django will let us import its cache wrapper
 # Caching is the only part of Django being tested
-from django.conf import settings 
+from django.conf import settings
 settings.configure(CACHES=CACHE_SETTINGS)
 
 from django.core.cache import cache
@@ -31,6 +31,7 @@ TEST_SCRIPT = textwrap.dedent("""
 
 # Submissions submitted by the student
 TEST_SUBMISSIONS = [random.randint(-100, 100) for i in range(100)]
+
 
 class TestContext(object):
     """ One-time set up for the test that is shared across transactions.
@@ -48,6 +49,7 @@ class TestContext(object):
 
             # Create a mock ModuleSystem, installing our cache
             system = mock.MagicMock(ModuleSystem)
+            system.STATIC_URL = '/dummy-static/'
             system.render_template = lambda template, context: "<div>%s</div>" % template
             system.cache = cache
             system.filestore = mock.MagicMock(fs.osfs.OSFS)
@@ -86,6 +88,7 @@ class TestContext(object):
         """ Return one of a small number of student submissions """
         return random.choice(TEST_SUBMISSIONS)
 
+
 class Transaction(object):
     """ User script that submits a response to a CustomResponse problem """
 
@@ -95,15 +98,15 @@ class Transaction(object):
         # Get the context (re-used across transactions)
         self.context = TestContext.singleton()
 
-        # Create a new custom response problem 
+        # Create a new custom response problem
         # using one of a small number of unique seeds
         # We're assuming that the capa module is limiting the number
         # of seeds (currently not the case for certain settings)
-        self.problem = lcp.LoncapaProblem(self.context.xml, 
-                                          '1', 
-                                          state=None, 
-                                          seed=self.context.random_seed(), 
-                                          system=self.context.system)
+        self.problem = lcp.LoncapaProblem(
+            self.context.xml, '1',
+            state=None, seed=self.context.random_seed(),
+            system=self.context.system,
+        )
 
     def run(self):
         """ Submit a response to the CustomResponse problem """

@@ -59,7 +59,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
         self.assertTrue(selected_email_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optout_course(self):
         """
         Make sure student does not receive course email after opting out.
@@ -88,7 +88,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # Assert that self.student.email not in mail.to, outbox should be empty
         self.assertEqual(len(mail.outbox), 0)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optin_course(self):
         """
         Make sure student receives course email after opting in.

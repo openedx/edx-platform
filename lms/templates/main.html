@@ -20,9 +20,10 @@
 </%def>
 
 <!DOCTYPE html>
-<!--[if lt IE 8]><html class="ie"><![endif]-->
-<!--[if IE 8]><html class="ie8"><![endif]-->
-<!--[if gte IE 9]><!--><html><!--<![endif]-->
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9"><![endif]-->
+<!--[if gt IE 9]><!--><html><!--<![endif]-->
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
@@ -51,21 +52,22 @@
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
-  <%static:css group='application'/>
+  <%static:css group='style-vendor'/>
+  <%static:css group='style-app'/>
+  <%static:css group='style-app-extend1'/>
+  <%static:css group='style-app-extend2'/>
 
   <%static:js group='main_vendor'/>
+
   <%block name="headextra"/>
   % if theme_enabled():
     <%include file="theme-head-extra.html" />
   % endif
 
   <!--[if lt IE 9]>
-  <script src="${static.url('js/html5shiv.js')}"></script>
+    <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <!--[if lte IE 9]>
-  <%static:css group='ie-fixes'/>
-  <![endif]-->
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
@@ -82,6 +84,8 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
+
   <%include file="mathjax_accessible.html" />
 
 % if theme_enabled():
@@ -90,7 +94,7 @@
   <%include file="navigation.html" />
 % endif
 
-  <section class="content-wrapper">
+  <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
@@ -101,6 +105,7 @@
   <%include file="footer.html" />
 % endif
 
+  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
   <%static:js group='module-js'/>
 

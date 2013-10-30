@@ -24,7 +24,7 @@
       @include transition(all 0.15s linear 0s);
       text-transform: lowercase;
 
-      &:hover, &.active {
+      &:hover, &.active, &:focus {
         border-color: rgb(200,200,200);
         color: $base-font-color;
         text-decoration: none;
@@ -165,7 +165,7 @@
         padding: 12px 0px 12px 20px;
         text-align: left;
 
-        &:hover {
+        &:hover, &:focus {
           background: rgb(245,245,245);
           text-decoration: none;
         }

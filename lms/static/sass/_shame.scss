@@ -48,7 +48,7 @@
   &.disabled, &[disabled], &.is-disabled {
     background: $action-primary-disabled-bg;
 
-    &:hover {
+    &:hover, &:focus {
       background: $action-primary-disabled-bg !important; // needed for IE currently
     }
   }
@@ -61,7 +61,7 @@
   background: $action-primary-bg;
   color: $action-primary-fg;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $action-primary-focused-bg;
   }
 
@@ -70,7 +70,7 @@
     background: $action-primary-active-bg;
     color: $action-primary-active-fg;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $action-primary-active-focused-shadow;
       color: $action-primary-active-focused-fg;
     }
@@ -89,7 +89,7 @@
   background: $action-secondary-bg;
   color: $action-secondary-fg;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $action-secondary-focused-bg;
   }
 
@@ -98,7 +98,7 @@
     background: $action-secondary-active-bg;
     color: $action-secondary-active-fg;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $action-secondary-active-focused-shadow;
       color: $action-secondary-active-focused-fg;
     }
@@ -172,7 +172,7 @@
         opacity: 0.6;
       }
 
-      &:hover .track {
+      &:hover .track, &:focus .track {
         opacity: 1.0;
       }
 
@@ -205,13 +205,13 @@
 
   header.global {
 
-    .logo a:hover, .logo:active {
+    .logo a:hover, .logo:active, .logo a:focus {
       border: none;
       text-decoration: none;
       padding-bottom: 0;
     }
 
-    .nav-global a:hover, .nav-global a:active {
+    .nav-global a:hover, .nav-global a:active, .nav-global a:focus {
       border: none;
     }
   }
@@ -229,4 +229,23 @@
 
 footer .references {
   @include footer_references_style;
+}
+
+// ====================
+
+// modal semantic button resetting - overriding the poorly scoped button mixin styling
+.close-modal, button.close-modal {
+  @extend %ui-reset-button;
+
+  &:focus {
+    border: none !important;
+    outline: thin dotted !important;
+  }
+}
+
+// ====================
+
+// poor cascade made worse by CSS splitting requires us to redefine the dashboard views' visual top padding
+.dashboard {
+  padding-top: 60px;
 }

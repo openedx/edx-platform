@@ -40,7 +40,7 @@ MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
 WIKI_ENABLED = True
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -51,7 +51,6 @@ _report_dir = REPO_ROOT / 'reports' / _system
 _report_dir.makedirs_p()
 
 NOSE_ARGS = [
-    '--tests', PROJECT_ROOT / 'djangoapps', COMMON_ROOT / 'djangoapps',
     '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
     '--xunit-file', _report_dir / 'nosetests.xml',
 ]
@@ -79,7 +78,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 # Don't rely on a real staff grading backend
@@ -110,9 +109,13 @@ MODULESTORE = {
     }
 }
 
+# Starting modulestores generates log messages.  If we wait to init modulestores,
+# then those messages will be silenced by the test runner.
+INIT_MODULESTORE_ON_STARTUP = False
+
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'xcontent',
     }
@@ -258,7 +261,7 @@ MITX_FEATURES['CLASS_DASHBOARD'] = True
 #   Generated checkid_setup request to http://testserver/openid/provider/login/ with assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
 
 import openid.oidutil
-openid.oidutil.log = lambda message, level=0: None
+openid.oidutil.log = lambda message, level = 0: None
 
 ### QUERYABLE APP ###
 INSTALLED_APPS += ('queryable_student_module',)

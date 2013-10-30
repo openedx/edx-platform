@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['logme', 'update_input', 'targets'], function (logme, updateInput, Targets) {
+define(['js/capa/drag_and_drop/logme', 'js/capa/drag_and_drop/update_input', 'js/capa/drag_and_drop/targets'], function (logme, updateInput, Targets) {
 return {
     'moveDraggableTo': function (moveType, target, funcCallback) {
         var self, offset;

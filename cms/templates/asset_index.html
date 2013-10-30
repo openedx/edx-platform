@@ -1,9 +1,10 @@
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
-
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 <%block name="title">${_("Files &amp; Uploads")}</%block>
-<%block name="bodyclass">is-signedin course uploads</%block>
+<%block name="bodyclass">is-signedin course uploads view-uploads</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
@@ -14,15 +15,108 @@
 </%block>
 
 <%block name="jsextra">
-    <script src="${static.url('js/vendor/mustache.js')}"></script>
-    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
-    <script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+<script type="text/javascript">
+require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
+         "js/views/assets", "js/views/feedback_prompt",
+         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
+        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
 
-    <script type="text/javascript">
-        var assets = new CMS.Models.AssetCollection(${asset_list});
-        assets.url = "${update_asset_callback_url}";
-        // TODO remove setting on window object after RequireJS.
-        window.assetsView = new CMS.Views.Assets({collection: assets, el: $('#asset_table_body')});
+    var assets = new AssetCollection(${asset_list});
+    assets.url = "${asset_callback_url}";
+    var assetsView = new AssetsView({collection: assets, el: $('#asset_table_body')});
+
+    var hideModal = function (e) {
+        if (e) {
+            e.preventDefault();
+        }
+        $('.file-input').unbind('change.startUpload');
+        ModalUtils.hideModal();
+    };
+
+    var showUploadModal = function (e) {
+        e.preventDefault();
+        resetUploadModal();
+        ModalUtils.showModal();
+        $('.file-input').bind('change', startUpload);
+        $('.upload-modal .file-chooser').fileupload({
+            dataType: 'json',
+            type: 'POST',
+            maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+            autoUpload: true,
+            progressall: function(e, data) {
+                var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
+                showUploadFeedback(e, percentComplete);
+            },
+            maxFileSize: 100 * 1000 * 1000,   // 100 MB
+            maxNumberofFiles: 100,
+            add: function(e, data) {
+                data.process().done(function () {
+                    data.submit();
+                });
+            },
+            done: function(e, data) {
+                displayFinishedUpload(data.result);
+            }
+
+        });
+    };
+
+    var showFileSelectionMenu = function(e) {
+        e.preventDefault();
+        $('.file-input').click();
+    };
+
+    var startUpload = function (e) {
+        var file = e.target.value;
+
+        $('.upload-modal h1').html(gettext('Uploading…'));
+        $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+        $('.upload-modal .choose-file-button').hide();
+        $('.upload-modal .progress-bar').removeClass('loaded').show();
+    };
+
+    var resetUploadModal = function () {
+        // Reset modal so it no longer displays information about previously
+        // completed uploads.
+        var percentVal = '0%';
+        $('.upload-modal .progress-fill').width(percentVal);
+        $('.upload-modal .progress-fill').html(percentVal);
+        $('.upload-modal .progress-bar').hide();
+
+        $('.upload-modal .file-name').show();
+        $('.upload-modal .file-name').html('');
+        $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+        $('.upload-modal .embeddable-xml-input').val('');
+        $('.upload-modal .embeddable').hide();
+    };
+
+    var showUploadFeedback = function (event, percentComplete) {
+        var percentVal = percentComplete + '%';
+        $('.upload-modal .progress-fill').width(percentVal);
+        $('.upload-modal .progress-fill').html(percentVal);
+    };
+
+    var displayFinishedUpload = function (resp) {
+        var asset = resp.asset;
+
+        $('.upload-modal h1').html(gettext('Upload New File'));
+        $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+        $('.upload-modal .embeddable').show();
+        $('.upload-modal .file-name').hide();
+        $('.upload-modal .progress-fill').html(resp.msg);
+        $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
+        $('.upload-modal .progress-fill').width('100%');
+
+        assetsView.addAsset(new AssetModel(asset));
+    };
+
+    domReady(function() {
+        $('.uploads .upload-button').bind('click', showUploadModal);
+        $('.upload-modal .close-button').bind('click', hideModal);
+        $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+    });
+
+}); // end of require()
     </script>
 </%block>
 
@@ -98,15 +192,13 @@
             <label>URL:</label>
             <input type="text" class="embeddable-xml-input" value='' readonly>
         </div>
-        <form class="file-chooser" action="${upload_asset_callback_url}"
+        <form class="file-chooser" action="${asset_callback_url}"
               method="post" enctype="multipart/form-data">
             <a href="#" class="choose-file-button">${_("Choose File")}</a>
             <input type="file" class="file-input" name="file" multiple>
         </form>
     </div>
 </div>
-
-<div class="modal-cover"></div>
 
 
 </%block>

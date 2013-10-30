@@ -43,10 +43,10 @@ class MockCommentServiceServerTest(unittest.TestCase):
         of how you would create a new user
         """
         # Send a request
-        values = {'username': u'user100', 'api_key': 'TEST_API_KEY',
+        values = {'username': u'user100',
                   'external_id': '4', 'email': u'user100@edx.org'}
         data = json.dumps(values)
-        headers = {'Content-Type': 'application/json', 'Content-Length': len(data)}
+        headers = {'Content-Type': 'application/json', 'Content-Length': len(data), 'X-Edx-Api-Key': 'TEST_API_KEY'}
         req = urllib2.Request(self.server_url + '/api/v1/users/4', data, headers)
 
         # Send the request to the mock cs server

@@ -289,7 +289,7 @@ class DjangoKeyValueStore(KeyValueStore):
 
     def get(self, key):
         if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
         field_object = self._field_data_cache.find(key)
         if field_object is None:
@@ -320,7 +320,7 @@ class DjangoKeyValueStore(KeyValueStore):
         for field in kv_dict:
             # Check field for validity
             if field.scope not in self._allowed_scopes:
-                raise InvalidScopeError(field.scope)
+                raise InvalidScopeError(field)
 
             # If the field is valid and isn't already in the dictionary, add it.
             field_object = self._field_data_cache.find_or_create(field)
@@ -352,7 +352,7 @@ class DjangoKeyValueStore(KeyValueStore):
 
     def delete(self, key):
         if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
         field_object = self._field_data_cache.find(key)
         if field_object is None:
@@ -368,7 +368,7 @@ class DjangoKeyValueStore(KeyValueStore):
 
     def has(self, key):
         if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
         field_object = self._field_data_cache.find(key)
         if field_object is None:

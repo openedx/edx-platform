@@ -55,8 +55,8 @@ class CourseMode(models.Model):
         """
         now = datetime.now(pytz.UTC)
         found_course_modes = cls.objects.filter(Q(course_id=course_id) &
-                                                Q(expiration_date__isnull=True) |
-                                                Q(expiration_date__gte=now))
+                                                (Q(expiration_date__isnull=True) |
+                                                Q(expiration_date__gte=now)))
         modes = ([Mode(mode.mode_slug, mode.mode_display_name, mode.min_price, mode.suggested_prices, mode.currency)
                   for mode in found_course_modes])
         if not modes:

@@ -15,14 +15,13 @@ common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
 
-import json
 import unittest
 
 from django.conf import settings
 
 from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from xmodule.modulestore import Location
-from xmodule.tests import get_test_system, LogicTest
+from xmodule.tests import get_test_system, LogicTest, get_test_descriptor_system
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -57,23 +56,18 @@ class VideoFactory(object):
         field_data = {'data': VideoFactory.sample_problem_xml_youtube,
                       'location': location}
 
-        system = get_test_system()
-        system.render_template = lambda template, context: context
+        system = get_test_descriptor_system()
 
         descriptor = VideoDescriptor(system, DictFieldData(field_data), ScopeIds(None, None, None, None))
-
-        module = descriptor.xmodule(system)
-
-        return module
+        descriptor.xmodule_runtime = get_test_system()
+        return descriptor
 
 
 class VideoModuleUnitTest(unittest.TestCase):
     """Unit tests for Video Xmodule."""
-
     def test_video_get_html(self):
         """Make sure that all parameters extracted correclty from xml"""
         module = VideoFactory.create()
-        module.runtime.render_template = lambda template, context: context
 
         sources = {
             'main': 'example.mp4',
@@ -99,14 +93,10 @@ class VideoModuleUnitTest(unittest.TestCase):
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }
 
-        self.assertEqual(module.get_html(), expected_context)
-
-    def test_video_instance_state(self):
-        module = VideoFactory.create()
-
-        self.assertDictEqual(
-            json.loads(module.get_instance_state()),
-            {'position': 0})
+        self.assertEqual(
+            module.render('student_view').content,
+            module.runtime.render_template('video.html', expected_context)
+        )
 
 
 class VideoModuleLogicTest(LogicTest):
@@ -117,21 +107,6 @@ class VideoModuleLogicTest(LogicTest):
     raw_field_data = {
         'data': '<video />'
     }
-
-    def test_parse_time(self):
-        """Ensure that times are parsed correctly into seconds."""
-        output = VideoDescriptor._parse_time('00:04:07')
-        self.assertEqual(output, 247)
-
-    def test_parse_time_none(self):
-        """Check parsing of None."""
-        output = VideoDescriptor._parse_time(None)
-        self.assertEqual(output, '')
-
-    def test_parse_time_empty(self):
-        """Check parsing of the empty string."""
-        output = VideoDescriptor._parse_time('')
-        self.assertEqual(output, '')
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""

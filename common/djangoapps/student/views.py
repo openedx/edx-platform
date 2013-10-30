@@ -16,6 +16,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
+# from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -29,18 +30,21 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int, urlencode
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.translation import ugettext as _u
 
 from ratelimitbackend.exceptions import RateLimitException
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
-from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
-                            TestCenterRegistration, TestCenterRegistrationForm,
-                            PendingNameChange, PendingEmailChange,
-                            CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registration, CourseEnrollmentAllowed)
+from student.models import (
+    Registration, UserProfile, TestCenterUser, TestCenterUserForm,
+    TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
+    PendingEmailChange, CourseEnrollment, unique_id_for_user,
+    get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
+)
 from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -48,6 +52,7 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -57,7 +62,7 @@ from courseware.access import has_access
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
-from bulk_email.models import Optout
+from bulk_email.models import Optout, CourseAuthorization
 from cme_registration.views import cme_register_user, cme_create_account
 
 import shoppingcart
@@ -66,6 +71,8 @@ import track.views
 
 from dogapi import dog_stats_api
 from pytz import UTC
+
+from util.json_request import JsonResponse
 
 log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -313,8 +320,14 @@ def dashboard(request):
 
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
-
+    # only show email settings for Mongo course and when bulk email is turned on
+    show_email_settings_for = frozenset(
+        course.id for course, _enrollment in courses if (
+            settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
+            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            CourseAuthorization.instructor_email_enabled(course.id)
+        )
+    )
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -330,7 +343,7 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
-               'exam_registrations': exam_registrations,
+               'show_email_settings_for': show_email_settings_for,
                }
 
     return render_to_response('dashboard.html', context)
@@ -614,6 +627,81 @@ def logout_user(request):
                            path='/',
                            domain=settings.SESSION_COOKIE_DOMAIN)
     return response
+
+@require_GET
+@login_required
+@ensure_csrf_cookie
+def manage_user_standing(request):
+    """
+    Renders the view used to manage user standing. Also displays a table
+    of user accounts that have been disabled and who disabled them.
+    """
+    if not request.user.is_staff:
+        raise Http404
+    all_disabled_accounts = UserStanding.objects.filter(
+        account_status=UserStanding.ACCOUNT_DISABLED
+    )
+
+    all_disabled_users = [standing.user for standing in all_disabled_accounts]
+
+    headers = ['username', 'account_changed_by']
+    rows = []
+    for user in all_disabled_users:
+        row = [user.username, user.standing.all()[0].changed_by]
+        rows.append(row)
+
+
+    context = {'headers': headers, 'rows': rows}
+
+    return render_to_response("manage_user_standing.html", context)
+
+@require_POST
+@login_required
+@ensure_csrf_cookie
+def disable_account_ajax(request):
+    """
+    Ajax call to change user standing. Endpoint of the form
+    in manage_user_standing.html
+    """
+    if not request.user.is_staff:
+        raise Http404
+    username = request.POST.get('username')
+    context = {}
+    if username is None or username.strip() == '':
+        context['message'] = _u('Please enter a username')
+        return JsonResponse(context, status=400)
+
+    account_action = request.POST.get('account_action')
+    if account_action is None:
+        context['message'] = _u('Please choose an option')
+        return JsonResponse(context, status=400)
+
+    username = username.strip()
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        context['message'] = _u("User with username {} does not exist").format(username)
+        return JsonResponse(context, status=400)
+    else:
+        user_account, _ = UserStanding.objects.get_or_create(
+            user=user, defaults={'changed_by': request.user},
+        )
+        if account_action == 'disable':
+            user_account.account_status = UserStanding.ACCOUNT_DISABLED
+            context['message'] = _u("Successfully disabled {}'s account").format(username)
+            log.info("{} disabled {}'s account".format(request.user, username))
+        elif account_action == 'reenable':
+            user_account.account_status = UserStanding.ACCOUNT_ENABLED
+            context['message'] = _u("Successfully reenabled {}'s account").format(username)
+            log.info("{} reenabled {}'s account".format(request.user, username))
+        else:
+            context['message'] = _u("Unexpected account status")
+            return JsonResponse(context, status=400)
+        user_account.changed_by = request.user
+        user_account.standing_last_changed_at = datetime.datetime.now(UTC)
+        user_account.save()
+
+    return JsonResponse(context)
 
 
 @login_required
@@ -1248,8 +1336,9 @@ def confirm_email_change(request, key):
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
         except PendingEmailChange.DoesNotExist:
+            response = render_to_response("invalid_email_key.html", {})
             transaction.rollback()
-            return render_to_response("invalid_email_key.html", {})
+            return response
 
         user = pec.user
         address_context = {
@@ -1258,8 +1347,9 @@ def confirm_email_change(request, key):
         }
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
+            response = render_to_response("email_exists.html", {})
             transaction.rollback()
-            return render_to_response("email_exists.html", {})
+            return response
 
         subject = render_to_string('emails/email_change_subject.txt', address_context)
         subject = ''.join(subject.splitlines())
@@ -1275,9 +1365,10 @@ def confirm_email_change(request, key):
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
-            transaction.rollback()
             log.warning('Unable to send confirmation email to old address', exc_info=True)
-            return render_to_response("email_change_failed.html", {'email': user.email})
+            response = render_to_response("email_change_failed.html", {'email': user.email})
+            transaction.rollback()
+            return response
 
         user.email = pec.new_email
         user.save()
@@ -1286,12 +1377,14 @@ def confirm_email_change(request, key):
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
-            transaction.rollback()
             log.warning('Unable to send confirmation email to new address', exc_info=True)
-            return render_to_response("email_change_failed.html", {'email': pec.new_email})
+            response = render_to_response("email_change_failed.html", {'email': pec.new_email})
+            transaction.rollback()
+            return response
 
+        response = render_to_response("email_change_successful.html", address_context)
         transaction.commit()
-        return render_to_response("email_change_successful.html", address_context)
+        return response
     except Exception:
         # If we get an unexpected exception, be sure to rollback the transaction
         transaction.rollback()

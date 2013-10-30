@@ -26,7 +26,7 @@ from contentstore.utils import (get_modulestore, get_lms_link_for_item,
 
 from models.settings.course_grading import CourseGradingModel
 
-from .requests import _xmodule_recurse
+from .helpers import _xmodule_recurse
 from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError

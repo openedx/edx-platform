@@ -1,6 +1,6 @@
 describe 'Calculator', ->
   beforeEach ->
-    loadFixtures 'calculator.html'
+    loadFixtures 'coffee/fixtures/calculator.html'
     @calculator = new Calculator
 
   describe 'bind', ->
@@ -9,8 +9,10 @@ describe 'Calculator', ->
 
     it 'bind the help button', ->
       # These events are bind by $.hover()
-      expect($('div.help-wrapper a')).toHandleWith 'mouseover', @calculator.helpToggle
-      expect($('div.help-wrapper a')).toHandleWith 'mouseout', @calculator.helpToggle
+      expect($('div.help-wrapper a')).toHandle 'mouseover'
+      expect($('div.help-wrapper a')).toHandle 'mouseout'
+      expect($('div.help-wrapper')).toHandle 'focusin'
+      expect($('div.help-wrapper')).toHandle 'focusout'
 
     it 'prevent default behavior on help button', ->
       $('div.help-wrapper a').click (e) ->
@@ -33,8 +35,8 @@ describe 'Calculator', ->
       # Since the focus is called asynchronously, we need to
       # wait until focus() is called.
       didFocus = false
-      runs -> 
-          spyOn($.fn, 'focus').andCallFake (elementName) -> didFocus = true 
+      runs ->
+          spyOn($.fn, 'focus').andCallFake (elementName) -> didFocus = true
           @calculator.toggle(jQuery.Event("click"))
 
       waitsFor (-> didFocus), "focus() should have been called on the input", 1000
@@ -49,12 +51,14 @@ describe 'Calculator', ->
       @calculator.toggle(jQuery.Event("click"))
       expect($('.calc')).not.toHaveClass('closed')
 
-  describe 'helpToggle', ->
-    it 'toggle the help overlay', ->
-      @calculator.helpToggle()
+  describe 'helpShow', ->
+    it 'show the help overlay', ->
+      @calculator.helpShow()
       expect($('.help')).toHaveClass('shown')
 
-      @calculator.helpToggle()
+  describe 'helpHide', ->
+    it 'show the help overlay', ->
+      @calculator.helpHide()
       expect($('.help')).not.toHaveClass('shown')
 
   describe 'calculate', ->

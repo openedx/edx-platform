@@ -52,7 +52,7 @@ class ChooseModeView(View):
             "error": error,
         }
         if "verified" in modes:
-            context["suggested_prices"] = modes["verified"].suggested_prices.split(",")
+            context["suggested_prices"] = [decimal.Decimal(x) for x in modes["verified"].suggested_prices.split(",")]
             context["currency"] = modes["verified"].currency.upper()
             context["min_price"] = modes["verified"].min_price
 

@@ -26,7 +26,7 @@ div.calc-main {
     top: -45px;
     width: 16px;
 
-    &:hover {
+    &:hover, &:focus {
       opacity: 0.8;
     }
 
@@ -117,6 +117,7 @@ div.calc-main {
             height: 35px;
             @include hide-text;
             width: 35px;
+             display: block;
           }
 
           dl {
@@ -124,8 +125,6 @@ div.calc-main {
             border-radius: 3px;
             box-shadow: 0 0 3px #999;
             color: #333;
-            display: none;
-            line-height: lh();
             opacity: 0;
             padding: 10px;
             position: absolute;
@@ -133,10 +132,15 @@ div.calc-main {
             top: -122px;
             @include transition(none);
             width: 600px;
+            height: 0;
+            overflow: hidden;
+            pointer-events: none;
 
             &.shown {
-              display: block;
-              opacity: 1.0;
+              height: auto;
+              opacity: 1;
+              overflow: visible;
+              pointer-events: auto;
             }
 
             dt {

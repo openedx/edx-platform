@@ -234,12 +234,26 @@ class DraftModuleStore(MongoModuleStore):
         """
         Save a current draft to the underlying modulestore
         """
+        try:
+            original_published = super(DraftModuleStore, self).get_item(location)
+        except ItemNotFoundError:
+            original_published = None
+
         draft = self.get_item(location)
 
         draft.published_date = datetime.now(UTC)
         draft.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft.get_explicitly_set_fields_by_scope(Scope.content))
         if draft.has_children:
+            if original_published is not None:
+                # see if children were deleted. 2 reasons for children lists to differ:
+                #   1) child deleted
+                #   2) child moved
+                for child in original_published.children:
+                    if child not in draft.children:
+                        rents = [Location(mom) for mom in self.get_parent_locations(child, None)]
+                        if (len(rents) == 1 and rents[0] == Location(location)):  # the 1 is this original_published
+                            self.delete_item(child, True)
             super(DraftModuleStore, self).update_children(location, draft.children)
         super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)

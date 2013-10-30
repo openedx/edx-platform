@@ -712,7 +712,7 @@
 
   // notification showing/hiding
   .wrapper-notification {
-    bottom: -($notification-height);
+    bottom: -($ui-notification-height);
 
     // varying animations
     &.is-shown {

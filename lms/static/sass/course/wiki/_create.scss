@@ -53,7 +53,7 @@ form#wiki_revision {
   margin-top: lh();
   width: flex-grid(3, 9);
 
-  &:hover {
+  &:hover, &:focus {
     color: #333;
   }
 

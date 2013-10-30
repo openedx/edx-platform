@@ -2619,7 +2619,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  color: #aeaeae;
+  color: #333;
 }
 
 .pinned .icon {
@@ -2633,14 +2633,14 @@ body.discussion {
 }
 
 .pinned span {
-  color: #B82066;
+  color: $pink;
   font-style: italic;
   //cursor change is here since pins are read-only for inline discussions.
   cursor: default;
 }
 
 .notpinned span {
-  color: #888;
+  color: #333;
   font-style: italic;
 }
 
@@ -2665,7 +2665,7 @@ display:none;
     
 .notflagged .icon {
   display: block;
-  color: #aeaeae;
+  color: #333;
   float: left;
   margin: 3px;
   width: 10px;
@@ -2676,7 +2676,6 @@ display:none;
 .flagged .icon
 {
   display: block;
-  color: #aeaeae;
   float: left;
   margin: 3px;
   width: 10px;
@@ -2686,11 +2685,11 @@ display:none;
 }
 
 .flagged span {
-  color: #B82066;
+  color: $pink;
   font-style: italic;
 }
 
 .notflagged span {
-  color: #888;
+  color: #333;
   font-style: italic;
 }
