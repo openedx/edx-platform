@@ -8,6 +8,8 @@ import logging
 import json
 import re
 import unittest
+from datetime import datetime, timedelta
+import pytz
 
 from django.conf import settings
 from django.test import TestCase
@@ -28,8 +30,8 @@ from textwrap import dedent
 
 from student.models import unique_id_for_user, CourseEnrollment
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
-                           change_enrollment)
-from student.tests.factories import UserFactory
+                           change_enrollment, complete_course_mode_info)
+from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
 import shoppingcart
@@ -214,6 +216,45 @@ class CourseEndingTest(TestCase):
                           'show_survey_button': False,
                           'grade': '67'
                           })
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class DashboardTest(TestCase):
+    """
+    Tests for dashboard utility functions
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            mode_display_name='Honor Code',
+        )
+
+    def test_course_mode_info(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertTrue(course_mode_info['show_upsell'])
+        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+
+        verified_mode.expiration_date = datetime.now(pytz.UTC) + timedelta(days=-1)
+        verified_mode.save()
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertFalse(course_mode_info['show_upsell'])
+        self.assertIsNone(course_mode_info['days_for_upsell'])
 
 
 class EnrollInCourseTest(TestCase):

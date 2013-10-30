@@ -14,6 +14,14 @@
   <script type="text/javascript">
   (function() {
 
+    $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+
+    function toggleExpandMessage(e) {
+        (e).preventDefault();
+
+        $(this).closest('.message.is-expandable').toggleClass('is-expanded');
+    }
+
     $(".email-settings").click(function(event) {
       $("#email_settings_course_id").val( $(event.target).data("course-id") );
       $("#email_settings_course_number").text( $(event.target).data("course-number") );
@@ -179,7 +187,8 @@
             <% show_courseware_link = (course.id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
-            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings" />
+            <% course_mode_info = all_course_modes.get(course.id) %>
+            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info" />
       % endfor
 
       </ul>
