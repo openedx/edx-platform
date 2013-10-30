@@ -6,8 +6,10 @@ wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
 ###
 
+# Load utilities
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
+PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 class SendEmail
   constructor: (@$container) ->
@@ -79,23 +81,25 @@ class SendEmail
 class Email
   # enable subsections.
   constructor: (@$section) ->
-    # attach self to html
-    # so that instructor_dashboard.coffee can find this object
-    # to call event handlers like 'onClickTitle'
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
     @$section.data 'wrapper', @
 
     # isolate # initialize SendEmail subsection
     plantTimeout 0, => new SendEmail @$section.find '.send-email'
 
+    @instructor_tasks = new (PendingInstructorTasks()) @$section
+
   # handler for when the section title is clicked.
-  onClickTitle: ->
+  onClickTitle: -> @instructor_tasks.task_poller.start()
+
+  # handler for when the section is closed
+  onExit: -> @instructor_tasks.task_poller.stop()
 
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    Email: Email
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  Email: Email

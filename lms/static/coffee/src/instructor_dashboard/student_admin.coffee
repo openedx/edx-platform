@@ -6,10 +6,13 @@ wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
 ###
 
+# Load utilities
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 plantInterval = -> window.InstructorDashboard.util.plantInterval.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 load_IntervalManager = -> window.InstructorDashboard.util.IntervalManager
+create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
+PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 
 # get jquery element and assert its existance
@@ -21,57 +24,11 @@ find_and_assert = ($root, selector) ->
   else
     item
 
-# render a task list table to the DOM
-# `$table_tasks` the $element in which to put the table
-# `tasks_data`
-create_task_list_table = ($table_tasks, tasks_data) ->
-  $table_tasks.empty()
-
-  options =
-    enableCellNavigation: true
-    enableColumnReorder: false
-    autoHeight: true
-    rowHeight: 60
-    forceFitColumns: true
-
-  columns = [
-    id: 'task_type'
-    field: 'task_type'
-    name: 'Task Type'
-  ,
-    id: 'requester'
-    field: 'requester'
-    name: 'Requester'
-    width: 30
-  ,
-    id: 'task_input'
-    field: 'task_input'
-    name: 'Input'
-  ,
-    id: 'task_state'
-    field: 'task_state'
-    name: 'State'
-    width: 30
-  ,
-    id: 'task_id'
-    field: 'task_id'
-    name: 'Task ID'
-    width: 50
-  ,
-    id: 'created'
-    field: 'created'
-    name: 'Created'
-  ]
-
-  table_data = tasks_data
-
-  $table_placeholder = $ '<div/>', class: 'slickgrid'
-  $table_tasks.append $table_placeholder
-  grid = new Slick.Grid($table_placeholder, table_data, columns, options)
-
 
 class StudentAdmin
   constructor: (@$section) ->
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
     @$section.data 'wrapper', @
 
     # gather buttons
@@ -93,21 +50,12 @@ class StudentAdmin
     @$btn_rescore_problem_all     = @$section.find "input[name='rescore-problem-all']"
     @$btn_task_history_all        = @$section.find "input[name='task-history-all']"
     @$table_task_history_all      = @$section.find ".task-history-all-table"
-    @$table_running_tasks         = @$section.find ".running-tasks-table"
+    @instructor_tasks             = new (PendingInstructorTasks()) @$section
 
     # response areas
     @$request_response_error_progress = find_and_assert @$section, ".student-specific-container .request-response-error"
     @$request_response_error_grade = find_and_assert @$section, ".student-grade-container .request-response-error"
     @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
-
-    # start polling for task list
-    # if the list is in the DOM
-    if @$table_running_tasks.length > 0
-      # reload every 20 seconds.
-      TASK_LIST_POLL_INTERVAL = 20000
-      @reload_running_tasks_list()
-      @task_poller = new (load_IntervalManager()) TASK_LIST_POLL_INTERVAL, =>
-        @reload_running_tasks_list()
 
     # attach click handlers
 
@@ -294,14 +242,6 @@ class StudentAdmin
           create_task_list_table @$table_task_history_all, data.tasks
         error: std_ajax_err => @$request_response_error_all.text gettext("Error listing task history for this student and problem.")
 
-  reload_running_tasks_list: =>
-    list_endpoint = @$table_running_tasks.data 'endpoint'
-    $.ajax
-      dataType: 'json'
-      url: list_endpoint
-      success: (data) => create_task_list_table @$table_running_tasks, data.tasks
-      error: std_ajax_err => console.warn "error listing all instructor tasks"
-
   # wraps a function, but first clear the error displays
   clear_errors_then: (cb) ->
     @$request_response_error_progress.empty()
@@ -317,17 +257,15 @@ class StudentAdmin
     @$request_response_error_all.empty()
 
   # handler for when the section title is clicked.
-  onClickTitle: -> @task_poller?.start()
+  onClickTitle: -> @instructor_tasks.task_poller.start()
 
   # handler for when the section is closed
-  onExit: -> @task_poller?.stop()
+  onExit: -> @instructor_tasks.task_poller.stop()
 
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    StudentAdmin: StudentAdmin
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  StudentAdmin: StudentAdmin
