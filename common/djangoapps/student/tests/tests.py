@@ -36,8 +36,6 @@ from student.tests.test_email import mock_render_to_string
 
 import shoppingcart
 
-from course_modes.models import CourseMode
-
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
 
@@ -424,50 +422,3 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
         self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
-
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class RefundUnenrollmentTests(ModuleStoreTestCase):
-    """
-    Tests views for unenrollment with refunds
-    """
-    # test data
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
-
-    def setUp(self):
-        # Create course, user, and enroll them as a verified student
-        self.user = UserFactory.create()
-        self.course_id = "org/test/Test_Course"
-        self.cost = 40
-        CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
-        course_mode = CourseMode(course_id=self.course_id,
-                                 mode_slug="honor",
-                                 mode_display_name="honor cert",
-                                 min_price=self.cost)
-        course_mode.save()
-        course_mode = CourseMode(course_id=self.course_id,
-                                 mode_slug="verified",
-                                 mode_display_name="verified cert",
-                                 min_price=self.cost)
-        course_mode.save()
-
-        self.req_factory = RequestFactory()
-
-        course_enrollment = CourseEnrollment.create_enrollment(self.user, self.course_id, 'verified', is_active=True)
-        course_enrollment.save()
-
-    # Student is verified and paid; we should be able to refund them
-    def test_unenroll_and_refund(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course_id, 'enrollment_action': 'unenroll'})
-        request.user = self.user
-        response = change_enrollment(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
-
-    def test_unenroll_but_no_course(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': 'non/existent/course', 'enrollment_action': 'unenroll'})
-        request.user = self.user
-        response = change_enrollment(request)
-        self.assertEqual(response.status_code, 400)

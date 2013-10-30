@@ -43,7 +43,6 @@ from student.models import (
     TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
-    verified_unenroll_done
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -472,29 +471,18 @@ def change_enrollment(request):
 
     elif action == "unenroll":
         try:
-            course = course_from_id(course_id)
-            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-
-            # did they sign up for verified certs?
-            if(enrollment_mode == 'verified'):
-                # If the user is allowed a refund, do so
-                if has_access(user, course, 'refund'):
-                    # triggers the callback to mark the certificate as refunded
-                    verified_unenroll_done.send(sender=request, user=user, user_email=user.email, course_id=course_id)
-            CourseEnrollment.unenroll(user, course_id)
-            org, course_num, run = course_id.split("/")
-            dog_stats_api.increment(
-                "common.student.unenrollment",
-                tags=["org:{0}".format(org),
-                      "course:{0}".format(course_num),
-                      "run:{0}".format(run)]
-            )
-            return HttpResponse()
+            CourseEnrollment.enrollment_mode_for_user(user, course_id)
         except CourseEnrollment.DoesNotExist:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
-        except ItemNotFoundError:
-            log.warning("User {0} tried to unenroll from non-existent course {1}".format(user.username, course_id))
-            return HttpResponseBadRequest(_("Course id is invalid"))
+        CourseEnrollment.unenroll(user, course_id)
+        org, course_num, run = course_id.split("/")
+        dog_stats_api.increment(
+            "common.student.unenrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
+        return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
@@ -909,7 +897,7 @@ def create_account(request, post_override=None):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
-    # dont send email if we are doing load testing or random user generation for some reason
+    # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):

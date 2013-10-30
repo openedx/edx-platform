@@ -12,10 +12,14 @@ from django.utils.timezone import UTC
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from course_modes.tests.factories import CourseModeFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AccessTestCase(TestCase):
+    """
+    Tests for the various access controls on the student dashboard
+    """
     def test__has_global_staff_access(self):
         u = Mock(is_staff=False)
         self.assertFalse(access._has_global_staff_access(u))
@@ -114,19 +118,26 @@ class AccessTestCase(TestCase):
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
 
     def test__has_access_refund(self):
-        user = UserFactory.create()
-        course = CourseFactory.create(org='org', number='test', run='course', display_name='Test Course')
         today = datetime.datetime.now(UTC())
-        grace_period = datetime.timedelta(days=14)
         one_day_extra = datetime.timedelta(days=1)
+        user = UserFactory.create()
 
-        # User is allowed to receive refund if it is within two weeks of course start date
-        course.enrollment_start = (today - one_day_extra)
-        self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
+        course_nonrefundable_id = 'nonrefundable/test/Test_Course'
+        course_nonrefundable = CourseFactory.create(org='nonrefundable', number='test', run='course', display_name='Test Course')
+        course_mode_nonrefundable = CourseModeFactory.create(course_id=course_nonrefundable_id,
+                                                             mode_slug='verified',
+                                                             expiration_date=(today - one_day_extra))
+        course_mode_nonrefundable.save()
 
-        course.enrollment_start = (today - grace_period)
-        self.assertTrue(access._has_access_course_desc(user, course, 'refund'))
+        course_refundable_id = 'refundable/test/Test_Course'
+        course_refundable = CourseFactory.create(org='refundable', number='test', run='course', display_name='Test Course')
+        course_mode_refundable = CourseModeFactory.create(course_id=course_refundable_id,
+                                                          mode_slug='verified',
+                                                          expiration_date=(today + one_day_extra))
+        course_mode_refundable.save()
+
+        # User cannot receive a refund one day after the expiration date
+        self.assertFalse(access._has_access_course_desc(user, course_nonrefundable, 'refund'))
 
         # After two weeks, user may no longer receive a refund
-        course.enrollment_start = (today - grace_period - one_day_extra)
-        self.assertFalse(access._has_access_course_desc(user, course, 'refund'))
+        self.assertTrue(access._has_access_course_desc(user, course_refundable, 'refund'))

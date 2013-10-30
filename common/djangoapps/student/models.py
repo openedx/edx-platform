@@ -23,14 +23,13 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import django.dispatch
 from django.forms import ModelForm, forms
 
 import comment_client as cc
 from pytz import UTC
 
-import django.dispatch
-
-verified_unenroll_done = django.dispatch.Signal(providing_args=["user", "user_email", "course_id"])
+unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -823,10 +822,12 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        refund_error = "Refund Error"
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
             record.is_active = False
             record.save()
+            unenroll_done.send(sender=cls, course_enrollment=record)
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
             log.error(err_msg.format(user, course_id))

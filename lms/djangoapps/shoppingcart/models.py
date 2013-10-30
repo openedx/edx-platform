@@ -8,8 +8,6 @@ from collections import namedtuple
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
 from django.dispatch import receiver
-from student.models import verified_unenroll_done
-
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -26,7 +24,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from course_modes.models import CourseMode
 from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, unenroll_done
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -402,38 +400,48 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @classmethod
-    @receiver(verified_unenroll_done)
+    @receiver(unenroll_done, sender=CourseEnrollment)
     def refund_cert_callback(sender, **kwargs):
         """
-        When a CourseEnrollment object whose mode is 'verified' has its is_active field set to false (i.e. when a student
-        is unenrolled), this callback ensures that the associated CertificateItem is marked as refunded, and that an
-        appropriate email is sent to billing.
+        When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
+        occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
+        refund.
+
+        Returns the refunded certificate on a successful refund.  If no refund is necessary, it returns nothing.
+        If an error that the user should see occurs, it returns a string specifying the error.
         """
+        mode = kwargs['course_enrollment'].mode
+        course_id = kwargs['course_enrollment'].course_id
+        user = kwargs['course_enrollment'].user
+
+        # Only refund verified cert unenrollments that are within bounds of the expiration date
+        if (mode != 'verified'):
+            return
+
+        if (CourseMode.mode_for_course(course_id, 'verified') is None):
+            return
+
+        target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=user, status='purchased', mode='verified')
         try:
-            course_id = kwargs['course_id']
-            user = kwargs['user']
-
-            # If there's duplicate entries, just grab the first one and refund it (though in most cases we should only get one)
-            target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=user, status='purchased', mode='verified')
             target_cert = target_certs[0]
-            target_cert.status = 'refunded'
-            target_cert.save()
-
-            order_number = target_cert.order_id
-
-            # send billing an email so they can handle refunding
-            subject = _("[Refund] User-Requested Refund")
-            message = "User " + str(user) + "(" + str(user.email) + ") has requested a refund on Order #" + str(order_number) + "."
-            to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-            from_email = "support@edx.org"
-            send_mail(subject, message, from_email, to_email, fail_silently=False)
-
-            return target_cert
-
         except IndexError:
-            log.exception("Matching CertificateItem not found while trying to refund.  User %s, Course %s", user, course_id)
-            raise IndexError
+            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", user, course_id)
+            return
+        target_cert.status = 'refunded'
+        target_cert.save()
+
+        order_number = target_cert.order_id
+        # send billing an email so they can handle refunding
+        subject = _("[Refund] User-Requested Refund")
+        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=user, user_email=user.email, order_number=order_number)
+        to_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        from_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        try:
+            send_mail(subject, message, from_email, to_email, fail_silently=False)
+        except (smtplib.SMTPException, BotoServerError):
+            log.error('Failed sending email to billing request a refund for verified certiciate (User %s, Course %s)', user, course_id)
+
+        return target_cert
 
     @classmethod
     @transaction.commit_on_success
