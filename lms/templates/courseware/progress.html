@@ -63,7 +63,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               earned = section['section_total'].earned
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
-              if section['graded'] or len(section['format']) > 0:
+              if section['graded'] and len(section['format']) > 0:
                 chapter_earned += section['section_total'].earned * category_weights[section['format']]
                 chapter_total += section['section_total'].possible * category_weights[section['format']]
               %>
