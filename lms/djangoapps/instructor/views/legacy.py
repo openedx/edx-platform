@@ -952,14 +952,14 @@ def _list_course_forum_members(course_id, rolename, datatable):
     """
     # make sure datatable is set up properly for display first, before checking for errors
     datatable['header'] = ['Username', 'Full name', 'Roles']
-    datatable['title'] = 'List of Forum {0}s in course {1}'.format(rolename, course_id)
+    datatable['title'] = u'List of Forum {0}s in course {1}'.format(rolename, course_id)
     datatable['data'] = []
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
-        return '<font color="red">Error: unknown rolename "{0}"</font>'.format(rolename)
+        return u'<font color="red">Error: unknown rolename "{0}"</font>'.format(rolename)
     uset = role.users.all().order_by('username')
-    msg = 'Role = {0}'.format(rolename)
+    msg = u'Role = {0}'.format(rolename)
     log.debug('role={0}'.format(rolename))
     datatable['data'] = [[x.username, x.profile.name, ', '.join([r.name for r in x.roles.filter(course_id=course_id).order_by('name')])] for x in uset]
     return msg
@@ -981,7 +981,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     try:
         user = User.objects.get(username=uname)
     except User.DoesNotExist:
-        return '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+        return u'<font color="red">Error: unknown username "{0}"</font>'.format(uname)
     try:
         role = Role.objects.get(name=rolename, course_id=course.id)
     except Role.DoesNotExist:
@@ -993,19 +993,19 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     log.debug('rolename={0}'.format(rolename))
     if add_or_remove == FORUM_ROLE_REMOVE:
         if not alreadyexists:
-            msg = '<font color="red">Error: user "{0}" does not have rolename "{1}", cannot remove</font>'.format(uname, rolename)
+            msg = u'<font color="red">Error: user "{0}" does not have rolename "{1}", cannot remove</font>'.format(uname, rolename)
         else:
             user.roles.remove(role)
-            msg = '<font color="green">Removed "{0}" from "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
+            msg = u'<font color="green">Removed "{0}" from "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
     else:
         if alreadyexists:
-            msg = '<font color="red">Error: user "{0}" already has rolename "{1}", cannot add</font>'.format(uname, rolename)
+            msg = u'<font color="red">Error: user "{0}" already has rolename "{1}", cannot add</font>'.format(uname, rolename)
         else:
             if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
-                msg = '<font color="red">Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add</font>'.format(uname)
+                msg = u'<font color="red">Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add</font>'.format(uname)
             else:
                 user.roles.add(role)
-                msg = '<font color="green">Added "{0}" to "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
+                msg = u'<font color="green">Added "{0}" to "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
 
     return msg
 
