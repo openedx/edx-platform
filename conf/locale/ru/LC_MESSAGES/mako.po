@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-30 16:55+0400\n"
-"PO-Revision-Date: 2013-10-30 17:58+0300\n"
+"PO-Revision-Date: 2013-10-30 19:36+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -7982,7 +7982,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:183
 msgid "Total"
-msgstr ""
+msgstr "Итого"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:196
 msgid "this"
