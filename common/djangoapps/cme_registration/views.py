@@ -5,6 +5,7 @@ CME Registration methods
 import json
 import logging
 from dogapi import dog_stats_api
+import datetime
 
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -21,7 +22,6 @@ from student.models import Registration
 import student
 from cme_registration.models import CmeUserProfile
 from mitxmako.shortcuts import render_to_response, render_to_string
-
 
 log = logging.getLogger("mitx.student")
 
@@ -40,7 +40,8 @@ def cme_register_user(request, extra_context=None):
         'enrollment_action': request.GET.get('enrollment_action'),
         'patient_population_choices': PATIENT_POPULATION_CHOICES,
         'specialty_choices': SPECIALTY_CHOICES,
-        'sub_specialty_choices': SUB_SPECIALTY_CHOICES
+        'sub_specialty_choices': SUB_SPECIALTY_CHOICES,
+        'sub_affiliation_choices': SUB_AFFILIATION_CHOICES,
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -56,7 +57,7 @@ def cme_create_account(request, post_override=None):
     '''
     json_string = {'success': False}
 
-    post_vars = post_override if post_override else request.POST
+    post_vars = post_override if post_override else request.POST.copy()
 
     # Confirm we have a properly formed request
     for var in ['username', 'email', 'password', 'name']:
@@ -65,27 +66,56 @@ def cme_create_account(request, post_override=None):
             json_string['field'] = var
             return HttpResponse(json.dumps(json_string))
 
-    #Validate required felds
-    error = validate_required_fields(post_vars)
+    # Validate required fields set1
+    error = validate_required_fields_set1(post_vars)
     if error is not None:
         return HttpResponse(json.dumps(error))
 
-    #Validate required check boxes
+    # Validate length of middle initial
+    error = validate_middle_initial_length(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
+    # Validate birth date
+    error = validate_birth_date_format(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
+    # Validate fields dependent on Professional Designation
+    error = validate_professional_fields(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
+    # Setup post_vars for correct sub_affiliation field
+    post_vars = setup_sub_affiliation_field(post_vars)
+
+    # Validate affiliation fields
+    error = validate_affiliation_fields(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
+    # Validate required fields set2
+    error = validate_required_fields_set2(post_vars)
+    if error is not None:
+        return HttpResponse(json.dumps(error))
+
+    # Validate required check boxes
     error = validate_required_boxes(post_vars)
     if error is not None:
         return HttpResponse(json.dumps(error))
 
-    #Validate required radio buttons
-    error = validate_required_radios(post_vars)
-    if error is not None:
-        return HttpResponse(json.dumps(error))
+    # Validate required radio buttons
+    # Commented out while no radios exist
+#     error = validate_required_radios(post_vars)
+#     if error is not None:
+#         return HttpResponse(json.dumps(error))
 
-    #Validate required secondary fields
+    # Validate required secondary fields
     error = validate_required_secondaries(post_vars)
     if error is not None:
         return HttpResponse(json.dumps(error))
 
-    #Validate email address
+    # Validate email address
     try:
         validate_email(post_vars['email'])
     except ValidationError:
@@ -93,7 +123,7 @@ def cme_create_account(request, post_override=None):
         json_string['field'] = 'email'
         return HttpResponse(json.dumps(json_string))
 
-    #Validate username conforms
+    # Validate username conforms
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
@@ -101,7 +131,7 @@ def cme_create_account(request, post_override=None):
         json_string['field'] = 'username'
         return HttpResponse(json.dumps(json_string))
 
-    #Validate Export controls
+    # Validate Export controls
     error = validate_export_controls(post_vars)
     if error is not None:
         return HttpResponse(json.dumps(error))
@@ -163,6 +193,7 @@ def _do_cme_create_account(post_vars):
     Since CmeUserProfile is implemented using multi-table inheritence of UserProfile, the CmeUserProfile object
     will also contain all the UserProfile fields.
     """
+
     user = User(username=post_vars['username'],
                 email=post_vars['email'],
                 is_active=False)
@@ -191,19 +222,18 @@ def _do_cme_create_account(post_vars):
 
     #UserProfile fields
     cme_user_profile.name = post_vars['name']
+    cme_user_profile.gender = post_vars.get('gender')
 
     #CmeUserProfile fields
-    cme_user_profile.profession = post_vars.get('profession')
+    cme_user_profile.last_name = post_vars['last_name']
+    cme_user_profile.first_name = post_vars['first_name']
+    cme_user_profile.middle_initial = post_vars.get('middle_initial')
+    cme_user_profile.birth_date = post_vars['birth_date']
     cme_user_profile.professional_designation = post_vars.get('professional_designation')
     cme_user_profile.license_number = post_vars.get('license_number')
-    cme_user_profile.organization = post_vars.get('organization')
-    cme_user_profile.stanford_affiliated = True if post_vars.get('stanford_affiliated') == '1' else False
-
-    if post_vars.get('how_stanford_affiliated') == 'Other':
-        cme_user_profile.how_stanford_affiliated = post_vars.get('how_stanford_affiliated_free')
-    else:
-        cme_user_profile.how_stanford_affiliated = post_vars.get('how_stanford_affiliated')
-
+    cme_user_profile.license_country = post_vars.get('license_country')
+    cme_user_profile.license_state = post_vars.get('license_state')
+    cme_user_profile.physician_status = post_vars.get('physician_status')
     cme_user_profile.patient_population = post_vars.get('patient_population')
 
     if post_vars.get('specialty') == 'Other':
@@ -216,32 +246,34 @@ def _do_cme_create_account(post_vars):
     else:
         cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
 
+    cme_user_profile.affiliation = post_vars.get('affiliation')
+
+    if post_vars.get('affiliation') == 'Other':
+        cme_user_profile.other_affiliation = post_vars.get('other_affiliation')
+    else:
+        cme_user_profile.other_affiliation = None
+
+    cme_user_profile.sub_affiliation = post_vars.get('sub_affiliation')
+    cme_user_profile.sunet_id = post_vars.get('sunet_id')
+    cme_user_profile.stanford_department = post_vars.get('stanford_department')
     cme_user_profile.address_1 = post_vars.get('address_1')
     cme_user_profile.address_2 = post_vars.get('address_2')
     cme_user_profile.city = post_vars.get('city')
-    cme_user_profile.state_province = post_vars.get('state_province')
+    cme_user_profile.state = post_vars.get('state')
+    cme_user_profile.county_province = post_vars.get('county_province')
     cme_user_profile.postal_code = post_vars.get('postal_code')
     cme_user_profile.country = post_vars.get('country')
-    cme_user_profile.phone_number = post_vars.get('phone_number')
-    cme_user_profile.extension = post_vars.get('extension')
-    cme_user_profile.fax = post_vars.get('fax')
-
-    if post_vars.get('hear_about_us') == 'Other':
-        cme_user_profile.hear_about_us = post_vars.get('hear_about_us_free')
-    else:
-        cme_user_profile.hear_about_us = post_vars.get('hear_about_us')
-
-    cme_user_profile.mailing_list = 1 if post_vars.get('mailing_list') == 'true' else 0
 
     try:
         cme_user_profile.save()
 
     except Exception:
+        print "Could not create cme_user_profile"
         log.exception("UserProfile creation failed for user {0}.".format(user.email))
     return (user, cme_user_profile, registration)
 
 
-def validate_required_fields(post_vars):
+def validate_required_fields_set1(post_vars):
     """
     Checks that required free text fields contain at least 2 chars
     `post_vars` is dict of post parameters (a `dict`)
@@ -252,28 +284,173 @@ def validate_required_fields(post_vars):
     required_fields_list = [{'email': 'A properly formatted e-mail is required.'},
                             {'password': 'A valid password is required.'},
                             {'username': 'Username must be minimum of two characters long.'},
-                            {'name': 'Your legal name must be a minimum of two characters long.'},
-                            {'profession': 'Choose your profession.'},
-                            {'license_number': 'Enter your license number.'},
-                            {'patient_population': 'Choose your patient population'},
-                            {'specialty': 'Choose your specialty'},
-                            {'address_1': 'Enter your Address 01'},
-                            {'city': 'Enter your city'},
-                            {'state_province': 'Choose your state/Province'},
-                            {'postal_code': 'Enter your postal code'},
-                            {'country': 'Choose your country'},
-                            {'phone_number': 'Enter your phone number'},
-                            {'hear_about_us': 'Choose how you heard about us'}
-                           ]
+                            {'name': 'Your full name must be a minimum of two characters long.'},
+                            {'last_name': 'Enter your last name'},
+                            {'first_name': 'Enter your first name'},
+                            {'birth_date': 'Enter your birth date'},
+                            {'professional_designation': 'Choose your professional designation'},
+                            ]
 
     error = {}
     for required_field in required_fields_list:
-        for key, val in required_field.iteritems():   
+        for key, val in required_field.iteritems():
             if len(post_vars.get(key)) < 2:
                 error['success'] = False
                 error['value'] = val
                 error['field'] = key
                 return error
+
+
+def validate_middle_initial_length(post_vars):
+    """
+    Checks length of middle initial
+    """
+
+    if len(post_vars.get('middle_initial')) > 1:
+        error = {}
+        error['success'] = False
+        error['value'] = 'Enter your middle initial as a single character'
+        error['field'] = 'middle_initial'
+        return error
+
+
+def validate_birth_date_format(post_vars):
+    """
+    Checks date is in format 'MM/DD'
+    """
+
+    birth_date = post_vars.get('birth_date')
+    date_parts = birth_date.split('/')
+
+    error = {}
+    if len(date_parts) < 2:
+        error['success'] = False
+        error['value'] = 'Enter your birth date as MM/DD'
+        error['field'] = 'birth_date'
+        return error
+
+    dummy_year = 2013
+    try:
+        dateobj = datetime.date(dummy_year, int(date_parts[0]), int(date_parts[1]))
+    except ValueError, e:
+        error['success'] = False
+        error['value'] = str(e)
+        error['field'] = 'birth_date'
+        return error
+
+
+def validate_professional_fields(post_vars):
+    """
+    Checks that professional fields are filled out correctly
+    `post_vars` is dict of post parameters (a `dict`)
+    Returns a dict indicating failure, field and message on empty field else None
+    """
+
+    required_fields_list = [{'license_number': 'Enter your license number'},
+                            {'license_country': 'Choose your license country'},
+                            {'physician_status': 'Enter your physician status'},
+                            {'patient_population': 'Choose your patient population'},
+                            {'specialty': 'Choose your specialty'},
+                            ]
+
+    error = {}
+    if post_vars.get('professional_designation') in ['DO', 'MD', 'MD, PhD', 'MBBS']:
+        for required_field in required_fields_list:
+            for key, val in required_field.iteritems():
+                if len(post_vars.get(key)) < 2:
+                    error['success'] = False
+                    error['value'] = val
+                    error['field'] = key
+                    return error
+
+    # license_state is required if license_country = United States
+    if post_vars.get('license_country') == 'United States':
+        if len(post_vars.get('license_state')) < 2:
+            error['success'] = False
+            error['value'] = 'Choose your license state'
+            error['field'] = 'license_state'
+            return error
+
+
+def setup_sub_affiliation_field(post_vars):
+    """
+    Sets post_vars['sub_affiliation'] to correct value dependent upon affiliation dropdown
+    """
+
+    affiliation_values = [{'Packard Children\'s Health Alliance': 'PCHA_affiliation'},
+                          {'University Healthcare Alliance': 'UHA_affiliation'},
+                          ]
+
+    post_vars['sub_affiliation'] = ''
+    for affiliation_value in affiliation_values:
+        for key, val in affiliation_value.iteritems():
+            if post_vars.get('affiliation') == key:
+                post_vars['sub_affiliation'] = post_vars.get(val)
+
+    return post_vars
+
+
+def validate_affiliation_fields(post_vars):
+    """
+    Checks affiliation fields
+    """
+
+    error = {}
+    affiliation_fields_list = [{'Packard Children\'s Health Alliance': 'Enter your Packard Children\'s Health Alliance affiliation'},
+                               {'University Healthcare Alliance': 'Enter your University Healthcare Alliance affiliation'},
+                               ]
+
+    for affiliation_field in affiliation_fields_list:
+        for key, val in affiliation_field.iteritems():
+            if post_vars.get('affiliation') == key and len(post_vars.get('sub_affiliation')) < 2:
+                error['success'] = False
+                error['value'] = val
+                error['field'] = 'sub_affiliation'
+                return error
+
+    required_fields_list = [{'sunet_id': 'Enter your SUNet ID'},
+                            {'stanford_department': 'Choose your Stanford department'},
+                            ]
+
+    if post_vars.get('affiliation') == 'Stanford University':
+        for required_field in required_fields_list:
+            for key, val in required_field.iteritems():
+                if len(post_vars.get(key)) < 2:
+                    error['success'] = False
+                    error['value'] = val
+                    error['field'] = key
+                    return error
+
+
+def validate_required_fields_set2(post_vars):
+    """
+    Checks that required free text fields contain at least 2 chars
+    `post_vars` is dict of post parameters (a `dict`)
+    Returns a dict indicating failure, field and message on empty field else None
+    """
+
+    #Add additional required fields here
+    required_fields_list = [{'address_1': 'Enter your Address 1'},
+                            {'city': 'Enter your city'},
+                            {'country': 'Choose your country'},
+                            {'postal_code': 'Enter your postal code'},
+                            ]
+
+    error = {}
+    for required_field in required_fields_list:
+        for key, val in required_field.iteritems():
+            if len(post_vars.get(key)) < 2:
+                error['success'] = False
+                error['value'] = val
+                error['field'] = key
+                return error
+
+    if post_vars.get('country') == 'United States':
+        if len(post_vars.get('state')) < 2:
+            error['success'] = False
+            error['value'] = 'Choose your state'
+            error['field'] = 'state'
+            return error
 
 
 def validate_required_boxes(post_vars):
@@ -307,11 +484,8 @@ def validate_required_secondaries(post_vars):
     """
 
     #Add additional required secondaries here
-    required_secondaries_dict = {'stanford_affiliated': ('1', 'how_stanford_affiliated', 'Choose how you are affiliated with Stanford.'),
-                                 'how_stanford_affiliated': ('Other', 'how_stanford_affiliated_free', 'Enter how you are affiliated with Stanford.'),
-                                 'specialty': ('Other', 'specialty_free', 'Enter your specialty.'),
+    required_secondaries_dict = {'specialty': ('Other', 'specialty_free', 'Enter your specialty.'),
                                  'sub_specialty': ('Other', 'sub_specialty_free', 'Enter your sub-specialty.'),
-                                 'hear_about_us': ('Other', 'hear_about_us_free', 'Enter how you heard about us.')
                                  }
 
     error = {}
@@ -322,25 +496,25 @@ def validate_required_secondaries(post_vars):
             error['field'] = k
             return error
 
-
-def validate_required_radios(post_vars):
-    """
-    Checks that required radio buttons have been checked
-    `post_vars is dict of post parameters (a `dict)
-    Returns a dict indicating failure, field and message on empty field else None
-    """
-
-    #Add additional required radios here
-    required_radios_dict = {'stanford_affiliated': 'Select whether, or not, you are affiliated with Stanford.'
-                            }
-
-    error = {}
-    for k, val in required_radios_dict.items():
-        if k not in post_vars:
-            error['success'] = False
-            error['value'] = val
-            error['field'] = k
-            return error
+# Commented out while no radios exist
+# def validate_required_radios(post_vars):
+#     """
+#     Checks that required radio buttons have been checked
+#     `post_vars is dict of post parameters (a `dict)
+#     Returns a dict indicating failure, field and message on empty field else None
+#     """
+#
+#     #Add additional required radios here
+#     required_radios_dict = {
+#                             }
+#
+#     error = {}
+#     for k, val in required_radios_dict.items():
+#         if k not in post_vars:
+#             error['success'] = False
+#             error['value'] = val
+#             error['field'] = k
+#             return error
 
 
 def validate_export_controls(post_vars):
@@ -357,21 +531,22 @@ def validate_export_controls(post_vars):
         }
 
 
-DENIED_COUNTRIES = [
-    'Sudan',
-    'Korea, Democratic People\'s Republic Of',
-    'Iran, Islamic Republic Of',
-    'Cuba',
-    'Syrian Arab Republic',
-    ]
+DENIED_COUNTRIES = ['Sudan',
+                    'Korea, Democratic People\'s Republic Of',
+                    'Iran, Islamic Republic Of',
+                    'Cuba',
+                    'Syrian Arab Republic',
+                    ]
 
-#Construct dicts for specialty and sub-specialty dropdowns
+#Construct dicts for specialty, sub-specialty, sub-affiliation dropdowns
 SPECIALTY_CHOICES = {}
 SUB_SPECIALTY_CHOICES = {}
+SUB_AFFILIATION_CHOICES = {}
 
 PATIENT_POPULATION_CHOICES = (('Adult', 'Adult'),
                               ('Pediatric', 'Pediatric'),
-                              ('Both', 'Both (Adult/Pediatric)'))
+                              ('Both', 'Both'),
+                              ('None', 'None'))
 SPECIALTY_CHOICES['Adult'] = (('Addiction_Medicine', 'Addiction Medicine'),
                               ('Allergy', 'Allergy'),
                               ('Anesthesiology', 'Anesthesiology'),
@@ -604,3 +779,18 @@ SUB_SPECIALTY_CHOICES['Surgery'] = (('Bariatric_Surgery', 'Bariatric Surgery'),
 SUB_SPECIALTY_CHOICES['Transplant'] = (('Solid_Organ', 'Solid Organ'),
                                        ('Blood_and_Bone_Marrow', 'Blood and Bone Marrow'),
                                        ('Other', 'Other, please enter:'))
+
+SUB_AFFILIATION_CHOICES['Packard_Childrens_Health_Alliance'] = (('Bayside_Medical_Group', 'Bayside Medical Group'),
+                                                                ('Diablo_Valley_Child_Neurology', 'Diablo Valley Child Neurology'),
+                                                                ('Jagdip_Powar_Associates', 'Jagdip Powar, MD and Associates'),
+                                                                ('Judy_Fuentebella_Associates', 'Judy Fuentebella, MD  and Associates'),
+                                                                ('Livermore_Pleasanton_San_Ramon_Pediatrics_Group', 'Livermore Pleasanton San Ramon Pediatrics Group'),
+                                                                ('Pediatric_Cardiology_Medical_Group', 'Pediatric Cardiology Medical Group'),
+                                                                ('Pediatric_Cardiology_Associates', 'Pediatric Cardiology Associates'),
+                                                                ('Peninsula_Pediatrics', 'Peninsula Pediatrics'),
+                                                                ('Sabina_Ali_Associates', 'Sabina Ali, MD  and Associates'))
+
+SUB_AFFILIATION_CHOICES['University_Healthcare_Alliance'] = (('Affinity_Medical_Partners_Medical_Group', 'Affinity Medical Partners Medical Group (AMP)'),
+                                                             ('Bay_Valley_Medical_Group', 'Bay Valley Medical Group (BVMG)'),
+                                                             ('Cardiovascular_Consultants_Medical_Group', 'Cardiovascular Consultants Medical Group (CCMG)'),
+                                                             ('Menlo_Medical_Clinic', 'Menlo Medical Clinic (MMC)'))

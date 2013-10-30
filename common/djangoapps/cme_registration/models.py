@@ -18,103 +18,149 @@ class CmeUserProfile(UserProfile):
     class Meta:
         db_table = "cme_registration"
 
-    PROFESSION_CHOICES = (('Allied Health Professional', 'Allied Health Professional'),
-                          ('Fellow', 'Fellow'),
-                          ('Nurse', 'Nurse'),
-                          ('Nurse Practioner', 'Nurse Practioner'),
-                          ('Physician', 'Physician'),
-                          ('Physician Assistant', 'Physician Assistant'),
-                          ('Resident', 'Resident'),
-                          ('Student', 'Student'))
-    profession = models.CharField(blank=True, null=True, max_length=30, choices=PROFESSION_CHOICES)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    middle_initial = models.CharField(max_length=1, blank=True, null=True)
+    birth_date = models.CharField(max_length=5, blank=True, null=True)
 
-    PROFESSIONAL_DESIGNATION_CHOICES = (('MD', 'MD'),
-                                        ('DO', 'DO'),
-                                        ('PA', 'PA'),
+    PROFESSIONAL_DESIGNATION_CHOICES = (('DO', 'DO'),
+                                        ('MD', 'MD'),
+                                        ('MD, PhD', 'MD, PhD'),
+                                        ('MBBS', 'MBBS'),
                                         ('NP', 'NP'),
-                                        ('RN', 'RN'))
-    professional_designation = models.CharField(blank=True, null=True, max_length=3, choices=PROFESSIONAL_DESIGNATION_CHOICES)
-    license_number = models.CharField(blank=True, null=True, max_length=255)
-    organization = models.CharField(blank=True, null=True, max_length=255)
-    stanford_affiliated = models.BooleanField(default=0)
+                                        ('PA', 'PA'),
+                                        ('RN', 'RN'),
+                                        ('Other', 'Other'),
+                                        ('None', 'None'))
+    professional_designation = models.CharField(blank=True, null=True, max_length=25, choices=PROFESSIONAL_DESIGNATION_CHOICES)
+    license_number = models.CharField(max_length=20, blank=True, null=True, )
+    license_country = models.CharField(max_length=50, blank=True, null=True)
+    license_state = models.CharField(max_length=50, blank=True, null=True)
 
-    HOW_STANFORD_AFFILIATED_CHOICES = (('Lucile Packard Children\'s Hospital at Stanford', 'Lucile Packard Children\'s Hospital at Stanford'),
-                                       ('Packard Children\'s Health Alliance (PCHA)', 'Packard Children\'s Health Alliance (PCHA)'),
-                                       ('Stanford Hospital & Clinics', 'Stanford Hospital & Clinics'),
-                                       ('Stanford University', 'Stanford University'),
-                                       ('University Healthcare Alliance (UHA)', 'University Healthcare Alliance (UHA)'),
-                                       ('Other', 'Other, please enter:'))
-    how_stanford_affiliated = models.CharField(blank=True, null=True, max_length=255, choices=HOW_STANFORD_AFFILIATED_CHOICES)
+    PHYSICIAN_STATUS_CHOICES = (('Active', 'Active'),
+                                ('Resident', 'Resident'),
+                                ('Fellow', 'Fellow'),
+                                ('Retired', 'Retired'))
+    physician_status = models.CharField(blank=True, null=True, max_length=8)
 
     PATIENT_POPULATION_CHOICES = (('Adult', 'Adult'),
                                   ('Pediatric', 'Pediatric'),
-                                  ('Both (Adult/Pediatric)', 'Both (Adult/Pediatric)'))
+                                  ('Both', 'Both'),
+                                  ('None', 'None'))
     patient_population = models.CharField(blank=True, null=True, max_length=25, choices=PATIENT_POPULATION_CHOICES)
     specialty = models.CharField(blank=True, null=True, max_length=255)
     sub_specialty = models.CharField(blank=True, null=True, max_length=255)
+
+    AFFILIATION_CHOICES = (('Lucile Packard Children\'s Hospital', 'Lucile Packard Children\'s Hospital'),
+                           ('Packard Children\'s Health Alliance', 'Packard Children\'s Health Alliance'),
+                           ('Stanford Hospital and Clinics', 'Stanford Hospital and Clinics'),
+                           ('Stanford University', 'Stanford University'),
+                           ('University Healthcare Alliance', 'University Healthcare Alliance'),
+                           ('Other', 'Other'))
+    affiliation = models.CharField(blank=True, null=True, max_length=46, choices=AFFILIATION_CHOICES)
+    other_affiliation = models.CharField(blank=True, null=True, max_length=46)
+    sub_affiliation = models.CharField(blank=True, null=True, max_length=46)
+
+    DEPARTMENT_CHOICES = (('Anesthesiology,Perioperative,Pain Medicine', 'Anesthesiology,Perioperative,Pain Medicine'),
+                          ('Biochemistry', 'Biochemistry'),
+                          ('Cardiothoracic Surgery', 'Cardiothoracic Surgery'),
+                          ('Centers - School of Medicine', 'Centers - School of Medicine'),
+                          ('Chemical and Systems Biology', 'Chemical and Systems Biology'),
+                          ('Comparative Medicine', 'Comparative Medicine'),
+                          ('Dermatology', 'Dermatology'),
+                          ('Developmental Biology', 'Developmental Biology'),
+                          ('Genetics Operations', 'Genetics Operations'),
+                          ('Health Research and Policy', 'Health Research and Policy'),
+                          ('Medicine', 'Medicine'),
+                          ('Microbiology and Immunology', 'Microbiology and Immunology'),
+                          ('Molecular and Cellular Physiology', 'Molecular and Cellular Physiology'),
+                          ('Neurobiology', 'Neurobiology'),
+                          ('Neurology', 'Neurology'),
+                          ('Neurosurgery', 'Neurosurgery'),
+                          ('Obstetrics & Gynecology', 'Obstetrics & Gynecology'),
+                          ('Ophthalmology', 'Ophthalmology'),
+                          ('Orthopaedic Surgery', 'Orthopaedic Surgery'),
+                          ('Otolaryngology/Head & Neck Surgery', 'Otolaryngology/Head & Neck Surgery'),
+                          ('Pathology', 'Pathology'),
+                          ('Pediatrics', 'Pediatrics'),
+                          ('Psychiatry and Behavioral Sciences', 'Psychiatry and Behavioral Sciences'),
+                          ('Radiation Oncology', 'Radiation Oncology'),
+                          ('Radiology', 'Radiology'),
+                          ('School of Medicine', 'School of Medicine'),
+                          ('SoM - Basic Science Pool', 'SoM - Basic Science Pool'),
+                          ('SoM - Bio-X/Clark', 'SoM - Bio-X/Clark'),
+                          ('SoM - Bioengineering', 'SoM - Bioengineering'),
+                          ('SoM - Clinical Science Pool', 'SoM - Clinical Science Pool'),
+                          ('SoM - Other Departments', 'SoM - Other Departments'),
+                          ('SoM Dean\'s Office Administrative Units', 'SoM Dean\'s Office Administrative Units'),
+                          ('SoM Non Cap Projects', 'SoM Non Cap Projects'),
+                          ('Stanford Cancer/Stem Cell Biology', 'Stanford Cancer/Stem Cell Biology'),
+                          ('Stanford Institutes of Medicine', 'Stanford Institutes of Medicine'),
+                          ('Structural Biology Department', 'Structural Biology Department'),
+                          ('Surgery', 'Surgery'),
+                          ('Urology', 'Urology'),
+                          ('Urology - Administration', 'Urology - Administration'),
+                          ('Urology - Divisions', 'Urology - Divisions'))
+    stanford_department = models.CharField(blank=True, null=True, max_length=46, choices=DEPARTMENT_CHOICES)
+    sunet_id = models.CharField(blank=True, null=True, max_length=33)
+
     address_1 = models.TextField(blank=True, null=True)
     address_2 = models.TextField(blank=True, null=True)
     city = models.TextField(blank=True, null=True)
-    STATE_CHOICES = (('Alabama', 'Alabama'),
-                     ('Alaska', 'Alaska'),
-                     ('Arizona', 'Arizona'),
-                     ('Arkansas', 'Arkansas'),
-                     ('California', 'California'),
-                     ('Colorado', 'Colorado'),
-                     ('Connecticut', 'Connecticut'),
-                     ('Delaware', 'Deleware'),
-                     ('District of Columbia', 'District of Columbia'),
-                     ('Florida', 'Florida'),
-                     ('Georgia', 'Georgia'),
-                     ('Hawaii', 'Hawaii'),
-                     ('Idaho', 'Idaho'),
-                     ('Illinois', 'Indiana'),
-                     ('Iowa', 'Iowa'),
-                     ('Kansas', 'Kansas'),
-                     ('Kentucky', 'Kentucky'),
-                     ('Louisiana', 'Louisiana'),
-                     ('Maine', 'Maine'),
-                     ('Maryland', 'Maryland'),
-                     ('Massachusetts', 'Massachusetts'),
-                     ('Michigan', 'Michigan'),
-                     ('Minnesota', 'Minnesota'),
-                     ('Mississippi', 'Mississippi'),
-                     ('Missouri', 'Missouri'),
-                     ('Montana', 'Montana'),
-                     ('Nebraska', 'Nebraska'),
-                     ('Nevada', 'Nevada'),
-                     ('Vermont', 'Vermont'),
-                     ('Virginia', 'Virginia'),
-                     ('Washington', 'Washington'),
-                     ('West Virginia', 'West Virginia'),
-                     ('Wisconsin', 'Wisconsin'),
-                     ('Wyoming', 'Wyoming'),
-                     ('American Samoa', 'American Samoa'),
-                     ('Armed Forces America', 'Armed Forces America'),
-                     ('Armed Forces Europe', 'Armed Forces Europe'),
-                     ('Armed Forces Pacific', 'Armed Forces Pacific'),
-                     ('Guam', 'Guam'),
-                     ('Northern Mariana Islands', 'Northern, Mariana Islands'),
-                     ('Palau', 'Palau'),
-                     ('Puerto Rico', 'Puerto Rico'),
-                     ('Utah', 'Utah'),
-                     ('Virgin Island', 'Virgin Island'),
-                     ('Alberta', 'Alberta'),
-                     ('British Columbia', 'British Columbia'),
-                     ('Manitoba', 'Manitoba'),
-                     ('Nanavut', 'Nanavut'),
-                     ('New Brunswick', 'New Brunswick'),
-                     ('Newfoundland and Labrador', 'Newfoundland and Labrador'),
-                     ('Northwest Territories', 'Northwest Territories'),
-                     ('Nova Scotia', 'Nova Scotia'),
-                     ('Ontario', 'Ontario'),
-                     ('Prince Edward Island', 'Prince Edward Island'),
-                     ('Quebec', 'Quebec'),
-                     ('Saskatchewan', 'Saskatchewan'),
-                     ('Yukon Territory', 'Yukon Territory'),
-                     ('Other', 'Other'))
+    STATE_CHOICES = (('AL', 'Alabama'),
+                     ('AK', 'Alaska'),
+                     ('AZ', 'Arizona'),
+                     ('AR', 'Arkansas'),
+                     ('CA', 'California'),
+                     ('CO', 'Colorado'),
+                     ('CT', 'Connecticut'),
+                     ('DE', 'Deleware'),
+                     ('DC', 'District of Columbia'),
+                     ('FL', 'Florida'),
+                     ('GA', 'Georgia'),
+                     ('HI', 'Hawaii'),
+                     ('ID', 'Idaho'),
+                     ('IL', 'Illinois'),
+                     ('IN', 'Indiana'),
+                     ('IA', 'Iowa'),
+                     ('KS', 'Kansas'),
+                     ('KY', 'Kentucky'),
+                     ('LA', 'Louisiana'),
+                     ('ME', 'Maine'),
+                     ('MD', 'Maryland'),
+                     ('MA', 'Massachusetts'),
+                     ('MI', 'Michigan'),
+                     ('MN', 'Minnesota'),
+                     ('MS', 'Mississippi'),
+                     ('MO', 'Missouri'),
+                     ('MT', 'Montana'),
+                     ('NE', 'Nebraska'),
+                     ('NV', 'Nevada'),
+                     ('NH', 'New Hampshire'),
+                     ('NJ', 'New Jersey'),
+                     ('NM', 'New Mexico'),
+                     ('NY', 'New York'),
+                     ('NC', 'North Carolina'),
+                     ('ND', 'North Dakota'),
+                     ('OH', 'Ohio'),
+                     ('OK', 'Oklahoma'),
+                     ('OR', 'Oregon'),
+                     ('PA', 'Pennsylvania'),
+                     ('RI', 'Rhode Island'),
+                     ('SC', 'South Carolina'),
+                     ('SD', 'South Dakota'),
+                     ('TN', 'Tennessee'),
+                     ('TX', 'Texas'),
+                     ('UT', 'Utah'),
+                     ('VT', 'Vermont'),
+                     ('VA', 'Virginia'),
+                     ('WA', 'Washington'),
+                     ('WV', 'West Virginia'),
+                     ('WI', 'Wisconsin'),
+                     ('WY', 'Wyoming'))
 
-    state_province = models.CharField(blank=True, null=True, max_length=50, choices=STATE_CHOICES)
+    state = models.CharField(blank=True, null=True, max_length=50, choices=STATE_CHOICES)
+    county_province = models.CharField(blank=True, null=True, max_length=50)
     postal_code = models.CharField(blank=True, null=True, max_length=20)
     COUNTRY_CHOICES = (('United States', 'United States'),
                        ('Afghanistan', 'Afghanistan'),
@@ -364,13 +410,5 @@ class CmeUserProfile(UserProfile):
                        ('Other', 'Other'))
 
     country = models.CharField(blank=True, null=True, max_length=50, choices=COUNTRY_CHOICES)
-    phone_number = models.CharField(blank=True, null=True, max_length=30)
-    extension = models.CharField(blank=True, null=True, max_length=10)
-    fax = models.CharField(blank=True, null=True, max_length=30)
-    HEAR_ABOUT_US_CHOICES = (('Direct Mail Brochure', 'Direct Mail Brochure'),
-                             ('Email Announcement', 'Email Announcement'),
-                             ('SCCME Web site', 'SCCME Web site'),
-                             ('Friend/Colleague', 'Friend/Colleague'),
-                             ('Other', 'Other, please enter:'))
-    hear_about_us = models.CharField(blank=True, null=True, max_length=255)
-    mailing_list = models.BooleanField(default=0)
+    GENDER_CHOICES = (('M', 'Male'),
+                      ('F', 'Female'))
