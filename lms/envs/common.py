@@ -858,6 +858,9 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 # A course-specific identifier is prepended.
 BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
 
+BULK_EMAIL_PREFIX_FROM_EMAIL = u'ГБОУ ЦПМ-КПК'
+
+
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
 BULK_EMAIL_EMAILS_PER_QUERY = 1000
