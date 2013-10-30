@@ -43,11 +43,21 @@ def assign_default_role(sender, instance, **kwargs):
     logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
     instance.user.roles.add(role)
 
+class Permission(models.Model):
+    name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
+    
+    class Meta:
+        # use existing table that was originally created from django_comment_client app
+        db_table = 'django_comment_client_permission'
+
+    def __unicode__(self):
+        return self.name
 
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
     course_id = models.CharField(max_length=255, blank=True, db_index=True)
+    permissions = models.ManyToManyField(Permission, related_name="roles")
 
     class Meta:
         # use existing table that was originally created from django_comment_client app
@@ -77,14 +87,3 @@ class Role(models.Model):
 
         return self.permissions.filter(name=permission).exists()
 
-
-class Permission(models.Model):
-    name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
-    roles = models.ManyToManyField(Role, related_name="permissions")
-
-    class Meta:
-        # use existing table that was originally created from django_comment_client app
-        db_table = 'django_comment_client_permission'
-
-    def __unicode__(self):
-        return self.name
