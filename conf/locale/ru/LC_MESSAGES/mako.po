@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-30 17:30+0400\n"
-"PO-Revision-Date: 2013-10-28 17:06+0300\n"
+"PO-Revision-Date: 2013-10-30 19:06+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -7668,7 +7668,7 @@ msgstr "Прогресс курса у обучающегося '{username}' ({e
 #: lms/templates/courseware/progress.html:75
 #: lms/templates/courseware/progress.html:121
 msgid "{earned:.3n} of {total:.3n} possible points"
-msgstr ""
+msgstr "{earned:.3n} из {total:.3n} возможных баллов"
 
 #: lms/templates/courseware/progress.html:98
 msgid "Problem Scores: "
@@ -7684,7 +7684,7 @@ msgstr "Нет оцениваемых заданий в этой секции"
 
 #: lms/templates/courseware/progress.html:117
 msgid "Total for "
-msgstr ""
+msgstr "Всего за "
 
 #: lms/templates/courseware/syllabus.html:20
 msgid "Syllabus"

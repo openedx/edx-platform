@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-30 17:31+0400\n"
-"PO-Revision-Date: 2013-10-23 19:46+0300\n"
+"PO-Revision-Date: 2013-10-30 19:03+0300\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/"
 "language/ru/)\n"
@@ -789,7 +789,7 @@ msgstr "Ваше сообщение не может быть пустым."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:41
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "Ваше письмо успешно поставленно в очередь на отправку."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:44
 msgid "yourself"
@@ -810,14 +810,16 @@ msgid ""
 "Your email was successfully queued for sending.  Please note that for large "
 "public classes (~10k), it may take 1-2 hours to send all emails."
 msgstr ""
+"Ваше письмо успешно поставленно в очередь на отправку. Заметьте, что для "
+"больших курсов (больше 10 тыс.), отправка всех писем может занять 1-2 часа."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:52
 msgid "You are about to send an email titled \""
-msgstr ""
+msgstr "Вы собираетесь отправить письмо с темой \""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:69
 msgid "Error sending email."
-msgstr ""
+msgstr "Ошибка отправки письма."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:131
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:156
@@ -825,7 +827,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:234
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:270
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "Пожалуйста введите почтовый адрес или имя пользователя студента."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:133
 msgid ""
@@ -951,9 +953,8 @@ msgid "Progress"
 msgstr "Прогресс"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:400
-#, fuzzy
 msgid "Problem without name"
-msgstr "Имя задачи"
+msgstr "Задача без названия"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:447
 msgid "Back to problem list"
