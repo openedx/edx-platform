@@ -24,12 +24,6 @@ ${_("Once you have registered and activated your account, visit {course_url} "
 	"to join the course.").format(course_url=course_url)}
 % endif
 
-----
-${_("This email was automatically sent from {site_name} to "
-	"{email_address}").format(
-		site_name=site_name, email_address=email_address
-	)}
-
 Внимание!
 Это письмо было сформировано и отправлено автоматической системой информирования.
 Пожалуйста, не отвечайте на него, так как ваш ответ не будет доставлен.
