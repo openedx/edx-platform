@@ -6,7 +6,12 @@
       <li class="help-item help-item-whyreverify">
         <h3 class="title">${_("Why Do I Need to Re-Verify?")}</h3>
         <div class="copy">
-          <p>${_("Nulla vitae elit libero, a pharetra augue. Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit sit amet non magna.")}</p>
+          <p>${_("There was a problem with your original verification.  To make sure that your identity is correctly associated with your course progress, we need to retake your photo and a photo of your identification document.  If you don't have a valid identification document, contact {link_start}{support_email}{link_end}.").format(
+          support_email=settings.DEFAULT_FEEDBACK_EMAIL,
+          link_start=u'<a href="mailto:{address}?subject={subject_line}">'.format(
+                                address=settings.DEFAULT_FEEDBACK_EMAIL,
+                                subject_line=_('Problem with ID re-verification')),
+          link_end=u'</a>')}</p>
         </div>
       </li>
 

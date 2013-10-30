@@ -537,11 +537,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # Translates the category names and messages into something more human readable
         message_dict = {
             ("photoIdReasons", "Not provided"): _("No photo ID was provided."),
-            ("photoIdReasons", "Text not clear"): _("The text in your photo ID image was not clear."),
+            ("photoIdReasons", "Text not clear"): _("We couldn't read your name from your photo ID image."),
             ("generalReasons", "Name mismatch"): _("The name associated with your account and the name on your ID do not match."),
-            ("generalReasons", "Expected name missing"): _("We were unable to send your name along with your photo."),
             ("userPhotoReasons", "Image not clear"): _("The image of your face was not clear."),
-            ("userPhotoReasons", "Face out of view"): _("Your face was not in view for your face photo"),
+            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo"),
         }
 
         try:
