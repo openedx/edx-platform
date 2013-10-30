@@ -376,9 +376,9 @@ class @StaffGrading
       @render_problem()
 
   problem_link:(problem) ->
-    problem_name = #{problem.problem_name}
-      if problem_name.length < 1
-        problem_name = "<" + gettext("Problem without name") + ">"
+    problem_name = problem.problem_name
+    if problem_name.length < 1
+      problem_name = "<" + gettext("Problem without name") + ">"
     link = $('<a>').attr('href', "javascript:void(0)").append(
       problem_name)
         .click =>
