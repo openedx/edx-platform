@@ -15,7 +15,8 @@ require(["coffee/src/views/tabs", "coffee/src/models/module"], function(TabsEdit
       model: new ModuleModel({
         id: '${context_course.location}'
       }),
-      mast: $('.wrapper-mast')
+      mast: $('.wrapper-mast'),
+      url: "${handler_url}"
     });
 });
   </script>

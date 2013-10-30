@@ -25,7 +25,7 @@ from django.views.decorators.http import require_http_methods
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from student.models import CourseEnrollment
 
-__all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
+__all__ = ['save_item', 'create_item', 'delete_item', 'delete_item_at_location', 'orphan']
 
 log = logging.getLogger(__name__)
 
@@ -178,8 +178,7 @@ def create_item(request):
 @expect_json
 def delete_item(request):
     """View for removing items."""
-    item_location = request.json['id']
-    item_location = Location(item_location)
+    item_location = Location(request.json['id'])
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -189,6 +188,16 @@ def delete_item(request):
     delete_children = request.json.get('delete_children', False)
     delete_all_versions = request.json.get('delete_all_versions', False)
 
+    delete_item_at_location(item_location, delete_children, delete_all_versions)
+    return JsonResponse()
+
+
+def delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
+    """
+    Deletes the item at with the given Location.
+
+    It is assumed that course permissions have already been checked.
+    """
     store = get_modulestore(item_location)
 
     item = store.get_item(item_location)
@@ -211,7 +220,6 @@ def delete_item(request):
                 parent.children = children
                 modulestore('direct').update_children(parent.location, parent.children)
 
-    return JsonResponse()
 
 # pylint: disable=W0613
 @login_required
