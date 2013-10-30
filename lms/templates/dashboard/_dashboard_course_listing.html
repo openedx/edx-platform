@@ -57,7 +57,7 @@
         </h3>
       </hgroup>
 
-      % if course.has_ended() and cert_status:
+      % if course.has_ended() and cert_status and not enrollment.mode == 'audit':
           <%
           if cert_status['status'] == 'generating':
               status_css_class = 'course-status-certrendering'
