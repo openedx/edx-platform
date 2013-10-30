@@ -22,6 +22,7 @@ from django.template.defaultfilters import date as _date
 
 log = logging.getLogger(__name__)
 
+def _(s): return s
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -389,6 +390,8 @@ class CourseFields(object):
 
     display_coursenumber = String(help="An optional display string for the course number that will get rendered in the LMS",
                                   scope=Scope.settings)
+
+    new_progress = Boolean(help=_("Use new chapter based progress render"), scope=Scope.settings, default=True)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule

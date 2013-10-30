@@ -28,6 +28,12 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
+<%
+    category_weights = {}
+    for section in grade_summary['grade_breakdown']:
+      category_weights[section['category']] = section['weight']
+%>
+
 <section class="container">
   <div class="profile-wrapper">
 
@@ -44,6 +50,10 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
         %for chapter in courseware_summary:
         %if not chapter['display_name'] == "hidden":
         <li>
+        <%
+          chapter_total = 0
+          chapter_earned = 0
+        %>
           <h2>${ chapter['display_name'] }</h2>
 
           <ol class="sections">
@@ -53,6 +63,9 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               earned = section['section_total'].earned
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
+              if section['graded'] or len(section['format']) > 0:
+                chapter_earned += section['section_total'].earned * category_weights[section['format']]
+                chapter_total += section['section_total'].possible * category_weights[section['format']]
               %>
 
               <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
@@ -96,6 +109,24 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
             </li> <!--End section-->
             %endfor
+            %if chapter_total > 0 and course.new_progress:
+            <%
+            chapter_percentageString = "{0:.0%}".format( float(chapter_earned)/chapter_total) if chapter_earned > 0 and chapter_total > 0 else ""
+            %>
+            <li>
+              <h3>${_("Total for ")}<a href="#">
+                ${ chapter['display_name'] }
+                %if chapter_total > 0 or chapter_earned > 0:
+                  <span class="sr">
+                    ${_("{earned:.3n} of {total:.3n} possible points").format( earned = float(chapter_earned), total = float(chapter_total) )}
+                  </span></a>
+                %endif
+                %if chapter_total > 0 or chapter_earned > 0:
+                  <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(chapter_earned), float(chapter_total), chapter_percentageString )}</span>
+                %endif
+              </h3>
+            </li>
+            %endif
           </ol> <!--End sections-->
         </li> <!--End chapter-->
         %endif

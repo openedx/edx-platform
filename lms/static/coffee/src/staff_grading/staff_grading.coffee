@@ -391,7 +391,10 @@ class @StaffGrading
   render_list: () ->
     for problem in @problems
       problem_row = $('<tr>')
-      problem_row.append($('<td class="problem-name">').append(@problem_link(problem)))
+      problem_name = @problem_link(problem)
+      if problem_name.length < 1
+        problem_name = "<" + gettext("Problem without name") + ">"
+      problem_row.append($('<td class="problem-name">').append(problem_name))
       problem_row.append($('<td>').append("#{problem.num_graded}"))
       problem_row.append($('<td>').append("#{problem.num_pending}"))
       problem_row.append($('<td class="sr">').append("#{problem.num_required}"))
