@@ -31,7 +31,7 @@ from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
-from xmodule.modulestore import ModuleStoreBase, Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 import re
@@ -251,7 +251,7 @@ def metadata_cache_key(location):
     return u"{0.org}/{0.course}".format(location)
 
 
-class MongoModuleStore(ModuleStoreBase):
+class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
@@ -850,8 +850,11 @@ class MongoModuleStore(ModuleStoreBase):
 
     def get_modulestore_type(self, course_id):
         """
-        Returns a type which identifies which modulestore is servicing the given
-        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
         """
         return MONGO_MODULESTORE_TYPE
 
