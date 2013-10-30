@@ -1,3 +1,1 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-Вы были зарегистрированы на курс ${course.display_name_with_default}
+Вы были зарегистрированы на курс ${course.display_name_with_default}.

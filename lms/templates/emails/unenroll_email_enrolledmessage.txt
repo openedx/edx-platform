@@ -1,17 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
+Уважаемый(ая) ${full_name}!
 
-${_("Dear {full_name}").format(full_name=full_name)}
+Вы были отчислены преподавателем с курса ${course.display_name_with_default} на сайте ${site_name}. Курс больше не будет показан в Вашем личном кабинете.
 
-${_("You have been un-enrolled in {course_name} at {site_name} by a member "
-    "of the course staff. The course will no longer appear on your "
-    "{site_name} dashboard.").format(
-    	course_name=course.display_name_with_default, site_name=site_name
-    )}
-
-${_("Your other courses have not been affected.")}
-
-----
-${_("This email was automatically sent from  ${site_name} to "
-	"${full_name}").format(
-    	full_name=full_name, site_name=site_name
-    )}
+Внимание!
+Это письмо было сформировано и отправлено автоматической системой информирования.
+Пожалуйста, не отвечайте на него, так как ваш ответ не будет доставлен.
+В случае необходимости связаться со службой технической поддержки напишите на адрес edu.olimpiada@yandex.ru
