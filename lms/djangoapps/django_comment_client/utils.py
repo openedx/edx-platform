@@ -333,7 +333,7 @@ def extend_content(content):
         try:
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
-        except user.DoesNotExist:
+        except User.DoesNotExist:
             log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
 
     content_info = {
