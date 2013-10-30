@@ -26,7 +26,6 @@
 
 <script type="text/template" id="thread-show-template">
   <div class="discussion-post">
-      <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow"></a></div>
       <header>
       ${"<% if (obj.group_id) { %>"}
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
@@ -45,6 +44,9 @@
                 ${_("&bull; This thread is closed.")}
               </span>
           </p>
+          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow" role="checkbox" aria-checked="false">
+            <span class="sr">${_("Follow this post")}</span>
+          </a>
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
