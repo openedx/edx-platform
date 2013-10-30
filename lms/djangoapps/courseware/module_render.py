@@ -34,6 +34,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.utils import get_extended_due_date
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
@@ -108,7 +109,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
                                  'format': section.format if section.format is not None else '',
-                                 'due': section.due,
+                                 'due': get_extended_due_date(section),
                                  'active': active,
                                  'graded': section.graded,
                                  })

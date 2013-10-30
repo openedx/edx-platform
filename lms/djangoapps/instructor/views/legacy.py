@@ -2,6 +2,7 @@
 Instructor Views
 """
 import csv
+import datetime
 import json
 import logging
 import os
@@ -58,6 +59,13 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
+
+from .extensions import (
+    dump_students_with_due_date_extensions,
+    dump_due_date_extensions_for_student,
+    get_units_with_due_date_options,
+    set_due_date_extension)
+
 
 log = logging.getLogger(__name__)
 
@@ -200,6 +208,22 @@ def instructor_dashboard(request, course_id):
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
+
+    def parse_datetime(s):
+        """
+        Constructs a datetime object in UTC from user input.
+        """
+        msg = ""
+        dt = None
+        try:
+            d, t = s.split()
+            mm, dd, yy = map(int, d.split('/'))
+            h, m = map(int, t.split(':'))
+            dt = datetime.datetime(yy, mm, dd, h, m, tzinfo=timezone.utc)
+            return msg, dt
+        except:
+            msg = "<font color='red'>Unable to parse date: {0} </font>".format(s)
+        return msg, dt
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -475,7 +499,7 @@ def instructor_dashboard(request, course_id):
                     except IndexError:
                         log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
                 datatable['data'] = ddata
-                    
+
                 datatable['title'] = 'Grades for assignment "%s"' % aname
 
                 if 'Export CSV' in action:
@@ -489,6 +513,90 @@ def instructor_dashboard(request, course_id):
                     files = {'datafile': file_pointer}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
+
+    #----------------------------------------
+    # Extensions
+
+    elif "Change due date for student" in action:
+        # get the form data
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', '')
+        url = request.POST.get('url')
+        if not url:
+            msg += '<font color="red">Must choose a unit. </font> '
+
+        # try to uniquely id student by email address or username
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        # parse datetime
+        message, due_date = parse_datetime(request.POST.get('due_datetime'))
+        msg += message
+
+        if url and student and due_date:
+            error, unit = set_due_date_extension(
+                course, url, student, due_date)
+            if error:
+                msg += '<font color="red">{0}</font> '.format(error)
+                log.debug(error)
+            else:
+                studentname = student.profile.name
+                unitname = getattr(unit, 'display_name', None)
+                if unitname:
+                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
+                msg += (
+                    'Successfully changed due date for student {0} for {1} '
+                    'to {2}').format(studentname, unitname,
+                                     due_date.strftime('%Y-%m-%d %H:%M'))
+
+    elif "Reset due date for student" in action:
+        # get the form data
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', '')
+        url = request.POST.get('url')
+        if not url:
+            msg += '<font color="red">Must choose a unit.</font> '
+
+        # try to uniquely id student by email address or username
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        if url and student:
+            error, unit = set_due_date_extension(
+                course, url, student, None)
+            if error:
+                msg += '<font color="red">{0}</font> '.format(error)
+                log.debug(error)
+            else:
+                studentname = student.profile.name
+                unitname = getattr(unit, 'display_name', None)
+                if unitname:
+                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
+                msg += (
+                    'Successfully reset due date for student {0} for {1} '
+                    'to {2}').format(studentname, unitname,
+                                     unit.due.strftime('%Y-%m-%d %H:%M'))
+
+    elif "Dump list of students with due date extensions" in action:
+        url = request.POST.get('url')
+        if not url:
+            msg += '<font color="red">Must choose a unit. </font> '
+        else:
+            error, datatable = dump_students_with_due_date_extensions(course, url)
+            if error:
+                msg += '<font color="red">{0}</font> '.format(error)
+
+    elif "Dump due date extensions for student" in action:
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', '')
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+
+        if student:
+            error, datatable = dump_due_date_extensions_for_student(
+                course, student)
+            if error:
+                msg += '<font color="red">{0}</font> '.format(error)
 
     #----------------------------------------
     # Admin
@@ -886,6 +994,8 @@ def instructor_dashboard(request, course_id):
         'disable_buttons': disable_buttons
     }
 
+    if settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES'):
+        context['units_with_due_dates'] = get_units_with_due_date_options(course)
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 

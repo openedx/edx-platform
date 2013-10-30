@@ -1,0 +1,42 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<H2>${_("Individual due date extensions")}</h2>
+
+<p>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student">
+</p>
+<p>
+  ${_("Choose the graded unit:")}
+  <select name="url">
+    <option value="">Choose one</option>
+    %for title, url in section_data['units_with_due_dates']:
+    <option value="${url}">${title}</option>
+    %endfor
+  </select>
+</p>
+<p>
+  ${_("Specify the individual due date and time in UTC:")}
+  <input type="text" name="due_datetime" 
+         placeholder="MM/DD/YYYY HH:MM"/>
+</p>
+<p class="request-response"></p>
+<p class="request-response-error"></p>
+<p>
+  <input type="button" name="change-due-date" value="${_("Change due date for student")}"
+         data-endpoint="${section_data['change_due_date_url']}">
+  <input type="button" name="reset-due-date" value="${_("Reset due date for student")}"
+         data-endpoint="${section_data['reset_due_date_url']}">
+</p>
+<p>
+  <input type="button" name="show-unit-extensions" value="${_("List students with due date extensions")}"
+         data-endpoint="${section_data['show_unit_extensions_url']}">
+  <input type="button" name="show-student-extensions" value="${_("List date extensions for student")}"
+         data-endpoint="${section_data['show_student_extensions_url']}">
+</p>
+
+<div class="data-display">
+  <div class="data-display-text"></div>
+  <div class="data-display-table"></div>
+</div>

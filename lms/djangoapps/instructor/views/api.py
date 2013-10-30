@@ -6,13 +6,16 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-import re
+import datetime
+import json
 import logging
+import re
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
@@ -40,6 +43,11 @@ import analytics.csvs
 import csv
 
 from bulk_email.models import CourseEmail
+
+from .extensions import (
+    dump_due_date_extensions_for_student,
+    dump_students_with_due_date_extensions,
+    set_due_date_extension)
 
 log = logging.getLogger(__name__)
 
@@ -887,6 +895,103 @@ def proxy_legacy_analytics(request, course_id):
             "Error from analytics server ({}).".format(res.status_code),
             status=500
         )
+
+
+def parse_datetime(s):
+    """
+    Constructs a datetime object in UTC from user input.
+    """
+    dt = None
+    try:
+        d, t = s.split()
+        mm, dd, yy = map(int, d.split('/'))
+        h, m = map(int, t.split(':'))
+        dt = datetime.datetime(yy, mm, dd, h, m, tzinfo=timezone.utc)
+        return dt
+    except:
+        error = _("Unable to parse date: ") + s
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url', 'due_datetime')
+def change_due_date(request, course_id):
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    url = request.GET.get('url')
+    due_date = parse_datetime(request.GET.get('due_datetime'))
+    if isinstance(due_date, HttpResponse):
+        return due_date # error
+    error, unit = set_due_date_extension(course, url, student, due_date)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+    studentname = student.profile.name
+    unitname = getattr(unit, 'display_name', None)
+    if unitname:
+        unitname = '{0} ({1})'.format(unitname, unit.location.url())
+    msg = (
+        'Successfully changed due date for student {0} for {1} '
+        'to {2}').format(studentname, unitname,
+                         due_date.strftime('%Y-%m-%d %H:%M'))
+
+    return JsonResponse(msg)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url')
+def reset_due_date(request, course_id):
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    url = request.GET.get('url')
+    error, unit = set_due_date_extension(course, url, student, None)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+    studentname = student.profile.name
+    unitname = getattr(unit, 'display_name', None)
+    if unitname:
+        unitname = '{0} ({1})'.format(unitname, unit.location.url())
+    due_date = unit.due
+    msg = (
+        'Successfully reset due date for student {0} for {1} '
+        'to {2}').format(studentname, unitname,
+                         due_date.strftime('%Y-%m-%d %H:%M'))
+
+    return JsonResponse(msg)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('url')
+def show_unit_extensions(request, course_id):
+    course = get_course_by_id(course_id)
+    url = request.GET.get('url')
+    error, data = dump_students_with_due_date_extensions(course, url)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+    header = data['header']
+    data['data'] = [dict(zip(header, row)) for row in data['data']]
+    return JsonResponse(data)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student')
+def show_student_extensions(request, course_id):
+    student = get_student_from_identifier(request.GET.get('student'))
+    course = get_course_by_id(course_id)
+    error, data = dump_due_date_extensions_for_student(course, student)
+    if error:
+        return HttpResponseBadRequest(json.dumps({'error': error}))
+    header = data['header']
+    data['data'] = [dict(zip(header, row)) for row in data['data']]
+    return JsonResponse(data)
 
 
 def _split_input_list(str_list):
