@@ -24,12 +24,13 @@
       $('body').addClass('js').addClass(view_name);
 
       // new window/tab opening
-      $('a[rel="external"], a[class="new-vp"]')
-      .click( function() {
-      window.open( $(this).attr('href') );
-      return false;
+      $('a[rel="external"], a[class="new-vp"]').click( function() {
+        window.open( $(this).attr('href') );
+        return false;
       });
-
+      
+//---------------------------------------- Client side registration behavior ----------------------------------------//
+      
       // form field label styling on focus
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").parent().addClass("is-focused");
@@ -38,14 +39,21 @@
       });
      
       // display dependent form sections
-      $('input.controller-show').click(function() {
-        $(this).parent().siblings('.controlled').slideDown('fast');
-      });
      
-      $('input.controller-hide').click(function() {
-        $(this).parent().siblings('.controlled').slideUp('fast');
+      $('select.affiliation-controller').change(function() {
+        $(this).siblings('.affiliation-controlled').slideUp('fast');
+        
+        if ($(this).children("option:selected").val() === 'Stanford University') {
+          $(this).siblings('.affiliation-controlled#sunet_id_container, .affiliation-controlled#stanford_department_container').slideDown('fast');
+        } else if ($(this).children("option:selected").val() === "Packard Children's Health Alliance") {
+          $(this).siblings('.affiliation-controlled#PCHA_affiliation_container').slideDown('fast');
+        } else if ($(this).children("option:selected").val() === 'University Healthcare Alliance') {
+          $(this).siblings('.affiliation-controlled#UHA_affiliation_container').slideDown('fast');
+        } else if ($(this).children("option:selected").val() === 'Other') {
+          $(this).siblings('.affiliation-controlled#other_affiliation_container').slideDown('fast');
+        }
       });
-     
+      
       $('select.controller').change(function() {
         if ($(this).children("option:selected").val() === 'Other') {
           $(this).siblings('.controlled').slideDown('fast');
@@ -70,7 +78,44 @@
           $(controlledField).html($(controlledFieldContents).html()).parent().show();
         }
       });
-
+      
+      // Dependent required fields
+      $('select#professional_designation').change(function() {
+        var dependentRequiredFields = 'li#license-number_container, li#license-country_container, li#physician_status_container, li#patient_population_container, li#specialty-container';
+        
+        if ($(this).children("option:selected").val() === 'MD' || $(this).children("option:selected").val() === 'MD, PhD' || $(this).children("option:selected").val() === 'DO' || $(this).children("option:selected").val() === 'MBBS') {
+          $(this).parent().siblings(dependentRequiredFields).addClass('required');
+        } else {
+          $(this).parent().siblings(dependentRequiredFields).removeClass('required');
+        }
+      });
+      $('select#stanford_affiliation').change(function() {
+        if ($(this).children("option:selected").val() === 'Other' || $(this).children("option:selected").val() === '') {
+          $(this).parent().siblings('li.field').removeClass('required');
+        } else {
+          $(this).parent().siblings('li.field').addClass('required');
+        }
+      });
+      $('select#license_country').change(function() {
+        var dependentRequiredFields = 'li#license-state_container';
+        
+        if ($(this).children("option:selected").val() === 'United States') {
+          $(this).parent().siblings(dependentRequiredFields).addClass('required');
+        } else {
+          $(this).parent().siblings(dependentRequiredFields).removeClass('required');
+        }
+      });
+      $('select#country').change(function() {
+        var dependentRequiredFields = 'li#state_container';
+        
+        if ($(this).children("option:selected").val() === 'United States') {
+          $(this).parent().siblings(dependentRequiredFields).addClass('required');
+        } else {
+          $(this).parent().siblings(dependentRequiredFields).removeClass('required');
+        }
+      });
+      
+//--------------------------------------- /Client side registration behavior ----------------------------------------//
     });
 
     (function() {
@@ -172,6 +217,37 @@
             <input id="name" type="text" name="name" value="" placeholder="example: Jane C Doe" required aria-required="true" />
             <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
           </li>
+          
+          <li class="field required text" id="field-name">
+            <label for="name">Last Name</label>
+            <input id="last_name" type="text" name="last_name" value="" required aria-required="true" />
+          </li>
+          
+          <li class="field required text" id="field-name">
+            <label for="name">First Name</label>
+            <input id="first_name" type="text" name="first_name" value="" required aria-required="true" />
+          </li>
+          
+          <li class="field select" id="field-name">
+            <label for="name">Middle Initial</label>
+            <input id="middle_initial" type="text" name="middle_initial" value="" required aria-required="true" />
+          </li>
+          
+          <li class="field required text" id="field-name">
+            <label for="name">Month and Day of Birth</label>
+            <input id="birth_date" type="text" name="birth_date" value="" required aria-required="true" placeholder="MM/DD" maxlength="5" />
+          </li>
+          
+          <li class="field select" id="gender_container">
+           <label for="gender">Gender</label>
+           <select id="gender" name="gender">
+             <option value="">--</option>
+             %for code, gender in CmeUserProfile.GENDER_CHOICES:
+               <option value="${code}">${gender}</option>
+             %endfor
+           </select>
+          </li>
+          
         </ol>
 
         % else:
@@ -213,22 +289,13 @@
         % endif
       </fieldset>
 
-      <fieldset class="group group-form group-form-secondary group-form-personalinformation">
+      <fieldset class="group group-form group-form-secondary group-form-professionalinformation form-page">
        <hr />
        <h3><strong>Professional Information</strong></h3>
    
        <ol class="list-input">
-          <li class="field required text" id="field-profession">
-            <label for="profession">Profession</label>
-            <select id="profession" name="profession">
-              <option value="">--</option>
-              %for code, profession in CmeUserProfile.PROFESSION_CHOICES:
-                <option value="${code}">${profession}</option>
-              %endfor
-            </select>
-          </li>
          
-          <li class="field select" id="field-professional-designation">
+          <li class="field required text" id="field-professional-designation_container">
             <label for="professional_designation">Professional Designation</label>
             <select id="professional_designation" name="professional_designation">
               <option value="">--</option>
@@ -238,60 +305,42 @@
             </select>
           </li>
          
-          <li class="field required text" id="license-number">
+          <li class="field select" id="license-number_container">
             <label for="license_number">License Number</label>
             <input id="license_number" type="text" name="license_number" />
           </li>
-         
-      </ol>
-      </fieldset>
-     
-      <fieldset class="group group-form group-form-secondary group-form-organizationinformation">
-       <hr />
-       <h3><strong>Organization Information</strong></h3>
-      
-       <ol class="list-input">
-         <li class="field select" id="organization">
-            <label for="organization">Organization</label>
-            <input id="organization" type="text" name="organization" />
-         </li>
-      
-         <li class="field required" id="stanford_affiliated">
-           <label for="stanford_affiliated">Are you affiliated with Stanford?</label>
-           <div class="field select radio " id="is_stanford_affiliated">
-              <span><input id="stanford_affiliated_yes" class="controller-show" type="radio" value="1" name="stanford_affiliated" aria-label="Yes" /> Yes</span>
-              <span><input id="stanford_affiliated_no" class="controller-hide" type="radio" value="0" name="stanford_affiliated" aria-label="No" style="margin-left: 50px;" /> No</span>
-             
-              <div class="field select controlled" id="how_stanford_affiliated" style="display: none;">
-                <br />
-                <label for="how_stanford_affiliated">How are you affiliated with Stanford?</label>
-                <select class="controller" id="how_stanford_affiliated" name="how_stanford_affiliated">
-                  <option value="">--</option>
-                  % for code, how_stanford_affiliated in CmeUserProfile.HOW_STANFORD_AFFILIATED_CHOICES:
-                    % if code == "Other, please enter:":
-                      <option value="${code}" class="controller-show">${how_stanford_affiliated}</option>
-                    % else:
-                      <option value="${code}" class="controller-hide">${how_stanford_affiliated}</option>
-                    % endif
-                  % endfor
-                </select>
-                <div class="field controlled" id="how_stanford_affililiated_free_container" style="display: none;">
-                  <br />
-                  <input id="how_stanford_affililiated_free" type="text" name="how_stanford_affiliated_free" title="Please enter how you are affiliated with Stanford here." />
-                </div>
-              </div>
-           </div>
-         </li>
 
-       </ol>
-      </fieldset>
+          <li class="field select" id="license-country_container">
+            <label for="license_country">License Country</label>
+           <select id="license_country" name="license_country">
+             <option value="">--</option>
+             %for code, country in CmeUserProfile.COUNTRY_CHOICES:
+               <option value="${code}">${country}</option>
+             %endfor
+           </select>
+          </li>
 
-      <fieldset class="group group-form group-form-secondary group-form-patientinformation">
-       <hr />
-       <h3><strong>Your Patient Information</strong></h3>
-      
-       <ol class="list-input">
-        <li class="field required" id="patient_population">
+          <li class="field select" id="license-state_container">
+            <label for="license_state">License State</label>
+           <select id="license_state" name="license_state">
+             <option value="">--</option>
+             %for code, state in CmeUserProfile.STATE_CHOICES:
+               <option value="${code}">${state}</option>
+             %endfor
+           </select>
+          </li>
+
+          <li class="field select" id="physician_status_container">
+            <label for="physician_status">Physician Status</label>
+           <select id="physician_status" name="physician_status">
+             <option value="">--</option>
+             %for code, status in CmeUserProfile.PHYSICIAN_STATUS_CHOICES:
+               <option value="${code}">${status}</option>
+             %endfor
+           </select>
+          </li>
+
+        <li class="field select" id="patient_population_container">
           <label for="patient_population">Patient population</label>
           <select id="patient_population" name="patient_population" class="select-controller">
             <option value="">--</option>
@@ -299,13 +348,15 @@
               <option value="${code}" class="specialty-${code} sub_specialty">${patient_population}</option>
             %endfor
           </select>
-        </li>
-       
+        </li>          
+         
+         
+         
           #####################################################
           ## Specialty Select Field
           #####################################################
          
-          <li class="field required" style="display: none;">
+          <li class="field select" style="display: none;" id="specialty-container">
             <label for="specialty">Specialty</label>
             <select id="specialty" name="specialty" class="controller select-controller">
               <option value="">--</option>
@@ -313,7 +364,7 @@
            
             <div class="field controlled" id="specialty_free_container" style="display: none;">
               <br />
-              <input id="specialty_free" type="text" name="specialty_free" title="Please enter your Specialty here." />
+              <input id="specialty_free" type="text" name="specialty_free" title="Please enter your Specialty here." placeholder="Please enter your Specialty here." />
            </div>
           </li>
          
@@ -343,7 +394,7 @@
           ## Sub Specialty Select Field
           #####################################################
        
-        <li class="field" style="display: none;">
+        <li class="field" style="display: none;" id="sub-specialty-container">
           <label for="sub_specialty">Sub-Specialty</label>
           <select id="sub_specialty" name="sub_specialty" class="controller">
             <option value="">--</option>
@@ -351,7 +402,7 @@
          
           <div class="field controlled" id="sub_specialty_free_container" style="display: none;">
            <br />
-           <input id="sub_specialty_free" type="text" name="sub_specialty_free" title="Please enter your Sub-Specialty here." />
+           <input id="sub_specialty_free" type="text" name="sub_specialty_free" title="Please enter your Sub-Specialty here." placeholder="Please enter your Sub-Specialty here." />
           </div>
         </li>
        
@@ -417,10 +468,72 @@
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+        
+        
        </ol>
       </fieldset>
-       
+      
+      <fieldset class="group group-form group-form-secondary group-form-affiliationinformation form-page">
+        <hr />
+        <h3><strong>Affiliation Information</strong></h3>
+      
+        <ol class="list-input">
+          
+          <li class="field select" id="affiliation">
+            <label for="affiliation">Affiliation</label>
+            <select id="affiliation" name="affiliation" class="affiliation-controller">
+              <option value="">--</option>
+              %for code, affiliation in CmeUserProfile.AFFILIATION_CHOICES:
+                <option value="${code}">${affiliation}</option>
+              %endfor
+            </select>
+           
+            <div class="field affiliation-controlled select required" id="sunet_id_container" style="display: none;">
+              <br />
+              <label for="sunet_id">SUNet ID</label>
+              <input id="sunet_id" type="text" name="sunet_id" />
+            </div>
+            
+            <div class="field affiliation-controlled select required" id="stanford_department_container" style="display: none;">
+              <label for="stanford_department">Stanford Department</label>
+              <select id="stanford_department" name="stanford_department">
+                <option value="">--</option>
+                %for code, stanford_department in CmeUserProfile.DEPARTMENT_CHOICES:
+                  <option value="${code}">${stanford_department}</option>
+                %endfor
+              </select>
+            </div>
+            
+            <div class="field affiliation-controlled select required" id="PCHA_affiliation_container" style="display: none;">
+              <br />
+              <label for="PCHA_affiliation">Packard Children's Health Alliance Affiliation</label>
+              <select id="PCHA_affiliation" name="PCHA_affiliation">
+                <option value="">--</option>
+                %for code, PCHA_affiliation in sub_affiliation_choices['Packard_Childrens_Health_Alliance']:
+                  <option value="${code}">${PCHA_affiliation}</option>
+                %endfor
+              </select>
+            </div>
+            
+            <div class="field affiliation-controlled select required" id="UHA_affiliation_container" style="display: none;">
+              <br />
+              <label for="UHA_affiliation">University Healthcare Alliance Affiliation</label>
+              <select id="UHA_affiliation" name="UHA_affiliation">
+                <option value="">--</option>
+                %for code, UHA_affiliation in sub_affiliation_choices['University_Healthcare_Alliance']:
+                  <option value="${code}">${UHA_affiliation}</option>
+                %endfor
+              </select>
+            </div>
+           
+            <div class="field affiliation-controlled" id="other_affiliation_container" style="display: none;">
+              <br />
+              <input id="other_affiliation" type="text" name="other_affiliation" title="Please enter your affiliation here." placeholder="Please enter your affiliation here." />
+            </div>
+          </li>
+          
+        </ol>
+      </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
         <hr />
@@ -429,37 +542,22 @@
 
         <ol class="list-input">
         
-         <li class="field required" id="address_1">
+         <li class="field required" id="address_1_container">
            <label for="address_1">Address 1</label>
            <input id="address_1" type="text" name="address_1" />
          </li>
        
-         <li class="field select" id="address_2">
+         <li class="field select" id="address_2_container">
            <label for="address_2">Address 2</label>
            <input id="address_2" type="text" name="address_2" />
          </li>
        
-         <li class="field required" id="city">
+         <li class="field required" id="city_container">
            <label for="city">City</label>
            <input id="city" type="text" name="city" />
          </li>
-       
-         <li class="field required" id="state_province">
-           <label for="state_province">State/Province</label>
-           <select id="state_province" name="state_province">
-             <option value="">--</option>
-             %for code, state in CmeUserProfile.STATE_CHOICES:
-               <option value="${code}">${state}</option>
-             %endfor
-           </select>
-         </li>
-       
-         <li class="field required" id="postal_code">
-           <label for="postal_code">Postal Code</label>
-           <input id="postal_code" type="text" name="postal_code" />
-         </li>
-       
-         <li class="field required" id="country">
+
+         <li class="field required" id="country_container">
            <label for="country">Country</label>
            <select id="country" name="country">
              <option value="">--</option>
@@ -468,46 +566,31 @@
              %endfor
            </select>
          </li>
-        
-         <li class="field required" id="phone_number">
-           <label for="phone_number">Phone Number</label>
-           <input id="phone_number" type="text" name="phone_number" />
-         </li>
-       
-         <li class="field select" id="extension">
-           <label for="extension">Extension</label>
-           <input id="extension" type="text" name="extension" />
-         </li>
-       
-         <li class="field select" id="fax">
-           <label for="fax">Fax</label>
-           <input id="fax" type="text" name="fax" />
-         </li>
-       
-         <li class="field required" id="hear_about_us">
-           <label for="hear_about_us">How did you hear about us?</label>
-           <select class="controller" id="hear_about_us" name="hear_about_us">
-             <option value="">--</option>
-             %for code, about_us in CmeUserProfile.HEAR_ABOUT_US_CHOICES:
-                % if code == "Other, please enter:":
-                  <option value="${code}" class="controller-show">${about_us}</option>
-                % else:
-                  <option value="${code}" class="controller-hide">${about_us}</option>
-                % endif
-              %endfor
-           </select>
-           <div class="field controlled" id="hear_about_us_free" style="display: none;">
-              <br />
-              <input id="hear_about_us_free" type="text" name="hear_about_us_free" title="Please enter how you heard about us here." />
-           </div>
-         </li>
-       
-            <input id="mailing_list" type="hidden" name="mailing_list" value="true" />
 
+         <li class="field" id="state_container">
+           <label for="state">State</label>
+           <select id="state" name="state">
+             <option value="">--</option>
+             %for code, state in CmeUserProfile.STATE_CHOICES:
+               <option value="${code}">${state}</option>
+             %endfor
+           </select>
+         </li>
+         
+         <li class="field" id="county_province_container">
+           <label for="county_province">International Province or Territory</label>
+           <input id="county_province" type="text" name="county_province" />
+         </li>
+
+         <li class="field required" id="postal_code_container">
+           <label for="postal_code">Postal/Zip Code</label>
+           <input id="postal_code" type="text" name="postal_code" />
+         </li>
+       
         </ol>
       </fieldset>
 
-      <fieldset class="group group-form group-form-accountacknowledgements">
+      <fieldset class="group group-form group-form-accountacknowledgements" id="form-checkboxes">
         <hr />
         <legend class="sr">Account Acknowledgements</legend>
 
@@ -543,7 +626,7 @@
       <input type="hidden" name="course_id" value="${course_id | h}" />
 % endif
 
-      <div class="form-actions">
+      <div class="form-actions" id="form-submit">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register <span class="orn-plus">+</span> Create My Account</button>
       </div>
     </form>
