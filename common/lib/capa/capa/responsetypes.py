@@ -52,6 +52,8 @@ CORRECTMAP_PY = None
 #-----------------------------------------------------------------------------
 # Exceptions
 
+def _(s):
+    return s
 
 class LoncapaProblemError(Exception):
     '''
