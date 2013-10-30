@@ -8,6 +8,7 @@ Many of these GETs may become PUTs in the future.
 
 import re
 import logging
+import json
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -30,6 +31,7 @@ from courseware.models import StudentModule
 from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
+from instructor_task.views import get_task_completion_info
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
 from instructor.views.tools import strip_if_string, get_student_from_identifier
@@ -675,9 +677,42 @@ def list_instructor_tasks(request, course_id):
         tasks = instructor_task.api.get_running_instructor_tasks(course_id)
 
     def extract_task_features(task):
-        """ Convert task to dict for json rendering """
-        features = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
-        return dict((feature, str(getattr(task, feature))) for feature in features)
+        """
+        Convert task to dict for json rendering.
+        Expects tasks have the following features:
+        * task_type (str, type of task)
+        * task_input (dict, input(s) to the task)
+        * task_id (str, celery id of the task)
+        * requester (str, username who submitted the task)
+        * task_state (str, state of task eg PROGRESS, COMPLETED)
+        * created (datetime, when the task was completed)
+        * task_output (optional)
+        """
+        # Pull out information from the task
+        features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
+        task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
+        # Some information (created, duration, status, task message) require additional formatting
+        task_feature_dict['created'] = task.created.isoformat()
+
+        # Get duration info, if known
+        duration_sec = 'unknown'
+        if hasattr(task, 'task_output') and task.task_output is not None:
+            try:
+                task_output = json.loads(task.task_output)
+            except ValueError:
+                log.error("Could not parse task output as valid json; task output: %s", task.task_output)
+            else:
+                if 'duration_ms' in task_output:
+                    duration_sec = int(task_output['duration_ms'] / 1000.0)
+        task_feature_dict['duration_sec'] = duration_sec
+
+        # Get progress status message & success information
+        success, task_message = get_task_completion_info(task)
+        status = _("Complete") if success else _("Incomplete")
+        task_feature_dict['status'] = status
+        task_feature_dict['task_message'] = task_message
+
+        return task_feature_dict
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),

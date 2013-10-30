@@ -19,4 +19,16 @@
   <div class="data-display-text"></div>
   <div class="data-display-table"></div>
   <div class="request-response-error"></div>
+
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("The status for any active tasks appears in a table below.")} </p>
+    <br />
+
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+
+%endif
 </div>
