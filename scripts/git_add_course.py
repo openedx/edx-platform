@@ -119,9 +119,18 @@ def add_repo(repo, rdir_in):
     # Get XML logging logger and capture debug to parse results
     output = StringIO.StringIO()
     import_logger = logging.getLogger('xmodule.modulestore.xml_importer')
+    git_logger = logging.getLogger('git_add_script')
+    xml_logger = logging.getLogger('xmodule.modulestore.xml')
+    xml_seq_logger = logging.getLogger('xmodule.seq_module')
+
     import_log_handler = logging.StreamHandler(output)
     import_log_handler.setLevel(logging.DEBUG)
-    import_logger.addHandler(import_log_handler)
+
+    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        logger.old_level = logger.level
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(import_log_handler)
+
     try:
         management.call_command('import', GIT_REPO_DIR, rdir,
                                 nostatic=not GIT_IMPORT_STATIC)
@@ -131,6 +140,11 @@ def add_repo(repo, rdir_in):
         return -1
 
     ret_import = output.getvalue()
+
+    # Remove handler hijacks
+    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        logger.setLevel(logger.old_level)
+        logger.removeHandler(import_log_handler)
 
     course_id = 'unknown'
     location = 'unknown'
