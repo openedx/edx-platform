@@ -181,7 +181,7 @@ class LTIModule(LTIFields, XModule):
         ]
 
         # Obtains client_key and client_secret credentials from current course:
-        course_id = self.runtime.course_id
+        course_id = self.course_id
         course_location = CourseDescriptor.id_to_location(course_id)
         course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key = client_secret = ''
