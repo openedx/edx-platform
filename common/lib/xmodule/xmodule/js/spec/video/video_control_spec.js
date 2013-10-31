@@ -30,6 +30,34 @@
         expect($('.video-controls').find('.vidtime')).toHaveText('0:00 / 0:00');
       });
 
+      it('add ARIA attributes to time control', function () {
+        var timeControl = $('div.slider>a');
+        expect(timeControl).toHaveAttrs({
+          'role': 'slider',
+          'title': 'video position',
+          'aria-disabled': 'false'
+        });
+        expect(timeControl).toHaveAttr('aria-valuetext');
+      });
+
+      it('add ARIA attributes to play control', function () {
+        var playControl = $('ul.vcr a');
+        expect(playControl).toHaveAttrs({
+          'role': 'button',
+          'title': 'Play',
+          'aria-disabled': 'false'
+        });
+      });
+
+      it('add ARIA attributes to fullscreen control', function () {
+        var fullScreenControl = $('a.add-fullscreen');
+        expect(fullScreenControl).toHaveAttrs({
+          'role': 'button',
+          'title': 'Fill browser',
+          'aria-disabled': 'false'
+        });
+      });
+
       it('bind the playback button', function() {
         expect($('.video_control')).toHandleWith('click', videoControl.togglePlayback);
       });
