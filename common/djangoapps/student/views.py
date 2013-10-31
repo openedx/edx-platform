@@ -270,7 +270,7 @@ def register_user(request, extra_context=None):
 
     if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
         return render_to_response('register-shib.html', context)
-    return render_to_response('university_profile/edge.html', context)
+    return render_to_response('register.html', context)
 
 
 @login_required

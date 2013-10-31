@@ -64,8 +64,8 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               if section['graded'] and len(section['format']) > 0:
-                chapter_earned += section['section_total'].earned * category_weights[section['format']]
-                chapter_total += section['section_total'].possible * category_weights[section['format']]
+                chapter_earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
+                chapter_total += section['section_total'].possible * category_weights.get(section['format'], 0.0)
               %>
 
               <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">

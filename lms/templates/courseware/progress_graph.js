@@ -76,8 +76,8 @@ $(function () {
           
         tickIndex += 1
 
-        earned += section['section_total'].earned * category_weights[section['format']]
-        total += section['section_total'].possible * category_weights[section['format']]
+        earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
+        total += section['section_total'].possible * category_weights.get(section['format'], 0.0)
       
       
       if chapter['display_name'] not in chapters:
