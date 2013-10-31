@@ -22,7 +22,12 @@
         afterEach(function () {
             YT.Player = undefined;
             $('.subtitles').remove();
+
+            // `source` tags should be removed to avoid memory leak bug that we
+            // had before. Removing of `source` tag, not `video` tag, stops
+            // loading video source and clears the memory.
             $('source').remove();
+
             window.onTouchBasedDevice = oldOTBD;
         });
 
@@ -442,7 +447,8 @@
                     expect(videoCaption.currentIndex).toEqual(5);
                 });
 
-                it('scroll caption to new position', function () {
+                // Disabled 10/25/13 due to flakiness in master
+                xit('scroll caption to new position', function () {
                     expect($.fn.scrollTo).toHaveBeenCalled();
                 });
             });
@@ -640,6 +646,8 @@
                 beforeEach(function () {
                     state.el.addClass('closed');
                     videoCaption.toggle(jQuery.Event('click'));
+
+                    jasmine.Clock.useMock();
                 });
 
                 it('log the show_transcript event', function () {
@@ -655,8 +663,19 @@
                     expect(state.el).not.toHaveClass('closed');
                 });
 
-                it('scroll the caption', function () {
-                    expect($.fn.scrollTo).toHaveBeenCalled();
+                // Test turned off due to flakiness (30.10.2013).
+                xit('scroll the caption', function () {
+                    // After transcripts are shown, and the video plays for a
+                    // bit.
+                    jasmine.Clock.tick(1000);
+
+                    // The transcripts should have advanced by at least one
+                    // position. When they advance, the list scrolls. The
+                    // current transcript position should be constantly
+                    // visible.
+                    runs(function () {
+                        expect($.fn.scrollTo).toHaveBeenCalled();
+                    });
                 });
             });
         });

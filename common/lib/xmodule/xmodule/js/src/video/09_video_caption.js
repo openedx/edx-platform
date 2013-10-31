@@ -241,9 +241,10 @@ function () {
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log('ERROR while fetching captions.');
+                console.log('[Video info]: ERROR while fetching captions.');
                 console.log(
-                    'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
+                    '[Video info]: STATUS:', textStatus +
+                    ', MESSAGE:', '' + errorThrown
                 );
 
                 _this.videoCaption.hideCaptions(true, false);
