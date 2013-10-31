@@ -353,8 +353,8 @@ class CapaModule(CapaFields, XModule):
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
-        check = _('Check')
-        final_check = _('Final Check')
+        check = _('Submit')
+        final_check = _('Final Submit')
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
