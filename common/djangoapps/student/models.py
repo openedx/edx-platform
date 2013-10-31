@@ -26,7 +26,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import ModelForm, forms
 
-import comment_client as cc
+import lms.lib.comment_client as cc
 from pytz import UTC
 
 

@@ -16,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
 
-from lms.xblock.field_data import LmsFieldData
+from lms.lib.xblock.field_data import LmsFieldData
 
 from util.sandboxing import can_execute_unsafe_code
 

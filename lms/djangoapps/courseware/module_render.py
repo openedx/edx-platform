@@ -20,7 +20,7 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
-from lms.xblock.field_data import LmsFieldData
+from lms.lib.xblock.field_data import LmsFieldData
 from mitxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import unique_id_for_user
