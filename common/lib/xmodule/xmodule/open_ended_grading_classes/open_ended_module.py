@@ -281,9 +281,23 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self.record_latest_score(new_score_msg['score'])
-        self.record_latest_post_assessment(score_msg)
-        self.child_state = self.POST_ASSESSMENT
+        if self.child_history:
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
+        else:
+            log.error((
+                "Trying to update score without existing studentmodule child_history:\n"
+                "   location: {location}\n"
+                "   score: {score}\n"
+                "   grader_ids: {grader_ids}\n"
+                "   submission_ids: {submission_ids}").format(
+                    location=self.location_string,
+                    score=new_score_msg['score'],
+                    grader_ids=new_score_msg['grader_ids'],
+                    submission_ids=new_score_msg['submission_ids']
+                )
+            )
 
         return True
 
