@@ -27,7 +27,7 @@ import django.dispatch
 from django.forms import ModelForm, forms
 
 from course_modes.models import CourseMode
-import comment_client as cc
+import lms.lib.comment_client as cc
 from pytz import UTC
 import crum
 

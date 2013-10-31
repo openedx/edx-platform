@@ -20,7 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_DIR, \
     TEST_DATA_MONGO_MODULESTORE, \
     TEST_DATA_DRAFT_MONGO_MODULESTORE, \
     TEST_DATA_MIXED_MODULESTORE
-from lms.xblock.field_data import LmsFieldData
+from lms.lib.xblock.field_data import LmsFieldData
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):

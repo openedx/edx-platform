@@ -17,7 +17,7 @@ from courseware.access import has_access
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
 import django_comment_client.utils as utils
-import comment_client as cc
+import lms.lib.comment_client as cc
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20

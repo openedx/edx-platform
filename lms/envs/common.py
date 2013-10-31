@@ -30,7 +30,7 @@ from path import path
 
 from .discussionsettings import *
 
-from lms.xblock.mixin import LmsBlockMixin
+from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 
@@ -213,9 +213,9 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
+# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
@@ -917,7 +917,7 @@ INSTALLED_APPS = (
     # Our courseware
     'circuit',
     'courseware',
-    'perfstats',
+    'lms.lib.perfstats',
     'student',
     'static_template_view',
     'staticbook',
