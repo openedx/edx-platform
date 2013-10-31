@@ -418,7 +418,6 @@ MKTG_URL_LINK_MAP = {
 
 COURSES_WITH_UNSAFE_CODE = []
 
-
 ############################## EVENT TRACKING #################################
 
 TRACK_MAX_EVENT = 10000

@@ -321,7 +321,7 @@ class TestPhotoVerification(TestCase):
         attempt.save()
 
         status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, (attempt.status, ''))
+        self.assertEquals(status, ('approved', ''))
 
         # create another one for the same user, make sure the right one is
         # returned
@@ -331,14 +331,20 @@ class TestPhotoVerification(TestCase):
         attempt2.save()
 
         status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, (attempt2.status, "No photo ID was provided."))
+        self.assertEquals(status, ('approved', ''))
+
+        # now delete the first one and verify that the denial is being handled
+        # properly
+        attempt.delete()
+        status = SoftwareSecurePhotoVerification.user_status(user)
+        self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
 
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
         attempt.status = 'denied'
         attempt.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
-        parsed_error_msg = attempt.parse_error_msg()
+        parsed_error_msg = attempt.parsed_error_msg()
         self.assertEquals("No photo ID was provided.", parsed_error_msg)
 
     def test_parse_error_msg_failure(self):
@@ -350,8 +356,9 @@ class TestPhotoVerification(TestCase):
             'Not Provided',
             '[{"IdReasons": ["Not provided"]}]',
             '{"IdReasons": ["Not provided"]}',
+            u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
         }
         for msg in bad_messages:
             attempt.error_msg = msg
-            parsed_error_msg = attempt.parse_error_msg()
+            parsed_error_msg = attempt.parsed_error_msg()
             self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")

@@ -25,14 +25,13 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseNotAllowed, Http404)
+                         Http404)
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date, base36_to_int, urlencode
+from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext as _u
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -337,7 +336,7 @@ def dashboard(request):
         )
     )
     # Verification Attempts
-    verification_status = SoftwareSecurePhotoVerification.user_status(user)
+    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -355,8 +354,8 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
-               'verification_status': verification_status[0],
-               'verification_msg': verification_status[1],
+               'verification_status': verification_status,
+               'verification_msg': verification_msg,
                }
 
     return render_to_response('dashboard.html', context)
@@ -663,10 +662,10 @@ def manage_user_standing(request):
         row = [user.username, user.standing.all()[0].changed_by]
         rows.append(row)
 
-
     context = {'headers': headers, 'rows': rows}
 
     return render_to_response("manage_user_standing.html", context)
+
 
 @require_POST
 @login_required
@@ -681,34 +680,34 @@ def disable_account_ajax(request):
     username = request.POST.get('username')
     context = {}
     if username is None or username.strip() == '':
-        context['message'] = _u('Please enter a username')
+        context['message'] = _('Please enter a username')
         return JsonResponse(context, status=400)
 
     account_action = request.POST.get('account_action')
     if account_action is None:
-        context['message'] = _u('Please choose an option')
+        context['message'] = _('Please choose an option')
         return JsonResponse(context, status=400)
 
     username = username.strip()
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        context['message'] = _u("User with username {} does not exist").format(username)
+        context['message'] = _("User with username {} does not exist").format(username)
         return JsonResponse(context, status=400)
     else:
-        user_account, _ = UserStanding.objects.get_or_create(
+        user_account, _succss = UserStanding.objects.get_or_create(
             user=user, defaults={'changed_by': request.user},
         )
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
-            context['message'] = _u("Successfully disabled {}'s account").format(username)
+            context['message'] = _("Successfully disabled {}'s account").format(username)
             log.info("{} disabled {}'s account".format(request.user, username))
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
-            context['message'] = _u("Successfully reenabled {}'s account").format(username)
+            context['message'] = _("Successfully reenabled {}'s account").format(username)
             log.info("{} reenabled {}'s account".format(request.user, username))
         else:
-            context['message'] = _u("Unexpected account status")
+            context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
         user_account.changed_by = request.user
         user_account.standing_last_changed_at = datetime.datetime.now(UTC)

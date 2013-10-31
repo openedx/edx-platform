@@ -115,7 +115,6 @@ class PhotoVerification(StatusModel):
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
     """
-
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
     STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
@@ -233,27 +232,44 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_status(cls, user):
         """
-        Returns the status of the user based on their latest verification attempt
+        Returns the status of the user based on their past verification attempts
 
         If no such verification exists, returns 'none'
         If verification has expired, returns 'expired'
+        If the verification has been approved, returns 'approved'
+        If the verification process is still ongoing, returns 'pending'
+        If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
         """
-        try:
-            attempts = cls.objects.filter(user=user).order_by('-updated_at')
-            attempt = attempts[0]
-        except IndexError:
-            return ('none', '')
+        status = 'none'
+        error_msg = ''
 
-        if attempt.created_at < cls._earliest_allowed_date():
-            return ('expired', '')
+        if cls.user_is_verified(user):
+            status = 'approved'
+        elif cls.user_has_valid_or_pending(user):
+            # user_has_valid_or_pending does include 'approved', but if we are
+            # here, we know that the attempt is still pending
+            status = 'pending'
+        else:
+            # we need to check the most recent attempt to see if we need to ask them to do
+            # a retry
+            try:
+                attempts = cls.objects.filter(user=user).order_by('-updated_at')
+                attempt = attempts[0]
+            except IndexError:
+                return ('none', error_msg)
+            if attempt.created_at < cls._earliest_allowed_date():
+                return ('expired', error_msg)
 
-        error_msg = attempt.error_msg
-        if attempt.error_msg:
-            error_msg = attempt.parse_error_msg()
+            # right now, this is the only state at which they must reverify. It
+            # may change later
+            if attempt.status == 'denied':
+                status = 'must_reverify'
+            if attempt.error_msg:
+                error_msg = attempt.parsed_error_msg()
 
-        return (attempt.status, error_msg)
+        return (status, error_msg)
 
-    def parse_error_msg(self):
+    def parsed_error_msg(self):
         """
         Sometimes, the error message we've received needs to be parsed into
         something more human readable
@@ -523,7 +539,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             self.status = "must_retry"
             self.save()
 
-    def parse_error_msg(self):
+    def parsed_error_msg(self):
         """
         Parse the error messages we receive from SoftwareSecure
 

@@ -21,10 +21,7 @@
 </li>
 %endif
 
-<%doc>
-This is for 'pending' statuses, where we are waiting for a response
-</%doc>
-%if verification_status in ('must_retry', 'submitted'):
+%if verification_status == 'pending':
 <li class="status status-verification is-pending">
   <span class="title status-title">${_("ID-Verification Status")}</span>
 
@@ -41,7 +38,7 @@ This is for 'pending' statuses, where we are waiting for a response
 
 %endif
 
-%if verification_status == 'denied':
+%if verification_status == 'must_reverify':
 <li class="status status-verification is-denied">
   <span class="title status-title">${_("ID-Verification Status")}</span>
 
