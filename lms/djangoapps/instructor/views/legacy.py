@@ -725,7 +725,18 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
+        def validate_email():
+            class EmailValidationException(Exception):
+                pass
+
+            if not email_subject:
+                raise EmailValidationException(_u("Email subject can not be empty."))
+            if not html_message:
+                raise EmailValidationException(_u("Email body can not be empty."))
+
         try:
+            validate_email()
+
             # Create the CourseEmail object.  This is saved immediately, so that
             # any transaction that has been pending up to this point will also be
             # committed.
@@ -736,7 +747,7 @@ def instructor_dashboard(request, course_id):
 
         except Exception as err:
             # Catch any errors and deliver a message to the user
-            error_msg = "Failed to send email! ({0})".format(err)
+            error_msg = _u("Failed to send email! ({error_message})").format(error_message=err)
             msg += "<font color='red'>" + error_msg + "</font>"
             log.exception(error_msg)
 
