@@ -219,7 +219,7 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get_html(self.url)
         self.assertEquals(resp.status_code, 200)
-        self.assertContains(resp, "Download Files")
+        self.assertContains(resp, "Export a Copy of My Course Data")
 
     def test_export_json_unsupported(self):
         """

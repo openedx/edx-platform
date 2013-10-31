@@ -86,36 +86,81 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
 
-    <article class="export-overview">
-      <div class="description">
-        <h2>${_("About Exporting Courses")}</h2>
-        ## Translators: ".tar.gz" is a file extension, and should not be translated
-        <p>${_("When exporting your course, you will receive a .tar.gz formatted file that contains the following course data:")}</p>
+      <div class="introduction">
+        <h2 class="title">${_("About Exporting Courses")}</h2>
+        <div class="copy">
+          ## Translators: ".tar.gz" is a file extension, and should not be translated
 
-        <ul>
-          <li>${_("Course Structure (Sections and sub-section ordering)")}</li>
-          <li>${_("Individual Units")}</li>
-          <li>${_("Individual Problems")}</li>
-          <li>${_("Static Pages")}</li>
-          <li>${_("Course Assets")}</li>
+          <p>${_("You can export this course to edit it outside of Studio. Select the Export Course Content button below to download a .{em_start}tar.gz{em_end} file that contains the course content.").format(em_start='<strong>', em_end="</strong>")}</p>
+        </div>
+      </div>
+
+      <div class="export-controls">
+        <h2 class="title">${_("Export a Copy of My Course Data")}</h2>
+
+        <ul class="list-actions">
+          <li class="item-action">
+            <a class="action action-export action-primary" href="${export_url}">
+              <i class="icon-download"></i>
+              <span class="copy">${_("Export Course Content")}</span>
+            </a>
+          </li>
         </ul>
-
-        <p>${_("Your course export <strong>will not include</strong>: student data, forum/discussion data, course settings, certificates, grading information, or user data.")}</p>
       </div>
 
-      <!-- default state -->
-      <div class="export-form-wrapper">
-        <form method="post" enctype="multipart/form-data" class="export-form">
-            <h2>${_("Export Course:")}</h2>
+      <div class="export-contents">
+        <div class="export-includes">
+          <h3 class="title-3">${_("Data {em_start}exported with{em_end} your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <ul class="list-details list-export-includes">
+            <li class="item-detail">${_("Course Content (all Sections, Sub-sections, and Units)")}</li>
+            <li class="item-detail">${_("Course Structure")}</li>
+            <li class="item-detail">${_("Individual Problems")}</li>
+            <li class="item-detail">${_("Static Pages")}</li>
+            <li class="item-detail">${_("Course Assets")}</li>
+            <li class="item-detail">${_("Course Settings")}</li>
+          </ul>
+        </div>
 
-          <a href="${export_url}" class="button-export">${_("Download Files")}</a>
-        </form>
+        <div class="export-excludes">
+          <h3 class="title-3">${_("Data {em_start}not exported{em_end} with your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <ul class="list-details list-export-excludes">
+            <li class="item-detail">${_("User Data")}</li>
+            <li class="item-detail">${_("Course Team Data")}</li>
+            <li class="item-detail">${_("Forum/discussion Data")}</li>
+            <li class="item-detail">${_("Certificates")}</li>
+          </ul>
+        </div>
       </div>
-
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Why export my course?")}</h3>
+
+        <ul class="list-details">
+          <li class="item-detail">${_("Edit the course XML directly, then import the modified course.")}</li>
+          <li class="item-detail">${_("Store a backup of your course in its current state.")}</li>
+          <li class="item-detail">${_("Import the course into another course instance, to create a customized version of your course.")}</li>
+        </ul>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Opening the downloaded file")}</h3>
+
+        <p>${_("Extract the .tar.gz with an archive program on your computer.  Extracted data includes the course.xml file, as well as subfolders containing course content.")}</p>
+      </div>
+
+      <div class="bit">
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <h3 class="title-3">${_("Course Team Data")}</h3>
+
+        <p>${_("Note that course team data is not exported, and that course team data is not changed when importing a course.")}</p>
+      </div>
+    </aside>
+  </section>
 </div>
 </%block>

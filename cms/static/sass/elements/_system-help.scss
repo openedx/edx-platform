@@ -211,3 +211,71 @@
     color: $gray;
   }
 }
+
+// ====================
+
+// informational bits (rename once UI pattern is further defined)
+.bit {
+  @extend %t-copy-sub1;
+  margin: 0 0 $baseline 0;
+  border-bottom: 1px solid $gray-l4;
+  padding: 0 0 $baseline 0;
+  color: $gray-l1;
+
+  &:last-child {
+    margin-bottom: 0;
+    border: none;
+    padding-bottom: 0;
+  }
+
+  h3, .title {
+    @extend %t-title7;
+    margin: 0 0 ($baseline/4) 0;
+    color: $gray-d2;
+    font-weight: 600;
+  }
+
+  p, .copy {
+    margin: 0 0 $baseline 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // actions
+  .list-actions {
+    @extend %cont-no-list;
+
+    .action-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // details
+  .list-details {
+    @extend %cont-no-list;
+
+    .item-detail {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // navigation
+  .nav-related, .nav-page {
+    @extend %cont-no-list;
+
+    .nav-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+}
