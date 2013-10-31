@@ -4,8 +4,6 @@
 
 (function() {
   var keyMap = CodeMirror.keyMap.accessible = {
-    "Alt-Tab": "insertTab",
-    "Alt-Shift-Tab": "insertTab",
     "Tab": false,
     "Shift-Tab": false, 
     fallthrough: "default"
