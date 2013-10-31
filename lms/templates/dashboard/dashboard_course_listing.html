@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info" />
 
 <%! from django.utils.translation import ugettext as _ %>
 <%!
@@ -29,11 +29,11 @@
     % endif
 
     % if enrollment.mode == "verified":
-    <span class="sts-enrollment">
-      <span class="label">${_("Enrolled as: ")}</span>
-      <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
-      <span class="sts-enrollment-value">${_("ID Verified")}</span>
-    </span>
+      <span class="sts-enrollment">
+        <span class="label">${_("Enrolled as: ")}</span>
+        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
+        <span class="sts-enrollment-value">${_("ID Verified")}</span>
+      </span>
     % endif
 
     <section class="info">
@@ -95,18 +95,43 @@
                 <li class="action">
                 <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document')}">
-                   Download Your PDF Certificate</a></li>
+                   ${_("Download Your PDF Certificate")}</a></li>
               % endif
 
               % if cert_status['show_survey_button']:
                 <li class="action"><a class="cta" href="${cert_status['survey_url']}">
-                       ${_('Complete our course feedback survey')}</a></li>
+                       ${_("Complete our course feedback survey")}</a></li>
               % endif
             </ul>
           % endif
           </div>
 
       % endif
+
+      %if course_mode_info['show_upsell']:
+        <div class="message message-upsell has-actions is-expandable is-shown">
+
+            <div class="wrapper-tip">
+              <h4 class="message-title">${_("Challenge Yourself!")}</h4>
+              <p class="message-copy">${_("Take this course as an ID-verified student.")}</p>
+            </div>
+
+            <div class="wrapper-extended">
+                <p class="message-copy">${_("You can still sign up for an ID verified certificate for this course. If you plan to complete the whole course, it is a great way to recognize your achievement. {a_start}Learn more about verified certificates{a_end}.").format(a_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), a_end="</a>")}</p>
+
+              <ul class="actions message-actions">
+                <li class="action-item">
+                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
+                    <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
+                    <span class="wrapper-copy">
+                      <span class="copy">${_("Upgrade to Verified Track")}</span>
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+        </div>
+      %endif
 
       % if show_courseware_link:
         % if course.has_ended():
@@ -115,8 +140,6 @@
           <a href="${course_target}" class="enter-course">${_('View Course')}</a>
         % endif
       % endif
-
-
 
       <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
 

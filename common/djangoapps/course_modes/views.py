@@ -34,10 +34,19 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
-        if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
-            return redirect(reverse('dashboard'))
-        modes = CourseMode.modes_for_course_dict(course_id)
 
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
+        upgrade = request.GET.get('upgrade', False)
+
+        # verified users do not need to register or upgrade
+        if enrollment_mode == 'verified':
+            return redirect(reverse('dashboard'))
+
+        # registered users who are not trying to upgrade do not need to re-register
+        if enrollment_mode is not None and upgrade is False:
+            return redirect(reverse('dashboard'))
+
+        modes = CourseMode.modes_for_course_dict(course_id)
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(course_id, None)
 
@@ -50,6 +59,7 @@ class ChooseModeView(View):
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
+            "upgrade": upgrade,
         }
         if "verified" in modes:
             context["suggested_prices"] = [decimal.Decimal(x) for x in modes["verified"].suggested_prices.split(",")]
@@ -69,6 +79,8 @@ class ChooseModeView(View):
         if not has_access(user, course, 'enroll'):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
+
+        upgrade = request.GET.get('upgrade', False)
 
         requested_mode = self.get_requested_mode(request.POST.get("mode"))
         if requested_mode == "verified" and request.POST.get("honor-code"):
@@ -106,13 +118,12 @@ class ChooseModeView(View):
             if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
                 return redirect(
                     reverse('verify_student_verified',
-                            kwargs={'course_id': course_id})
+                            kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade)
                 )
 
             return redirect(
                 reverse('verify_student_show_requirements',
-                        kwargs={'course_id': course_id}),
-            )
+                        kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade))
 
     def get_requested_mode(self, user_choice):
         """
@@ -121,6 +132,7 @@ class ChooseModeView(View):
         """
         choices = {
             "Select Audit": "audit",
-            "Select Certificate": "verified"
+            "Select Certificate": "verified",
+            "Upgrade Your Registration": "verified"
         }
         return choices.get(user_choice)
