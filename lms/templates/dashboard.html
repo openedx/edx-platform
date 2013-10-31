@@ -164,7 +164,7 @@ text-transform: capitalize;
                 % for announcement in site_wide_announcements:
                 % if announcement.members_only:
                 <li class="announcement">
-                    <h2 class="title">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y H:i")}</h2>
+                    <h2 class="title">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y")}</h2>
                     ${announcement.content}
                     <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">РЈР±СЂР°С‚СЊ</a> -->
                 </li>

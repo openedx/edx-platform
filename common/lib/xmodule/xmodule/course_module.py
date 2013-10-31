@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 from cStringIO import StringIO
 from math import exp
@@ -203,7 +204,7 @@ class CourseFields(object):
                               }
                           ],
                               "GRADE_CUTOFFS": {
-                                  "Pass": 0.5
+                                  u"Зачет": 0.5
                               }},
                           scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)

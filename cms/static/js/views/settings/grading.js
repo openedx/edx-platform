@@ -1,5 +1,5 @@
-define(["js/views/validation", "underscore", "jquery", "jquery.ui", "js/views/settings/grader"],
-    function(ValidatingView, _, $, ui, GraderView) {
+define(["js/views/validation", "underscore", "jquery", "jquery.ui", "gettext", "js/views/settings/grader"],
+    function(ValidatingView, _, $, ui, gettext, GraderView) {
 
 var GradingView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
@@ -273,7 +273,7 @@ var GradingView = ValidatingView.extend({
 
         // Munge existing grade labels?
         // If going from Pass/Fail to 3 levels, change to Pass to A
-        if (gradeLength === 1 && this.descendingCutoffs[0]['designation'] === 'Pass') {
+        if (gradeLength === 1 && this.descendingCutoffs[0]['designation'] === gettext('Pass')) {
             this.descendingCutoffs[0]['designation'] = this.GRADES[0];
             this.setTopGradeLabel();
         }
@@ -293,7 +293,7 @@ var GradingView = ValidatingView.extend({
         domElement.remove();
 
         if (this.descendingCutoffs.length === 1 && this.descendingCutoffs[0]['designation'] === this.GRADES[0]) {
-            this.descendingCutoffs[0]['designation'] = 'Pass';
+            this.descendingCutoffs[0]['designation'] = gettext('Pass');
             this.setTopGradeLabel();
         }
         this.setFailLabel();
@@ -308,7 +308,7 @@ var GradingView = ValidatingView.extend({
     },
 
     failLabel: function() {
-        if (this.descendingCutoffs.length === 1) return 'Fail';
+        if (this.descendingCutoffs.length === 1) return gettext('Fail');
         else return 'F';
     },
     setFailLabel: function() {
