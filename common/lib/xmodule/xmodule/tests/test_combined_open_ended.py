@@ -212,6 +212,39 @@ class OpenEndedModuleTest(unittest.TestCase):
     definition = {'oeparam': oeparam}
     descriptor = Mock()
 
+    feedback = {
+        "success": True,
+        "feedback": "Grader Feedback"
+    }
+
+    single_score_msg = {
+        'correct': True,
+        'score': 4,
+        'msg': 'Grader Message',
+        'feedback': json.dumps(feedback),
+        'grader_type': 'IN',
+        'grader_id': '1',
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [0],
+        'rubric_scores_complete': True,
+        'rubric_xml': etree.tostring(rubric)
+    }
+
+    multiple_score_msg = {
+        'correct': True,
+        'score': [0, 1],
+        'msg': 'Grader Message',
+        'feedback': [json.dumps(feedback), json.dumps(feedback)],
+        'grader_type': 'PE',
+        'grader_id': ['1', '2'],
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [[0], [0]],
+        'rubric_scores_complete': [True, True],
+        'rubric_xml': [etree.tostring(rubric), etree.tostring(rubric)]
+    }
+
     def setUp(self):
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
@@ -269,62 +302,15 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': "Grader Feedback"
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': score_msg}
-        self.openendedmodule.update_score(get, self.test_system)
-
-    def update_score_single(self):
-        self.openendedmodule.new_history_entry("New Entry")
-        feedback = {
-            "success": True,
-            "feedback": "Grader Feedback"
-        }
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': json.dumps(feedback),
-            'grader_type': 'IN',
-            'grader_id': '1',
-            'submission_id': '1',
-            'success': True,
-            'rubric_scores': [0],
-            'rubric_scores_complete': True,
-            'rubric_xml': etree.tostring(self.rubric)
-        }
-        get = {'queuekey': "abcd",
-               'xqueue_body': json.dumps(score_msg)}
+               'xqueue_body': json.dumps(self.single_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
 
     def update_score_multiple(self):
         self.openendedmodule.new_history_entry("New Entry")
-        feedback = {
-            "success": True,
-            "feedback": "Grader Feedback"
-        }
-        score_msg = {
-            'correct': True,
-            'score': [0, 1],
-            'msg': 'Grader Message',
-            'feedback': [json.dumps(feedback), json.dumps(feedback)],
-            'grader_type': 'PE',
-            'grader_id': ['1', '2'],
-            'submission_id': '1',
-            'success': True,
-            'rubric_scores': [[0], [0]],
-            'rubric_scores_complete': [True, True],
-            'rubric_xml': [etree.tostring(self.rubric), etree.tostring(self.rubric)]
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': json.dumps(score_msg)}
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
-
 
     def test_latest_post_assessment(self):
         self.update_score_single()
@@ -345,6 +331,24 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.update_score_multiple()
         score = self.openendedmodule.latest_score()
         self.assertEquals(score, 1)
+
+    @patch('xmodule.open_ended_grading_classes.open_ended_module.log.error')
+    def test_update_score_nohistory(self, error_logger):
+        """
+        Tests error handling when there is no child_history
+        """
+        # NOTE that we are not creating any history items
+        get = {'queuekey': "abcd",
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
+        error_msg = ("Trying to update score without existing studentmodule child_history:\n"
+                     "   location: i4x://edX/sa_test/selfassessment/SampleQuestion\n"
+                     "   score: 1\n"
+                     "   grader_ids: [u'1', u'2']\n"
+                     "   submission_ids: [u'1', u'1']")
+        self.openendedmodule.update_score(get, self.test_system)
+        (msg,), _ = error_logger.call_args
+        self.assertTrue(error_logger.called)
+        self.assertEqual(msg, error_msg)
 
     def test_open_ended_display(self):
         """
