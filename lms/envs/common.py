@@ -187,10 +187,6 @@ MITX_FEATURES = {
 
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
-
-    # Disable instructor dash buttons for downloading course data
-    # when enrollment exceeds this number
-    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 }
 
 # Used for A/B testing

@@ -172,7 +172,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+              max_enrollment=course.max_enrollment_instr_buttons
             )}
         </p>
       </div>
@@ -409,7 +409,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+              max_enrollment=course.max_enrollment_instr_buttons
             )}
         </p>
       </div>

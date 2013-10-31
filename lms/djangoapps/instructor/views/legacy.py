@@ -850,7 +850,7 @@ def instructor_dashboard(request, course_id):
 
     # disable buttons for large courses
     disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    max_enrollment_for_buttons = course.max_enrollment_instr_buttons
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_number > max_enrollment_for_buttons
 

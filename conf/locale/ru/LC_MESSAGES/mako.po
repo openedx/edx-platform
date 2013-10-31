@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-10-30 19:57+0400\n"
-"PO-Revision-Date: 2013-10-30 20:08+0300\n"
+"PO-Revision-Date: 2013-10-31 15:23+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -6263,7 +6263,7 @@ msgstr "Загрузка оценок"
 #: lms/templates/courseware/instructor_dashboard.html:170
 #: lms/templates/courseware/instructor_dashboard.html:407
 msgid "Note: some of these buttons are known to time out for larger courses. We have temporarily disabled those features for courses with more than {max_enrollment} students. We are urgently working on fixing this issue. Thank you for your patience as we continue working to improve the platform!"
-msgstr "Заметка: известно, что некоторые из кнопок превышают допустимое время работы для больших курсов. Мы временно отключили эти функциональные возможности для курсов с количеством участников больше 200 человек. Мы работаем на исправлением этой проблемы. Спасибо за спокойствие, пока мы работаем над улучшением нашей платформы! Команда Edx."
+msgstr "Заметка: известно, что некоторые из кнопок превышают допустимое время работы для больших курсов. Мы временно отключили эти функциональные возможности для курсов с количеством участников больше {max_enrollment} человек. Вы можете отредактировать это значение в расширенных настройках курса."
 
 #: lms/templates/courseware/instructor_dashboard.html:191
 msgid "Dump list of enrolled students"
