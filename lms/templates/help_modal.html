@@ -15,7 +15,7 @@
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
-    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal" tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
       <h2><span class="edx">Помощь</span></h2>
@@ -80,7 +80,7 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
-    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal" tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
       <h2>${_('Thank You!')}</h2>

@@ -158,7 +158,7 @@ font-size: x-large;
                 <li class="announcement">
                     <h2 class="title"><span class="date">
 <%! from django.template.defaultfilters import date as _date%>
-${ _date(announcement.creation_date, "j/m/Y")}</h2>
+${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
                     <p style="font-size: smaller;">${announcement.content}</p>
                     <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">Убрать</a> -->
                 </li>
