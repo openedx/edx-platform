@@ -314,7 +314,7 @@
       &:hover {
         background: $paleYellow;
 
-        .course-actions .view-live-button {
+        .course-actions .action-view .view {
           opacity: 1.0;
           pointer-events: auto;
         }
@@ -337,7 +337,7 @@
       // encompassing course link
       .course-link {
         @extend %ui-depth2;
-        width: flex-grid(7, 9);
+        width: flex-grid(6, 9);
         margin-right: flex-gutter();
       }
 
@@ -383,21 +383,56 @@
       .course-actions {
         @extend %ui-depth3;
         position: static;
-        width: flex-grid(2, 9);
+        width: flex-grid(3, 9);
         text-align: right;
 
-        // view live button
-        .view-live-button {
-          @extend %ui-depth3;
-          @include transition(opacity $tmg-f2 ease-in-out 0);
-          @include box-sizing(border-box);
-          padding: ($baseline/2);
-          opacity: 0.0;
-          pointer-events: none;
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/2);
 
-          &:hover {
-            opacity: 1.0;
-            pointer-events: auto;
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // delete course
+        .action-delete {
+
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0.0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+
+          .delete {
+            @extend %ui-btn-non;
+            @extend %t-action1;
+            color: $gray-l3;
+
+            &:hover {
+              background-color: $blue;
+              color: $gray-l6;
+            }
+          }
+        }
+
+        // view live button
+        .action-view {
+
+          .view {
+            @extend %ui-depth3;
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            @include box-sizing(border-box);
+            padding: ($baseline/2);
+            opacity: 0.0;
+            pointer-events: none;
+
+            &:hover {
+              opacity: 1.0;
+              pointer-events: auto;
+            }
           }
         }
 
