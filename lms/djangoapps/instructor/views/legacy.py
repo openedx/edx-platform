@@ -197,7 +197,7 @@ def instructor_dashboard(request, course_id):
                 student = User.objects.get(email=unique_student_identifier)
             else:
                 student = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student.  "
+            msg += _u("Found a single student.  ")
         except User.DoesNotExist:
             student = None
             msg += "<font color='red'>" + _u("Couldn't find student with that email or username.") + "  </font>"
@@ -422,7 +422,7 @@ def instructor_dashboard(request, course_id):
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
-            msg += "<a href='{0}' target='_blank'> " + _u("Progress page for username: {1} with email address: {2}").format(progress_url, student.username, student.email) + "</a>."
+            msg += _u("<a href='{0}' target='_blank'>Progress page for username: {1} with email address: {2}").format(progress_url, student.username, student.email) + "</a>."
 
     #----------------------------------------
     # export grades to remote gradebook
@@ -725,7 +725,18 @@ def instructor_dashboard(request, course_id):
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
+        def validate_email():
+            class EmailValidationException(Exception):
+                pass
+
+            if not email_subject:
+                raise EmailValidationException(_u("Email subject can not be empty."))
+            if not html_message:
+                raise EmailValidationException(_u("Email body can not be empty."))
+
         try:
+            validate_email()
+
             # Create the CourseEmail object.  This is saved immediately, so that
             # any transaction that has been pending up to this point will also be
             # committed.
@@ -736,7 +747,7 @@ def instructor_dashboard(request, course_id):
 
         except Exception as err:
             # Catch any errors and deliver a message to the user
-            error_msg = "Failed to send email! ({0})".format(err)
+            error_msg = _u("Failed to send email! ({error_message})").format(error_message=err)
             msg += "<font color='red'>" + error_msg + "</font>"
             log.exception(error_msg)
 
@@ -850,7 +861,7 @@ def instructor_dashboard(request, course_id):
 
     # disable buttons for large courses
     disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    max_enrollment_for_buttons = course.max_enrollment_instr_buttons
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_number > max_enrollment_for_buttons
 

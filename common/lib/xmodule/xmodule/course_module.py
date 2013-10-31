@@ -14,7 +14,7 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 import json
 
-from xblock.fields import Scope, List, String, Dict, Boolean
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
@@ -216,6 +216,7 @@ class CourseFields(object):
     discussion_topics = Dict(help="Map of topics names to ids", scope=Scope.settings)
     discussion_sort_alpha = Boolean(scope=Scope.settings, default=False, help="Sort forum categories and subcategories alphabetically.")
     testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
+    max_enrollment_instr_buttons = Integer(scope=Scope.settings, default=200, help="Disable instructor dash buttons for downloading course data when enrollment exceeds this number")
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
     cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)

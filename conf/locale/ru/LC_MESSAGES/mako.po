@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-30 16:55+0400\n"
-"PO-Revision-Date: 2013-10-30 17:58+0300\n"
+"POT-Creation-Date: 2013-10-31 17:03+0400\n"
+"PO-Revision-Date: 2013-10-31 17:08+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -4333,6 +4333,10 @@ msgstr "Аналитика"
 msgid "Course Statistics At A Glance"
 msgstr "Обзор статистики курса"
 
+#: lms/djangoapps/instructor/views/legacy.py:200
+msgid "Found a single student.  "
+msgstr "Найден один студент.  "
+
 #: lms/djangoapps/instructor/views/legacy.py:203
 msgid "Couldn't find student with that email or username."
 msgstr ""
@@ -4412,8 +4416,8 @@ msgid "Failed to create a background task for rescoring \"{key}\": {id}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py:425
-msgid "Progress page for username: {1} with email address: {2}"
-msgstr ""
+msgid "<a href='{0}' target='_blank'>Progress page for username: {1} with email address: {2}"
+msgstr "<a href='{0}' target='_blank'>Страница прогресса пользователя {1} с почтовым адресом {2}"
 
 #: lms/djangoapps/instructor/views/legacy.py:439
 msgid "Assignment Name"
@@ -4429,7 +4433,7 @@ msgid "Invalid assignment name '%s'"
 msgstr "Неправильное название задания '%s'"
 
 #: lms/djangoapps/instructor/views/legacy.py:470
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1132
 msgid "External email"
 msgstr "Внешний почтовый адрес"
 
@@ -4451,15 +4455,15 @@ msgid "Instructor group = {0}"
 msgstr "Инструктор group = {0}"
 
 #: lms/djangoapps/instructor/views/legacy.py:507
-#: lms/djangoapps/instructor/views/legacy.py:954
-#: lms/djangoapps/instructor/views/legacy.py:1028
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:965
+#: lms/djangoapps/instructor/views/legacy.py:1039
+#: lms/djangoapps/instructor/views/legacy.py:1132
 msgid "Username"
 msgstr "Имя пользователя"
 
 #: lms/djangoapps/instructor/views/legacy.py:507
-#: lms/djangoapps/instructor/views/legacy.py:954
-#: lms/djangoapps/instructor/views/legacy.py:1028
+#: lms/djangoapps/instructor/views/legacy.py:965
+#: lms/djangoapps/instructor/views/legacy.py:1039
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -4469,7 +4473,7 @@ msgstr "Список инструкторов курса {0}"
 
 #: lms/djangoapps/instructor/views/legacy.py:522
 #: lms/djangoapps/instructor/views/legacy.py:541
-#: lms/djangoapps/instructor/views/legacy.py:984
+#: lms/djangoapps/instructor/views/legacy.py:995
 msgid "Error: unknown username \"{0}\""
 msgstr "Ошибка: неизвестное имя пользователя \"{0}\""
 
@@ -4508,94 +4512,108 @@ msgstr ""
 msgid "List of beta_testers"
 msgstr "Список бета-тестеров"
 
-#: lms/djangoapps/instructor/views/legacy.py:746
+#: lms/djangoapps/instructor/views/legacy.py:733
+msgid "Email subject can not be empty."
+msgstr "Тема сообщения не может быть пустой."
+
+#: lms/djangoapps/instructor/views/legacy.py:735
+msgid "Email body can not be empty."
+msgstr "Сообщение не может быть пустым."
+
+#: lms/djangoapps/instructor/views/legacy.py:750
+msgid "Failed to send email! ({error_message})"
+msgstr "Не удалось отправить электронное письмо. Причина: {error_message}"
+
+#: lms/djangoapps/instructor/views/legacy.py:757
 msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "public classes (~10k), it may take 1-2 hours to send all emails."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:748
+#: lms/djangoapps/instructor/views/legacy.py:759
 msgid "Your email was successfully queued for sending."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:901
+#: lms/djangoapps/instructor/views/legacy.py:912
 msgid "No remote gradebook defined in course metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:906
+#: lms/djangoapps/instructor/views/legacy.py:917
 msgid "No remote gradebook url defined in settings.MITX_FEATURES"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:911
+#: lms/djangoapps/instructor/views/legacy.py:922
 msgid "No gradebook name defined in course remote_gradebook metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:923
+#: lms/djangoapps/instructor/views/legacy.py:934
 #, python-format
 msgid "Failed to communicate with gradebook server at %s<br/>"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:924
+#: lms/djangoapps/instructor/views/legacy.py:935
 #, python-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:935
+#: lms/djangoapps/instructor/views/legacy.py:946
 #, python-format
 msgid "Remote gradebook response for %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:954
+#: lms/djangoapps/instructor/views/legacy.py:965
 msgid "Roles"
 msgstr "Роли"
 
-#: lms/djangoapps/instructor/views/legacy.py:955
+#: lms/djangoapps/instructor/views/legacy.py:966
 msgid "List of Forum {name}s in course {id}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:960
-#: lms/djangoapps/instructor/views/legacy.py:988
+#: lms/djangoapps/instructor/views/legacy.py:971
+#: lms/djangoapps/instructor/views/legacy.py:999
 msgid "Error: unknown rolename \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:996
+#: lms/djangoapps/instructor/views/legacy.py:1007
 msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:999
+#: lms/djangoapps/instructor/views/legacy.py:1010
 msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1002
+#: lms/djangoapps/instructor/views/legacy.py:1013
 msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1005
+#: lms/djangoapps/instructor/views/legacy.py:1016
 msgid ""
 "Error: user \"{0}\" should first be added as staff before adding as a forum "
 "administrator, cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1008
+#: lms/djangoapps/instructor/views/legacy.py:1019
 msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1030
+#: lms/djangoapps/instructor/views/legacy.py:1041
 msgid "{0} in course {1}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1047
+#: lms/djangoapps/instructor/views/legacy.py:1058
 msgid "Error: unknown username or email \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1053
+#: lms/djangoapps/instructor/views/legacy.py:1064
 msgid "{action} {user} {prep} {title} group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1132
 msgid "ID"
 msgstr ""
 
+#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1132
 #: lms/djangoapps/instructor/views/legacy.py:1121
 #: lms/templates/dashboard.html:166
 #: lms/templates/register-shib.html:139
@@ -4608,25 +4626,25 @@ msgstr ""
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1132
 msgid "edX email"
 msgstr "edX адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:1304
+#: lms/djangoapps/instructor/views/legacy.py:1315
 msgid "Enrollment of students"
 msgstr "Зачислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1377
+#: lms/djangoapps/instructor/views/legacy.py:1388
 msgid "Un-enrollment of students"
 msgstr "Отчислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1565
+#: lms/djangoapps/instructor/views/legacy.py:1576
 msgid ""
 "Failed to find any background tasks for course \"{course}\", module "
 "\"{problem}\" and student \"{student}\"."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1568
+#: lms/djangoapps/instructor/views/legacy.py:1579
 msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
@@ -7353,7 +7371,7 @@ msgstr "Загрузка оценок"
 #: lms/templates/courseware/instructor_dashboard.html:170
 #: lms/templates/courseware/instructor_dashboard.html:407
 msgid "Note: some of these buttons are known to time out for larger courses. We have temporarily disabled those features for courses with more than {max_enrollment} students. We are urgently working on fixing this issue. Thank you for your patience as we continue working to improve the platform!"
-msgstr "Заметка: известно, что некоторые из кнопок превышают допустимое время работы для больших курсов. Мы временно отключили эти функциональные возможности для курсов с количеством участников больше 200 человек. Мы работаем на исправлением этой проблемы. Спасибо за спокойствие, пока мы работаем над улучшением нашей платформы! Команда Edx."
+msgstr "Заметка: известно, что некоторые из кнопок превышают допустимое время работы для больших курсов. Мы временно отключили эти функциональные возможности для курсов с количеством участников больше {max_enrollment} человек. Вы можете отредактировать это значение в расширенных настройках курса."
 
 #: lms/templates/courseware/instructor_dashboard.html:191
 msgid "Dump list of enrolled students"
@@ -9405,7 +9423,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:183
 msgid "Total"
-msgstr ""
+msgstr "Итого"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:196
 msgid "this"
