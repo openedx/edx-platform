@@ -32,6 +32,8 @@ Studio: Change course overview page, checklists, assets, and course staff
 management page URLs to a RESTful interface. Also removed "\listing", which
 duplicated "\index".
 
+LMS: Fixed accessibility bug where users could not tab through wiki (LMS-1307)
+
 Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
 be played.
