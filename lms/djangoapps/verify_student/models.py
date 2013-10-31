@@ -115,8 +115,6 @@ class PhotoVerification(StatusModel):
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
     """
-    # We can make this configurable later...
-    DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
 
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
@@ -181,8 +179,9 @@ class PhotoVerification(StatusModel):
         Returns the earliest allowed date given the settings
 
         """
+        DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         allowed_date = (
-            datetime.now(pytz.UTC) - timedelta(days=cls.DAYS_GOOD_FOR)
+            datetime.now(pytz.UTC) - timedelta(days=DAYS_GOOD_FOR)
         )
         return allowed_date
 
