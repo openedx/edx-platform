@@ -3,6 +3,7 @@ import urlparse
 from oauthlib.oauth1.rfc5849 import signature
 import mock
 import sys
+import requests
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -13,6 +14,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
     '''
 
     protocol = "HTTP/1.0"
+    callback_url = None
 
     def log_message(self, format, *args):
         """Log an arbitrary message."""
@@ -25,6 +27,24 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
         self._send_head()
+
+    def do_GET(self):
+        '''
+        Handle a POST request from the client and sends response back.
+        '''
+        self.send_response(200, 'OK')
+        self.send_header('Content-type', 'html')
+        self.end_headers()
+
+        response_str = """<html><head><title>TEST TITLE</title></head>
+            <body>Grade this LTI</body></html>"""
+
+        self.wfile.write(response_str)
+
+        if MockLTIRequestHandler.callback_url:
+            self._send_graded_result(MockLTIRequestHandler.callback_url)
+
+
 
     def do_POST(self):
         '''
@@ -55,7 +75,8 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 'oauth_callback',
                 'lis_outcome_service_url',
                 'lis_result_sourcedid',
-                'launch_presentation_return_url'
+                'launch_presentation_return_url',
+                'lis_person_sourcedid',
             ]
 
             if sorted(correct_keys) != sorted(post_dict.keys()):
@@ -66,10 +87,16 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                     status_message = "This is LTI tool. Success."
                 else:
                     status_message = "Wrong LTI signature"
+
+            callback_url = post_dict["lis_outcome_service_url"]
+            if callback_url:
+                MockLTIRequestHandler.callback_url = callback_url
+            else:
+                callback_url = None
         else:
             status_message = "Invalid request URL"
 
-        self._send_response(status_message)
+        self._send_response(status_message, url=callback_url)
 
     def _send_head(self):
         '''
@@ -102,21 +129,39 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             return {}
         return post_dict
 
-    def _send_response(self, message):
+    def _send_graded_result(self, callback_url):
+        payload = {'score': 0.95}
+
+        # temporarily changed to get for easy view in browser
+        response=requests.post(callback_url, data=payload)
+        assert response.status_code == 200
+
+    def _send_response(self, message, url=None):
         '''
         Send message back to the client
         '''
-        response_str = """<html><head><title>TEST TITLE</title></head>
-        <body>
-        <div><h2>IFrame loaded</h2> \
-        <h3>Server response is:</h3>\
-        <h3 class="result">{}</h3></div>
-        </body></html>""".format(message)
+
+        if url is not None:
+            response_str = """<html><head><title>TEST TITLE</title></head>
+                <body>
+                <div><h2>Graded IFrame loaded</h2> \
+                <h3>Server response is:</h3>\
+                <h3 class="result">{}</h3></div>
+                <a href="{url}/grade">Grade</a>
+                </body></html>""".format(message, url="http://%s:%s" % self.server.server_address)
+        else:
+            response_str = """<html><head><title>TEST TITLE</title></head>
+                <body>
+                <div><h2>IFrame loaded</h2> \
+                <h3>Server response is:</h3>\
+                <h3 class="result">{}</h3></div>
+                </body></html>""".format(message)
 
         # Log the response
         logger.debug("LTI: sent response {}".format(response_str))
 
         self.wfile.write(response_str)
+
 
     def _is_correct_lti_request(self):
         '''If url to LTI tool is correct.'''

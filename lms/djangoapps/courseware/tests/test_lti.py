@@ -5,6 +5,12 @@ from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 
+import courseware.grades as grades
+from xmodule.modulestore.django import modulestore
+from student.tests.factories import UserFactory
+from django.test.client import RequestFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 
 class TestLTI(BaseTestXmodule):
     """
@@ -15,6 +21,28 @@ class TestLTI(BaseTestXmodule):
     of `oauthlib` library.
     """
     CATEGORY = "lti"
+    grading_policy = None
+
+    def set_up_course(self, **course_kwargs):
+        """
+        Create a stock coursecourse with a specific due date.
+
+        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
+        """
+
+        course = CourseFactory(**course_kwargs)
+        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = self.section = ItemFactory(
+            category='sequential',
+            parent_location=chapter.location,
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+        vertical = ItemFactory(category='vertical', parent_location=section.location)
+        ItemFactory(category=self.CATEGORY, parent_location=vertical.location)
+
+        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+
+        return course
 
     def setUp(self):
         """
@@ -82,3 +110,40 @@ class TestLTI(BaseTestXmodule):
             generated_context,
             self.runtime.render_template('lti.html', expected_context),
         )
+
+    @mock.patch('xmodule.lti_module.LTIModule.get_score')
+    def test_lti_grading(self, get_score):
+        """
+        Makes sure that LTI is graded.
+        """
+        weight = 0.15
+        grading_policy = {
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": weight
+                },
+            ]
+        }
+        mocked_score = {'score': 0.7, 'total': 1}
+        get_score.return_value = mocked_score
+
+        course = self.set_up_course(grading_policy=grading_policy)
+        request_factory = RequestFactory()
+        user = UserFactory.create()
+        request = request_factory.get("foo")
+        request.user = user
+
+        grade_summary = grades.grade(user, request, course)
+        actual_score = grade_summary['grade_breakdown'][0]['percent']
+
+        self.assertEqual(
+            actual_score,
+            mocked_score['score']*weight
+        )
+
+
+

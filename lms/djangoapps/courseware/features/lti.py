@@ -1,6 +1,7 @@
 #pylint: disable=C0111
 
 import os
+
 from django.contrib.auth.models import User
 from lettuce import world, step
 from lettuce.django import django_url
@@ -86,9 +87,8 @@ def set_incorrect_lti_passport(_step):
     }
     i_am_registered_for_the_course(coursenum, metadata)
 
-
-@step('the course has an LTI component with (.*) fields, new_page is(.*)$')
-def add_correct_lti_to_course(_step, fields, new_page):
+@step('the course has an LTI component with (.*) fields, new_page is(.*), is_graded is(.*)$')
+def add_correct_lti_to_course(_step, fields, new_page, is_graded):
     category = 'lti'
     lti_id = 'correct_lti_id'
     launch_url = world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint']
@@ -106,6 +106,11 @@ def add_correct_lti_to_course(_step, fields, new_page):
     else:  # default is True
         new_page = True
 
+    if is_graded.strip().lower() == 'false':
+        is_graded = False
+    else:  # default is True
+        is_graded = True
+
     world.scenario_dict['LTI'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['SEQUENTIAL'].location,
         category=category,
@@ -113,9 +118,16 @@ def add_correct_lti_to_course(_step, fields, new_page):
         metadata={
             'lti_id': lti_id,
             'launch_url': launch_url,
-            'open_in_a_new_page': new_page
+            'open_in_a_new_page': new_page,
+            'is_graded': is_graded,
         }
     )
+
+    setattr(world.scenario_dict['LTI'], 'TEST_BASE_PATH', '{host}:{port}'.format(
+        host=world.browser.host,
+        port=world.browser.port,
+    ))
+
     course = world.scenario_dict["COURSE"]
     chapter_name = world.scenario_dict['SECTION'].display_name.replace(
         " ", "_")
@@ -138,6 +150,20 @@ def create_course(course, metadata):
     # This also ensures that the necessary templates are loaded
     world.clear_courses()
 
+    weight = 0.15
+    grading_policy = {
+        "GRADER": [
+            {
+                "type": "Homework",
+                "min_count": 1,
+                "drop_count": 0,
+                "short_label": "HW",
+                "weight": weight
+            },
+        ]
+    }
+    metadata.update(grading_policy)
+
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
@@ -145,13 +171,25 @@ def create_course(course, metadata):
         org='edx',
         number=course,
         display_name='Test Course',
-        metadata=metadata
+        metadata=metadata,
+        grading_policy={
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": weight
+                },
+            ]
+        },
     )
 
     # Add a section to the course to contain problems
     world.scenario_dict['SECTION'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['COURSE'].location,
-        display_name='Test Section'
+        display_name='Test Section',
+        metadata={'graded': True, 'format': 'Homework'}
     )
     world.scenario_dict['SEQUENTIAL'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['SECTION'].location,
@@ -170,6 +208,7 @@ def i_am_registered_for_the_course(course, metadata):
     # If the user is not already enrolled, enroll the user.
     CourseEnrollment.enroll(usr, course_id(course))
 
+    world.add_to_course_staff('robot', world.scenario_dict['COURSE'].number)
     world.log_in(username='robot', password='test')
 
 
@@ -195,4 +234,14 @@ def check_lti_popup():
     world.browser.driver.close() # Close the pop-up window
     world.browser.switch_to_window(parent_window) # Switch to the main window again
 
+@step('I open gradebook$')
+def check_gradebook(_step):
+    location = world.scenario_dict['LTI'].location.html_id()
+    iframe_name = 'ltiLaunchFrame-' + location
+    with world.browser.get_iframe(iframe_name) as iframe:
+        iframe.find_by_css('a')[0].click()
+
+    world.click_link('Instructor')
+    world.click_link('Gradebook')
+    assert world.is_css_present('.grade-table')
 

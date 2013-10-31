@@ -5,9 +5,12 @@ Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 """
 
+from uuid import uuid4
+
 import logging
 import oauthlib.oauth1
 import urllib
+import json
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -15,9 +18,11 @@ from xmodule.x_module import XModule
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
-from xblock.fields import Boolean
+from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
+
+unicode = unicode  # to disable pylint unicode warnings
 
 
 class LTIError(Exception):
@@ -48,6 +53,8 @@ class LTIFields(object):
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
     open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
+    is_graded = Boolean(help="The LTI provider will grade student's results.", default=False, scope=Scope.settings)
+    weight = Float(help="Weight for student grades.", default=1.0, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
@@ -135,6 +142,8 @@ class LTIModule(LTIFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = "LTI"
 
+    TEST_BASE_PATH = None
+
     def get_html(self):
         """
         Renders parameters to template.
@@ -214,7 +223,7 @@ class LTIModule(LTIFields, XModule):
         input_fields = self.oauth_params(
             custom_parameters,
             client_key,
-            client_secret
+            client_secret,
         )
         context = {
             'input_fields': input_fields,
@@ -228,6 +237,61 @@ class LTIModule(LTIFields, XModule):
         }
 
         return self.system.render_template('lti.html', context)
+
+    def get_user_id(self):
+        user_id = self.runtime.anonymous_student_id
+        assert user_id is not None
+        return user_id
+
+    def get_base_path(self):
+        if self.TEST_BASE_PATH:
+            return 'http://{host}{path}'.format(
+                host=self.TEST_BASE_PATH,
+                path=self.system.ajax_url,
+            )
+        else:
+            return self.system.hostname + self.system.ajax_url
+
+    def get_context_id(self):
+        # This is an opaque identifier that uniquely identifies the context that contains
+        # the link being launched. This parameter is recommended.
+
+        # so context_id is lti_id
+        return self.lti_id
+
+    def get_resource_link_id(self):
+        #  This is an opaque unique identifier that the TC guarantees will be unique
+        #   within the TC for every placement of the link.
+        #  If the tool / activity is placed multiple times in the same context,
+        #  each of those placements will be distinct.
+        # This value will also change if the item is exported from one system or
+        # context and imported into another system or context.
+        # This parameter is required.
+
+        # This is unique id of edx platform.
+        return unicode(self.id) if self.is_graded else ''
+
+    def get_lis_result_sourcedid(self):
+        if self.is_graded:
+            # This field contains an identifier that indicates the LIS Result Identifier (if any)
+            # associated with this launch.  This field identifies a unique row and column within the
+            # TC gradebook.  This field is unique for every combination of context_id / resource_link_id / user_id.
+            # This value may change for a particular resource_link_id / user_id  from one launch to the next.
+            # The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
+            # This field is optional.
+
+            # context_id is lti_id
+            return '{}::{}::{}'.format(self.lti_id, self.get_resource_link_id(), self.get_user_id())
+        else:
+            return ''
+
+    def get_lis_person_sourcedid(self):
+        # This field contains the LIS identifier for the user account that is performing this launch.
+        # The example syntax of "school:user" is not the required format - lis_person_sourcedid
+        # is simply a unique identifier (i.e., a normalized string).
+        # This field is optional and its content and meaning are defined by LIS.
+        school = 'EdX'
+        return '{}:{}:{}'.format(school, self.get_user_id(), uuid4().hex) if self.is_graded else ''
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
@@ -245,19 +309,24 @@ class LTIModule(LTIFields, XModule):
             client_secret=unicode(client_secret)
         )
 
-        user_id = self.runtime.anonymous_student_id
-        assert user_id is not None
-
         # must have parameters for correct signing from LTI:
         body = {
-            u'user_id': user_id,
+            u'user_id': self.get_user_id,
             u'oauth_callback': u'about:blank',
-            u'lis_outcome_service_url': '',
-            u'lis_result_sourcedid': '',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
-            u'role': u'student'
+            u'role': u'student',
+
+            # for grades, TODO: generate properly:
+            # required
+            u'resource_link_id': self.get_resource_link_id(),
+            u'lis_outcome_service_url': '{}/set'.format(self.get_base_path() if self.is_graded else ''),
+
+            # optional fields
+            u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
+            u'lis_person_sourcedid': self.get_lis_person_sourcedid(),
+
         }
 
         # appending custom parameter for signing
@@ -301,9 +370,60 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         params.update(body)
         return params
 
+    def get_score(self):
+        return {
+            'score': 0.5,
+            'total': self.get_maxscore()
+        }
+
+    def get_maxscore(self):
+        return self.weight
+
+    def handle_ajax(self, dispatch, data):
+        """
+        This is called by courseware.module_render, to handle an AJAX call.
+
+        Returns json in following format:
+        {'status_code': HTTP status code, 'content': use it only for returning
+        data for action `read`}
+        """
+        # Investigate how will be applied changes to specific user_id
+
+        action = dispatch.lower()
+
+        if action == 'set':
+            if 'score' not in data.keys():
+                return json.dumps({'status_code': 400})
+
+            self.system.publish({
+                'event_name': 'grade',
+                'value': data['score'],
+                'max_value': self.get_maxscore(),
+            })
+
+            return json.dumps({'status_code': 200})
+
+        elif action == 'read':
+            response = {
+                'status_code': 200,
+                'content': {
+                    'value': self.get_score(),
+                },
+            }
+
+            return json.dumps(response)
+
+        elif action == 'delete':
+            return json.dumps({'status_code': 200})
+
+        return json.dumps({'status_code': 404})
+
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
     Descriptor for LTI Xmodule.
     """
+    has_score = True
+    graded = True
+
     module_class = LTIModule
