@@ -521,7 +521,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         error_text = ""
         problem_list = []
         try:
-            problem_list_json = self.peer_gs.get_problem_list(self.system.course_id, self.system.anonymous_student_id)
+            problem_list_json = self.peer_gs.get_problem_list(self.course_id, self.system.anonymous_student_id)
             problem_list_dict = problem_list_json
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
@@ -571,7 +571,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
-            'course_id': self.system.course_id,
+            'course_id': self.course_id,
             'ajax_url': ajax_url,
             'success': success,
             'problem_list': good_problem_list,
@@ -605,7 +605,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
             'problem_location': problem_location,
-            'course_id': self.system.course_id,
+            'course_id': self.course_id,
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,

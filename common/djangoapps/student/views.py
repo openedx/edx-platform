@@ -285,6 +285,29 @@ def register_user(request, extra_context=None):
     return render_to_response('register.html', context)
 
 
+def complete_course_mode_info(course_id, enrollment):
+    """
+    We would like to compute some more information from the given course modes
+    and the user's current enrollment
+
+    Returns the given information:
+        - whether to show the course upsell information
+        - numbers of days until they can't upsell anymore
+    """
+    modes = CourseMode.modes_for_course_dict(course_id)
+    mode_info = {'show_upsell': False, 'days_for_upsell': None}
+    # we want to know if the user is already verified and if verified is an
+    # option
+    if 'verified' in modes and enrollment.mode != 'verified':
+        mode_info['show_upsell'] = True
+        # if there is an expiration date, find out how long from now it is
+        if modes['verified'].expiration_date:
+            today = datetime.datetime.now(UTC).date()
+            mode_info['days_for_upsell'] = (modes['verified'].expiration_date - today).days
+
+    return mode_info
+
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -318,6 +341,7 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
                                           if has_access(request.user, course, 'load'))
 
+    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in courses}
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
     # only show email settings for Mongo course and when bulk email is turned on
@@ -342,6 +366,7 @@ def dashboard(request):
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
+               'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
                }
