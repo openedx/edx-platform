@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import logging
 import re
@@ -31,6 +32,9 @@ MAX_SCORE = 1
 
 FILE_NOT_FOUND_IN_RESPONSE_MESSAGE = "We could not find a file in your submission.  Please try choosing a file or pasting a link to your file into the answer box."
 ERROR_SAVING_FILE_MESSAGE = "We are having trouble saving your file.  Please try another file or paste a link to your file into the answer box."
+
+FILE_NOT_FOUND_IN_RESPONSE_MESSAGE = u"Отсутствует файл для отправки. Пожалуйста, выберите файл или вставьте ссылку на файл в текст вашего сообщения."
+ERROR_SAVING_FILE_MESSAGE = u"Возникли проблемы при отправке вашего файла. Пожалуйста выберите другой файл или вставьте ссылку на файл в текст вашего сообщения."
 
 def upload_to_s3(file_to_upload, keyname, s3_interface):
     '''
