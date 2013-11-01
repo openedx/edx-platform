@@ -170,7 +170,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
-    def lockAnAsset(self, content_store, course_location):
+    def _lock_an_asset(self, content_store, course_location):
         """
         Lock an arbitrary asset in the course
         :param course_location:
@@ -398,9 +398,51 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs, expected_tabs)
 
     def test_static_tab_reordering(self):
+        module_store, course_location, new_location = self._create_static_tabs()
+
+        course = module_store.get_item(course_location)
+
+        # reverse the ordering
+        reverse_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                reverse_tabs.insert(0, 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
+
+        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': reverse_tabs})
+
+        course = module_store.get_item(course_location)
+
+        # compare to make sure that the tabs information is in the expected order after the server call
+        course_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                course_tabs.append('i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
+
+        self.assertEqual(reverse_tabs, course_tabs)
+
+    def test_static_tab_deletion(self):
+        module_store, course_location, new_location = self._create_static_tabs()
+
+        course = module_store.get_item(course_location)
+        num_tabs = len(course.tabs)
+        url_slug = (course.tabs[num_tabs - 1])['url_slug']
+        tab_id = 'i4x://edX/999/static_tab/{0}'.format(url_slug)
+
+        self.client.delete(new_location.url_reverse('tabs') + '/' + tab_id)
+
+        course = module_store.get_item(course_location)
+        self.assertEqual(num_tabs - 1, len(course.tabs))
+        tab_found = False
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab' and tab['url_slug'] == url_slug:
+                tab_found = True
+        self.assertFalse(tab_found, "tab should have been deleted")
+
+    def _create_static_tabs(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        new_location = loc_mapper().translate_location(course_location.course_id, course_location, False, True)
 
         ItemFactory.create(
             parent_location=course_location,
@@ -411,25 +453,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             category="static_tab",
             display_name="Static_2")
 
-        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
-
-        # reverse the ordering
-        reverse_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
-
-        self.client.ajax_post(reverse('reorder_static_tabs'), {'tabs': reverse_tabs})
-
-        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
-
-        # compare to make sure that the tabs information is in the expected order after the server call
-        course_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                course_tabs.append('i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
-
-        self.assertEqual(reverse_tabs, course_tabs)
+        return module_store, course_location, new_location
 
     def test_import_polls(self):
         module_store = modulestore('direct')
@@ -614,7 +638,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
             self.assertIsNotNone(thumbnail)
 
-    def _delete_asset_in_course (self):
+    def _delete_asset_in_course(self):
         """
         Helper method for:
           1) importing course from xml
@@ -952,7 +976,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertIn(private_location_no_draft.url(), sequential.children)
 
-        locked_asset = self.lockAnAsset(content_store, location)
+        locked_asset = self._lock_an_asset(content_store, location)
         locked_asset_attrs = content_store.get_attrs(locked_asset)
         # the later import will reupload
         del locked_asset_attrs['uploadDate']
@@ -1007,7 +1031,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         shutil.rmtree(root_dir)
 
     def check_import(self, module_store, root_dir, draft_store, content_store, stub_location, course_location,
-        locked_asset, locked_asset_attrs):
+                     locked_asset, locked_asset_attrs):
         # reimport
         import_from_xml(
             module_store, root_dir, ['test_export'], draft_store=draft_store,
@@ -1382,7 +1406,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
 
         # unseed the forums for the first course
-        course_id =_get_course_id(test_course_data)
+        course_id = _get_course_id(test_course_data)
         delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
@@ -1590,7 +1614,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # go to various pages
 
         # import page
-        resp = self.client.get_html(new_location.url_reverse('import/', ''))
+        resp = self.client.get_html(new_location.url_reverse('import'))
         self.assertEqual(resp.status_code, 200)
 
         # export page
@@ -1601,7 +1625,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # course team
-        url = new_location.url_reverse('course_team/', '')
+        url = new_location.url_reverse('course_team')
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
 
@@ -1627,20 +1651,27 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # assets_handler (HTML for full page content)
-        url = new_location.url_reverse('assets/', '')
+        url = new_location.url_reverse('assets')
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, 200)
+
+        # tabs_handler (HTML for full page content)
+        url = new_location.url_reverse('tabs')
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.get_html(reverse('edit_subsection',
-                                       kwargs={'location': subsection_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_subsection', kwargs={'location': subsection_location.url()})
+        )
         self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.get_html(reverse('edit_unit',
-                                       kwargs={'location': unit_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_unit', kwargs={'location': unit_location.url()})
+        )
         self.assertEqual(resp.status_code, 200)
 
         # delete a component
@@ -1853,7 +1884,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         Show the course overview page.
         """
         new_location = loc_mapper().translate_location(location.course_id, location, False, True)
-        return self.client.get_html(new_location.url_reverse('course/', ''))
+        return self.client.get_html(new_location.url_reverse('course'))
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -1931,7 +1962,7 @@ def _create_course(test, course_data):
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
-    test.assertEqual(data['url'], new_location.url_reverse("course/", ""))
+    test.assertEqual(data['url'], new_location.url_reverse("course"))
 
 
 def _get_course_id(test_course_data):

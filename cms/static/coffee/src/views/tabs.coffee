@@ -24,6 +24,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         axis: 'y'
         items: '> .component'
       )
+      @updateUrl = @options.url
 
     tabMoved: (event, ui) =>
       tabs = []
@@ -34,14 +35,16 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       analytics.track "Reordered Static Pages",
         course: course_location_analytics
 
+      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving.show()
       $.ajax({
         type:'POST',
-        url: '/reorder_static_tabs',
+        url: @updateUrl,
         data: JSON.stringify({
           tabs : tabs
         }),
         contentType: 'application/json'
-      })
+      }).success(=> saving.hide())
 
     addNewTab: (event) =>
       event.preventDefault()
@@ -66,6 +69,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         course: course_location_analytics
 
     deleteTab: (event) =>
+      updateUrl = @updateUrl
       confirm = new PromptView.Warning
         title: gettext('Delete Component Confirmation')
         message: gettext('Are you sure you want to delete this component? This action cannot be undone.')
@@ -82,12 +86,15 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
               deleting = new NotificationView.Mini
                 title: gettext('Deleting&hellip;')
               deleting.show()
-              $.postJSON('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type:'DELETE',
+                url: updateUrl+'/'+$component.data('id'),
+                contentType: 'application/json'
+              }).success(=>
                 $component.remove()
                 deleting.hide()
               )
+
           secondary: [
             text: gettext('Cancel')
             click: (view) ->
