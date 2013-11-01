@@ -74,6 +74,7 @@ class XQueueCertInterface(object):
                 )
         self.whitelist = CertificateWhitelist.objects.all()
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
+        self.use_https = True
 
     def regen_cert(self, student, course_id, course=None):
         """(Re-)Make certificate for a particular student in a particular course
@@ -216,9 +217,14 @@ class XQueueCertInterface(object):
 
     def _send_to_xqueue(self, contents, key):
 
+        if self.use_https:
+            proto = "https"
+        else:
+            proto = "http"
+
         xheader = make_xheader(
-            'https://{0}/update_certificate?{1}'.format(
-                settings.SITE_NAME, key), key, settings.CERT_QUEUE)
+            '{0}://{1}/update_certificate?{2}'.format(
+                proto, settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
                 header=xheader, body=json.dumps(contents))
