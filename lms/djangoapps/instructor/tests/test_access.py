@@ -17,7 +17,7 @@ from django_comment_common.models import (Role,
 from instructor.access import (allow_access,
                                revoke_access,
                                list_with_level,
-                               update_forum_role_membership)
+                               update_forum_role)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -148,44 +148,44 @@ class TestInstructorAccessForum(ModuleStoreTestCase):
 
     def test_allow(self):
         user = UserFactory.create()
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
         self.assertIn(user, self.mod_role.users.all())
 
     def test_allow_twice(self):
         user = UserFactory.create()
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
         self.assertIn(user, self.mod_role.users.all())
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
         self.assertIn(user, self.mod_role.users.all())
 
     @raises(Role.DoesNotExist)
     def test_allow_badrole(self):
         user = UserFactory.create()
-        update_forum_role_membership(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
     def test_revoke(self):
         user = self.moderators[0]
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
 
     def test_revoke_twice(self):
         user = self.moderators[0]
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
 
     def test_revoke_notallowed(self):
         user = UserFactory()
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
 
     @raises(Role.DoesNotExist)
     def test_revoke_badrole(self):
         user = self.moderators[0]
-        update_forum_role_membership(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
     @raises(ValueError)
     def test_bad_mode(self):
         user = UserFactory()
-        update_forum_role_membership(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')
