@@ -33,7 +33,7 @@ import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
 import instructor.enrollment as enrollment
-from instructor.enrollment import enroll_email, unenroll_email
+from instructor.enrollment import enroll_email, unenroll_email, get_email_params
 from instructor.views.tools import strip_if_string, get_student_from_identifier
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
@@ -189,7 +189,10 @@ def students_update_enrollment(request, course_id):
     - emails is string containing a list of emails separated by anything split_input_list can handle.
     - auto_enroll is a boolean (defaults to false)
         If auto_enroll is false, students will be allowed to enroll.
-        If auto_enroll is true, students will be enroled as soon as they register.
+        If auto_enroll is true, students will be enrolled as soon as they register.
+    - email_students is a boolean (defaults to false)
+        If email_students is true, students will be sent email notification
+        If email_students is false, students will not be sent email notification
 
     Returns an analog to this JSON structure: {
         "action": "enroll",
@@ -213,18 +216,25 @@ def students_update_enrollment(request, course_id):
         ]
     }
     """
+
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
     emails = _split_input_list(emails_raw)
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
+    email_students = request.GET.get('email_students') in ['true', 'True', True]
+
+    email_params = {}
+    if email_students:
+        course = get_course_by_id(course_id)
+        email_params = get_email_params(course, auto_enroll)
 
     results = []
     for email in emails:
         try:
             if action == 'enroll':
-                before, after = enroll_email(course_id, email, auto_enroll)
+                before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
-                before, after = unenroll_email(course_id, email)
+                before, after = unenroll_email(course_id, email, email_students, email_params)
             else:
                 return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
 
