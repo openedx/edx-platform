@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Users with is_staff=True no longer have the STAFF label appear on
+their forum posts.
+
 Blades: Video start and end times now function the same for both YouTube and
 HTML5 videos. If end time is set, the video can still play until the end, after
 it pauses on the end time.
