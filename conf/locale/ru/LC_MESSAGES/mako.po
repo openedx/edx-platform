@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-31 17:36+0400\n"
-"PO-Revision-Date: 2013-11-01 17:34+0300\n"
-"Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
+"POT-Creation-Date: 2013-11-01 18:38+0400\n"
+"PO-Revision-Date: 2013-11-01 18:41+0300\n"
+"Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -158,13 +158,13 @@ msgstr "Это может случиться из-за ошибки на наш�
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:82
+#: cms/static/coffee/src/views/module_edit.js:71
 #, python-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:136
-#: cms/static/coffee/src/views/unit.js:88
+#: cms/static/coffee/src/views/module_edit.js:125
+#: cms/static/coffee/src/views/unit.js:69
 #: cms/static/js/models/section.js:27
 #: cms/static/js/views/asset.js:79
 #: cms/static/js/views/course_info_handout.js:55
@@ -174,28 +174,28 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:98
+#: cms/static/coffee/src/views/tabs.js:89
 msgid "Delete Component Confirmation"
 msgstr "Подтверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:99
+#: cms/static/coffee/src/views/tabs.js:90
 msgid "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы действительно хотите удалить этот компонент? Это действие не можетбыть отменено."
 
-#: cms/static/coffee/src/views/tabs.js:102
+#: cms/static/coffee/src/views/tabs.js:93
 #: cms/static/js/views/course_info_update.js:140
 msgid "OK"
 msgstr "OK"
 
-#: cms/static/coffee/src/views/tabs.js:113
-#: cms/static/coffee/src/views/unit.js:188
+#: cms/static/coffee/src/views/tabs.js:104
+#: cms/static/coffee/src/views/unit.js:169
 #: cms/static/js/base.js:282
 #: cms/static/js/views/course_info_update.js:148
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:126
-#: cms/static/coffee/src/views/unit.js:211
+#: cms/static/coffee/src/views/tabs.js:117
+#: cms/static/coffee/src/views/unit.js:192
 #: cms/static/js/base.js:298
 #: cms/static/js/views/asset.js:67
 #: cms/static/js/views/course_info_update.js:166
@@ -217,15 +217,15 @@ msgstr "Удаление&hellip;"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: cms/static/coffee/src/views/unit.js:179
+#: cms/static/coffee/src/views/unit.js:160
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:180
+#: cms/static/coffee/src/views/unit.js:161
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Действие по удалению этого компонента не может быть отменено."
 
-#: cms/static/coffee/src/views/unit.js:183
+#: cms/static/coffee/src/views/unit.js:164
 msgid "Yes, delete this component"
 msgstr "Да, удалить этот компонент"
 
@@ -471,6 +471,11 @@ msgstr "Ваши политические изменения были сохра
 #: cms/static/js/views/settings/advanced.js:106
 msgid "Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs."
 msgstr "Учтите, что валидация ключей и значений политик еще не реализована. В случае трудностей проверьте пары ключ-значение."
+
+#: cms/static/js/views/settings/grading.js:276
+#, fuzzy
+msgid "designation"
+msgstr "Идентификация"
 
 #: cms/static/js/views/settings/grading.js:276
 #: cms/static/js/views/settings/grading.js:296
@@ -1506,7 +1511,7 @@ msgstr "Адрес электронной почты"
 #: cms/templates/login.html:31
 #: lms/templates/login.html:135
 #: lms/templates/login_modal.html:35
-#: lms/templates/university_profile/edge.html:184
+#: lms/templates/university_profile/edge.html:190
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
@@ -1518,7 +1523,7 @@ msgstr "Забыли пароль?"
 #: lms/templates/provider_login.html:47
 #: lms/templates/register.html:130
 #: lms/templates/signup_modal.html:47
-#: lms/templates/university_profile/edge.html:179
+#: lms/templates/university_profile/edge.html:185
 msgid "Password"
 msgstr "Пароль"
 
@@ -3251,7 +3256,7 @@ msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ВОЗМОЖНОСТЬ. Разреш�
 msgid "Markdown source of this module"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py:395
+#: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
 msgstr ""
 
@@ -3543,7 +3548,7 @@ msgstr "Загрузка данных"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:171
 #: lms/templates/dashboard.html:188
 #: lms/templates/courseware/instructor_dashboard.html:138
-#: lms/templates/university_profile/edge.html:175
+#: lms/templates/university_profile/edge.html:181
 msgid "Email"
 msgstr "Эл. почта"
 
@@ -3555,6 +3560,10 @@ msgstr "Аналитика"
 #: lms/djangoapps/instructor/views/legacy.py:111
 msgid "Course Statistics At A Glance"
 msgstr "Обзор статистики курса"
+
+#: lms/djangoapps/instructor/views/legacy.py:200
+msgid "Found a single student.  "
+msgstr "Найден один студент.  "
 
 #: lms/djangoapps/instructor/views/legacy.py:203
 msgid "Couldn't find student with that email or username."
@@ -3628,189 +3637,200 @@ msgstr ""
 msgid "Failed to create a background task for rescoring \"{key}\": {id}."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:425
-#, fuzzy
-msgid "Progress page for username: {1} with email address: {2}"
-msgstr "<a href='{0}' target='_blank'>Страница прогресса пользователя {1} с почтовым адресом {2}"
+#: lms/djangoapps/instructor/views/legacy.py:426
+msgid "Progress page for username: {username} with email address: {email}"
+msgstr "Страница прогресса пользователя {username} с почтовым адресом {email}"
 
-#: lms/djangoapps/instructor/views/legacy.py:439
+#: lms/djangoapps/instructor/views/legacy.py:441
 msgid "Assignment Name"
 msgstr "Название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:463
+#: lms/djangoapps/instructor/views/legacy.py:465
 msgid "Please enter an assignment name"
 msgstr "Введите название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:467
+#: lms/djangoapps/instructor/views/legacy.py:469
 #, python-format
 msgid "Invalid assignment name '%s'"
 msgstr "Неправильное название задания '%s'"
 
-#: lms/djangoapps/instructor/views/legacy.py:470
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:472
+#: lms/djangoapps/instructor/views/legacy.py:1134
 msgid "External email"
 msgstr "Внешний почтовый адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:479
+#: lms/djangoapps/instructor/views/legacy.py:481
 #, python-format
 msgid "Grades for assignment \"%s\""
 msgstr "Оценки для задания \"%s\""
 
-#: lms/djangoapps/instructor/views/legacy.py:498
+#: lms/djangoapps/instructor/views/legacy.py:500
 msgid "Staff group = {0}"
 msgstr "Группа преподавателей = {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:499
+#: lms/djangoapps/instructor/views/legacy.py:501
 msgid "List of Staff"
 msgstr "Список преподавателей"
 
-#: lms/djangoapps/instructor/views/legacy.py:504
+#: lms/djangoapps/instructor/views/legacy.py:506
 msgid "Instructor group = {0}"
 msgstr "Инструктор group = {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:507
-#: lms/djangoapps/instructor/views/legacy.py:954
-#: lms/djangoapps/instructor/views/legacy.py:1028
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:509
+#: lms/djangoapps/instructor/views/legacy.py:967
+#: lms/djangoapps/instructor/views/legacy.py:1041
+#: lms/djangoapps/instructor/views/legacy.py:1134
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: lms/djangoapps/instructor/views/legacy.py:507
-#: lms/djangoapps/instructor/views/legacy.py:954
-#: lms/djangoapps/instructor/views/legacy.py:1028
+#: lms/djangoapps/instructor/views/legacy.py:509
+#: lms/djangoapps/instructor/views/legacy.py:967
+#: lms/djangoapps/instructor/views/legacy.py:1041
 msgid "Full name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:509
+#: lms/djangoapps/instructor/views/legacy.py:511
 msgid "List of Instructors in course {0}"
 msgstr "Список инструкторов курса {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:522
-#: lms/djangoapps/instructor/views/legacy.py:541
-#: lms/djangoapps/instructor/views/legacy.py:984
+#: lms/djangoapps/instructor/views/legacy.py:524
+#: lms/djangoapps/instructor/views/legacy.py:543
+#: lms/djangoapps/instructor/views/legacy.py:997
 msgid "Error: unknown username \"{0}\""
 msgstr "Ошибка: неизвестное имя пользователя \"{0}\""
 
-#: lms/djangoapps/instructor/views/legacy.py:526
+#: lms/djangoapps/instructor/views/legacy.py:528
 msgid "Added {user} to instructor group = {group}"
 msgstr "Добавить {user} в группу инструкторов = {group}"
 
-#: lms/djangoapps/instructor/views/legacy.py:545
+#: lms/djangoapps/instructor/views/legacy.py:547
 msgid "Removed {user} from instructor group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:567
+#: lms/djangoapps/instructor/views/legacy.py:569
 #, python-format
 msgid "Student profile data for course %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:581
+#: lms/djangoapps/instructor/views/legacy.py:583
 #, python-format
 msgid "Found %d records to dump "
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:583
+#: lms/djangoapps/instructor/views/legacy.py:585
 msgid "Couldn't find module with that urlname."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:590
+#: lms/djangoapps/instructor/views/legacy.py:592
 #, python-format
 msgid "Student state for problem %s"
 msgstr "Удалить состояние студента для задания %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:607
+#: lms/djangoapps/instructor/views/legacy.py:609
 msgid "Beta test group = {0}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:608
+#: lms/djangoapps/instructor/views/legacy.py:610
 msgid "List of beta_testers"
 msgstr "Список бета-тестеров"
 
-#: lms/djangoapps/instructor/views/legacy.py:746
+#: lms/djangoapps/instructor/views/legacy.py:735
+msgid "Email subject can not be empty."
+msgstr "Тема сообщения не может быть пустой."
+
+#: lms/djangoapps/instructor/views/legacy.py:737
+msgid "Email body can not be empty."
+msgstr "Сообщение не может быть пустым."
+
+#: lms/djangoapps/instructor/views/legacy.py:752
+msgid "Failed to send email! ({error_message})"
+msgstr "Не удалось отправить электронное письмо. Причина: {error_message}"
+
+#: lms/djangoapps/instructor/views/legacy.py:759
 msgid "Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:748
+#: lms/djangoapps/instructor/views/legacy.py:761
 msgid "Your email was successfully queued for sending."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:901
+#: lms/djangoapps/instructor/views/legacy.py:914
 msgid "No remote gradebook defined in course metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:906
+#: lms/djangoapps/instructor/views/legacy.py:919
 msgid "No remote gradebook url defined in settings.MITX_FEATURES"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:911
+#: lms/djangoapps/instructor/views/legacy.py:924
 msgid "No gradebook name defined in course remote_gradebook metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:923
+#: lms/djangoapps/instructor/views/legacy.py:936
 #, python-format
 msgid "Failed to communicate with gradebook server at %s<br/>"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:924
+#: lms/djangoapps/instructor/views/legacy.py:937
 #, python-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:935
+#: lms/djangoapps/instructor/views/legacy.py:948
 #, python-format
 msgid "Remote gradebook response for %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:954
+#: lms/djangoapps/instructor/views/legacy.py:967
 msgid "Roles"
 msgstr "Роли"
 
-#: lms/djangoapps/instructor/views/legacy.py:955
+#: lms/djangoapps/instructor/views/legacy.py:968
 msgid "List of Forum {name}s in course {id}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:960
-#: lms/djangoapps/instructor/views/legacy.py:988
+#: lms/djangoapps/instructor/views/legacy.py:973
+#: lms/djangoapps/instructor/views/legacy.py:1001
 msgid "Error: unknown rolename \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:996
+#: lms/djangoapps/instructor/views/legacy.py:1009
 msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:999
+#: lms/djangoapps/instructor/views/legacy.py:1012
 msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1002
+#: lms/djangoapps/instructor/views/legacy.py:1015
 msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1005
+#: lms/djangoapps/instructor/views/legacy.py:1018
 msgid "Error: user \"{0}\" should first be added as staff before adding as a forum administrator, cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1008
+#: lms/djangoapps/instructor/views/legacy.py:1021
 msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1030
+#: lms/djangoapps/instructor/views/legacy.py:1043
 msgid "{0} in course {1}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1047
+#: lms/djangoapps/instructor/views/legacy.py:1060
 msgid "Error: unknown username or email \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1053
+#: lms/djangoapps/instructor/views/legacy.py:1066
 msgid "{action} {user} {prep} {title} group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1134
 msgid "ID"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1134
 #: lms/templates/dashboard.html:185
 #: lms/templates/register-shib.html:139
 #: lms/templates/register.html:162
@@ -3819,23 +3839,23 @@ msgstr ""
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:1121
+#: lms/djangoapps/instructor/views/legacy.py:1134
 msgid "edX email"
 msgstr "edX адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:1304
+#: lms/djangoapps/instructor/views/legacy.py:1317
 msgid "Enrollment of students"
 msgstr "Зачислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1377
+#: lms/djangoapps/instructor/views/legacy.py:1390
 msgid "Un-enrollment of students"
 msgstr "Отчислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1565
+#: lms/djangoapps/instructor/views/legacy.py:1578
 msgid "Failed to find any background tasks for course \"{course}\", module \"{problem}\" and student \"{student}\"."
 msgstr "Невозможно найти фоновые задачи модуля \"{problem}\" курса \"{course}\" для студента \"{student}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:1568
+#: lms/djangoapps/instructor/views/legacy.py:1581
 msgid "Failed to find any background tasks for course \"{course}\" and module \"{problem}\"."
 msgstr "Невозможно найти фоновые задачи модуля \"{problem}\" курса \"{course}\"."
 
@@ -4898,7 +4918,7 @@ msgstr "Посмотрите наш раздел помощи для ответ�
 
 #: lms/templates/login_modal.html:11
 #: lms/templates/provider_login.html:37
-#: lms/templates/university_profile/edge.html:183
+#: lms/templates/university_profile/edge.html:189
 msgid "Log In"
 msgstr "Войти"
 
@@ -9604,11 +9624,11 @@ msgstr "В данный момент сервера <em>{platform_name}</em> п�
 msgid "Our staff is currently working to get the site back up as soon as possible. Please email us at <a href=\"mailto:\\{tech_support_email}\">{tech_support_email}</a> to report any problems or downtime."
 msgstr "Персонал работает над восстановлением функционирования сайта. Пожалуйста, пишите нам по адресу <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> для сообщений об ошибках или недоступности сайта."
 
-#: lms/templates/university_profile/edge.html:172
+#: lms/templates/university_profile/edge.html:178
 msgid "Log in to your courses"
 msgstr "Войти в ваши курсы"
 
-#: lms/templates/university_profile/edge.html:189
+#: lms/templates/university_profile/edge.html:195
 msgid "Register for classes"
 msgstr "Регистрация на курсы"
 
@@ -10032,18 +10052,6 @@ msgstr ""
 #, fuzzy
 msgid "{span_start}active{span_end}"
 msgstr "Войдите в {span_start}{platform_name}{span_end}"
-
-#~ msgid "Found a single student.  "
-#~ msgstr "Найден один студент.  "
-
-#~ msgid "Email subject can not be empty."
-#~ msgstr "Тема сообщения не может быть пустой."
-
-#~ msgid "Email body can not be empty."
-#~ msgstr "Сообщение не может быть пустым."
-
-#~ msgid "Failed to send email! ({error_message})"
-#~ msgstr "Не удалось отправить электронное письмо. Причина: {error_message}"
 
 #~ msgid "Missing key {0} from submission.  Please reload and try again."
 #~ msgstr ""
