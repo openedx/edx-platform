@@ -287,7 +287,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'mitxmako.shortcuts.marketing_link_context_processor',
 
     # Include TEMPLATE_VISIBLE_SETTINGS in templates
-    'settings_context_processor.context_processors.settings'
+    'settings_context_processor.context_processors.settings',
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
