@@ -3121,11 +3121,11 @@ msgstr "Текущее задание, которое выполняется с�
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:206
 msgid "A list of lists of state dictionaries for student states that are saved.This field is only populated if the instructor changes tasks afterthe module is created and students have attempted it (for example changes a self assessed problem to self and peer assessed."
-msgstr "Список списков словарей сохраненных состояний студентов. Это поле заполняется только в случае, если инструктор меняет задания после того, как модуль был создан и студенты начали сдавать задания (например, задание было изменено с задания на самостоятельную проверку на задание на перекрестную проверку)."
+msgstr "Список списков словарей сохраненных состояний студентов. Это поле заполняется только в случае, если инструктор меняет задания после того, как объект был создан и студенты начали сдавать задания (например, задание было изменено с задания на самостоятельную проверку на задание на перекрестную проверку)."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:213
 msgid "List of state dictionaries of each task within this module."
-msgstr "Список словарей состояния каждой задачи в данном модуле."
+msgstr "Список словарей состояния каждой задачи в данном объекте."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:217
 msgid "Which step within the current task that the student is on."
@@ -3262,7 +3262,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:38
 msgid "Display name for this module"
-msgstr "Отображаемое имя для этого модуля"
+msgstr "Отображаемое имя для этого объекта"
 
 #: common/lib/xmodule/xmodule/master_class_module.py:43
 msgid "Max places"
@@ -3607,27 +3607,27 @@ msgstr "Ошибка создания теневого задания для с�
 
 #: lms/djangoapps/instructor/views/legacy.py:346
 msgid "Found module.  "
-msgstr "Найден модуль.   "
+msgstr "Объект найден.   "
 
 #: lms/djangoapps/instructor/views/legacy.py:348
 msgid "Couldn't find module with that urlname: {0}. "
-msgstr "Невозможно найти модуль с таким адресом: {0}."
+msgstr "Невозможно найти объект с таким адресом: {0}."
 
 #: lms/djangoapps/instructor/views/legacy.py:359
 msgid "Deleted student module state for {0}!"
-msgstr "Состояние студента для модуля {0} удалено!"
+msgstr "Состояние объекта для студента {0} удалено!"
 
 #: lms/djangoapps/instructor/views/legacy.py:372
 msgid "Failed to delete module state for {id}/{url}. "
-msgstr "Ошибка удаления состояния модуля для {id}/{url}. "
+msgstr "Ошибка удаления состояния объекта для {id}/{url}. "
 
 #: lms/djangoapps/instructor/views/legacy.py:395
 msgid "Module state successfully reset!"
-msgstr "Состояния модуля успешно сброшено!"
+msgstr "Состояния объекта успешно сброшено!"
 
 #: lms/djangoapps/instructor/views/legacy.py:397
 msgid "Couldn't reset module state for {id}/{url}. "
-msgstr "Невозможно сбросить состояние модуля для {id}/{url}. "
+msgstr "Невозможно сбросить состояние объекта для {id}/{url}. "
 
 #: lms/djangoapps/instructor/views/legacy.py:407
 msgid "Failed to create a background task for rescoring \"{key}\" for student {id}."
@@ -3853,11 +3853,11 @@ msgstr "Отчислить несколько студентов"
 
 #: lms/djangoapps/instructor/views/legacy.py:1578
 msgid "Failed to find any background tasks for course \"{course}\", module \"{problem}\" and student \"{student}\"."
-msgstr "Невозможно найти фоновые задачи модуля \"{problem}\" курса \"{course}\" для студента \"{student}\"."
+msgstr "Невозможно найти фоновые задачи объекта \"{problem}\" курса \"{course}\" для студента \"{student}\"."
 
 #: lms/djangoapps/instructor/views/legacy.py:1581
 msgid "Failed to find any background tasks for course \"{course}\" and module \"{problem}\"."
-msgstr "Невозможно найти фоновые задачи модуля \"{problem}\" курса \"{course}\"."
+msgstr "Невозможно найти фоновые задачи объекта \"{problem}\" курса \"{course}\"."
 
 #: lms/djangoapps/instructor_task/views.py:109
 #: lms/djangoapps/instructor_task/views.py:114
@@ -5015,7 +5015,7 @@ msgstr "На серверах <em>{platform_name}</em> возникла ошиб
 
 #: lms/templates/module-error.html:5
 msgid "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible. Please email us at <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any problems or downtime."
-msgstr "К сожалению, данный модуль временно недоступен. Мы работаем над устранением этой проблемы. Пожалуйста, пишите нам <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> о всех проблемах."
+msgstr "К сожалению, данный объект временно недоступен. Мы работаем над устранением этой проблемы. Пожалуйста, пишите нам <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> о всех проблемах."
 
 #: lms/templates/module-error.html:8
 msgid "Details"
@@ -5375,7 +5375,7 @@ msgstr "Отладка персонала"
 
 #: lms/templates/staff_problem_info.html:57
 msgid "Module Fields"
-msgstr "Поля модуля"
+msgstr "Поля объекта"
 
 #: lms/templates/staff_problem_info.html:63
 msgid "XML attributes"
@@ -6142,7 +6142,7 @@ msgstr "Возникла ошибка на серверах {span_start}{platfor
 
 #: lms/templates/courseware/courseware-error.html:18
 msgid "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible. Please email us at '<a href=\"mailto:{tech_support_email}\">{tech_support_email}</a>' to report any problems or downtime."
-msgstr "Извините, но данный модуль временно недоступен. Персонал работает, чтобы устранить проблему как можно быстрее. Для сообщений об ошибках или недоступности системы пишите нам по адресу <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a>."
+msgstr "Извините, но данный объект временно недоступен. Персонал работает, чтобы устранить проблему как можно быстрее. Для сообщений об ошибках или недоступности системы пишите нам по адресу <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a>."
 
 #: lms/templates/courseware/courseware.html:5
 msgid "{course_number} Courseware"
@@ -6422,11 +6422,11 @@ msgstr "Перепроверить все попытки студента"
 
 #: lms/templates/courseware/instructor_dashboard.html:302
 msgid "You may also delete the entire state of a student for the specified module:"
-msgstr "Вы также можете удалить все состояние студента в указанном модуле:"
+msgstr "Вы также можете удалить все состояние студента в указанном объекте:"
 
 #: lms/templates/courseware/instructor_dashboard.html:303
 msgid "Delete student state for module"
-msgstr "Удалить состояние студента для модуля"
+msgstr "Удалить состояние студента для данного объекта"
 
 #: lms/templates/courseware/instructor_dashboard.html:307
 msgid "Rescoring runs in the background, and status for active tasks will appear in a table below. To see status for all tasks submitted for this problem and student, click on this button:"
