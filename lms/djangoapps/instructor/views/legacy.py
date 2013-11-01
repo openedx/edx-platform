@@ -74,6 +74,9 @@ log = logging.getLogger(__name__)
 FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
 
+# For determining if a shibboleth course
+SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+
 
 def split_by_comma_and_whitespace(a_str):
     """
@@ -419,8 +422,8 @@ def instructor_dashboard(request, course_id):
                         module_state_key, err.message
                     )
                     log.exception("Encountered exception from rescore: student '{0}' problem '{1}'".format(
-                            unique_student_identifier, module_state_key
-                        )
+                        unique_student_identifier, module_state_key
+                    )
                     )
 
     elif "Get link to student's progress page" in action:
@@ -482,7 +485,7 @@ def instructor_dashboard(request, course_id):
                     try:
                         ddata.append([x.email, x.grades[aidx]])
                     except IndexError:
-                        log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
+                        log.debug('No grade for assignment %s (%s) for student %s', aidx, aname, x.email)
                 datatable['data'] = ddata
 
                 datatable['title'] = 'Grades for assignment "%s"' % aname
@@ -694,10 +697,11 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'Enroll multiple students':
 
+        is_shib_course = uses_shib(course)
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
         email_students = bool(request.POST.get('email_students'))
-        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students)
+        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
         datatable = ret['datatable']
 
     elif action == 'Unenroll multiple students':
@@ -1227,7 +1231,7 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False, email_students=False):
+def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """
     Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns
@@ -1256,7 +1260,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         ceaset.delete()
 
     if email_students:
-        stripped_site_name = _remove_preview(settings.SITE_NAME)
+        stripped_site_name = settings.SITE_NAME
         registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
         #Composition of email
         d = {'site_name': stripped_site_name,
@@ -1264,6 +1268,8 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
              'course': course,
              'auto_enroll': auto_enroll,
              'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
+             'course_about_url': 'https://' + stripped_site_name + '/courses/' + course_id + '/about',
+             'is_shib_course': is_shib_course,
              }
 
     for student in new_students:
@@ -1345,7 +1351,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
-    stripped_site_name = _remove_preview(settings.SITE_NAME)
+    stripped_site_name = settings.SITE_NAME
     if email_students:
         course = course_from_id(course_id)
         #Composition of email
@@ -1414,6 +1420,7 @@ def send_mail_to_student(student, param_dict):
     `email_address`: email of student (a `str`)
     `full_name`: student full name (a `str`)
     `message`: type of email to send and template to use (a `str`)
+    `is_shib_course`: (a `boolean`)
                                         ]
     Returns a boolean indicating whether the email was sent successfully.
     """
@@ -1438,12 +1445,6 @@ def send_mail_to_student(student, param_dict):
         return True
     else:
         return False
-
-
-def _remove_preview(site_name):
-    if site_name[:8] == "preview.":
-        return site_name[8:]
-    return site_name
 
 
 def get_and_clean_student_list(students):
@@ -1628,3 +1629,12 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
             datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
     return msg, datatable
+
+
+def uses_shib(course):
+    """
+    Used to return whether course has Shibboleth as the enrollment domain
+
+    Returns a boolean indicating if Shibboleth authentication is set for this course.
+    """
+    return course.enrollment_domain and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)

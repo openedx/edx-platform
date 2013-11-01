@@ -3,6 +3,8 @@ Unit tests for enrollment methods in views.py
 
 """
 
+from mock import patch
+
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -279,7 +281,6 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
             'You have been un-enrolled from Robot Super Course'
         )
 
-
     def test_send_mail_to_student(self):
         """
         Do invalid mail template test
@@ -289,3 +290,52 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         send_mail_ret = send_mail_to_student('student0@test.com', d)
         self.assertFalse(send_mail_ret)
+
+    @patch('instructor.views.legacy.uses_shib')
+    def test_enrollment_email_on_shib_on(self, mock_uses_shib):
+        # Do email on enroll, shibboleth on test
+
+        course = self.course
+        mock_uses_shib.return_value = True
+
+        # Create activated, but not enrolled, user
+        UserFactory.create(username="student5_0", email="student5_0@test.com", first_name="ShibTest", last_name="Enrolled")
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student5_0@test.com, student5_1@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
+
+        # Check the page output
+        self.assertContains(response, '<td>student5_0@test.com</td>')
+        self.assertContains(response, '<td>student5_1@test.com</td>')
+        self.assertContains(response, '<td>added, email sent</td>')
+        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on, email sent</td>')
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been enrolled in Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear ShibTest Enrolled\n\nYou have been enrolled in Robot Super Course "
+            "at edx.org by a member of the course staff. "
+            "The course should now appear on your edx.org dashboard.\n\n"
+            "To start accessing course materials, please visit "
+            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
+            "----\nThis email was automatically sent from edx.org to ShibTest Enrolled"
+        )
+
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[1].body,
+            "Dear student,\n\nYou have been invited to join "
+            "Robot Super Course at edx.org by a member of the "
+            "course staff.\n\n"
+            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n"
+            "----\nThis email was automatically sent from edx.org to "
+            "student5_1@test.com"
+        )

@@ -304,6 +304,23 @@ section.instructor-dashboard-content-2 {
       font-weight: bold;
     }
   }
+  
+  label[for="email-students"]:hover + .email-students-hint {
+    display: block;
+  }
+
+  .email-students-hint {
+    position: absolute;
+    display: none;
+    padding: $baseline;
+    width: $half_width;
+    border: 1px solid $light-gray;
+    background-color: $white;
+
+    span.emph {
+      font-weight: bold;
+    }
+  }
 
   .batch-enrollment {
     textarea {
