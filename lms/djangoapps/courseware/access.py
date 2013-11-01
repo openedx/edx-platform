@@ -503,6 +503,14 @@ def _has_global_staff_access(user):
         return False
 
 
+def group_names(user):
+    """Return the list of names of the groups that a user is in"""
+    if not hasattr(user, '_groups'):
+        user._groups = user.groups.values_list('name', flat=True)
+
+    return user._groups
+
+
 def _adjust_start_date_for_beta_testers(user, descriptor):
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
@@ -530,10 +538,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         # bail early if no beta testing is set up
         return descriptor.start
 
-    user_groups = [g.name for g in user.groups.all()]
-
     beta_group = course_beta_test_group_name(descriptor.location)
-    if beta_group in user_groups:
+    if beta_group in group_names(user):
         debug("Adjust start time: user in group %s", beta_group)
         delta = timedelta(descriptor.days_early_for_beta)
         effective = descriptor.start - delta
@@ -577,7 +583,7 @@ def _has_access_to_location(user, location, access_level, course_context):
         return True
 
     # If not global staff, is the user in the Auth group for this class?
-    user_groups = [g.name for g in user.groups.all()]
+    user_groups = group_names(user)
 
     if access_level == 'staff':
         staff_groups = group_names_for_staff(location, course_context) + \
