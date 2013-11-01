@@ -41,6 +41,7 @@ unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
+
 class UserStanding(models.Model):
     """
     This table contains a student's account's status.

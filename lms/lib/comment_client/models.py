@@ -1,4 +1,4 @@
-from .utils import *
+from .utils import extract, perform_request, CommentClientRequestError
 
 
 class Model(object):
