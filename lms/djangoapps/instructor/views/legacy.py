@@ -356,7 +356,7 @@ def instructor_dashboard(request, course_id):
                 # delete the state
                 try:
                     student_module.delete()
-                    msg += "<font color='red'>" + _u("Deleted student module state for {0}!") + "</font>".format(module_state_key)
+                    msg += "<font color='red'>" + _u("Deleted student module state for {0}!").format(module_state_key) + "</font>"
                     event = {
                         "problem": module_state_key,
                         "student": unique_student_identifier,

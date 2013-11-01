@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-01 18:38+0400\n"
-"PO-Revision-Date: 2013-11-01 18:41+0300\n"
+"PO-Revision-Date: 2013-11-01 18:55+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3615,7 +3615,7 @@ msgstr "Невозможно найти модуль с таким адресо�
 
 #: lms/djangoapps/instructor/views/legacy.py:359
 msgid "Deleted student module state for {0}!"
-msgstr "Удалить состояние студента для модуля {0}!"
+msgstr "Состояние студента для модуля {0} удалено!"
 
 #: lms/djangoapps/instructor/views/legacy.py:372
 msgid "Failed to delete module state for {id}/{url}. "
