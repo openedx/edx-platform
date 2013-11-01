@@ -1,3 +1,4 @@
+"""Provides factories for student models."""
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
                             PendingEmailChange, UserStanding,
@@ -10,13 +11,14 @@ from uuid import uuid4
 from pytz import UTC
 
 # Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232
+# pylint: disable=W0232, C0111
 
 
 class GroupFactory(DjangoModelFactory):
     FACTORY_FOR = Group
 
     name = u'staff_MITx/999/Robot_Super_Course'
+
 
 class UserStandingFactory(DjangoModelFactory):
     FACTORY_FOR = UserStanding
@@ -47,6 +49,7 @@ class CourseModeFactory(DjangoModelFactory):
     suggested_prices = ''
     currency = 'usd'
 
+
 class RegistrationFactory(DjangoModelFactory):
     FACTORY_FOR = Registration
 
@@ -70,7 +73,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @post_generation
-    def profile(obj, create, extracted, **kwargs):
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)

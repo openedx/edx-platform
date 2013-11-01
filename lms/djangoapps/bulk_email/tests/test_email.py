@@ -11,7 +11,9 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
@@ -47,16 +49,11 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
-        # Create instructor group for course
-        instructor_group = GroupFactory.create(name="instructor_MITx/999/Robot_Super_Course")
-        instructor_group.user_set.add(self.instructor)
+
+        self.instructor = InstructorFactory(self.course)
 
         # Create staff
-        self.staff = [UserFactory() for _ in xrange(STAFF_COUNT)]
-        staff_group = GroupFactory()
-        for staff in self.staff:
-            staff_group.user_set.add(staff)  # pylint: disable=E1101
+        self.staff = [StaffFactory(self.course) for _ in xrange(STAFF_COUNT)]
 
         # Create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
