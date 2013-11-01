@@ -46,6 +46,7 @@ from instructor.offline_gradecalc import student_grades
 from instructor.views.tools import strip_if_string
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
+                                 submit_grade_course,
                                  submit_update_offline_grades,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
@@ -262,7 +263,8 @@ def instructor_dashboard(request, course_id):
     if action == 'Compute Grades for all Students':
         log.debug(action)
         try:
-            instructor_task = submit_update_offline_grades(request, course_id)
+            # instructor_task = submit_update_offline_grades(request, course_id)
+            instructor_task = submit_grade_course(request, course_id)
             if instructor_task is None:
                 msg += '<font color="red">Failed to create a background task for grading.</font>'
             else:

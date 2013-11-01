@@ -3,7 +3,11 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
+import csv
 import json
+from cStringIO import StringIO
+from datetime import datetime
+from gzip import GzipFile
 from json import JSONEncoder
 from time import time
 from sys import exc_info
@@ -620,3 +624,149 @@ def update_offline_grade(xmodule_instance_args, course_descriptor, student):
     # Release any queries that the connection has been hanging onto:
     reset_queries()
     return return_value
+
+
+def iterate_grades_for(course_id, students, xmodule_instance_args, action_name='graded'):
+    """Given a course_id and xmodule_instance_args, yield a tuple of:
+
+    (student, gradeset, err_msg) for every student enrolled in the course.
+
+    If an error occured, gradeset will be an empty dict and err_msg will be an
+    exception message. If there was no error, err_msg is an empty string.
+
+    The gradeset is a dictionary with the following fields:
+
+    - grade : A final letter grade.
+    - percent : The final percent for the class (rounded up).
+    - section_breakdown : A breakdown of each section that makes
+        up the grade. (For display)
+    - grade_breakdown : A breakdown of the major components that
+        make up the final grade. (For display)
+    - raw_scores contains scores for every graded module
+    """
+    # Find the course descriptor.
+    # Depth is set to zero, to indicate that the number of levels of children
+    # for the modulestore to cache should be infinite.  If the course is not found,
+    # let it throw the exception.
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    course_descriptor = modulestore().get_instance(course_id, course_loc, depth=0)
+
+    for student in students:
+        with dog_stats_api.timer('instructor_tasks.student.time.step', tags=['action:{name}'.format(name=action_name)]):
+            track_function = _get_track_function_for_task(student, xmodule_instance_args)
+            xqueue_callback_url_prefix = _get_xqueue_callback_url_prefix(xmodule_instance_args)
+
+            try:
+                gradeset = grade_as_task(
+                    student,
+                    course_descriptor,
+                    track_function,
+                    xqueue_callback_url_prefix
+                )
+                yield student, gradeset, ""
+            except Exception as exc:
+                # Keep marching on even if this student couldn't be graded for
+                # some reason.
+                TASK_LOG.exception(
+                    'Cannot grade student %s (%s) because of exception: %s',
+                    student.username,
+                    student.id,
+                    exc.message
+                )
+                yield student, {}, exc.message
+
+
+S3_ENABLED = False
+
+def store_in_s3(course_id, filename, rows):
+    """Given a course_id, filename, and rows (each row is an iterable of strings),
+    write this data out to S3. If we're in development mode, we'll put this in
+    /tmp/edx/course_id
+    """
+    output_buffer = StringIO()
+    gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
+    csv.writer(gzip_file).writerows(rows)
+    gzip_file.close()
+
+    with open("/tmp/{}.gz".format(filename), "wb") as f:
+        f.write(output_buffer.getvalue())
+
+
+def path_for_course(course_id):
+    return "/grades/{}/"
+
+def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    """
+    # Get start time for task:
+    start_time = time()
+
+    STATUS_INTERVAL = 100
+
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
+    # But when doing grading at this scale, the memory required to store the resulting
+    # enrolled_students is too large to fit comfortably in memory, and subsequent
+    # course grading requests lead to memory fragmentation.  So we will err here on the
+    # side of smaller memory allocations at the cost of additional lookups.
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:200]
+
+    # perform the main loop
+    num_attempted = 0
+    num_succeeded = 0
+    num_failed = 0
+    num_total = enrolled_students.count()
+    curr_step = "Calculating Grades"
+
+    def update_task_progress():
+        """Return a dict containing info about current task"""
+        current_time = time()
+        progress = {
+            'action_name': action_name,
+            'attempted': num_attempted,
+            'succeeded': num_succeeded,
+            'failed' : num_failed,
+            'total' : num_total,
+            'duration_ms': int((current_time - start_time) * 1000),
+            'step' : curr_step,
+        }
+        _get_current_task().update_state(state=PROGRESS, meta=progress)
+
+        return progress
+
+    # Loop over all our students and build a
+    header = None
+    all_grades = iterate_grades_for(course_id, enrolled_students, xmodule_instance_args, action_name)
+    rows = []
+    err_rows = [["id", "username", "error_msg"]]
+    for student, gradeset, err_msg in all_grades:
+        # Periodically update task status (this is a db write)
+        if num_attempted % STATUS_INTERVAL == 0:
+            update_task_progress()
+        num_attempted += 1
+
+        # An empty gradeset means we failed to grade a student.
+        if gradeset:
+            num_succeeded += 1
+            if not header:
+                header = [section['label'] for section in gradeset[u'section_breakdown']]
+                rows.append(["id", "email", "username", "grade"] + header)
+
+            percents = {
+                section['label']: section.get('percent', 0.0)
+                for section in gradeset[u'section_breakdown']
+                if 'label' in section
+            }
+            row_percents = [percents[label] for label in header]
+            rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
+        else:
+            num_failed += 1
+            err_rows.append([student.id, student.username, err_msg])
+
+    curr_step = "Uploading CSVs"
+    update_task_progress()
+    store_in_s3(course_id, "grades_timestamp.csv", rows)
+    store_in_s3(course_id, "grades_timestamp_err.csv", err_rows)
+
+    # One last update before we close out...
+    return update_task_progress()

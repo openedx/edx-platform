@@ -33,6 +33,7 @@ from instructor_task.tasks_helper import (
     delete_problem_module_state,
     perform_enrolled_student_update,
     perform_module_state_update,
+    push_grades_to_s3,
     rescore_problem_module_state,
     reset_attempts_module_state,
     update_offline_grade,
@@ -154,26 +155,10 @@ def update_offline_grades(entry_id, xmodule_instance_args):
     visit_fcn = partial(perform_enrolled_student_update, update_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
 
-#@task(base=BaseInstructorTask)  # pylint: disable=E1102
-#def push_grades_to_s3(entry_id, xmodule_instance_args):
-#    """
-#
-#    """
-#    action_name = 'graded'
-#    all_grades = OrderedDict()
-#
-#    def append_student_grades(_course, student):
-#        grades_for_student = somefunc(student)
-#        if grades_for_student:
-#            all_grades[student.username] = grades_for_student
-#
-#        grades_stream.write(grades_line.encode('utf-8'))
-#
-#        return True
-#
-#    visit_fcn = partial(perform_enrolled_student_update, append)
-#    result = run_main_task(entry_id, visit_fcn, action_name)
-#
-#    # Upload to s3
-#
-#    return result
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+def grade_course(entry_id, xmodule_instance_args):
+    """
+
+    """
+    task_fn = partial(push_grades_to_s3, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, 'graded')
