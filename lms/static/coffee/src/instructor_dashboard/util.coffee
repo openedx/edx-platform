@@ -36,7 +36,7 @@ create_task_list_table = ($table_tasks, tasks_data) ->
     enableCellNavigation: true
     enableColumnReorder: false
     autoHeight: true
-    rowHeight: 60
+    rowHeight: 100
     forceFitColumns: true
 
   columns = [
@@ -120,7 +120,7 @@ class PendingInstructorTasks
 
     # start polling for task list
     # if the list is in the DOM
-    if @$table_running_tasks.length > 0
+    if @$table_running_tasks.length
       # reload every 20 seconds.
       TASK_LIST_POLL_INTERVAL = 20000
       @reload_running_tasks_list()
@@ -132,8 +132,12 @@ class PendingInstructorTasks
     $.ajax
       dataType: 'json'
       url: list_endpoint
-      success: (data) => create_task_list_table @$table_running_tasks, data.tasks
-      error: std_ajax_err => console.warn "error listing all instructor tasks"
+      success: (data) =>
+        if data.tasks.length
+          create_task_list_table @$table_running_tasks, data.tasks
+        else
+          console.log "No pending instructor tasks to display"
+      error: std_ajax_err => console.error "Error finding pending instructor tasks to display"
     ### /Pending Instructor Tasks Section ####
 
 # export for use

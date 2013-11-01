@@ -10,6 +10,7 @@ such that the value can be defined later than this assignment (file load order).
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
+create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
 
 class SendEmail
   constructor: (@$container) ->
@@ -20,6 +21,9 @@ class SendEmail
     @$btn_send = @$container.find("input[name='send']'")
     @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
+    @$history_request_response_error = @$container.find(".history-request-response-error")
+    @$btn_task_history_email = @$container.find("input[name='task-history-email']'")
+    @$table_task_history_email = @$container.find(".task-history-email-table")
 
     # attach click handlers
 
@@ -62,6 +66,22 @@ class SendEmail
         else
           @$task_response.empty()
           @$request_response_error.empty()
+
+    # list task history for email
+    @$btn_task_history_email.click =>
+      url = @$btn_task_history_email.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url: url
+        success: (data) =>
+          if data.tasks.length
+            create_task_list_table @$table_task_history_email, data.tasks
+          else
+            @$history_request_response_error.text gettext("There is no email history for this course.")
+            # Enable the msg-warning css display
+            $(".msg-warning").css({"display":"block"})
+        error: std_ajax_err =>
+          @$history_request_response_error.text gettext("There was an error obtaining email task history for this course.")
 
   fail_with_error: (msg) ->
     console.warn msg
