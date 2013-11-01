@@ -281,6 +281,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
+        # self.child_history is initialized as [].  record_latest_score() and record_latest_post_assessment()
+        # operate on self.child_history[-1].  Thus we have to make sure child_history is not [].
+        # Handle at this level instead of in record_*() because this is a good place to reduce the number of conditions
+        # and also keep the persistent state from changing.
         if self.child_history:
             self.record_latest_score(new_score_msg['score'])
             self.record_latest_post_assessment(score_msg)
