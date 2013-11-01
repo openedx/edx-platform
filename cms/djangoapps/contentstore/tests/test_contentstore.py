@@ -1200,9 +1200,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         handout_location = Location(['i4x', 'edX', 'toy', 'course_info', 'handouts'])
+        # get the translation
+        handouts_locator = loc_mapper().translate_location('edX/toy/2012_Fall', handout_location)
 
-        # get module info
-        resp = self.client.get_html(reverse('module_info', kwargs={'module_location': handout_location}))
+        # get module info (json)
+        resp = self.client.get(handouts_locator.url_reverse('/xblock', ''))
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
@@ -1600,10 +1602,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # course info
-        resp = self.client.get(reverse('course_info',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get(new_location.url_reverse('course_info'))
         self.assertEqual(resp.status_code, 200)
 
         # settings_details
@@ -1627,14 +1626,15 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.get_html(reverse('edit_subsection',
-                                       kwargs={'location': subsection_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_subsection', kwargs={'location': subsection_location.url()})
+        )
         self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.get_html(reverse('edit_unit',
-                                       kwargs={'location': unit_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_unit', kwargs={'location': unit_location.url()}))
         self.assertEqual(resp.status_code, 200)
 
         def delete_item(category, name):

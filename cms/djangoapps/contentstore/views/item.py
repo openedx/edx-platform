@@ -3,6 +3,7 @@
 import logging
 from uuid import uuid4
 from requests.packages.urllib3.util import parse_url
+from static_replace import replace_static_urls
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth.decorators import login_required
@@ -24,6 +25,7 @@ from xmodule.x_module import XModuleDescriptor
 from django.views.decorators.http import require_http_methods
 from xmodule.modulestore.locator import BlockUsageLocator
 from student.models import CourseEnrollment
+from xblock.fields import Scope
 
 __all__ = ['save_item', 'create_item', 'orphan', 'xblock_handler']
 
@@ -33,7 +35,8 @@ log = logging.getLogger(__name__)
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
-@require_http_methods(("DELETE"))
+# pylint: disable=unused-argument
+@require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
 def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
@@ -44,10 +47,19 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         json: delete this xblock instance from the course. Supports query parameters "recurse" to delete
         all children and "all_versions" to delete from all (mongo) versions.
     """
-    if request.method == 'DELETE':
-        location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
-        if not has_access(request.user, location):
-            raise PermissionDenied()
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if request.method == 'GET':
+        rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
+        rsp = _get_module_info(location, rewrite_static_links=rewrite_static_links)
+        return JsonResponse(rsp)
+    elif request.method in ("POST", "PUT"):
+        # Replace w/ save_item from below
+        rsp = _set_module_info(location, request.json)
+        return JsonResponse(rsp)
+    elif request.method == 'DELETE':
 
         old_location = loc_mapper().translate_locator_to_location(location)
 
@@ -261,3 +273,104 @@ def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, bl
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()
+
+
+def _get_module_info(usage_loc, rewrite_static_links=False):
+    """
+    metadata, data, id representation of a leaf module fetcher.
+    :param usage_loc: A BlockUsageLocator
+    """
+    old_location = loc_mapper().translate_locator_to_location(usage_loc)
+    store = get_modulestore(old_location)
+    try:
+        module = store.get_item(old_location)
+    except ItemNotFoundError:
+        if old_location.category in ['course_info']:
+            # create a new one
+            store.create_and_save_xmodule(old_location)
+            module = store.get_item(old_location)
+        else:
+            raise
+
+    data = module.data
+    if rewrite_static_links:
+        # we pass a partially bogus course_id as we don't have the RUN information passed yet
+        # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
+        data = replace_static_urls(
+            module.data,
+            None,
+            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
+        )
+
+    return {
+        'id': unicode(usage_loc),
+        'data': data,
+        'metadata': module.get_explicitly_set_fields_by_scope(Scope.settings)
+    }
+
+
+def _set_module_info(usage_loc, post_data):
+    """
+    Old metadata, data, id representation leaf module updater.
+    :param usage_loc: a BlockUsageLocator
+    :param post_data: the payload with data, metadata, and possibly children (even tho the getter
+    doesn't support children)
+    """
+    # TODO replace with save_item: differences
+    #  - this doesn't handle nullout
+    #  - this returns the new model
+    old_location = loc_mapper().translate_locator_to_location(usage_loc)
+    store = get_modulestore(old_location)
+    module = None
+    try:
+        module = store.get_item(old_location)
+    except ItemNotFoundError:
+        # new module at this location: almost always used for the course about pages; thus, no parent. (there
+        # are quite a handful of about page types available for a course and only the overview is pre-created)
+        store.create_and_save_xmodule(old_location)
+        module = store.get_item(old_location)
+
+    if post_data.get('data') is not None:
+        data = post_data['data']
+        store.update_item(old_location, data)
+    else:
+        data = module.get_explicitly_set_fields_by_scope(Scope.content)
+
+    if post_data.get('children') is not None:
+        children = post_data['children']
+        store.update_children(old_location, children)
+
+    # cdodge: also commit any metadata which might have been passed along in the
+    # POST from the client, if it is there
+    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
+    # not presented to the end-user for editing. So let's fetch the original and
+    # 'apply' the submitted metadata, so we don't end up deleting system metadata
+    if post_data.get('metadata') is not None:
+        posted_metadata = post_data['metadata']
+
+        # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        for metadata_key, value in posted_metadata.items():
+            field = module.fields[metadata_key]
+
+            if value is None:
+                # remove both from passed in collection as well as the collection read in from the modulestore
+                field.delete_from(module)
+            else:
+                try:
+                    value = field.from_json(value)
+                except ValueError:
+                    return JsonResponse({"error": "Invalid data"}, 400)
+                field.write_to(module, value)
+
+        # commit to datastore
+        metadata = module.get_explicitly_set_fields_by_scope(Scope.settings)
+        store.update_metadata(old_location, metadata)
+    else:
+        metadata = module.get_explicitly_set_fields_by_scope(Scope.settings)
+
+    return {
+        'id': unicode(usage_loc),
+        'data': data,
+        'metadata': metadata
+    }

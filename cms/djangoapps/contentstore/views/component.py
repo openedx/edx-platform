@@ -21,9 +21,7 @@ from xmodule.modulestore.django import loc_mapper
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
-from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import (get_modulestore, get_lms_link_for_item,
-    compute_unit_state, UnitState, get_course_for_item)
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -41,7 +39,7 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'create_draft',
            'publish_draft',
            'unpublish_unit',
-           'module_info']
+           ]
 
 log = logging.getLogger(__name__)
 
@@ -240,7 +238,7 @@ def edit_unit(request, location):
                     pass
     else:
         log.error(
-            "Improper format for course advanced keys! %",
+            "Improper format for course advanced keys! %s",
             course_advanced_keys
         )
 
@@ -393,39 +391,3 @@ def unpublish_unit(request):
     _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
-
-
-@expect_json
-@require_http_methods(("GET", "POST", "PUT"))
-@login_required
-@ensure_csrf_cookie
-def module_info(request, module_location):
-    "Get or set information for a module in the modulestore"
-    location = Location(module_location)
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
-    logging.debug('rewrite_static_links = {0} {1}'.format(
-        request.GET.get('rewrite_url_links', False),
-        rewrite_static_links)
-    )
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    if request.method == 'GET':
-        rsp = get_module_info(
-            get_modulestore(location),
-            location,
-            rewrite_static_links=rewrite_static_links
-        )
-    elif request.method in ("POST", "PUT"):
-        rsp = set_module_info(
-            get_modulestore(location),
-            location, request.json
-        )
-    return JsonResponse(rsp)
