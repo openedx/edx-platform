@@ -401,31 +401,27 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @receiver(unenroll_done, sender=CourseEnrollment)
-    def refund_cert_callback(sender, **kwargs):
+    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
         refund.
 
-        Returns the refunded certificate on a successful refund.  If no refund is necessary, it returns nothing.
-        If an error that the user should see occurs, it returns a string specifying the error.
+        Returns the refunded certificate on a successful refund; else, it returns nothing.
         """
-        mode = kwargs['course_enrollment'].mode
-        course_id = kwargs['course_enrollment'].course_id
-        user = kwargs['course_enrollment'].user
 
         # Only refund verified cert unenrollments that are within bounds of the expiration date
-        if (mode != 'verified'):
+        if course_enrollment.mode != 'verified':
             return
 
-        if (CourseMode.mode_for_course(course_id, 'verified') is None):
+        if CourseMode.mode_for_course(course_enrollment.course_id, 'verified') is None:
             return
 
-        target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=user, status='purchased', mode='verified')
+        target_certs = CertificateItem.objects.filter(course_id=course_enrollment.course_id, user_id=course_enrollment.user, status='purchased', mode='verified')
         try:
             target_cert = target_certs[0]
         except IndexError:
-            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", user, course_id)
+            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
             return
         target_cert.status = 'refunded'
         target_cert.save()
@@ -433,13 +429,20 @@ class CertificateItem(OrderItem):
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
         subject = _("[Refund] User-Requested Refund")
-        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=user, user_email=user.email, order_number=order_number)
+        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
+                                                                                                       user_email=course_enrollment.user.email,
+                                                                                                       order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
         from_email = [settings.PAYMENT_SUPPORT_EMAIL]
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except (smtplib.SMTPException, BotoServerError):
-            log.error('Failed sending email to billing request a refund for verified certiciate (User %s, Course %s)', user, course_id)
+            err_str = 'Failed sending email to billing request a refund for verified certiciate (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})'
+            log.error(err_str.format(
+                user=course_enrollment.user,
+                course=course_enrollment.course_id,
+                ce_id=course_enrollment.id,
+                order=order_number))
 
         return target_cert
 
