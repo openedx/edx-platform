@@ -12,6 +12,7 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import loc_mapper
 
 from ..utils import get_course_for_item, get_modulestore
 
@@ -117,7 +118,12 @@ def edit_tabs(request, org, course, coursename):
         static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
     components = [
-        static_tab.location.url()
+        [
+            static_tab.location.url(),
+            loc_mapper().translate_location(
+                course_item.location.course_id, static_tab.location, False, True
+            ).url_reverse("xblock")
+        ]
         for static_tab
         in static_tabs
     ]

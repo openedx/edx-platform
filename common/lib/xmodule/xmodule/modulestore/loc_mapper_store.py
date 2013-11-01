@@ -167,13 +167,16 @@ class LocMapperStore(object):
 
         return BlockUsageLocator(course_id=entry['course_id'], branch=branch, usage_id=usage_id)
 
-    def translate_locator_to_location(self, locator):
+    def translate_locator_to_location(self, locator, get_course=False):
         """
         Returns an old style Location for the given Locator if there's an appropriate entry in the
         mapping collection. Note, it requires that the course was previously mapped (a side effect of
         translate_location or explicitly via create_map_entry) and
         the block's usage_id was previously stored in the
         map (a side effect of translate_location or via add|update_block_location).
+
+        If get_course, then rather than finding the map for this locator, it finds the 'course' root
+        for the mapped course.
 
         If there are no matches, it returns None.
 
@@ -191,7 +194,16 @@ class LocMapperStore(object):
         for candidate in maps:
             for old_name, cat_to_usage in candidate['block_map'].iteritems():
                 for category, usage_id in cat_to_usage.iteritems():
-                    if usage_id == locator.usage_id:
+                    if get_course:
+                        if category == 'course':
+                            return Location(
+                                'i4x',
+                                candidate['_id']['org'],
+                                candidate['_id']['course'],
+                                'course',
+                                self._decode_from_mongo(old_name),
+                                None)
+                    elif usage_id == locator.usage_id:
                         # figure out revision
                         # enforce the draft only if category in [..] logic
                         if category in draft.DIRECT_ONLY_CATEGORIES:

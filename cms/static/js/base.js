@@ -279,15 +279,14 @@ function _deleteItem($el, type) {
                     });
                     deleting.show();
 
-                    $.postJSON('/delete_item',
-                           {'id': id,
-                            'delete_children': true,
-                            'delete_all_versions': true},
-                           function(data) {
-                               $el.remove();
-                               deleting.hide();
-                           }
-                          );
+                    $.ajax({
+                        type: 'DELETE',
+                        url: $el.data('update_url')+'?'+ $.param({recurse: true, all_versions: true}),
+                        success: function () {
+                            $el.remove();
+                            deleting.hide();
+                        }
+                    });
                 }
             },
             secondary: {
