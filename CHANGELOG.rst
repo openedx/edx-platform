@@ -33,7 +33,7 @@ disabilites.  (LMS-1303)
 
 Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
 
-Studio: Change course overview page, checklists, assets, and course staff
+Studio: Change course overview page, checklists, assets, import, export, and course staff
 management page URLs to a RESTful interface. Also removed "\listing", which
 duplicated "\index".
 

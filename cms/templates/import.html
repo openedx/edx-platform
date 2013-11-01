@@ -34,7 +34,10 @@
 
         <p class="error-block"></p>
 
-        <a href="#" class="action action-choose-file choose-file-button">${_("Choose File")}</a>
+        <a href="#" class="action action-choose-file choose-file-button">
+          <i class="icon-upload"></i>
+          <span class="copy">${_("Choose a File to Import")}</span>
+        </a>
 
         <div class="wrapper wrapper-file-name file-name-block">
             <h3 class="title">
@@ -131,6 +134,13 @@
         <h3 class="title-3">${_("Warning: Auto-generated Nodes")}</h3>
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
+      </div>
+
+      <div class="bit">
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <h3 class="title-3">${_("Course Team Info and Exporting/Importing")}</h3>
+
+        <p>${_("Please note that when importing course content, your course team info will not be changed by the imported course's information.")}</p>
       </div>
     </aside>
   </section>

@@ -1,3 +1,4 @@
+import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
@@ -31,11 +32,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
-        'contentstore.views.export_course', name='export_course'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/generate_export/(?P<name>[^/]+)$',
-        'contentstore.views.generate_export_course', name='generate_export_course'),
 
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
@@ -124,6 +120,7 @@ urlpatterns += patterns(
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
+    url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
 )
 
 js_info_dict = {

@@ -1594,10 +1594,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # export page
-        resp = self.client.get(reverse('export_course',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get_html(new_location.url_reverse('export/', ''))
         self.assertEqual(resp.status_code, 200)
 
         # course team
