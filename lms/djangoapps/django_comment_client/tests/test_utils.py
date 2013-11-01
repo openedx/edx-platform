@@ -39,6 +39,7 @@ class AccessUtilsTestCase(TestCase):
         self.course_id = 'edX/toy/2012_Fall'
         self.student_role = RoleFactory(name='Student', course_id=self.course_id)
         self.moderator_role = RoleFactory(name='Moderator', course_id=self.course_id)
+        self.community_ta_role = RoleFactory(name='Community TA', course_id=self.course_id)
         self.student1 = UserFactory(username='student', email='student@edx.org')
         self.student1_enrollment = CourseEnrollmentFactory(user=self.student1)
         self.student_role.users.add(self.student1)
@@ -47,10 +48,14 @@ class AccessUtilsTestCase(TestCase):
         self.moderator = UserFactory(username='moderator', email='staff@edx.org', is_staff=True)
         self.moderator_enrollment = CourseEnrollmentFactory(user=self.moderator)
         self.moderator_role.users.add(self.moderator)
+        self.community_ta1 = UserFactory(username='community_ta1', email='community_ta1@edx.org')
+        self.community_ta_role.users.add(self.community_ta1)
+        self.community_ta2 = UserFactory(username='community_ta2', email='community_ta2@edx.org')
+        self.community_ta_role.users.add(self.community_ta2)
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
-        expected = {u'Moderator': [3], u'Student': [1, 2], 'Staff': [3]}
+        expected = {u'Moderator': [3], u'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
 
     def test_has_forum_access(self):
