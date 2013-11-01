@@ -91,30 +91,30 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
               <legend class="sr">${_("Required Information to Create a New Course")}</legend>
 
               <ol class="list-input">
-                <li class="field field-inline text required" id="field-course-name">
+                <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
                   <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
-                  <span class="tip tip-stacked">${_("The public display name for your course.")}</span>
+                  <span class="tip">${_("The public display name for your course.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
-                <li class="field field-inline text required" id="field-organization">
+                <li class="field text required" id="field-organization">
                   <label for="new-course-org">${_("Organization")}</label>
-                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. MITX or IMF')}" />
-                  <span class="tip tip-stacked">${_("The name of the organization sponsoring the course")}  - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                  <span class="tip">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
 
-                <li class="field field-inline text required" id="field-course-number">
+                <li class="field text required" id="field-course-number">
                   <label for="new-course-number">${_("Course Number")}</label>
                   <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
-                  <span class="tip tip-stacked">${_("The unique number that identifies your course within your organization")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <span class="tip">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
 
-                <li class="field field-inline text required" id="field-course-run">
+                <li class="field text required" id="field-course-run">
                   <label for="new-course-run">${_("Course Run")}</label>
-                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2013_Spring')}" />
-                  <span class="tip tip-stacked">${_("The term in which your course will run")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
+                  <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
               </ol>
