@@ -11,6 +11,8 @@ it pauses on the end time.
 
 Blades: Disallow users to enter video url's in http.
 
+LMS: Improve the acessibility of the forum follow post buttons.
+
 Blades: Fix bug when the speed can only be changed when the video is playing.
 
 LMS: Change bulk email implementation to use less memory, and to better handle
