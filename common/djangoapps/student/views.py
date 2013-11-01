@@ -695,7 +695,7 @@ def disable_account_ajax(request):
         context['message'] = _("User with username {} does not exist").format(username)
         return JsonResponse(context, status=400)
     else:
-        user_account, _succss = UserStanding.objects.get_or_create(
+        user_account, _success = UserStanding.objects.get_or_create(
             user=user, defaults={'changed_by': request.user},
         )
         if account_action == 'disable':
