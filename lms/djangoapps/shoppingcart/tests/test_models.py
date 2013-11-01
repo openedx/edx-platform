@@ -20,7 +20,7 @@ from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
-from django.utils.timezone import UTC
+import pytz
 import datetime
 
 
@@ -384,7 +384,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(UTC()).date() + many_days))
+                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -407,7 +407,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(UTC()).date() + many_days))
+                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -436,12 +436,12 @@ class CertificateItemTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
         cart.purchase()
 
-        course_mode.expiration_date = (datetime.datetime.now(UTC()).date() - many_days)
+        course_mode.expiration_date = (datetime.datetime.now(pytz.utc).date() - many_days)
         course_mode.save()
 
         CourseEnrollment.unenroll(self.user, course_id)
         target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=self.user, status='refunded', mode='verified')
-        self.assertEqual(len(target_certs),0)
+        self.assertEqual(len(target_certs), 0)
 
     def test_refund_cert_no_cert_exists(self):
         # If there is no paid certificate, the refund callback should return nothing

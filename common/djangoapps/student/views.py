@@ -470,9 +470,7 @@ def change_enrollment(request):
         )
 
     elif action == "unenroll":
-        try:
-            CourseEnrollment.enrollment_mode_for_user(user, course_id)
-        except CourseEnrollment.DoesNotExist:
+        if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
         org, course_num, run = course_id.split("/")

@@ -8,7 +8,7 @@ import courseware.access as access
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from .factories import CourseEnrollmentAllowedFactory
 import datetime
-from django.utils.timezone import UTC
+import pytz
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -81,7 +81,7 @@ class AccessTestCase(TestCase):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         u = Mock()
         d = Mock()
-        d.start = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        d.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(u, d, 'load'))
@@ -89,8 +89,8 @@ class AccessTestCase(TestCase):
 
     def test__has_access_course_desc_can_enroll(self):
         u = Mock()
-        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates
@@ -118,7 +118,7 @@ class AccessTestCase(TestCase):
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
 
     def test__has_access_refund(self):
-        today = datetime.datetime.now(UTC())
+        today = datetime.datetime.now(pytz.utc)
         one_day_extra = datetime.timedelta(days=1)
         user = UserFactory.create()
 
