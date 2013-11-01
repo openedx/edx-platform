@@ -65,6 +65,12 @@ margin: -10px 0 0 0;
 width: 32.20339%;
 float: right;
 }
+.modal-form-error {
+background: tint($red,90%);
+color: rgb(143, 14, 14);
+display: block;
+font-weight: bold;
+}
 </style>
 
 <style>
@@ -249,6 +255,7 @@ ${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
          $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
        }
        $('#login_error').html(json.value).stop().css("display", "block");
+       $('#login_error').effect("shake");
      }
     });
   })(this)
