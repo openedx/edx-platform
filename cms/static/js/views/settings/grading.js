@@ -273,7 +273,7 @@ var GradingView = ValidatingView.extend({
 
         // Munge existing grade labels?
         // If going from Pass/Fail to 3 levels, change to Pass to A
-        if (gradeLength === 1 && this.descendingCutoffs[0]['designation'] === gettext('Pass')) {
+        if (gradeLength === 1 && gettext(this.descendingCutoffs[0]['designation']) === gettext('Pass')) {
             this.descendingCutoffs[0]['designation'] = this.GRADES[0];
             this.setTopGradeLabel();
         }
