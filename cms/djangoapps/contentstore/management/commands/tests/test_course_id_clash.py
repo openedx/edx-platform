@@ -3,7 +3,9 @@ from StringIO import StringIO
 from django.test import TestCase
 from django.core.management import call_command
 from xmodule.modulestore.tests.factories import CourseFactory
+from nose.plugins.skip import SkipTest
 
+@SkipTest
 class ClashIdTestCase(TestCase):
     """
     Test for course_id_clash.
