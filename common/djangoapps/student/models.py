@@ -33,6 +33,7 @@ from pytz import UTC
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
+
 class UserStanding(models.Model):
     """
     This table contains a student's account's status.

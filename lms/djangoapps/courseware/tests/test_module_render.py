@@ -26,6 +26,9 @@ from .factories import UserFactory
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests of courseware.module_render
+    """
     def setUp(self):
         self.location = ['i4x', 'edX', 'toy', 'chapter', 'Overview']
         self.course_id = 'edX/toy/2012_Fall'

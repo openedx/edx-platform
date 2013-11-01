@@ -14,6 +14,7 @@ import string       # pylint: disable=W0402
 import re
 import logging
 import operator
+import requests
 import sympy
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
@@ -25,11 +26,9 @@ from sympy.physics.quantum.state import *
 # import sympy.physics.quantum.qubit
 
 from xml.sax.saxutils import unescape
-import sympy
 import unicodedata
 from lxml import etree
 #import subprocess
-import requests
 from copy import deepcopy
 
 log = logging.getLogger(__name__)
