@@ -60,23 +60,23 @@ function (VideoPlayer) {
      *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
-        state.setSpeed      = _.bind(setSpeed, state);
-        state.youtubeId     = _.bind(youtubeId, state);
-        state.getDuration   = _.bind(getDuration, state);
-        state.trigger       = _.bind(trigger, state);
-        state.stopBuffering = _.bind(stopBuffering, state);
+        var methodsDict = {
+            bindTo: bindTo,
+            checkStartEndTimes: checkStartEndTimes,
+            fetchMetadata: fetchMetadata,
+            getDuration: getDuration,
+            getVideoMetadata: getVideoMetadata,
+            initialize: initialize,
+            parseSpeed: parseSpeed,
+            parseVideoSources: parseVideoSources,
+            parseYoutubeStreams: parseYoutubeStreams,
+            setSpeed: setSpeed,
+            stopBuffering: stopBuffering,
+            trigger: trigger,
+            youtubeId: youtubeId
+        };
 
-        // Old private functions. Now also public so that can be
-        // tested by Jasmine.
-
-        state.initialize          = _.bind(initialize, state);
-        state.parseSpeed          = _.bind(parseSpeed, state);
-        state.fetchMetadata       = _.bind(fetchMetadata, state);
-        state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
-        state.parseVideoSources   = _.bind(parseVideoSources, state);
-        state.getVideoMetadata    = _.bind(getVideoMetadata, state);
-
-        state.checkStartEndTimes  = _.bind(checkStartEndTimes, state);
+        bindTo(methodsDict, state, state);
     }
 
     // function _renderElements(state)
@@ -97,7 +97,7 @@ function (VideoPlayer) {
         if(state.videoType === 'youtube') {
             YT.ready(function() {
                 VideoPlayer(state);
-            })
+            });
         } else {
             VideoPlayer(state);
         }
@@ -232,6 +232,25 @@ function (VideoPlayer) {
     // keyword) is the 'state' object. The magic private function that makes
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+
+    // function bindTo(methodsDict, obj, context, rewrite)
+    // Creates a new function with specific context and assigns it to the provided
+    // object.
+    function bindTo(methodsDict, obj, context, rewrite) {
+        $.each(methodsDict, function(name, method) {
+            if (_.isFunction(method)) {
+
+                if (_.isUndefined(rewrite)) {
+                    rewrite = true;
+                }
+
+                if (_.isUndefined(obj[name]) || rewrite) {
+                    obj[name] = _.bind(method, context);
+                }
+            }
+        });
+    }
 
     // function initialize(element)
     // The function set initial configuration and preparation.
