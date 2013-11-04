@@ -47,6 +47,10 @@ class InheritanceMixin(XBlockMixin):
         help="String customization substitutions for particular locations",
         scope=Scope.settings
     )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings)
 
 
 def compute_inherited_metadata(descriptor):

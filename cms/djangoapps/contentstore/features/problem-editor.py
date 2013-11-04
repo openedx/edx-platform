@@ -5,6 +5,7 @@ import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
+from advanced_settings import change_value
 from course_import import import_file, go_to_import
 from selenium.webdriver.common.keys import Keys
 
@@ -159,9 +160,19 @@ def cancel_does_not_save_changes(step):
     step.given("I see the advanced settings and their expected values")
 
 
+@step('I have enabled latex compiler')
+def enable_latex_compiler(step):
+    url = world.browser.url
+    step.given("I select the Advanced Settings")
+    change_value(step, 'use_latex_compiler', True)
+    world.visit(url)
+    world.wait_for_xmodule()
+
+
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
     world.create_course_with_unit()
+    step.given('I have enabled latex compiler')
     world.create_component_instance(
         step=step,
         category='problem',

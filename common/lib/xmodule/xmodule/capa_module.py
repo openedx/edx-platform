@@ -158,6 +158,11 @@ class CapaFields(object):
         # TODO: someday it should be possible to not duplicate this definition here
         # and in inheritance.py
     )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):
@@ -1174,10 +1179,23 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown,
-                         'enable_markdown': self.markdown is not None})
+        _context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # VS[compat]
@@ -1193,9 +1211,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
-                                    CapaDescriptor.text_customization])
+        non_editable_fields.extend([
+            CapaDescriptor.due,
+            CapaDescriptor.graceperiod,
+            CapaDescriptor.force_save_button,
+            CapaDescriptor.markdown,
+            CapaDescriptor.text_customization,
+            CapaDescriptor.use_latex_compiler,
+        ])
         return non_editable_fields
 
     # Proxy to CapaModule for access to any of its attributes
