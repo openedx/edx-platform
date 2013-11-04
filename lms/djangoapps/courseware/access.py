@@ -205,10 +205,8 @@ def _has_access_course_desc(user, course, action):
 
     def can_refund():
         """
-        For paid/verified certificates, students may receive a refund IFF the deadline
-        for refunds has not yet passed.  Note that this function *only* checks whether
-        or not that deadline has passed; checking whether the student actually *purchased*
-        a paid/verified certificate must be done elsewhere.
+        For paid/verified certificates, students may receive a refund IFF they have
+        a verified certificate and the deadline for refunds has not yet passed.
         """
         course_mode = CourseMode.mode_for_course(course.id, 'verified')
         if course_mode is None:
