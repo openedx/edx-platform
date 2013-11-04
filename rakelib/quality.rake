@@ -1,5 +1,9 @@
 def run_pylint(system, report_dir, flags='')
-    apps = Dir["#{system}", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
+    dirs = Dir["#{system}", "#{system}/djangoapps/*"]
+    if system != 'lms'
+        dirs += Dir["#{system}/lib/*"]
+    end
+    apps = dirs.map do |app|
         File.basename(app)
     end.select do |app|
         app !=~ /.pyc$/
@@ -61,7 +65,7 @@ task :quality => [dquality_dir, :install_python_prereqs] do
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
     pylint_reports = FileList[File.join(REPORT_DIR, '**/pylint.report')].join(' ')
-    pythonpath_prefix = "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:common:common/djangoapps:common/lib"
+    pythonpath_prefix = "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:cms:cms/djangoapps:cms/lib:common:common/djangoapps:common/lib"
     sh("#{pythonpath_prefix} diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html #{pylint_reports}")
     sh("#{pythonpath_prefix} diff-quality --violations=pylint #{pylint_reports}")
 end

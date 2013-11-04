@@ -2,7 +2,7 @@ import django.http
 from django.test import TestCase
 import json
 
-import comment_client
+import lms.lib.comment_client
 import django_comment_client.middleware as middleware
 
 
@@ -11,9 +11,9 @@ class AjaxExceptionTestCase(TestCase):
         self.a = middleware.AjaxExceptionMiddleware()
         self.request1 = django.http.HttpRequest()
         self.request0 = django.http.HttpRequest()
-        self.exception1 = comment_client.CommentClientRequestError('{}', 401)
-        self.exception2 = comment_client.CommentClientRequestError('Foo!', 404)
-        self.exception0 = comment_client.CommentClient500Error("Holy crap the server broke!")
+        self.exception1 = lms.lib.comment_client.CommentClientRequestError('{}', 401)
+        self.exception2 = lms.lib.comment_client.CommentClientRequestError('Foo!', 404)
+        self.exception0 = lms.lib.comment_client.CommentClient500Error("Holy crap the server broke!")
         self.request1.META['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
         self.request0.META['HTTP_X_REQUESTED_WITH'] = "SHADOWFAX"
 

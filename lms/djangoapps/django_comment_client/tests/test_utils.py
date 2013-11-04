@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from django_comment_common.models import Role, Permission
-from factories import RoleFactory
+from django_comment_client.tests.factories import RoleFactory
 import django_comment_client.utils as utils
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
