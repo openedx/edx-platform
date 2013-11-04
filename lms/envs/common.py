@@ -439,12 +439,12 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+SERVER_EMAIL = 'devops@example.com'
+TECH_SUPPORT_EMAIL = 'technical@example.com'
+CONTACT_EMAIL = 'info@example.com'
+BUGS_EMAIL = 'bugs@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -513,7 +513,7 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ################################# Pearson TestCenter config  ################
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
-# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@example.com"
 
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
@@ -524,7 +524,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
+PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
@@ -542,7 +542,7 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'url': 'http://example.com/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
     'staff_grading': 'staff_grading',
@@ -861,7 +861,7 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 # Suffix used to construct 'from' email address for bulk emails.
 # A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
