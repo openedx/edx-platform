@@ -26,6 +26,7 @@ from django.dispatch import receiver
 import django.dispatch
 from django.forms import ModelForm, forms
 
+from course_modes.models import CourseMode
 import comment_client as cc
 from pytz import UTC
 
@@ -925,6 +926,18 @@ class CourseEnrollment(models.Model):
         if self.is_active:
             self.is_active = False
             self.save()
+
+    def refundable(self):
+        """
+        For paid/verified certificates, students may receive a refund IFF they have
+        a verified certificate and the deadline for refunds has not yet passed.
+        """
+        course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
+        if course_mode is None:
+            return False
+        else:
+            return True
+
 
 
 class CourseEnrollmentAllowed(models.Model):

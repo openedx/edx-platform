@@ -10,10 +10,6 @@ from .factories import CourseEnrollmentAllowedFactory
 import datetime
 import pytz
 
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from course_modes.tests.factories import CourseModeFactory
-
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AccessTestCase(TestCase):
@@ -116,28 +112,3 @@ class AccessTestCase(TestCase):
 
         # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
-
-    def test__has_access_refund(self):
-        today = datetime.datetime.now(pytz.utc)
-        one_day_extra = datetime.timedelta(days=1)
-        user = UserFactory.create()
-
-        course_nonrefundable_id = 'nonrefundable/test/Test_Course'
-        course_nonrefundable = CourseFactory.create(org='nonrefundable', number='test', run='course', display_name='Test Course')
-        course_mode_nonrefundable = CourseModeFactory.create(course_id=course_nonrefundable_id,
-                                                             mode_slug='verified',
-                                                             expiration_date=(today - one_day_extra))
-        course_mode_nonrefundable.save()
-
-        course_refundable_id = 'refundable/test/Test_Course'
-        course_refundable = CourseFactory.create(org='refundable', number='test', run='course', display_name='Test Course')
-        course_mode_refundable = CourseModeFactory.create(course_id=course_refundable_id,
-                                                          mode_slug='verified',
-                                                          expiration_date=(today + one_day_extra))
-        course_mode_refundable.save()
-
-        # User cannot receive a refund one day after the expiration date
-        self.assertFalse(access._has_access_course_desc(user, course_nonrefundable, 'refund'))
-
-        # After two weeks, user may no longer receive a refund
-        self.assertTrue(access._has_access_course_desc(user, course_refundable, 'refund'))

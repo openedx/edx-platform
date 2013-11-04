@@ -48,7 +48,6 @@ from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
-from shoppingcart.models import CertificateItem
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -341,7 +340,7 @@ def dashboard(request):
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in courses
-                                       if (has_access(request.user, course, 'refund') and (_enrollment.mode == "verified")))
+                                       if _enrollment.refundable())
 
     # get info w.r.t ExternalAuthMap
     external_auth_map = None

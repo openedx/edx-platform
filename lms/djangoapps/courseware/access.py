@@ -14,7 +14,6 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
-from course_modes.models import CourseMode
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
@@ -203,24 +202,11 @@ def _has_access_course_desc(user, course, action):
 
         return can_enroll() or can_load()
 
-    def can_refund():
-        """
-        For paid/verified certificates, students may receive a refund IFF they have
-        a verified certificate and the deadline for refunds has not yet passed.
-        """
-        course_mode = CourseMode.mode_for_course(course.id, 'verified')
-        if course_mode is None:
-            return False
-        else:
-            return True
-
-
     checkers = {
         'load': can_load,
         'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
-        'refund': can_refund,
         'staff': lambda: _has_staff_access_to_descriptor(user, course),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
         }
