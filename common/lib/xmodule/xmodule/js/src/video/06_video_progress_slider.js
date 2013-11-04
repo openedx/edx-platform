@@ -31,18 +31,15 @@ function () {
     //     Functions which will be accessible via 'state' object. When called,
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
-        state.videoProgressSlider.onStop         = _.bind(onStop, state);
-        state.videoProgressSlider.updatePlayTime = _.bind(
-            updatePlayTime, state
-        );
+        var methodsDict = {
+            buildSlider: buildSlider,
+            onSlide: onSlide,
+            onStop: onStop,
+            updatePlayTime: updatePlayTime,
+            updateStartEndTimeRegion: updateStartEndTimeRegion
+        };
 
-        //Added for tests -- JM
-        state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
-
-        state.videoProgressSlider.updateStartEndTimeRegion = _.bind(
-            updateStartEndTimeRegion, state
-        );
+        state.bindTo(methodsDict, state.videoProgressSlider, state);
     }
 
     // function _renderElements(state)
@@ -99,12 +96,14 @@ function () {
     }
 
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end, step;
+        var left, width, start, end, step, duration;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
         if (!params.duration) {
             return;
+        } else {
+            duration = params.duration;
         }
 
         // If the range spans the entire length of video, we don't do anything.
@@ -117,7 +116,7 @@ function () {
         // If end is set to null, then we set it to the end of the video. We
         // know that start is not a the beginning, therefore we must build a
         // range.
-        end = this.videoPlayer.endTime || params.duration;
+        end = this.videoPlayer.endTime || duration;
 
         // Because JavaScript has weird rounding rules when a series of
         // mathematical operations are performed in a single statement, we will
@@ -125,11 +124,9 @@ function () {
         //
         // This will ensure that visually, the start-end range aligns nicely
         // with actual starting and ending point of the video.
-        step = 100.0 / params.duration;
+        step = 100.0 / duration;
         left = start * step;
         width = end * step - left;
-        left = left.toFixed(1);
-        width = width.toFixed(1);
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {

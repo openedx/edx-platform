@@ -44,11 +44,13 @@ function () {
     //     Functions which will be accessible via 'state' object. When called,
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoSpeedControl.changeVideoSpeed = _.bind(
-            changeVideoSpeed, state
-        );
-        state.videoSpeedControl.setSpeed = _.bind(setSpeed, state);
-        state.videoSpeedControl.reRender = _.bind(reRender, state);
+        var methodsDict = {
+            changeVideoSpeed: changeVideoSpeed,
+            reRender: reRender,
+            setSpeed: setSpeed
+        };
+
+        state.bindTo(methodsDict, state.videoSpeedControl, state);
     }
 
     // function _renderElements(state)
@@ -164,7 +166,7 @@ function () {
             // 1. Play control
             // 2. Speed control
             // 3. Fastest speed called firstSpeed
-            // 4. Intermediary speed called otherSpeed 
+            // 4. Intermediary speed called otherSpeed
             // 5. Slowest speed called lastSpeed
             // 6. Volume control
             // This field will keep track of where the focus is coming from.
@@ -176,8 +178,8 @@ function () {
             // or closes it.
             state.videoSpeedControl.el.children('a')
                 .on('focus', function () {
-                    // If the focus is coming from the first speed entry 
-                    // (tabbing backwards) or last speed entry (tabbing forward) 
+                    // If the focus is coming from the first speed entry
+                    // (tabbing backwards) or last speed entry (tabbing forward)
                     // hide the speed entries dialog.
                     if (state.previousFocus === 'firstSpeed' ||
                         state.previousFocus === 'lastSpeed') {
@@ -187,7 +189,7 @@ function () {
                 .on('blur', function () {
                     // When the focus leaves this element, the speed entries
                     // dialog will be shown.
-                    
+
                     // If we are tabbing forward (previous focus is play
                     // control), we open the dialog and set focus on the first
                     // speed entry.
@@ -198,8 +200,8 @@ function () {
                         .focus();
                     }
 
-                    // If we are tabbing backwards (previous focus is volume 
-                    // control), we open the dialog and set focus on the 
+                    // If we are tabbing backwards (previous focus is volume
+                    // control), we open the dialog and set focus on the
                     // last speed entry.
                     if (state.previousFocus === 'volume') {
                         state.videoSpeedControl.el.addClass('open');
@@ -207,7 +209,7 @@ function () {
                         .find('a.speed_link:last')
                         .focus();
                     }
-                    
+
                 });
 
             // ******************************
@@ -223,13 +225,13 @@ function () {
                 if (state.previousFocus === 'otherSpeed') {
                     state.previousFocus = 'firstSpeed';
                     state.videoSpeedControl.el.children('a').focus();
-                }    
+                }
             });
 
             // Track the focus on intermediary speeds.
             speedLinks
                 .filter(function (index) {
-                    return index === 1 || index === 2
+                    return index === 1 || index === 2;
                 })
                 .on('blur', function () {
                     state.previousFocus = 'otherSpeed';
@@ -242,9 +244,9 @@ function () {
                 if (state.previousFocus === 'otherSpeed') {
                     state.previousFocus = 'lastSpeed';
                     state.videoSpeedControl.el.children('a').focus();
-                }   
+                }
             });
-            
+
         }
     }
 
@@ -283,7 +285,7 @@ function () {
                 this.videoSpeedControl.currentSpeed
             );
         }
-        // When a speed entry has been selected, we want the speed control to 
+        // When a speed entry has been selected, we want the speed control to
         // regain focus.
         parentEl.parent().siblings('a').focus();
     }

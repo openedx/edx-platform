@@ -24,8 +24,12 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoVolumeControl.onChange = _.bind(onChange, state);
-        state.videoVolumeControl.toggleMute = _.bind(toggleMute, state);
+        var methodsDict = {
+            onChange: onChange,
+            toggleMute: toggleMute
+        };
+
+        state.bindTo(methodsDict, state.videoVolumeControl, state);
     }
 
     // function _renderElements(state)
@@ -67,14 +71,11 @@ function () {
         // Let screen readers know that:
 
         // This anchor behaves as a button named 'Volume'.
-        var buttonStr = gettext(
-                state.videoVolumeControl.currentVolume === 0
-                ? 'Volume muted'
-                : 'Volume'
-            );
+        var currentVolume = state.videoVolumeControl.currentVolume,
+            buttonStr = (currentVolume === 0) ? 'Volume muted' : 'Volume';
         // We add the aria-label attribute because the title attribute cannot be
-        // read. 
-        state.videoVolumeControl.buttonEl.attr('aria-label', buttonStr);
+        // read.
+        state.videoVolumeControl.buttonEl.attr('aria-label', gettext(buttonStr));
 
         // Let screen readers know that this anchor, representing the slider
         // handle, behaves as a slider named 'volume'.
@@ -154,7 +155,7 @@ function () {
                 // We store the fact that previous element that lost focus was
                 // the volume clontrol.
                 state.volumeBlur = true;
-                // The following field is used in video_speed_control to track 
+                // The following field is used in video_speed_control to track
                 // the element that had the focus before it.
                 state.previousFocus = 'volume';
             });
@@ -167,8 +168,11 @@ function () {
     // ***************************************************************
 
     function onChange(event, ui) {
-        this.videoVolumeControl.currentVolume = ui.value;
-        this.videoVolumeControl.el.toggleClass('muted', this.videoVolumeControl.currentVolume === 0);
+        var currentVolume = ui.value,
+            ariaLabelText = (currentVolume === 0) ? 'Volume muted' : 'Volume';
+
+        this.videoVolumeControl.currentVolume = currentVolume;
+        this.videoVolumeControl.el.toggleClass('muted', currentVolume === 0);
 
         $.cookie('video_player_volume_level', ui.value, {
             expires: 3650,
@@ -176,17 +180,15 @@ function () {
         });
 
         this.trigger('videoPlayer.onVolumeChange', ui.value);
-        
+
         // ARIA
         this.videoVolumeControl.volumeSliderHandleEl.attr({
             'aria-valuenow': ui.value,
             'aria-valuetext': getVolumeDescription(ui.value)
         });
-       
+
         this.videoVolumeControl.buttonEl.attr(
-            'aria-label', this.videoVolumeControl.currentVolume === 0
-                          ? gettext('Volume muted')
-                          : gettext('Volume')
+            'aria-label', gettext(ariaLabelText)
         );
     }
 
@@ -227,7 +229,7 @@ function () {
         } else if (vol <= 99) {
             return 'very loud';
         }
-        
+
         return 'maximum';
     }
 
