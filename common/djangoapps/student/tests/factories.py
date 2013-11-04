@@ -73,7 +73,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @post_generation
-    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, no-self-argument
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)
