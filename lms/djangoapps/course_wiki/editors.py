@@ -60,5 +60,4 @@ class CodeMirror(BaseEditor):
               "js/vendor/CodeMirror/mitx_markdown.js",
               "js/wiki/accessible.js",
               "js/wiki/CodeMirror.init.js",
-              "js/wiki/cheatsheet.js",
               )
