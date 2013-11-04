@@ -19,6 +19,11 @@ class Command(BaseCommand):
                     dest='noop',
                     default=False,
                     help="Don't grade or add certificate requests to the queue"),
+        make_option('--insecure',
+                    action='store_true',
+                    dest='insecure',
+                    default=False,
+                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course',
@@ -52,6 +57,8 @@ class Command(BaseCommand):
         if not options['noop']:
             # Add the certificate request to the queue
             xq = XQueueCertInterface()
+            if options['insecure']:
+                xq.use_https = False
             ret = xq.regen_cert(student, course_id, course=course)
             print '{0} - {1}'.format(student, ret)
         else:
