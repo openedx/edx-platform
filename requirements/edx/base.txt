@@ -57,6 +57,7 @@ pymongo==2.4.1
 pyparsing==1.5.6
 python-memcached==1.48
 python-openid==2.2.5
+python-dateutil==2.1
 pytz==2012h
 pysrt==0.4.7
 PyYAML==3.10
