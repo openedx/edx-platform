@@ -256,6 +256,22 @@ class DashboardTest(TestCase):
         self.assertFalse(course_mode_info['show_upsell'])
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
+    def test_refundable(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+
+        self.assertTrue(enrollment.refundable())
+
+        verified_mode.expiration_date = (datetime.now(pytz.UTC) - timedelta(days=1)).date()
+        verified_mode.save()
+        self.assertFalse(enrollment.refundable())
+
+
 
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""

@@ -31,7 +31,7 @@ class CourseModeModelTest(TestCase):
             mode_slug=mode_slug,
             min_price=min_price,
             suggested_prices=suggested_prices,
-            currency=currency
+            currency=currency,
         )
 
     def test_modes_for_course_empty(self):

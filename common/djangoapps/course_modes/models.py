@@ -11,7 +11,6 @@ from django.db.models import Q
 
 Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_date'])
 
-
 class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.
@@ -72,8 +71,8 @@ class CourseMode(models.Model):
     @classmethod
     def modes_for_course_dict(cls, course_id):
         """
-        Returns the modes for a particular course as a dictionary with
-        the mode slug as the key
+        Returns the non-expired modes for a particular course as a
+        dictionary with the mode slug as the key
         """
         return {mode.slug: mode for mode in cls.modes_for_course(course_id)}
 
@@ -81,6 +80,8 @@ class CourseMode(models.Model):
     def mode_for_course(cls, course_id, mode_slug):
         """
         Returns the mode for the course corresponding to mode_slug.
+
+        Returns only non-expired modes.
 
         If this particular mode is not set for the course, returns None
         """
@@ -95,7 +96,8 @@ class CourseMode(models.Model):
     @classmethod
     def min_course_price_for_currency(cls, course_id, currency):
         """
-        Returns the minimum price of the course in the appropriate currency over all the course's modes.
+        Returns the minimum price of the course in the appropriate currency over all the course's
+        non-expired modes.
         If there is no mode found, will return the price of DEFAULT_MODE, which is 0
         """
         modes = cls.modes_for_course(course_id)

@@ -183,14 +183,15 @@
       <h2>${_("Current Courses")}</h2>
     </header>
 
-    % if len(courses) > 0:
+    % if len(course_enrollment_pairs) > 0:
       <ul class="listing-courses">
-        % for course, enrollment in courses:
+        % for course, enrollment in course_enrollment_pairs:
             <% show_courseware_link = (course.id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
             <% course_mode_info = all_course_modes.get(course.id) %>
-            <%include file='dashboard/_dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info" />
+            <% show_refund_option = (course.id in show_refund_option_for) %>
+            <%include file='dashboard/_dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, show_refund_option = show_refund_option" />
       % endfor
 
       </ul>
@@ -244,26 +245,7 @@
   </div>
 </section>
 
-<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
-    <header>
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      <hr/>
-    </header>
-
-    <div id="unenroll_error" class="modal-form-error"></div>
-
-    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <input name="course_id" id="unenroll_course_id" type="hidden" />
-      <input name="enrollment_action" type="hidden" value="unenroll" />
-      <div class="submit">
-        <input name="submit" type="submit" value="${_('Unregister')}" />
-      </div>
-    </form>
-  </div>
-</section>
 
 <section id="password_reset_complete" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
@@ -339,5 +321,24 @@
         </fieldset>
       </form>
     </div>
+  </div>
+</section>
+
+<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
+  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <header>
+      <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      refund
+      <hr/>
+    </header>
+    <div id="unenroll_error" class="modal-form-error"></div>
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="${_('Unregister')}" />
+      </div>
+    </form>
   </div>
 </section>
