@@ -158,22 +158,3 @@
   </section>
 </article>
 </li>
-
-<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
-    <header>
-      <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      refund
-      <hr/>
-    </header>
-    <div id="unenroll_error" class="modal-form-error"></div>
-    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <input name="course_id" id="unenroll_course_id" type="hidden" />
-      <input name="enrollment_action" type="hidden" value="unenroll" />
-      <div class="submit">
-        <input name="submit" type="submit" value="${_('Unregister')}" />
-      </div>
-    </form>
-  </div>
-</section>
