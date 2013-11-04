@@ -296,13 +296,13 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our courses list for the user, but ignore any courses that no longer
-    # exist (because the course IDs have changed). Still, we don't delete those
+    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
-    courses = []
+    course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            courses.append((course_from_id(enrollment.course_id), enrollment))
+            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -321,15 +321,15 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                           if has_access(request.user, course, 'load'))
 
-    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in courses}
-    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
+    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
-        course.id for course, _enrollment in courses if (
+        course.id for course, _enrollment in course_enrollment_pairs if (
             settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
             modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
@@ -339,7 +339,7 @@ def dashboard(request):
     # Verification Attempts
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
-    show_refund_option_for = frozenset(course.id for course, _enrollment in courses
+    show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
 
     # get info w.r.t ExternalAuthMap
@@ -349,7 +349,7 @@ def dashboard(request):
     except ExternalAuthMap.DoesNotExist:
         pass
 
-    context = {'courses': courses,
+    context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
                'external_auth_map': external_auth_map,

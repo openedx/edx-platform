@@ -183,9 +183,9 @@
       <h2>${_("Current Courses")}</h2>
     </header>
 
-    % if len(courses) > 0:
+    % if len(course_enrollment_pairs) > 0:
       <ul class="listing-courses">
-        % for course, enrollment in courses:
+        % for course, enrollment in course_enrollment_pairs:
             <% show_courseware_link = (course.id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
