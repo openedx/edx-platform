@@ -8,20 +8,20 @@ from django.contrib.auth.models import User
 class Command(BaseCommand):
     help = """
     This command creates and registers a user in a given course
-    as "audit", "verified_id" or "honor".
+    as "audit", "verified" or "honor".
 
     example:
         # Enroll a user test@example.com into the demo course
         # The username and name will default to "test"
-        manage.py ... create_user -e test@example.com -p insecure -c edX/Open_DemoX/edx_demo_course -m verified_id
+        manage.py ... create_user -e test@example.com -p insecure -c edX/Open_DemoX/edx_demo_course -m verified
     """
 
     option_list = BaseCommand.option_list + (
         make_option('-m', '--mode',
-                    metavar='ENROLLMENT_TYPE',
+                    metavar='ENROLLMENT_MODE',
                     dest='mode',
                     default='honor',
-                    choices=('audit', 'verified_id', 'honor'),
+                    choices=('audit', 'verified', 'honor'),
                     help='Enrollment type for user for a specific course'),
         make_option('-u', '--username',
                     metavar='USERNAME',
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                     metavar='COURSE_ID',
                     dest='course',
                     default=None,
-                    help='course to enroll the user in (optiona)'),
+                    help='course to enroll the user in (optional)'),
         make_option('-s', '--staff',
                     metavar='COURSE_ID',
                     dest='staff',
