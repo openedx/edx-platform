@@ -150,10 +150,10 @@
     </header>
     <section class="user-info">
       <ul>
-        <li>
+        <li class="info--username">
           <span class="title"><div class="icon name-icon"></div>${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
-        <li>
+        <li class="info--email">
           <span class="title"><div class="icon email-icon"></div>${_("Email")}
             % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
             (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
@@ -162,14 +162,16 @@
         </li>
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-        <li>
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
+        <li class="controls--account">
+          <span class="title"><div class="icon"></div><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->
           </form>
         </li>
         % endif
+
+        <%include file='dashboard/_dashboard_status_verification.html' />
 
       </ul>
     </section>
@@ -188,7 +190,7 @@
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
             <% course_mode_info = all_course_modes.get(course.id) %>
-            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info" />
+            <%include file='dashboard/_dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info" />
       % endfor
 
       </ul>

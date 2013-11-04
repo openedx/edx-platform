@@ -3,22 +3,15 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="bodyclass">register verification-process step-photos ${'is-upgrading' if upgrade else ''}</%block>
-<%block name="title">
-  <title>
-    %if upgrade:
-      ${_("Upgrade Your Registration for {} | Verification").format(course_name)}
-    %else:
-      ${_("Register for {} | Verification").format(course_name)}
-    %endif
-  </title>
-</%block>
+<%block name="bodyclass">register verification-process is-not-verified step-photos</%block>
+<%block name="title"><title>${_("Re-Verification")}</title></%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
 <script src="${static.url('js/verify_student/photocapture.js')}"></script>
 </%block>
+
 
 <%block name="content">
 
@@ -28,7 +21,7 @@
     <div class="msg-content">
       <h3 class="title">${_("No Webcam Detected")}</h3>
       <div class="copy">
-        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue registering, or select to {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue.")}</p>
       </div>
     </div>
   </div>
@@ -46,41 +39,49 @@
   </div>
 </div>
 
-<div id="order-error" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+%if error:
+<div id="submission-error" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
     <i class="msg-icon icon-warning-sign"></i>
     <div class="msg-content">
-      <h3 class="title">${_("Error processing your order")}</h3>
+      <h3 class="title">${_("Error submitting your images")}</h3>
       <div class="copy">
-        <p>${_("Oops! Something went wrong. Please confirm your details again and click the button to move on to payment. If you are still having trouble, please try again later.")}</p>
+        <p>${_("Oops! Something went wrong. Please confirm your details and try again.")}</p>
       </div>
     </div>
   </div>
 </div>
+%endif
 
 <div class="container">
   <section class="wrapper">
 
-    <%include file="_verification_header.html" args="course_name=course_name" />
+    <div class="wrapper-reverification">
+      <section class="reverification">
+        <div class="message">
+          <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
+          <div class="copy">
+            <p>${_("There was an error with your previous verification. In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
+          </div>
+        </div>
+
+        <span class="deco-arrow"></span>
+      </section>
+    </div>
 
     <div class="wrapper-progress">
       <section class="progress">
         <h3 class="sr title">${_("Your Progress")}</h3>
 
         <ol class="progress-steps">
-          <li class="progress-step is-completed" id="progress-step0">
-            <span class="wrapper-step-number"><span class="step-number">0</span></span>
-            <span class="step-name">${_("Intro")}</span>
-          </li>
-
           <li class="progress-step is-current" id="progress-step1">
             <span class="wrapper-step-number"><span class="step-number">1</span></span>
-            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Take Photo")}</span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Re-Take Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step2">
             <span class="wrapper-step-number"><span class="step-number">2</span></span>
-            <span class="step-name">${_("Take ID Photo")}</span>
+            <span class="step-name">${_("Re-Take ID Photo")}</span>
           </li>
 
           <li class="progress-step" id="progress-step3">
@@ -88,12 +89,7 @@
             <span class="step-name">${_("Review")}</span>
           </li>
 
-          <li class="progress-step" id="progress-step4">
-            <span class="wrapper-step-number"><span class="step-number">4</span></span>
-            <span class="step-name">${_("Make Payment")}</span>
-          </li>
-
-          <li class="progress-step progress-step-icon" id="progress-step5">
+          <li class="progress-step progress-step-icon" id="progress-step4">
             <span class="wrapper-step-number"><span class="step-number">
               <i class="icon-ok"></i>
             </span></span>
@@ -113,7 +109,7 @@
         <section class="wrapper carousel"  data-transition="slide">
           <div id="wrapper-facephoto" class="wrapper-view block-photo">
             <div class="facephoto view">
-              <h3 class="title">${_("Take Your Photo")}</h3>
+              <h3 class="title">${_("Re-Take Your Photo")}</h3>
               <div class="instruction">
                 <p>${_("Use your webcam to take a picture of your face so we can match it with the picture on your ID.")}</p>
               </div>
@@ -178,13 +174,6 @@
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
-                        <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
-
-                        %if upgrade:
-                          <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
-                        %else:
-                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
-                        %endif
                       </dl>
                     </div>
                   </div>
@@ -196,7 +185,7 @@
 
                 <ol class="wizard-steps">
                   <li class="wizard-step">
-                    <a id="face_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Take ID Photo")}</a>
+                    <a id="face_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Re-Take ID Photo")}</a>
                   </li>
                 </ol>
               </nav>
@@ -253,10 +242,10 @@
                     <div class="copy">
                       <ul class="list-help">
                         <li class="help-item">${_("Make sure your ID is well-lit")}</li>
+                        <li class="help-item help-item-emphasis">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                         <li class="help-item">${_("Check that there isn't any glare")}</li>
                         <li class="help-item">${_("Ensure that you can see your photo and read your name")}</li>
                         <li class="help-item">${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
-                        <li class="help-item">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                         <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your ID")}</li>
                         <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
                       </ul>
@@ -302,7 +291,7 @@
                 <ol class="review-tasks">
 
                   <li class="review-task review-task-photos">
-                    <h4 class="title">${_("Review the Photos You've Taken")}</h4>
+                    <h4 class="title">${_("Review the Photos You've Re-Taken")}</h4>
 
                     <div class="copy">
                       <p>${_("Please review the photos and verify that they meet the requirements listed below.")}</p>
@@ -366,17 +355,6 @@
                       </li>
                     </ul>
                   </li>
-
-                  <li class="review-task  review-task-contribution">
-                    <h4 class="title">${_("Check Your Contribution Level")}</h4>
-
-                    <div class="copy">
-                      <p>${_("Please confirm your contribution for this course (min. $")} ${min_price} <span class="denomination-name">${currency}</span>${_("):")}</p>
-                    </div>
-
-                    <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
-
-                  </li>
                 </ol>
               </div>
 
@@ -384,7 +362,7 @@
                 <div class="prompt-verify">
                   <h3 class="title">Before proceeding, please confirm that your details match</h3>
 
-                   <p class="copy"> ${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</p>
+                   <p class="copy"> ${_("Once you verify your details match the requirements, you can move onto to confirm your re-verification submisssion.")}</p>
 
                   <ul class="list-actions">
                     <li class="action action-verify">
@@ -396,10 +374,9 @@
 
                 <ol class="wizard-steps">
                   <li class="wizard-step step-proceed">
-                    <form id="pay_form" method="post" action="${purchase_endpoint}">
+                    <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                      <input type="hidden" name="course_id" value="${course_id | h}" />
-                      <input class="action-primary disabled" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
+                      <input class="action-primary disabled" type="button" id="reverify_button" value="Submit photos & re-verify" name="payment">
                     </form>
                   </li>
                 </ol>
@@ -410,7 +387,7 @@
       </article>
     </div> <!-- /wrapper-content-main -->
 
-     <%include file="_verification_support.html" />
+    <%include file="_reverification_support.html" />
   </section>
 </div>
 
