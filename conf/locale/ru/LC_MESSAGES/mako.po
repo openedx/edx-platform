@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 18:24+0400\n"
-"PO-Revision-Date: 2013-11-05 18:28+0300\n"
+"POT-Creation-Date: 2013-11-05 19:00+0400\n"
+"PO-Revision-Date: 2013-11-05 19:02+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3737,10 +3737,12 @@ msgid "List of beta_testers"
 msgstr "Список бета-тестеров"
 
 #: lms/djangoapps/instructor/views/legacy.py:736
+#: lms/templates/courseware/instructor_dashboard.html:555
 msgid "Email subject can not be empty."
 msgstr "Тема сообщения не может быть пустой."
 
 #: lms/djangoapps/instructor/views/legacy.py:738
+#: lms/templates/courseware/instructor_dashboard.html:558
 msgid "Email body can not be empty."
 msgstr "Сообщение не может быть пустым."
 
@@ -4711,7 +4713,7 @@ msgid "Level"
 msgstr "Уровень"
 
 #: lms/templates/folditbasic.html:23
-#: lms/templates/courseware/instructor_dashboard.html:783
+#: lms/templates/courseware/instructor_dashboard.html:791
 msgid "Submitted"
 msgstr "Отправлено"
 
@@ -6688,101 +6690,101 @@ msgstr "Вы отправили письмо себе чтобы убедить�
 msgid "Send email"
 msgstr "Отослать письмо"
 
-#: lms/templates/courseware/instructor_dashboard.html:579
+#: lms/templates/courseware/instructor_dashboard.html:587
 msgid "No Analytics are available at this time."
 msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:584
+#: lms/templates/courseware/instructor_dashboard.html:592
 msgid "Students enrolled:"
 msgstr "Участвующие студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:592
+#: lms/templates/courseware/instructor_dashboard.html:600
 msgid "Students active in the last week:"
 msgstr "Студенты, активные на прошлой неделе"
 
-#: lms/templates/courseware/instructor_dashboard.html:600
+#: lms/templates/courseware/instructor_dashboard.html:608
 msgid "Student activity day by day"
 msgstr "Активность студентов день за днем"
 
-#: lms/templates/courseware/instructor_dashboard.html:606
+#: lms/templates/courseware/instructor_dashboard.html:614
 msgid "Day"
 msgstr "День"
 
-#: lms/templates/courseware/instructor_dashboard.html:607
+#: lms/templates/courseware/instructor_dashboard.html:615
 #: lms/templates/static_templates/faq.html:73
 #: lms/templates/static_templates/faq.html:131
 msgid "Students"
 msgstr "Студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:622
+#: lms/templates/courseware/instructor_dashboard.html:630
 msgid "Answer distribution for problems"
 msgstr "Распределение ответов по задачам"
 
-#: lms/templates/courseware/instructor_dashboard.html:628
-#: lms/templates/courseware/instructor_dashboard.html:665
+#: lms/templates/courseware/instructor_dashboard.html:636
+#: lms/templates/courseware/instructor_dashboard.html:673
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:22
 msgid "Problem"
 msgstr "Задача"
 
-#: lms/templates/courseware/instructor_dashboard.html:629
+#: lms/templates/courseware/instructor_dashboard.html:637
 msgid "Max"
 msgstr "Максимальный"
 
-#: lms/templates/courseware/instructor_dashboard.html:630
+#: lms/templates/courseware/instructor_dashboard.html:638
 msgid "Points Earned (Num Students)"
 msgstr "Получено баллов (число студентов)"
 
-#: lms/templates/courseware/instructor_dashboard.html:659
+#: lms/templates/courseware/instructor_dashboard.html:667
 msgid "Students answering correctly"
 msgstr "Студенты, ответившие корректно"
 
-#: lms/templates/courseware/instructor_dashboard.html:666
+#: lms/templates/courseware/instructor_dashboard.html:674
 msgid "Number of students"
 msgstr "Число студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:679
+#: lms/templates/courseware/instructor_dashboard.html:687
 msgid "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):"
 msgstr "Распределение студентов по странам, все курсы, сен-2012, окт-2017, 1 сервер (показано для примера):"
 
-#: lms/templates/courseware/instructor_dashboard.html:775
+#: lms/templates/courseware/instructor_dashboard.html:783
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:44
 msgid "Pending Instructor Tasks"
 msgstr "Ожидающие задачи инструктора"
 
-#: lms/templates/courseware/instructor_dashboard.html:779
+#: lms/templates/courseware/instructor_dashboard.html:787
 msgid "Task Type"
 msgstr "Тип задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:780
+#: lms/templates/courseware/instructor_dashboard.html:788
 msgid "Task inputs"
 msgstr "Входные данные задач"
 
-#: lms/templates/courseware/instructor_dashboard.html:781
+#: lms/templates/courseware/instructor_dashboard.html:789
 msgid "Task Id"
 msgstr "ID задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:782
+#: lms/templates/courseware/instructor_dashboard.html:790
 msgid "Requester"
 msgstr "Запрашивающий"
 
-#: lms/templates/courseware/instructor_dashboard.html:784
+#: lms/templates/courseware/instructor_dashboard.html:792
 msgid "Task State"
 msgstr "Состояние задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:785
+#: lms/templates/courseware/instructor_dashboard.html:793
 msgid "Duration (sec)"
 msgstr "Длительность (в секундах)"
 
-#: lms/templates/courseware/instructor_dashboard.html:786
+#: lms/templates/courseware/instructor_dashboard.html:794
 msgid "Task Progress"
 msgstr "Ход выполнения задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:798
-#: lms/templates/courseware/instructor_dashboard.html:799
+#: lms/templates/courseware/instructor_dashboard.html:806
+#: lms/templates/courseware/instructor_dashboard.html:807
 msgid "unknown"
 msgstr "неизвестный"
 
-#: lms/templates/courseware/instructor_dashboard.html:863
+#: lms/templates/courseware/instructor_dashboard.html:871
 msgid "Course errors"
 msgstr "Ошибки курса"
 
@@ -7027,6 +7029,12 @@ msgstr "Моя когорта"
 #: lms/templates/discussion/_new_post.html:69
 msgid "new post title"
 msgstr "заголовок нового сообщения"
+
+#: lms/templates/discussion/_inline_new_post.html:39
+#: lms/templates/discussion/_new_post.html:70
+#: lms/templates/discussion/_underscore_templates.html:87
+msgid "Title"
+msgstr "Заголовок"
 
 #: lms/templates/discussion/_inline_new_post.html:50
 #: lms/templates/discussion/_new_post.html:81
