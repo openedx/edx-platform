@@ -13,13 +13,15 @@ from mock import Mock, patch
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
 
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
@@ -29,8 +31,7 @@ import instructor_task.api
 
 from instructor.access import allow_access
 import instructor.views.api
-from instructor.views.api import (
-    _split_input_list, _msk_from_problem_urlname, common_exceptions_400)
+from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 
 
@@ -97,58 +98,144 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Ensure that users cannot access endpoints they shouldn't be able to.
     """
     def setUp(self):
-        self.user = UserFactory.create()
         self.course = CourseFactory.create()
+        self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.client.login(username=self.user.username, password='test')
 
-    def test_staff_level(self):
+        self.problem_urlname = 'robot-some-problem-urlname'
+        _module = StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course.id,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
+            state=json.dumps({'attempts': 10}),
+        )
+
+        # Endpoints that only Staff or Instructors can access
+        self.staff_level_endpoints = [
+            ('students_update_enrollment', {'emails': 'foo@example.org', 'action': 'enroll'}),
+            ('get_grading_config', {}),
+            ('get_students_features', {}),
+            ('get_distribution', {}),
+            ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
+            ('reset_student_attempts', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            ('update_forum_role_membership', {'email': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
+            ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
+            ('proxy_legacy_analytics', {'aname': 'ProblemGradeDistribution'}),
+            ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
+            ('list_instructor_tasks', {}),
+            ('list_background_email_tasks', {}),
+        ]
+        # Endpoints that only Instructors can access
+        self.instructor_level_endpoints = [
+            ('modify_access', {'email': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
+            ('list_course_role_members', {'rolename': 'beta'}),
+            ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+        ]
+
+    def _access_endpoint(self, endpoint, args, status_code, msg):
+        """
+        Asserts that accessing the given `endpoint` gets a response of `status_code`.
+
+        endpoint: string, endpoint for instructor dash API
+        args: dict, kwargs for `reverse` call
+        status_code: expected HTTP status code response
+        msg: message to display if assertion fails.
+        """
+        url = reverse(endpoint, kwargs={'course_id': self.course.id})
+        if endpoint in 'send_email':
+            response = self.client.post(url, args)
+        else:
+            response = self.client.get(url, args)
+        print endpoint
+        print response
+        self.assertEqual(
+            response.status_code,
+            status_code,
+            msg=msg
+        )
+
+    def test_student_level(self):
         """
         Ensure that an enrolled student can't access staff or instructor endpoints.
         """
-        staff_level_endpoints = [
-            'students_update_enrollment',
-            'modify_access',
-            'list_course_role_members',
-            'get_grading_config',
-            'get_students_features',
-            'get_distribution',
-            'get_student_progress_url',
-            'reset_student_attempts',
-            'rescore_problem',
-            'list_instructor_tasks',
-            'list_forum_members',
-            'update_forum_role_membership',
-            'proxy_legacy_analytics',
-            'send_email',
-            'list_background_email_tasks',
-        ]
-        for endpoint in staff_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(
-                response.status_code,
+        self.client.login(username=self.user.username, password='test')
+
+        for endpoint, args in self.staff_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
                 403,
-                msg="Student should not be allowed to access endpoint " + endpoint
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+    def test_staff_level(self):
+        """
+        Ensure that a staff member can't access instructor endpoints.
+        """
+        staff_member = StaffFactory(self.course)
+        CourseEnrollment.enroll(staff_member, self.course.id)
+        self.client.login(username=staff_member.username, password='test')
+        # Try to promote to forums admin - not working
+        # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics', 'list_forum_members']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Staff member should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Staff member should not be allowed to access endpoint " + endpoint
             )
 
     def test_instructor_level(self):
         """
-        Ensure that a staff member can't access instructor endpoints.
+        Ensure that an instructor member can access all endpoints.
         """
-        instructor_level_endpoints = [
-            'modify_access',
-            'list_course_role_members',
-            'reset_student_attempts',
-            'update_forum_role_membership',
-        ]
-        for endpoint in instructor_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(
-                response.status_code,
-                403,
-                msg="Staff should not be allowed to access endpoint " + endpoint
+        inst = InstructorFactory(self.course)
+        CourseEnrollment.enroll(inst, self.course.id)
+        self.client.login(username=inst.username, password='test')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            # TODO: make this work
+            if endpoint in ['rescore_problem']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
             )
 
 
@@ -161,8 +248,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.enrolled_student = UserFactory()
@@ -288,8 +375,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     response yet, so only the status code is tested.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.other_instructor = UserFactory()
@@ -425,8 +512,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     Test endpoints that show data without side effects.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -562,8 +649,8 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     database, that is the job of task tests and test_enrollment.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -706,8 +793,8 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     only with valid email messages.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
@@ -828,8 +915,8 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             return attr_dict
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -959,8 +1046,8 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.content = '{"test_content": "robot test content"}'
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
     @patch.object(instructor.views.api.requests, 'get')

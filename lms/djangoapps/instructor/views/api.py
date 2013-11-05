@@ -35,7 +35,7 @@ from instructor_task.views import get_task_completion_info
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
 from instructor.views.tools import strip_if_string, get_student_from_identifier
-import instructor.access as access
+from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -294,9 +294,9 @@ def modify_access(request, course_id):
         )
 
     if action == 'allow':
-        access.allow_access(course, user, rolename)
+        allow_access(course, user, rolename)
     elif action == 'revoke':
-        access.revoke_access(course, user, rolename)
+        revoke_access(course, user, rolename)
     else:
         return HttpResponseBadRequest("unrecognized action '{}'".format(action))
 
@@ -352,7 +352,7 @@ def list_course_role_members(request, course_id):
 
     response_payload = {
         'course_id': course_id,
-        rolename: map(extract_user_info, access.list_with_level(
+        rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
     }
@@ -381,7 +381,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613
+def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -882,7 +882,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
 
     try:
-        access.update_forum_role_membership(course_id, user, rolename, action)
+        update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:
         return HttpResponseBadRequest("Role does not exist.")
 
