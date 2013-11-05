@@ -17,10 +17,12 @@ from django.utils.translation import ugettext as _
 from dashboard.sysadmin import create_user
 from external_auth.models import ExternalAuthMap
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import Group
 from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.utils.html import escape
+from courseware.access import get_access_group_name, has_access
 from dashboard.sysadmin import CourseImportLog
 import mongoengine
 
@@ -86,9 +88,6 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self.client.get(reverse('sysadmin'))
         self.assertEqual('/sysadmin', response.context['next'])
 
-        response = self.client.get(reverse('gitlogs'))
-        self.assertEqual('/gitlogs', response.context['next'])
-
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
         self.assertTrue(logged_in)
@@ -97,7 +96,7 @@ class TestSysadmin(SysadminBaseTestCase):
         self.assertEqual('/sysadmin', response.context['next'])
 
         response = self.client.get(reverse('gitlogs'))
-        self.assertEqual('/gitlogs', response.context['next'])
+        self.assertEqual(response.status_code, 404)
 
         self.user.is_staff = True
         self.user.save()
@@ -344,14 +343,52 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._add_edx4edx()
         response = self.client.get(reverse('gitlogs'))
-        print(response.content)
-        print(CourseImportLog.objects.all())
+
         # Check that our earlier import has a log with a link to details
         self.assertIn('/gitlogs/MITx/edx4edx/edx4edx', response.content)
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={'course_id': 'MITx/edx4edx/edx4edx'}))
 
+        self.assertIn('======&gt; IMPORTING course to location', response.content)
+
+        self._rm_edx4edx()
+
+    def test_gitlog_courseteam_access(self):
+        """Ensure course team users are allowed to access only their own course"""
+
+        try:
+            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        except OSError:
+            pass
+
+        self._setstaff_login()
+        self._add_edx4edx()
+        self.user.is_staff = False
+        self.user.save()
+        logged_in = self.client.login(username=self.user.username,
+                                      password='foo')
+        response = self.client.get(reverse('gitlogs'))
+
+        # Make sure our non privileged user doesn't have access to all logs
+        self.assertEqual(response.status_code, 404)
+
+        # Add user as staff in course team
+        def_ms = modulestore()
+        course = def_ms.get_course('MITx/edx4edx/edx4edx')
+        
+        staff_groupname = get_access_group_name(course, 'staff')
+        group, _ = Group.objects.get_or_create(name=staff_groupname)
+        self.user.groups.add(group)
+        
+        self.assertTrue(has_access(self.user, course, 'staff'))
+        logged_in = self.client.login(username=self.user.username,
+                                      password='foo')
+        self.assertTrue(logged_in)
+
+        response = self.client.get(
+            reverse('gitlogs_detail', kwargs={'course_id': 'MITx/edx4edx/edx4edx'}))
+        print(response.content)
         self.assertIn('======&gt; IMPORTING course to location', response.content)
 
         self._rm_edx4edx()
