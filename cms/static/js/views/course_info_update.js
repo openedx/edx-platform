@@ -36,7 +36,7 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
                 }
             });
             this.$el.find(".new-update-form").hide();
-            this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+            this.$el.find('.date').datepicker({ 'dateFormat': 'd MM, yy' });
             return this;
         },
 
@@ -68,7 +68,7 @@ define(["backbone", "underscore", "codemirror", "js/models/course_update",
             });
 
             $('.date').datepicker('destroy');
-            $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+            $('.date').datepicker({ 'dateFormat': 'd MM, yy' });
         },
 
         onSave: function(event) {
