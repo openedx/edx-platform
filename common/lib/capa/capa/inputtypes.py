@@ -55,7 +55,7 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
-def _(s): return s
+from django.utils.translation import ugettext as _
 #########################################################################
 
 registry = TagRegistry()

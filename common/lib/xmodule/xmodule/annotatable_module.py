@@ -10,8 +10,7 @@ import textwrap
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
 
 class AnnotatableFields(object):
     data = String(help="XML data for the annotation", scope=Scope.content,

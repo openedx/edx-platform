@@ -18,8 +18,7 @@ from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
 
 class HtmlFields(object):
     display_name = String(

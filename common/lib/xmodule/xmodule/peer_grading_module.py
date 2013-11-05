@@ -19,8 +19,7 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 

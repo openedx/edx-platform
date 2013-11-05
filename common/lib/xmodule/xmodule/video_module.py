@@ -35,9 +35,7 @@ from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
-
+from django.utils.translation import ugettext as _
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""

@@ -22,8 +22,7 @@ from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+def _(s): return s ##FIXME
 
 def dummy_track(_event_type, _event):
     pass

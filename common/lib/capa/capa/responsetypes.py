@@ -44,6 +44,7 @@ import capa.safe_exec as safe_exec
 
 log = logging.getLogger(__name__)
 
+from django.utils.translation import ugettext as _
 
 CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
 CORRECTMAP_PY = None
@@ -52,8 +53,6 @@ CORRECTMAP_PY = None
 #-----------------------------------------------------------------------------
 # Exceptions
 
-def _(s):
-    return s
 
 class LoncapaProblemError(Exception):
     '''

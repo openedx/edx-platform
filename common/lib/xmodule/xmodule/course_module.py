@@ -21,11 +21,9 @@ from django.utils.timezone import UTC
 from xmodule.util import date_utils
 from django.template.defaultfilters import date as _date
 
-def _(s): return s
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger(__name__)
-
-def _(s): return s
 
 class StringOrDate(Date):
     def from_json(self, value):

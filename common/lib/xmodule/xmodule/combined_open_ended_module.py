@@ -11,10 +11,9 @@ from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-def _(s):
-    return s
-
 log = logging.getLogger("mitx.courseware")
+
+from django.utils.translation import ugettext as _
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",

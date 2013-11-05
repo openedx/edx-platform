@@ -23,8 +23,7 @@ from xblock.fields import Scope, String, Dict, Boolean, List
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
 
 class PollFields(object):
     # Name of poll to use in links to this poll

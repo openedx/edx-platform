@@ -19,8 +19,7 @@ from xblock.fields import Boolean
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
 
 class LTIError(Exception):
     pass

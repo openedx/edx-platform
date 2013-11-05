@@ -25,14 +25,12 @@ from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
+#def _(s): return s
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
-
-def _(s):
-    return s;
 
 def randomization_bin(seed, problem_id):
     """
@@ -594,12 +592,12 @@ class CapaModule(CapaFields, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
-        generic_error_message = _(
+        generic_error_message = (
             "We're sorry, there was an error with processing your request. "
             "Please try reloading your page and trying again."
         )
 
-        not_found_error_message = _(
+        not_found_error_message = (
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )

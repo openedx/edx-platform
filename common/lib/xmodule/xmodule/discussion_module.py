@@ -6,9 +6,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope
 from uuid import uuid4
 
-def _(s):
-    return s;
-
+from django.utils.translation import ugettext as _
 
 class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings, default="$$GUID$$")
