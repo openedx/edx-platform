@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-01 18:38+0400\n"
-"PO-Revision-Date: 2013-11-01 18:55+0300\n"
+"POT-Creation-Date: 2013-11-05 14:36+0400\n"
+"PO-Revision-Date: 2013-11-05 14:39+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -3583,31 +3583,31 @@ msgstr "Сырые оценки студетнов зачисленных на {
 
 #: lms/djangoapps/instructor/views/legacy.py:282
 msgid "Failed to create a background task for rescoring \"{0}\"."
-msgstr "Ошибка создания теневого задания для переоценки \"{0}\"."
+msgstr "Ошибка при создании фонового процесса для перепроверки \"{0}\"."
 
 #: lms/djangoapps/instructor/views/legacy.py:286
 msgid "Failed to create a background task for rescoring \"{0}\": problem not found."
-msgstr "Ошибка создания теневого задания для переоценки \"{0}\": задача не найдена."
+msgstr "Ошибка при создании фонового процесса для перепроверки \"{0}\". Задача не найдена."
 
 #: lms/djangoapps/instructor/views/legacy.py:289
 msgid "Failed to create a background task for rescoring \"{url}\": {message}."
-msgstr "Ошибка создания теневого задания для переоценки \"{url}\": {message}."
+msgstr "Ошибка при создании фонового процесса для перепроверки \"{url}\": {message}."
 
 #: lms/djangoapps/instructor/views/legacy.py:297
 msgid "Failed to create a background task for resetting \"{0}\"."
-msgstr "Ошибка создания теневого задания для сброса \"{0}\"."
+msgstr "Ошибка при создании фонового процесса для сброса \"{0}\"."
 
 #: lms/djangoapps/instructor/views/legacy.py:302
 msgid "Failed to create a background task for resetting \"{0}\": problem not found."
-msgstr "\"Ошибка создания теневого задания для сброса \"{0}\": задача не найдена.\""
+msgstr "\"Ошибка при создании фонового процесса для сброса \"{0}\": задача не найдена.\""
 
 #: lms/djangoapps/instructor/views/legacy.py:305
 msgid "Failed to create a background task for resetting \"{url}\": {message}."
-msgstr "Ошибка создания теневого задания для сброса \"{url}\": {message}."
+msgstr "Ошибка при создании фонового процесса для сброса \"{url}\": {message}."
 
 #: lms/djangoapps/instructor/views/legacy.py:346
 msgid "Found module.  "
-msgstr "Объект найден.   "
+msgstr "Найден модуль.   "
 
 #: lms/djangoapps/instructor/views/legacy.py:348
 msgid "Couldn't find module with that urlname: {0}. "
@@ -3631,11 +3631,11 @@ msgstr "Невозможно сбросить состояние объекта 
 
 #: lms/djangoapps/instructor/views/legacy.py:407
 msgid "Failed to create a background task for rescoring \"{key}\" for student {id}."
-msgstr ""
+msgstr "Ошибка при создании фонового процесса для перепроверки \"{key}\" для студента {id}."
 
 #: lms/djangoapps/instructor/views/legacy.py:411
 msgid "Failed to create a background task for rescoring \"{key}\": {id}."
-msgstr ""
+msgstr "Ошибка при создании фонового процесса для перепроверки \"{key}\": {id}."
 
 #: lms/djangoapps/instructor/views/legacy.py:426
 msgid "Progress page for username: {username} with email address: {email}"
@@ -3858,6 +3858,10 @@ msgstr "Невозможно найти фоновые задачи объект
 #: lms/djangoapps/instructor/views/legacy.py:1581
 msgid "Failed to find any background tasks for course \"{course}\" and module \"{problem}\"."
 msgstr "Невозможно найти фоновые задачи объекта \"{problem}\" курса \"{course}\"."
+
+#: lms/djangoapps/instructor_task/api_helper.py:231
+msgid "Specified module does not support rescoring."
+msgstr "Указанный объект не поддерживает переоценку."
 
 #: lms/djangoapps/instructor_task/views.py:109
 #: lms/djangoapps/instructor_task/views.py:114
