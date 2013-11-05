@@ -356,7 +356,7 @@ def instructor_dashboard(request, course_id):
                 # delete the state
                 try:
                     student_module.delete()
-                    msg += "<font color='red'>" + _u("Deleted student module state for {0}!") + "</font>".format(module_state_key)
+                    msg += "<font color='red'>" + _u("Deleted student module state for {0}!").format(module_state_key) + "</font>"
                     event = {
                         "problem": module_state_key,
                         "student": unique_student_identifier,
@@ -422,7 +422,9 @@ def instructor_dashboard(request, course_id):
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
-            msg += _u("<a href='{0}' target='_blank'>Progress page for username: {1} with email address: {2}").format(progress_url, student.username, student.email) + "</a>."
+            msg += "<a href='{url}' target='_blank'>".format(url = progress_url) + \
+                   _u("Progress page for username: {username} with email address: {email}").\
+                       format(username = student.username, email =  student.email) + "</a>."
 
     #----------------------------------------
     # export grades to remote gradebook

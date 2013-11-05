@@ -9,6 +9,7 @@ from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
 from instructor_task.models import InstructorTask, PROGRESS
+from django.utils.translation import ugettext as _u
 
 
 log = logging.getLogger(__name__)
@@ -227,7 +228,7 @@ def check_arguments_for_rescoring(course_id, problem_url):
     """
     descriptor = modulestore().get_instance(course_id, problem_url)
     if not hasattr(descriptor, 'module_class') or not hasattr(descriptor.module_class, 'rescore_problem'):
-        msg = "Specified module does not support rescoring."
+        msg = _u("Specified module does not support rescoring.")
         raise NotImplementedError(msg)
 
 

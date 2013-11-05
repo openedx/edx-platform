@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: \n"
+"POT-Creation-Date: 2013-11-05 14:54+0400\n"
 "PO-Revision-Date: 2013-11-01 14:34+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -923,7 +923,7 @@ msgstr ""
 msgid "Markdown source of this module"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py:395
+#: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
 msgstr ""
 

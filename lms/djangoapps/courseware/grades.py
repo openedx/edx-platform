@@ -12,7 +12,7 @@ from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from xblock.fields import Scope
 from .module_render import get_module, get_module_for_descriptor
 from xmodule import graders
-from xmodule.capa_module import CapaModule
+from xmodule.capa_module import CapaDescriptor
 from xmodule.graders import Score
 from .models import StudentModule
 
@@ -90,8 +90,9 @@ def yield_problems(request, course, student):
             continue
 
         for problem in yield_module_descendents(section_module):
-            if isinstance(problem, CapaModule):
-                yield problem
+            problem_desc = get_module(student, request, problem.location, field_data_cache, course.id)
+            if isinstance(problem_desc, CapaDescriptor):
+                yield problem_desc
 
 
 def answer_distributions(request, course):
@@ -111,11 +112,11 @@ def answer_distributions(request, course):
     enrolled_students = User.objects.filter(courseenrollment__course_id=course.id)
 
     for student in enrolled_students:
-        for capa_module in yield_problems(request, course, student):
-            for problem_id in capa_module.lcp.student_answers:
+        for capa_desc in yield_problems(request, course, student):
+            for problem_id in capa_desc.lcp.student_answers:
                 # Answer can be a list or some other unhashable element.  Convert to string.
-                answer = str(capa_module.lcp.student_answers[problem_id])
-                key = (capa_module.url_name, capa_module.display_name_with_default, problem_id)
+                answer = str(capa_desc.lcp.student_answers[problem_id])
+                key = (capa_desc.url_name, capa_desc.display_name_with_default, problem_id)
                 counts[key][answer] += 1
 
     return counts
