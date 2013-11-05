@@ -1044,3 +1044,14 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+
+###################### Registration ##################################
+
+# Remove some of the fields from the list to not display them
+REGISTRATION_OPTIONAL_FIELDS = set([
+    'level_of_education',
+    'gender',
+    'year_of_birth',
+    'mailing_address',
+    'goals',
+])
