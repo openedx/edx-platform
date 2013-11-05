@@ -6,13 +6,19 @@ function (Resizer) {
 
     describe('Resizer', function () {
         var html = [
-                '<div class="rszr-wrapper" style="width:200px; height: 200px;">',
-                    '<div class="rszr-el" style="width:100px; height: 150px;">',
+                '<div ' +
+                    'class="rszr-wrapper" ' +
+                    'style="width:200px; height: 200px;"' +
+                '>',
+                    '<div ' +
+                        'class="rszr-el" ' +
+                        'style="width:100px; height: 150px;"' +
+                    '>',
                         'Content',
                     '</div>',
                 '</div>'
             ].join(''),
-            config, container, element;
+            config, container, element, originalConsoleLog;
 
         beforeEach(function () {
             setFixtures(html);
@@ -23,12 +29,17 @@ function (Resizer) {
                 container: container,
                 element: element
             };
+
+            originalConsoleLog = window.console.log;
+            spyOn(console, 'log');
+        });
+
+        afterEach(function () {
+            window.console.log = originalConsoleLog;
         });
 
         it('When Initialize without required parameters, log message is shown',
             function () {
-                spyOn(console, 'log');
-
                 new Resizer({ });
                 expect(console.log).toHaveBeenCalled();
             }

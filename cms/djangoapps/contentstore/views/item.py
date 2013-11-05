@@ -2,8 +2,9 @@
 
 import logging
 from uuid import uuid4
+from requests.packages.urllib3.util import parse_url
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth.decorators import login_required
 
 from xmodule.modulestore import Location
@@ -47,7 +48,7 @@ def save_item(request):
     # little smarter and able to pass something more akin to {unset: [field, field]}
 
     try:
-        item_location = request.POST['id']
+        item_location = request.json['id']
     except KeyError:
         import inspect
 
@@ -76,30 +77,27 @@ def save_item(request):
 
     store = get_modulestore(Location(item_location))
 
-    if request.POST.get('data') is not None:
-        data = request.POST['data']
+    if request.json.get('data'):
+        data = request.json['data']
         store.update_item(item_location, data)
 
-    # cdodge: note calling request.POST.get('children') will return None if children is an empty array
-    # so it lead to a bug whereby the last component to be deleted in the UI was not actually
-    # deleting the children object from the children collection
-    if 'children' in request.POST and request.POST['children'] is not None:
-        children = request.POST['children']
+    if request.json.get('children') is not None:
+        children = request.json['children']
         store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along
-    if request.POST.get('nullout') is not None or request.POST.get('metadata') is not None:
+    if request.json.get('nullout') is not None or request.json.get('metadata') is not None:
         # the postback is not the complete metadata, as there's system metadata which is
         # not presented to the end-user for editing. So let's fetch the original and
         # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
-        for metadata_key in request.POST.get('nullout', []):
+        for metadata_key in request.json.get('nullout', []):
             setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
-        for metadata_key, value in request.POST.get('metadata', {}).items():
+        for metadata_key, value in request.json.get('metadata', {}).items():
             field = existing_item.fields[metadata_key]
 
             if value is None:
@@ -110,6 +108,17 @@ def save_item(request):
                 except ValueError:
                     return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
+
+
+            if existing_item.category == 'video':
+
+                allowedSchemes = ['https']
+                # The entire site is served from https, so browsers with good
+                # security will reject non-https URLs anyway.
+                # Also, following video module specific code is here, because front-end
+                # metadata fields doesn't support validation.
+                if metadata_key == 'html5_sources' and not all([parse_url(u).scheme in allowedSchemes for u in value]):
+                    raise ValidationError(u'HTML5 video sources support following protocols: {0}.'.format(' '.join(allowedSchemes)))
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         existing_item.save()
@@ -126,10 +135,10 @@ def save_item(request):
 @expect_json
 def create_item(request):
     """View for create items."""
-    parent_location = Location(request.POST['parent_location'])
-    category = request.POST['category']
+    parent_location = Location(request.json['parent_location'])
+    category = request.json['category']
 
-    display_name = request.POST.get('display_name')
+    display_name = request.json.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -140,7 +149,7 @@ def create_item(request):
     # get the metadata, display_name, and definition from the request
     metadata = {}
     data = None
-    template_id = request.POST.get('boilerplate')
+    template_id = request.json.get('boilerplate')
     if template_id is not None:
         clz = XModuleDescriptor.load_class(category)
         if clz is not None:
@@ -169,7 +178,7 @@ def create_item(request):
 @expect_json
 def delete_item(request):
     """View for removing items."""
-    item_location = request.POST['id']
+    item_location = request.json['id']
     item_location = Location(item_location)
 
     # check permissions for this user within this course
@@ -177,8 +186,8 @@ def delete_item(request):
         raise PermissionDenied()
 
     # optional parameter to delete all children (default False)
-    delete_children = request.POST.get('delete_children', False)
-    delete_all_versions = request.POST.get('delete_all_versions', False)
+    delete_children = request.json.get('delete_children', False)
+    delete_all_versions = request.json.get('delete_all_versions', False)
 
     store = get_modulestore(item_location)
 

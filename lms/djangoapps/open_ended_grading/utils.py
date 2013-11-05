@@ -1,18 +1,18 @@
 import json
+import logging
 
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.x_module import ModuleSystem
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.x_module import ModuleSystem
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from mitxmako.shortcuts import render_to_string
 
-import logging
 
 log = logging.getLogger(__name__)
 

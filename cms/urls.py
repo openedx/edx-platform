@@ -31,18 +31,7 @@ urlpatterns = patterns('',  # nopep8
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
-    url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
-        'contentstore.views.import_course', name='import_course'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import_status/(?P<name>[^/]+)$',
-        'contentstore.views.import_status', name='import_status'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
-        'contentstore.views.export_course', name='export_course'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/generate_export/(?P<name>[^/]+)$',
-        'contentstore.views.generate_export_course', name='generate_export_course'),
 
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
@@ -122,14 +111,16 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     'contentstore.views',
 
-    url(r'^course$', 'index', name='index'),
     url(r'^request_course_creator$', 'request_course_creator'),
     # (?ix) == ignore case and verbose (multiline regex)
-    url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
-    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
+    url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
-    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler')
+    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
+    url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
+    url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
+    url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
 )
 
 js_info_dict = {

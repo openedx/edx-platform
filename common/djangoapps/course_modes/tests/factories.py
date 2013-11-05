@@ -11,3 +11,4 @@ class CourseModeFactory(DjangoModelFactory):
     mode_display_name = 'audit course'
     min_price = 0
     currency = 'usd'
+    expiration_date = None

@@ -27,8 +27,6 @@ class LocMapperStore(object):
     or dominant store, but that's not a requirement. This store creates its own connection.
     '''
 
-    # C0103: varnames and attrs must be >= 3 chars, but db defined by long time usage
-    # pylint: disable = C0103
     def __init__(
         self, host, db, collection, port=27017, user=None, password=None,
         **kwargs

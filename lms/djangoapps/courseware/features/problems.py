@@ -107,6 +107,9 @@ def check_problem(step):
     world.browser.execute_script("window.scrollTo(0,1024)")
     world.css_click("input.check")
 
+    # Wait for the problem to finish re-rendering
+    world.wait_for_ajax_complete()
+
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')
 def assert_problem_has_answer(step, problem_type, answer_class):
@@ -126,6 +129,9 @@ def assert_problem_has_answer(step, problem_type, answer_class):
 @step(u'I reset the problem')
 def reset_problem(_step):
     world.css_click('input.reset')
+
+    # Wait for the problem to finish re-rendering
+    world.wait_for_ajax_complete()
 
 
 @step(u'I press the button with the label "([^"]*)"$')
@@ -172,7 +178,6 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     *problem_type* is a string identifying the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect', 'unanswered']
     """
-
     # Determine which selector(s) to look for based on correctness
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
     assert(problem_type in PROBLEM_DICT)

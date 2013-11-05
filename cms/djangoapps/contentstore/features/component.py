@@ -1,6 +1,10 @@
 #pylint: disable=C0111
 #pylint: disable=W0621
 
+# Lettuce formats proposed definitions for unimplemented steps with the
+# argument name "step" instead of "_step" and pylint does not like that.
+#pylint: disable=W0613
+
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
@@ -61,6 +65,17 @@ def see_a_multi_step_component(step, category):
         else:
             actual_text = world.css_text(selector, index=idx)
             assert_in(step_hash['Component'].upper(), actual_text)
+
+
+@step(u'I see a "([^"]*)" Problem component$')
+def see_a_problem_component(step, category):
+    component_css = 'section.xmodule_CapaModule'
+    assert_true(world.is_css_present(component_css),
+                'No problem was added to the unit.')
+
+    problem_css = 'li.component section.xblock-student_view'
+    actual_text = world.css_text(problem_css)
+    assert_in(category.upper(), actual_text)
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')

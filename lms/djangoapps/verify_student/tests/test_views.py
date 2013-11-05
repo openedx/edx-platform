@@ -10,20 +10,31 @@ verify_student/start?course_id=MITx/6.002x/2013_Spring # create
 
 """
 import urllib
+from mock import patch, Mock, ANY
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from course_modes.models import CourseMode
+from verify_student.views import render_to_response
+from verify_student.models import SoftwareSecurePhotoVerification
+
+
+def mock_render_to_response(*args, **kwargs):
+    return render_to_response(*args, **kwargs)
+
+render_mock = Mock(side_effect=mock_render_to_response)
 
 
 class StartView(TestCase):
 
-    def start_url(course_id=""):
+    def start_url(self, course_id=""):
         return "/verify_student/{0}".format(urllib.quote(course_id))
 
     def test_start_new_verification(self):
@@ -58,3 +69,44 @@ class TestVerifyView(TestCase):
         response = self.client.get(url)
 
         self.assertEquals(response.status_code, 302)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestReverifyView(TestCase):
+    """
+    Tests for the reverification views
+
+    """
+    def setUp(self):
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_reverify_get(self):
+        url = reverse('verify_student_reverify')
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        ((_template, context), _kwargs) = render_mock.call_args
+        self.assertFalse(context['error'])
+
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_reverify_post_failure(self):
+        url = reverse('verify_student_reverify')
+        response = self.client.post(url, {'face_image': '',
+                                          'photo_id_image': ''})
+        self.assertEquals(response.status_code, 200)
+        ((template, context), _kwargs) = render_mock.call_args
+        self.assertIn('photo_reverification', template)
+        self.assertTrue(context['error'])
+
+    @patch.dict(settings.MITX_FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_reverify_post_success(self):
+        url = reverse('verify_student_reverify')
+        response = self.client.post(url, {'face_image': ',',
+                                          'photo_id_image': ','})
+        self.assertEquals(response.status_code, 302)
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+            self.assertIsNotNone(verification_attempt)
+        except ObjectDoesNotExist:
+            self.fail('No verification object generated')

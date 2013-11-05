@@ -134,9 +134,9 @@ $(document).ready(function() {
             <ul class="list-actions">
               <li class="action action-select">
                 %if upgrade:
-                 <input type="submit" name="mode" value="Upgrade Your Registration" />
+                <input type="submit" name="certificate_mode" value="${_('Upgrade Your Registration')}" />
                 %else:
-                  <input type="submit" name="mode" value="Select Certificate" />
+                <input type="submit" name="certificate_mode" value="${_('Select Certificate')}" />
                 %endif
 
               </li>
@@ -179,7 +179,7 @@ $(document).ready(function() {
 
               <ul class="list-actions">
                 <li class="action action-select">
-                  <input type="submit" name="mode" value="Select Audit" />
+                <input type="submit" name="audit_mode" value="${_('Select Audit')}" />
                 </li>
               </ul>
             </div>

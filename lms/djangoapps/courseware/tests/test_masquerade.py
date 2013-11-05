@@ -8,17 +8,17 @@ Notes for running by hand:
 ./manage.py lms --settings test test lms/djangoapps/courseware
 """
 
+import json
+
 from django.test.utils import override_settings
-
 from django.core.urlresolvers import reverse
-
 from django.contrib.auth.models import Group, User
+
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-import json
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

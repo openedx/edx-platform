@@ -1,17 +1,16 @@
 """
 Instructor Views
 """
-from collections import defaultdict
 import csv
 import json
 import logging
-from markupsafe import escape
 import os
 import re
 import requests
-from requests.status_codes import codes
-from collections import OrderedDict
 
+from collections import defaultdict, OrderedDict
+from markupsafe import escape
+from requests.status_codes import codes
 from StringIO import StringIO
 
 from django.conf import settings
@@ -744,7 +743,7 @@ def instructor_dashboard(request, course_id):
         else:
             # If sending the task succeeds, deliver a success message to the user.
             if email_to_option == "all":
-                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
+                email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.</p></div>'
             else:
                 email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
 
@@ -1590,14 +1589,16 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
             success, task_message = get_task_completion_info(instructor_task)
             status = "Complete" if success else "Incomplete"
             # generate row for this task:
-            row = [str(instructor_task.task_type),
-                   str(instructor_task.task_id),
-                   str(instructor_task.requester),
-                   instructor_task.created.isoformat(' '),
-                   duration_sec,
-                   str(instructor_task.task_state),
-                   status,
-                   task_message]
+            row = [
+                str(instructor_task.task_type),
+                str(instructor_task.task_id),
+                str(instructor_task.requester),
+                instructor_task.created.isoformat(' '),
+                duration_sec,
+                str(instructor_task.task_state),
+                status,
+                task_message
+            ]
             datatable['data'].append(row)
 
         if problem_url is None:

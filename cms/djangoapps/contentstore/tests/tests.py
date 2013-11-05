@@ -1,9 +1,8 @@
-from django.test.client import Client
 from django.test.utils import override_settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
-from contentstore.tests.utils import parse_json, user, registration
+from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -82,12 +81,12 @@ class AuthTestCase(ContentStoreTestCase):
         self.email = 'a@b.com'
         self.pw = 'xyz'
         self.username = 'testuser'
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         # clear the cache so ratelimiting won't affect these tests
         cache.clear()
 
     def check_page_get(self, url, expected):
-        resp = self.client.get(url)
+        resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, expected)
         return resp
 
@@ -152,20 +151,20 @@ class AuthTestCase(ContentStoreTestCase):
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
         auth_pages = (
-            reverse('index'),
+            '/course',
         )
 
         # These are pages that should just load when the user is logged in
         # (no data needed)
         simple_auth_pages = (
-            reverse('index'),
+            '/course',
         )
 
         # need an activated user
         self.test_create_account()
 
         # Create a new session
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
 
         # Not logged in.  Should redirect to login.
         print('Not logged in')
@@ -184,7 +183,7 @@ class AuthTestCase(ContentStoreTestCase):
     def test_index_auth(self):
 
         # not logged in.  Should return a redirect.
-        resp = self.client.get(reverse('index'))
+        resp = self.client.get_html('/course')
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.

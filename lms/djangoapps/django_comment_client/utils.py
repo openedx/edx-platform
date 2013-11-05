@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
-from django_comment_common.models import Role
+from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view
 
 import mitxmako
@@ -42,12 +42,8 @@ def merge_dict(dic1, dic2):
 
 
 def get_role_ids(course_id):
-    roles = Role.objects.filter(course_id=course_id)
-    staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
-    roles_with_ids = {'Staff': staff}
-    for role in roles:
-        roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
-    return roles_with_ids
+    roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
+    return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
 def has_forum_access(uname, course_id, rolename):
@@ -333,7 +329,7 @@ def extend_content(content):
         try:
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
-        except user.DoesNotExist:
+        except User.DoesNotExist:
             log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
 
     content_info = {

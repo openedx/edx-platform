@@ -14,9 +14,16 @@
 
   .olddash-button-wrapper {
     position: absolute;
-    top: 17px;
+    top: 16px;
     right: 15px;
-    @include font-size(14);
+    @include font-size(16);
+  }
+
+  .studio-edit-link{
+    position: absolute;
+    top: 40px;
+    right: 15px;
+    @include font-size(16);
   }
 
   // system feedback - messages
@@ -35,10 +42,8 @@
   .msg-warning {
     border-top: 2px solid $warning-color;
     background: tint($warning-color,95%);
-
-    .copy {
-      color: $warning-color;
-    }
+    display: none;
+    color: $warning-color;
   }
 
   // TYPE: confirm

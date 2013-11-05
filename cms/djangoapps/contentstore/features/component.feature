@@ -19,11 +19,19 @@ Feature: CMS.Component Adding
            | Component               |
            | Text                    |
            | Announcement            |
-           | E-text Written in LaTeX |
        Then I see HTML components in this order:
            | Component               |
            | Text                    |
            | Announcement            |
+
+    Scenario: I can add Latex HTML components
+       Given I am in Studio editing a new unit
+       Given I have enabled latex compiler
+       When I add this type of HTML component:
+           | Component               |
+           | E-text Written in LaTeX |
+       Then I see HTML components in this order:
+           | Component               |
            | E-text Written in LaTeX |
 
     Scenario: I can add Common Problem components
@@ -43,9 +51,14 @@ Feature: CMS.Component Adding
            | Numerical Input      |
            | Text Input           |
 
-    Scenario: I can add Advanced Problem components
+    Scenario Outline: I can add Advanced Problem components
        Given I am in Studio editing a new unit
-       When I add this type of Advanced Problem component:
+       When I add a "<Component>" "Advanced Problem" component
+       Then I see a "<Component>" Problem component
+       # Flush out the database before the next example executes
+       And I reset the database
+
+    Examples:
            | Component                     |
            | Blank Advanced Problem        |
            | Circuit Schematic Builder     |
@@ -53,18 +66,21 @@ Feature: CMS.Component Adding
            | Drag and Drop                 |
            | Image Mapped Input            |
            | Math Expression Input         |
-           | Problem Written in LaTeX      |
            | Problem with Adaptive Hint    |
-       Then I see Problem components in this order:
+
+
+    Scenario: I can add Advanced Latex Problem components
+       Given I am in Studio editing a new unit
+       Given I have enabled latex compiler
+       When I add a "<Component>" "Advanced Problem" component
+       Then I see a "<Component>" Problem component
+       # Flush out the database before the next example executes
+       And I reset the database
+
+    Examples:
            | Component                     |
-           | Blank Advanced Problem        |
-           | Circuit Schematic Builder     |
-           | Custom Python-Evaluated Input |
-           | Drag and Drop                 |
-           | Image Mapped Input            |
-           | Math Expression Input         |
            | Problem Written in LaTeX      |
-           | Problem with Adaptive Hint    |
+           | Problem with Adaptive Hint in Latex  |
 
     Scenario: I see a prompt on delete
         Given I am in Studio editing a new unit

@@ -193,12 +193,14 @@ def edit_unit(request, location):
         # add boilerplates
         if hasattr(component_class, 'templates'):
             for template in component_class.templates():
-                component_templates[category].append((
-                    template['metadata'].get('display_name'),
-                    category,
-                    template['metadata'].get('markdown') is not None,
-                    template.get('template_id')
-                ))
+                filter_templates = getattr(component_class, 'filter_templates', None)
+                if not filter_templates or filter_templates(template, course):
+                    component_templates[category].append((
+                        template['metadata'].get('display_name'),
+                        category,
+                        template['metadata'].get('markdown') is not None,
+                        template.get('template_id')
+                    ))
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
@@ -323,7 +325,7 @@ def assignment_type_update(request, org, course, category, name):
         rsp = CourseGradingModel.get_section_grader_type(location)
     elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
         rsp = CourseGradingModel.update_section_grader_type(
-                    location, request.POST
+                    location, request.json
         )
     return JsonResponse(rsp)
 
@@ -332,7 +334,7 @@ def assignment_type_update(request, org, course, category, name):
 @expect_json
 def create_draft(request):
     "Create a draft"
-    location = request.POST['id']
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
@@ -351,7 +353,7 @@ def publish_draft(request):
     """
     Publish a draft
     """
-    location = request.POST['id']
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
@@ -370,7 +372,7 @@ def publish_draft(request):
 @expect_json
 def unpublish_unit(request):
     "Unpublish a unit"
-    location = request.POST['id']
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
@@ -413,6 +415,6 @@ def module_info(request, module_location):
     elif request.method in ("POST", "PUT"):
         rsp = set_module_info(
             get_modulestore(location),
-            location, request.POST
+            location, request.json
         )
     return JsonResponse(rsp)

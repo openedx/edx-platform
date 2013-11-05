@@ -1,7 +1,7 @@
 import logging
-import yaml
 import os
 import sys
+import yaml
 
 from functools import partial
 from lxml import etree
@@ -739,11 +739,16 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 )
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
+                if isinstance(self, self.xmodule_runtime.error_descriptor_class):
+                    log.exception('Error creating an ErrorModule from an ErrorDescriptor')
+                    raise
+
                 log.exception('Error creating xmodule')
                 descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
                     self,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
+                descriptor.xmodule_runtime = self.xmodule_runtime
                 self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
         return self.xmodule_runtime.xmodule_instance
 

@@ -1,7 +1,11 @@
 import json
 import logging
-import sys
+
+import static_replace
+
 from functools import partial
+from requests.auth import HTTPBasicAuth
+from dogapi import dog_stats_api
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -12,14 +16,20 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from requests.auth import HTTPBasicAuth
-from dogapi import dog_stats_api
-
 from capa.xqueue_interface import XQueueInterface
+from courseware.access import has_access
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from lms.xblock.field_data import LmsFieldData
 from mitxmako.shortcuts import render_to_string
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import unique_id_for_user
+from util.json_request import JsonResponse
+from util.sandboxing import can_execute_unsafe_code
+from xblock.fields import Scope
 from xblock.runtime import DbModel
+from xblock.runtime import KeyValueStore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -27,18 +37,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
-import static_replace
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
-
-from courseware.access import has_access
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache, DjangoKeyValueStore
-from xblock.runtime import KeyValueStore
-from xblock.fields import Scope
-from util.sandboxing import can_execute_unsafe_code
-from util.json_request import JsonResponse
-from lms.xblock.field_data import LmsFieldData
 
 log = logging.getLogger(__name__)
 

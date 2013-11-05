@@ -15,6 +15,7 @@ from xmodule.modulestore.django import modulestore
 
 from ..utils import get_course_for_item, get_modulestore
 
+from django.utils.translation import ugettext as _
 
 __all__ = ['edit_tabs', 'reorder_static_tabs']
 
@@ -30,11 +31,13 @@ def initialize_course_tabs(course):
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
-    course.tabs = [{"type": "courseware"},
-                   {"type": "course_info", "name": "Course Info"},
-                   {"type": "discussion", "name": "Discussion"},
-                   {"type": "wiki", "name": "Wiki"},
-                   {"type": "progress", "name": "Progress"}]
+    course.tabs = [
+        {"type": "courseware", "name": _("Courseware")},
+        {"type": "course_info", "name": _("Course Info")},
+        {"type": "discussion", "name": _("Discussion")},
+        {"type": "wiki", "name": _("Wiki")},
+        {"type": "progress", "name": _("Progress")},
+    ] 
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
@@ -43,7 +46,7 @@ def initialize_course_tabs(course):
 @expect_json
 def reorder_static_tabs(request):
     "Order the static tabs in the requested order"
-    tabs = request.POST['tabs']
+    tabs = request.json['tabs']
     course = get_course_for_item(tabs[0])
 
     if not has_access(request.user, course.location):

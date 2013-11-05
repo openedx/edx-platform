@@ -1,17 +1,19 @@
-from django.conf import settings
-from xmodule.open_ended_grading_classes import peer_grading_service
-from .staff_grading_service import StaffGradingService
-from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
-import json
-from student.models import unique_id_for_user
-from courseware.models import StudentModule
-import logging
-from courseware.access import has_access
-from util.cache import cache
 import datetime
+import json
+import logging
+
+from django.conf import settings
+
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
+
+from courseware.access import has_access
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
-import datetime
+from student.models import unique_id_for_user
+from util.cache import cache
+
+from .staff_grading_service import StaffGradingService
 
 log = logging.getLogger(__name__)
 

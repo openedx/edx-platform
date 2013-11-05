@@ -239,6 +239,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         cloudSectionEl
             .addClass('active')
             .find('.your_words').html(studentWordsStr)
+            .end()
             .find('.total_num_words').html(response.total_count);
 
         $(cloudSectionEl.attr('id') + ' .word_cloud').empty();
@@ -282,7 +283,7 @@ define('WordCloudMain', ['logme'], function (logme) {
             .attr('transform', function (d) {
                 return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')scale(' + scale + ')';
             })
-            .text(function (d) {               
+            .text(function (d) {
                 return d.text;
             });
     }; // End-of: WordCloudMain.prototype.drawWordCloud = function (words, bounds) {

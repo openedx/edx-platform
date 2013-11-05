@@ -1,7 +1,6 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Course Import")}</%block>
@@ -28,17 +27,17 @@
           <p>${_("During the initial stages of the import process, please do not navigate away from this page.")}</p>
       </div>
 
-      <form id="fileupload" method="post" enctype="multipart/form-data"
-          class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
-
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+      <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         <h2 class="title">${_("Select a File (.tar.gz format) to Replace Your Course Content")}</h2>
 
         <p class="error-block"></p>
 
-        <a href="#" class="action action-choose-file choose-file-button">${_("Choose File")}</a>
+        <a href="#" class="action action-choose-file choose-file-button">
+          <i class="icon-upload"></i>
+          <span class="copy">${_("Choose a File to Import")}</span>
+        </a>
 
         <div class="wrapper wrapper-file-name file-name-block">
             <h3 class="title">
@@ -136,6 +135,13 @@
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
       </div>
+
+      <div class="bit">
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <h3 class="title-3">${_("Course Team Info and Exporting/Importing")}</h3>
+
+        <p>${_("Please note that when importing course content, your course team info will not be changed by the imported course's information.")}</p>
+      </div>
     </aside>
   </section>
 </div>
@@ -158,7 +164,7 @@ var chooseBtn = $('.choose-file-button');
 
 var allStats = $('#status-infos');
 
-var feedbackUrl = "${reverse('import_status', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name='fillerName'))}"
+var feedbackUrl = "${import_status_url}";
 
 var defaults = [
     '${_("There was an error during the upload process.")}\n',
