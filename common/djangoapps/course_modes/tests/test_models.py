@@ -106,7 +106,7 @@ class CourseModeModelTest(TestCase):
         expiration_date = datetime.now(pytz.UTC) + timedelta(days=1)
         expired_mode.expiration_date = expiration_date
         expired_mode.save()
-        expired_mode_value = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', expiration_date.date())
+        expired_mode_value = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', expiration_date)
         modes = CourseMode.modes_for_course(self.course_id)
         self.assertEqual([expired_mode_value, mode1], modes)
 

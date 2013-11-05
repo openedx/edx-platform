@@ -36,7 +36,7 @@ class CourseMode(models.Model):
     currency = models.CharField(default="usd", max_length=8)
 
     # turn this mode off after the given expiration date
-    expiration_date = models.DateField(default=None, null=True, blank=True)
+    expiration_date = models.DateTimeField(default=None, null=True, blank=True)
 
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
     DEFAULT_MODE_SLUG = 'honor'
