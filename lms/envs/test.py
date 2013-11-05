@@ -121,6 +121,12 @@ CONTENTSTORE = {
     }
 }
 
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'test_modulestore',
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
