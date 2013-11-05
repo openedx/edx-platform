@@ -16,7 +16,11 @@ def has_instructor_access_for_class(user, course_id):
     """
 
     course = get_course_with_access(user, course_id, 'staff', depth=None)
-    return has_access(user, course, 'instructor')
+    
+    #ToDo returning false hangs page.
+    return has_access(user, course, 'staff')
+
+    
 
 
 # def all_problem_attempt_distribution(request, course_id):
