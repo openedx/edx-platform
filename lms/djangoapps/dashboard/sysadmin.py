@@ -31,12 +31,14 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 from django.utils.html import escape
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.store_utilities import delete_course
+from courseware.access import has_access
 import mongoengine
 
 import track.views
@@ -526,7 +528,7 @@ def sysadmin_dashboard(request):
 
 # -----------------------------------------------------------------------------
 
-@staff_member_required
+@login_required
 def view_git_logs(request, course_id=None):
     """Shows logs of imports that happened as a result of a git import"""
     # pylint: disable-msg=W0613
@@ -559,8 +561,18 @@ def view_git_logs(request, course_id=None):
                            'MONGODB_LOG settings. error: {0}').format(str(ex)))
 
     if course_id is None:
+
+        # Require staff if not going to specific course
+        if not request.user.is_staff:
+            raise Http404
         cilset = CourseImportLog.objects.all().order_by('-created')
     else:
+        course = get_course_by_id(course_id)
+        # Allow only course team, instructors, and staff
+        if not (request.user.is_staff or
+                has_access(request.user, course, 'instructor') or
+                has_access(request.user, course, 'staff')):
+            raise Http404
         log.debug('course_id={0}'.format(course_id))
         cilset = CourseImportLog.objects.filter(
             course_id=course_id).order_by('-created')
