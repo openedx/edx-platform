@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 14:54+0400\n"
+"POT-Creation-Date: 2013-11-05 18:17+0400\n"
 "PO-Revision-Date: 2013-11-01 14:34+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -1102,6 +1102,13 @@ msgstr "Эл. почта"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:183
 msgid "Analytics"
 msgstr "Аналитика"
+
+#: lms/djangoapps/instructor/views/legacy.py:584
+msgid "Found {number} record to dump"
+msgid_plural "Found {number} records to dump"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
