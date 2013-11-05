@@ -551,7 +551,15 @@ function goto( mode)
         var emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
         document.idashform.onsubmit = function() {
           this.message.value = emailEditor.save()['data'];
-          return true;
+          if (!this.subject.value) {
+              alert("${_("Email subject can not be empty.")}");
+              return false;
+          } else if (!this.message.value) {
+              alert("${_("Email body can not be empty.")}");
+              return false;
+          } else {
+              return true;
+          }
         }
       });
     </script>
