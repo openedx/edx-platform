@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 15:34+0400\n"
-"PO-Revision-Date: 2013-11-05 15:39+0300\n"
+"POT-Creation-Date: 2013-11-05 16:21+0400\n"
+"PO-Revision-Date: 2013-11-05 16:28+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -5354,8 +5354,12 @@ msgstr "Комментарий"
 
 #: lms/templates/staff_problem_info.html:34
 #: lms/templates/courseware/notifications.html:52
+#: lms/templates/discussion/_user_profile.html:17
 msgid "comment"
-msgstr "комментарий"
+msgid_plural "comments"
+msgstr[0] "комментарий"
+msgstr[1] "комментария"
+msgstr[2] "комментариев"
 
 #: lms/templates/staff_problem_info.html:35
 msgid "Tag"
@@ -7199,11 +7203,18 @@ msgstr "Изменить настройку уведомлений"
 msgid "If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following."
 msgstr "Если включено, один раз в день на почту Вы будете получать дайджест, информирующий об активности в постах, за которыми Вы следите. "
 
-#: lms/templates/discussion/_user_profile.html:19
+#: lms/templates/discussion/_user_profile.html:16
+msgid "discussion started"
+msgid_plural "discussions started"
+msgstr[0] "начатая дискуссия"
+msgstr[1] "начатые дискуссии"
+msgstr[2] "начатых дискуссий"
+
+#: lms/templates/discussion/_user_profile.html:20
 msgid "Revoke Moderator rights"
 msgstr "Забрать права модератора"
 
-#: lms/templates/discussion/_user_profile.html:21
+#: lms/templates/discussion/_user_profile.html:22
 msgid "Promote to Moderator"
 msgstr "Предоставить права модератора"
 
@@ -10195,9 +10206,6 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
 #~ msgid "0 or higher"
 #~ msgstr "0 или выше"
-
-#~ msgid "Discussions"
-#~ msgstr "Дискуссии"
 
 #~ msgid "Course-wide settings for online discussion"
 #~ msgstr "Глобальные настройки курса для онлайн дискуссии"
