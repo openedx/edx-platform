@@ -177,13 +177,13 @@ MITX_FEATURES = {
     'MULTIPLE_ENROLLMENT_ROLES' : False,
 
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False,
+    'ENABLE_SHOPPING_CART': True,
 
     # Toggle storing detailed billing information
     'STORE_BILLING_INFO': False,
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
-    'ENABLE_PAID_COURSE_REGISTRATION': False,
+    'ENABLE_PAID_COURSE_REGISTRATION': True,
 
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
@@ -526,11 +526,11 @@ PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
-        'SHARED_SECRET': '',
-        'MERCHANT_ID': '',
-        'SERIAL_NUMBER': '',
+        'SHARED_SECRET': 'keysecret',
+        'MERCHANT_ID': 'cybersource_csiu_id',
+        'SERIAL_NUMBER': '0123456789012345678901',
         'ORDERPAGE_VERSION': '7',
-        'PURCHASE_ENDPOINT': '',
+        'PURCHASE_ENDPOINT': '/shoppingcart/payment_fake',
     }
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
