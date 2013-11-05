@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 14:36+0400\n"
-"PO-Revision-Date: 2013-11-05 14:39+0300\n"
+"POT-Creation-Date: 2013-11-05 15:34+0400\n"
+"PO-Revision-Date: 2013-11-05 15:39+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -6799,7 +6799,7 @@ msgstr ""
 
 #: lms/templates/courseware/news.html:20
 msgid "Updates to Discussion Posts You Follow"
-msgstr "Обновления к сообщениям в дискусиях, которые вы отслеживаете"
+msgstr "Обновления к сообщениям в дискуссиях, которые вы отслеживаете"
 
 #: lms/templates/courseware/notifications.html:41
 msgid "Anonymous"
@@ -6944,7 +6944,7 @@ msgstr "Новая запись"
 
 #: lms/templates/discussion/_discussion_module.html:5
 msgid "Show Discussion"
-msgstr "Показать дискусии"
+msgstr "Показать дискуссии"
 
 #: lms/templates/discussion/_filter_dropdown.html:29
 msgid "Filter Topics"
@@ -6958,11 +6958,11 @@ msgstr "Фильтр тем"
 #: lms/templates/discussion/_new_post.html:30
 #: lms/templates/discussion/_thread_list_template.html:17
 msgid "Show All Discussions"
-msgstr "Показать все дискусии"
+msgstr "Показать все дискуссии"
 
 #: lms/templates/discussion/_filter_dropdown.html:41
 msgid "Show Flagged Discussions"
-msgstr "Показать отмеченные дискусии"
+msgstr "Показать отмеченные дискуссии"
 
 #: lms/templates/discussion/_filter_dropdown.html:48
 msgid "Posts I'm Following"
@@ -7038,6 +7038,10 @@ msgstr "Темы дискуссий"
 #: lms/templates/discussion/_thread_list_template.html:16
 msgid "Discussion topics; current selection is: "
 msgstr "Темы дискуссий; текущий набор тем:"
+
+#: lms/templates/discussion/_thread_list_template.html:25
+msgid "Search all discussions"
+msgstr "Искать среди всех дискуссий"
 
 #: lms/templates/discussion/_thread_list_template.html:30
 msgid "Sort by:"
