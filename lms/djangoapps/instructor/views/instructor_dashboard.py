@@ -18,7 +18,9 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id
+
+from courseware.courses import get_course_by_id, get_cms_course_link
+
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -51,6 +53,15 @@ def instructor_dashboard_2(request, course_id):
         _section_data_download(course_id),
         _section_analytics(course_id),
     ]
+
+    # Gate access to course email by feature flag & by course-specific authorization
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
+        sections.append(_section_send_email(course_id, access, course))
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link(course)
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
