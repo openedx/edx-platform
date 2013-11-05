@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-
+from django.db import DatabaseError
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -27,6 +27,7 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
     DuplicateTaskException,
+    MAX_DATABASE_LOCK_RETRIES,
 )
 
 
@@ -285,13 +286,29 @@ class TestEmailErrors(ModuleStoreTestCase):
         with self.assertRaisesRegexp(DuplicateTaskException, 'already retried'):
             send_course_email(entry_id, bogus_email_id, to_list, global_email_context, new_subtask_status.to_dict())
 
-    def dont_test_send_email_undefined_email(self):
+    def test_send_email_with_locked_instructor_task(self):
+        # test at a lower level, to ensure that the course gets checked down below too.
+        entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
+        entry_id = entry.id  # pylint: disable=E1101
+        subtask_id = "subtask-id-locked-model"
+        initialize_subtask_info(entry, "emailed", 100, [subtask_id])
+        subtask_status = SubtaskStatus.create(subtask_id)
+        bogus_email_id = 1001
+        to_list = ['test@test.com']
+        global_email_context = {'course_title': 'dummy course'}
+        with patch('instructor_task.subtasks.InstructorTask.save') as mock_task_save:
+            mock_task_save.side_effect = DatabaseError
+            with self.assertRaises(DatabaseError):
+                send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())
+            self.assertEquals(mock_task_save.call_count, MAX_DATABASE_LOCK_RETRIES)
+
+    def test_send_email_undefined_email(self):
         # test at a lower level, to ensure that the course gets checked down below too.
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         entry_id = entry.id  # pylint: disable=E1101
         to_list = ['test@test.com']
         global_email_context = {'course_title': 'dummy course'}
-        subtask_id = "subtask-id-value"
+        subtask_id = "subtask-id-undefined-email"
         initialize_subtask_info(entry, "emailed", 100, [subtask_id])
         subtask_status = SubtaskStatus.create(subtask_id)
         bogus_email_id = 1001
