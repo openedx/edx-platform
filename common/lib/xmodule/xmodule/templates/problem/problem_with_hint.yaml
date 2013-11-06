@@ -45,7 +45,7 @@ metadata:
         What is the best programming language that exists today?   You may
         enter your answer in upper or lower case, with or without quotes.
         
-        \edXabox{type="custom" cfn='test_str' expect='python' hintfn='hint_fn'}
+        \edXabox{type="custom" cfn='test_str' expect='c++' hintfn='hint_fn'}
     markdown: !!null
 data: |
     <problem>
@@ -84,8 +84,8 @@ data: |
         <p>
     What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes. </p>
         <p>
-          <customresponse cfn="test_str" expect="python">
-            <textline correct_answer="python"/>
+          <customresponse cfn="test_str" expect="c++">
+            <textline correct_answer="c++"/>
             <hintgroup hintfn="hint_fn"/>
           </customresponse>
         </p>
