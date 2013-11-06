@@ -2,6 +2,7 @@
 
 import logging
 from uuid import uuid4
+
 from static_replace import replace_static_urls
 
 from django.core.exceptions import PermissionDenied

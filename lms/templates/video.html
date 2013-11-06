@@ -45,17 +45,15 @@
 
     <div class="tc-wrapper">
       <a href="#before-transcript" class="nav-skip">${_("Skip to a navigable version of this video's transcript.")}</a>
-      
-      <article class="video-wrapper">
-          <div class="video-player-pre"></div>
 
+      <article class="video-wrapper">
+          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <div class="video-player-pre"></div>
           <section class="video-player">
               <div id="${id}"></div>
               <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
           </section>
-
           <div class="video-player-post"></div>
-
           <section class="video-controls">
               <div class="slider" title="Video position"></div>
 
@@ -87,14 +85,14 @@
           </section>
           <a class="nav-skip" id="before-transcript" href="#after-transcript">${_('Skip to end of transcript.')}</a>
       </article>
-      
+
       <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
         <li></li>
       </ol>
     </div>
-    
+
     <a class="nav-skip" id="after-transcript" href="#before-transcript">${_('Go back to start of transcript.')}</a>
-    
+
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
     % if sources.get('main'):
