@@ -366,10 +366,10 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect($('#unit-1')).toHaveClass('was-dropped')
                 # We expect 2 requests to be sent-- the first for removing Unit 1 from Subsection 1,
                 # and the second for adding Unit 1 to the end of Subsection 2.
-                expect(@requests[0].requestBody).toEqual('{"id":"subsection-1-id","children":["second-unit-id","third-unit-id"]}')
+                expect(@requests[0].requestBody).toEqual('{"children":["second-unit-id","third-unit-id"]}')
                 @requests[0].respond(200)
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
-                expect(@requests[1].requestBody).toEqual('{"id":"subsection-2-id","children":["fourth-unit-id","first-unit-id"]}')
+                expect(@requests[1].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}')
                 @requests[1].respond(200)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 # Class is removed in a timeout.

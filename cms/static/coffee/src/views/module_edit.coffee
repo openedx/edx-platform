@@ -69,6 +69,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
           payload
           (data) =>
               @model.set(id: data.id)
+              @model.url = data.update_url
               @$el.data('id', data.id)
               @$el.data('update_url', data.update_url)
               @render()

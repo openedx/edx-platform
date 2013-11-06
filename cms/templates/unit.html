@@ -10,19 +10,21 @@ from xmodule.modulestore.django import loc_mapper
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/unit", "jquery.ui"],
-    function(doc, $, ModuleModel, UnitEditView, ui) {
+require(["domReady!", "jquery", "backbone", "coffee/src/views/unit", "jquery.ui"],
+    function(doc, $, Backbone, UnitEditView, ui) {
   window.unit_location_analytics = '${unit_location}';
 
   // tabs
   $('.tab-group').tabs();
 
-  new UnitEditView({
-    el: $('.main-wrapper'),
-    model: new ModuleModel({
+  var model = new Backbone.Model({
       id: '${unit_location}',
       state: '${unit_state}'
-    })
+  });
+  model.url = '${unit_update_url}'
+  new UnitEditView({
+    el: $('.main-wrapper'),
+    model: model
   });
 
   $('.new-component-template').each(function(){

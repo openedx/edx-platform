@@ -178,7 +178,7 @@ function saveSubsection() {
         $spinner.show();
     }
 
-    var id = $('.subsection-body').data('id');
+    var url = $('.subsection-body').data('update_url');
 
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
@@ -202,12 +202,11 @@ function saveSubsection() {
     });
 
     $.ajax({
-        url: "/save_item",
-        type: "POST",
+        url: url,
+        type: "PUT",
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
-            'id': id,
             'metadata': metadata
         }),
         success: function() {

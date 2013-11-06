@@ -38,6 +38,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             e.preventDefault();
             var $modal = $(modalSelector);
             $modal.attr('data-id', $(this).attr('data-id'));
+            $modal.attr('data-update_url', $(this).attr('data-update_url'));
             $modal.find('.start-date').val($(this).attr('data-date'));
             $modal.find('.start-time').val($(this).attr('data-time'));
             if ($modal.find('.start-date').val() == '' && $modal.find('.start-time').val() == '') {
@@ -56,6 +57,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             );
 
             var id = $(modalSelector).attr('data-id');
+            var url = $(modalSelector).attr('data-update_url');
 
             analytics.track('Edited Section Release Date', {
                 'course': course_location_analytics,
@@ -69,12 +71,11 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             saving.show();
             // call into server to commit the new order
             $.ajax({
-                url: "/save_item",
-                type: "POST",
+                url: url,
+                type: "PUT",
                 dataType: "json",
                 contentType: "application/json",
                 data: JSON.stringify({
-                    'id': id,
                     'metadata': {
                         'start': datetime
                     }
@@ -456,12 +457,11 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                     }
                 );
                 $.ajax({
-                    url: '/save_item',
-                    type: 'POST',
+                    url: ele.data('update_url'),
+                    type: 'PUT',
                     dataType: 'json',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        id: ele.data('id'),
                         children: children
                     }),
                     success: success

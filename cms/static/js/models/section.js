@@ -8,10 +8,8 @@ define(["backbone", "gettext", "js/views/feedback_notification"], function(Backb
                 return gettext("You must specify a name");
             }
         },
-        url: "/save_item",
         toJSON: function() {
             return {
-                id: this.get("id"),
                 metadata: {
                     display_name: this.get("name")
                 }

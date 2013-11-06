@@ -122,6 +122,10 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    update_url = loc_mapper().translate_location(
+        course.location.course_id, item.location, False, True
+    ).url_reverse("xblock", "")
+
     return render_to_response(
         'edit_subsection.html',
         {
@@ -133,6 +137,7 @@ def edit_subsection(request, location):
            'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
            'parent_location': course.location,
            'parent_item': parent,
+           'update_url': update_url,
            'policy_metadata': policy_metadata,
            'subsection_units': subsection_units,
            'can_view_live': can_view_live

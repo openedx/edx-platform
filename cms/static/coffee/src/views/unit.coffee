@@ -1,7 +1,7 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleModel, ModuleEditView) ->
+        "coffee/src/views/module_edit"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView) ->
   class UnitEditView extends Backbone.View
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
@@ -61,11 +61,13 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
       @$('.component').each (idx, element) =>
+        model = new Backbone.Model
+            id: $(element).data('id')
+        model.url = $(element).data('update_url')
         new ModuleEditView
           el: element,
           onDelete: @deleteComponent,
-          model: new ModuleModel
-            id: $(element).data('id')
+          model: model
 
     showComponentTemplates: (event) =>
       event.preventDefault()
@@ -90,7 +92,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
       editor = new ModuleEditView(
         onDelete: @deleteComponent
-        model: new ModuleModel()
+        model: new Backbone.Model()
       )
 
       @$newComponentItem.before(editor.$el)
