@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-06 15:17+0400\n"
+"POT-Creation-Date: 2013-11-06 17:03+0400\n"
 "PO-Revision-Date: 2013-11-01 14:34+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -739,26 +739,146 @@ msgstr "Неправильный синтаксис формулы '{0}'"
 msgid "CustomResponse: check function returned an invalid dict"
 msgstr "CustomResponse: функция проверки вернула недопустимый словарь"
 
-#: common/lib/xmodule/xmodule/capa_module.py:357
-msgid "Check"
-msgstr "Проверка"
-
-#: common/lib/xmodule/xmodule/capa_module.py:358
-msgid "Final Check"
-msgstr "Последняя проверка"
-
-#: common/lib/xmodule/xmodule/capa_module.py:946
-msgid "Error: {msg}"
-msgstr "Ошибка: {msg}"
-
+#: common/lib/xmodule/xmodule/capa_module.py:86
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:195
-#: common/lib/xmodule/xmodule/master_class_module.py:37
+#: common/lib/xmodule/xmodule/master_class_module.py:39
+#: common/lib/xmodule/xmodule/peer_grading_module.py:68
 msgid "Display Name"
 msgstr "Отображаемое имя:"
 
+#: common/lib/xmodule/xmodule/capa_module.py:87
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:196
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr "Данное имя появится в горизонтальной навигации сверху страницы"
+
+#: common/lib/xmodule/xmodule/capa_module.py:91
+msgid "Blank Advanced Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:93
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:228
+msgid "Number of attempts taken by the student on this problem"
+msgstr "Количество попыток, использованных студентом по этой задаче"
+
+#: common/lib/xmodule/xmodule/capa_module.py:96
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
+msgid "Maximum Attempts"
+msgstr "Максимальное число попыток"
+
+#: common/lib/xmodule/xmodule/capa_module.py:97
+#, fuzzy
+msgid ""
+"Defines the number of times a student can try to answer this problem. If the "
+"value is not set, infinite attempts are allowed."
+msgstr ""
+"Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
+"оценивается в 1 балл."
+
+#: common/lib/xmodule/xmodule/capa_module.py:101
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:265
+msgid "Date that this problem is due by"
+msgstr "Срок, до которого можно сдавать эту задачу"
+
+#: common/lib/xmodule/xmodule/capa_module.py:103
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:269
+msgid "Amount of time after the due date that submissions will be accepted"
+msgstr ""
+"Промежуток времени после даты сдачи, в течение которого задачу еще можно "
+"сдавать"
+
+#: common/lib/xmodule/xmodule/capa_module.py:107
+msgid "Show Answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:108
+msgid ""
+"Defines when to show the answer to the problem. A default value can be set "
+"in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:122
+msgid "Whether to force the save button to appear on the page"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:127
+#, fuzzy
+msgid "Randomization"
+msgstr "Глобальная навигация"
+
+#: common/lib/xmodule/xmodule/capa_module.py:128
+msgid ""
+"Defines how often inputs are randomized when a student loads the problem. "
+"This setting only applies to problems that can have randomly generated "
+"numeric values. A default value can be set in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:140
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:273
+msgid "XML data for the problem"
+msgstr "XML данные для задачи"
+
+#: common/lib/xmodule/xmodule/capa_module.py:141
+msgid "Dictionary with the correctness of current student answers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:143
+msgid "Dictionary for maintaining the state of inputtypes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:144
+#, fuzzy
+msgid "Dictionary with the current student responses"
+msgstr "На каком шаге в текущей задаче сейчас находится студент."
+
+#: common/lib/xmodule/xmodule/capa_module.py:145
+#, fuzzy
+msgid "Whether the student has answered the problem"
+msgstr "Число попыток студента ответить на эту задачу."
+
+#: common/lib/xmodule/xmodule/capa_module.py:146
+msgid "Random seed for this student"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:148
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
+#: common/lib/xmodule/xmodule/peer_grading_module.py:62
+msgid "Problem Weight"
+msgstr "Вес задачи"
+
+#: common/lib/xmodule/xmodule/capa_module.py:149
+#, fuzzy
+msgid ""
+"Defines the number of points each problem is worth. If the value is not set, "
+"each response field in the problem is worth one point."
+msgstr ""
+"Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
+"оценивается в 1 балл."
+
+#: common/lib/xmodule/xmodule/capa_module.py:154
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:319
+msgid "Markdown source of this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:156
+msgid ""
+"Source code for LaTeX and Word problems. This feature is not well-supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:160
+msgid "String customization substitutions for particular locations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:361
+msgid "Check"
+msgstr "Проверка"
+
+#: common/lib/xmodule/xmodule/capa_module.py:362
+msgid "Final Check"
+msgstr "Последняя проверка"
+
+#: common/lib/xmodule/xmodule/capa_module.py:950
+msgid "Error: {msg}"
+msgstr "Ошибка: {msg}"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:197
 msgid "Open Response Assessment"
@@ -794,6 +914,7 @@ msgid "initial"
 msgstr "начальный"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:222
+#: common/lib/xmodule/xmodule/peer_grading_module.py:45
 msgid "Graded"
 msgstr "Оценено"
 
@@ -801,17 +922,9 @@ msgstr "Оценено"
 msgid "Defines whether the student gets credit for grading this problem."
 msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:228
-msgid "Number of attempts taken by the student on this problem"
-msgstr "Количество попыток, использованных студентом по этой задаче"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:233
 msgid "If the problem is ready to be reset or not."
 msgstr "Готова ли задача к очистке или нет."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
-msgid "Maximum Attempts"
-msgstr "Максимальное число попыток"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:239
 msgid "The number of times the student can try to answer this problem."
@@ -851,29 +964,12 @@ msgstr ""
 "'True', проверяющие смогут вносить изменения в посылку студента. Эти "
 "изменения будут сохранены и отображены вместе с оцененной обратной связью."
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:265
-msgid "Date that this problem is due by"
-msgstr "Срок, до которого можно сдавать эту задачу"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:269
-msgid "Amount of time after the due date that submissions will be accepted"
-msgstr ""
-"Промежуток времени после даты сдачи, в течение которого задачу еще можно "
-"сдавать"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:272
 msgid "Current version number"
 msgstr "Номер текущей версии"
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:273
-msgid "XML data for the problem"
-msgstr "XML данные для задачи"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
-msgid "Problem Weight"
-msgstr "Вес задачи"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:277
+#: common/lib/xmodule/xmodule/peer_grading_module.py:63
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set, "
 "each problem is worth one point."
@@ -940,47 +1036,48 @@ msgstr ""
 "студентов. Эта возможность предназначена для использования, когда 'Требуемая "
 "перекрестная проверка' > 'Число проверяющих'"
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:319
-msgid "Markdown source of this module"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:38
+#: common/lib/xmodule/xmodule/master_class_module.py:40
+#: common/lib/xmodule/xmodule/peer_grading_module.py:69
 msgid "Display name for this module"
 msgstr "Отображаемое имя для этого модуля"
 
-#: common/lib/xmodule/xmodule/master_class_module.py:43
+#: common/lib/xmodule/xmodule/master_class_module.py:42
+msgid "Master Class"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/master_class_module.py:45
 msgid "Max places"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:44
+#: common/lib/xmodule/xmodule/master_class_module.py:46
 msgid "Number of text boxes available for students to input words/sentences."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:50
+#: common/lib/xmodule/xmodule/master_class_module.py:52
 msgid "Autopass score"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:51
+#: common/lib/xmodule/xmodule/master_class_module.py:53
 msgid "Maximum number of words to be displayed in generated word cloud."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:59
+#: common/lib/xmodule/xmodule/master_class_module.py:61
 msgid "Whether this student has been register for this master class."
 msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:64
+#: common/lib/xmodule/xmodule/master_class_module.py:66
 msgid "All registrations from all students."
 msgstr "Все регистрации от всех студентов."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:68
+#: common/lib/xmodule/xmodule/master_class_module.py:70
 msgid "Passed registrations."
 msgstr "Прошедшие регистрацию."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:89
+#: common/lib/xmodule/xmodule/master_class_module.py:91
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -988,13 +1085,63 @@ msgstr ""
 "Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:91
+#: common/lib/xmodule/xmodule/master_class_module.py:93
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
 msgstr ""
 "Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
 "данную страницу позже для результатов."
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:32
+msgid "Show Single Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:33
+msgid ""
+"When True, only the single problem specified by \"Link to Problem Location\" "
+"is shown. When False, a panel is displayed with all problems available for "
+"peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:39
+msgid "Link to Problem Location"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:40
+msgid ""
+"The location of the problem being graded. Only used when \"Show Single "
+"Problem\" is True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:46
+#, fuzzy
+msgid ""
+"Defines whether the student gets credit for grading this problem. Only used "
+"when \"Show Single Problem\" is True."
+msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:51
+msgid "Due date that should be displayed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:54
+msgid "Amount of grace to give on the due date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:58
+msgid "Student data for a given peer grading problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:71
+#, fuzzy
+msgid "Peer Grading Interface"
+msgstr "Перекрестная проверка"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:74
+#, fuzzy
+msgid "Html contents to display for this module"
+msgstr "Отображаемое имя для этого модуля"
 
 #: common/lib/xmodule/xmodule/video_module.py:312
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."

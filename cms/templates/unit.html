@@ -92,7 +92,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
                                 % if boilerplate_name is None:
                                   <li class="editor-md empty">
                                     <a href="#" data-category="${category}">
-                                      <span class="name">${name}</span>
+                                      <span class="name">${_(name)}</span>
                                     </a>
                                   </li>
 
@@ -100,7 +100,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
                                   <li class="editor-md">
                                     <a href="#" data-category="${category}"
                                        data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
+                                      <span class="name">${_(name)}</span>
                                     </a>
                                   </li>
                                 % endif
@@ -117,7 +117,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
                                   <li class="editor-manual">
                                     <a href="#" data-category="${category}"
                                        data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
+                                      <span class="name">${_(name)}</span>
                                     </a>
                                   </li>
                                 % endif
@@ -126,7 +126,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
                         </div>
                     </div>
                     % endif
-                    <a href="#" class="cancel-button">Cancel</a>
+                    <a href="#" class="cancel-button">${_("Cancel")}</a>
                 </div>
                 % endif
                 % endfor

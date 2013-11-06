@@ -23,51 +23,55 @@ log = logging.getLogger(__name__)
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
 
+def _(s):
+    return s;
+
+
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
-        display_name="Show Single Problem",
-        help='When True, only the single problem specified by "Link to Problem Location" is shown. '
-             'When False, a panel is displayed with all problems available for peer grading.',
+        display_name=_("Show Single Problem"),
+        help=_('When True, only the single problem specified by "Link to Problem Location" is shown. '
+               'When False, a panel is displayed with all problems available for peer grading.'),
         default=False,
         scope=Scope.settings
     )
     link_to_location = String(
-        display_name="Link to Problem Location",
-        help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
+        display_name=_("Link to Problem Location"),
+        help=_('The location of the problem being graded. Only used when "Show Single Problem" is True.'),
         default="",
         scope=Scope.settings
     )
     graded = Boolean(
-        display_name="Graded",
-        help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
+        display_name=_("Graded"),
+        help=_('Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.'),
         default=False,
         scope=Scope.settings
     )
     due = Date(
-        help="Due date that should be displayed.",
+        help=_("Due date that should be displayed."),
         scope=Scope.settings)
     graceperiod = Timedelta(
-        help="Amount of grace to give on the due date.",
+        help=_("Amount of grace to give on the due date."),
         scope=Scope.settings
     )
     student_data_for_location = Dict(
-        help="Student data for a given peer grading problem.",
+        help=_("Student data for a given peer grading problem."),
         scope=Scope.user_state
     )
     weight = Float(
-        display_name="Problem Weight",
-        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. If the value is not set, each problem is worth one point."),
         scope=Scope.settings, values={"min": 0, "step": ".1"},
         default=1
     )
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default="Peer Grading Interface"
+        default=_("Peer Grading Interface")
     )
     data = String(
-        help="Html contents to display for this module",
+        help=_("Html contents to display for this module"),
         default='<peergrading></peergrading>',
         scope=Scope.content
     )

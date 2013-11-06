@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Custom Python-Evaluated Input
+    display_name: Программная проверка ответа
     markdown: !!null
 data: |
       <problem>
