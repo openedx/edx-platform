@@ -14,6 +14,8 @@ VIDEO_BUTTONS = {
 # We should wait 300 ms for event handler invocation + 200ms for safety.
 DELAY = 0.5
 
+# Captions become invisible by fading out. We must wait by a specified time.
+FADEOUT_TIMEOUT = 3
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
@@ -125,6 +127,8 @@ def the_youtube_video_is_shown(_step):
 
 @step('Make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
+    world.wait(FADEOUT_TIMEOUT)
+
     if captions_state == 'closed':
         if world.css_visible('.subtitles'):
             world.browser.find_by_css('.hide-subtitles').click()
@@ -184,7 +188,12 @@ def see_a_range_slider_with_proper_range(_step, left, width):
     width = int(width.strip())
 
     world.wait_for_visible(".slider-range")
+
+    # The video should play for a bit before the range dimensions will
+    # finalize. This is due to the fact that duration of the video is not
+    # known beforehand.
     world.wait(4)
+
     slider_range = world.browser.driver.find_element_by_css_selector(".slider-range")
 
     assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
