@@ -384,7 +384,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
+                                 expiration_date=(datetime.datetime.now(pytz.utc) + many_days))
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -407,7 +407,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
+                                 expiration_date=(datetime.datetime.now(pytz.utc) + many_days))
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -436,7 +436,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
         cart.purchase()
 
-        course_mode.expiration_date = (datetime.datetime.now(pytz.utc).date() - many_days)
+        course_mode.expiration_date = (datetime.datetime.now(pytz.utc) - many_days)
         course_mode.save()
 
         CourseEnrollment.unenroll(self.user, course_id)
