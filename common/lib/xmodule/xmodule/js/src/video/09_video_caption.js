@@ -346,6 +346,8 @@ function () {
         var container = $('<ol>'),
             _this = this;
 
+        console.log('[renderCaption]: about to render; state = ', this);
+
         this.elVideoWrapper.after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls')
             .append(this.videoCaption.hideSubtitlesEl);

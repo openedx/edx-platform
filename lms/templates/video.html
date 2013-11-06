@@ -18,7 +18,7 @@
     ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
 
     data-caption-data-dir="${data_dir}"
-    data-show-captions="${show_captions}"
+    data-show-transcripts-initially="${show_captions}"
     data-start="${start}"
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
@@ -45,7 +45,7 @@
 
     <div class="tc-wrapper">
       <a href="#transcript-captions" class="sr">Skip to clickable transcript video links.</a>
-      
+
       <article class="video-wrapper">
           <div class="video-player-pre"></div>
 

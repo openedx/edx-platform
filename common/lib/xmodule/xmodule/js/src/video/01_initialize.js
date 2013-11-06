@@ -35,7 +35,7 @@ function (VideoPlayer) {
      *
      * Initialize module exports this function.
      *
-     * @param {object} state The object containg the state of the video player.
+     * @param {object} state The object containing the state of the video player.
      *     All other modules, their parameters, public variables, etc. are
      *     available via this object.
      * @param {DOM element} element Container of the entire Video DOM element.
@@ -56,7 +56,7 @@ function (VideoPlayer) {
      * these functions will get the 'state'
      * object as a context.
      *
-     * @param {object} state The object containg the state (properties,
+     * @param {object} state The object containing the state (properties,
      *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
@@ -107,7 +107,7 @@ function (VideoPlayer) {
     //     Configure displaying of captions.
     //
     //     Option
-    //         this.config.show_captions = true | false
+    //         this.config.showTranscriptsInitially = true | false
     //
     //     Defines whether or not captions are shown on first viewing.
     //
@@ -117,7 +117,7 @@ function (VideoPlayer) {
     //     represents the user's choice of having the subtitles shown or
     //     hidden. This choice is stored in cookies.
     function _configureCaptions(state) {
-        if (state.config.show_captions) {
+        if (state.config.showTranscriptsInitially) {
             state.hide_captions = ($.cookie('hide_captions') === 'true');
         } else {
             state.hide_captions = true;
@@ -133,7 +133,7 @@ function (VideoPlayer) {
 
     // function _setPlayerMode(state)
     //     By default we will be forcing HTML5 player mode. Only in the case
-    //     when, after initializtion, we will get one available playback rate,
+    //     when, after initialization, we will get one available playback rate,
     //     we will change to Flash player mode. There is a need to store this
     //     setting in cookies because otherwise we will have to change from
     //     HTML5 to Flash on every page load in a browser that doesn't fully
@@ -207,7 +207,7 @@ function (VideoPlayer) {
 
         if (!state.config.sub || !state.config.sub.length) {
             state.config.sub = '';
-            state.config.show_captions = false;
+            state.config.showTranscriptsInitially = false;
         }
 
         state.setSpeed($.cookie('video_speed'));
@@ -235,8 +235,8 @@ function (VideoPlayer) {
 
 
     // function bindTo(methodsDict, obj, context, rewrite)
-    // Creates a new function with specific context and assigns it to the provided
-    // object.
+    // Creates a new function with specific context and assigns it to the
+    // provided object.
     function bindTo(methodsDict, obj, context, rewrite) {
         $.each(methodsDict, function(name, method) {
             if (_.isFunction(method)) {
@@ -285,7 +285,11 @@ function (VideoPlayer) {
             endTime:            data['end'],
             caption_data_dir:   data['captionDataDir'],
             caption_asset_path: data['captionAssetPath'],
-            show_captions:      regExp.test(data['showCaptions'].toString()),
+
+            showTranscriptsInitially: regExp.test(
+                data['showTranscriptsInitially'].toString()
+            ),
+
             youtubeStreams:     data['streams'],
             autohideHtml5:      regExp.test(data['autohideHtml5'].toString()),
             sub:                data['sub'],
@@ -341,7 +345,7 @@ function (VideoPlayer) {
                             'video with id "' + _this.id + '".'
                         );
 
-                        // When the youtube link doesn't work for any reason
+                        // When the YouTube link doesn't work for any reason
                         // (for example, the great firewall in china) any
                         // alternate sources should automatically play.
                         if (!_prepareHTML5Video(_this)) {
@@ -453,7 +457,7 @@ function (VideoPlayer) {
     // function parseVideoSources(, mp4Source, webmSource, oggSource)
     //
     //     Take the HTML5 sources (URLs of videos), and make them available
-    //     explictly for each type of video format (mp4, webm, ogg).
+    //     explicitly for each type of video format (mp4, webm, ogg).
     function parseVideoSources(sources) {
         var _this = this,
             v = document.createElement('video'),
@@ -550,7 +554,7 @@ function (VideoPlayer) {
         var video;
 
         if (this.videoType === 'html5') {
-            // HTML5 player haven't default way to abort bufferization.
+            // HTML5 player haven't default way to abort buffering.
             // In this case we simply resetting source and call load().
             video = this.videoPlayer.player.video;
             video.src = '';
