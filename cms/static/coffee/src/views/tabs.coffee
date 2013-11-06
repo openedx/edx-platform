@@ -1,15 +1,19 @@
-define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification", "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, Backbone, PromptView, NotificationView, ModuleModel, ModuleEditView) ->
+define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification",
+    "coffee/src/views/module_edit", "js/models/module_info", "js/utils/module"],
+($, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) ->
   class TabsEdit extends Backbone.View
 
     initialize: =>
       @$('.component').each((idx, element) =>
+          model = new ModuleModel({
+              id: $(element).data('locator'),
+              old_id:$(element).data('id')
+          })
+
           new ModuleEditView(
               el: element,
               onDelete: @deleteTab,
-              model: new ModuleModel(
-                  id: $(element).data('id'),
-              )
+              model: model
           )
       )
 
@@ -28,7 +32,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
     tabMoved: (event, ui) =>
       tabs = []
       @$('.component').each((idx, element) =>
-          tabs.push($(element).data('id'))
+          tabs.push($(element).data('locator'))
       )
 
       analytics.track "Reordered Static Pages",
@@ -78,13 +82,13 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
               analytics.track "Deleted Static Page",
                 course: course_location_analytics
-                id: $component.data('id')
+                id: $component.data('locator')
               deleting = new NotificationView.Mini
                 title: gettext('Deleting&hellip;')
               deleting.show()
               $.ajax({
                 type: 'DELETE',
-                url: $component.data('update_url')
+                url: ModuleUtils.getUpdateUrl($component.data('locator'))
               }).success(=>
                 $component.remove()
                 deleting.hide()

@@ -13,6 +13,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from ..utils import get_course_for_item, get_modulestore
 
@@ -47,8 +48,12 @@ def initialize_course_tabs(course):
 @expect_json
 def reorder_static_tabs(request):
     "Order the static tabs in the requested order"
+    def get_location_for_tab(tab):
+        tab_locator = BlockUsageLocator(tab)
+        return loc_mapper().translate_locator_to_location(tab_locator)
+
     tabs = request.json['tabs']
-    course = get_course_for_item(tabs[0])
+    course = get_course_for_item(get_location_for_tab(tabs[0]))
 
     if not has_access(request.user, course.location):
         raise PermissionDenied()
@@ -64,7 +69,7 @@ def reorder_static_tabs(request):
     # load all reference tabs, return BadRequest if we can't find any of them
     tab_items = []
     for tab in tabs:
-        item = modulestore('direct').get_item(Location(tab))
+        item = modulestore('direct').get_item(get_location_for_tab(tab))
         if item is None:
             return HttpResponseBadRequest()
 
@@ -122,15 +127,20 @@ def edit_tabs(request, org, course, coursename):
             static_tab.location.url(),
             loc_mapper().translate_location(
                 course_item.location.course_id, static_tab.location, False, True
-            ).url_reverse("xblock")
+            )
         ]
         for static_tab
         in static_tabs
     ]
 
+    course_locator = loc_mapper().translate_location(
+        course_item.location.course_id, course_item.location, False, True
+    )
+
     return render_to_response('edit-tabs.html', {
         'context_course': course_item,
-        'components': components
+        'components': components,
+        'locator': course_locator
     })
 
 
