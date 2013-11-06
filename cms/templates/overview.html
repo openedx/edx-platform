@@ -4,6 +4,7 @@
   from xmodule.util import date_utils
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
+  from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -141,7 +142,13 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       <div class="wrapper-dnd">
         <article class="courseware-overview" data-id="${context_course.location.url()}">
           % for section in sections:
-          <section class="courseware-section branch is-draggable" data-id="${section.location}" data-parent-id="${context_course.location.url()}">
+          <%
+            section_update_url = loc_mapper().translate_location(
+              context_course.location.course_id, section.location, False, True
+            ).url_reverse('xblock')
+          %>
+          <section class="courseware-section branch is-draggable" data-id="${section.location}"
+                   data-parent-id="${context_course.location.url()}" data-update_url="${section_update_url}">
 
             <%include file="widgets/_ui-dnd-indicator-before.html" />
 
@@ -184,7 +191,13 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
               </div>
               <ol class="sortable-subsection-list" data-id="${section.location.url()}">
                 % for subsection in section.get_children():
-                <li class="courseware-subsection branch collapsed id-holder is-draggable" data-id="${subsection.location}" data-parent-id="${section.location.url()}">
+                  <%
+                    subsection_update_url = loc_mapper().translate_location(
+                      context_course.location.course_id, subsection.location, False, True
+                    ).url_reverse('xblock')
+                  %>
+                <li class="courseware-subsection branch collapsed id-holder is-draggable" data-id="${subsection.location}"
+                    data-parent-id="${section.location.url()}" data-update_url="${subsection_update_url}">
 
                   <%include file="widgets/_ui-dnd-indicator-before.html" />
 

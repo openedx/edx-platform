@@ -70,6 +70,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
           (data) =>
               @model.set(id: data.id)
               @$el.data('id', data.id)
+              @$el.data('update_url', data.update_url)
               @render()
       )
 
