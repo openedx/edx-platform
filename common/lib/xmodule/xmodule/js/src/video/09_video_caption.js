@@ -106,6 +106,7 @@ function () {
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
         if (!this.videoCaption.fetchCaption()) {
+            console.log('[call 4]');
             this.videoCaption.hideCaptions(true);
             this.videoCaption.hideSubtitlesEl.hide();
         }
@@ -234,6 +235,7 @@ function () {
                     ', MESSAGE:', '' + errorThrown
                 );
 
+                console.log('[call 5]');
                 _this.videoCaption.hideCaptions(true, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
@@ -346,8 +348,6 @@ function () {
         var container = $('<ol>'),
             _this = this;
 
-        console.log('[renderCaption]: about to render; state = ', this);
-
         this.elVideoWrapper.after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls')
             .append(this.videoCaption.hideSubtitlesEl);
@@ -376,7 +376,7 @@ function () {
 
         this.videoCaption.bindHandlers();
 
-        $.each(this.videoCaption.captions, function(index, text) {
+        $.each(this.videoCaption.captions, function (index, text) {
             var liEl = $('<li>');
 
             liEl.html(text);
@@ -444,6 +444,7 @@ function () {
     function captionMouseOverOut(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
+
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
             if (event.type === 'mouseover') {
                 caption.removeClass('focused');
@@ -496,14 +497,18 @@ function () {
     function captionBlur(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
+
         caption.removeClass('focused');
+
         // If we are on first or last index, we have to turn automatic scroll
         // on again when losing focus. There is no way to know in what
         // direction we are tabbing. So we could be on the first element and
         // tabbing back out of the captions or on the last element and tabbing
         // forward out of the captions.
-        if (captionIndex === 0 ||
-            captionIndex === this.videoCaption.captions.length-1) {
+        if (
+            captionIndex === 0 ||
+            captionIndex === this.videoCaption.captions.length - 1
+        ) {
             this.videoCaption.autoHideCaptions();
 
             this.videoCaption.autoScrolling = true;
@@ -760,10 +765,11 @@ function () {
 
     function setSubtitlesHeight() {
         var height = 0;
+
         if (
             ((this.videoType === 'html5') && (this.config.autohideHtml5)) ||
             (!this.config.autohideHtml5)
-        ){
+        ) {
             // on page load captionHidden = undefined
             if  (
                 (
@@ -781,6 +787,7 @@ function () {
                 // autochanges its height.
             }
         }
+
         this.videoCaption.subtitlesEl.css({
             maxHeight: this.videoCaption.captionHeight() - height
         });

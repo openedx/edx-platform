@@ -35,9 +35,9 @@ function (VideoPlayer) {
      *
      * Initialize module exports this function.
      *
-     * @param {object} state The object containing the state of the video player.
-     *     All other modules, their parameters, public variables, etc. are
-     *     available via this object.
+     * @param {object} state The object containing the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
      * @param {DOM element} element Container of the entire Video DOM element.
      */
     return function (state, element) {
@@ -94,8 +94,8 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        if(state.videoType === 'youtube') {
-            YT.ready(function() {
+        if (state.videoType === 'youtube') {
+            YT.ready(function () {
                 VideoPlayer(state);
             });
         } else {
@@ -238,7 +238,7 @@ function (VideoPlayer) {
     // Creates a new function with specific context and assigns it to the
     // provided object.
     function bindTo(methodsDict, obj, context, rewrite) {
-        $.each(methodsDict, function(name, method) {
+        $.each(methodsDict, function (name, method) {
             if (_.isFunction(method)) {
 
                 if (_.isUndefined(rewrite)) {
@@ -314,6 +314,8 @@ function (VideoPlayer) {
         }
         this.config.ytTestTimeout = tempYtTestTimeout;
 
+        _setConfigurations(this);
+
         if (!(_parseYouTubeIDs(this))) {
 
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
@@ -325,7 +327,6 @@ function (VideoPlayer) {
 
             console.log('[Video info]: Start player in HTML5 mode.');
 
-            _setConfigurations(this);
             _renderElements(this);
         } else {
             if (!this.youtubeXhr) {
@@ -383,7 +384,6 @@ function (VideoPlayer) {
                         _this.parseSpeed();
                     }
 
-                    _setConfigurations(_this);
                     _renderElements(_this);
                 });
         }
