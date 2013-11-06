@@ -1,7 +1,7 @@
 from certificates.models import GeneratedCertificate
 from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
-from certificates.models import CertificateWhitelist
+from certificates.models import CertificateWhitelist, CertificateModes
 
 from courseware import grades, courses
 from django.test.client import RequestFactory
@@ -177,12 +177,12 @@ class XQueueCertInterface(object):
             enrollment = CourseEnrollment.objects.get(user=student)
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
-            if enrolment.mode == CertificateModes.verified:
-                template_pdf  = "certificate-template-{0}-{1}-verified.pdf".format(
+            if enrollment.mode == CertificateModes.verified:
+                template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
                     org, course_num)
             else:
                 # honor code and audit students
-                template_pdf  = "certificate-template-{0}-{1}.pdf".format(
+                template_pdf = "certificate-template-{0}-{1}.pdf".format(
                     org, course_num)
 
             cert, created = GeneratedCertificate.objects.get_or_create(
