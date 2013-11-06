@@ -44,8 +44,12 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
 
 log = logging.getLogger(__name__)
 
+
+def _(s):
+    return s
+
 # NOTE: edit_unit assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = [_('discussion'), _('html'), _('problem'), _('video')]
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
@@ -217,7 +221,7 @@ def edit_unit(request, location):
                 try:
                     component_class = load_mixed_class(category)
 
-                    component_templates['advanced'].append((
+                    component_templates[_('advanced')].append((
                         component_class.display_name.default or category,
                         category,
                         False,

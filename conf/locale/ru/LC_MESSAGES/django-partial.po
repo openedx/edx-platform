@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 18:17+0400\n"
+"POT-Creation-Date: 2013-11-06 15:17+0400\n"
 "PO-Revision-Date: 2013-11-01 14:34+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -27,6 +27,27 @@ msgstr "Мои заметки"
 #: cms/djangoapps/contentstore/views/assets.py:172
 msgid "Upload completed"
 msgstr "Загрузка завершена"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+#, fuzzy
+msgid "discussion"
+msgstr "Дискуссии"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "html"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "problem"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py:224
+msgid "advanced"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py:165
 msgid ""
