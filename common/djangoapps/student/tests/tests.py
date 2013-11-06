@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
-from mock import Mock, patch, sentinel
+from mock import Mock, patch
 from textwrap import dedent
 
 from student.models import unique_id_for_user, CourseEnrollment
@@ -276,16 +276,6 @@ class DashboardTest(TestCase):
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""
 
-    def setUp(self):
-        patcher = patch('student.models.server_track')
-        self.mock_server_track = patcher.start()
-        self.addCleanup(patcher.stop)
-
-        crum_patcher = patch('student.models.crum.get_current_request')
-        self.mock_get_current_request = crum_patcher.start()
-        self.addCleanup(crum_patcher.stop)
-        self.mock_get_current_request.return_value = sentinel.request
-
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = "edX/Test101/2013"
@@ -299,28 +289,24 @@ class EnrollInCourseTest(TestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
             course_id_partial))
-        self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Enrolling them again should be harmless
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
             course_id_partial))
-        self.assert_no_events_were_emitted()
 
         # Now unenroll the user
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
         self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
             course_id_partial))
-        self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Unenrolling them again should also be harmless
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
         self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
             course_id_partial))
-        self.assert_no_events_were_emitted()
 
         # The enrollment record should still exist, just be inactive
         enrollment_record = CourseEnrollment.objects.get(
@@ -328,37 +314,6 @@ class EnrollInCourseTest(TestCase):
             course_id=course_id
         )
         self.assertFalse(enrollment_record.is_active)
-
-    def assert_no_events_were_emitted(self):
-        """Ensures no events were emitted since the last event related assertion"""
-        self.assertFalse(self.mock_server_track.called)
-        self.mock_server_track.reset_mock()
-
-    def assert_enrollment_event_was_emitted(self, user, course_id):
-        """Ensures an enrollment event was emitted since the last event related assertion"""
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
-            'edx.course.enrollment.activated',
-            {
-                'course_id': course_id,
-                'user_id': user.pk,
-                'mode': 'honor'
-            }
-        )
-        self.mock_server_track.reset_mock()
-
-    def assert_unenrollment_event_was_emitted(self, user, course_id):
-        """Ensures an unenrollment event was emitted since the last event related assertion"""
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
-            'edx.course.enrollment.deactivated',
-            {
-                'course_id': course_id,
-                'user_id': user.pk,
-                'mode': 'honor'
-            }
-        )
-        self.mock_server_track.reset_mock()
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
@@ -369,13 +324,11 @@ class EnrollInCourseTest(TestCase):
 
         # Unenroll does nothing
         CourseEnrollment.unenroll(user, course_id)
-        self.assert_no_events_were_emitted()
 
         # Implicit save() happens on new User object when enrolling, so this
         # should still work
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_enrollment_event_was_emitted(user, course_id)
 
     def test_enrollment_by_email(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
@@ -383,13 +336,11 @@ class EnrollInCourseTest(TestCase):
 
         CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_enrollment_event_was_emitted(user, course_id)
 
         # This won't throw an exception, even though the user is not found
         self.assertIsNone(
             CourseEnrollment.enroll_by_email("not_jack@fake.edx.org", course_id)
         )
-        self.assert_no_events_were_emitted()
 
         self.assertRaises(
             User.DoesNotExist,
@@ -398,21 +349,17 @@ class EnrollInCourseTest(TestCase):
             course_id,
             ignore_errors=False
         )
-        self.assert_no_events_were_emitted()
 
         # Now unenroll them by email
         CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Harmless second unenroll
         CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_no_events_were_emitted()
 
         # Unenroll on non-existent user shouldn't throw an error
         CourseEnrollment.unenroll_by_email("not_jack@fake.edx.org", course_id)
-        self.assert_no_events_were_emitted()
 
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
@@ -420,19 +367,15 @@ class EnrollInCourseTest(TestCase):
         course_id2 = "MITx/6.003z/2012"
 
         CourseEnrollment.enroll(user, course_id1)
-        self.assert_enrollment_event_was_emitted(user, course_id1)
         CourseEnrollment.enroll(user, course_id2)
-        self.assert_enrollment_event_was_emitted(user, course_id2)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id1))
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
 
         CourseEnrollment.unenroll(user, course_id1)
-        self.assert_unenrollment_event_was_emitted(user, course_id1)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
 
         CourseEnrollment.unenroll(user, course_id2)
-        self.assert_unenrollment_event_was_emitted(user, course_id2)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
 
@@ -445,33 +388,27 @@ class EnrollInCourseTest(TestCase):
         # (calling CourseEnrollment.enroll() would have)
         enrollment = CourseEnrollment.create_enrollment(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_no_events_were_emitted()
 
         # Until you explicitly activate it
         enrollment.activate()
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Activating something that's already active does nothing
         enrollment.activate()
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_no_events_were_emitted()
 
         # Now deactive
         enrollment.deactivate()
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Deactivating something that's already inactive does nothing
         enrollment.deactivate()
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_no_events_were_emitted()
 
         # A deactivated enrollment should be activated if enroll() is called
         # for that user/course_id combination
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assert_enrollment_event_was_emitted(user, course_id)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

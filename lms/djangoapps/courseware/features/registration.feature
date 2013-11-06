@@ -10,7 +10,6 @@ Feature: LMS.Register for a course
     And I visit the courses page
     When I register for the course "6.002x"
     Then I should see the course numbered "6.002x" in my dashboard
-    And a "edx.course.enrollment.activated" server event is emitted
 
   Scenario: I can unregister for a course
     Given I am registered for the course "6.002x"
@@ -20,4 +19,3 @@ Feature: LMS.Register for a course
     Then I should be on the dashboard page
     And I should see an empty dashboard message
     And I should NOT see the course numbered "6.002x" in my dashboard
-    And a "edx.course.enrollment.deactivated" server event is emitted
