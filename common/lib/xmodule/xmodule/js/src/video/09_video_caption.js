@@ -106,7 +106,6 @@ function () {
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
         if (!this.videoCaption.fetchCaption()) {
-            console.log('[call 4]');
             this.videoCaption.hideCaptions(true);
             this.videoCaption.hideSubtitlesEl.hide();
         }
@@ -235,7 +234,6 @@ function () {
                     ', MESSAGE:', '' + errorThrown
                 );
 
-                console.log('[call 5]');
                 _this.videoCaption.hideCaptions(true, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
