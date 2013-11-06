@@ -2,45 +2,44 @@
 metadata:
     display_name: Переключатели
     markdown: |
-       A multiple choice problem presents radio buttons for student input. Students can only select a single 
-       option presented. Multiple Choice questions have been the subject of many areas of research due to the early 
-       invention and adoption of bubble sheets.
-       
-       One of the main elements that goes into a good multiple choice question is the existence of good distractors. 
-       That is, each of the alternate responses presented to the student should be the result of a plausible mistake 
-       that a student might make.
+       В заданиях с переключателями студенты могут выбрать только один ответ из предложенных.
+       Переключатели очень удобны для использования.
+
+       Одна из отличительных особенностей заданий такого типа, что можно другими ответами отвлечь от правильного.
+       Каждый вариант ответа дает студенту возможность ошибиться.
     
-       What Apple device competed with the portable CD player?
-            ( ) The iPad
-            ( ) Napster
-            (x) The iPod
-            ( ) The vegetable peeler
+       Какое устройство предназначено для прослушивания виниловых пластинок?
+            ( ) CD-плеер
+            ( ) Радио
+            (x) Граммофон
+            ( ) Планшет
             
        [explanation]
-       The release of the iPod allowed consumers to carry their entire music library with them in a 
-       format that did not rely on fragile and energy-intensive spinning disks.
+       Граммофон - единственный прибор предназначенны специально для воспроизведения звука с граммофонной пластинки.
        [explanation]
 data: |
    <problem>
    <p>
-   A multiple choice problem presents radio buttons for student
-   input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-   <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make. 
+      В заданиях с переключателями студенты могут выбрать только один ответ из предложенных.
+       Переключатели очень удобны для использования.
+   </p>
+   <p> Одна из отличительных особенностей заданий такого типа, что можно другими ответами отвлечь от правильного.
+       Каждый вариант ответа дает студенту возможность ошибиться.
    </p>
 
-   <p>What Apple device competed with the portable CD player?</p>
+   <p>Какое устройство предназначено для прослушивания виниловых пластинок?</p>
        <multiplechoiceresponse>
         <choicegroup type="MultipleChoice">
-           <choice correct="false" name="ipad">The iPad</choice>
-           <choice correct="false" name="beatles">Napster</choice>
-           <choice correct="true" name="ipod">The iPod</choice>
-           <choice correct="false" name="peeler">The vegetable peeler</choice>
+           <choice correct="false" name="ipad">CD-плеер</choice>
+           <choice correct="false" name="beatles">Радио</choice>
+           <choice correct="true" name="ipod">Граммофон</choice>
+           <choice correct="false" name="peeler">Планшет</choice>
         </choicegroup>
        </multiplechoiceresponse>
        <solution>
            <div class="detailed-solution">
-               <p>Explanation</p>
-               <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks. </p>
+               <p>Комментарий</p>
+               <p>Граммофон - единственный прибор предназначенны специально для воспроизведения звука с граммофонной пластинки.</p>
            </div>
        </solution>
    </problem>

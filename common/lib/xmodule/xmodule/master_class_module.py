@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 
 from django.utils.translation import ugettext as _
 
+
 def pretty_bool(value):
     """Check value for possible `True` value.
 

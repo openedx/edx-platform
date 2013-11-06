@@ -25,7 +25,6 @@ from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
-#def _(s): return s
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -90,8 +89,8 @@ class CapaFields(object):
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Defines the number of times a student can try to answer this problem. "
-              "If the value is not set, infinite attempts are allowed."),
+        help=(_("Defines the number of times a student can try to answer this problem. "
+                "If the value is not set, infinite attempts are allowed.")),
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
@@ -101,8 +100,8 @@ class CapaFields(object):
     )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Defines when to show the answer to the problem. "
-              "A default value can be set in Advanced Settings."),
+        help=(_("Defines when to show the answer to the problem. "
+                "A default value can be set in Advanced Settings.")),
         scope=Scope.settings,
         default="finished",
         values=[
@@ -122,8 +121,8 @@ class CapaFields(object):
     rerandomize = Randomization(
         display_name=_("Randomization"),
         help=_("Defines how often inputs are randomized when a student loads the problem. "
-             "This setting only applies to problems that can have randomly generated numeric values. "
-             "A default value can be set in Advanced Settings."),
+               "This setting only applies to problems that can have randomly generated numeric values. "
+               "A default value can be set in Advanced Settings."),
         default="never",
         scope=Scope.settings,
         values=[
@@ -142,8 +141,8 @@ class CapaFields(object):
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
     weight = Float(
         display_name=_("Problem Weight"),
-        help=_("Defines the number of points each problem is worth. "
-              "If the value is not set, each response field in the problem is worth one point."),
+        help=(_("Defines the number of points each problem is worth. "
+                "If the value is not set, each response field in the problem is worth one point.")),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
@@ -1087,7 +1086,7 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'msg': _("Problem is closed")}
+                    'msg': "Problem is closed"}
 
         # Problem submitted. Student should reset before saving
         # again.
@@ -1095,15 +1094,15 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'msg': _("Problem needs to be reset prior to save")}
+                    'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
 
         self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
-        msg = _("Your answers have been saved")
-        msg_long = _("Your answers have been saved but not graded. Hit 'Check' to grade them.")
+        msg = "Your answers have been saved"
+        msg_long = "Your answers have been saved but not graded. Hit 'Check' to grade them."
         if not self.max_attempts == 0:
             msg = msg_long
         return {'success': True,
@@ -1129,13 +1128,13 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
             return {'success': False,
-                    'error': _("Problem is closed")}
+                    'error': "Problem is closed"}
 
         if not self.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
             return {'success': False,
-                    'error': _("Refresh the page and make an attempt before resetting.")}
+                    'error': "Refresh the page and make an attempt before resetting."}
 
         if self.rerandomize in ["always", "onreset"]:
             # Reset random number generator seed.
