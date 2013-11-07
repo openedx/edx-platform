@@ -98,6 +98,6 @@ def change_text(text):
 
 def verify_text_in_editor_and_update(button_css, before, after):
     world.css_click(button_css)
-    text = world.css_find(".cm-string").html
+    text = world.css_find(".CodeMirror-lines").text
     assert before in text
     change_text(after)

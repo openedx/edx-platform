@@ -27,7 +27,7 @@ Feature: CMS.Course updates
         Given I have opened a new course in Studio
         And I go to the course updates page
         When I add a new update with the text "Привет"
-        And I modify the text to "Пока"
+        And I change the update from "Привет" to "Пока"
         Then I should see the update "Пока"
         And I see a "saving" notification
 
@@ -36,8 +36,8 @@ Feature: CMS.Course updates
     Scenario: Users can edit updates with unicode and tags
         Given I have opened a new course in Studio
         And I go to the course updates page
-        When I add a new update with the text "Привет"
-        And I modify the text to "<p>Пока</p>"
+        When I add a new update with the text "<p>Привет</p>"
+        And I change the update from "<p>Привет</p>" to "<p>Пока</p>"
         Then I should see the update "Пока"
         And I see a "saving" notification
 
