@@ -702,26 +702,22 @@ class GradesStore(object):
         """
         storage_type = settings.GRADES_DOWNLOAD.get("STORAGE_TYPE")
         if storage_type.lower() == "s3":
-            return s.kGradesStore.from_config()
+            return S3GradesStore.from_config()
         elif storage_type.lower() == "localfs":
             return LocalFSGradesStore.from_config()
 
 
 class S3GradesStore(GradesStore):
     """
-
-
     """
-
-    def __init__(self, bucket, root_path):
-        self.bucket_name = bucket_name
+    def __init__(self, bucket_name, root_path):
         self.root_path = root_path
 
         conn = S3Connection(
             settings.AUTH_TOKENS["AWS_ACCESS_KEY_ID"],
             settings.AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
         )
-        self.bucket = conn.get_bucket(self.bucket_name)
+        self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
     def from_config(cls):
