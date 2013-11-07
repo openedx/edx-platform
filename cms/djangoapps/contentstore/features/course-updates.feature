@@ -21,6 +21,26 @@ Feature: CMS.Course updates
         Then I should see the update "Goodbye"
         And I see a "saving" notification
 
+    # Internet explorer can't select all so the update appears weirdly
+    @skip_internetexplorer
+    Scenario: Users can edit updates with unicode
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I add a new update with the text "Привет"
+        And I modify the text to "Пока"
+        Then I should see the update "Пока"
+        And I see a "saving" notification
+
+    # Internet explorer can't select all so the update appears weirdly
+    @skip_internetexplorer
+    Scenario: Users can edit updates with unicode and tags
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I add a new update with the text "Привет"
+        And I modify the text to "<p>Пока</p>"
+        Then I should see the update "Пока"
+        And I see a "saving" notification
+
     Scenario: Users can delete updates
         Given I have opened a new course in Studio
         And I go to the course updates page
