@@ -1,0 +1,52 @@
+<%page args="cert_status, course, enrollment" />
+
+<%! from django.utils.translation import ugettext as _ %>
+
+<%
+if cert_status['status'] == 'generating':
+    status_css_class = 'course-status-certrendering'
+elif cert_status['status'] == 'ready':
+    status_css_class = 'course-status-certavailable'
+elif cert_status['status'] == 'notpassing':
+    status_css_class = 'course-status-certnotavailable'
+else:
+    status_css_class = 'course-status-processing'
+%>
+<div class="message message-status ${status_css_class} is-shown">
+
+% if cert_status['status'] == 'processing':
+      <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
+% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
+      <p class="message-copy">${_("Your final grade:")}
+      <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+      % if cert_status['status'] == 'notpassing':
+         ${_("Grade required for a certificate:")} <span class="grade-value">
+           ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+      % elif cert_status['status'] == 'restricted':
+          <p class="message-copy">
+          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
+          </p>
+      % endif
+      </p>
+% endif
+
+% if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
+  <ul class="actions">
+    % if cert_status['show_disabled_download_button']:
+      <li class="action"><span class="disabled">
+          ${_("Your Certificate is Generating")}</span></li>
+    % elif cert_status['show_download_url']:
+      <li class="action">
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document')}">
+         ${_("Download Your PDF Certificate")}</a></li>
+    % endif
+
+    % if cert_status['show_survey_button']:
+      <li class="action"><a class="cta" href="${cert_status['survey_url']}">
+             ${_("Complete our course feedback survey")}</a></li>
+    % endif
+  </ul>
+% endif
+</div>
+
