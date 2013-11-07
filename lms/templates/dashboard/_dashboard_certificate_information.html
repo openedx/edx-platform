@@ -35,10 +35,15 @@ else:
     % if cert_status['show_disabled_download_button']:
       <li class="action"><span class="disabled">
           ${_("Your Certificate is Generating")}</span></li>
-    % elif cert_status['show_download_url']:
+    % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
       <li class="action">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
+         ${_("Download Your PDF Certificate")}</a></li>
+    % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
+      <li class="action">
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document of your verified certificate.')}">
          ${_("Download Your PDF Certificate")}</a></li>
     % endif
 
