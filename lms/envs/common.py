@@ -618,7 +618,7 @@ MIDDLEWARE_CLASSES = (
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # For A/B testing
-    'waffle.middleware.WaffleMiddleware',
+    # 'waffle.middleware.WaffleMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -1049,3 +1049,9 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
 
 # Grades download
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE' : 's3',
+    'BUCKET' : 'edx-grades',
+    'ROOT_PATH' : 'grades',
+}

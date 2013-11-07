@@ -197,6 +197,13 @@ CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
+###################### Grade Downloads ######################
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE' : 'localfs',
+    'BUCKET' : 'edx-grades',
+    'ROOT_PATH' : '/tmp/edx-s3/grades',
+}
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True

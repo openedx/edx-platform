@@ -149,6 +149,15 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Grades'):
+    %if downloadable_grades_links:
+      The following files can now be downloaded:
+
+      <ul>
+      % for filename, link in downloadable_grades_links:
+         <li><a href="${link}">${filename}</a></li>
+      % endfor
+      </ul>
+    %endif
 
     <p>To pre-compute grades in the background, click this button.
     Once computed, grades can be downloaded.  They also can be recomputed.</p>

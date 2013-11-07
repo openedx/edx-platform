@@ -4,7 +4,11 @@ running state of a course.
 
 """
 import csv
+import hashlib
 import json
+import os
+import os.path
+import urllib
 from cStringIO import StringIO
 from datetime import datetime
 from gzip import GzipFile
@@ -15,6 +19,9 @@ from traceback import format_exc
 from os.path import exists
 # import meliae.scanner as scanner
 
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
@@ -23,6 +30,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
+
+from pytz import UTC
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -675,31 +684,188 @@ def iterate_grades_for(course_id, students, xmodule_instance_args, action_name='
                 )
                 yield student, {}, exc.message
 
-
-S3_ENABLED = False
-
-def store_in_s3(course_id, filename, rows):
-    """Given a course_id, filename, and rows (each row is an iterable of strings),
-    write this data out to S3. If we're in development mode, we'll put this in
-    /tmp/edx/course_id
+class GradesStore(object):
     """
-    output_buffer = StringIO()
-    gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
-    csv.writer(gzip_file).writerows(rows)
-    gzip_file.close()
+    Simple abstraction layer that can fetch and store CSV files for grades
+    download. Should probably refactor later to create a GradesFile object that
+    can simply be appended to for the sake of memory efficiency, rather than
+    passing in the whole dataset. Doing that for now just because it's simpler.
+    """
+    @classmethod
+    def from_config(cls):
+        """Return one of the GradesStore subclasses depending on django
+        configuration.
 
-    with open("/tmp/{}.gz".format(filename), "wb") as f:
-        f.write(output_buffer.getvalue())
+        TODO: Give details of what's expected in config.
+        TODO?: Move this somewhere else...? Where? In courseware/grades? Maybe
+               kill the superclass altogether and just make a module level method?
+        """
+        storage_type = settings.GRADES_DOWNLOAD.get("STORAGE_TYPE")
+        if storage_type.lower() == "s3":
+            return s.kGradesStore.from_config()
+        elif storage_type.lower() == "localfs":
+            return LocalFSGradesStore.from_config()
 
 
-def path_for_course(course_id):
-    return "/grades/{}/"
+class S3GradesStore(GradesStore):
+    """
+
+
+    """
+
+    def __init__(self, bucket, root_path):
+        self.bucket_name = bucket_name
+        self.root_path = root_path
+
+        conn = S3Connection(
+            settings.AUTH_TOKENS["AWS_ACCESS_KEY_ID"],
+            settings.AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+        )
+        self.bucket = conn.get_bucket(self.bucket_name)
+
+    @classmethod
+    def from_config(cls):
+        return cls(
+            settings.GRADES_DOWNLOAD['BUCKET'],
+            settings.GRADES_DOWNLOAD['ROOT_PATH']
+        )
+
+    def key_for(self, course_id, filename):
+        """Return the key we would use to store and retrive the data for the
+        given filename."""
+        hashed_course_id = hashlib.sha1(course_id)
+
+        key = Key(self.bucket)
+        key.key = "{}/{}/{}".format(
+            self.root_path,
+            hashed_course_id.hexdigest(),
+            filename
+        )
+
+        return key
+
+    def store(self, course_id, filename, buff):
+        key = self.key_for(course_id, filename)
+
+        data = buff.getvalue()
+        key.size = len(data)
+        key.content_type = "text/csv"
+        key.content_encoding = "gzip"
+
+        key.set_contents_from_string(data)
+
+    def store_rows(course_id, filename, rows):
+        """
+        Given a course_id, filename, and rows (each row is an iterable of strings),
+        write this data out.
+        """
+        output_buffer = StringIO()
+        gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
+        csv.writer(gzip_file).writerows(rows)
+        gzip_file.close()
+
+        self.store(course_id, filename, output_buffer)
+
+    def links_for(self, course_id):
+        """
+        For a given `course_id`, return a list of `(filename, url)` tuples. `url`
+        can be plugged straight into an href
+        """
+        course_dir = self.path_to(course_id, '')
+        return sorted(
+            [
+                (key.key.split("/")[-1], key.generate_url(expires_in=300))
+                for key in self.bucket.list(course_dir.key)
+            ],
+            reverse=True
+        )
+
+
+class LocalFSGradesStore(GradesStore):
+    """
+    LocalFS implementation of a GradesStore. This is meant for debugging
+    purposes and is *absolutely not for production use*. Use S3GradesStore for
+    that.
+    """
+    def __init__(self, root_path):
+        """
+        Initialize with root_path where we're going to store our files. We
+        will build a directory structure under this for each course.
+        """
+        self.root_path = root_path
+        if not os.path.exists(root_path):
+            os.makedirs(root_path)
+
+    @classmethod
+    def from_config(cls):
+        """
+        Generate an instance of this object from Django settings. It assumes
+        that there is a dict in settings named GRADES_DOWNLOAD and that it has
+        a ROOT_PATH that maps to an absolute file path that the web app has
+        write permissions to. `LocalFSGradesStore` will create any intermediate
+        directories as needed.
+        """
+        return cls(settings.GRADES_DOWNLOAD['ROOT_PATH'])
+
+    def path_to(self, course_id, filename):
+        """Return the full path to a given file for a given course."""
+        return os.path.join(self.root_path, urllib.quote(course_id, safe=''), filename)
+
+    def store(self, course_id, filename, buff):
+        """
+        Given the `course_id` and `filename`, store the contents of `buff` in
+        that file. Overwrite anything that was there previously. `buff` is
+        assumed to be a StringIO objecd (or anything that can flush its contents
+        to string using `.getvalue()`).
+        """
+        full_path = self.path_to(course_id, filename)
+        directory = os.path.dirname(full_path)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+
+        with open(full_path, "wb") as f:
+            f.write(buff.getvalue())
+
+    def store_rows(self, course_id, filename, rows):
+        """
+        Given a course_id, filename, and rows (each row is an iterable of strings),
+        write this data out.
+        """
+        output_buffer = StringIO()
+        csv.writer(output_buffer).writerows(rows)
+        self.store(course_id, filename, output_buffer)
+
+    def links_for(self, course_id):
+        """
+        For a given `course_id`, return a list of `(filename, url)` tuples. `url`
+        can be plugged straight into an href
+        """
+        course_dir = self.path_to(course_id, '')
+        return sorted(
+            [
+                (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
+                for filename in os.listdir(course_dir)
+            ],
+            reverse=True
+        )
+
 
 def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
+    For a given `course_id`, generate a grades CSV file for all students that
+    are enrolled, and store using a `GradesStore`. Once created, the files can
+    be accessed by instantiating another `GradesStore` (via
+    `GradesStore.from_config()`) and calling `link_for()` on it. Writes are
+    buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
+    that are visible in GradesStore will be complete ones.
+
+    `xmodule_instance_args` is used to provide information for creating a track
+    function and an XQueue callback. These are passed to
+    get_module_for_descriptor_internal, which sidesteps the need for a Request
+    object when instantiating an xmodule instance.
     """
     # Get start time for task:
-    start_time = time()
+    start_time = datetime.now(UTC)
 
     STATUS_INTERVAL = 100
 
@@ -709,7 +875,7 @@ def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, 
     # enrolled_students is too large to fit comfortably in memory, and subsequent
     # course grading requests lead to memory fragmentation.  So we will err here on the
     # side of smaller memory allocations at the cost of additional lookups.
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:200]
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)[:10]
 
     # perform the main loop
     num_attempted = 0
@@ -720,14 +886,14 @@ def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, 
 
     def update_task_progress():
         """Return a dict containing info about current task"""
-        current_time = time()
+        current_time = datetime.now(UTC)
         progress = {
             'action_name': action_name,
             'attempted': num_attempted,
             'succeeded': num_succeeded,
             'failed' : num_failed,
             'total' : num_total,
-            'duration_ms': int((current_time - start_time) * 1000),
+            'duration_ms': int((current_time - start_time).total_seconds() * 1000),
             'step' : curr_step,
         }
         _get_current_task().update_state(state=PROGRESS, meta=progress)
@@ -745,7 +911,6 @@ def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, 
             update_task_progress()
         num_attempted += 1
 
-        # An empty gradeset means we failed to grade a student.
         if gradeset:
             num_succeeded += 1
             if not header:
@@ -760,13 +925,20 @@ def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, 
             row_percents = [percents[label] for label in header]
             rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
         else:
+            # An empty gradeset means we failed to grade a student.
             num_failed += 1
             err_rows.append([student.id, student.username, err_msg])
 
     curr_step = "Uploading CSVs"
     update_task_progress()
-    store_in_s3(course_id, "grades_timestamp.csv", rows)
-    store_in_s3(course_id, "grades_timestamp_err.csv", err_rows)
+
+    grades_store = GradesStore.from_config()
+    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
+
+    grades_store.store_rows(course_id, "grades_{}.csv".format(timestamp_str), rows)
+    # If there are any error rows (don't count the header), write that out as well
+    if len(err_rows) > 1:
+        grades_store.store_rows(course_id, "grades_{}_err.csv".format(timestamp_str), err_rows)
 
     # One last update before we close out...
     return update_task_progress()

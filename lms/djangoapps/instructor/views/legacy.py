@@ -53,6 +53,7 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
+from instructor_task.tasks_helper import GradesStore
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
@@ -911,9 +912,11 @@ def instructor_dashboard(request, course_id):
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_number > max_enrollment_for_buttons
 
+    # Grading downloads
+    grades_store = GradesStore.from_config()
+
     #----------------------------------------
     # context for rendering
-
     context = {
         'course': course,
         'staff_access': True,
@@ -940,7 +943,9 @@ def instructor_dashboard(request, course_id):
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
         'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons
+        'disable_buttons': disable_buttons,
+
+        'downloadable_grades_links': grades_store.links_for(course_id),
     }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):

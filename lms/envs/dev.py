@@ -279,6 +279,13 @@ EDX_API_KEY = None
 ####################### Shoppingcart ###########################
 MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
 
+###################### Grade Downloads ######################
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE' : 'localfs',
+    'BUCKET' : 'edx-grades',
+    'ROOT_PATH' : '/tmp/edx-s3/grades',
+}
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
