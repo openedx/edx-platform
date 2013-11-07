@@ -142,7 +142,7 @@ def save_item(request):
                 # security will reject non-https URLs anyway.
                 # Also, following video module specific code is here, because front-end
                 # metadata fields doesn't support validation.
-                if metadata_key == 'html5_sources' and not all([parse_url(u).scheme in allowedSchemes for u in value]):
+                if metadata_key == 'html5_sources' and not all([parse_url(u).scheme.lower() in allowedSchemes for u in value]):
                     raise ValidationError(u'HTML5 video sources support following protocols: {0}.'.format(' '.join(allowedSchemes)))
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
