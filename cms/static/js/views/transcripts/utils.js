@@ -145,8 +145,7 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
                 }
 
                 var link = document.createElement('a'),
-                    allowedProtocols = ['https'],
-                    match, protocol;
+                    match;
 
                 link.href = url;
                 match = link.pathname
@@ -154,8 +153,7 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
                             .pop()
                             .match(/(.+)\.(mp4|webm)$/);
 
-                protocol = link.protocol.slice(0, -1);
-                if (match && $.inArray(protocol, allowedProtocols) !== -1) {
+                if (match) {
                     cache[url] = {
                         video: match[1],
                         type: match[2]
