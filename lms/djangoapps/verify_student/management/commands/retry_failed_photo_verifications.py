@@ -15,6 +15,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='must_retry')
-        for attempt in attempts_to_retry:
+        print("Attempting to retry {0} failed PhotoVerification submissions".format(len(attempts_to_retry)))
+        for index, attempt in enumerate(attempts_to_retry):
+            print("Retrying submission #{0} (ID: {1}, User: {2})".format(index, attempt.id, attempt.user))
             attempt.submit()
-        self.stdout.write("Resubmitted failed photo verifications")
+            print("Retry result: {0}".format(attempt.status))
+        print("Done resubmitting failed photo verifications")
