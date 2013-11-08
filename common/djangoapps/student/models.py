@@ -875,9 +875,6 @@ class CourseEnrollment(models.Model):
             cls.create_or_update_enrollment(user, course_id, record.mode, is_active=False)
             unenroll_done.send(sender=cls, course_enrollment=record)
 
-            # TODO: Do we still need to emit this event since unenroll now calls create_or_update_enrollment?
-            #record.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
-
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
             log.error(err_msg.format(user, course_id))
@@ -978,6 +975,7 @@ class CourseEnrollment(models.Model):
             CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, self.mode, False)
 
     def change_mode(self, mode):
+        """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
         self.mode = mode
         CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, mode, self.is_active)
 

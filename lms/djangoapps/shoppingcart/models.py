@@ -506,8 +506,7 @@ class CertificateItem(OrderItem):
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
 
-        self.course_enrollment.mode = self.mode
-        self.course_enrollment.save()
+        self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
     @property
