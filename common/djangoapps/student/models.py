@@ -27,7 +27,7 @@ import django.dispatch
 from django.forms import ModelForm, forms
 
 from course_modes.models import CourseMode
-import comment_client as cc
+import lms.lib.comment_client as cc
 from pytz import UTC
 import crum
 
@@ -40,6 +40,7 @@ unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
 
 class UserStanding(models.Model):
     """

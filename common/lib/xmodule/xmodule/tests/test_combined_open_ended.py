@@ -6,14 +6,15 @@ OpenEndedModule
 
 """
 
-from datetime import datetime
 import json
 import logging
 import unittest
 
+from datetime import datetime
 from lxml import etree
 from mock import Mock, MagicMock, ANY, patch
 from pytz import UTC
+from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
@@ -24,7 +25,7 @@ from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (
-    MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+    DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
     TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile
 )
@@ -646,9 +647,13 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         """
         Return a combined open ended module with the specified parameters
         """
-        definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric),
-                      'task_xml': task_xml}
+        definition = {
+            'prompt': etree.XML(self.prompt),
+            'rubric': etree.XML(self.rubric),
+            'task_xml': task_xml
+        }
         descriptor = Mock(data=definition)
+        module = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
         instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
             instance_state.update({'current_task_number': task_number})
@@ -659,6 +664,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                static_data=self.static_data,
                                                metadata=self.metadata,
                                                instance_state=instance_state)
+        self.test_system.xmodule_instance = module
         return combinedoe
 
     def ai_state_reset(self, task_state, task_number=None):
@@ -764,8 +770,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.save()
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])
@@ -807,8 +814,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertIsInstance(status, basestring)
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])
@@ -905,8 +913,9 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         module.save()
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])
