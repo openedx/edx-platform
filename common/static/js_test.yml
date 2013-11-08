@@ -28,6 +28,7 @@ prepend_path: common/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
+    - js/vendor/jasmine-debug.js
     - js/vendor/jquery.min.js
     - js/vendor/jasmine-jquery.js
     - js/vendor/underscore-min.js

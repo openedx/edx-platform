@@ -58,6 +58,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/common_static/js/vendor/jasmine-debug.js
 
 # Paths to source JavaScript files
 src_paths:
