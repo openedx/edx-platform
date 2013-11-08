@@ -3,15 +3,14 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-06 17:03+0400\n"
-"PO-Revision-Date: 2013-11-01 14:34+0300\n"
-"Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
+"PO-Revision-Date: 2013-11-08 16:41+0300\n"
+"Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 1.5.4\n"
 "Generated-By: Babel 0.9.6\n"
 "X-POOTLE-MTIME: 1379946749.0\n"
@@ -60,31 +59,19 @@ msgstr ""
 "{err}"
 
 #: cms/djangoapps/contentstore/views/course.py:176
-msgid ""
-"There is already a course defined with the same organization, course number, "
-"and course run. Please change either organization or course number to be "
-"unique."
-msgstr ""
-"Уже существует курс, созданный той же самой организацией, с тем же номером и "
-"годом проведения. Измените что-нибудь, чтобы достичь уникальности."
+msgid "There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique."
+msgstr "Уже существует курс, созданный той же самой организацией, с тем же номером и годом проведения. Измените что-нибудь, чтобы достичь уникальности."
 
 #: cms/djangoapps/contentstore/views/course.py:180
 #: cms/djangoapps/contentstore/views/course.py:182
 #: cms/djangoapps/contentstore/views/course.py:201
 #: cms/djangoapps/contentstore/views/course.py:203
-msgid ""
-"Please change either the organization or course number so that it is unique."
-msgstr ""
-"Пожалуйста, измените либо организацию, либо номер курса, чтобы они были "
-"уникальны"
+msgid "Please change either the organization or course number so that it is unique."
+msgstr "Пожалуйста, измените либо организацию, либо номер курса, чтобы они были уникальны"
 
 #: cms/djangoapps/contentstore/views/course.py:198
-msgid ""
-"There is already a course defined with the same organization and course "
-"number. Please change at least one field to be unique."
-msgstr ""
-"Уже существует курс, созданный той же самой организацией, с тем же номером. "
-"Измените что-нибудь, чтобы достичь уникальности."
+msgid "There is already a course defined with the same organization and course number. Please change at least one field to be unique."
+msgstr "Уже существует курс, созданный той же самой организацией, с тем же номером. Измените что-нибудь, чтобы достичь уникальности."
 
 #: cms/djangoapps/contentstore/views/import_export.py:68
 msgid "We only support uploading a .tar.gz file."
@@ -129,9 +116,7 @@ msgstr "Не могу найти пользователя с адресом '{em
 
 #: cms/djangoapps/contentstore/views/user.py:185
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
-"Пользователь {email} был зарегистрирован, но еще не активировал свою учетную "
-"запись."
+msgstr "Пользователь {email} был зарегистрирован, но еще не активировал свою учетную запись."
 
 #: cms/djangoapps/contentstore/views/user.py:203
 #: cms/djangoapps/contentstore/views/user.py:246
@@ -180,12 +165,8 @@ msgid "Current course creator state"
 msgstr "Текущий статус создателя курса"
 
 #: cms/djangoapps/course_creators/models.py:44
-msgid ""
-"Optional notes about this user (for example, why course creation access was "
-"denied)"
-msgstr ""
-"Дополнительные заметки о пользователе (к примеру, почему создание курсов "
-"было запрещено)"
+msgid "Optional notes about this user (for example, why course creation access was denied)"
+msgstr "Дополнительные заметки о пользователе (к примеру, почему создание курсов было запрещено)"
 
 #: common/djangoapps/course_modes/models.py:42
 msgid "Honor Code Certificate"
@@ -210,12 +191,8 @@ msgstr ""
 
 #: common/djangoapps/student/middleware.py:26
 #, fuzzy
-msgid ""
-"Your account has been disabled. If you believe this was done in error, "
-"please contact us at {link_start}{support_email}{link_end}"
-msgstr ""
-"Ваши права на создание курсов в Студии edX были отозваны. Если Вы считаете, "
-"что это ошибка, обратитесь к "
+msgid "Your account has been disabled. If you believe this was done in error, please contact us at {link_start}{support_email}{link_end}"
+msgstr "Ваши права на создание курсов в Студии edX были отозваны. Если Вы считаете, что это ошибка, обратитесь к "
 
 #: common/djangoapps/student/middleware.py:33
 #, fuzzy
@@ -374,8 +351,7 @@ msgstr "Руководитель (директор, заведующий) обр
 
 #: common/djangoapps/student/models.py:175
 msgid "Vice manager (director, head of) the educational institution"
-msgstr ""
-"Заместитель руководителя (директора, заведующего) образовательного учреждения"
+msgstr "Заместитель руководителя (директора, заведующего) образовательного учреждения"
 
 #: common/djangoapps/student/models.py:176
 msgid "Senior master"
@@ -495,8 +471,7 @@ msgstr "Недействительная запись на курс"
 
 #: common/djangoapps/student/views.py:509
 msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-"Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
+msgstr "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
 
 #: common/djangoapps/student/views.py:540
 msgid "Too many failed login attempts. Try again later."
@@ -507,13 +482,8 @@ msgid "Email or password is incorrect."
 msgstr "E-mail или пароль введены неверно."
 
 #: common/djangoapps/student/views.py:595
-msgid ""
-"This account has not been activated. We have sent another activation "
-"message. Please check your e-mail for the activation instructions."
-msgstr ""
-"Эта учетная запись не была активирована. Мы выслали еще одно активационное "
-"письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
-"активации."
+msgid "This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions."
+msgstr "Эта учетная запись не была активирована. Мы выслали еще одно активационное письмо. Пожалуйста, проверьте свою электронную почту для инструкций по активации."
 
 #: common/djangoapps/student/views.py:745
 msgid "An account with the Email '{email}' already exists."
@@ -598,9 +568,7 @@ msgstr "Требуется заполненое поле Название обр
 
 #: common/djangoapps/student/views.py:884
 msgid "Work StatGrad login is required"
-msgstr ""
-"Требуется заполненое поле Логин образовательного учреждения в системе "
-"Статград"
+msgstr "Требуется заполненое поле Логин образовательного учреждения в системе Статград"
 
 #: common/djangoapps/student/views.py:885
 msgid "Work location is required"
@@ -767,9 +735,7 @@ msgstr "Максимальное число попыток"
 
 #: common/lib/xmodule/xmodule/capa_module.py:97
 #, fuzzy
-msgid ""
-"Defines the number of times a student can try to answer this problem. If the "
-"value is not set, infinite attempts are allowed."
+msgid "Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed."
 msgstr ""
 "Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
 "оценивается в 1 балл."
@@ -782,18 +748,14 @@ msgstr "Срок, до которого можно сдавать эту зад�
 #: common/lib/xmodule/xmodule/capa_module.py:103
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:269
 msgid "Amount of time after the due date that submissions will be accepted"
-msgstr ""
-"Промежуток времени после даты сдачи, в течение которого задачу еще можно "
-"сдавать"
+msgstr "Промежуток времени после даты сдачи, в течение которого задачу еще можно сдавать"
 
 #: common/lib/xmodule/xmodule/capa_module.py:107
 msgid "Show Answer"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:108
-msgid ""
-"Defines when to show the answer to the problem. A default value can be set "
-"in Advanced Settings."
+msgid "Defines when to show the answer to the problem. A default value can be set in Advanced Settings."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:122
@@ -806,10 +768,7 @@ msgid "Randomization"
 msgstr "Глобальная навигация"
 
 #: common/lib/xmodule/xmodule/capa_module.py:128
-msgid ""
-"Defines how often inputs are randomized when a student loads the problem. "
-"This setting only applies to problems that can have randomly generated "
-"numeric values. A default value can be set in Advanced Settings."
+msgid "Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:140
@@ -847,9 +806,7 @@ msgstr "Вес задачи"
 
 #: common/lib/xmodule/xmodule/capa_module.py:149
 #, fuzzy
-msgid ""
-"Defines the number of points each problem is worth. If the value is not set, "
-"each response field in the problem is worth one point."
+msgid "Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point."
 msgstr ""
 "Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
 "оценивается в 1 балл."
@@ -860,8 +817,7 @@ msgid "Markdown source of this module"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:156
-msgid ""
-"Source code for LaTeX and Word problems. This feature is not well-supported."
+msgid "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py:160
@@ -882,24 +838,15 @@ msgstr "Ошибка: {msg}"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:197
 msgid "Open Response Assessment"
-msgstr "Открытый ответ"
+msgstr "Задание с открытым ответом"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:201
 msgid "Current task that the student is on."
 msgstr "Текущее задание, которое выполняется студентом."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:206
-msgid ""
-"A list of lists of state dictionaries for student states that are saved.This "
-"field is only populated if the instructor changes tasks afterthe module is "
-"created and students have attempted it (for example changes a self assessed "
-"problem to self and peer assessed."
-msgstr ""
-"Список списков словарей сохраненных состояний студентов. Это поле "
-"заполняется только в случае, если инструктор меняет задания после того, как "
-"модуль был создан и студенты начали сдавать задания (например, задание было "
-"изменено с задания на самостоятельную проверку на задание на перекрестную "
-"проверку)."
+msgid "A list of lists of state dictionaries for student states that are saved.This field is only populated if the instructor changes tasks afterthe module is created and students have attempted it (for example changes a self assessed problem to self and peer assessed."
+msgstr "Список списков словарей сохраненных состояний студентов. Это поле заполняется только в случае, если инструктор меняет задания после того, как модуль был создан и студенты начали сдавать задания (например, задание было изменено с задания на самостоятельную проверку на задание на перекрестную проверку)."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:213
 msgid "List of state dictionaries of each task within this module."
@@ -943,26 +890,16 @@ msgid "Disable Quality Filter"
 msgstr "Отключить фильтр качества"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:252
-msgid ""
-"If False, the Quality Filter is enabled and submissions with poor spelling, "
-"short length, or poor grammar will not be peer reviewed."
-msgstr ""
-"Если значение False, фильтр качества включен и сдаваемые работы с "
-"грамматическими ошибками или слишком короткие не будут проверены."
+msgid "If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed."
+msgstr "Если значение False, фильтр качества включен и сдаваемые работы с грамматическими ошибками или слишком короткие не будут проверены."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:257
 msgid "Peer Track Changes"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:258
-msgid ""
-"EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  If set to 'True', peer graders "
-"will be able to make changes to the student submission and those changes "
-"will be tracked and shown along with the graded feedback."
-msgstr ""
-"ЭКСПЕРИМЕНТАЛЬНАЯ ОСОБЕННОСТЬ ПЕРЕКРЕСТНОЙ ПРОВЕРКИ: если установлено в "
-"'True', проверяющие смогут вносить изменения в посылку студента. Эти "
-"изменения будут сохранены и отображены вместе с оцененной обратной связью."
+msgid "EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  If set to 'True', peer graders will be able to make changes to the student submission and those changes will be tracked and shown along with the graded feedback."
+msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ОСОБЕННОСТЬ ПЕРЕКРЕСТНОЙ ПРОВЕРКИ: если установлено в 'True', проверяющие смогут вносить изменения в посылку студента. Эти изменения будут сохранены и отображены вместе с оцененной обратной связью."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:272
 msgid "Current version number"
@@ -970,9 +907,7 @@ msgstr "Номер текущей версии"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:277
 #: common/lib/xmodule/xmodule/peer_grading_module.py:63
-msgid ""
-"Defines the number of points each problem is worth. If the value is not set, "
-"each problem is worth one point."
+msgid "Defines the number of points each problem is worth. If the value is not set, each problem is worth one point."
 msgstr ""
 "Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
 "оценивается в 1 балл."
@@ -982,9 +917,7 @@ msgid "Minimum Peer Grading Calibrations"
 msgstr "Минимальное число работ калибровки перекрестной проверки"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:284
-msgid ""
-"The minimum number of calibration essays each student will need to complete "
-"for peer grading."
+msgid "The minimum number of calibration essays each student will need to complete for peer grading."
 msgstr ""
 "Минимальное число калибровочных работ, которые должны быть выполнены перед\n"
 "получением права на перекрестную проверку."
@@ -994,12 +927,8 @@ msgid "Maximum Peer Grading Calibrations"
 msgstr "Максимальное число работ калибровки перекрестной проверки"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:291
-msgid ""
-"The maximum number of calibration essays each student will need to complete "
-"for peer grading."
-msgstr ""
-"Максимальное число калибровочных работ, которые должны быть выполнены перед "
-"получением права на перекрестную проверку."
+msgid "The maximum number of calibration essays each student will need to complete for peer grading."
+msgstr "Максимальное число калибровочных работ, которые должны быть выполнены перед получением права на перекрестную проверку."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:297
 msgid "Peer Graders per Response"
@@ -1014,9 +943,7 @@ msgid "Required Peer Grading"
 msgstr "Требуемая перекрестная проверка"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:305
-msgid ""
-"The number of other students each student making a submission will have to "
-"grade."
+msgid "The number of other students each student making a submission will have to grade."
 msgstr "Число работ других студентов, которые должен проверить каждый студент."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:311
@@ -1024,17 +951,8 @@ msgid "Allow \"overgrading\" of peer submissions"
 msgstr "Разрешить \"перепроверку\" работ"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:312
-msgid ""
-"EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already "
-"have the requisite number of graders, but ONLY WHEN all submissions they are "
-"eligible to grade already have enough graders.  This is intended for use "
-"when settings for `Required Peer Grading` > `Peer Graders per Response`"
-msgstr ""
-"ЭКСПЕРИМЕНТАЛЬНАЯ ВОЗМОЖНОСТЬ. Разрешить студентам выполнять перекрестную "
-"проверку работ, которые уже проверены достаточным количеством студентов, но "
-"только тогда, когда все работы уже проверены достаточным количеством "
-"студентов. Эта возможность предназначена для использования, когда 'Требуемая "
-"перекрестная проверка' > 'Число проверяющих'"
+msgid "EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, but ONLY WHEN all submissions they are eligible to grade already have enough graders.  This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"
+msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ВОЗМОЖНОСТЬ. Разрешить студентам выполнять перекрестную проверку работ, которые уже проверены достаточным количеством студентов, но только тогда, когда все работы уже проверены достаточным количеством студентов. Эта возможность предназначена для использования, когда 'Требуемая перекрестная проверка' > 'Число проверяющих'"
 
 #: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
@@ -1078,30 +996,19 @@ msgid "Passed registrations."
 msgstr "Прошедшие регистрацию."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:91
-msgid ""
-"You have been registered for this master class. We will provide addition "
-"information soon."
-msgstr ""
-"Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
-"скором времени."
+msgid "You have been registered for this master class. We will provide addition information soon."
+msgstr "Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в скором времени."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:93
-msgid ""
-"You are pending for registration for this master class. Please visit this "
-"page later for result."
-msgstr ""
-"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
-"данную страницу позже для результатов."
+msgid "You are pending for registration for this master class. Please visit this page later for result."
+msgstr "Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите данную страницу позже для результатов."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:32
 msgid "Show Single Problem"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:33
-msgid ""
-"When True, only the single problem specified by \"Link to Problem Location\" "
-"is shown. When False, a panel is displayed with all problems available for "
-"peer grading."
+msgid "When True, only the single problem specified by \"Link to Problem Location\" is shown. When False, a panel is displayed with all problems available for peer grading."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:39
@@ -1109,16 +1016,12 @@ msgid "Link to Problem Location"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:40
-msgid ""
-"The location of the problem being graded. Only used when \"Show Single "
-"Problem\" is True."
+msgid "The location of the problem being graded. Only used when \"Show Single Problem\" is True."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:46
 #, fuzzy
-msgid ""
-"Defines whether the student gets credit for grading this problem. Only used "
-"when \"Show Single Problem\" is True."
+msgid "Defines whether the student gets credit for grading this problem. Only used when \"Show Single Problem\" is True."
 msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:51
@@ -1149,31 +1052,22 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:632
 msgid "Could not contact the graders.  Please notify course staff."
-msgstr ""
-"Невозможно связаться с системой оценивания.  Пожалуйста сообщите о "
-"случившемся администраторам курса."
+msgstr "Невозможно связаться с системой оценивания.  Пожалуйста сообщите о случившемся администраторам курса."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:636
-msgid ""
-"Received invalid response from the graders.  Please notify course staff."
-msgstr ""
-"Получен некоректный ответ от системы оценивания.  Пожалуйста сообщите о "
-"случившемся администраторам курса."
+msgid "Received invalid response from the graders.  Please notify course staff."
+msgstr "Получен некоректный ответ от системы оценивания.  Пожалуйста сообщите о случившемся администраторам курса."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:644
 msgid "Feedback not available yet"
 msgstr "Обратная связь пока недоступна"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:645
-msgid ""
-"You need to peer grade {moresub} more submissions in order to see your "
-"feedback."
+msgid "You need to peer grade {moresub} more submissions in order to see your feedback."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:646
-msgid ""
-"You have graded responses from {graded} students, and {beengraded} students "
-"have graded your submissions."
+msgid "You have graded responses from {graded} students, and {beengraded} students have graded your submissions."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:647
@@ -1181,25 +1075,16 @@ msgid "You have made {sub} submissions."
 msgstr "Вы сделали {sub} попыток."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:781
-msgid ""
-"You have attempted this question {your} times. You are only allowed to "
-"attempt it {allowed} times."
-msgstr ""
-"Вы пытались ответить на этот вопрос {your} раз. Вы можете это сделать только "
-"{allowed} раз."
+msgid "You have attempted this question {your} times. You are only allowed to attempt it {allowed} times."
+msgstr "Вы пытались ответить на этот вопрос {your} раз. Вы можете это сделать только {allowed} раз."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:956
 msgid "The problem state got out-of-sync.  Please try reloading the page."
-msgstr ""
-"Произошла рассинхронизация состояния задачи. Пожалуйста, перезагрузите "
-"страницу."
+msgstr "Произошла рассинхронизация состояния задачи. Пожалуйста, перезагрузите страницу."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:695
-msgid ""
-"Your response has been submitted.  Please check back later for your grade."
-msgstr ""
-"Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
-"оценки."
+msgid "Your response has been submitted.  Please check back later for your grade."
+msgstr "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей оценки."
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
 #, fuzzy
@@ -1240,8 +1125,7 @@ msgstr "максимальный размер загружаемого файл�
 
 #: lms/djangoapps/django_comment_client/base/views.py:627
 msgid "Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
-"Ошибка загрузки файла. Пожалуйста сообщите администратору сайта. Спасибо."
+msgstr "Ошибка загрузки файла. Пожалуйста сообщите администратору сайта. Спасибо."
 
 #: lms/djangoapps/instructor/views/api.py:58
 msgid "User does not exist."
@@ -1430,13 +1314,8 @@ msgid " (out of {total})"
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py:280
-msgid ""
-"Cannot find any open response problems in this course.  Have you submitted "
-"answers to any open response assessment questions?  If not, please do so and "
-"return to this page."
-msgstr ""
-"В этом курсе отсутствуют задания с открытым ответом. Отправьте ответ на "
-"любое задание с открытым ответом и вернитесь на эту страницу."
+msgid "Cannot find any open response problems in this course.  Have you submitted answers to any open response assessment questions?  If not, please do so and return to this page."
+msgstr "В этом курсе отсутствуют задания с открытым ответом. Отправьте ответ на любое задание с открытым ответом и вернитесь на эту страницу."
 
 #: lms/djangoapps/open_ended_grading/utils.py:20
 msgid "AI Assessment"
@@ -1459,17 +1338,11 @@ msgid "Instructor Assessment"
 msgstr "Проверка инструктором"
 
 #: lms/djangoapps/open_ended_grading/utils.py:27
-msgid ""
-"Error occurred while contacting the grading service.  Please notify course "
-"staff."
-msgstr ""
-"При обращении к сервису проверки работ возникла ошибка. Пожалуйста, "
-"уведомите преподавателей."
+msgid "Error occurred while contacting the grading service.  Please notify course staff."
+msgstr "При обращении к сервису проверки работ возникла ошибка. Пожалуйста, уведомите преподавателей."
 
 #: lms/djangoapps/open_ended_grading/utils.py:28
-msgid ""
-"Error occurred while contacting the grading service.  Please notify your edX "
-"point of contact."
+msgid "Error occurred while contacting the grading service.  Please notify your edX point of contact."
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py:100
@@ -1493,27 +1366,20 @@ msgid "Flagged Submissions"
 msgstr "Помеченные посылки"
 
 #: lms/djangoapps/open_ended_grading/views.py:56
-msgid ""
-"View all problems that require peer assessment in this particular course."
+msgid "View all problems that require peer assessment in this particular course."
 msgstr "Просмотреть все задачи, требующие перекрестной проверки в этом курсе."
 
 #: lms/djangoapps/open_ended_grading/views.py:57
-msgid ""
-"View ungraded submissions submitted by students for the open ended problems "
-"in the course."
-msgstr ""
-"Просмотреть непроверенные работы студентов для задач с открытым ответом в "
-"этом курсе."
+msgid "View ungraded submissions submitted by students for the open ended problems in the course."
+msgstr "Просмотреть непроверенные работы студентов для задач с открытым ответом в этом курсе."
 
 #: lms/djangoapps/open_ended_grading/views.py:58
-msgid ""
-"View open ended problems that you have previously submitted for grading."
+msgid "View open ended problems that you have previously submitted for grading."
 msgstr "Посмотреть задачи с открытым ответом, сданные Вами на проверку."
 
 #: lms/djangoapps/open_ended_grading/views.py:59
 msgid "View submissions that have been flagged by students as inappropriate."
-msgstr ""
-"Просмотреть работы, отмеченные студентами как потенциально недостойные."
+msgstr "Просмотреть работы, отмеченные студентами как потенциально недостойные."
 
 #: lms/djangoapps/open_ended_grading/views.py:63
 #: lms/djangoapps/open_ended_grading/views.py:64
@@ -1529,10 +1395,7 @@ msgid "Submissions have been flagged for review"
 msgstr "Работы были отмечены на просмотр"
 
 #: lms/djangoapps/open_ended_grading/views.py:134
-msgid ""
-"Error with initializing peer grading. There has not been a peer grading "
-"module created in the courseware that would allow you to grade others. "
-"Please check back later for this."
+msgid "Error with initializing peer grading. There has not been a peer grading module created in the courseware that would allow you to grade others. Please check back later for this."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:159
@@ -1544,9 +1407,7 @@ msgid "Trying to add a different currency into the cart"
 msgstr "Попытка добавить другую валюту в корзину"
 
 #: lms/djangoapps/shoppingcart/models.py:387
-msgid ""
-"Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new "
-"enrollments."
+msgid "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new enrollments."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:432
@@ -1558,11 +1419,7 @@ msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py:489
-msgid ""
-"Note - you have up to 2 weeks into the course to unenroll from the Verified "
-"Certificate option and receive a full refund. To receive your refund, "
-"contact {billing_email}. Please include your order number in your e-mail. "
-"Please do NOT include your credit card information."
+msgid "Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option and receive a full refund. To receive your refund, contact {billing_email}. Please include your order number in your e-mail. Please do NOT include your credit card information."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py:25
@@ -1598,14 +1455,11 @@ msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:159
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
+msgid "The payment processor accepted an order whose number is not in our system."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:179
-msgid ""
-"The amount charged by the processor {0} {1} is different than the total cost "
-"of the order {2} {3}."
+msgid "The amount charged by the processor {0} {1} is different than the total cost of the order {2} {3}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:307
@@ -1621,21 +1475,15 @@ msgid "One or more fields in the request contains invalid data."
 msgstr "Одно или несколько полей запроса содержат некорректные данные."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:316
-msgid ""
-"Error: General system failure. Possible fix: retry the payment after a few "
-"minutes."
+msgid "Error: General system failure. Possible fix: retry the payment after a few minutes."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:328
-msgid ""
-"The issuing bank has questions about the request. Possible fix: retry with "
-"another form of payment"
+msgid "The issuing bank has questions about the request. Possible fix: retry with another form of payment"
 msgstr "Банк-эмитент не подтвердил запрос. Попробуйте другие формы платежа"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:340
-msgid ""
-"Insufficient funds in the account. Possible fix: retry with another form of "
-"payment"
+msgid "Insufficient funds in the account. Possible fix: retry with another form of payment"
 msgstr "Недостаточно средств на счету. Попробуйте другие формы платежа"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:342
@@ -1648,26 +1496,19 @@ msgid "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr "Банк-эмитент недоступен. Повторите операцию через несколько минут"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
-msgid ""
-"The card has reached the credit limit. Possible fix: retry with another form "
-"of payment"
+msgid "The card has reached the credit limit. Possible fix: retry with another form of payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:350
-msgid ""
-"Invalid card verification number. Possible fix: retry with another form of "
-"payment"
+msgid "Invalid card verification number. Possible fix: retry with another form of payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:354
-msgid ""
-"Invalid account number. Possible fix: retry with another form of payment"
+msgid "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:360
-msgid ""
-"General decline by the processor.  Possible fix: retry with another form of "
-"payment"
+msgid "General decline by the processor.  Possible fix: retry with another form of payment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:366
@@ -1683,8 +1524,7 @@ msgid "The authorization has already been captured"
 msgstr "Авторизация уже была получена"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:372
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
+msgid "The requested transaction amount must match the previous transaction amount."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py:380
@@ -1720,13 +1560,11 @@ msgstr "Процесс сброса пароля завершен"
 #, python-format
 msgid ""
 "\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in"
-"%(link_end)s now.\n"
+"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
 "      "
 msgstr ""
 "\n"
-"      Ваш пароль установлен.  Теперь вы можете пройти по ссылке "
-"%(link_start)sВход%(link_end)s.\n"
+"      Ваш пароль установлен.  Теперь вы можете пройти по ссылке %(link_start)sВход%(link_end)s.\n"
 "      "
 
 #: lms/templates/registration/password_reset_confirm.html:70
@@ -1737,8 +1575,7 @@ msgstr "Форма сброса пароля"
 #, fuzzy, python-format
 msgid ""
 "\n"
-"                We're sorry, %(platform_name)s enrollment is not available "
-"in your region\n"
+"                We're sorry, %(platform_name)s enrollment is not available in your region\n"
 "            "
 msgstr "Извините, учетные записи {platform_name} в данный момент недоступны"
 
@@ -1756,20 +1593,14 @@ msgid "The two password fields didn't match."
 msgstr "Пароли не совпадают."
 
 #: lms/templates/registration/password_reset_confirm.html:92
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
-msgstr ""
-"Извините, но у нас возникли трудности с обработкой вашего запроса на сброс "
-"пароля."
+msgid "We're sorry, our systems seem to be having trouble processing your password reset"
+msgstr "Извините, но у нас возникли трудности с обработкой вашего запроса на сброс пароля."
 
 #: lms/templates/registration/password_reset_confirm.html:94
 #, python-format
 msgid ""
 "\n"
-"                Someone has been made aware of this issue. Please try again "
-"shortly. Please %(start_link)scontact us%(end_link)s about any concerns you "
-"have.\n"
+"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
 "            "
 msgstr ""
 
@@ -1785,15 +1616,11 @@ msgstr " Сброс пароля прошел неудачно"
 #, python-format
 msgid ""
 "\n"
-"            The password reset link was invalid, possibly because the link "
-"has already been used.  Please return to the %(start_link)slogin page"
-"%(end_link)s and start the password reset process again.\n"
+"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
 "\n"
-"            Ссылка на сброс пароля некорректная, возможно ей кто-то уже "
-"воспользовался.  Пожалуйста вернитесь на страницу %(start_link)sВхода"
-"%(end_link)s и начните процесс сброса пароля заново.\n"
+"            Ссылка на сброс пароля некорректная, возможно ей кто-то уже воспользовался.  Пожалуйста вернитесь на страницу %(start_link)sВхода%(end_link)s и начните процесс сброса пароля заново.\n"
 "        "
 
 #: lms/templates/registration/password_reset_confirm.html:140
@@ -1825,7 +1652,8 @@ msgstr ""
 msgid "This article was last modified:"
 msgstr ""
 
-#: lms/templates/wiki/create.html:5 lms/templates/wiki/create.html.py:30
+#: lms/templates/wiki/create.html:5
+#: lms/templates/wiki/create.html.py:30
 #, fuzzy
 msgid "Add new article"
 msgstr "Добавить новых студентов"
@@ -1835,12 +1663,14 @@ msgstr "Добавить новых студентов"
 msgid "Create article"
 msgstr "Создан: {datetime}"
 
-#: lms/templates/wiki/create.html:42 lms/templates/wiki/delete.html:13
+#: lms/templates/wiki/create.html:42
+#: lms/templates/wiki/delete.html:13
 #: lms/templates/wiki/delete.html.py:54
 msgid "Go back"
 msgstr ""
 
-#: lms/templates/wiki/delete.html:5 lms/templates/wiki/delete.html.py:50
+#: lms/templates/wiki/delete.html:5
+#: lms/templates/wiki/delete.html.py:50
 #: lms/templates/wiki/edit.html:23
 #, fuzzy
 msgid "Delete article"
@@ -1856,15 +1686,11 @@ msgid "You cannot delete a root article."
 msgstr ""
 
 #: lms/templates/wiki/delete.html:18
-msgid ""
-"You cannot delete this article because you do not have permission to delete "
-"articles with children. Try to remove the children manually one-by-one."
+msgid "You cannot delete this article because you do not have permission to delete articles with children. Try to remove the children manually one-by-one."
 msgstr ""
 
 #: lms/templates/wiki/delete.html:24
-msgid ""
-"You are deleting an article. This means that its children will be deleted as "
-"well. If you choose to purge, children will also be purged!"
+msgid "You are deleting an article. This means that its children will be deleted as well. If you choose to purge, children will also be purged!"
 msgstr ""
 
 #: lms/templates/wiki/delete.html:26
@@ -1884,7 +1710,8 @@ msgstr ""
 msgid "Edit"
 msgstr "Редактировать"
 
-#: lms/templates/wiki/edit.html:14 lms/templates/wiki/edit.html.py:34
+#: lms/templates/wiki/edit.html:14
+#: lms/templates/wiki/edit.html.py:34
 #, fuzzy
 msgid "Save changes"
 msgstr "Сохранить изменения"
@@ -1904,11 +1731,7 @@ msgid "History"
 msgstr "Посмотреть историю"
 
 #: lms/templates/wiki/history.html:56
-msgid ""
-"Click each revision to see a list of edited lines. Click the Preview button "
-"to see how the article looked at this stage. At the bottom of this page, you "
-"can change to a particular revision or merge an old revision with the "
-"current one."
+msgid "Click each revision to see a list of edited lines. Click the Preview button to see how the article looked at this stage. At the bottom of this page, you can change to a particular revision or merge an old revision with the current one."
 msgstr ""
 
 #: lms/templates/wiki/history.html:75
@@ -1930,7 +1753,8 @@ msgstr "Авторегистрировать"
 msgid "Change"
 msgstr "замена"
 
-#: lms/templates/wiki/history.html:127 lms/templates/wiki/history.html:132
+#: lms/templates/wiki/history.html:127
+#: lms/templates/wiki/history.html:132
 msgid "Merge selected with current..."
 msgstr ""
 
@@ -1938,11 +1762,13 @@ msgstr ""
 msgid "Switch to selected version"
 msgstr ""
 
-#: lms/templates/wiki/history.html:153 lms/templates/wiki/history.html:180
+#: lms/templates/wiki/history.html:153
+#: lms/templates/wiki/history.html:180
 msgid "Back to history view"
 msgstr ""
 
-#: lms/templates/wiki/history.html:158 lms/templates/wiki/history.html:163
+#: lms/templates/wiki/history.html:158
+#: lms/templates/wiki/history.html:163
 msgid "Switch to this version"
 msgstr ""
 
@@ -1951,16 +1777,15 @@ msgid "Merge with current"
 msgstr ""
 
 #: lms/templates/wiki/history.html:172
-msgid ""
-"When you merge a revision with the current, all data will be retained from "
-"both versions and merged at its approximate location from each revision."
+msgid "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision."
 msgstr ""
 
 #: lms/templates/wiki/history.html:172
 msgid "After this, it's important to do a manual review."
 msgstr ""
 
-#: lms/templates/wiki/history.html:185 lms/templates/wiki/history.html:190
+#: lms/templates/wiki/history.html:185
+#: lms/templates/wiki/history.html:190
 msgid "Create new merged version"
 msgstr ""
 
@@ -1991,8 +1816,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"  You need to <a href=\"%(login_url)s\">log in</a> or <a href="
-"\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
 "  "
 msgstr ""
 
@@ -2005,9 +1829,7 @@ msgid "Wiki Syntax Help"
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html:8
-msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+msgid "This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:"
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html:10
@@ -2023,9 +1845,7 @@ msgid "Miniature Markdown Guide"
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html:14
-msgid ""
-"To create a new wiki article, create a link to it. Clicking the link gives "
-"you the creation page."
+msgid "To create a new wiki article, create a link to it. Clicking the link gives you the creation page."
 msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html:15
@@ -2102,8 +1922,7 @@ msgstr "голоса"
 #, python-format
 msgid ""
 "\n"
-"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet"
-"%(end_link)s for help.\n"
+"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
 "\t"
 msgstr ""
 
@@ -2138,15 +1957,11 @@ msgid "Search files and articles"
 msgstr "Расписание и детали"
 
 #: lms/templates/wiki/plugins/attachments/index.html:36
-msgid ""
-"You can reuse files from other articles. These files are subject to updates "
-"on other articles which may or may not be a good thing."
+msgid "You can reuse files from other articles. These files are subject to updates on other articles which may or may not be a good thing."
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:65
-msgid ""
-"The following files are available for this article. Copy the markdown tag to "
-"directly refer to a file from the article text."
+msgid "The following files are available for this article. Copy the markdown tag to directly refer to a file from the article text."
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:84
@@ -2197,3 +2012,4 @@ msgstr "Предыдущий"
 #: lms/templates/wiki/plugins/attachments/index.html:130
 msgid "There are no attachments for this article."
 msgstr ""
+
