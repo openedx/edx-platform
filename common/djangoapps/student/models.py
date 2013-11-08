@@ -872,12 +872,11 @@ class CourseEnrollment(models.Model):
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            if record.is_active:
-                record.is_active = False
-                record.save()
+            cls.create_or_update_enrollment(user, course_id, record.mode, is_active=False)
+            unenroll_done.send(sender=cls, course_enrollment=record)
 
-                record.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
-                unenroll_done.send(sender=cls, course_enrollment=record)
+            # TODO: Do we still need to emit this event since unenroll now calls create_or_update_enrollment?
+            #record.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
@@ -968,8 +967,7 @@ class CourseEnrollment(models.Model):
         """Makes this `CourseEnrollment` record active. Saves immediately."""
         if not self.is_active:
             self.is_active = True
-            self.save()
-            self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+            CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, self.mode, True)
 
     def deactivate(self):
         """Makes this `CourseEnrollment` record inactive. Saves immediately. An
@@ -977,8 +975,11 @@ class CourseEnrollment(models.Model):
         """
         if self.is_active:
             self.is_active = False
-            self.save()
-            self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+            CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, self.mode, False)
+
+    def change_mode(self, mode):
+        self.mode = mode
+        CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, mode, self.is_active)
 
     def refundable(self):
         """
@@ -990,7 +991,6 @@ class CourseEnrollment(models.Model):
             return False
         else:
             return True
-
 
 
 class CourseEnrollmentAllowed(models.Model):
