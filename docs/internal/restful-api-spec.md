@@ -3,8 +3,6 @@ This document is [copied from Apiary](http://docs.edxapi.apiary.io/),
 and the canonical version lives there. This API is designed to allow clients
 to introspect and manipulate XBlocks and their related models.
 
-![index/snapshot overview](index-snapshot-overview.png)
-
 # Group XBlocks
 Conceptually, an XBlock is any component that knows how to render itself, at least
 in a certain context. XBlocks can contain other XBlocks. XBlocks can define their
@@ -88,7 +86,7 @@ for who can read the index, and who can modify its contents
 A Course is the definitive example of an index, but other
 types of indexes could also exist.
 
-![index/snapshot diagram](https://s3.amazonaws.com/uploads.hipchat.com/26537/313915/C41Suikkfgpl4PG/api.png)
+![index/snapshot diagram](index-snapshot-overview.png)
 
 ## Indexes [/v1/indexes]
 
