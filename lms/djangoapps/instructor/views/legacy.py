@@ -900,7 +900,8 @@ def instructor_dashboard(request, course_id):
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
         'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons
+        'disable_buttons': disable_buttons,
+        'metrics_results': metrics_results,
     }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
