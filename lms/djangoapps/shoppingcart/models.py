@@ -467,7 +467,7 @@ class CertificateItem(OrderItem):
         try:
             course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
         except ObjectDoesNotExist:
-            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+            course_enrollment = CourseEnrollment.create_or_update_enrollment(order.user, course_id, mode=mode)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)

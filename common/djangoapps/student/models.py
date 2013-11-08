@@ -713,7 +713,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def create_enrollment(cls, user, course_id, mode="honor", is_active=False):
+    def create_or_update_enrollment(cls, user, course_id, mode="honor", is_active=False):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -818,7 +818,7 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        return cls.create_enrollment(user, course_id, mode, is_active=True)
+        return cls.create_or_update_enrollment(user, course_id, mode, is_active=True)
 
     @classmethod
     def enroll_by_email(cls, email, course_id, mode="honor", ignore_errors=True):
