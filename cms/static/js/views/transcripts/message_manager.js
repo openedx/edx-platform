@@ -68,7 +68,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
             if (!tplHtml) {
                 console.error('Couldn\'t load Transcripts status template');
 
-                return;
+                return this;
             }
 
             template = _.template(tplHtml);

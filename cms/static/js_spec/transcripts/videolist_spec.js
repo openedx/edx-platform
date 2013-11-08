@@ -2,17 +2,14 @@ define(
     [
         "jquery", "underscore",
         "js/views/transcripts/utils", "js/views/transcripts/metadata_videolist",
-        "js/views/transcripts/message_manager",
         "js/views/metadata", "js/models/metadata", "js/views/abstract_editor",
         "sinon", "xmodule", "jasmine-jquery"
     ],
-function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, AbstractEditor, sinon) {
+function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, sinon) {
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
                 'transcripts/metadata-videolist-entry.underscore'
             ),
-            correctMessanger = MessageManager,
-            messenger = correctMessanger.prototype,
             abstractEditor = AbstractEditor.prototype,
             component_id = 'component_id',
             videoList = [
@@ -51,15 +48,16 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 status: 'Success',
                 subs: 'video_id'
             }),
-            view, sinonXhr;
+            view, sinonXhr, MessageManager, messenger;
 
         beforeEach(function () {
-            sinonXhr =  sinon.fakeServer.create();
+            sinonXhr = sinon.fakeServer.create();
             sinonXhr.respondWith([
                 200,
                 { "Content-Type": "application/json"},
                 response
             ]);
+
             sinonXhr.autoRespond = true;
 
             var tpl = sandbox({
@@ -80,13 +78,18 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 ).text(videoListEntryTemplate)
             );
 
-            spyOn(messenger, 'initialize');
-            spyOn(messenger, 'render').andReturn(messenger);
-            spyOn(messenger, 'showError');
-            spyOn(messenger, 'hideError');
             spyOn(Utils, 'command').andCallThrough();
             spyOn(abstractEditor, 'initialize').andCallThrough();
             spyOn(abstractEditor, 'render').andCallThrough();
+            spyOn(console, 'error');
+
+            messenger = jasmine.createSpyObj('MessageManager',[
+                'initialize', 'render', 'showError', 'hideError'
+            ]);
+
+            $.each(messenger, function(index, method) {
+                 method.andReturn(messenger);
+            });
 
             MessageManager = function () {
                 messenger.initialize();
@@ -96,11 +99,10 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
 
             $el = $('.component');
 
-            spyOn(console, 'error');
-
             view = new VideoList({
                 el: $el,
-                model: model
+                model: model,
+                MessageManager: MessageManager
             });
 
             this.addMatchers({
@@ -126,10 +128,8 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
         });
 
         afterEach(function () {
-            MessageManager = correctMessanger;
             sinonXhr.restore();
         });
-
 
         var waitsForResponse = function (expectFunc, prep) {
             var flag = false;
@@ -145,6 +145,7 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 if (len && req[0].readyState === 4) {
                     flag = true;
                 }
+
                 return flag;
             }, "Ajax Timeout", 750);
 
@@ -153,10 +154,12 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
 
 
         it('Initialize', function () {
-            expect(abstractEditor.initialize).toHaveBeenCalled();
-            expect(messenger.initialize).toHaveBeenCalled();
-            expect(view.component_id).toBe(component_id);
-            expect(view.$el).toHandle('input');
+            waitsForResponse(function () {
+                expect(abstractEditor.initialize).toHaveBeenCalled();
+                expect(messenger.initialize).toHaveBeenCalled();
+                expect(view.component_id).toBe(component_id);
+                expect(view.$el).toHandle('input');
+            });
         });
 
         describe('Render', function () {
@@ -263,10 +266,14 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
         describe('isUniqVideoTypes', function () {
 
             it('Unique data - return true', function () {
-                var data = videoList,
-                    result = view.isUniqVideoTypes(data);
+                var data = videoList;
 
-                expect(result).toBe(true);
+                waitsForResponse(function () {
+                    var result = view.isUniqVideoTypes(data);
+
+                    expect(result).toBe(true);
+                });
+
             });
 
             it('Not Unique data - return false', function () {
@@ -286,10 +293,13 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                             type: "youtube",
                             video: "12345678901"
                         }
-                    ],
-                    result = view.isUniqVideoTypes(data);
+                    ];
 
-                expect(result).toBe(false);
+                waitsForResponse(function () {
+                    var result = view.isUniqVideoTypes(data);
+
+                    expect(result).toBe(false);
+                });
             });
         });
 
@@ -312,20 +322,26 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                             type: "youtube",
                             video: "12345678901"
                         }
-                    ],
-                    result = view.checkIsUniqVideoTypes(data);
+                    ];
 
-                expect(messenger.showError).toHaveBeenCalled();
-                expect(result).toBe(false);
+                waitsForResponse(function () {
+                    var result = view.checkIsUniqVideoTypes(data);
+
+                    expect(messenger.showError).toHaveBeenCalled();
+                    expect(result).toBe(false);
+                });
             });
 
             it('All works okay if arguments are not passed', function () {
                 spyOn(view, 'getVideoObjectsList').andReturn(videoList);
-                var result = view.checkIsUniqVideoTypes();
 
-                expect(view.getVideoObjectsList).toHaveBeenCalled();
-                expect(messenger.showError).not.toHaveBeenCalled();
-                expect(result).toBe(true);
+                waitsForResponse(function () {
+                    var result = view.checkIsUniqVideoTypes();
+
+                    expect(view.getVideoObjectsList).toHaveBeenCalled();
+                    expect(messenger.showError).not.toHaveBeenCalled();
+                    expect(result).toBe(true);
+                });
             });
         });
 
@@ -335,61 +351,77 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
             });
 
             it('Error message are shown', function () {
-                var data = { mode: 'incorrect' },
-                    result = view.checkValidity(data, true);
+                waitsForResponse(function () {
+                    var data = { mode: 'incorrect' },
+                        result = view.checkValidity(data, true);
 
-                expect(messenger.showError).toHaveBeenCalled();
-                expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                expect(result).toBe(false);
+                    expect(messenger.showError).toHaveBeenCalled();
+                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                    expect(result).toBe(false);
+                });
             });
 
             it('Error message are shown when flag is not passed', function () {
-                var data = { mode: 'incorrect' },
-                    result = view.checkValidity(data);
+                waitsForResponse(function () {
+                    var data = { mode: 'incorrect' },
+                        result = view.checkValidity(data);
 
-                expect(messenger.showError).not.toHaveBeenCalled();
-                expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                expect(result).toBe(true);
+                    expect(messenger.showError).not.toHaveBeenCalled();
+                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                    expect(result).toBe(true);
+                });
             });
 
             it('All works okay if correct data is passed', function () {
-                var data = videoList,
-                    result = view.checkValidity(data);
+                waitsForResponse(function () {
+                    var data = videoList,
+                        result = view.checkValidity(data);
 
-                expect(messenger.showError).not.toHaveBeenCalled();
-                expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                expect(result).toBe(true);
+                    expect(messenger.showError).not.toHaveBeenCalled();
+                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                    expect(result).toBe(true);
+                });
             });
         });
 
         it('openExtraVideosBar', function () {
-            view.$extraVideosBar.removeClass('is-visible');
+            waitsForResponse(function () {
+                view.$extraVideosBar.removeClass('is-visible');
 
-            view.openExtraVideosBar();
-            expect(view.$extraVideosBar).toHaveClass('is-visible');
+                view.openExtraVideosBar();
+                expect(view.$extraVideosBar).toHaveClass('is-visible');
+            });
         });
 
         it('closeExtraVideosBar', function () {
-            view.$extraVideosBar.addClass('is-visible');
+            waitsForResponse(function () {
+                view.$extraVideosBar.addClass('is-visible');
+                view.closeExtraVideosBar();
 
-            view.closeExtraVideosBar();
-            expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+            });
         });
 
         it('toggleExtraVideosBar', function () {
-            view.$extraVideosBar.addClass('is-visible');
-            view.toggleExtraVideosBar();
-            expect(view.$extraVideosBar).not.toHaveClass('is-visible');
-            view.toggleExtraVideosBar();
-            expect(view.$extraVideosBar).toHaveClass('is-visible');
+            waitsForResponse(function () {
+                view.$extraVideosBar.addClass('is-visible');
+                view.toggleExtraVideosBar();
+                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+                view.toggleExtraVideosBar();
+                expect(view.$extraVideosBar).toHaveClass('is-visible');
+            });
         });
 
         it('getValueFromEditor', function () {
-            expect(view).assertValueInView(modelStub.value);
+            waitsForResponse(function () {
+                expect(view).assertValueInView(modelStub.value);
+            });
         });
 
         it('setValueInEditor', function () {
-            expect(view).assertCanUpdateView(['abc.mp4']);
+            waitsForResponse(function () {
+                expect(view).assertCanUpdateView(['abc.mp4']);
+            });
         });
 
         it('getVideoObjectsList', function () {
@@ -406,12 +438,14 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 }
             ];
 
-            view.setValueInEditor([
-                'http://youtu.be/12345678901',
-                'video.mp4',
-                'video'
-            ]);
-            expect(view).assertIsCorrectVideoList(value);
+            waitsForResponse(function () {
+                view.setValueInEditor([
+                    'http://youtu.be/12345678901',
+                    'video.mp4',
+                    'video'
+                ]);
+                expect(view).assertIsCorrectVideoList(value);
+            });
         });
 
         describe('getPlaceholders', function () {
@@ -422,10 +456,12 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
             });
 
             it('All works okay if empty values are passed', function () {
-                var result = view.getPlaceholders([]),
-                expectedResult = _.values(defaultPlaceholders).reverse();
+                waitsForResponse(function () {
+                    var result = view.getPlaceholders([]),
+                    expectedResult = _.values(defaultPlaceholders).reverse();
 
-                expect(result).toEqual(expectedResult);
+                    expect(result).toEqual(expectedResult);
+                });
             });
 
 
@@ -459,10 +495,12 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                         }
                     };
 
-                    $.each(dataDict, function(index, val) {
-                        var result = view.getPlaceholders(val.value);
+                    waitsForResponse(function () {
+                        $.each(dataDict, function(index, val) {
+                            var result = view.getPlaceholders(val.value);
 
-                        expect(result).toEqual(val.expectedResult);
+                            expect(result).toEqual(val.expectedResult);
+                        });
                     });
                 }
             );
@@ -496,13 +534,15 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 function () {
                     $.fn.hasClass.andReturn(false);
                     view.checkValidity.andReturn(false);
-                    view.inputHandler(eventObject);
 
-                    expect(messenger.hideError).not.toHaveBeenCalled();
-                    expect(view.updateModel).not.toHaveBeenCalled();
-                    expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                    expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
-                    expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                    waitsForResponse(function () {
+                        view.inputHandler(eventObject);
+                        expect(messenger.hideError).not.toHaveBeenCalled();
+                        expect(view.updateModel).not.toHaveBeenCalled();
+                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                        expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
+                        expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                    });
                 }
             );
 
@@ -510,13 +550,15 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 function () {
                     $.fn.hasClass.andReturn(true);
                     view.checkValidity.andReturn(false);
-                    view.inputHandler(eventObject);
 
-                    expect(messenger.hideError).not.toHaveBeenCalled();
-                    expect(view.updateModel).not.toHaveBeenCalled();
-                    expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                    expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
-                    expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                    waitsForResponse(function () {
+                        view.inputHandler(eventObject);
+                        expect(messenger.hideError).not.toHaveBeenCalled();
+                        expect(view.updateModel).not.toHaveBeenCalled();
+                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                        expect($.fn.prop).toHaveBeenCalledWith('disabled', true);
+                        expect($.fn.addClass).toHaveBeenCalledWith('is-disabled');
+                    });
                 }
             );
 
@@ -524,13 +566,15 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 function () {
                     view.checkValidity.andReturn(true);
                     _.isEqual.andReturn(false);
-                    view.inputHandler(eventObject);
 
-                    expect(messenger.hideError).not.toHaveBeenCalled();
-                    expect(view.updateModel).toHaveBeenCalled();
-                    expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                    expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
-                    expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                    waitsForResponse(function () {
+                        view.inputHandler(eventObject);
+                        expect(messenger.hideError).not.toHaveBeenCalled();
+                        expect(view.updateModel).toHaveBeenCalled();
+                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                        expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
+                        expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                    });
                 }
             );
 
@@ -538,13 +582,15 @@ function ($, _, Utils, VideoList, MessageManager, MetadataView, MetadataModel, A
                 function () {
                     view.checkValidity.andReturn(true);
                     _.isEqual.andReturn(true);
-                    view.inputHandler(eventObject);
 
-                    expect(messenger.hideError).toHaveBeenCalled();
-                    expect(view.updateModel).not.toHaveBeenCalled();
-                    expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                    expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
-                    expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                    waitsForResponse(function () {
+                        view.inputHandler(eventObject);
+                        expect(messenger.hideError).toHaveBeenCalled();
+                        expect(view.updateModel).not.toHaveBeenCalled();
+                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                        expect($.fn.prop).toHaveBeenCalledWith('disabled', false);
+                        expect($.fn.removeClass).toHaveBeenCalledWith('is-disabled');
+                    });
                 }
             );
 
