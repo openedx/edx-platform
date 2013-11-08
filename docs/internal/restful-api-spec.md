@@ -26,11 +26,13 @@ supports.
           "title": "Thumbs",
           "description": "a simple control to indicate thumbs-up or thumbs-down, and aggregate responses",
           "schema": {},
+          "defaults": {}
         }, {
           "id": "randomize",
           "title": "Randomize",
           "description": "randomize children",
-          "schema": {}
+          "schema": {},
+          "defaults": {}
         }, {
           "id": "schema_ex",
           "title": "Schema Type Example",
@@ -43,6 +45,9 @@ supports.
             },
             "list_of_strings": ["string"],
             "list_of_ints": ["int"]
+          },
+          "defaults": {
+            "name": "Empty"
           }
         }]
 
@@ -66,6 +71,9 @@ supports.
             },
             "list_of_strings": ["string"],
             "list_of_ints": ["int"]
+          },
+          "defaults": {
+            "name": "Empty"
           }
         }
 
@@ -79,6 +87,8 @@ for who can read the index, and who can modify its contents
 
 A Course is the definitive example of an index, but other
 types of indexes could also exist.
+
+![index/snapshot diagram](https://s3.amazonaws.com/uploads.hipchat.com/26537/313915/C41Suikkfgpl4PG/api.png)
 
 ## Indexes [/v1/indexes]
 
@@ -498,6 +508,25 @@ request to partially update the index.
 
             {"id": "cca0d370-37be-4168-90c3-7fc4a818e8fc"}
 
+### Create or Reset Snapshot on Branch [POST]
+Creates an empty snapshot identified by the branch name. The
+created snapshot has no parent snapshot, and no content.
+If this API endpoint is called on a branch that already has an
+existing snapshot, a new snapshot is still created, and
+the course's branch pointer is updated to point to this new
+snapshot.
++ Response 201 (application/json)
+    + Headers
+
+            Location: /v1/snapshots/0298b9f7-b8ef-4bcb-ab33-8f712aa520bd
+
+    + Body
+
+            {
+              "message": "created",
+              "id": "0298b9f7-b8ef-4bcb-ab33-8f712aa520bd"
+            }
+
 ### Update Branch Pointer [PUT]
 Point the branch at a new snapshot identified by the given ID.
 If the given ID does not refer to an existing snapshot, this
@@ -702,10 +731,47 @@ may resemble URLs. That's why they do not start with `/v1`.
           "list_of_ints": [1, 2, 3, 4, 5]
         }
 
+### Create empty XBlock instance [POST]
+This will create a new snapshot based on this snapshot, with an empty
+XBlock instance with name provided in the URL. The request must
+specify a `type` in the request body, which is the ID of an XBlock
+type that this server supports. The "parent" attribute on the
+newly-created XBlock instance will be `null`.
+
+In addition to the `type` attribute, this request *may* contain other
+attributes to set for the newly-created XBlock instance, based on
+the schema of the XBlock type. Those attributes will be set on the
+newly-created XBlock instance. Unspecified attributes will be set
+based on the defaults of the XBlock type.
+
+If this API endpoint is called on an existing XBlock, the
+newly-created snapshot will contain an empty XBlock instance
+instead, effectively resetting the XBlock instance. This
+is also the way to change the type of an XBlock instance.
+
++ Request (application/json)
+
+        {"type": "randomize"}
+
++ Response 201 (application/json)
+    + Headers
+
+            Location: /v1/snapshots/b6bbab4a-3a21-485e-ab41-094488ae0847/xblocks/chapter7
+
+    + Body
+
+            {
+              "message": "created",
+              "location": "/v1/snapshots/b6bbab4a-3a21-485e-ab41-094488ae0847/xblocks/chapter7"
+            }
+
 ### Create new XBlock instance based on partially updating this instance [PUT]
 Note that this will create a new snapshot based on this snapshot, and a new
 XBlock instance based on this XBlock instance. The response is simply a
 pointer to the newly-created XBlock instance under the newly-created snapshot.
+
+The `type` of an XBlock instance cannot be updated using this API endpoint.
+To change the `type` of an XBlock instance, replace it using the POST verb.
 
 + Request (application/json)
 
