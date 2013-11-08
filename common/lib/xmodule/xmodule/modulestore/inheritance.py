@@ -1,7 +1,7 @@
 from datetime import datetime
 from pytz import UTC
 
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, List
 from xmodule.fields import Date, Timedelta
 from xblock.runtime import KeyValueStore
 
@@ -50,7 +50,12 @@ class InheritanceMixin(XBlockMixin):
     use_latex_compiler = Boolean(
         help="Enable LaTeX templates?",
         default=False,
-        scope=Scope.settings)
+        scope=Scope.settings
+    )
+    lti_passports = List(
+        help="LTI tools passports as id:client_key:client_secret",
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

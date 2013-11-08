@@ -48,6 +48,10 @@ class LTIFields(object):
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
     open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
+    lti_passports = List(
+        help="LTI tools passports as id:client_key:client_secret",
+        scope=Scope.settings
+    )
 
 
 class LTIModule(LTIFields, XModule):
@@ -180,13 +184,9 @@ class LTIModule(LTIFields, XModule):
             "tool_consumer_instance_contact_email",
         ]
 
-        # Obtains client_key and client_secret credentials from current course:
-        course_id = self.course_id
-        course_location = CourseDescriptor.id_to_location(course_id)
-        course = self.descriptor.runtime.modulestore.get_item(course_location)
         client_key = client_secret = ''
 
-        for lti_passport in course.lti_passports:
+        for lti_passport in self.lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
@@ -307,3 +307,11 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
     Descriptor for LTI Xmodule.
     """
     module_class = LTIModule
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(LTIModuleDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([
+            LTIModuleDescriptor.lti_passports,
+        ])
+        return non_editable_fields
