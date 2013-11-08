@@ -145,3 +145,44 @@ th {
   background: #eee;
   font-weight: bold;
 }
+
+
+//---------------------------------------- Image Modal Styling ----------------------------------------//
+
+.imageModal-trigger p a.imageModal-link {
+  display: block;                                                                             
+  position: relative;
+}
+
+.imageModal-trigger p a.imageModal-link i {
+  font-style: normal;
+  color: #666;
+  position: absolute;
+  top: 0;
+  left: 10px;
+  opacity: 0;
+}
+.imageModal-trigger p a.imageModal-link:hover i {
+  opacity: 1;
+}
+
+.imageModal {
+  display: none;
+  position: fixed;
+  cursor: pointer;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  height: 95%;
+  width: 95%;
+  padding: 2.5%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.imageModal img {
+  height: 97%;
+  margin: 0 auto;
+  display: block;
+  position: relative;
+}
+
+//--------------------------------------- /Image Modal Styling ----------------------------------------//

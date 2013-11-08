@@ -43,6 +43,9 @@ class HtmlModule(HtmlFields, XModule):
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee')
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/html/imageModal.js')
         ]
     }
     js_module_name = "HTMLModule"

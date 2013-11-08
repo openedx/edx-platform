@@ -1,0 +1,16 @@
+---
+metadata:
+    display_name: Image Modal
+data: |
+      <div class="imageModal-trigger">
+        <h2>Title of Unit</h2>
+        <p>
+          <a class="imageModal-link" href="#"> 
+            <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-small.jpg" />
+            <i class="icon-zoom-in icon-3x"></i>
+          </a>
+        </p>
+      </div>
+      <div class="imageModal">
+        <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-big.jpg" />
+      </div>
