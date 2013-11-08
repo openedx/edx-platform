@@ -14,7 +14,7 @@
   @extend %t-title4;
   @extend %t-weight1;
   margin: 0 0 ($baseline*0.75) 0;
-  border-bottom: 1px solid $m-gray-l3;
+  border-bottom: 1px solid $m-gray-l4;
   padding-bottom: ($baseline/2);
   color: $m-gray-d4;
 }
@@ -80,16 +80,9 @@
   }
 }
 
-%copy-badge {
-  @extend %t-title8;
-  @extend %t-weight5;
-  border-radius: ($baseline/5);
-  padding: ($baseline/2) $baseline;
-  text-transform: uppercase;
-}
-
 // ====================
 
+// MISC: extends - button
 %btn-verify-primary {
   @extend %btn-primary-green;
 }
@@ -160,7 +153,7 @@
 // ====================
 
 // VIEW: all verification steps
-.register.verification-process {
+.verification-process {
 
   // reset: box-sizing (making things so right its scary)
   * {
@@ -267,12 +260,16 @@
   // elements - controls
   .action-primary {
     @extend %btn-primary-blue;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   .action-confirm {
     @extend %btn-verify-primary;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   // ====================
@@ -470,17 +467,19 @@
             margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
+            letter-spacing: 0.1rem;
           }
         }
       }
 
       .sts-label {
         @extend %t-title7;
+        @extend %t-weight4;
         display: block;
         margin-bottom: ($baseline/2);
         border-bottom: ($baseline/10) solid $m-gray-l4;
         padding-bottom: ($baseline/2);
-        color: $m-gray;
+        color: $m-gray-d1;
       }
 
       .sts-course {
@@ -751,6 +750,7 @@
 
             .action {
               @extend %btn-verify-primary;
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -1190,7 +1190,7 @@
     .form-register-choose {
       @include clearfix();
       width: flex-grid(12,12);
-      margin: $baseline 0;
+      margin: ($baseline*2) 0;
 
       .deco-divider {
         width: flex-grid(8,12);
@@ -1210,7 +1210,7 @@
       background: $m-gray-l4;
 
       &:last-child {
-        margin-bottom: none;
+        margin-bottom: 0;
       }
 
       .wrapper-copy, .list-actions {
@@ -1352,12 +1352,13 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
+        margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
         input {
           width: auto;
+          padding: 0;
         }
 
         &:last-child {
@@ -1646,7 +1647,7 @@
         @include font-size(24);
         color: $m-blue-d3;
 
-        &:hover {
+        &:hover, &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -1796,7 +1797,7 @@
         &:last-child {
           margin-bottom: 0;
           border-bottom: none;
-          padding-bottom: none;
+          padding-bottom: 0;
         }
 
         > .title {
@@ -1900,5 +1901,13 @@
 
   .progress-sts-value {
     width: 32% !important;
+  }
+}
+
+// STATE: upgrading registration type
+.register.is-upgrading {
+
+  .form-register-choose {
+    margin-top: ($baseline*2) !important;
   }
 }

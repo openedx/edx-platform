@@ -84,3 +84,32 @@
     display: none;
   }
 }
+
+// ====================
+
+// needed utility extend for resetting poor basic <button> elem styling
+%ui-reset-button  {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  text-shadow: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+
+  &:focus {
+    // outline: thin dotted !important;
+  }
+}
+
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}

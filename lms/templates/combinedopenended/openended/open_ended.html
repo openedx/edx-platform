@@ -1,15 +1,15 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section id="openended_${id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
-   <div class="error"></div>
-   <div class="prompt">
-    ${prompt|n}
-   </div>
-   <div class="visibility-control visibility-control-response">
-        <div class="inner">
-        </div>
-        <span class="section-header section-header-response">${_("Response")}</span>
-   </div>
-  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
+<section id="openended_${module_id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
+    <div class="error"></div>
+    <div class="prompt">
+      ${prompt|n}
+    </div>
+    <div class="visibility-control visibility-control-response">
+      <div class="inner">
+      </div>
+      <label class="section-header section-header-response" for="answer_${module_id}">Response</label>
+    </div>
+    <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="answer_${module_id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
   <div class="grader-status">

@@ -68,8 +68,10 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], FAILURE)
         self.assertFalse(output['in_progress'])
-        expected_progress = {'exception': TEST_FAILURE_EXCEPTION,
-                             'message': TEST_FAILURE_MESSAGE}
+        expected_progress = {
+            'exception': TEST_FAILURE_EXCEPTION,
+            'message': TEST_FAILURE_MESSAGE,
+        }
         self.assertEquals(output['task_progress'], expected_progress)
 
     def test_get_status_from_success(self):
@@ -83,13 +85,70 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], SUCCESS)
         self.assertFalse(output['in_progress'])
-        expected_progress = {'attempted': 3,
-                             'updated': 2,
-                             'total': 5,
-                             'action_name': 'rescored'}
+        expected_progress = {
+            'attempted': 3,
+            'succeeded': 2,
+            'total': 5,
+            'action_name': 'rescored',
+        }
         self.assertEquals(output['task_progress'], expected_progress)
 
-    def _test_get_status_from_result(self, task_id, mock_result):
+    def test_get_status_from_legacy_success(self):
+        # get status for a task that had already succeeded, back at a time
+        # when 'updated' was used instead of the preferred 'succeeded'.
+        legacy_progress = {
+            'attempted': 3,
+            'updated': 2,
+            'total': 5,
+            'action_name': 'rescored',
+        }
+        instructor_task = self._create_entry(task_state=SUCCESS, task_output=legacy_progress)
+        task_id = instructor_task.task_id
+        response = self._get_instructor_task_status(task_id)
+        output = json.loads(response.content)
+        self.assertEquals(output['message'], "Problem rescored for 2 of 3 students (out of 5)")
+        self.assertEquals(output['succeeded'], False)
+        self.assertEquals(output['task_id'], task_id)
+        self.assertEquals(output['task_state'], SUCCESS)
+        self.assertFalse(output['in_progress'])
+        self.assertEquals(output['task_progress'], legacy_progress)
+
+    def _create_email_subtask_entry(self, total=5, attempted=3, succeeded=2, skipped=0, task_state=PROGRESS):
+        """Create an InstructorTask with subtask defined and email argument."""
+        progress = {'attempted': attempted,
+                    'succeeded': succeeded,
+                    'skipped': skipped,
+                    'total': total,
+                    'action_name': 'emailed',
+                    }
+        instructor_task = self._create_entry(task_state=task_state, task_output=progress)
+        instructor_task.subtasks = {}
+        instructor_task.task_input = json.dumps({'email_id': 134})
+        instructor_task.save()
+        return instructor_task
+
+    def test_get_status_from_subtasks(self):
+        # get status for a task that is in progress, with updates
+        # from subtasks.
+        instructor_task = self._create_email_subtask_entry(skipped=1)
+        task_id = instructor_task.task_id
+        response = self._get_instructor_task_status(task_id)
+        output = json.loads(response.content)
+        self.assertEquals(output['message'], "Progress: emailed 2 of 3 so far (skipping 1) (out of 5)")
+        self.assertEquals(output['succeeded'], False)
+        self.assertEquals(output['task_id'], task_id)
+        self.assertEquals(output['task_state'], PROGRESS)
+        self.assertTrue(output['in_progress'])
+        expected_progress = {
+            'attempted': 3,
+            'succeeded': 2,
+            'skipped': 1,
+            'total': 5,
+            'action_name': 'emailed',
+        }
+        self.assertEquals(output['task_progress'], expected_progress)
+
+    def _test_get_status_from_result(self, task_id, mock_result=None):
         """
         Provides mock result to caller of instructor_task_status, and returns resulting output.
         """
@@ -120,10 +179,12 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = PROGRESS
-        mock_result.result = {'attempted': 5,
-                              'updated': 4,
-                              'total': 10,
-                              'action_name': 'rescored'}
+        mock_result.result = {
+            'attempted': 5,
+            'succeeded': 4,
+            'total': 10,
+            'action_name': 'rescored',
+        }
         output = self._test_get_status_from_result(task_id, mock_result)
         self.assertEquals(output['message'], "Progress: rescored 4 of 5 so far (out of 10)")
         self.assertEquals(output['succeeded'], False)
@@ -145,9 +206,11 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_state'], FAILURE)
         self.assertFalse(output['in_progress'])
-        expected_progress = {'exception': 'NotImplementedError',
-                             'message': "This task later failed.",
-                             'traceback': "random traceback"}
+        expected_progress = {
+            'exception': 'NotImplementedError',
+            'message': "This task later failed.",
+            'traceback': "random traceback",
+        }
         self.assertEquals(output['task_progress'], expected_progress)
 
     def test_update_progress_to_revoked(self):
@@ -165,7 +228,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         expected_progress = {'message': "Task revoked before running"}
         self.assertEquals(output['task_progress'], expected_progress)
 
-    def _get_output_for_task_success(self, attempted, updated, total, student=None):
+    def _get_output_for_task_success(self, attempted, succeeded, total, student=None):
         """returns the task_id and the result returned by instructor_task_status()."""
         # view task entry for task in progress
         instructor_task = self._create_progress_entry(student)
@@ -173,12 +236,25 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = SUCCESS
-        mock_result.result = {'attempted': attempted,
-                              'updated': updated,
-                              'total': total,
-                              'action_name': 'rescored'}
+        mock_result.result = {
+            'attempted': attempted,
+            'succeeded': succeeded,
+            'total': total,
+            'action_name': 'rescored',
+        }
         output = self._test_get_status_from_result(task_id, mock_result)
         return output
+
+    def _get_email_output_for_task_success(self, attempted, succeeded, total, skipped=0):
+        """returns the result returned by instructor_task_status()."""
+        instructor_task = self._create_email_subtask_entry(
+            total=total,
+            attempted=attempted,
+            succeeded=succeeded,
+            skipped=skipped,
+            task_state=SUCCESS,
+        )
+        return self._test_get_status_from_result(instructor_task.task_id)
 
     def test_update_progress_to_success(self):
         output = self._get_output_for_task_success(10, 8, 10)
@@ -186,10 +262,12 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_state'], SUCCESS)
         self.assertFalse(output['in_progress'])
-        expected_progress = {'attempted': 10,
-                             'updated': 8,
-                             'total': 10,
-                             'action_name': 'rescored'}
+        expected_progress = {
+            'attempted': 10,
+            'succeeded': 8,
+            'total': 10,
+            'action_name': 'rescored',
+        }
         self.assertEquals(output['task_progress'], expected_progress)
 
     def test_success_messages(self):
@@ -223,6 +301,47 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
 
         output = self._get_output_for_task_success(1, 1, 1, student=self.student)
         self.assertTrue("Problem successfully rescored for student" in output['message'])
+        self.assertTrue(output['succeeded'])
+
+    def test_email_success_messages(self):
+        output = self._get_email_output_for_task_success(0, 0, 10)
+        self.assertEqual(output['message'], "Unable to find any recipients to be emailed (out of 10)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 0, 10)
+        self.assertEqual(output['message'], "Message failed to be emailed for any of 10 recipients ")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 8, 10)
+        self.assertEqual(output['message'], "Message emailed for 8 of 10 recipients")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(9, 8, 10)
+        self.assertEqual(output['message'], "Message emailed for 8 of 9 recipients (out of 10)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 10, 10)
+        self.assertEqual(output['message'], "Message successfully emailed for 10 recipients")
+        self.assertTrue(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(0, 0, 10, skipped=3)
+        self.assertEqual(output['message'], "Unable to find any recipients to be emailed (skipping 3) (out of 10)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 0, 10, skipped=3)
+        self.assertEqual(output['message'], "Message failed to be emailed for any of 10 recipients  (skipping 3)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 8, 10, skipped=3)
+        self.assertEqual(output['message'], "Message emailed for 8 of 10 recipients (skipping 3)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(9, 8, 10, skipped=3)
+        self.assertEqual(output['message'], "Message emailed for 8 of 9 recipients (skipping 3) (out of 10)")
+        self.assertFalse(output['succeeded'])
+
+        output = self._get_email_output_for_task_success(10, 10, 10, skipped=3)
+        self.assertEqual(output['message'], "Message successfully emailed for 10 recipients (skipping 3)")
         self.assertTrue(output['succeeded'])
 
     def test_get_info_for_queuing_task(self):
@@ -262,4 +381,4 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task.task_input = "{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
-        self.assertEquals(message, "Problem rescored for 2 of 3 students (out of 5)")
+        self.assertEquals(message, "Status: rescored 2 of 3 (out of 5)")

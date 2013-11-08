@@ -154,7 +154,7 @@
         // function might (and probably will) fail.
         oldSetTimeout = window.setTimeout;
         // Redefine window.setTimeout() function as a spy.
-        window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; })
+        window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; });
         window.setTimeout.andReturn(100);
 
         initialize();
@@ -180,8 +180,7 @@
         expect(videoPlayer.currentTime).toEqual(20);
       });
 
-      // Temporarily disabled due to intermittent failures
-      // Fails with error: " Expected true to be falsy."
+      // Disabled 10/9/13 after failing in master
       xit('set timeout to unfreeze the slider', function() {
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
         window.setTimeout.mostRecentCall.args[0]();

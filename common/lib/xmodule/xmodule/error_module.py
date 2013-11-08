@@ -77,7 +77,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     module_class = ErrorModule
 
     def get_html(self):
-        return ''
+        return u''
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location):

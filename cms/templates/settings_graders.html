@@ -1,11 +1,13 @@
 <%inherit file="base.html" />
 <%block name="title">${_("Grading Settings")}</%block>
-<%block name="bodyclass">is-signedin course grading settings</%block>
+<%block name="bodyclass">is-signedin course grading view-settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
+  from django.core.urlresolvers import reverse
 %>
 
 <%block name="header_extras">
@@ -18,30 +20,21 @@
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
-
   <script type="text/javascript">
-    $(document).ready(function(){
-
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
-
-      var editor = new CMS.Views.Settings.Grading({
-          el: $('.settings-grading'),
-          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
-      });
-
-      editor.render();
+require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings/course_grading_policy"], function(doc, $, GradingView, CourseGradingPolicyModel) {
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
     });
 
+    var editor = new GradingView({
+        el: $('.settings-grading'),
+        model : new CourseGradingPolicyModel(${course_details|n},{parse:true})
+    });
+
+    editor.render();
+});
   </script>
 </%block>
 
@@ -124,7 +117,7 @@
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i>${_("New Assignment Type")}
+              <i class="icon-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
@@ -141,13 +134,16 @@
 
       <div class="bit">
       % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+        <%
+          ctx_loc = context_course.location
+          location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+          course_team_url = location.url_reverse('course_team/', '')
+        %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>

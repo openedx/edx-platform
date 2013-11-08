@@ -17,22 +17,22 @@ from lxml import etree
 from pkg_resources import resource_string
 import datetime
 import time
+import copy
 
 from django.http import Http404
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
-from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
-
-from xblock.field_data import DictFieldData
+from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
+from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
-
 log = logging.getLogger(__name__)
 
 
@@ -50,7 +50,7 @@ class VideoFields(object):
     )
     show_captions = Boolean(
         help="This controls whether or not captions are shown by default.",
-        display_name="Show Captions",
+        display_name="Show Transcript",
         scope=Scope.settings,
         default=True
     )
@@ -63,35 +63,37 @@ class VideoFields(object):
         default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
-        help="The Youtube ID for the .75x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the .75x speed video.",
         display_name="Youtube ID for .75x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
-        help="The Youtube ID for the 1.25x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.25x speed video.",
         display_name="Youtube ID for 1.25x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
-        help="The Youtube ID for the 1.5x speed video.",
+        help="Optional, for older browsers: the Youtube ID for the 1.5x speed video.",
         display_name="Youtube ID for 1.5x speed",
         scope=Scope.settings,
         default=""
     )
-    start_time = Float(
-        help="Start time for the video.",
+    start_time = RelativeTime(  # datetime.timedelta object
+        help="Start time for the video (HH:MM:SS).",
         display_name="Start Time",
         scope=Scope.settings,
-        default=0.0
+        default=datetime.timedelta(seconds=0)
     )
-    end_time = Float(
-        help="End time for the video.",
+    end_time = RelativeTime(  # datetime.timedelta object
+        help="End time for the video (HH:MM:SS).",
         display_name="End Time",
         scope=Scope.settings,
-        default=0.0
+        default=datetime.timedelta(seconds=0)
     )
+    #front-end code of video player checks logical validity of (start_time, end_time) pair.
+
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
         display_name="Download Video",
@@ -105,13 +107,13 @@ class VideoFields(object):
     )
     track = String(
         help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
-        display_name="Download Track",
+        display_name="Download Transcript",
         scope=Scope.settings,
         default=""
     )
     sub = String(
         help="The name of the timed transcript track (for non-Youtube videos).",
-        display_name="HTML5 Timed Transcript",
+        display_name="HTML5 Transcript",
         scope=Scope.settings,
         default=""
     )
@@ -135,6 +137,7 @@ class VideoModule(VideoFields, XModule):
 
     js = {
         'js': [
+            resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
             resource_string(__name__, 'js/src/video/02_html5_video.js'),
@@ -156,10 +159,6 @@ class VideoModule(VideoFields, XModule):
         log.debug(u"GET {0}".format(data))
         log.debug(u"DISPATCH {0}".format(dispatch))
         raise Http404()
-
-    def get_instance_state(self):
-        """Return information about state (position)."""
-        return json.dumps({'position': self.position})
 
     def get_html(self):
         caption_asset_path = "/static/subs/"
@@ -186,8 +185,8 @@ class VideoModule(VideoFields, XModule):
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': json.dumps(self.show_captions),
-            'start': self.start_time,
-            'end': self.end_time,
+            'start': self.start_time.total_seconds(),
+            'end': self.end_time.total_seconds(),
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
@@ -201,14 +200,14 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     module_class = VideoModule
 
     tabs = [
-        # {
-        #     'name': "Subtitles",
-        #     'template': "video/subtitles.html",
-        # },
         {
-            'name': "Settings",
-            'template': "tabs/metadata-edit-tab.html",
+            'name': "Basic",
+            'template': "video/transcripts.html",
             'current': True
+        },
+        {
+            'name': "Advanced",
+            'template': "tabs/metadata-edit-tab.html"
         }
     ]
 
@@ -269,8 +268,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         attrs = {
             'display_name': self.display_name,
             'show_captions': json.dumps(self.show_captions),
-            'start_time': datetime.timedelta(seconds=self.start_time),
-            'end_time': datetime.timedelta(seconds=self.end_time),
+            'start_time': self.start_time,
+            'end_time': self.end_time,
             'sub': self.sub,
         }
         for key, value in attrs.items():
@@ -290,6 +289,45 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele.set('src', self.track)
             xml.append(ele)
         return xml
+
+    def get_context(self):
+        """
+        Extend context by data for transcripts basic tab.
+        """
+        _context = super(VideoDescriptor, self).get_context()
+
+        metadata_fields = copy.deepcopy(self.editable_metadata_fields)
+
+        display_name = metadata_fields['display_name']
+        video_url = metadata_fields['html5_sources']
+        youtube_id_1_0 = metadata_fields['youtube_id_1_0']
+
+        def get_youtube_link(video_id):
+            if video_id:
+                return 'http://youtu.be/{0}'.format(video_id)
+            else:
+                return ''
+
+        video_url.update({
+            'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
+            'display_name': 'Video URL',
+            'field_name': 'video_url',
+            'type': 'VideoList',
+            'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
+        })
+
+        youtube_id_1_0_value = get_youtube_link(youtube_id_1_0['value'])
+
+        if youtube_id_1_0_value:
+            video_url['value'].insert(0, youtube_id_1_0_value)
+
+        metadata = {
+            'display_name': display_name,
+            'video_url': video_url
+        }
+
+        _context.update({'transcripts_basic_tab_metadata': metadata})
+        return _context
 
     @classmethod
     def _parse_youtube(cls, data):
@@ -324,9 +362,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         xml = etree.fromstring(xml_data)
         field_data = {}
 
+        # Convert between key types for certain attributes --
+        # necessary for backwards compatibility.
         conversions = {
-            'start_time': cls._parse_time,
-            'end_time': cls._parse_time
+            # example: 'start_time': cls._example_convert_start_time
         }
 
         # Convert between key names for certain attributes --
@@ -370,24 +409,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 field_data[attr] = value
 
         return field_data
-
-    @classmethod
-    def _parse_time(cls, str_time):
-        """Converts s in '12:34:45' format to seconds. If s is
-        None, returns empty string"""
-        if not str_time:
-            return ''
-        else:
-            try:
-                obj_time = time.strptime(str_time, '%H:%M:%S')
-                return datetime.timedelta(
-                    hours=obj_time.tm_hour,
-                    minutes=obj_time.tm_min,
-                    seconds=obj_time.tm_sec
-                ).total_seconds()
-            except ValueError:
-                # We've seen serialized versions of float in this field
-                return float(str_time)
 
 
 def _create_youtube_string(module):

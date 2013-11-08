@@ -75,6 +75,8 @@ function (VideoPlayer) {
         state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
         state.parseVideoSources   = _.bind(parseVideoSources, state);
         state.getVideoMetadata    = _.bind(getVideoMetadata, state);
+
+        state.checkStartEndTimes  = _.bind(checkStartEndTimes, state);
     }
 
     // function _renderElements(state)
@@ -92,23 +94,12 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        var onPlayerReadyFunc;
-        if (
-            (
-                (state.videoType === 'youtube') &&
-                (window.YT) &&
-                (window.YT.Player)
-            ) ||
-            (state.videoType === 'html5')
-        ) {
-            VideoPlayer(state);
+        if(state.videoType === 'youtube') {
+            YT.ready(function() {
+                VideoPlayer(state);
+            })
         } else {
-            if (state.videoType === 'youtube') {
-                onPlayerReadyFunc = 'onYouTubePlayerAPIReady';
-            } else {
-                onPlayerReadyFunc = 'onHTML5PlayerAPIReady';
-            }
-            window[onPlayerReadyFunc] = _.bind(VideoPlayer, window, state);
+            VideoPlayer(state);
         }
     }
 
@@ -149,25 +140,7 @@ function (VideoPlayer) {
     //     support HTML5. When we have this setting in cookies, we can select
     //     the proper mode from the start (not having to change mode later on).
     function _setPlayerMode(state) {
-        (function (currentPlayerMode) {
-            if (
-                (currentPlayerMode === 'html5') ||
-                (currentPlayerMode === 'flash')
-            ) {
-                state.currentPlayerMode = currentPlayerMode;
-            } else {
-                $.cookie('current_player_mode', 'html5', {
-                    expires: 3650,
-                    path: '/'
-                });
-                state.currentPlayerMode = 'html5';
-            }
-
-            console.log(
-                '[Video info]: YouTube player mode is "' +
-                state.currentPlayerMode + '".'
-            );
-        }($.cookie('current_player_mode')));
+        state.currentPlayerMode = 'html5';
     }
 
     // function _parseYouTubeIDs(state)
@@ -264,14 +237,20 @@ function (VideoPlayer) {
     // The function set initial configuration and preparation.
 
     function initialize(element) {
-        var _this = this, tempYtTestTimeout;
+        var _this = this,
+            regExp = /^true$/i,
+            data, tempYtTestTimeout;
         // This is used in places where we instead would have to check if an
         // element has a CSS class 'fullscreen'.
         this.isFullScreen = false;
 
         // The parent element of the video, and the ID.
         this.el = $(element).find('.video');
+        this.elVideoWrapper = this.el.find('.video-wrapper');
         this.id = this.el.attr('id').replace(/video_/, '');
+
+        // jQuery .data() return object with keys in lower camelCase format.
+        data = this.el.data();
 
         console.log(
             '[Video info]: Initializing video with id "' + this.id + '".'
@@ -283,32 +262,30 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
-            start:              this.el.data('start'),
-            end:                this.el.data('end'),
-
-            caption_data_dir:   this.el.data('caption-data-dir'),
-            caption_asset_path: this.el.data('caption-asset-path'),
-            show_captions:      (
-                                    this.el.data('show-captions')
-                                        .toString().toLowerCase() === 'true'
-                                ),
-            youtubeStreams:     this.el.data('streams'),
-
-            sub:                this.el.data('sub'),
-            mp4Source:          this.el.data('mp4-source'),
-            webmSource:         this.el.data('webm-source'),
-            oggSource:          this.el.data('ogg-source'),
-
-            ytTestUrl:   this.el.data('yt-test-url'),
-
+            start:              data['start'],
+            end:                data['end'],
+            caption_data_dir:   data['captionDataDir'],
+            caption_asset_path: data['captionAssetPath'],
+            show_captions:      regExp.test(data['showCaptions'].toString()),
+            youtubeStreams:     data['streams'],
+            autohideHtml5:      regExp.test(data['autohideHtml5'].toString()),
+            sub:                data['sub'],
+            mp4Source:          data['mp4Source'],
+            webmSource:         data['webmSource'],
+            oggSource:          data['oggSource'],
+            ytTestUrl:          data['ytTestUrl'],
             fadeOutTimeout:     1400,
-
+            captionsFreezeTime: 10000,
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
+        // Make sure that start end end times are valid. If not, they will be
+        // set to `null` and will not be used later on.
+        this.checkStartEndTimes();
+
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
-        tempYtTestTimeout = parseInt(this.el.data('yt-test-timeout'), 10);
+        tempYtTestTimeout = parseInt(data['ytTestTimeout'], 10);
         if (!isFinite(tempYtTestTimeout)) {
             tempYtTestTimeout = 1500;
         }
@@ -386,6 +363,30 @@ function (VideoPlayer) {
                     _setConfigurations(_this);
                     _renderElements(_this);
                 });
+        }
+    }
+
+    /*
+     * function checkStartEndTimes()
+     *
+     * Validate config.start and config.end times.
+     *
+     * We can check at this time if the times are proper integers, and if they
+     * make general sense. I.e. if start time is => 0 and <= end time.
+     *
+     * An invalid start time will be reset to 0. An invalid end time will be
+     * set to `null`. It the task for the appropriate player API to figure out
+     * if start time and/or end time are greater than the length of the video.
+     */
+    function checkStartEndTimes() {
+        this.config.start = parseInt(this.config.start, 10);
+        if ((!isFinite(this.config.start)) || (this.config.start < 0)) {
+            this.config.start = 0;
+        }
+
+        this.config.end = parseInt(this.config.end, 10);
+        if ((!isFinite(this.config.end)) || (this.config.end < this.config.start)) {
+            this.config.end = null;
         }
     }
 

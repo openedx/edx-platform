@@ -1,7 +1,7 @@
 // studio - views - textbooks
 // ====================
 
-body.course.textbooks {
+.view-textbooks {
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);

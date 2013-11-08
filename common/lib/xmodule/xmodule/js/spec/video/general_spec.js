@@ -11,8 +11,6 @@
 
         afterEach(function () {
             window.OldVideoPlayer = undefined;
-            window.onYouTubePlayerAPIReady = undefined;
-            window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
         });
 
@@ -186,6 +184,62 @@
             });
         });
 
+        describe('checking start and end times', function () {
+            var miniTestSuite = [
+                {
+                    itDescription: 'both times are proper',
+                    data: {start: 12, end: 24},
+                    expectData: {start: 12, end: 24}
+                },
+                {
+                    itDescription: 'start time is invalid',
+                    data: {start: '', end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'end time is invalid',
+                    data: {start: 12, end: ''},
+                    expectData: {start: 12, end: null}
+                },
+                {
+                    itDescription: 'start time is less than 0',
+                    data: {start: -12, end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'start time is greater than end time',
+                    data: {start: 42, end: 24},
+                    expectData: {start: 42, end: null}
+                },
+            ];
+
+            beforeEach(function () {
+                loadFixtures('video.html');
+
+            });
+
+            $.each(miniTestSuite, function (index, test) {
+                itFabrique(test.itDescription, test.data, test.expectData);
+            });
+
+            return;
+
+            function itFabrique(itDescription, data, expectData) {
+                it(itDescription, function () {
+                    $('#example').find('.video')
+                        .data({
+                            'start': data.start,
+                            'end': data.end
+                        });
+
+                    state = new Video('#example');
+
+                    expect(state.config.start).toBe(expectData.start);
+                    expect(state.config.end).toBe(expectData.end);
+                });
+            }
+        });
+
         describe('multiple YT on page', function () {
             var state1, state2, state3;
 
@@ -214,14 +268,23 @@
                 // Total ajax calls made.
                 numAjaxCalls = $.ajax.calls.length;
 
-                // Subtract ajax calls to get captions.
+                // Subtract ajax calls to get captions via
+                // state.videoCaption.fetchCaption() function.
                 numAjaxCalls -= $.ajaxWithPrefix.calls.length;
 
-                // Subtract ajax calls to get metadata for each video.
+                // Subtract ajax calls to get metadata for each video via
+                // state.getVideoMetadata() function.
+                numAjaxCalls -= 3;
+
+                // Subtract ajax calls to log event 'pause_video' via
+                // state.videoPlayer.log() function.
                 numAjaxCalls -= 3;
 
                 // This should leave just one call. It was made to check
-                // for YT availability.
+                // for YT availability. This is done in state.initialize()
+                // function. SPecifically, with the statement
+                //
+                //     this.youtubeXhr = this.getVideoMetadata();
                 expect(numAjaxCalls).toBe(1);
             });
         });

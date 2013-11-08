@@ -77,7 +77,8 @@ class CapaFactory(object):
                attempts=None,
                problem_state=None,
                correct=False,
-               done=None
+               done=None,
+               text_customization=None
                ):
         """
         All parameters are optional, and are added to the created problem if specified.
@@ -113,6 +114,8 @@ class CapaFactory(object):
             field_data['rerandomize'] = rerandomize
         if done is not None:
             field_data['done'] = done
+        if text_customization is not None:
+            field_data['text_customization'] = text_customization
 
         descriptor = Mock(weight="1")
         if problem_state is not None:
@@ -835,6 +838,19 @@ class CapaModuleTest(unittest.TestCase):
 
         module = CapaFactory.create(attempts=0)
         self.assertEqual(module.check_button_name(), "Submit")
+
+    def test_check_button_name_customization(self):
+        module = CapaFactory.create(attempts=1,
+                                    max_attempts=10,
+                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
+                                    )
+        self.assertEqual(module.check_button_name(), "Submit")
+
+        module = CapaFactory.create(attempts=9,
+                                    max_attempts=10,
+                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
+                                    )
+        self.assertEqual(module.check_button_name(), "Final Submit")
 
     def test_should_show_check_button(self):
 

@@ -819,10 +819,14 @@ class CombinedOpenEndedV1Module():
         Output: The status html to be rendered
         """
         status = []
+        current_task_human_name = ""
         for i in xrange(0, len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
 
-            task_data = {'task_number': i + 1, 'human_task' : human_task_name, 'current' : self.current_task_number==i}
+            # Extract the name of the current task for screen readers.
+            if self.current_task_number == i:
+                current_task_human_name = human_task_name
+            task_data = {'task_number': i + 1, 'human_task': human_task_name, 'current': self.current_task_number==i}
             status.append(task_data)
 
         context = {
@@ -830,6 +834,7 @@ class CombinedOpenEndedV1Module():
             'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
             'legend_list': LEGEND_LIST,
             'render_via_ajax': render_via_ajax,
+            'current_task_human_name': current_task_human_name,
         }
         status_html = self.system.render_template("{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR),
                                                   context)

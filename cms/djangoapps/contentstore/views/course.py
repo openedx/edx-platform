@@ -12,11 +12,11 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods, require_POST
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
 from mitxmako.shortcuts import render_to_response
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.content import StaticContent
 
@@ -48,7 +48,10 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
-__all__ = ['course_index', 'create_new_course', 'course_info',
+from xmodule.modulestore.locator import BlockUsageLocator
+import re
+import bson
+__all__ = ['create_new_course', 'course_info', 'course_handler',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
            'course_config_advanced_page',
@@ -59,24 +62,69 @@ __all__ = ['course_index', 'create_new_course', 'course_info',
 
 
 @login_required
+def course_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+    """
+    The restful handler for course specific requests.
+    It provides the course tree with the necessary information for identifying and labeling the parts. The root
+    will typically be a 'course' object but may not be especially as we support modules.
+
+    GET
+        html: return html page overview for the given course
+        json: return json representing the course branch's index entry as well as dag w/ all of the children
+        replaced w/ json docs where each doc has {'_id': , 'display_name': , 'children': }
+    POST
+        json: create (or update?) this course or branch in this course for this user, return resulting json
+        descriptor (same as in GET course/...). Leaving off /branch/draft would imply create the course w/ default
+        branches. Cannot change the structure contents ('_id', 'display_name', 'children') but can change the
+        index entry.
+    PUT
+        json: update this course (index entry not xblock) such as repointing head, changing display name, org,
+        course_id, prettyid. Return same json as above.
+    DELETE
+        json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
+    """
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            raise NotImplementedError('coming soon')
+        elif not has_access(
+            request.user,
+            BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        ):
+            raise PermissionDenied()
+        elif request.method == 'POST':
+            raise NotImplementedError()
+        elif request.method == 'PUT':
+            raise NotImplementedError()
+        elif request.method == 'DELETE':
+            raise NotImplementedError()
+        else:
+            return HttpResponseBadRequest()
+    elif request.method == 'GET':  # assume html
+        return course_index(request, course_id, branch, version_guid, block)
+    else:
+        return HttpResponseNotFound()
+
+
+@login_required
 @ensure_csrf_cookie
-def course_index(request, org, course, name):
+def course_index(request, course_id, branch, version_guid, block):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    # TODO: when converting to split backend, if location does not have a usage_id,
+    # we'll need to get the course's root block_id
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    lms_link = get_lms_link_for_item(location)
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': org,
-        'course': course,
-        'coursename': name
-    })
+    old_location = loc_mapper().translate_locator_to_location(location)
 
-    course = modulestore().get_item(location, depth=3)
+    lms_link = get_lms_link_for_item(old_location)
+
+    course = modulestore().get_item(old_location, depth=3)
     sections = course.get_children()
 
     return render_to_response('overview.html', {
@@ -89,7 +137,6 @@ def course_index(request, org, course, name):
         'parent_location': course.location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
-        'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
         'category': 'vertical'
     })
@@ -99,7 +146,9 @@ def course_index(request, org, course, name):
 @expect_json
 def create_new_course(request):
     """
-    Create a new course
+    Create a new course.
+
+    Returns the URL for the course overview page.
     """
     if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
@@ -134,15 +183,17 @@ def create_new_course(request):
                 'course number so that it is unique.'),
         })
 
-    course_search_location = [
-        'i4x',
-        dest_location.org,
-        dest_location.course,
-        'course',
-        None
-    ]
-    courses = modulestore().get_items(course_search_location)
-    if len(courses) > 0:
+    # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
+    # file for new locators. get_items should accept a query rather than requiring it be a legal location
+    course_search_location = bson.son.SON({
+        '_id.tag': 'i4x',
+        # cannot pass regex to Location constructor; thus this hack
+        '_id.org': re.compile('^{}$'.format(dest_location.org), re.IGNORECASE),
+        '_id.course': re.compile('^{}$'.format(dest_location.course), re.IGNORECASE),
+        '_id.category': 'course',
+    })
+    courses = modulestore().collection.find(course_search_location, fields=('_id'))
+    if courses.count() > 0:
         return JsonResponse({
             'ErrMsg': _('There is already a course defined with the same '
                 'organization and course number. Please '
@@ -188,7 +239,8 @@ def create_new_course(request):
     # work.
     CourseEnrollment.enroll(request.user, new_course.location.course_id)
 
-    return JsonResponse({'id': new_course.location.url()})
+    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
+    return JsonResponse({'url': new_location.url_reverse("course/", "")})
 
 
 @login_required
@@ -275,6 +327,9 @@ def get_course_settings(request, org, course, name):
 
     course_module = modulestore().get_item(location)
 
+    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+    upload_asset_url = new_loc.url_reverse('assets/', '')
+
     return render_to_response('settings.html', {
         'context_course': course_module,
         'course_location': location,
@@ -286,11 +341,7 @@ def get_course_settings(request, org, course, name):
         'about_page_editable': not settings.MITX_FEATURES.get(
             'ENABLE_MKTG_SITE', False
         ),
-        'upload_asset_url': reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name,
-        })
+        'upload_asset_url': upload_asset_url
     })
 
 
@@ -597,11 +648,8 @@ def textbook_index(request, org, course, name):
             )
             return JsonResponse(course_module.pdf_textbooks)
     else:
-        upload_asset_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name,
-        })
+        new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+        upload_asset_url = new_loc.url_reverse('assets/', '')
         textbook_url = reverse('textbook_index', kwargs={
             'org': org,
             'course': course,

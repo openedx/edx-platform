@@ -1,34 +1,43 @@
+import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
 # TODO: This should be removed once the CMS is running via wsgi on all production servers
 import cms.startup as startup
+from xmodule.modulestore import parsers
 startup.run()
 
 # There is a course creators admin table.
 from ratelimitbackend import admin
 admin.autodiscover()
 
-urlpatterns = ('',  # nopep8
+urlpatterns = patterns('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
-    url(r'^listing', 'contentstore.views.index', name='index'),
-    url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
     url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
+
+    url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
+    url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
+    url(r'^transcripts/check$', 'contentstore.views.check_transcripts', name='check_transcripts'),
+    url(r'^transcripts/choose$', 'contentstore.views.choose_transcripts', name='choose_transcripts'),
+    url(r'^transcripts/replace$', 'contentstore.views.replace_transcripts', name='replace_transcripts'),
+    url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
+    url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
+
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
-        'contentstore.views.course_index', name='course_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
         'contentstore.views.import_course', name='import_course'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import_status/(?P<name>[^/]+)$',
+        'contentstore.views.import_status', name='import_status'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
         'contentstore.views.export_course', name='export_course'),
@@ -37,14 +46,6 @@ urlpatterns = ('',  # nopep8
 
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
-        'contentstore.views.upload_asset', name='upload_asset'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
-        'contentstore.views.manage_users', name='manage_users'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)/(?P<email>[^/]+)$',
-        'contentstore.views.course_team_user', name='course_team_user'),
-
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
         'contentstore.views.course_info', name='course_info'),
@@ -68,16 +69,9 @@ urlpatterns = ('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$',
         'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
-    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.static_pages',
-        name='static_pages'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
-        'contentstore.views.asset_index', name='asset_index'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/(?P<asset_id>.+)?.*$',
-        'contentstore.views.assets.update_asset', name='update_asset'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
@@ -102,14 +96,13 @@ urlpatterns = ('',  # nopep8
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
+    url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
 )
 
 # User creation and updating views
-urlpatterns += (
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
-        'contentstore.views.update_checklist', name='checklists_updates'),
+urlpatterns += patterns(
+    '',
     url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
@@ -125,22 +118,36 @@ urlpatterns += (
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 )
 
+# restful api
+urlpatterns += patterns(
+    'contentstore.views',
+
+    url(r'^course$', 'index', name='index'),
+    url(r'^request_course_creator$', 'request_course_creator'),
+    # (?ix) == ignore case and verbose (multiline regex)
+    url(r'(?ix)^course/{}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+    url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
+    url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
+    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
+    url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler')
+)
+
 js_info_dict = {
     'domain': 'djangojs',
     'packages': ('cms',),
 }
 
-urlpatterns += (
+urlpatterns += patterns('',
     # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
-    urlpatterns += (
+    urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
     )
 
-urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
 
 # enable automatic login
 if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
@@ -154,8 +161,6 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
-
-urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
 #pylint: disable=C0103

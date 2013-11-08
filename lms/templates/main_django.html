@@ -2,6 +2,7 @@
 {% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 <html>
 <head>
+<<<<<<< HEAD
   {% block title %}
     {% if THEME_NAME == "stanford" %}
       <title>Home | class.stanford.edu</title>
@@ -11,8 +12,14 @@
   {% endblock %}
   
   <link rel="icon" type="image/x-icon" href="{% static FAVICON_PATH %}" />
-  
-  {% compressed_css 'application' %}
+
+  {% compressed_css 'style-vendor' %}
+  {% compressed_css 'style-app' %}
+  {% compressed_css 'style-app-extend1' %}
+  {% compressed_css 'style-app-extend2' %}
+  {% compressed_css 'style-course-vendor' %}
+  {% compressed_css 'style-course' %}
+
   {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}
   {% endblock %}
@@ -27,9 +34,6 @@
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <!--[if lte IE 9]>
-  <%static:css group='ie-fixes'/>
-  <![endif]-->
   <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
 </head>
 

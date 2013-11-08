@@ -47,6 +47,14 @@ Feature: CMS.Course updates
         Then I see the handout "Test"
         And I see a "saving" notification
 
+    Scenario: Text outside of tags is preserved
+        Given I have opened a new course in Studio
+        And I go to the course updates page
+        When I add a new update with the text "before <strong>middle</strong> after"
+        Then I should see the update "before <strong>middle</strong> after"
+        And when I reload the page
+        Then I should see the update "before <strong>middle</strong> after"
+
     Scenario: Static links are rewritten when previewing a course update
         Given I have opened a new course in Studio
         And I go to the course updates page

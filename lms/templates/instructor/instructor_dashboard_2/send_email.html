@@ -1,0 +1,51 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<div class="vert-left send-email" id="section-send-email">
+  <h2> ${_("Send Email")} </h2>
+  <div class="request-response msg msg-confirm copy" id="request-response"></div>
+  <ul class="list-fields">
+    <li class="field">
+      <label for="id_to">${_("Send to:")}</label><br/>
+      <select id="id_to" name="send_to">
+        <option value="myself">${_("Myself")}</option>
+        %if to_option == "staff":
+        <option value="staff" selected="selected">${_("Staff and instructors")}</option>
+        %else:
+        <option value="staff">${_("Staff and instructors")}</option>
+          %endif
+          %if to_option == "all":
+            <option value="all" selected="selected">${_("All (students, staff and instructors)")}</option>
+          %else:
+      <option value="all">${_("All (students, staff and instructors)")}</option>
+      %endif
+      </select>
+    </li>
+  <br/>
+  <li class="field">
+    <label for="id_subject">${_("Subject: ")}</label><br/>
+     %if subject:
+      <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
+     %else:
+      <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
+     %endif
+     <span class="tip">${_("(Max 128 characters)")}</span>
+  </li>
+  <li class="field">
+    <label>Message:</label>
+      <div class="email-editor"> 
+      ${ section_data['editor'] } 
+      </div>
+    <input type="hidden" name="message" value="">
+  </li>
+  </ul>
+ <div class="submit-email-action">
+  ${_("Please try not to email students more than once a day. Before sending your email, consider:")}
+  <ul class="list-advice">
+   <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
+   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+  </ul>
+ </div>
+  <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
+  <div class="request-response-error"></div>
+</div>

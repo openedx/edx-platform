@@ -191,19 +191,8 @@ function () {
             }
 
             // Determine the starting and ending time for the video.
-            this.start = 0;
-            this.end = null;
-            if (config.playerVars) {
-                this.start = parseFloat(config.playerVars.start);
-                if ((!isFinite(this.start)) || (this.start < 0)) {
-                    this.start = 0;
-                }
-
-                this.end = parseFloat(config.playerVars.end);
-                if ((!isFinite(this.end)) || (this.end < this.start)) {
-                    this.end = null;
-                }
-            }
+            this.start = config.playerVars.start;
+            this.end = config.playerVars.end;
 
             // Create HTML markup for the <video> element, populating it with sources from previous step.
             // Because of problems with creating video element via jquery
@@ -216,12 +205,7 @@ function () {
             // currently doing.
             this.videoEl = $(this.video);
 
-            this.videoEl.css({
-                'width': '100%'
-            });
-
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
-            // this.callStateChangeCallback();
 
             // Attach a 'click' event on the <video> element. It will cause the video to pause/play.
             this.videoEl.on('click', function (event) {
@@ -318,6 +302,6 @@ function () {
 
     // HTML5Video object - what this module exports.
     return HTML5Video;
-})
+});
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

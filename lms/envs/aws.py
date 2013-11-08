@@ -17,18 +17,21 @@ from .common import *
 from logsettings import get_logger_config
 import os
 
-# specified as an environment variable.  Typically this is set
-# in the service's upstart script and corresponds exactly to the service name.
-# Service variants apply config differences via env and auth JSON files,
-# the names of which correspond to the variant.
+from path import path
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+# configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-# when not variant is specified we attempt to load an unvaried
-# config set.
-CONFIG_PREFIX = ""
+# CONFIG_ROOT specifies the directory where the JSON configuration
+# files are expected to be found. If not specified, use the project
+# directory.
+CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 
-if SERVICE_VARIANT:
-    CONFIG_PREFIX = SERVICE_VARIANT + "."
+# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# based on the service variant. If no variant is use, don't use a
+# prefix.
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
 
 ################################ ALWAYS THE SAME ##############################
@@ -96,8 +99,14 @@ CELERY_QUEUES = {
 ########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
 
-with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# STATIC_ROOT specifies the directory where static files are
+# collected
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE)
 
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
@@ -107,8 +116,6 @@ EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', 'localhost')  # django default is localhost
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', 25)  # django default is 25
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is False
-EMAILS_PER_TASK = ENV_TOKENS.get('EMAILS_PER_TASK', 100)
-EMAILS_PER_QUERY = ENV_TOKENS.get('EMAILS_PER_QUERY', 1000)
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
@@ -130,10 +137,9 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-#Email overrides
+# Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
-DEFAULT_BULK_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_BULK_FROM_EMAIL', DEFAULT_BULK_FROM_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
@@ -143,7 +149,21 @@ PAYMENT_SUPPORT_EMAIL = ENV_TOKENS.get('PAYMENT_SUPPORT_EMAIL', PAYMENT_SUPPORT_
 PAID_COURSE_REGISTRATION_CURRENCY = ENV_TOKENS.get('PAID_COURSE_REGISTRATION_CURRENCY',
                                                    PAID_COURSE_REGISTRATION_CURRENCY)
 
-#Theme overrides
+# Bulk Email overrides
+BULK_EMAIL_DEFAULT_FROM_EMAIL = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_FROM_EMAIL', BULK_EMAIL_DEFAULT_FROM_EMAIL)
+BULK_EMAIL_EMAILS_PER_TASK = ENV_TOKENS.get('BULK_EMAIL_EMAILS_PER_TASK', BULK_EMAIL_EMAILS_PER_TASK)
+BULK_EMAIL_EMAILS_PER_QUERY = ENV_TOKENS.get('BULK_EMAIL_EMAILS_PER_QUERY', BULK_EMAIL_EMAILS_PER_QUERY)
+BULK_EMAIL_DEFAULT_RETRY_DELAY = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_RETRY_DELAY', BULK_EMAIL_DEFAULT_RETRY_DELAY)
+BULK_EMAIL_MAX_RETRIES = ENV_TOKENS.get('BULK_EMAIL_MAX_RETRIES', BULK_EMAIL_MAX_RETRIES)
+BULK_EMAIL_INFINITE_RETRY_CAP = ENV_TOKENS.get('BULK_EMAIL_INFINITE_RETRY_CAP', BULK_EMAIL_INFINITE_RETRY_CAP)
+BULK_EMAIL_LOG_SENT_EMAILS = ENV_TOKENS.get('BULK_EMAIL_LOG_SENT_EMAILS', BULK_EMAIL_LOG_SENT_EMAILS)
+BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = ENV_TOKENS.get('BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS', BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS)
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it.  At the moment, the name is the same.
+# We have to reset the value here, since we have changed the value of the queue name.
+BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
@@ -152,10 +172,15 @@ if not THEME_NAME is None:
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
-#Timezone overrides
+# Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
-#Additional installed apps
+# Translation overrides
+LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
+LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
+USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
+
+# Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
 
@@ -205,7 +230,7 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
-with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 ############### Mixed Related(Secure/Not-Secure) Items ##########
@@ -230,6 +255,7 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 # use the one from common.py
 MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
+DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG',DOC_STORE_CONFIG)
 
 OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',
                                                OPEN_ENDED_GRADING_INTERFACE)

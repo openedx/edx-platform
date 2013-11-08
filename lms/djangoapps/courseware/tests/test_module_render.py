@@ -74,7 +74,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # get the rendered HTML output which should have the rewritten link
-        html = module.get_html()
+        html = module.render('student_view').content
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
@@ -345,9 +345,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             wrap_xmodule_display=True,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
-        self.assertIn('section class="xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -358,9 +358,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             wrap_xmodule_display=False,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
-        self.assertNotIn('section class="xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertNotIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_static_link_rewrite(self):
         module = render.get_module(
@@ -370,7 +370,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/foo_content'.format(
@@ -388,7 +388,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/_file.jpg'.format(
@@ -412,7 +412,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
             static_asset_path="toy_course_dir",
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
         self.assertIn('href="/static/toy_course_dir', result_fragment.content)
 
     def test_course_image(self):
@@ -438,7 +438,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
         self.assertIn(
             '/courses/{course_id}/bar/content'.format(
@@ -456,7 +456,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.field_data_cache,
             self.course.id,
         )
-        result_fragment = module.runtime.render(module, None, 'student_view')
+        result_fragment = module.render('student_view')
 
         self.assertIn(
             'Staff Debug',

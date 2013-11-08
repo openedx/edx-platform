@@ -137,6 +137,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(None, get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
+        xm = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
         p = xm.get_progress()
         self.assertEqual(p, None)

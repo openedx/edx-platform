@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 <%block name="title">Course Checklists</%block>
-<%block name="bodyclass">is-signedin course uxdesign checklists</%block>
+<%block name="bodyclass">is-signedin course view-checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
@@ -15,22 +17,18 @@
 </%block>
 
 <%block name="jsextra">
-
-<script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
-<script type="text/javascript" src="${static.url('js/models/checklists.js')}"></script>
-
 <script type="text/javascript">
-    $(document).ready(function () {
-        var checklistCollection = new CMS.Models.ChecklistCollection();
-        checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"],
+        function(doc, $, ChecklistCollection, ChecklistView) {
+    var checklistCollection = new ChecklistCollection();
+    checklistCollection.url = "${handler_url}";
 
-        var editor = new CMS.Views.Checklists({
-            el: $('.course-checklists'),
-            collection: checklistCollection
-        });
-        checklistCollection.fetch({reset: true});
+    var editor = new ChecklistView({
+        el: $('.course-checklists'),
+        collection: checklistCollection
     });
-
+    checklistCollection.fetch({reset: true});
+});
 </script>
 </%block>
 

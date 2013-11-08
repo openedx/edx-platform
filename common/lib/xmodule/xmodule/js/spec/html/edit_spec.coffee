@@ -1,4 +1,8 @@
 describe 'HTMLEditingDescriptor', ->
+  beforeEach ->
+    window.baseUrl = "/static/deadbeef"
+  afterEach ->
+    delete window.baseUrl
   describe 'Read data from server, create Editor, and get data back out', ->
     it 'Does not munge &lt', ->
 #     This is a test for Lighthouse #22,

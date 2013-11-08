@@ -1,6 +1,6 @@
-if (!CMS.Models['Settings']) CMS.Models.Settings = {};
+define(["backbone"], function(Backbone) {
 
-CMS.Models.Settings.Advanced = Backbone.Model.extend({
+var Advanced = Backbone.Model.extend({
 
     defaults: {
         // the properties are whatever the user types in (in addition to whatever comes originally from the server)
@@ -21,3 +21,6 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
         Backbone.Model.prototype.save.call(this, attrs, options);
     }
 });
+
+return Advanced;
+}); // end define()

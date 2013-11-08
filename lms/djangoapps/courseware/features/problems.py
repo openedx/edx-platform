@@ -9,6 +9,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import i_am_registered_for_the_course
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
+from nose.tools import assert_equal
 
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
@@ -138,23 +139,28 @@ def press_the_button_with_label(_step, buttonname):
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(_step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
-    if doesnt_appear:
+    if bool(doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
         assert world.is_css_present(button_css)
 
 
-@step(u'the button with the label "([^"]*)" does( not)? appear')
-def button_with_label_present(_step, buttonname, doesnt_appear):
-    if doesnt_appear:
-        assert world.browser.is_text_not_present(buttonname, wait_time=5)
-    else:
-        assert world.browser.is_text_present(buttonname, wait_time=5)
+@step(u'the Show/Hide button label is "([^"]*)"$')
+def show_hide_label_is(_step, label_name):
+    # The label text is changed by static/xmodule_js/src/capa/display.js
+    # so give it some time to change on the page.
+    label_css = 'button.show span.show-label'
+    world.wait_for(lambda _: world.css_has_text(label_css, label_name))
 
 
 @step(u'I should see a score of "([^"]*)"$')
 def see_score(_step, score):
-    assert world.browser.is_text_present(score)
+    # The problem progress is changed by
+    # cms/static/xmodule_js/src/capa/display.js
+    # so give it some time to render on the page.
+    score_css = 'section.problem-progress'
+    expected_text = '({})'.format(score)
+    world.wait_for(lambda _: world.css_has_text(score_css, expected_text))
 
 
 @step(u'[Mm]y "([^"]*)" answer is( NOT)? marked "([^"]*)"')
@@ -173,7 +179,7 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
 
     # At least one of the correct selectors should be present
     for sel in PROBLEM_DICT[problem_type][correctness]:
-        if isnt_marked:
+        if bool(isnt_marked):
             has_expected = world.is_css_not_present(sel)
         else:
             has_expected = world.is_css_present(sel)

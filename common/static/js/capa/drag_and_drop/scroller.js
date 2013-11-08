@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['logme'], function (logme) {
+define(['js/capa/drag_and_drop/logme'], function (logme) {
     return Scroller;
 
     function Scroller(state) {
@@ -40,7 +40,7 @@ define(['logme'], function (logme) {
                         '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
                         'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
 
-                        'background-image: url(\'/static/images/arrow-left.png\'); ' +
+                        "background-image: url('"+baseUrl+"images/arrow-left.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
                     '" ' +
@@ -136,7 +136,7 @@ define(['logme'], function (logme) {
                         '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
                         'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
 
-                        'background-image: url(\'/static/images/arrow-right.png\'); ' +
+                        "background-image: url('"+baseUrl+"images/arrow-right.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
                     '" ' +

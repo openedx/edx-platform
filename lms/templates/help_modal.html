@@ -15,7 +15,7 @@
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
-    <a href="#" role="button" class="close-modal" tabindex="0" title="${_('Close Modal')}">&#10005;</a>
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
       <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
@@ -53,7 +53,7 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header></header>
 
@@ -81,7 +81,7 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}" tabindex="0">&#10005;</a>
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
       <h2>${_('Thank You!')}</h2>

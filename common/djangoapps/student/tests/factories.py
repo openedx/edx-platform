@@ -1,6 +1,8 @@
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
-                            PendingEmailChange)
+                            PendingEmailChange, UserStanding,
+                            )
+from course_modes.models import CourseMode
 from django.contrib.auth.models import Group
 from datetime import datetime
 from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
@@ -16,6 +18,13 @@ class GroupFactory(DjangoModelFactory):
 
     name = u'staff_MITx/999/Robot_Super_Course'
 
+class UserStandingFactory(DjangoModelFactory):
+    FACTORY_FOR = UserStanding
+
+    user = None
+    account_status = None
+    changed_by = None
+
 
 class UserProfileFactory(DjangoModelFactory):
     FACTORY_FOR = UserProfile
@@ -27,6 +36,16 @@ class UserProfileFactory(DjangoModelFactory):
     mailing_address = None
     goals = u'World domination'
 
+
+class CourseModeFactory(DjangoModelFactory):
+    FACTORY_FOR = CourseMode
+
+    course_id = None
+    mode_display_name = u'Honor Code',
+    mode_slug = 'honor'
+    min_price = 0
+    suggested_prices = ''
+    currency = 'usd'
 
 class RegistrationFactory(DjangoModelFactory):
     FACTORY_FOR = Registration

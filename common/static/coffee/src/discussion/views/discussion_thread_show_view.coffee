@@ -4,6 +4,7 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
+      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
@@ -51,10 +52,12 @@ if Backbone?
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
 
     renderPinned: =>

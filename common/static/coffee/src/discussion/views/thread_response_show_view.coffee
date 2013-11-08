@@ -6,6 +6,7 @@ if Backbone?
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
+        "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
 
     $: (selector) ->
         @$el.find(selector)
@@ -104,10 +105,12 @@ if Backbone?
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
         
     updateModelDetails: =>

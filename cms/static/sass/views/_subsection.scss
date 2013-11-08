@@ -1,7 +1,7 @@
 // studio - views - course subsection
 // ====================
 
-body.course.subsection {
+.view-subsection {
 
   .main-wrapper {
     margin-top: ($baseline*2);
@@ -399,5 +399,22 @@ body.course.subsection {
         }
       }
     }
+  }
+
+  // UI: DnD - specific elems/cases - units
+  .courseware-unit {
+
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+  }
+
+  // UI: DnD - specific elems/cases - empty parents initial drop indicator
+  .draggable-drop-indicator-initial {
+    display: none;
   }
 }

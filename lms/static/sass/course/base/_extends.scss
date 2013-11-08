@@ -10,7 +10,7 @@ h1.top-header {
   text-transform: none;
   letter-spacing: 0;
 
-  &:hover {
+  &:hover, &:focus {
     text-decoration: none;
   }
 }
@@ -135,7 +135,7 @@ h1.top-header {
         @include box-sizing(border-box);
         padding: lh(.25) lh(.5) lh(.25) 0;
 
-        &:hover {
+        &:hover, &:focus {
           color: #666;
           background: #f6f6f6;
         }
@@ -159,7 +159,7 @@ h1.top-header {
       width: 16px;
       z-index: 99;
 
-      &:hover {
+      &:hover, &:focus {
         background-color: white;
       }
     }
@@ -183,7 +183,7 @@ h1.top-header {
       border-left: 1px solid lighten($border-color, 10%);
       display: block;
 
-      &:hover {
+      &:hover, &:focus {
         background: none;
       }
     }

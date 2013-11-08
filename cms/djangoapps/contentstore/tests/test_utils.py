@@ -1,11 +1,21 @@
 """ Tests for utils. """
 from contentstore import utils
 import mock
+import unittest
 import collections
 import copy
+import json
+from uuid import uuid4
+
 from django.test import TestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.exceptions import NotFoundError
 
 
 class LMSLinksTestCase(TestCase):
@@ -88,8 +98,10 @@ class ExtraPanelTabTestCase(TestCase):
         else:
             return []
 
-    def get_course_with_tabs(self, tabs=[]):
+    def get_course_with_tabs(self, tabs=None):
         """ Returns a mock course object with a tabs attribute. """
+        if tabs is None:
+            tabs = []
         course = collections.namedtuple('MockCourse', ['tabs'])
         if isinstance(tabs, basestring):
             course.tabs = self.get_tab_type_dicts(tabs)

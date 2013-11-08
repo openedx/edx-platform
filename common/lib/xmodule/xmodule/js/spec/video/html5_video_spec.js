@@ -16,7 +16,7 @@
         });
 
         afterEach(function() {
-            YT.Player = void 0;
+            state = undefined;
             $.fn.scrollTo.reset();
             $('.subtitles').remove();
             $('source').remove();
@@ -28,7 +28,7 @@
                 spyOn(player, 'callStateChangeCallback').andCallThrough();
             });
 
-            describe('click', function () {
+            describe('[click]', function () {
                 describe('when player is paused', function () {
                     beforeEach(function () {
                         spyOn(player.video, 'play').andCallThrough();
@@ -40,10 +40,7 @@
                         expect(player.video.play).toHaveBeenCalled();
                     });
 
-                    // Temporarily disabled due to intermittent failures
-                    // Fails with "timeout: timed out after 1000 msec waiting for Player state should be changed"
-                    // on Firefox
-                    xit('player state was changed', function () {
+                    it('player state was changed', function () {
                         waitsFor(function () {
                             return player.getPlayerState() !== STATUS.PAUSED;
                         }, 'Player state should be changed', WAIT_TIMEOUT);
@@ -63,41 +60,41 @@
                         });
                     });
                 });
-            });
 
-            describe('when player is played', function () {
-                beforeEach(function () {
-                    spyOn(player.video, 'pause').andCallThrough();
-                    player.playerState  = STATUS.PLAYING;
-                    $(player.videoEl).trigger('click');
-                });
+                describe('[player is playing]', function () {
+                    beforeEach(function () {
+                        spyOn(player.video, 'pause').andCallThrough();
+                        player.playerState  = STATUS.PLAYING;
+                        $(player.videoEl).trigger('click');
+                    });
 
-                it('native event was called', function () {
-                    expect(player.video.pause).toHaveBeenCalled();
-                });
+                    it('native event was called', function () {
+                        expect(player.video.pause).toHaveBeenCalled();
+                    });
 
-                it('player state was changed', function () {
-                    waitsFor(function () {
-                        return player.getPlayerState() !== STATUS.PLAYING;
-                    }, 'Player state should be changed', WAIT_TIMEOUT);
+                    it('player state was changed', function () {
+                        waitsFor(function () {
+                            return player.getPlayerState() !== STATUS.PLAYING;
+                        }, 'Player state should be changed', WAIT_TIMEOUT);
 
-                    runs(function () {
-                        expect(player.getPlayerState()).toBe(STATUS.PAUSED);
+                        runs(function () {
+                            expect(player.getPlayerState()).toBe(STATUS.PAUSED);
+                        });
+                    });
+
+                    it('callback was called', function () {
+                        waitsFor(function () {
+                            return player.getPlayerState() !== STATUS.PLAYING;
+                        }, 'Player state should be changed', WAIT_TIMEOUT);
+
+                        runs(function () {
+                            expect(player.callStateChangeCallback).toHaveBeenCalled();
+                        });
                     });
                 });
-
-                it('callback was called', function () {
-                    waitsFor(function () {
-                        return player.getPlayerState() !== STATUS.PLAYING;
-                    }, 'Player state should be changed', WAIT_TIMEOUT);
-
-                    runs(function () {
-                        expect(player.callStateChangeCallback).toHaveBeenCalled();
-                    });
-                });
             });
 
-            describe('play', function () {
+            describe('[play]', function () {
                 beforeEach(function () {
                     spyOn(player.video, 'play').andCallThrough();
                     player.playerState = STATUS.PAUSED;
@@ -129,10 +126,14 @@
                 });
             });
 
-            describe('pause', function () {
+            describe('[pause]', function () {
                 beforeEach(function () {
                     spyOn(player.video, 'pause').andCallThrough();
+                    player.playerState = STATUS.UNSTARTED;
                     player.playVideo();
+                    waitsFor(function () {
+                        return player.getPlayerState() !== STATUS.UNSTARTED;
+                    }, 'Video never started playing', WAIT_TIMEOUT);
                     player.pauseVideo();
                 });
 
@@ -142,7 +143,7 @@
 
                 it('player state was changed', function () {
                     waitsFor(function () {
-                        return player.getPlayerState() !== STATUS.UNSTARTED;
+                        return player.getPlayerState() !== STATUS.PLAYING;
                     }, 'Player state should be changed', WAIT_TIMEOUT);
 
                     runs(function () {
@@ -152,7 +153,7 @@
 
                 it('callback was called', function () {
                     waitsFor(function () {
-                        return player.getPlayerState() !== STATUS.UNSTARTED;
+                        return player.getPlayerState() !== STATUS.PLAYING;
                     }, 'Player state should be changed', WAIT_TIMEOUT);
                     runs(function () {
                         expect(player.callStateChangeCallback).toHaveBeenCalled();
@@ -160,7 +161,7 @@
                 });
             });
 
-            describe('canplay', function () {
+            describe('[canplay]', function () {
                 beforeEach(function () {
                     waitsFor(function () {
                         return player.getPlayerState() !== STATUS.UNSTARTED;
@@ -192,7 +193,7 @@
                 });
             });
 
-            describe('ended', function () {
+            describe('[ended]', function () {
                 beforeEach(function () {
                     waitsFor(function () {
                         return player.getPlayerState() !== STATUS.UNSTARTED;

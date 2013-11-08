@@ -4,7 +4,9 @@
 
 
 <%block name="headextra">
-  <%static:css group='course'/>
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-course'/>
+
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
@@ -25,14 +27,14 @@
             var i = 1
             $(".hint-select").each(function(){
                 if ($(this).is(":checked")) {
-                    data_dict[i] = [$(this).parent().attr("data-problem"), 
-                                    $(this).parent().attr("data-answer"), 
+                    data_dict[i] = [$(this).parent().attr("data-problem"),
+                                    $(this).parent().attr("data-answer"),
                                     $(this).parent().attr("data-pk")];
                     i += 1
                 }
             });
             $.ajax(window.location.pathname, {
-                type: "POST", 
+                type: "POST",
                 data: data_dict,
                 success: update_contents
             });
@@ -42,16 +44,16 @@
             var data_dict = {'op': 'change votes',
                              'field': field}
             for (var i=0; i<changed_votes.length; i++) {
-                data_dict[i] = [$(changed_votes[i]).parent().attr("data-problem"), 
-                                $(changed_votes[i]).parent().attr("data-answer"), 
+                data_dict[i] = [$(changed_votes[i]).parent().attr("data-problem"),
+                                $(changed_votes[i]).parent().attr("data-answer"),
                                 $(changed_votes[i]).parent().attr("data-pk"),
                                 $(changed_votes[i]).val()];
             }
             $.ajax(window.location.pathname, {
-                type: "POST", 
+                type: "POST",
                 data: data_dict,
                 success: update_contents
-            });        
+            });
         });
 
         $("#switch-fields").click(function(){
@@ -61,7 +63,7 @@
                 type: "POST",
                 data: out_dict,
                 success: update_contents
-              
+
               });
         });
 
@@ -87,14 +89,14 @@
             var i = 1
             $(".hint-select").each(function(){
                 if ($(this).is(":checked")) {
-                    data_dict[i] = [$(this).parent().attr("data-problem"), 
-                                    $(this).parent().attr("data-answer"), 
+                    data_dict[i] = [$(this).parent().attr("data-problem"),
+                                    $(this).parent().attr("data-answer"),
                                     $(this).parent().attr("data-pk")];
                     i += 1
                 }
             });
             $.ajax(window.location.pathname, {
-                type: "POST", 
+                type: "POST",
                 data: data_dict,
                 success: update_contents
             });
@@ -102,7 +104,7 @@
     }
 
     $(document).ready(setup);
-    
+
     function update_contents(data, status, jqXHR) {
         $('.instructor-dashboard-content').html(data.contents);
         setup();

@@ -76,7 +76,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Create my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          html("${_('Create My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
@@ -131,9 +131,9 @@
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
           <li class="field required text" id="field-username">
-            <label for="username">${_('Public Username')}</label>
+            <label for="username">${_('Public Display Name')}</label>
             <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
-            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')}</span>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
@@ -152,7 +152,7 @@
 
         <div class="message">
           <h3 class="message-title">${_("Welcome {username}").format(username=extauth_id)}</h3>
-          <p class="message-copy">${_("Enter a public username:")}</p>
+          <p class="message-copy">${_("Enter a Public Display Name:")}</p>
         </div>
 
         <ol class="list-input">
@@ -167,9 +167,9 @@
           % endif
 
           <li class="field required text" id="field-username">
-            <label for="username">${_('Public Username')}</label>
+            <label for="username">${_('Public Display Name')}</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip" />
-            <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')}</span>
+            <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
           % if ask_for_fullname:
@@ -177,7 +177,7 @@
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
 
           % endif

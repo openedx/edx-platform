@@ -1,7 +1,6 @@
 import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.inheritance import own_metadata
 
 import logging

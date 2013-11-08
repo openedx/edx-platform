@@ -75,7 +75,7 @@
           margin-bottom: 15px;
           padding-bottom: 17px;
 
-          &:hover {
+          &:hover, &:focus {
             .title .icon {
               opacity: 1.0;
             }
@@ -162,7 +162,7 @@
         border-radius: 11px;
         background: $dot-color;
 
-        &:hover {
+        &:hover, &:focus {
           background: $lighter-base-font-color;
         }
 
@@ -227,6 +227,8 @@
     }
   }
 
+  // ====================
+
   // course listings
   .my-courses {
     float: left;
@@ -265,12 +267,14 @@
         padding: 5px 10px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-        &:hover {
+        &:hover, &:focus {
           color: $link-color;
           text-decoration: none;
         }
       }
     }
+
+    // ====================
 
     // UI: course list
     .listing-courses {
@@ -288,6 +292,8 @@
         }
       }
     }
+
+    // ====================
 
     // UI: individual course item
     .course {
@@ -350,7 +356,7 @@
             line-height: 42px;
             font-weight: 300;
 
-            &:hover {
+            &:hover, &:focus {
               text-decoration: none;
             }
           }
@@ -405,36 +411,38 @@
             font: normal 15px/1.6rem $sans-serif;
             padding: 6px 32px 7px;
 
-            &:hover {
+            &:hover, &:focus {
               text-decoration: none;
             }
           }
 
-          &:hover {
+          &:hover, &:focus {
             text-decoration: none;
           }
         }
       }
 
+      // ====================
+
       // STATE: course mode - verified
       &.verified {
         @extend %ui-depth2;
-        margin-top: ($baseline*2.5);
-        border-top: 1px solid $verified-color-lvl3;
-        padding-top: ($baseline*1.25);
-        background: $white;
+        position: relative;
 
-        // FIXME: bad, but needed selector!
-        .info > hgroup .date-block {
-          top: ($baseline*1.25);
+        .cover {
+          border-radius: ($baseline/10);
+          border: 1px solid $verified-color-lvl3;
+          border-bottom: 4px solid $verified-color-lvl3;
+          padding: ($baseline/10);
         }
 
         // course enrollment status message
         .sts-enrollment {
           display: inline-block;
           position: absolute;
-          top: -28px;
-          right: ($baseline/2);
+          top: 105px;
+          left: 55px;
+          bottom: ($baseline/2);
           text-align: center;
 
           .label {
@@ -454,53 +462,176 @@
             @extend %copy-badge;
             border-radius: 0;
             padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
-            color: $white;
             background: $verified-color-lvl3;
+            color: $white;
           }
         }
       }
-
     }
 
-    .message-status {
+    // ====================
+
+    // UI: message
+    .message {
       @include clearfix;
       border-radius: 3px;
       display: none;
       z-index: 10;
-      margin: 20px 0 10px;
-      padding: 15px 20px;
+      margin: $baseline 0 ($baseline/2) 0;
+      padding: ($baseline*0.75) $baseline;
       font-family: $sans-serif;
       background: tint($yellow,70%);
       border: 1px solid #ccc;
 
-      .message-copy {
+      // STATE: shown
+      &.is-shown {
+        display: block;
+      }
+
+      a {
         font-family: $sans-serif;
-        font-size: 13px;
-        margin: 0;
+      }
+
+      strong {
+        font-weight: 700;
 
         a {
-          font-family: $sans-serif;
+          font-weight: 700;
         }
+      }
+
+      .actions {
+        @include clearfix;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .message-title,
+      .message-copy .title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/4);
+      }
+
+      .message-copy,
+      .message-copy .copy {
+        @extend %t-copy-sub1;
+        margin: 0;
+      }
+
+      // CASE: expandable
+      &.is-expandable {
+
+        .wrapper-tip {
+
+          .message-title, .message-copy {
+            @include transition(color 0.25s ease-in-out 0);
+            margin-bottom: 0;
+          }
+
+          // STATE: hover
+          &:hover {
+            cursor: pointer;
+
+            .message-title, .message-copy {
+              color: $link-color;
+            }
+          }
+        }
+
+        .wrapper-extended {
+          @include transition(opacity 0.25s ease-in-out 0);
+          display: none;
+          opacity: 0.0;
+        }
+
+        // STATE: is expanded
+        &.is-expanded {
+
+          .wrapper-extended {
+            display: block;
+            opacity: 1.0;
+          }
+        }
+      }
+    }
+
+    // TYPE: upsell
+    .message-upsell {
+
+      .wrapper-tip {
+        @include clearfix();
+
+        .message-title {
+          float: left;
+        }
+
+        .message-copy {
+          float: right;
+        }
+      }
+
+      .wrapper-extended {
+        padding: ($baseline/2) 0;
+
+        .message-copy {
+          margin-bottom: $baseline;
+        }
+      }
+
+      .action-upgrade {
+        @extend %btn-primary-green;
+        @include clearfix();
+        position: relative;
+        left: ($baseline/2);
+        padding: 8px $baseline 8px ($baseline*2);
+
+        .deco-graphic {
+          position: absolute;
+          top: -($baseline/4);
+          left: -($baseline*0.75);
+          width: ($baseline*2);
+        }
+
+        span {
+          color: $white; // nasty but needed override for poor <span> styling
+        }
+
+        .copy, .copy-sub {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .copy {
+          @extend %t-action3;
+          @extend %t-weight4;
+          margin-right: $baseline;
+        }
+
+        .copy-sub {
+          @extend %t-action4;
+          opacity: 0.875;
+        }
+      }
+    }
+
+    // TYPE: status
+    .message-status {
+      background: tint($yellow,70%);
+      border-color: #ccc;
+
+      .message-copy {
+        @extend %t-copy-sub1;
+        margin: 0;
 
         .grade-value {
           font-size: 1.2rem;
           font-weight: bold;
         }
-
-        strong {
-          font-weight: 700;
-
-          a {
-            font-weight: 700;
-          }
-        }
       }
 
       .actions {
-         @include clearfix;
-        list-style: none;
-        margin: 0;
-        padding: 0;
 
         .action {
           float: left;
@@ -522,7 +653,7 @@
             &.disabled {
               cursor: default !important;
 
-              &:hover {
+              &:hover, &:focus {
                 background: #eee;
                 background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
                 background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
@@ -584,13 +715,9 @@
         font-weight: bold;
         letter-spacing: 0;
 
-        &:hover {
+        &:hover, &:focus {
           text-decoration: none;
         }
-      }
-
-      &.is-shown {
-        display: block;
       }
 
       &.course-status-processing {
@@ -614,7 +741,6 @@
       }
     }
 
-
     a.unenroll {
       float: right;
       display: block;
@@ -624,7 +750,7 @@
       font-size: .8em;
       margin-top: 32px;
 
-      &:hover {
+      &:hover, &:focus {
         color: #333;
       }
     }

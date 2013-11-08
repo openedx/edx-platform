@@ -1,4 +1,6 @@
-CMS.Models.FileUpload = Backbone.Model.extend({
+define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+
+var FileUpload = Backbone.Model.extend({
     defaults: {
         "title": "",
         "message": "",
@@ -57,3 +59,6 @@ CMS.Models.FileUpload = Backbone.Model.extend({
         };
     }
 });
+
+return FileUpload;
+}); // end define()

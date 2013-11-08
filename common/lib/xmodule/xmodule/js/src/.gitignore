@@ -6,3 +6,4 @@
 
 # Video are written in pure JavaScript.
 !video/*.js
+!video/transcripts/*.js

@@ -1,44 +1,31 @@
-@XModule =
+@XModule = {}
+
+@XBlockToXModuleShim = (runtime, element) ->
   ###
   Load a single module (either an edit module or a display module)
   from the supplied element, which should have a data-type attribute
   specifying the class to load
   ###
-  loadModule: (element) ->
-    moduleType = $(element).data('type')
-    if moduleType == 'None'
-      return
+  moduleType = $(element).data('type')
+  if moduleType == 'None'
+    return
 
-    try
-      module = new window[moduleType](element)
-      if $(element).hasClass('xmodule_edit')
-        $(document).trigger('XModule.loaded.edit', [element, module])
+  try
+    module = new window[moduleType](element)
+    if $(element).hasClass('xmodule_edit')
+      $(document).trigger('XModule.loaded.edit', [element, module])
 
-      if $(element).hasClass('xmodule_display')
-        $(document).trigger('XModule.loaded.display', [element, module])
+    if $(element).hasClass('xmodule_display')
+      $(document).trigger('XModule.loaded.display', [element, module])
 
-      return module
+    return module
 
-    catch error
-      if window.console and console.log
-        console.error "Unable to load #{moduleType}: #{error.message}"
-      else
-        throw error
-
-  ###
-  Load all modules on the page of the specified type.
-  If container is provided, only load modules inside that element
-  Type is one of 'display' or 'edit'
-  ###
-  loadModules: (container) ->
-    selector = ".xmodule_edit, .xmodule_display"
-
-    if container?
-      modules = $(container).find(selector)
+  catch error
+    if window.console and console.log
+      console.error "Unable to load #{moduleType}: #{error.message}"
     else
-      modules = $(selector)
+      throw error
 
-    modules.each((idx, element) -> XModule.loadModule element)
 
 class @XModule.Descriptor
 

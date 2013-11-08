@@ -9,71 +9,86 @@ Feature: LMS.Verified certificates
         When I select the audit track
         Then I should see the course on my dashboard
 
-    # There is currently no way to avoid trying to upload
-    # the photos to S3 for processing
-    #Scenario: I can submit photos to verify my identity
-    #    Given I am logged in
-    #    When I select the verified track
-    #    And I go to step "1"
-    #    And I capture my "face" photo
-    #    And I approve my "face" photo
-    #    And I go to step "2"
-    #    And I capture my "photo_id" photo
-    #    And I approve my "photo_id" photo
-    #    And I go to step "3"
-    #    And I select a contribution amount
-    #    And I confirm that the details match
-    #    And I go to step "4"
-    #    Then I am at the payment page
+    Scenario: I can submit photos to verify my identity
+        Given I am logged in
+        When I select the verified track
+        And I go to step "1"
+        And I capture my "face" photo
+        And I approve my "face" photo
+        And I go to step "2"
+        And I capture my "photo_id" photo
+        And I approve my "photo_id" photo
+        And I go to step "3"
+        And I select a contribution amount
+        And I confirm that the details match
+        And I go to step "4"
+        Then I am at the payment page
 
-    # There is currently no way to avoid trying to upload
-    # the photos to S3 for processing
-    #Scenario: I can pay for a verified certificate
-    #    Given I have submitted photos to verify my identity
-    #    When I submit valid payment information
-    #    Then I see that my payment was successful
+    Scenario: I can pay for a verified certificate
+        Given I have submitted photos to verify my identity
+        When I submit valid payment information
+        Then I see that my payment was successful
 
-
-    # There is currently no way to avoid trying to upload
-    # the photos to S3 for processing
-    #Scenario: Verified courses display correctly on dashboard
-    #    Given I have submitted photos to verify my identity
-    #    When I submit valid payment information
-    #    And I navigate to my dashboard
-    #    Then I see the course on my dashboard
-    #    And I see that I am on the verified track
+    Scenario: Verified courses display correctly on dashboard
+        Given I have submitted photos to verify my identity
+        When I submit valid payment information
+        And I navigate to my dashboard
+        Then I see the course on my dashboard
+        And I see that I am on the verified track
+        And I do not see the upsell link on my dashboard
 
     # Not easily automated
-    #Scenario: I can re-take photos
-    #    Given I have submitted my "<PhotoType>" photo
-    #    When I retake my "<PhotoType>" photo
-    #    Then I see the new photo on the confirmation page.
-    #
-    #    Examples:
-    #    | PhotoType     |
-    #    | face          |
-    #    | ID            |
+#    Scenario: I can re-take photos
+#        Given I have submitted my "<PhotoType>" photo
+#        When I retake my "<PhotoType>" photo
+#        Then I see the new photo on the confirmation page.
+#
+#        Examples:
+#        | PhotoType     |
+#        | face          |
+#        | ID            |
 
-    # Not yet implemented LMS-983
-    #Scenario: I can edit identity information
-    #    Given I have submitted face and ID photos
-    #    When I edit my name
-    #    Then I see the new name on the confirmation page.
+#    # TODO: automate
+#    Scenario: I can edit identity information
+#        Given I have submitted face and ID photos
+#        When I edit my name
+#        Then I see the new name on the confirmation page.
 
     Scenario: I can return to the verify flow
         Given I have submitted photos to verify my identity
         When I leave the flow and return
         Then I am at the verified page
 
-    # Currently broken LMS-1009
-    #Scenario: I can pay from the return flow
-    #    Given I have submitted photos to verify my identity
-    #    When I leave the flow and return
-    #    And I press the payment button
-    #    Then I am at the payment page
+    # TODO: automate
+#    Scenario: I can pay from the return flow
+#        Given I have submitted photos to verify my identity
+#        When I leave the flow and return
+#        And I press the payment button
+#        Then I am at the payment page
 
     Scenario: I can take a verified certificate course for free
         Given I am logged in
         And the course has an honor mode
         When I give a reason why I cannot pay
         Then I should see the course on my dashboard
+
+    Scenario: The upsell offer is on the dashboard if I am auditing.
+        Given I am logged in
+        When I select the audit track
+        And I navigate to my dashboard
+        Then I see the upsell link on my dashboard
+
+    Scenario: I can take the upsell offer and pay for it
+        Given I am logged in
+        And I select the audit track
+        And I navigate to my dashboard
+        When I see the upsell link on my dashboard
+        And I select the upsell link on my dashboard
+        And I select the verified track for upgrade
+        And I submit my photos and confirm
+        And I am at the payment page
+        And I submit valid payment information
+        And I navigate to my dashboard
+        Then I see the course on my dashboard
+        And I see that I am on the verified track
+

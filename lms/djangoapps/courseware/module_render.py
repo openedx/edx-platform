@@ -25,7 +25,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xmodule, save_module  # pylint: disable=F0401
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
 import static_replace
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -38,7 +38,7 @@ from xblock.runtime import KeyValueStore
 from xblock.fields import Scope
 from util.sandboxing import can_execute_unsafe_code
 from util.json_request import JsonResponse
-from lms.xblock.field_data import lms_field_data
+from lms.xblock.field_data import LmsFieldData
 
 log = logging.getLogger(__name__)
 
@@ -219,6 +219,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if not has_access(user, descriptor, 'load', course_id):
         return None
 
+    student_data = DbModel(DjangoKeyValueStore(field_data_cache))
+    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
+
     # Setup system context for module instance
     ajax_url = reverse(
         'modx_dispatch',
@@ -294,10 +297,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xmodule_field_data(descriptor):
-        student_data = DbModel(DjangoKeyValueStore(field_data_cache))
-        return lms_field_data(descriptor._field_data, student_data)
-
     def publish(event):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
@@ -334,13 +333,50 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
 
+    # Build a list of wrapping functions that will be applied in order
+    # to the Fragment content coming out of the xblocks that are about to be rendered.
+    block_wrappers = []
+
+    # Wrap the output display in a single div to allow for the XModule
+    # javascript to be bound correctly
+    if wrap_xmodule_display is True:
+        block_wrappers.append(wrap_xblock)
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
 
+    # Rewrite urls beginning in /static to point to course-specific content
+    block_wrappers.append(partial(
+        replace_static_urls,
+        getattr(descriptor, 'data_dir', None),
+        course_id=course_id,
+        static_asset_path=static_asset_path or descriptor.static_asset_path
+    ))
+
+    # Allow URLs of the form '/course/' refer to the root of multicourse directory
+    #   hierarchy of this course
+    block_wrappers.append(partial(replace_course_urls, course_id))
+
+    # this will rewrite intra-courseware links (/jump_to_id/<id>). This format
+    # is an improvement over the /course/... format for studio authored courses,
+    # because it is agnostic to course-hierarchy.
+    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
+    # function, we just need to specify something to get the reverse() to work.
+    block_wrappers.append(partial(
+        replace_jump_to_id_urls,
+        course_id,
+        reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
+    ))
+
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+        if has_access(user, descriptor, 'staff', course_id):
+            block_wrappers.append(partial(add_histogram, user))
+
     system = ModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
+        static_url=settings.STATIC_URL,
         ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
@@ -368,7 +404,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xmodule_field_data=xmodule_field_data,
         publish=publish,
         anonymous_student_id=unique_id_for_user(user),
         course_id=course_id,
@@ -377,7 +412,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-        mixins=descriptor.system.mixologist._mixins,
+        mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
+        wrappers=block_wrappers,
     )
     if settings.MITX_FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)
@@ -394,62 +430,17 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    try:
-        module = descriptor.xmodule(system)
-    except:
-        log.exception("Error creating module from descriptor {0}".format(descriptor))
-
-        # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-        if has_access(user, descriptor.location, 'staff', course_id):
-            err_descriptor_class = ErrorDescriptor
-        else:
-            err_descriptor_class = NonStaffErrorDescriptor
-
-        err_descriptor = err_descriptor_class.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        )
-
-        # Make an error module
-        return err_descriptor.xmodule(system)
-
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
-    _get_html = module.get_html
 
-    if wrap_xmodule_display is True:
-        _get_html = wrap_xmodule(module.get_html, module, 'xmodule_display.html')
+    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+    if has_access(user, descriptor.location, 'staff', course_id):
+        system.error_descriptor_class = ErrorDescriptor
+    else:
+        system.error_descriptor_class = NonStaffErrorDescriptor
 
-    module.get_html = replace_static_urls(
-        _get_html,
-        getattr(descriptor, 'data_dir', None),
-        course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.static_asset_path
-    )
-
-    # Allow URLs of the form '/course/' refer to the root of multicourse directory
-    #   hierarchy of this course
-    module.get_html = replace_course_urls(module.get_html, course_id)
-
-    # this will rewrite intra-courseware links
-    # that use the shorthand /jump_to_id/<id>. This is very helpful
-    # for studio authored courses (compared to the /course/... format) since it is
-    # is durable with respect to moves and the author doesn't need to
-    # know the hierarchy
-    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
-    # function, we just need to specify something to get the reverse() to work
-    module.get_html = replace_jump_to_id_urls(
-        module.get_html,
-        course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
-    )
-
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
-        if has_access(user, module, 'staff', course_id):
-            module.get_html = add_histogram(module.get_html, module, user)
-
-    # force the module to save after rendering
-    module.get_html = save_module(module.get_html, module)
-    return module
+    descriptor.xmodule_runtime = system
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    return descriptor
 
 
 def find_target_student_module(request, user_id, course_id, mod_id):

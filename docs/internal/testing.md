@@ -231,6 +231,8 @@ Acceptance tests will run on a randomized port and can be run in the background 
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
 as well as the port listed in cms/djangoapps/contentstore/feature/upload.py
 
+During acceptance test execution, Django log files are written to `test_root/log/lms_acceptance.log` and `test_root/log/cms_acceptance.log`.
+
 **Note**: The acceptance tests can *not* currently run in parallel.
 
 ## Viewing Test Coverage

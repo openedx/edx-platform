@@ -1,6 +1,11 @@
 // tender help/support widget
 // ====================
 
+// UI: hiding the default tender help "tag" element
+#tender_toggler {
+  display: none;
+}
+
 #tender_frame, #tender_window {
   background-image: none !important;
   background: none;

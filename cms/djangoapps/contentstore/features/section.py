@@ -5,8 +5,6 @@ from lettuce import world, step
 from common import *
 from nose.tools import assert_equal  # pylint: disable=E0611
 
-############### ACTIONS ####################
-
 
 @step('I click the New Section link$')
 def i_click_new_section_link(_step):
@@ -51,9 +49,6 @@ def set_section_release_date(_step, datestring, timestring):
 def i_see_a_mini_notification(_step, _type):
     saving_css = '.wrapper-notification-mini'
     assert world.is_css_present(saving_css)
-
-
-############ ASSERTIONS ###################
 
 
 @step('I see my section on the Courseware page$')
@@ -124,8 +119,6 @@ def the_section_release_date_is_updated(_step):
     status_text = world.css_text(css)
     assert_equal(status_text, 'Will Release: 12/25/2013 at 00:00 UTC')
 
-
-############ HELPER METHODS ###################
 
 def save_section_name(name):
     name_css = '.new-section-name'

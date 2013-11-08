@@ -12,7 +12,9 @@ from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
 from track import tracker
+from track import contexts
 from track.models import TrackingLog
+from eventtracking import tracker as eventtracker
 
 
 def log_event(event):
@@ -43,18 +45,22 @@ def user_track(request):
     except:
         agent = ''
 
-    event = {
-        "username": username,
-        "session": scookie,
-        "ip": request.META['REMOTE_ADDR'],
-        "event_source": "browser",
-        "event_type": request.REQUEST.get('event_type','unknown'),
-        "event": request.REQUEST.get('event','unknown'),
-        "agent": agent,
-        "page": request.REQUEST.get('page', 'unknown'),
-        "time": datetime.datetime.now(UTC),
-        "host": request.META['SERVER_NAME'],
-    }
+    page = request.REQUEST['page']
+
+    with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
+        event = {
+            "username": username,
+            "session": scookie,
+            "ip": request.META['REMOTE_ADDR'],
+            "event_source": "browser",
+            "event_type": request.REQUEST['event_type'],
+            "event": request.REQUEST['event'],
+            "agent": agent,
+            "page": page,
+            "time": datetime.datetime.now(UTC),
+            "host": request.META['SERVER_NAME'],
+            "context": eventtracker.get_tracker().resolve_context(),
+        }
 
     log_event(event)
 
@@ -83,6 +89,7 @@ def server_track(request, event_type, event, page=None):
         "page": page,
         "time": datetime.datetime.now(UTC),
         "host": request.META['SERVER_NAME'],
+        "context": eventtracker.get_tracker().resolve_context(),
     }
 
     if event_type.startswith("/event_logs") and request.user.is_staff:
@@ -118,17 +125,19 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # All fields must be specified, in case the tracking information is
     # also saved to the TrackingLog model.  Get values from the task-level
     # information, or just add placeholder values.
-    event = {
-        "username": request_info.get('username', 'unknown'),
-        "ip": request_info.get('ip', 'unknown'),
-        "event_source": "task",
-        "event_type": event_type,
-        "event": full_event,
-        "agent": request_info.get('agent', 'unknown'),
-        "page": page,
-        "time": datetime.datetime.now(UTC),
-        "host": request_info.get('host', 'unknown')
-    }
+    with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
+        event = {
+            "username": request_info.get('username', 'unknown'),
+            "ip": request_info.get('ip', 'unknown'),
+            "event_source": "task",
+            "event_type": event_type,
+            "event": full_event,
+            "agent": request_info.get('agent', 'unknown'),
+            "page": page,
+            "time": datetime.datetime.now(UTC),
+            "host": request_info.get('host', 'unknown'),
+            "context": eventtracker.get_tracker().resolve_context(),
+        }
 
     log_event(event)
 

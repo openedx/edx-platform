@@ -39,7 +39,9 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 
     conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
     bucketname = str(s3_interface['storage_bucket_name'])
-    bucket = conn.create_bucket(bucketname.lower())
+    bucket = conn.lookup(bucketname.lower())
+    if not bucket:
+        bucket = conn.create_bucket(bucketname.lower())
 
     k = Key(bucket)
     k.key = keyname

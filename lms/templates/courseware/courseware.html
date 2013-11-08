@@ -5,8 +5,21 @@
 <%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-course'/>
+  
   <%include file="../discussion/_js_head_dependencies.html" />
+
+  % if show_chat:
+    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
+    ## It'd be better to have this in a place like lms/css/vendor/candy,
+    ## but the candy_res/ folder contains images and other junk, and it
+    ## all needs to stay together for the Candy.js plugin to work.
+    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
+  % endif
+  ${fragment.head_html()}
+
 </%block>
 
 <%block name="js_extra">
@@ -135,6 +148,8 @@
   </script>
 % endif
 
+${fragment.foot_html()}
+
 </%block>
 
 % if timer_expiration_duration:
@@ -170,31 +185,30 @@
 % endif
 
     <section class="course-content">
-      ${content}
+      ${fragment.body_html()}
     </section>
   </div>
 </section>
 
 % if course.show_calculator:
     <div class="calc-main">
-        <a aria-label="${_('Open Calculator')}" href="#" class="calc">${_("Calculator")}</a>
-
+        <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
         <div id="calculator_wrapper">
             <form id="calculator">
                 <div class="input-wrapper">
-                    <input type="text" id="calculator_input" title="Calculator Input Field" />
+                    <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
 
                     <div class="help-wrapper">
-                        <a href="#">${_("Hints")}</a>
-                        <dl class="help">
-                            <dt>${_("Suffixes:")}</dt>
-                            <dd> %kMGTcmunp</dd>
-                            <dt>${_("Operations:")}</dt>
-                            <dd>^ * / + - ()</dd>
-                            <dt>${_("Functions:")}</dt>
-                            <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
-                            <dt>${_("Constants")}</dt>
-                            <dd>e, pi</dd>
+                        <a id="calculator_hint" href="#" role="button" aria-haspopup="true" aria-controls="calculator_input_help" aria-expanded="false" tabindex="-1">${_("Hints")}</a>
+                        <dl id="calculator_input_help" class="help">
+                            <dt tabindex="-1">${_("Suffixes:")}</dt>
+                            <dd tabindex="-1"> %kMGTcmunp</dd>
+                            <dt tabindex="-1">${_("Operations:")}</dt>
+                            <dd tabindex="-1">^ * / + - ()</dd>
+                            <dt tabindex="-1">${_("Functions:")}</dt>
+                            <dd tabindex="-1">sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
+                            <dt tabindex="-1">${_("Constants")}</dt>
+                            <dd tabindex="-1">e, pi</dd>
 
                             <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
 
@@ -202,8 +216,8 @@
                         </dl>
                     </div>
                 </div>
-                <input id="calculator_button" type="submit" title="Calculate" value="="/>
-                <input type="text" id="calculator_output" title="Calculator Output Field" readonly />
+                <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" arial-label="${_('Calculate')}" value="=" tabindex="-1" />
+                <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
             </form>
 
         </div>

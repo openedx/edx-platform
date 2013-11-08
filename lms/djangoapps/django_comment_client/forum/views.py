@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+import newrelic.agent
 
 from mitxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
@@ -14,7 +15,7 @@ from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_comment
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
-from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
 import django_comment_client.utils as utils
 import comment_client as cc
 
@@ -25,11 +26,11 @@ escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
 
-@login_required
+@newrelic.agent.function_trace()
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
-    This may raise cc.utils.CommentClientError or
-    cc.utils.CommentClientUnknownError if something goes wrong.
+    This may raise an appropriate subclass of cc.utils.CommentClientError
+    if something goes wrong.
     """
     default_query_params = {
         'page': 1,
@@ -108,20 +109,16 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
+    nr_transaction = newrelic.agent.current_transaction()
+
     course = get_course_with_access(request.user, course_id, 'load_forum')
 
-    try:
-        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-        cc_user = cc.User.from_django_user(request.user)
-        user_info = cc_user.to_dict()
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-        # TODO (vshnayder): since none of this code seems to be aware of the fact that
-        # sometimes things go wrong, I suspect that the js client is also not
-        # checking for errors on request.  Check and fix as needed.
-        log.error("Error loading inline discussion threads.")
-        raise Http404
+    threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+    cc_user = cc.User.from_django_user(request.user)
+    user_info = cc_user.to_dict()
 
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
     allow_anonymous = course.allow_anonymous
     allow_anonymous_to_peers = course.allow_anonymous_to_peers
@@ -168,9 +165,11 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
+    nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, course_id, 'load_forum')
-    category_map = utils.get_discussion_category_map(course)
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_discussion_category_map"):
+        category_map = utils.get_discussion_category_map(course)
 
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
@@ -178,19 +177,16 @@ def forum_form_discussion(request, course_id):
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        log.error("Error loading forum discussion threads: %s", str(err))
-        raise Http404
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
-    for thread in threads:
-        courseware_context = get_courseware_context(thread, course)
-        if courseware_context:
-            thread.update(courseware_context)
+    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        add_courseware_context(threads, course)
+
     if request.is_ajax():
         return utils.JsonResponse({
             'discussion_data': threads,   # TODO: Standardize on 'discussion_data' vs 'threads'
@@ -208,10 +204,11 @@ def forum_form_discussion(request, course_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
-        cohorts = get_course_cohorts(course_id)
-        cohorted_commentables = get_cohorted_commentables(course_id)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+            cohorts = get_course_cohorts(course_id)
+            cohorted_commentables = get_cohorted_commentables(course_id)
 
-        user_cohort_id = get_cohort_id(request.user, course_id)
+            user_cohort_id = get_cohort_id(request.user, course_id)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -239,25 +236,23 @@ def forum_form_discussion(request, course_id):
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
+    nr_transaction = newrelic.agent.current_transaction()
+
     course = get_course_with_access(request.user, course_id, 'load_forum')
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
-    try:
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-        log.error("Error loading single thread.")
-        raise Http404
+    thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
 
     if request.is_ajax():
-        courseware_context = get_courseware_context(thread, course)
-        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
+            annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
         # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
-        if courseware_context:
-            content.update(courseware_context)
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context([content], course)
         return utils.JsonResponse({
             #'html': html,
             'content': content,
@@ -265,21 +260,18 @@ def single_thread(request, course_id, discussion_id, thread_id):
         })
 
     else:
-        category_map = utils.get_discussion_category_map(course)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_discussion_category_map"):
+            category_map = utils.get_discussion_category_map(course)
 
-        try:
-            threads, query_params = get_threads(request, course_id)
-            threads.append(thread.to_dict())
-        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
-            log.error("Error loading single thread.")
-            raise Http404
+        threads, query_params = get_threads(request, course_id)
+        threads.append(thread.to_dict())
 
         course = get_course_with_access(request.user, course_id, 'load_forum')
 
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context(threads, course)
+
         for thread in threads:
-            courseware_context = get_courseware_context(thread, course)
-            if courseware_context:
-                thread.update(courseware_context)
             if thread.get('group_id') and not thread.get('group_name'):
                 thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
 
@@ -299,11 +291,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
-        cohorts = get_course_cohorts(course_id)
-        cohorted_commentables = get_cohorted_commentables(course_id)
-        user_cohort = get_cohort_id(request.user, course_id)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+            cohorts = get_course_cohorts(course_id)
+            cohorted_commentables = get_cohorted_commentables(course_id)
+            user_cohort = get_cohort_id(request.user, course_id)
 
         context = {
             'discussion_id': discussion_id,
@@ -333,6 +327,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 @login_required
 def user_profile(request, course_id, user_id):
+    nr_transaction = newrelic.agent.current_transaction()
+
     #TODO: Allow sorting?
     course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
@@ -348,7 +344,8 @@ def user_profile(request, course_id, user_id):
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         if request.is_ajax():
             return utils.JsonResponse({
@@ -370,11 +367,14 @@ def user_profile(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
+    except User.DoesNotExist:
         raise Http404
 
 
+@login_required
 def followed_threads(request, course_id, user_id):
+    nr_transaction = newrelic.agent.current_transaction()
+
     course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
@@ -391,7 +391,8 @@ def followed_threads(request, course_id, user_id):
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
         if request.is_ajax():
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
@@ -413,5 +414,5 @@ def followed_threads(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
+    except User.DoesNotExist:
         raise Http404

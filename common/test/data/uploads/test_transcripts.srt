@@ -1,0 +1,43 @@
+0
+00:00:00,270 --> 00:00:02,720
+LILA FISHER: Hi, welcome to Edx.
+
+1
+00:00:02,720 --> 00:00:05,430
+I'm Lila Fisher, an Edx fellow helping to put
+
+2
+00:00:05,430 --> 00:00:07,160
+together these courses.
+
+3
+00:00:07,160 --> 00:00:10,830
+As you know, our courses are entirely online.
+
+4
+00:00:10,830 --> 00:00:12,880
+So before we start learning about the subjects that
+
+5
+00:00:12,880 --> 00:00:15,890
+brought you here, let's learn about the tools that you will
+
+6
+00:00:15,890 --> 00:00:19,000
+use to navigate through the course material.
+
+7
+00:00:19,000 --> 00:00:22,070
+Let's start with what is on your screen right now.
+
+8
+00:00:22,070 --> 00:00:25,170
+You are watching a video of me talking.
+
+9
+00:00:25,170 --> 00:00:27,890
+You have several tools associated with these videos.
+
+10
+00:00:27,890 --> 00:00:30,590
+Some of them are standard video buttons, like the play

@@ -7,6 +7,8 @@ import tarfile
 import tempfile
 import copy
 from path import path
+import json
+import logging
 from uuid import uuid4
 from pymongo import MongoClient
 
@@ -18,8 +20,9 @@ from django.conf import settings
 from xmodule.contentstore.django import _CONTENTSTORE
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+log = logging.getLogger(__name__)
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
@@ -67,7 +70,7 @@ class ImportTestCase(CourseTestCase):
 
     def tearDown(self):
         shutil.rmtree(self.content_dir)
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
 
@@ -84,6 +87,17 @@ class ImportTestCase(CourseTestCase):
                     "course-data": [btar]
                 })
         self.assertEquals(resp.status_code, 415)
+        # Check that `import_status` returns the appropriate stage (i.e., the
+        # stage at which import failed).
+        status_url = reverse("import_status", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': os.path.split(self.bad_tar)[1],
+        })
+        resp_status = self.client.get(status_url)
+        log.debug(str(self.client.session["import_status"]))
+        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], 2)
+
 
     def test_with_coursexml(self):
         """
@@ -183,3 +197,14 @@ class ImportTestCase(CourseTestCase):
         try_tar(self._symlink_tar())
         try_tar(self._outside_tar())
         try_tar(self._outside_tar2())
+        # Check that `import_status` returns the appropriate stage (i.e.,
+        # either 3, indicating all previous steps are completed, or 0,
+        # indicating no upload in progress)
+        status_url = reverse("import_status", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': os.path.split(self.good_tar)[1],
+        })
+        resp_status = self.client.get(status_url)
+        import_status = json.loads(resp_status.content)["ImportStatus"]
+        self.assertIn(import_status, (0, 3))

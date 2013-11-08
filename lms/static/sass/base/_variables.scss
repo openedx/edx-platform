@@ -221,6 +221,11 @@ $action-secondary-disabled-fg: $white;
 $header-graphic-super-color: $m-blue-d1;
 $header-graphic-sub-color: $m-gray-d2;
 
+// State-based colors
+$error-color: $error-red;
+$warning-color: $m-pink;
+$confirm-color: $m-green;
+
 // ====================
 
 // MISC: visual horizontal rules

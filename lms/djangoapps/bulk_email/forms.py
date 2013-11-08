@@ -6,12 +6,16 @@ import logging
 from django import forms
 from django.core.exceptions import ValidationError
 
-from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG
+from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization
+
+from courseware.courses import get_course_by_id
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-class CourseEmailTemplateForm(forms.ModelForm):
+class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
     """Form providing validation of CourseEmail templates."""
 
     class Meta:  # pylint: disable=C0111
@@ -43,3 +47,32 @@ class CourseEmailTemplateForm(forms.ModelForm):
         template = self.cleaned_data["plain_template"]
         self._validate_template(template)
         return template
+
+
+class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
+    """Input form for email enabling, allowing us to verify data."""
+
+    class Meta:  # pylint: disable=C0111
+        model = CourseAuthorization
+
+    def clean_course_id(self):
+        """Validate the course id"""
+        course_id = self.cleaned_data["course_id"]
+        try:
+            # Just try to get the course descriptor.
+            # If we can do that, it's a real course.
+            get_course_by_id(course_id, depth=1)
+        except Exception as exc:
+            msg = 'Error encountered ({0})'.format(str(exc).capitalize())
+            msg += ' --- Entered course id was: "{0}". '.format(course_id)
+            msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
+            raise forms.ValidationError(msg)
+
+        # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
+        is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+        if not is_studio_course:
+            msg = "Course Email feature is only available for courses authored in Studio. "
+            msg += '"{0}" appears to be an XML backed course.'.format(course_id)
+            raise forms.ValidationError(msg)
+
+        return course_id
