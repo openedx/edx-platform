@@ -39,9 +39,9 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
   $(".section-name").each(function() {
       var model = new SectionModel({
-          id: $(this).parent(".item-details").data("id"),
           name: $(this).data("name")
       });
+      model.url = $(this).data("update_url");
       new SectionShowView({model: model, el: this}).render();
   })
 });
@@ -140,7 +140,12 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
     <div class="inner-wrapper">
 
       <div class="wrapper-dnd">
-        <article class="courseware-overview" data-id="${context_course.location.url()}">
+        <%
+          course_update_url = loc_mapper().translate_location(
+            context_course.location.course_id, context_course.location, False, True
+          ).url_reverse('xblock')
+        %>
+        <article class="courseware-overview" data-id="${context_course.location.url()}" data-update_url="${course_update_url}">
           % for section in sections:
           <%
             section_update_url = loc_mapper().translate_location(
@@ -156,7 +161,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
             <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
               <div class="item-details" data-id="${section.location}">
-                <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
+                <h3 class="section-name" data-name="${section.display_name_with_default | h}" data-update_url="${section_update_url}"></h3>
                 <div class="section-published-date">
                   <%
                     if section.start is not None:
@@ -173,7 +178,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                     <span class="published-status"><strong>${_("Will Release:")}</strong>
                     ${date_utils.get_default_time_display(section.start)}</span>
                     <a href="#" class="edit-button" data-date="${start_date_str}"
-                      data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
+                      data-time="${start_time_str}" data-id="${section.location}" data-update_url="${section_update_url}">${_("Edit")}</a>
                   %endif
                 </div>
               </div>

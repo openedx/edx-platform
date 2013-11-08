@@ -1,15 +1,15 @@
-define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification", "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, Backbone, PromptView, NotificationView, ModuleModel, ModuleEditView) ->
+define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification", "coffee/src/views/module_edit"],
+($, ui, Backbone, PromptView, NotificationView, ModuleEditView) ->
   class TabsEdit extends Backbone.View
 
     initialize: =>
       @$('.component').each((idx, element) =>
+          model = new Backbone.Model(id: $(element).data('id'))
+          model.url = $(element).data('update_url')
           new ModuleEditView(
               el: element,
               onDelete: @deleteTab,
-              model: new ModuleModel(
-                  id: $(element).data('id'),
-              )
+              model: model
           )
       )
 
@@ -48,7 +48,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
       editor = new ModuleEditView(
         onDelete: @deleteTab
-        model: new ModuleModel()
+        model: new Backbone.Model()
       )
 
       $('.new-component-item').before(editor.$el)

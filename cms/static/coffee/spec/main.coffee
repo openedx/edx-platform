@@ -182,7 +182,7 @@ define([
     "coffee/spec/main_spec",
 
     "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
-    "coffee/spec/models/module_spec", "coffee/spec/models/section_spec",
+    "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",

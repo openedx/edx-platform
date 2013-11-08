@@ -25,7 +25,7 @@ from django.views.decorators.http import require_http_methods
 from xmodule.modulestore.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 
-__all__ = ['save_item', 'create_item', 'orphan', 'xblock_handler']
+__all__ = ['create_item', 'orphan', 'xblock_handler']
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
-@require_http_methods(("DELETE"))
+@require_http_methods(("DELETE", "PUT", "POST"))
 @login_required
 @expect_json
 def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
@@ -43,107 +43,91 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
     DELETE
         json: delete this xblock instance from the course. Supports query parameters "recurse" to delete
         all children and "all_versions" to delete from all (mongo) versions.
+    PUT or POST
+        json: update the xblock instance (note that create is not yet supported). The json payload can contain
+        these fields, all optional:
+            :data: the new value for the data.
+            :children: the ids (old-style) of children for this xblock.
+            :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
+                       to None! Absent ones will be left alone.
+            :nullout: which metadata fields to set to None
     """
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    old_location = loc_mapper().translate_locator_to_location(location)
+
     if request.method == 'DELETE':
-        location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
-        if not has_access(request.user, location):
-            raise PermissionDenied()
-
-        old_location = loc_mapper().translate_locator_to_location(location)
-
         delete_children = bool(request.REQUEST.get('recurse', False))
         delete_all_versions = bool(request.REQUEST.get('all_versions', False))
 
-        _delete_item_at_location(old_location, delete_children, delete_all_versions)
-        return JsonResponse()
-
-
-@login_required
-@expect_json
-def save_item(request):
-    """
-    Will carry a json payload with these possible fields
-    :id (required): the id
-    :data (optional): the new value for the data
-    :metadata (optional): new values for the metadata fields.
-        Any whose values are None will be deleted not set to None! Absent ones will be left alone
-    :nullout (optional): which metadata fields to set to None
-    """
-    # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
-    # little smarter and able to pass something more akin to {unset: [field, field]}
-
-    try:
-        item_location = request.json['id']
-    except KeyError:
-        import inspect
-
-        log.exception(
-            '''Request missing required attribute 'id'.
-                Request info:
-                %s
-                Caller:
-                Function %s in file %s
-            ''',
-            request.META,
-            inspect.currentframe().f_back.f_code.co_name,
-            inspect.currentframe().f_back.f_code.co_filename
+        return _delete_item_at_location(old_location, delete_children, delete_all_versions)
+    else:  # PUT or POST currently mapped to save.
+        return _save_item(
+            old_location,
+            data=request.json.get('data'),
+            children=request.json.get('children'),
+            metadata=request.json.get('metadata'),
+            nullout=request.json.get('nullout')
         )
-        return JsonResponse({"error": "Request missing required attribute 'id'."}, 400)
+
+
+def _save_item(item_location, data=None, children=None, metadata=None, nullout=None):
+    """
+    Saves certain properties (data, children, metadata, nullout) for a given xblock item.
+
+    The item_location is still the old-style location.
+    """
+    store = get_modulestore(item_location)
 
     try:
-        old_item = modulestore().get_item(item_location)
+        old_item = store.get_item(item_location)
     except (ItemNotFoundError, InvalidLocationError):
         log.error("Can't find item by location.")
         return JsonResponse({"error": "Can't find item by location"}, 404)
 
-    # check permissions for this user within this course
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
-
-    store = get_modulestore(Location(item_location))
-
-    if request.json.get('data'):
-        data = request.json['data']
+    if data:
         store.update_item(item_location, data)
 
-    if request.json.get('children') is not None:
-        children = request.json['children']
+    if children is not None:
         store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along
-    if request.json.get('nullout') is not None or request.json.get('metadata') is not None:
+    if nullout is not None or metadata is not None:
         # the postback is not the complete metadata, as there's system metadata which is
         # not presented to the end-user for editing. So let's fetch the original and
         # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
-        for metadata_key in request.json.get('nullout', []):
-            setattr(existing_item, metadata_key, None)
+        if nullout is not None:
+            for metadata_key in nullout:
+                setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
-        for metadata_key, value in request.json.get('metadata', {}).items():
-            field = existing_item.fields[metadata_key]
+        if metadata is not None:
+            for metadata_key, value in metadata.items():
+                field = existing_item.fields[metadata_key]
 
-            if value is None:
-                field.delete_from(existing_item)
-            else:
-                try:
-                    value = field.from_json(value)
-                except ValueError:
-                    return JsonResponse({"error": "Invalid data"}, 400)
-                field.write_to(existing_item, value)
+                if value is None:
+                    field.delete_from(existing_item)
+                else:
+                    try:
+                        value = field.from_json(value)
+                    except ValueError:
+                        return JsonResponse({"error": "Invalid data"}, 400)
+                    field.write_to(existing_item, value)
 
+                if existing_item.category == 'video':
 
-            if existing_item.category == 'video':
-
-                allowedSchemes = ['https']
-                # The entire site is served from https, so browsers with good
-                # security will reject non-https URLs anyway.
-                # Also, following video module specific code is here, because front-end
-                # metadata fields doesn't support validation.
-                if metadata_key == 'html5_sources' and not all([parse_url(u).scheme.lower() in allowedSchemes for u in value]):
-                    raise ValidationError(u'HTML5 video sources support following protocols: {0}.'.format(' '.join(allowedSchemes)))
+                    allowedSchemes = ['https']
+                    # The entire site is served from https, so browsers with good
+                    # security will reject non-https URLs anyway.
+                    # Also, following video module specific code is here, because front-end
+                    # metadata fields doesn't support validation.
+                    if metadata_key == 'html5_sources' and not all([parse_url(u).scheme.lower() in allowedSchemes for u in value]):
+                        raise ValidationError(u'HTML5 video sources support following protocols: {0}.'.format(' '.join(allowedSchemes)))
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         existing_item.save()
@@ -229,6 +213,8 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
                 children.remove(item_url)
                 parent.children = children
                 modulestore('direct').update_children(parent.location, parent.children)
+
+    return JsonResponse()
 
 
 # pylint: disable=W0613

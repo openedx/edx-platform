@@ -9,10 +9,10 @@
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["coffee/src/views/tabs", "coffee/src/models/module"], function(TabsEditView, ModuleModel) {
+require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) {
     new TabsEditView({
       el: $('.main-wrapper'),
-      model: new ModuleModel({
+      model: new Backbone.Model({
         id: '${context_course.location}'
       }),
       mast: $('.wrapper-mast')

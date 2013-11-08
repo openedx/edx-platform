@@ -133,7 +133,7 @@ class TestCreateItem(CourseTestCase):
 
 class TestEditItem(CourseTestCase):
     """
-    Test contentstore.views.item.save_item
+    Test xblock update.
     """
     def response_id(self, response):
         """
@@ -166,86 +166,71 @@ class TestEditItem(CourseTestCase):
             }),
             content_type="application/json"
         )
-        self.seq_location = self.response_id(resp)
+        resp_content = json.loads(resp.content)
+        self.seq_id = resp_content['id']
+        self.seq_update_url = resp_content['update_url']
+
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
         resp = self.client.post(
             reverse('create_item'),
             json.dumps({
-                'parent_location': self.seq_location,
+                'parent_location': self.seq_id,
                 'category': 'problem',
                 'boilerplate': template_id,
             }),
             content_type="application/json"
         )
-        self.problems = [self.response_id(resp)]
+        resp_content = json.loads(resp.content)
+        self.problem_id = resp_content['id']
+        self.problem_update_url = resp_content['update_url']
 
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'metadata': {'rerandomize': 'onreset'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'metadata': {'rerandomize': 'onreset'}}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = modulestore('draft').get_item(self.problem_id)
         self.assertEqual(problem.rerandomize, 'onreset')
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'metadata': {'rerandomize': None}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'metadata': {'rerandomize': None}}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = modulestore('draft').get_item(self.problem_id)
         self.assertEqual(problem.rerandomize, 'never')
 
     def test_null_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = modulestore('draft').get_item(self.problem_id)
         self.assertIsNotNone(problem.markdown)
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'nullout': ['markdown']
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'nullout': ['markdown']}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = modulestore('draft').get_item(self.problem_id)
         self.assertIsNone(problem.markdown)
 
     def test_date_fields(self):
         """
         Test setting due & start dates on sequential
         """
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = modulestore().get_item(self.seq_id)
         self.assertIsNone(sequential.due)
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.seq_location,
-                'metadata': {'due': '2010-11-22T04:00Z'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'due': '2010-11-22T04:00Z'}}
         )
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = modulestore().get_item(self.seq_id)
         self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.seq_location,
-                'metadata': {'start': '2010-09-12T14:00Z'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'start': '2010-09-12T14:00Z'}}
         )
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = modulestore().get_item(self.seq_id)
         self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))

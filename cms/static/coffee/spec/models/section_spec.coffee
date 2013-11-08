@@ -3,22 +3,14 @@ define ["js/models/section", "sinon"], (Section, sinon) ->
         describe "basic", ->
             beforeEach ->
                 @model = new Section({
-                    id: 42,
                     name: "Life, the Universe, and Everything"
                 })
-
-            it "should take an id argument", ->
-                expect(@model.get("id")).toEqual(42)
 
             it "should take a name argument", ->
                 expect(@model.get("name")).toEqual("Life, the Universe, and Everything")
 
-            it "should have a URL set", ->
-                expect(@model.url).toEqual("/save_item")
-
             it "should serialize to JSON correctly", ->
                 expect(@model.toJSON()).toEqual({
-                id: 42,
                 metadata:
                     {
                     display_name: "Life, the Universe, and Everything"
@@ -30,9 +22,9 @@ define ["js/models/section", "sinon"], (Section, sinon) ->
                 spyOn(Section.prototype, 'showNotification')
                 spyOn(Section.prototype, 'hideNotification')
                 @model = new Section({
-                    id: 42,
                     name: "Life, the Universe, and Everything"
                 })
+                @model.url = 'test_url'
                 @requests = requests = []
                 @xhr = sinon.useFakeXMLHttpRequest()
                 @xhr.onCreate = (xhr) -> requests.push(xhr)
