@@ -837,6 +837,8 @@ class LocalFSGradesStore(GradesStore):
         can be plugged straight into an href
         """
         course_dir = self.path_to(course_id, '')
+        if not os.path.exists(course_dir):
+            return []
         return sorted(
             [
                 (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
