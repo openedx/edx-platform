@@ -13,7 +13,7 @@ function () {
         if (state.videoType === 'html5') {
             _initialize(state);
         } else if (state.videoType === 'youtube' && state.youtubeXhr) {
-            state.youtubeXhr.done(function () {
+            state.youtubeXhr.always(function () {
                 _initialize(state);
             });
         }
