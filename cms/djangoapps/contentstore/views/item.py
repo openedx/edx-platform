@@ -2,9 +2,8 @@
 
 import logging
 from uuid import uuid4
-from requests.packages.urllib3.util import parse_url
 
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
 from xmodule.modulestore import Location
@@ -108,17 +107,6 @@ def save_item(request):
                 except ValueError:
                     return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
-
-
-            if existing_item.category == 'video':
-
-                allowedSchemes = ['https']
-                # The entire site is served from https, so browsers with good
-                # security will reject non-https URLs anyway.
-                # Also, following video module specific code is here, because front-end
-                # metadata fields doesn't support validation.
-                if metadata_key == 'html5_sources' and not all([parse_url(u).scheme in allowedSchemes for u in value]):
-                    raise ValidationError(u'HTML5 video sources support following protocols: {0}.'.format(' '.join(allowedSchemes)))
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         existing_item.save()
