@@ -243,14 +243,14 @@ class DashboardTest(TestCase):
             course_id=self.course.id,
             mode_slug='verified',
             mode_display_name='Verified',
-            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
         self.assertTrue(course_mode_info['show_upsell'])
         self.assertEquals(course_mode_info['days_for_upsell'], 1)
 
-        verified_mode.expiration_date = datetime.now(pytz.UTC) + timedelta(days=-1)
+        verified_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
         verified_mode.save()
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
         self.assertFalse(course_mode_info['show_upsell'])
@@ -261,13 +261,13 @@ class DashboardTest(TestCase):
             course_id=self.course.id,
             mode_slug='verified',
             mode_display_name='Verified',
-            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
 
         self.assertTrue(enrollment.refundable())
 
-        verified_mode.expiration_date = (datetime.now(pytz.UTC) - timedelta(days=1)).date()
+        verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         verified_mode.save()
         self.assertFalse(enrollment.refundable())
 
