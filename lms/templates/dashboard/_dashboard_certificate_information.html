@@ -39,12 +39,12 @@ else:
       <li class="action">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your PDF Certificate")}</a></li>
+         ${_("Download Your Certificate (PDF)")}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
       <li class="action">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document of your verified certificate.')}">
-         ${_("Download Your PDF Certificate")}</a></li>
+         ${_("Download Your ID Verified Certificate of Achievement (PDF)")}</a></li>
     % endif
 
     % if cert_status['show_survey_button']:
