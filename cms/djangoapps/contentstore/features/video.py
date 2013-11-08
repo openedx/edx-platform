@@ -28,7 +28,6 @@ def i_created_a_video_component(step):
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
-    world.disable_jquery_animations()
     _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
 
 
@@ -128,12 +127,7 @@ def the_youtube_video_is_shown(_step):
 
 @step('Make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
-    # TODO: If I uncomment the following line, all tests pass.
-    #
-    # NOTE: In function i_created_a_video_with_subs() I have
-    # world.disable_jquery_animations().
-    #
-    # world.wait(FADEOUT_TIMEOUT)
+    world.wait(FADEOUT_TIMEOUT)
 
     if captions_state == 'closed':
         if world.css_visible('.subtitles'):
