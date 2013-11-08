@@ -3,6 +3,9 @@ Module that allows to insert LTI tools to page.
 
 Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
+
+play and test:
+http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 """
 
 from uuid import uuid4
@@ -11,6 +14,7 @@ import logging
 import oauthlib.oauth1
 import urllib
 import json
+import textwrap
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -387,36 +391,53 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         {'status_code': HTTP status code, 'content': use it only for returning
         data for action `read`}
         """
-        # Investigate how will be applied changes to specific user_id
-
+        # It can be case, that user is logged out, but TP have not yet submitted grade for him.
+        # for this case, TP sends back anonymous_id and we obtain user by anonymous user id.
+        # TODO: test and verify it!
+        import ipdb; ipdb.set_trace()
+        anonymous_id = data.get('anonymous_id', 'test_anonymous_id')
         action = dispatch.lower()
-
+        # test $.post('/preview/modx/0/i4x://mitx/cs101/lti/80587c94f3cc455f8a63f660b7ff9315/set', {'score': 1})
+        # $.post('http://localhost:8000/courses/blades/1/2013_Spring/courseware/caac519cf1ad4fba96a76a6f816faae9/f773addfbafa4059a0bcd5c33ce01901/set', {'score': 1})
         if action == 'set':
             if 'score' not in data.keys():
                 return json.dumps({'status_code': 400})
 
-            self.system.publish({
-                'event_name': 'grade',
-                'value': data['score'],
-                'max_value': self.get_maxscore(),
-            })
+            self.system.publish(
+                event={
+                    'event_name': 'grade',
+                    'value': data['score'],
+                    'max_value': self.get_maxscore(),
+                },
+                custom_user=self.system.user
+            )
 
             return json.dumps({'status_code': 200})
 
-        elif action == 'read':
+        else:  # return "unsupported" response
             response = {
                 'status_code': 200,
-                'content': {
-                    'value': self.get_score(),
-                },
+                'content': textwrap.dedent("""
+                    <?xml version="1.0" encoding="UTF-8"?>
+                        <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                            <imsx_POXHeader>
+                                <imsx_POXResponseHeaderInfo>
+                                <imsx_version>V1.0</imsx_version>
+                                <imsx_messageIdentifier>4560</imsx_messageIdentifier>
+                                <imsx_statusInfo>
+                                    <imsx_codeMajor>unsupported</imsx_codeMajor>
+                                    <imsx_severity>status</imsx_severity>
+                                    <imsx_description>readPerson is not supported</imsx_description>
+                                    <imsx_messageRefIdentifier>999999123</imsx_messageRefIdentifier>
+                                    <imsx_operationRefIdentifier>readPerson</imsx_operationRefIdentifier>
+                                </imsx_statusInfo>
+                                </imsx_POXResponseHeaderInfo>
+                            </imsx_POXHeader>
+                        <imsx_POXBody/>
+                        </imsx_POXEnvelopeResponse>
+                """)
             }
-
             return json.dumps(response)
-
-        elif action == 'delete':
-            return json.dumps({'status_code': 200})
-
-        return json.dumps({'status_code': 404})
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

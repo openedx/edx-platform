@@ -25,6 +25,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import django.dispatch
 from django.forms import ModelForm, forms
+from django.core.exceptions import ObjectDoesNotExist
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -40,6 +41,52 @@ unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
+
+class AnonymousUsers(models.Model):
+    """
+    This table contains user and anonymous_user_id
+
+    Purpose of this table is to provide user by anonymous_user_id.
+
+    We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
+    http://docs.python.org/2/library/md5.html#md5.digest_size
+    """
+    user = models.ForeignKey(User, db_index=True, related_name='anonymous', unique=True)
+    anonymous_user_id = models.CharField(db_index=True, blank=False, unique=True, max_length=16)
+
+
+def unique_id_for_user(user):
+    """
+    Return a unique id for a user, suitable for inserting into
+    e.g. personalized survey links.
+    """
+    def _unique_id_for_user(user):
+        # include the secret key as a salt, and to make the ids unique across different LMS installs.
+        h = hashlib.md5()
+        h.update(settings.SECRET_KEY)
+        h.update(str(user.id))
+        return h.hexdigest()
+
+    return AnonymousUsers.objects.get_or_create(
+        user=user,
+        anonymous_user_id=_unique_id_for_user(user)
+    )[0].anonymous_user_id
+
+
+def user_by_anonymous_id(id):
+    """
+    Return user by anonymous_user_id using AnonymousUsers lookup table.
+
+    Do not raise `django.ObjectDoesNotExist` exception,
+    if there is no user for anonymous_student_id,
+    because this function will be used inside xmodule w/o django access.
+    """
+    try:
+        obj = AnonymousUsers.objects.get(anonymous_user_id=id)
+    except ObjectDoesNotExist:
+        return None
+    return obj.user
 
 
 class UserStanding(models.Model):
@@ -617,19 +664,6 @@ def get_testcenter_registration(user, course_id, exam_series_code):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 get_testcenter_registration.__test__ = False
-
-
-def unique_id_for_user(user):
-    """
-    Return a unique id for a user, suitable for inserting into
-    e.g. personalized survey links.
-    """
-    # include the secret key as a salt, and to make the ids unique across
-    # different LMS installs.
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    return h.hexdigest()
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly
