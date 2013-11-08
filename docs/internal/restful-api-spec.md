@@ -9,6 +9,11 @@ in a certain context. XBlocks can contain other XBlocks. XBlocks can define thei
 own schema for storing data, which must consist only of primitive types
 (string, int, list, mapping)
 
+The "title" and "description" strings are meant to be displayed in a UI, and as such
+should be translated into the language specified by the `Accept-Language` header
+in the request. If the server is unable to translate the strings into the requested
+language, they will be returned untranslated.
+
 *Note:* This API is read-only. XBlock types cannot be created, modified, or deleted
 through this API; available XBlock types are solely controlled by the server
 administrator(s). Other XBlock types may exist on other servers, but these API
@@ -21,18 +26,21 @@ supports.
 
         [{
           "id": "thumbs",
+          "version": "1.0",
           "title": "Thumbs",
           "description": "a simple control to indicate thumbs-up or thumbs-down, and aggregate responses",
           "schema": {},
           "defaults": {}
         }, {
           "id": "randomize",
+          "version": "0.1a",
           "title": "Randomize",
           "description": "randomize children",
           "schema": {},
           "defaults": {}
         }, {
           "id": "schema_ex",
+          "version": "2.5.4",
           "title": "Schema Type Example",
           "description": "just demonstrates all the different schema types",
           "schema": {
@@ -59,6 +67,7 @@ supports.
 
         {
           "id": "schema_ex",
+          "version": "2.5.4",
           "title": "Schema Type Example",
           "description": "just demonstrates all the different schema types",
           "schema": {
@@ -82,6 +91,11 @@ Conceptually, an index is simply a mapping of branches
 for that branch. Indexes also contain permission information
 for who can read the index, and who can modify its contents
 (or the contents of its child snapshots).
+
+The "display" hash is meant to be displayed in a UI, and as such
+should be translated into the language specified by the `Accept-Language` header
+in the request. If the server is unable to translate the strings into the requested
+language, they will be returned untranslated.
 
 A Course is the definitive example of an index, but other
 types of indexes could also exist.
@@ -703,6 +717,11 @@ Like snapshots, XBlock instances are immutable. Any operation that would
 modify an existing XBlock instance instead creates a new instance, and
 returns a reference to that newly-created instance.
 
+`type` refers to the ID of an XBlock Type, and`type_version` is refers
+to the version of the XBlock Type. If `type_version` is null or is
+unspecified, it is assumed that the instance is an instance of the latest
+version of this XBlock Type that the server supports.
+
 + Parameters
     + id (required, UUID, `a7e3233a-c19d-40d4-b450-2046bd099501`)
         The ID of the snapshot that contains this xblock, usually a UUID.
@@ -718,6 +737,7 @@ may resemble URLs. That's why they do not start with `/v1`.
         {
           "id": "/snapshots/a7e3233a-c19d-40d4-b450-2046bd099501/xblocks/chapter7",
           "type": "schema_ex",
+          "type_version": "2.5.4",
           "parent": "/snapshots/e78ff15e-da0b-4d77-845e-30a30d265106/xblocks/chapter7",
           "children": [],
           "name": "my_name",
