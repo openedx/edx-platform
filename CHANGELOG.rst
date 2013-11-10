@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Make LTI passports to be in InheritanceMixin. (BLD-501)
+
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.
 

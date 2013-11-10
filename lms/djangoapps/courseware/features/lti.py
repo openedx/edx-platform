@@ -77,7 +77,8 @@ def set_correct_lti_passport(_step):
 
 @step('the course has incorrect LTI credentials$')
 def set_incorrect_lti_passport(_step):
-    coursenum = 'test_course'
+    #another coursenum given because of test fail when tests run in sequence
+    coursenum = 'test_course_2'
     metadata = {
         'lti_passports': ["test_lti_id:{}:{}".format(
             world.lti_server.oauth_settings['client_key'],
