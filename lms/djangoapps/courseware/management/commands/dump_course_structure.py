@@ -1,5 +1,5 @@
 """
-A Django command that dumps the structure of a course as a JSON object.
+A Django command that dumps the structure of a course as a JSON object or CSV list.
 
 The resulting JSON object has one entry for each module in the course:
 
@@ -17,6 +17,8 @@ The resulting JSON object has one entry for each module in the course:
 """
 
 import json
+import csv
+import StringIO
 from optparse import make_option
 from textwrap import dedent
 
@@ -41,6 +43,16 @@ class Command(BaseCommand):
                     action='store',
                     default='default',
                     help='Name of the modulestore'),
+        make_option('--flat',
+                    action='store_true',
+                    dest='flat',
+                    default=False,
+                    help='Show "flattened" course content with order and levels'),
+        make_option('--csv',
+                    action='store_true',
+                    dest='csv',
+                    default=False,
+                    help='output in CSV format (default is JSON)'),
     )
 
     def handle(self, *args, **options):
@@ -64,12 +76,20 @@ class Command(BaseCommand):
 
         # Convert course data to dictionary and dump it as JSON to stdout
 
-        info = dump_module(course)
+        if options['flat']:
+            info = dump_module_by_position(course_id, course)
+        else:
+            info = dump_module_by_module(course)
+            
+        if options['csv']:
+            csvout = StringIO.StringIO()
+            writer = csv.writer(csvout, dialect='excel')
+            writer.writerows(info)
+            return csvout.getvalue()
+        else:
+            return json.dumps(info, indent=2, sort_keys=True)
 
-        return json.dumps(info, indent=2, sort_keys=True)
-
-
-def dump_module(module, destination=None):
+def dump_module_by_module(module, destination=None):
     """
     Add the module and all its children to the destination dictionary in
     as a flat structure.
@@ -87,6 +107,51 @@ def dump_module(module, destination=None):
     }
 
     for child in module.get_children():
-        dump_module(child, destination)
+        dump_module_by_module(child, destination)
 
     return destination
+
+def dump_module_by_position(course_id, module, level=0, 
+                            destination=None, prefix=None, parent=None):
+    """
+    Add a module and all of its children to the end of the list.
+    Keep a running tally of position in the list and indent level.
+    """
+    pos = 0
+    if destination:
+        pos = destination[-1][1] + 1  # pos is the 2nd col
+
+    if level == 0:
+        display_name_long = ""
+    elif level == 1:
+        display_name_long = module.display_name
+    else:
+        display_name_long = prefix + "," + module.display_name
+
+    if destination == None:
+        destination = [ ('course_id',
+                         'position',
+                         'level',
+                         'module_id',
+                         'type',
+                         'displayname',
+                         'path',
+                         'parent') ]
+
+    destination.append( (course_id,
+                         pos, 
+                         level, 
+                         module.id, 
+                         module.location.category,
+                         module.display_name, 
+                         display_name_long,
+                         parent) )
+    for child in module.get_children():
+        dump_module_by_position(course_id, 
+                                child, 
+                                level=level+1, 
+                                destination=destination, 
+                                prefix=display_name_long, 
+                                parent=module.id)
+    return destination
+
