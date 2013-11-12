@@ -169,11 +169,10 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     }, "Defaults never loaded", 1000);
 
                     runs(function() {
+                        var displayNameValue = collection[0].getValue(),
+                            videoUrlValue = collection[1].getValue();
 
-                        var displayNameValue = collection[0].getValue();
-                        var videoUrlValue = collection[1].getValue();
-
-                        expect(displayNameValue).toBe('default');
+                        expect(displayNameValue).toEqual('default');
                         expect(videoUrlValue).toEqual([
                             'http://youtu.be/OEoXaMPEzfM',
                             'default.mp4',
@@ -237,13 +236,13 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         var html5SourcesValue = collection[2].getValue();
                         var youtubeValue = collection[3].getValue();
 
-                        expect(displayNameValue).toBe('display value');
-                        expect(subValue).toBe('default');
+                        expect(displayNameValue).toEqual('display value');
+                        expect(subValue).toEqual('default');
                         expect(html5SourcesValue).toEqual([
                             'video.mp4',
                             'video.webm'
                         ]);
-                        expect(youtubeValue).toBe('12345678901');
+                        expect(youtubeValue).toEqual('12345678901');
                     });
                 });
 
@@ -256,13 +255,13 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         html5SourcesValue = collection[2].getValue(),
                         youtubeValue = collection[3].getValue();
 
-                    expect(displayNameValue).toBe('default');
-                    expect(subValue).toBe('default');
+                    expect(displayNameValue).toEqual('default');
+                    expect(subValue).toEqual('default');
                     expect(html5SourcesValue).toEqual([
                         'default.mp4',
                         'default.webm'
                     ]);
-                    expect(youtubeValue).toBe('OEoXaMPEzfM');
+                    expect(youtubeValue).toEqual('OEoXaMPEzfM');
                 });
 
                 it('Youtube Id is not adjusted', function () {
@@ -283,7 +282,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         'video.mp4',
                         'video.webm'
                     ]);
-                    expect(youtubeValue).toBe('');
+                    expect(youtubeValue).toEqual('');
                 });
 
                 it('Timed Transcript field is updated', function () {
@@ -294,7 +293,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     var collection = metadataCollection.models,
                         subValue = collection[1].getValue();
 
-                    expect(subValue).toBe('test_value');
+                    expect(subValue).toEqual('test_value');
                 });
 
                 it('Timed Transcript field is updated just once', function () {
@@ -309,7 +308,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
 
-                    expect(subModel.setValue.calls.length).toBe(1);
+                    expect(subModel.setValue.calls.length).toEqual(1);
                 });
 
             });
