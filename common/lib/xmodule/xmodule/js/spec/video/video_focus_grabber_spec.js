@@ -76,7 +76,7 @@
             runs(function () {
                 // Captions should not be "sticky" for the autohide mechanism
                 // to work.
-                state.videoCaption.hideCaptions(true);
+                state.videoCaption.hideCaptions(false);
 
                 // Make sure that the controls are visible. After this event
                 // is triggered a count down is started to autohide captions.

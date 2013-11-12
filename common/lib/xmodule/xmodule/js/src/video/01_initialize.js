@@ -120,7 +120,7 @@ function (VideoPlayer) {
         if (state.config.showTranscriptsInitially) {
             state.showCaptions = ($.cookie('show_captions') === 'true');
         } else {
-            state.showCaptions = true;
+            state.showCaptions = false;
 
             $.cookie('show_captions', state.showCaptions, {
                 expires: 3650,

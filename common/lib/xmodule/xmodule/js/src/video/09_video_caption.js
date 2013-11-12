@@ -106,7 +106,7 @@ function () {
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
         if (!this.videoCaption.fetchCaption()) {
-            this.videoCaption.hideCaptions(true);
+            this.videoCaption.hideCaptions(false);
             this.videoCaption.hideSubtitlesEl.hide();
         }
     }
@@ -234,7 +234,7 @@ function () {
                     ', MESSAGE:', '' + errorThrown
                 );
 
-                _this.videoCaption.hideCaptions(true, false);
+                _this.videoCaption.hideCaptions(false, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
@@ -674,9 +674,9 @@ function () {
 
         if (this.el.hasClass('closed')) {
             this.videoCaption.autoShowCaptions();
-            this.videoCaption.hideCaptions(false);
-        } else {
             this.videoCaption.hideCaptions(true);
+        } else {
+            this.videoCaption.hideCaptions(false);
 
             // In the case when captions are not auto-hidden based on mouse
             // movement anywhere on the video, we must hide them explicitly
