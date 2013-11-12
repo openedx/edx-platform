@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
@@ -696,23 +697,20 @@ def progress(request, course_id, student_id=None):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course_id, student, course, depth=None)
-
-    courseware_summary = grades.progress_summary(student, request, course,
-                                                 field_data_cache)
-    grade_summary = grades.grade(student, request, course, field_data_cache)
+    courseware_summary = grades.progress_summary(student, request, course)
+    grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
-    context = {'course': course,
-               'courseware_summary': courseware_summary,
-               'grade_summary': grade_summary,
-               'staff_access': staff_access,
-               'student': student,
-               }
+    context = {
+        'course': course,
+        'courseware_summary': courseware_summary,
+        'grade_summary': grade_summary,
+        'staff_access': staff_access,
+        'student': student,
+    }
     context.update()
 
     return render_to_response('courseware/progress.html', context)

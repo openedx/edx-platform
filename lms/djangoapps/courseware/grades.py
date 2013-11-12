@@ -121,7 +121,7 @@ def answer_distributions(request, course):
     return counts
 
 
-def grade(student, request, course, field_data_cache=None, keep_raw_scores=False):
+def grade(student, request, course, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -132,10 +132,11 @@ def grade(student, request, course, field_data_cache=None, keep_raw_scores=False
     - grade : A final letter grade.
     - percent : The final percent for the class (rounded up).
     - section_breakdown : A breakdown of each section that makes
-        up the grade. (For display)
+      up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
-        make up the final grade. (For display)
-    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores for every graded module
+      make up the final grade. (For display)
+    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores
+      for every graded module
 
     More information on the format is in the docstring for CourseGrader.
     """
@@ -155,7 +156,7 @@ def grade(student, request, course, field_data_cache=None, keep_raw_scores=False
             # some problems have state that is updated independently of interaction
             # with the LMS, so they need to always be scored. (E.g. foldit.)
             should_grade_section = any(
-                [descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']]
+                descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
             )
 
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
@@ -163,7 +164,9 @@ def grade(student, request, course, field_data_cache=None, keep_raw_scores=False
                 should_grade_section = StudentModule.objects.filter(
                     student=student,
                     module_type='problem',
-                    module_state_key__in=[descriptor.location for descriptor in section['xmoduledescriptors']]
+                    module_state_key__in=[
+                        descriptor.location for descriptor in section['xmoduledescriptors']
+                    ]
                 ).exists()
 
             if should_grade_section:
@@ -173,7 +176,7 @@ def grade(student, request, course, field_data_cache=None, keep_raw_scores=False
                     '''creates an XModule instance given a descriptor'''
                     # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
-                    field_data_cache = FieldDataCache(grading_context['all_descriptors'], course.id, student)
+                    field_data_cache = FieldDataCache([descriptor], course.id, student)
                     return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
@@ -250,7 +253,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def progress_summary(student, request, course, field_data_cache):
+def progress_summary(student, request, course):
     """
     This pulls a summary of all problems in the course.
 
@@ -264,8 +267,6 @@ def progress_summary(student, request, course, field_data_cache):
     Arguments:
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
-        field_data_cache: A FieldDataCache initialized with all
-             instance_modules for the student
 
     If the student does not have access to load the course module, this function
     will return None.
@@ -274,6 +275,9 @@ def progress_summary(student, request, course, field_data_cache):
 
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, student, course, depth=None
+    )
     course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
     if not course_module:
         # This student must not have access to the course.
@@ -322,10 +326,12 @@ def progress_summary(student, request, course, field_data_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name_with_default,
-                         'display_name': chapter_module.display_name_with_default,
-                         'url_name': chapter_module.url_name,
-                         'sections': sections})
+        chapters.append({
+            'course': course.display_name_with_default,
+            'display_name': chapter_module.display_name_with_default,
+            'url_name': chapter_module.url_name,
+            'sections': sections
+        })
 
     return chapters
 
