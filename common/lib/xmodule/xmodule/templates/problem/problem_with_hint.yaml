@@ -6,10 +6,11 @@ data: |
     <problem>
       <text>
         <p>
-          <h4>Problem With Adaptive Hint</h4>
+          <h4>Задача с подсказкой</h4>
         </p>
         <p>
-    This problem demonstrates a question with hints, based on using the <tt class="tt">hintfn</tt> method. </p>
+        Это задание показывает возможности вопроса с подсказкой.
+        Попробуйте разные варианты ответа, в случае если вы были близки вам подскажут.</p>
         <script type="text/python" system_path="python_lib">
     def test_str(expect, ans):
       print expect, ans
@@ -25,19 +26,19 @@ data: |
       if 'java' in ans:
          hint = 'that is only good for drinking'
       elif 'perl' in ans:
-         hint = 'not that rich'
+         hint = 'не настолько хорош'
       elif 'pascal' in ans:
-         hint = 'that is a beatnick language'
+         hint = 'язык моего детства'
       elif 'fortran' in ans:
-         hint = 'those were the good days'
+         hint = 'это были хорошие дни'
       elif 'clu' in ans:
-         hint = 'you must be invariant'
+         hint = 'видимо, ты старомоден'
       if hint:
-        hint = "&lt;font color='blue'&gt;Hint: {0}&lt;/font&gt;".format(hint)
+        hint = "&lt;font color='blue'&gt;Подсказка: {0}&lt;/font&gt;".format(hint)
         new_cmap.set_hint_and_mode(aid,hint,'always')
     </script>
         <p>
-    What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes. </p>
+    Какой язык программирования является лучшим на данный момент? </p>
         <p>
           <customresponse cfn="test_str" expect="c++">
             <textline correct_answer="c++"/>

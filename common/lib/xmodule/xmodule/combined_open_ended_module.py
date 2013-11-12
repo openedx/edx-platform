@@ -49,7 +49,7 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
-DEFAULT_DATA = textwrap.dedent("""\
+DEFAULT_DATA = textwrap.dedent(_("""\
 <combinedopenended>
     <prompt>
         <h3>Censorship in the Libraries</h3>
@@ -168,7 +168,7 @@ DEFAULT_DATA = textwrap.dedent("""\
     </task>
 
 </combinedopenended>
-""")
+"""))
 
 
 class VersionInteger(Integer):
@@ -316,7 +316,7 @@ class CombinedOpenEndedFields(object):
     )
     markdown = String(
         help=_("Markdown source of this module"),
-        default=textwrap.dedent("""\
+        default=textwrap.dedent(_("""\
                     [prompt]
                         <h3>Censorship in the Libraries</h3>
 
@@ -355,7 +355,7 @@ class CombinedOpenEndedFields(object):
                     (Self), ({4-12}AI), ({9-12}Peer)
                     [tasks]
 
-        """),
+        """)),
         scope=Scope.settings
     )
 

@@ -4,7 +4,7 @@
 		<div class="row">
 			<label class="inline-label">Date:</label>
 			<!-- TODO replace w/ date widget and actual date (problem is that persisted version is "Month day" not an actual date obj -->
-			<input type="text" class="date" value="<%= updateModel.get('date') %>">
+			<input type="text" class="date">
 		</div>
 		<div class="row">
 			<textarea class="new-update-content text-editor"><%= updateModel.get('content') %></textarea>

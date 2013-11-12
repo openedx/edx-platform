@@ -10,6 +10,7 @@ import requests
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
 
+def _(s): return s;
 
 def make_hashkey(seed):
     '''
@@ -123,6 +124,6 @@ class XQueueInterface(object):
             return (1, _('cannot connect to server'))
 
         if r.status_code not in [200]:
-            return (1, _('unexpected HTTP status code [%d]') % r.status_code)
+            return (1, _('unexpected HTTP status code [{status}]').format(status = r.status_code))
 
         return parse_xreply(r.text)

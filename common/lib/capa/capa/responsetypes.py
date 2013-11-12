@@ -1496,8 +1496,8 @@ class CodeResponse(LoncapaResponse):
         cmap = CorrectMap()
         if error:
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_('Unable to deliver your submission to grader. (Reason: %s.)'
-                         ' Please try again later.') % msg)
+                     msg=_('Unable to deliver your submission to grader. (Reason: {msg}.)'
+                         ' Please try again later.').format(msg = msg))
         else:
             # Queueing mechanism flags:
             #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
@@ -1850,13 +1850,13 @@ class FormulaResponse(LoncapaResponse):
                     )
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error %s in formula', err)
-                raise StudentInputError(_("Invalid input: Could not parse '%s' as a formula") %
-                                        cgi.escape(answer))
+                raise StudentInputError(_("Invalid input: Could not parse '{answer}' as a formula").format(
+                                        answer = cgi.escape(answer)))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula', err)
-                raise StudentInputError(_("Invalid input: Could not parse '%s' as a formula") %
-                                        cgi.escape(answer))
+                raise StudentInputError(_("Invalid input: Could not parse '{answer}' as a formula").format(
+                                        answer = cgi.escape(answer)))
         return out
 
     def randomize_variables(self, samples):
@@ -2577,10 +2577,9 @@ class ChoiceTextResponse(LoncapaResponse):
                 _, _, trace = sys.exc_info()
 
                 raise StudentInputError(
-                    _("Could not interpret '{0}' as a number{1}").format(
-                        cgi.escape(answer_value),
-                        trace
-                    )
+                        _("Could not interpret '{answer}' as a number{number}").format(
+                          answer = cgi.escape(answer_value),
+                          number = trace)
                 )
             # Ignore the results of the comparisons which were just for
             # Numerical Validation.

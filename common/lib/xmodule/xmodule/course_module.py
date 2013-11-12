@@ -216,7 +216,7 @@ class CourseFields(object):
     discussion_topics = Dict(help=_("Map of topics names to ids"), scope=Scope.settings)
     discussion_sort_alpha = Boolean(scope=Scope.settings, default=False, help=_("Sort forum categories and subcategories alphabetically."))
     testcenter_info = Dict(help=_("Dictionary of Test Center info"), scope=Scope.settings)
-    max_enrollment_instr_buttons = Integer(scope=Scope.settings, default=200, help="Disable instructor dash buttons for downloading course data when enrollment exceeds this number")
+    max_enrollment_instr_buttons = Integer(scope=Scope.settings, default=1000000, help="Disable instructor dash buttons for downloading course data when enrollment exceeds this number")
     announcement = Date(help=_("Date this course is announced"), scope=Scope.settings)
     cohort_config = Dict(help=_("Dictionary defining cohort configuration"), scope=Scope.settings)
     is_new = Boolean(help=_("Whether this course should be flagged as new"), scope=Scope.settings)
