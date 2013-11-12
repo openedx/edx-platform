@@ -36,4 +36,5 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works
   Given the course has correct LTI credentials
   And the course has an LTI component with correct fields, new_page is false, is_graded is true
-  And I open gradebook
+  And I click on Grade link
+  Then I wiew result in Progress page

@@ -13,8 +13,8 @@ from uuid import uuid4
 import logging
 import oauthlib.oauth1
 import urllib
-import json
 import textwrap
+from lxml import etree
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -265,38 +265,40 @@ class LTIModule(LTIFields, XModule):
         return self.lti_id
 
     def get_resource_link_id(self):
-        #  This is an opaque unique identifier that the TC guarantees will be unique
-        #   within the TC for every placement of the link.
-        #  If the tool / activity is placed multiple times in the same context,
-        #  each of those placements will be distinct.
-        # This value will also change if the item is exported from one system or
-        # context and imported into another system or context.
-        # This parameter is required.
-
-        # This is unique id of edx platform.
+        """
+        This is an opaque unique identifier that the TC guarantees will be unique
+        within the TC for every placement of the link.
+        If the tool / activity is placed multiple times in the same context,
+        each of those placements will be distinct.
+        This value will also change if the item is exported from one system or
+        context and imported into another system or context.
+        This parameter is required.
+        """
+        # This is unique id of edx platform instance. Ned, it is true?
         return unicode(self.id) if self.is_graded else ''
 
     def get_lis_result_sourcedid(self):
-        if self.is_graded:
-            # This field contains an identifier that indicates the LIS Result Identifier (if any)
-            # associated with this launch.  This field identifies a unique row and column within the
-            # TC gradebook.  This field is unique for every combination of context_id / resource_link_id / user_id.
-            # This value may change for a particular resource_link_id / user_id  from one launch to the next.
-            # The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
-            # This field is optional.
-
-            # context_id is lti_id
+        """
+        This field contains an identifier that indicates the LIS Result Identifier (if any)
+        associated with this launch.  This field identifies a unique row and column within the
+        TC gradebook.  This field is unique for every combination of context_id / resource_link_id / user_id.
+        This value may change for a particular resource_link_id / user_id  from one launch to the next.
+        The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
+        This field is generally optional, but is required for grading.
+        """
+        if self.is_graded:  # lti_id should be context_id by meaning.
             return '{}::{}::{}'.format(self.lti_id, self.get_resource_link_id(), self.get_user_id())
         else:
             return ''
 
-    def get_lis_person_sourcedid(self):
-        # This field contains the LIS identifier for the user account that is performing this launch.
-        # The example syntax of "school:user" is not the required format - lis_person_sourcedid
-        # is simply a unique identifier (i.e., a normalized string).
-        # This field is optional and its content and meaning are defined by LIS.
-        school = 'EdX'
-        return '{}:{}:{}'.format(school, self.get_user_id(), uuid4().hex) if self.is_graded else ''
+    # Optional, do not use it for now.
+    # def get_lis_person_sourcedid(self):
+    #     # This field contains the LIS identifier for the user account that is performing this launch.
+    #     # The example syntax of "school:user" is not the required format - lis_person_sourcedid
+    #     # is simply a unique identifier (i.e., a normalized string).
+    #     # This field is optional and its content and meaning are defined by LIS.
+    #     school = 'EdX'
+    #     return '{}:{}:{}'.format(school, self.get_user_id(), uuid4().hex) if self.is_graded else ''
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
@@ -323,14 +325,11 @@ class LTIModule(LTIFields, XModule):
             u'lti_version': 'LTI-1p0',
             u'role': u'student',
 
-            # for grades, TODO: generate properly:
-            # required
+            # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': '{}/set'.format(self.get_base_path() if self.is_graded else ''),
-
-            # optional fields
+            u'lis_outcome_service_url': '{}/replaceResult'.format(self.get_base_path() if self.is_graded else ''),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
-            u'lis_person_sourcedid': self.get_lis_person_sourcedid(),
+            # u'lis_person_sourcedid': self.get_lis_person_sourcedid(),  # optional, do not use for now.
 
         }
 
@@ -376,6 +375,9 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     def get_score(self):
+        """
+        TODO read score
+        """
         return {
             'score': 0.5,
             'total': self.get_maxscore()
@@ -388,56 +390,111 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
+        Used only for grading.
+
         Returns json in following format:
-        {'status_code': HTTP status code, 'content': use it only for returning
-        data for action `read`}
+        {'status_code': HTTP status code, 'content': proper XML defined in LTI v.1.1}
+
+        Uses http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html::
+
+            This specification extends the OAuth signature to include integrity checks on HTTP request bodies
+            with content types other than application/x-www-form-urlencoded.
         """
-        # It can be case, that user is logged out, but TP have not yet submitted grade for him.
-        # for this case, TP sends back anonymous_id and we obtain user by anonymous user id.
-        # TODO: test and verify it!
-        anonymous_id = data.get('anonymous_id', 'test_anonymous_id')
+
+        # verify oauth signing
+
+        # Beware: xmlns is broken link, as it is from LTI spec page, where it is broken.
+        response_xml_template = textwrap.dedent("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                <imsx_POXHeader>
+                    <imsx_POXResponseHeaderInfo>
+                        <imsx_version>V1.0</imsx_version>
+                        <imsx_messageIdentifier>{imsx_messageIdentifier}</imsx_messageIdentifier>
+                        <imsx_statusInfo>
+                            <imsx_codeMajor>{imsx_codeMajor}</imsx_codeMajor>
+                            <imsx_severity>status</imsx_severity>
+                            <imsx_description>{imsx_description}</imsx_description>
+                            <imsx_messageRefIdentifier>
+                            </imsx_messageRefIdentifier>
+                        </imsx_statusInfo>
+                    </imsx_POXResponseHeaderInfo>
+                </imsx_POXHeader>
+                <imsx_POXBody>{response}</imsx_POXBody>
+            </imsx_POXEnvelopeResponse>
+        """)
+
+        unsupported_values = {
+            'imsx_codeMajor': 'unsupported',
+            'imsx_description': 'Only replaceResult is supported',
+            'imsx_messageIdentifier': 'unknown',
+            'response': ''
+        }
+
+        # what should come from LTI provider:
+        """
+        data_example = textwrap.dedent(\"""
+            <?xml version = "1.0" encoding = "UTF-8"?>
+                <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
+                  <imsx_POXHeader>
+                    <imsx_POXRequestHeaderInfo>
+                      <imsx_version>V1.0</imsx_version>
+                      <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
+                    </imsx_POXRequestHeaderInfo>
+                  </imsx_POXHeader>
+                  <imsx_POXBody>
+                    <replaceResultRequest>
+                      <resultRecord>
+                        <sourcedGUID>
+                          <sourcedId>feb-123-456-2929::28883</sourcedId>
+                        </sourcedGUID>
+                        <result>
+                          <resultScore>
+                            <language>en-us</language>
+                            <textString>0.4</textString>
+                          </resultScore>
+                        </result>
+                      </resultRecord>
+                    </replaceResultRequest>
+                  </imsx_POXBody>
+                </imsx_POXEnvelopeRequest>
+        \""")
+        """
+        data = data.keys()[0] + '=' + data.values()[0]
+        data = data.strip().encode('utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        try:  # get data from request
+            root = etree.fromstring(data, parser=parser)
+            namespaces = {'def': root.nsmap.values()[0]}
+            imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+            sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
+            score = root.xpath("//def:textString", namespaces=namespaces)[0].text
+        except:
+            return response_xml_template.format(**unsupported_values), "application/xml"
+
         action = dispatch.lower()
-        # test $.post('/preview/modx/0/i4x://mitx/cs101/lti/80587c94f3cc455f8a63f660b7ff9315/set', {'score': 1})
-        # $.post('http://localhost:8000/courses/blades/1/2013_Spring/courseware/caac519cf1ad4fba96a76a6f816faae9/f773addfbafa4059a0bcd5c33ce01901/set', {'score': 1})
-        if action == 'set':
-            if 'score' not in data.keys():
-                return json.dumps({'status_code': 400})
+        if action == 'replaceresult':
 
             self.system.publish(
                 event={
                     'event_name': 'grade',
-                    'value': data['score'],
+                    'value': score,
                     'max_value': self.get_maxscore(),
                 },
-                custom_user=self.system.get_real_user(anonymous_id)
+                custom_user=self.system.get_real_user(sourcedId.split('::')[-1])
             )
 
-            return json.dumps({'status_code': 200})
-
-        else:  # return "unsupported" response
-            response = {
-                'status_code': 200,
-                'content': textwrap.dedent("""
-                    <?xml version="1.0" encoding="UTF-8"?>
-                        <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-                            <imsx_POXHeader>
-                                <imsx_POXResponseHeaderInfo>
-                                <imsx_version>V1.0</imsx_version>
-                                <imsx_messageIdentifier>4560</imsx_messageIdentifier>
-                                <imsx_statusInfo>
-                                    <imsx_codeMajor>unsupported</imsx_codeMajor>
-                                    <imsx_severity>status</imsx_severity>
-                                    <imsx_description>readPerson is not supported</imsx_description>
-                                    <imsx_messageRefIdentifier>999999123</imsx_messageRefIdentifier>
-                                    <imsx_operationRefIdentifier>readPerson</imsx_operationRefIdentifier>
-                                </imsx_statusInfo>
-                                </imsx_POXResponseHeaderInfo>
-                            </imsx_POXHeader>
-                        <imsx_POXBody/>
-                        </imsx_POXEnvelopeResponse>
-                """)
+            values = {
+                'imsx_codeMajor': 'success',
+                'imsx_description': 'Score for {sourced_id} is now {score}'.format(sourced_id=sourcedId, score=score),
+                'imsx_messageIdentifier': imsx_messageIdentifier,
+                'response': '<replaceResultResponse/>'
             }
-            return json.dumps(response)
+            return response_xml_template.format(**values), "application/xml"
+
+        # return "unsupported" response
+        unsupported_values['imsx_messageIdentifier'] = imsx_messageIdentifier
+        return response_xml_template.format(**unsupported_values), "application/xml"
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

@@ -1,9 +1,13 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from uuid import uuid4
+import textwrap
 import urlparse
 from oauthlib.oauth1.rfc5849 import signature
 import mock
 import sys
 import requests
+import textwrap
+
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -30,9 +34,8 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         '''
-        Handle a POST request from the client and sends response back.
+        Handle a GET request from the client and sends response back.
         '''
-        self.post_dict = self._post_dict()
 
         self.send_response(200, 'OK')
         self.send_header('Content-type', 'html')
@@ -51,17 +54,20 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         Handle a POST request from the client and sends response back.
         '''
-        self._send_head()
 
-        self.post_dict = self._post_dict()  # Retrieve the POST data
-
+        '''
         logger.debug("LTI provider received POST request {} to path {}".format(
             str(self.post_dict),
             self.path)
         )  # Log the request
-
-        # Respond only to requests with correct lti endpoint:
-        if self._is_correct_lti_request():
+        '''
+        # Respond to grade request
+        if 'grade' in self.path and self._send_graded_result().status_code == 200:
+            status_message = "I have stored grades."
+            self.server.grade_data['callback_url'] = None
+        # Respond to request with correct lti endpoint:
+        elif self._is_correct_lti_request():
+            self.post_dict = self._post_dict()
             correct_keys = [
                 'user_id',
                 'role',
@@ -77,7 +83,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 'lis_outcome_service_url',
                 'lis_result_sourcedid',
                 'launch_presentation_return_url',
-                'lis_person_sourcedid',
+                # 'lis_person_sourcedid',  optional, not used now.
                 'resource_link_id',
             ]
             if sorted(correct_keys) != sorted(self.post_dict.keys()):
@@ -98,20 +104,23 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 'callback_url': self.post_dict["lis_outcome_service_url"],
                 'user_id': self.post_dict['user_id']
             }
-
         else:
             status_message = "Invalid request URL"
+
+        self._send_head()
         self._send_response(status_message)
 
     def _send_head(self):
         '''
         Send the response code and MIME headers
         '''
+        self.send_response(200)
+        '''
         if self._is_correct_lti_request():
             self.send_response(200)
         else:
             self.send_response(500)
-
+        '''
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
@@ -137,26 +146,58 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             self.server.cookie = {k.strip():v[0]  for k,v in urlparse.parse_qs(cookie).items()}
         except:
             self.server.cookie = {}
+        referer = urlparse.urlparse(self.headers.getheader('referer'))
+        self.server.referer_host = "{}://{}".format(referer.scheme, referer.netloc)
         return post_dict
 
     def _send_graded_result(self):
-        payload = {
-            'score': 0.3,
-            'anonymous_id': self.server.grade_data['user_id']
+
+        values = {
+            'textString': 0.9,
+            'sourcedId': self.server.grade_data['user_id'],
+            'imsx_messageIdentifier': uuid4().hex,
         }
 
+        payload = textwrap.dedent("""
+            <?xml version = "1.0" encoding = "UTF-8"?>
+                <imsx_POXEnvelopeRequest>
+                  <imsx_POXHeader>
+                    <imsx_POXRequestHeaderInfo>
+                      <imsx_version>V1.0</imsx_version>
+                      <imsx_messageIdentifier>{imsx_messageIdentifier}</imsx_messageIdentifier> /
+                    </imsx_POXRequestHeaderInfo>
+                  </imsx_POXHeader>
+                  <imsx_POXBody>
+                    <replaceResultRequest>
+                      <resultRecord>
+                        <sourcedGUID>
+                          <sourcedId>{sourcedId}</sourcedId>
+                        </sourcedGUID>
+                        <result>
+                          <resultScore>
+                            <language>en-us</language>
+                            <textString>{textString}</textString>
+                          </resultScore>
+                        </result>
+                      </resultRecord>
+                    </replaceResultRequest>
+                  </imsx_POXBody>
+                </imsx_POXEnvelopeRequest>
+        """)
+        data = payload.format(**values)
         # temporarily changed to get for easy view in browser
-        url = "http://localhost:8000" + self.server.grade_data['callback_url']
+        url = self.server.referer_host + self.server.grade_data['callback_url']
         cookies = self.server.cookie
-        headers = {'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest', 'X-CSRFToken':'update_me'}
+        headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': 'update_me'}
         headers['X-CSRFToken'] = cookies.get('csrftoken')
-        response=requests.post(
+        response = requests.post(
             url,
-            data=payload,
-            cookies={k: v for k,v in cookies.items() if k in ['csrftoken', 'sessionid']},
+            data=data,
+            cookies={k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']},
             headers=headers
         )
-        #assert response.status_code == 200
+        assert response.status_code == 200
+        return response
 
     def _send_response(self, message):
         '''
@@ -169,7 +210,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 <div><h2>Graded IFrame loaded</h2> \
                 <h3>Server response is:</h3>\
                 <h3 class="result">{}</h3></div>
-                <a href="{url}/grade">Grade</a>
+                <form action="{url}/grade" method="post">
+                <input type="submit" value="Submit">
+                </form>
+
                 </body></html>""".format(message, url="http://%s:%s" % self.server.server_address)
         else:
             response_str = """<html><head><title>TEST TITLE</title></head>

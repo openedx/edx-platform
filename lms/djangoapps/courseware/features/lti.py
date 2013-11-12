@@ -73,7 +73,6 @@ def set_correct_lti_passport(_step):
             world.lti_server.oauth_settings['client_secret']
         )]
     }
-    import ipdb; ipdb.set_trace()
     i_am_registered_for_the_course(coursenum, metadata)
 
 
@@ -246,4 +245,17 @@ def check_gradebook(_step):
     world.click_link('Instructor')
     world.click_link('Gradebook')
     assert world.is_css_present('.grade-table')
+
+@step('I wiew result in Progress page$')
+def check_progress(_step):
+    world.click_link('Progress')
+    assert world.browser.is_text_present('Practice Scores:  0.99/1')
+
+@step('I click on Grade link$')
+def check_progress(_step):
+    location = world.scenario_dict['LTI'].location.html_id()
+    iframe_name = 'ltiLaunchFrame-' + location
+    with world.browser.get_iframe(iframe_name) as iframe:
+        world.click_link('Grade')
+        assert world.browser.is_text_present('I have stored grades.')
 
