@@ -258,6 +258,12 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-app.css',
     },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/style-app-extend1.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1.css',
+    },
     'style-xmodule': {
         'source_filenames': [
             'sass/style-xmodule.css',

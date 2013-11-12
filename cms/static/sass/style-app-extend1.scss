@@ -27,14 +27,28 @@
 @import 'elements/typography';
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
-@import 'elements/navigation'; // all archetypes of navigation
-@import 'elements/forms';
-@import 'elements/header';
-@import 'elements/footer';
-@import 'elements/sock';
-@import 'elements/tender-widget';
-@import 'elements/system-feedback'; // alerts, notifications, states
-@import 'elements/system-help'; // help UI
-@import 'elements/modal'; // interstitial UI, dialogs, modal windows
-@import 'elements/vendor'; // overrides to vendor-provided styling
-@import 'elements/uploads';
+
+// base - specific views
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/subsection';
+@import 'views/unit';
+@import 'views/users';
+@import 'views/checklists';
+@import 'views/textbooks';
+
+// base - contexts
+@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+
+// temp - inherited
+@import 'assets/content-types';
+
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
