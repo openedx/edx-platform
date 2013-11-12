@@ -34,7 +34,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access, get_cms_course_link_by_id
+from courseware.courses import get_course_with_access, get_cms_course_link
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -827,7 +827,7 @@ def instructor_dashboard(request, course_id):
 
     studio_url = None
     if is_studio_course:
-        studio_url = get_cms_course_link_by_id(course_id)
+        studio_url = get_cms_course_link(course)
 
     email_editor = None
     # HTML editor for email
