@@ -4,7 +4,7 @@ def run_pylint(system, report_dir, flags='')
         apps += Dir["#{system}/lib/*"]
     end
 
-    apps.map do |app|
+    apps = apps.map do |app|
         File.basename(app)
     end.select do |app|
         app !=~ /.pyc$/
