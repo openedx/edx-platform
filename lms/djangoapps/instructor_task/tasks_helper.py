@@ -847,7 +847,7 @@ class LocalFSGradesStore(GradesStore):
             reverse=True
         )
 
-
+@transaction.autocommit
 def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a grades CSV file for all students that

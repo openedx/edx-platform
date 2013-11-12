@@ -1052,6 +1052,6 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE' : 's3',
-    'BUCKET' : 'edx-grades',
+    'BUCKET' : 'edx-student-grades',
     'ROOT_PATH' : 'grades',
 }
