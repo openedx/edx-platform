@@ -112,17 +112,17 @@ function (VideoPlayer) {
     //     Defines whether or not captions are shown on first viewing.
     //
     //     Option
-    //          this.hide_captions = true | false
+    //          this.showCaptions = true | false
     //
     //     represents the user's choice of having the subtitles shown or
     //     hidden. This choice is stored in cookies.
     function _configureCaptions(state) {
         if (state.config.showTranscriptsInitially) {
-            state.hide_captions = ($.cookie('hide_captions') === 'true');
+            state.showCaptions = ($.cookie('show_captions') === 'true');
         } else {
-            state.hide_captions = true;
+            state.showCaptions = true;
 
-            $.cookie('hide_captions', state.hide_captions, {
+            $.cookie('show_captions', state.showCaptions, {
                 expires: 3650,
                 path: '/'
             });
