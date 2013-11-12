@@ -4,9 +4,11 @@ from __future__ import division
 import random
 import logging
 
+from contextlib import contextmanager
 from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from xblock.fields import Scope
@@ -120,7 +122,7 @@ def answer_distributions(request, course):
 
     return counts
 
-
+@transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It returns the
@@ -161,13 +163,14 @@ def grade(student, request, course, keep_raw_scores=False):
 
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             if not should_grade_section:
-                should_grade_section = StudentModule.objects.filter(
-                    student=student,
-                    module_type='problem',
-                    module_state_key__in=[
-                        descriptor.location for descriptor in section['xmoduledescriptors']
-                    ]
-                ).exists()
+                with manual_transaction():
+                    should_grade_section = StudentModule.objects.filter(
+                        student=student,
+                        module_type='problem',
+                        module_state_key__in=[
+                            descriptor.location for descriptor in section['xmoduledescriptors']
+                        ]
+                    ).exists()
 
             if should_grade_section:
                 scores = []
@@ -176,7 +179,8 @@ def grade(student, request, course, keep_raw_scores=False):
                     '''creates an XModule instance given a descriptor'''
                     # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
-                    field_data_cache = FieldDataCache([descriptor], course.id, student)
+                    with manual_transaction():
+                        field_data_cache = FieldDataCache([descriptor], course.id, student)
                     return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
@@ -253,6 +257,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
+@transaction.commit_manually
 def progress_summary(student, request, course):
     """
     This pulls a summary of all problems in the course.
@@ -275,13 +280,14 @@ def progress_summary(student, request, course):
 
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, student, course, depth=None
-    )
-    course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
-    if not course_module:
-        # This student must not have access to the course.
-        return None
+    with manual_transaction():
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, student, course, depth=None
+        )
+        course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
+        if not course_module:
+            # This student must not have access to the course.
+            return None
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
@@ -296,7 +302,9 @@ def progress_summary(student, request, course):
             if section_module.hide_from_toc:
                 continue
 
-            # Same for sections
+            # load each section in its own transaction
+            transaction.commit()
+
             graded = section_module.graded
             scores = []
 
@@ -305,6 +313,7 @@ def progress_summary(student, request, course):
             for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
 
                 course_id = course.id
+                # with manual_transaction():
                 (correct, total) = get_score(course_id, student, module_descriptor, module_creator)
                 if correct is None and total is None:
                     continue
@@ -334,7 +343,6 @@ def progress_summary(student, request, course):
         })
 
     return chapters
-
 
 def get_score(course_id, user, problem_descriptor, module_creator):
     """
@@ -408,3 +416,14 @@ def get_score(course_id, user, problem_descriptor, module_creator):
         total = weight
 
     return (correct, total)
+
+
+@contextmanager
+def manual_transaction():
+    try:
+        yield
+    except Exception:
+        transaction.rollback()
+        log.exception('transaction rolled back')
+    else:
+        transaction.commit()

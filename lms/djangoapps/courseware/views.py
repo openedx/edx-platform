@@ -644,8 +644,9 @@ def mktg_course_about(request, course_id):
     except (ValueError, Http404) as e:
         # if a course does not exist yet, display a coming
         # soon button
-        return render_to_response('courseware/mktg_coming_soon.html',
-                                  {'course_id': course_id})
+        return render_to_response(
+            'courseware/mktg_coming_soon.html', {'course_id': course_id}
+        )
 
     registered = registered_for_course(course, request.user)
 
@@ -660,17 +661,20 @@ def mktg_course_about(request, course_id):
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
-    return render_to_response('courseware/mktg_course_about.html',
-                              {
-                                  'course': course,
-                                  'registered': registered,
-                                  'allow_registration': allow_registration,
-                                  'course_target': course_target,
-                                  'show_courseware_link': show_courseware_link,
-                                  'course_modes': course_modes,
-                              })
+    return render_to_response(
+        'courseware/mktg_course_about.html',
+        {
+            'course': course,
+            'registered': registered,
+            'allow_registration': allow_registration,
+            'course_target': course_target,
+            'show_courseware_link': show_courseware_link,
+            'course_modes': course_modes,
+        }
+    )
 
 
+@transaction.commit_manually
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def progress(request, course_id, student_id=None):
@@ -678,6 +682,7 @@ def progress(request, course_id, student_id=None):
 
     Course staff are allowed to see the progress of students in their class.
     """
+    # with grades.manual_transaction():
     course = get_course_with_access(request.user, course_id, 'load', depth=None)
     staff_access = has_access(request.user, course, 'staff')
 
@@ -690,14 +695,15 @@ def progress(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    # NOTE: To make sure impersonation by instructor works, use
-    # student instead of request.user in the rest of the function.
+        # NOTE: To make sure impersonation by instructor works, use
+        # student instead of request.user in the rest of the function.
 
-    # The pre-fetching of groups is done to make auth checks not require an
-    # additional DB lookup (this kills the Progress page in particular).
+        # The pre-fetching of groups is done to make auth checks not require an
+        # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, request, course)
+
     grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
@@ -713,7 +719,11 @@ def progress(request, course_id, student_id=None):
     }
     context.update()
 
-    return render_to_response('courseware/progress.html', context)
+    with grades.manual_transaction():
+        response = render_to_response('courseware/progress.html', context)
+
+    return response
+
 
 
 @login_required
