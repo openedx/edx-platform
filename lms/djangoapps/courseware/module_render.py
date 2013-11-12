@@ -24,7 +24,7 @@ from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
 from mitxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
+from student.models import unique_id_for_user, user_by_anonymous_id
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.fields import Scope
@@ -406,6 +406,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
+        get_real_user=user_by_anonymous_id,
     )
 
     # pass position specified in URL to module through ModuleSystem

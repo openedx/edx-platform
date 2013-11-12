@@ -32,19 +32,18 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         Handle a POST request from the client and sends response back.
         '''
-        post_dict = self._post_dict()
+        self.post_dict = self._post_dict()
 
         self.send_response(200, 'OK')
         self.send_header('Content-type', 'html')
         self.end_headers()
 
         response_str = """<html><head><title>TEST TITLE</title></head>
-            <body>Grade this LTI</body></html>"""
+            <body>I have stored grades.</body></html>"""
 
         self.wfile.write(response_str)
 
-        if MockLTIRequestHandler.callback_url:
-            self._send_graded_result(MockLTIRequestHandler.callback_url)
+        self._send_graded_result()
 
 
 
@@ -54,10 +53,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         self._send_head()
 
-        post_dict = self._post_dict()  # Retrieve the POST data
+        self.post_dict = self._post_dict()  # Retrieve the POST data
 
         logger.debug("LTI provider received POST request {} to path {}".format(
-            str(post_dict),
+            str(self.post_dict),
             self.path)
         )  # Log the request
 
@@ -81,10 +80,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 'lis_person_sourcedid',
                 'resource_link_id',
             ]
-            if sorted(correct_keys) != sorted(post_dict.keys()):
+            if sorted(correct_keys) != sorted(self.post_dict.keys()):
                 status_message = "Incorrect LTI header"
             else:
-                params = {k: v for k, v in post_dict.items() if k != 'oauth_signature'}
+                params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
                 '''
                 if self.server.check_oauth_signature(params, post_dict['oauth_signature']):
                     status_message = "This is LTI tool. Success."
@@ -92,14 +91,17 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                     status_message = "Wrong LTI signature"
                 '''
                 status_message = "This is LTI tool. Success."
-            callback_url = post_dict["lis_outcome_service_url"]
-            if callback_url:
-                MockLTIRequestHandler.callback_url = callback_url
-            else:
-                callback_url = None
+
+            # set data for grades
+            # what need to be stored as server data
+            self.server.grade_data = {
+                'callback_url': self.post_dict["lis_outcome_service_url"],
+                'user_id': self.post_dict['user_id']
+            }
+
         else:
             status_message = "Invalid request URL"
-        self._send_response(status_message, url=MockLTIRequestHandler.callback_url)
+        self._send_response(status_message)
 
     def _send_head(self):
         '''
@@ -137,28 +139,31 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             self.server.cookie = {}
         return post_dict
 
-    def _send_graded_result(self, callback_url):
-        payload = {'score': 0.95}
+    def _send_graded_result(self):
+        payload = {
+            'score': 0.3,
+            'anonymous_id': self.server.grade_data['user_id']
+        }
 
         # temporarily changed to get for easy view in browser
-        url = "http://localhost:8001" + callback_url
+        url = "http://localhost:8000" + self.server.grade_data['callback_url']
         cookies = self.server.cookie
         headers = {'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest', 'X-CSRFToken':'update_me'}
         headers['X-CSRFToken'] = cookies.get('csrftoken')
         response=requests.post(
             url,
             data=payload,
-            cookies=cookies,
+            cookies={k: v for k,v in cookies.items() if k in ['csrftoken', 'sessionid']},
             headers=headers
         )
         #assert response.status_code == 200
 
-    def _send_response(self, message, url=None):
+    def _send_response(self, message):
         '''
         Send message back to the client
         '''
 
-        if url is not None:
+        if self.server.grade_data['callback_url']:
             response_str = """<html><head><title>TEST TITLE</title></head>
                 <body>
                 <div><h2>Graded IFrame loaded</h2> \

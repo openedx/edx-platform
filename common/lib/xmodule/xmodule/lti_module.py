@@ -254,7 +254,8 @@ class LTIModule(LTIFields, XModule):
                 path=self.system.ajax_url,
             )
         else:
-            return self.system.hostname + self.system.ajax_url
+            # return self.system.hostname + self.system.ajax_url
+            return self.system.ajax_url
 
     def get_context_id(self):
         # This is an opaque identifier that uniquely identifies the context that contains
@@ -315,7 +316,7 @@ class LTIModule(LTIFields, XModule):
 
         # must have parameters for correct signing from LTI:
         body = {
-            u'user_id': self.get_user_id,
+            u'user_id': self.get_user_id(),
             u'oauth_callback': u'about:blank',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
@@ -394,7 +395,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # It can be case, that user is logged out, but TP have not yet submitted grade for him.
         # for this case, TP sends back anonymous_id and we obtain user by anonymous user id.
         # TODO: test and verify it!
-        import ipdb; ipdb.set_trace()
         anonymous_id = data.get('anonymous_id', 'test_anonymous_id')
         action = dispatch.lower()
         # test $.post('/preview/modx/0/i4x://mitx/cs101/lti/80587c94f3cc455f8a63f660b7ff9315/set', {'score': 1})
@@ -409,7 +409,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                     'value': data['score'],
                     'max_value': self.get_maxscore(),
                 },
-                custom_user=self.system.user
+                custom_user=self.system.get_real_user(anonymous_id)
             )
 
             return json.dumps({'status_code': 200})

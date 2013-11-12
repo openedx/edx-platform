@@ -962,7 +962,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None, **kwargs):
+            replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1046,6 +1046,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
+
+        self.get_real_user = get_real_user
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
