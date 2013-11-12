@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from dealer.git import git
 from django.template import RequestContext
 requestcontext = None
 
@@ -24,4 +23,3 @@ class MakoMiddleware(object):
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
         requestcontext['site'] = request.get_host()
-        requestcontext['REVISION'] = git.revision
