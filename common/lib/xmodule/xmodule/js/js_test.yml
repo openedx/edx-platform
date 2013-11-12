@@ -33,6 +33,7 @@ src_paths:
 
 # Paths to library JavaScript files (optional)
 lib_paths:
+    - common_static/js/vendor/jasmine-debug.js
     - common_static/coffee/src/ajax_prefix.js
     - common_static/coffee/src/logger.js
     - common_static/js/vendor/jasmine-jquery.js
