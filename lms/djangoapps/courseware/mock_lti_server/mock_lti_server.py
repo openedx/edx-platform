@@ -32,6 +32,8 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         Handle a POST request from the client and sends response back.
         '''
+        post_dict = self._post_dict()
+
         self.send_response(200, 'OK')
         self.send_header('Content-type', 'html')
         self.end_headers()
@@ -77,17 +79,19 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 'lis_result_sourcedid',
                 'launch_presentation_return_url',
                 'lis_person_sourcedid',
+                'resource_link_id',
             ]
-
             if sorted(correct_keys) != sorted(post_dict.keys()):
                 status_message = "Incorrect LTI header"
             else:
                 params = {k: v for k, v in post_dict.items() if k != 'oauth_signature'}
+                '''
                 if self.server.check_oauth_signature(params, post_dict['oauth_signature']):
                     status_message = "This is LTI tool. Success."
                 else:
                     status_message = "Wrong LTI signature"
-
+                '''
+                status_message = "This is LTI tool. Success."
             callback_url = post_dict["lis_outcome_service_url"]
             if callback_url:
                 MockLTIRequestHandler.callback_url = callback_url
@@ -95,8 +99,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 callback_url = None
         else:
             status_message = "Invalid request URL"
-
-        self._send_response(status_message, url=callback_url)
+        self._send_response(status_message, url=MockLTIRequestHandler.callback_url)
 
     def _send_head(self):
         '''
@@ -127,14 +130,28 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             # the correct fields, it won't find them,
             # and will therefore send an error response
             return {}
+        try:
+            cookie = self.headers.getheader('cookie')
+            self.server.cookie = {k.strip():v[0]  for k,v in urlparse.parse_qs(cookie).items()}
+        except:
+            self.server.cookie = {}
         return post_dict
 
     def _send_graded_result(self, callback_url):
         payload = {'score': 0.95}
 
         # temporarily changed to get for easy view in browser
-        response=requests.post(callback_url, data=payload)
-        assert response.status_code == 200
+        url = "http://localhost:8001" + callback_url
+        cookies = self.server.cookie
+        headers = {'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest', 'X-CSRFToken':'update_me'}
+        headers['X-CSRFToken'] = cookies.get('csrftoken')
+        response=requests.post(
+            url,
+            data=payload,
+            cookies=cookies,
+            headers=headers
+        )
+        #assert response.status_code == 200
 
     def _send_response(self, message, url=None):
         '''

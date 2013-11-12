@@ -73,6 +73,7 @@ def set_correct_lti_passport(_step):
             world.lti_server.oauth_settings['client_secret']
         )]
     }
+    import ipdb; ipdb.set_trace()
     i_am_registered_for_the_course(coursenum, metadata)
 
 
@@ -236,6 +237,7 @@ def check_lti_popup():
 
 @step('I open gradebook$')
 def check_gradebook(_step):
+    #import ipdb; ipdb.set_trace()
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiLaunchFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
