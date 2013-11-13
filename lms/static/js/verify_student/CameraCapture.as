@@ -22,7 +22,6 @@ package
 	import flash.display.PNGEncoderOptions;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.StatusEvent;
 	import flash.external.ExternalInterface;
 	import flash.geom.Rectangle;
 	import flash.media.Camera;
