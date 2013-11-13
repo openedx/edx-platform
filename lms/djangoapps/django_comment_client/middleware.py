@@ -1,4 +1,4 @@
-from comment_client import CommentClientRequestError
+from lms.lib.comment_client import CommentClientRequestError
 from django_comment_client.utils import JsonError
 import json
 import logging

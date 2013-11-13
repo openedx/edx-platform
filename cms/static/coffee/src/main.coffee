@@ -2,17 +2,16 @@ define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
         "js/views/feedback_notification",
         "coffee/src/ajax_prefix", "jquery.cookie"],
 (domReady, $, str, Backbone, gettext, NotificationView) ->
-  AjaxPrefix.addAjaxPrefix jQuery, ->
-    $("meta[name='path_prefix']").attr('content')
-
-  window.CMS = window.CMS or {}
-  CMS.URL = CMS.URL or {}
-  window.onTouchBasedDevice = ->
-    navigator.userAgent.match /iPhone|iPod|iPad/i
-
-  _.extend CMS, Backbone.Events
-
   main = ->
+    AjaxPrefix.addAjaxPrefix jQuery, ->
+      $("meta[name='path_prefix']").attr('content')
+
+    window.CMS = window.CMS or {}
+    CMS.URL = CMS.URL or {}
+    window.onTouchBasedDevice = ->
+      navigator.userAgent.match /iPhone|iPod|iPad/i
+
+    _.extend CMS, Backbone.Events
     Backbone.emulateHTTP = true
 
     $.ajaxSetup
@@ -48,8 +47,9 @@ define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
         data: JSON.stringify(data)
         success: callback
 
-    if onTouchBasedDevice()
-      $('body').addClass 'touch-based-device'
+    domReady ->
+      if onTouchBasedDevice()
+        $('body').addClass 'touch-based-device'
 
-  domReady(main)
+  main()
   return main

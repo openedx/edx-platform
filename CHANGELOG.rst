@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Beta instructor dashboard will only count actively enrolled students for
+course enrollment numbers.
+
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.
 

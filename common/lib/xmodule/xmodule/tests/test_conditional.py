@@ -225,7 +225,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         html_expect = module.xmodule_runtime.render_template(
             'conditional_ajax.html',
             {
-                'ajax_url': 'courses/course_id/modx/a_location',
+                # Test ajax url is just usage-id / handler_name
+                'ajax_url': 'i4x://HarvardX/ER22x/conditional/condone/xmodule_handler',
                 'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
                 'id': 'i4x://HarvardX/ER22x/conditional/condone',
                 'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'

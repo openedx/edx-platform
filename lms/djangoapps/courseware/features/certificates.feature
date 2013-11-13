@@ -8,6 +8,7 @@ Feature: LMS.Verified certificates
         Given I am logged in
         When I select the audit track
         Then I should see the course on my dashboard
+        And a "edx.course.enrollment.activated" server event is emitted
 
     Scenario: I can submit photos to verify my identity
         Given I am logged in
@@ -36,6 +37,7 @@ Feature: LMS.Verified certificates
         Then I see the course on my dashboard
         And I see that I am on the verified track
         And I do not see the upsell link on my dashboard
+        And a "edx.course.enrollment.activated" server event is emitted
 
     # Not easily automated
 #    Scenario: I can re-take photos
@@ -71,6 +73,7 @@ Feature: LMS.Verified certificates
         And the course has an honor mode
         When I give a reason why I cannot pay
         Then I should see the course on my dashboard
+        And a "edx.course.enrollment.activated" server event is emitted
 
     Scenario: The upsell offer is on the dashboard if I am auditing.
         Given I am logged in
@@ -91,4 +94,5 @@ Feature: LMS.Verified certificates
         And I navigate to my dashboard
         Then I see the course on my dashboard
         And I see that I am on the verified track
+        And a "edx.course.enrollment.activated" server event is emitted
 

@@ -488,11 +488,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        self.client.post(
-            reverse('delete_item'),
-            json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
-            "application/json"
-        )
+        location = loc_mapper().translate_location(course_location.course_id, sequential.location, False, True)
+        self.client.delete(location.url_reverse('xblock'), {'recurse': True, 'all_versions': True})
 
         found = False
         try:
@@ -1640,29 +1637,24 @@ class ContentStoreTest(ModuleStoreTestCase):
                                        kwargs={'location': unit_location.url()}))
         self.assertEqual(resp.status_code, 200)
 
+        def delete_item(category, name):
+            """ Helper method for testing the deletion of an xblock item. """
+            del_loc = loc.replace(category=category, name=name)
+            del_location = loc_mapper().translate_location(loc.course_id, del_loc, False, True)
+            resp = self.client.delete(del_location.url_reverse('xblock'))
+            self.assertEqual(resp.status_code, 204)
+
         # delete a component
-        del_loc = loc.replace(category='html', name='test_html')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='html', name='test_html')
 
         # delete a unit
-        del_loc = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='vertical', name='test_vertical')
 
         # delete a unit
-        del_loc = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='sequential', name='test_sequence')
 
         # delete a chapter
-        del_loc = loc.replace(category='chapter', name='chapter_2')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='chapter', name='chapter_2')
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')

@@ -34,7 +34,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
 
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-update_url="${unit_update_url}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
@@ -48,8 +48,8 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
         <article class="unit-body window">
         <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for id in components:
-            <li class="component" data-id="${id}"/>
+            % for id, component_update_url in components:
+            <li class="component" data-id="${id}" data-update_url="${component_update_url}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">

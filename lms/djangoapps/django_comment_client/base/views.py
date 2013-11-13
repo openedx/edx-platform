@@ -6,7 +6,7 @@ import logging
 import urlparse
 import functools
 
-import comment_client as cc
+import lms.lib.comment_client as cc
 import django_comment_client.utils as utils
 import django_comment_client.settings as cc_settings
 
@@ -72,7 +72,7 @@ def create_thread(request, course_id, commentable_id):
     """
     Given a course and commentble ID, create the thread
     """
-    
+
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST

@@ -82,9 +82,10 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
               deleting = new NotificationView.Mini
                 title: gettext('Deleting&hellip;')
               deleting.show()
-              $.postJSON('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type: 'DELETE',
+                url: $component.data('update_url')
+              }).success(=>
                 $component.remove()
                 deleting.hide()
               )
