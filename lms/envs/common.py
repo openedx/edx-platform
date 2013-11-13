@@ -1051,7 +1051,7 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = {
-    'STORAGE_TYPE' : 's3',
-    'BUCKET' : 'edx-student-grades',
-    'ROOT_PATH' : 'grades',
+    'STORAGE_TYPE' : 'localfs',
+    'BUCKET' : 'edx-grades',
+    'ROOT_PATH' : '/tmp/edx-s3/grades',
 }

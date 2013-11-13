@@ -714,8 +714,8 @@ class S3GradesStore(GradesStore):
         self.root_path = root_path
 
         conn = S3Connection(
-            settings.AUTH_TOKENS["AWS_ACCESS_KEY_ID"],
-            settings.AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY
         )
         self.bucket = conn.get_bucket(bucket_name)
 
@@ -745,12 +745,19 @@ class S3GradesStore(GradesStore):
 
         data = buff.getvalue()
         key.size = len(data)
-        key.content_type = "text/csv"
         key.content_encoding = "gzip"
+        key.content_type = "text/csv"
 
-        key.set_contents_from_string(data)
+        key.set_contents_from_string(
+            data,
+            headers={
+                "Content-Encoding" : "gzip",
+                "Content-Length" : len(data),
+                "Content-Type" : "text/csv",
+            }
+        )
 
-    def store_rows(course_id, filename, rows):
+    def store_rows(self, course_id, filename, rows):
         """
         Given a course_id, filename, and rows (each row is an iterable of strings),
         write this data out.
@@ -767,11 +774,11 @@ class S3GradesStore(GradesStore):
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
         can be plugged straight into an href
         """
-        course_dir = self.path_to(course_id, '')
+        course_dir = self.key_for(course_id, '')
         return sorted(
             [
                 (key.key.split("/")[-1], key.generate_url(expires_in=300))
-                for key in self.bucket.list(course_dir.key)
+                for key in self.bucket.list(prefix=course_dir.key)
             ],
             reverse=True
         )
@@ -933,10 +940,18 @@ def push_grades_to_s3(xmodule_instance_args, _entry_id, course_id, _task_input, 
     grades_store = GradesStore.from_config()
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
 
-    grades_store.store_rows(course_id, "grades_{}.csv".format(timestamp_str), rows)
+    grades_store.store_rows(
+        course_id,
+        "{}_grades_{}.csv".format(urllib.quote(course_id, safe=''), timestamp_str),
+        rows
+    )
     # If there are any error rows (don't count the header), write that out as well
     if len(err_rows) > 1:
-        grades_store.store_rows(course_id, "grades_{}_err.csv".format(timestamp_str), err_rows)
+        grades_store.store_rows(
+            course_id,
+            "{}_grades_{}_err.csv".format(urllib.quote(course_id, safe=''), timestamp_str),
+            err_rows
+        )
 
     # One last update before we close out...
     return update_task_progress()
