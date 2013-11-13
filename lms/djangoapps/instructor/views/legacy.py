@@ -78,30 +78,6 @@ def split_by_comma_and_whitespace(a_str):
     return re.split(r'[\s,]', a_str)
 
 
-def return_csv(fn, datatable, fp=None):
-    """
-    Outputs a CSV file from the contents of a datatable.
-
-    Uses the 'header' and 'data' keys of the datatable dict.
-    """
-    starttime = time()
-    if fp is None:
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
-    else:
-        response = fp
-    writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-#    writer.writerow(datatable['header'])
-    writer.writerow(unicode(datatable['header']).encode('utf-8'))
-    for datarow in datatable['data']:
-        encoded_row = [unicode(s).encode('utf-8') for s in datarow]
-        writer.writerow(encoded_row)
-
-    endtime = time()
-    print("   Duration for return_csv call on {}: {} secs".format(fn, (endtime - starttime)))
-    return response
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
@@ -1164,6 +1140,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
     course = CourseDescriptor
     course_id = course ID
+    get_external_email = Grab the user's email from the external authmap (like
+                         for servers running Shibboleth auth) and include it as
+                         a column. True by default, will just print blanks if no
+                         entry exists for that user in the authmap.
 
     Note: both are passed in, only because instructor_dashboard already has them already.
 
@@ -1176,7 +1156,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
 
     '''
-    starttime = time()
     # add check that grades exist
     if get_grades and not offline_grades_available(course_id):
         return None
@@ -1191,7 +1170,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     ).prefetch_related("groups").order_by('username').select_related("profile", "externalauthmap")
 
     # For "small" courses, we will add extra columns that are too expensive to determine for large courses.
-    is_small_course = enrolled_students.count() < 500
+    is_small_course = enrolled_students.count() <= settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
 
     # set up header:
     header = ['ID', 'Username', 'Full Name', 'edX email']
@@ -1223,7 +1202,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         if get_grades:
             gradeset = student_grades(student, request, course)
-#            log.debug('student={0}, gradeset={1}'.format(student, gradeset))
             # add date when grade was fetched:
             # TODO: figure out if this needs formatting, particularly for csv
             datarow.append(gradeset['updated'].isoformat())
@@ -1238,9 +1216,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         data.append(datarow)
     datatable['data'] = data
-
-    endtime = time()
-    print("   Duration for get_student_grade_summary_data call on {}: {} secs".format(course_id, (endtime - starttime)))
 
     return datatable
 

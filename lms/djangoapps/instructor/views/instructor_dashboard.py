@@ -117,7 +117,6 @@ def _section_course_info(course_id, access):
         section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
     except Exception:
         section_data['grade_cutoffs'] = "Not Available"
-    # section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
         section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_item_errors(course.location)]

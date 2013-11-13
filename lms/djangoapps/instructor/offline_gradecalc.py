@@ -71,17 +71,6 @@ def offline_grade_calculation(course_id):
     print "All Done!"
 
 
-def offline_grades_available(course_id):
-    '''
-    Returns False if no offline grades available for specified course.
-    Otherwise returns latest log field entry about the available pre-computed grades.
-    '''
-    ocgl = models.OfflineComputedGradeLog.objects.filter(course_id=course_id)
-    if not ocgl:
-        return False
-    return ocgl.latest('created')
-
-
 def student_grades(student, request, course, keep_raw_scores=False, use_offline=False):
     '''
     This is the main interface to get grades.  It has the same parameters as grades.grade, as well

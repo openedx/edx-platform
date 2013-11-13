@@ -211,8 +211,6 @@ def submit_bulk_course_email(request, course_id, email_id):
 
 def submit_update_offline_grades(request, course_id):
     """
-    Request to have state deleted for a problem as a background task.
-
     The offline grades will be updated for all students who have enrolled
     in a course.  Parameters are the `course_id`.
 
@@ -235,10 +233,6 @@ def submit_update_offline_grades(request, course_id):
 
 def submit_grade_course(request, course_id):
     """
-    Request to have state deleted for a problem as a background task.
-
-    The offline grades will be updated for all students who have enrolled
-    in a course.  Parameters are the `course_id`.
 
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
