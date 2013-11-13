@@ -9,6 +9,8 @@ from pymongo import MongoClient
 from django.test.utils import override_settings
 from django.conf import settings
 
+from nose.plugins.skip import SkipTest
+
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -185,6 +187,12 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         _CONTENTSTORE.clear()
 
     def test_success_downloading_subs(self):
+
+        # Disabled 11/14/13
+        # This test is flakey because it performs an HTTP request on an external service
+        # Re-enable when `requests.get` is patched using `mock.patch`
+        raise SkipTest
+
         good_youtube_subs = {
             0.5: 'JMD_ifUUfsU',
             1.0: 'hI10vDNYz4M',
@@ -206,6 +214,12 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         self.clear_subs_content(good_youtube_subs)
 
     def test_fail_downloading_subs(self):
+
+        # Disabled 11/14/13
+        # This test is flakey because it performs an HTTP request on an external service
+        # Re-enable when `requests.get` is patched using `mock.patch`
+        raise SkipTest
+
         bad_youtube_subs = {
             0.5: 'BAD_YOUTUBE_ID1',
             1.0: 'BAD_YOUTUBE_ID2',
@@ -228,6 +242,12 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         self.clear_subs_content(bad_youtube_subs)
 
     def test_success_downloading_chinese_transcripts(self):
+
+        # Disabled 11/14/13
+        # This test is flakey because it performs an HTTP request on an external service
+        # Re-enable when `requests.get` is patched using `mock.patch`
+        raise SkipTest
+
         good_youtube_subs = {
             1.0: 'j_jEn79vS3g',  # Chinese, utf-8
         }
