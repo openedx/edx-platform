@@ -8,11 +8,20 @@ DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
 
+################################ LOGGERS ######################################
+
+import logging
+
+# Disable noisy loggers
+for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
+    logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
+
+
 ################################ EMAIL ########################################
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-################################# LMS INTEGRATION ######################################
+################################# LMS INTEGRATION #############################
 
 MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost:8000"
 
@@ -21,7 +30,7 @@ MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost:8000"
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
-################################ DEBUG TOOLBAR #################################
+################################ DEBUG TOOLBAR ################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
@@ -45,7 +54,7 @@ DEBUG_TOOLBAR_CONFIG = {
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
-#####################################################################
+###############################################################################
 # Lastly, see if the developer has any local overrides.
 try:
     from .private import *  # pylint: disable=F0401

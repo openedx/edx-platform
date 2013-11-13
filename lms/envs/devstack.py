@@ -11,6 +11,14 @@ TEMPLATE_DEBUG = True
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
+################################ LOGGERS ######################################
+
+import logging
+
+# Disable noisy loggers
+for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
+    logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
+
 
 ################################ EMAIL ########################################
 
