@@ -106,7 +106,7 @@ function () {
         this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
         if (!this.videoCaption.fetchCaption()) {
-            this.videoCaption.hideCaptions(true);
+            this.videoCaption.hideCaptions(false);
             this.videoCaption.hideSubtitlesEl.hide();
         }
     }
@@ -234,7 +234,7 @@ function () {
                     ', MESSAGE:', '' + errorThrown
                 );
 
-                _this.videoCaption.hideCaptions(true, false);
+                _this.videoCaption.hideCaptions(false, false);
                 _this.videoCaption.hideSubtitlesEl.hide();
             }
         });
@@ -370,11 +370,11 @@ function () {
             );
         }
 
-        this.videoCaption.hideCaptions(this.hide_captions);
+        this.videoCaption.hideCaptions(this.showCaptions);
 
         this.videoCaption.bindHandlers();
 
-        $.each(this.videoCaption.captions, function(index, text) {
+        $.each(this.videoCaption.captions, function (index, text) {
             var liEl = $('<li>');
 
             liEl.html(text);
@@ -442,6 +442,7 @@ function () {
     function captionMouseOverOut(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
+
         if (captionIndex === this.videoCaption.currentCaptionIndex) {
             if (event.type === 'mouseover') {
                 caption.removeClass('focused');
@@ -494,14 +495,18 @@ function () {
     function captionBlur(event) {
         var caption = $(event.target),
             captionIndex = parseInt(caption.attr('data-index'), 10);
+
         caption.removeClass('focused');
+
         // If we are on first or last index, we have to turn automatic scroll
         // on again when losing focus. There is no way to know in what
         // direction we are tabbing. So we could be on the first element and
         // tabbing back out of the captions or on the last element and tabbing
         // forward out of the captions.
-        if (captionIndex === 0 ||
-            captionIndex === this.videoCaption.captions.length-1) {
+        if (
+            captionIndex === 0 ||
+            captionIndex === this.videoCaption.captions.length - 1
+        ) {
             this.videoCaption.autoHideCaptions();
 
             this.videoCaption.autoScrolling = true;
@@ -669,9 +674,9 @@ function () {
 
         if (this.el.hasClass('closed')) {
             this.videoCaption.autoShowCaptions();
-            this.videoCaption.hideCaptions(false);
-        } else {
             this.videoCaption.hideCaptions(true);
+        } else {
+            this.videoCaption.hideCaptions(false);
 
             // In the case when captions are not auto-hidden based on mouse
             // movement anywhere on the video, we must hide them explicitly
@@ -690,7 +695,7 @@ function () {
         }
     }
 
-    function hideCaptions(hide_captions, update_cookie) {
+    function hideCaptions(showCaptions, update_cookie) {
         var hideSubtitlesEl = this.videoCaption.hideSubtitlesEl,
             type, text;
 
@@ -698,14 +703,7 @@ function () {
             update_cookie = true;
         }
 
-        if (hide_captions) {
-            type = 'hide_transcript';
-            this.captionsHidden = true;
-
-            this.el.addClass('closed');
-
-            text = gettext('Turn on captions');
-        } else {
+        if (showCaptions) {
             type = 'show_transcript';
             this.captionsHidden = false;
 
@@ -713,6 +711,13 @@ function () {
             this.videoCaption.scrollCaption();
 
             text = gettext('Turn off captions');
+        } else {
+            type = 'hide_transcript';
+            this.captionsHidden = true;
+
+            this.el.addClass('closed');
+
+            text = gettext('Turn on captions');
         }
 
         hideSubtitlesEl
@@ -732,7 +737,7 @@ function () {
         this.videoCaption.setSubtitlesHeight();
 
         if (update_cookie) {
-            $.cookie('hide_captions', hide_captions, {
+            $.cookie('show_captions', showCaptions, {
                 expires: 3650,
                 path: '/'
             });
@@ -758,15 +763,16 @@ function () {
 
     function setSubtitlesHeight() {
         var height = 0;
+
         if (
             ((this.videoType === 'html5') && (this.config.autohideHtml5)) ||
             (!this.config.autohideHtml5)
-        ){
+        ) {
             // on page load captionHidden = undefined
             if  (
                 (
                     this.captionsHidden === undefined &&
-                    this.hide_captions === true
+                    this.showCaptions === false
                 ) ||
                 (this.captionsHidden === true)
             ) {
@@ -779,6 +785,7 @@ function () {
                 // autochanges its height.
             }
         }
+
         this.videoCaption.subtitlesEl.css({
             maxHeight: this.videoCaption.captionHeight() - height
         });

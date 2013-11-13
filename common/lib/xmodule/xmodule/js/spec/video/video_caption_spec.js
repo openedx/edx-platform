@@ -637,9 +637,9 @@
                     videoCaption.toggle(jQuery.Event('click'));
                 });
 
-                it('log the hide_transcript event', function () {
+                it('log the show_transcript event', function () {
                     expect(videoPlayer.log).toHaveBeenCalledWith(
-                        'hide_transcript',
+                        'show_transcript',
                         {
                             currentTime: videoPlayer.currentTime
                         }

@@ -322,7 +322,7 @@ function (HTML5Video, Resizer) {
 
         this.trigger('videoControl.pause', null);
 
-        if (this.config.show_captions) {
+        if (this.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
 
@@ -345,7 +345,7 @@ function (HTML5Video, Resizer) {
 
         this.trigger('videoControl.pause', null);
 
-        if (this.config.show_captions) {
+        if (this.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
     }
@@ -368,7 +368,7 @@ function (HTML5Video, Resizer) {
 
         this.trigger('videoControl.play', null);
 
-        if (this.config.show_captions) {
+        if (this.showCaptions) {
             this.trigger('videoCaption.play', null);
         }
 
