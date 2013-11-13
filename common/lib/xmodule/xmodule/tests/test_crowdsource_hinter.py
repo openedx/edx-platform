@@ -143,6 +143,7 @@ class CHModuleFactory(object):
             return capa_module
         system.get_module = fake_get_module
         module = CrowdsourceHinterModule(descriptor, system, DictFieldData(field_data), Mock())
+        system.xmodule_instance = module
 
         return module
 

@@ -9,10 +9,10 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 
 from xmodule.course_module import CourseDescriptor
-from xmodule.x_module import ModuleSystem
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from courseware.access import has_access
+from lms.lib.xblock.runtime import LmsModuleSystem
 from mitxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.json_request import expect_json
@@ -69,9 +69,8 @@ class StaffGradingService(GradingService):
     """
 
     def __init__(self, config):
-        config['system'] = ModuleSystem(
+        config['system'] = LmsModuleSystem(
             static_url='/static',
-            ajax_url=None,
             track_function=None,
             get_module = None,
             render_template=render_to_string,

@@ -121,6 +121,12 @@ CONTENTSTORE = {
     }
 }
 
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'test_modulestore',
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -223,7 +229,7 @@ for static_dir in STATICFILES_DIRS:
         new_staticfiles_dirs.append(static_dir)
 STATICFILES_DIRS = new_staticfiles_dirs
 
-FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
+FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',

@@ -20,21 +20,22 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
-from lms.xblock.field_data import LmsFieldData
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
 from mitxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import unique_id_for_user
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.fields import Scope
-from xblock.runtime import DbModel
-from xblock.runtime import KeyValueStore
+from xblock.runtime import DbModel, KeyValueStore
+from xblock.exceptions import NoSuchHandlerError
+from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 
 
@@ -220,17 +221,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     student_data = DbModel(DjangoKeyValueStore(field_data_cache))
     descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
-    # Setup system context for module instance
-    ajax_url = reverse(
-        'modx_dispatch',
-        kwargs=dict(
-            course_id=course_id,
-            location=descriptor.location.url(),
-            dispatch=''
-        ),
-    )
-    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
-    ajax_url = ajax_url.rstrip('/')
 
     def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
@@ -338,7 +328,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(wrap_xblock)
+        block_wrappers.append(partial(wrap_xblock, partial(handler_prefix, course_id)))
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -371,11 +361,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if has_access(user, descriptor, 'staff', course_id):
             block_wrappers.append(partial(add_histogram, user))
 
-    system = ModuleSystem(
+    system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
         static_url=settings.STATIC_URL,
-        ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
         filestore=descriptor.runtime.resources_fs,
@@ -493,15 +482,13 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch, location, course_id):
-    ''' Generic view for extensions. This is where AJAX calls go.
+def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
+    """
+    Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
 
       - request -- the django request.
-      - dispatch -- the command string to pass through to the module's handle_ajax call
-           (e.g. 'problem_reset').  If this string contains '?', only pass
-           through the part before the first '?'.
       - location -- the module location. Used to look up the XModule instance
       - course_id -- defines the course context for this request.
 
@@ -509,8 +496,8 @@ def modx_dispatch(request, dispatch, location, course_id):
     the location and course_id do not identify a valid module, the module is
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
-    '''
-    # ''' (fix emacs broken parsing)
+    """
+    location = unquote_slashes(usage_id)
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
@@ -519,16 +506,11 @@ def modx_dispatch(request, dispatch, location, course_id):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    # Get the submitted data
-    data = request.POST.copy()
-
-    # Get and check submitted files
+    # Check submitted files
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
-    for key in files:  # Merge files into to data dictionary
-        data[key] = files.getlist(key)
 
     try:
         descriptor = modulestore().get_instance(course_id, location)
@@ -551,14 +533,16 @@ def modx_dispatch(request, dispatch, location, course_id):
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {0} for user {1}--access denied?".format(location, request.user))
+        log.debug("No module %s for user %s -- access denied?", location, request.user)
         raise Http404
 
-    # Let the module handle the AJAX
+    req = django_to_webob_request(request)
     try:
-        ajax_return = instance.handle_ajax(dispatch, data)
-        # Save any fields that have changed to the underlying KeyValueStore
-        instance.save()
+        resp = instance.handle(handler, req, suffix)
+
+    except NoSuchHandlerError:
+        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+        raise Http404
 
     # If we can't find the module, respond with a 404
     except NotFoundError:
@@ -572,12 +556,11 @@ def modx_dispatch(request, dispatch, location, course_id):
         return JsonResponse(object={'success': err.args[0]}, status=200)
 
     # If any other error occurred, re-raise it to trigger a 500 response
-    except:
-        log.exception("error processing ajax call")
+    except Exception:
+        log.exception("error executing xblock handler")
         raise
 
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
+    return webob_to_django_response(resp)
 
 
 def get_score_bucket(grade, max_grade):

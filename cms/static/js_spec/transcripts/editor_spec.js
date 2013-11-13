@@ -18,8 +18,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 type: MetadataModel.VIDEO_LIST_TYPE,
                 value: [
                     'http://youtu.be/12345678901',
-                    'https://domain.com/video.mp4',
-                    'https://domain.com/video.webm'
+                    'video.mp4',
+                    'video.webm'
                 ]
             },
             DisplayNameEntry = {
@@ -116,10 +116,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     help: 'A list of html5 sources.',
                     options: [],
                     type: MetadataModel.LIST_TYPE,
-                    value: [
-                        'https://domain.com/default.mp4',
-                        'https://domain.com/default.webm'
-                    ]
+                    value: ['default.mp4', 'default.webm']
                 },
 
                 youtubeEntry = {
@@ -174,12 +171,14 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     runs(function() {
                         var displayNameValue = collection[0].getValue(),
                             videoUrlValue = collection[1].getValue();
-                        expect(displayNameValue).toBe('default');
+
+                        expect(displayNameValue).toEqual('default');
                         expect(videoUrlValue).toEqual([
                             'http://youtu.be/OEoXaMPEzfM',
-                            'https://domain.com/default.mp4',
-                            'https://domain.com/default.webm'
+                            'default.mp4',
+                            'default.webm'
                         ]);
+                    });
                 });
 
                 it('If metadataCollection is not defined', function () {
@@ -190,8 +189,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
 
                     expect(videoUrlValue).toEqual([
                         'http://youtu.be/12345678901',
-                        'https://domain.com/video.mp4',
-                        'https://domain.com/video.webm'
+                        'video.mp4',
+                        'video.webm'
                     ]);
                 });
 
@@ -202,8 +201,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
 
                     model.setValue([
                         '12345678',
-                        'https://domain.com/default.mp4',
-                        'https://domain.com/default.webm'
+                        'default.mp4',
+                        'default.webm'
                     ]);
 
                     transcripts.syncBasicTab(metadataCollection, metadataView);
@@ -213,8 +212,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
 
                     expect(videoUrlValue).toEqual([
                         '',
-                        'https://domain.com/default.mp4',
-                        'https://domain.com/default.webm'
+                        'default.mp4',
+                        'default.webm'
                     ]);
                 });
             });
@@ -232,18 +231,18 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
 
                     runs(function() {
 
-                        var displayNameValue = collection[0].getValue(),
-                            subValue = collection[1].getValue(),
-                            html5SourcesValue = collection[2].getValue(),
-                            youtubeValue = collection[3].getValue();
+                        var displayNameValue = collection[0].getValue();
+                        var subValue = collection[1].getValue();
+                        var html5SourcesValue = collection[2].getValue();
+                        var youtubeValue = collection[3].getValue();
 
-                        expect(displayNameValue).toBe('display value');
-                        expect(subValue).toBe('default');
+                        expect(displayNameValue).toEqual('display value');
+                        expect(subValue).toEqual('default');
                         expect(html5SourcesValue).toEqual([
-                            'https://domain.com/video.mp4',
-                            'https://domain.com/video.webm'
+                            'video.mp4',
+                            'video.webm'
                         ]);
-                        expect(youtubeValue).toBe('12345678901');
+                        expect(youtubeValue).toEqual('12345678901');
                     });
                 });
 
@@ -256,21 +255,21 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         html5SourcesValue = collection[2].getValue(),
                         youtubeValue = collection[3].getValue();
 
-                    expect(displayNameValue).toBe('default');
-                    expect(subValue).toBe('default');
+                    expect(displayNameValue).toEqual('default');
+                    expect(subValue).toEqual('default');
                     expect(html5SourcesValue).toEqual([
-                        'https://domain.com/default.mp4',
-                        'https://domain.com/default.webm'
+                        'default.mp4',
+                        'default.webm'
                     ]);
-                    expect(youtubeValue).toBe('OEoXaMPEzfM');
+                    expect(youtubeValue).toEqual('OEoXaMPEzfM');
                 });
 
                 it('Youtube Id is not adjusted', function () {
                     var model = transcripts.collection.models[1];
 
                     model.setValue([
-                        'https://domain.com/video.mp4',
-                        'https://domain.com/video.webm'
+                        'video.mp4',
+                        'video.webm'
                     ]);
 
                     transcripts.syncAdvancedTab(metadataCollection);
@@ -280,10 +279,10 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         youtubeValue = collection[3].getValue();
 
                     expect(html5SourcesValue).toEqual([
-                        'https://domain.com/video.mp4',
-                        'https://domain.com/video.webm'
+                        'video.mp4',
+                        'video.webm'
                     ]);
-                    expect(youtubeValue).toBe('');
+                    expect(youtubeValue).toEqual('');
                 });
 
                 it('Timed Transcript field is updated', function () {
@@ -294,7 +293,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     var collection = metadataCollection.models,
                         subValue = collection[1].getValue();
 
-                    expect(subValue).toBe('test_value');
+                    expect(subValue).toEqual('test_value');
                 });
 
                 it('Timed Transcript field is updated just once', function () {
@@ -309,7 +308,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
 
-                    expect(subModel.setValue.calls.length).toBe(1);
+                    expect(subModel.setValue.calls.length).toEqual(1);
                 });
 
             });

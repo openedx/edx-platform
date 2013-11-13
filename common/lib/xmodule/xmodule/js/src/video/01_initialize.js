@@ -167,7 +167,7 @@ function (VideoPlayer) {
     // function _prepareHTML5Video(state)
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
-    function _prepareHTML5Video(state, html5Mode) {
+    function _prepareHTML5Video(state) {
         state.parseVideoSources(
             {
                 mp4: state.config.mp4Source,
@@ -176,15 +176,13 @@ function (VideoPlayer) {
             }
         );
 
-        if (html5Mode) {
-            state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-            state.videos = {
-                '0.75': state.config.sub,
-                '1.0':  state.config.sub,
-                '1.25': state.config.sub,
-                '1.5':  state.config.sub
-            };
-        }
+        state.speeds = ['0.75', '1.0', '1.25', '1.50'];
+        state.videos = {
+            '0.75': state.config.sub,
+            '1.0':  state.config.sub,
+            '1.25': state.config.sub,
+            '1.5':  state.config.sub
+        };
 
         // We must have at least one non-YouTube video source available.
         // Otherwise, return a negative.
@@ -313,7 +311,7 @@ function (VideoPlayer) {
         if (!(_parseYouTubeIDs(this))) {
 
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
-            if (!_prepareHTML5Video(this, true)) {
+            if (!_prepareHTML5Video(this)) {
 
                 // Non-YouTube sources were not found either.
                 return;

@@ -94,6 +94,7 @@ def video_is_rendered(_step, mode):
     }
     html_tag = modes[mode.lower()]
     assert world.css_find('.video {0}'.format(html_tag)).first
+    assert world.is_css_present('.speed_link')
 
 
 @step('all sources are correct$')

@@ -27,13 +27,20 @@ import django.dispatch
 from django.forms import ModelForm, forms
 
 from course_modes.models import CourseMode
-import comment_client as cc
+import lms.lib.comment_client as cc
 from pytz import UTC
+import crum
+
+from track import contexts
+from track.views import server_track
+from eventtracking import tracker
+
 
 unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
 
 class UserStanding(models.Model):
     """
@@ -667,6 +674,11 @@ class PendingEmailChange(models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 
+
+EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
+EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -737,18 +749,54 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, _ = CourseEnrollment.objects.get_or_create(
+        enrollment, created = CourseEnrollment.objects.get_or_create(
             user=user,
             course_id=course_id,
         )
-        # In case we're reactivating a deactivated enrollment, or changing the
-        # enrollment mode.
-        if enrollment.mode != mode or enrollment.is_active != is_active:
-            enrollment.mode = mode
+
+        activation_changed = False
+        if enrollment.is_active != is_active:
             enrollment.is_active = is_active
+            activation_changed = True
+
+        mode_changed = False
+        if enrollment.mode != mode:
+            enrollment.mode = mode
+            mode_changed = True
+
+        if activation_changed or mode_changed:
             enrollment.save()
 
+        if created:
+            if is_active:
+                enrollment.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+        else:
+            if activation_changed:
+                if is_active:
+                    enrollment.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+                else:
+                    enrollment.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+
         return enrollment
+
+    def emit_event(self, event_name):
+        """
+        Emits an event to explicitly track course enrollment and unenrollment.
+        """
+
+        try:
+            context = contexts.course_context_from_course_id(self.course_id)
+            data = {
+                'user_id': self.user.id,
+                'course_id': self.course_id,
+                'mode': self.mode,
+            }
+
+            with tracker.get_tracker().context(event_name, context):
+                server_track(crum.get_current_request(), event_name, data)
+        except:  # pylint: disable=bare-except
+            if event_name and self.course_id:
+                log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
     def enroll(cls, user, course_id, mode="honor"):
@@ -825,9 +873,13 @@ class CourseEnrollment(models.Model):
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            record.is_active = False
-            record.save()
-            unenroll_done.send(sender=cls, course_enrollment=record)
+            if record.is_active:
+                record.is_active = False
+                record.save()
+
+                record.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+                unenroll_done.send(sender=cls, course_enrollment=record)
+
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
             log.error(err_msg.format(user, course_id))
@@ -918,6 +970,7 @@ class CourseEnrollment(models.Model):
         if not self.is_active:
             self.is_active = True
             self.save()
+            self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
 
     def deactivate(self):
         """Makes this `CourseEnrollment` record inactive. Saves immediately. An
@@ -926,6 +979,7 @@ class CourseEnrollment(models.Model):
         if self.is_active:
             self.is_active = False
             self.save()
+            self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
     def refundable(self):
         """
