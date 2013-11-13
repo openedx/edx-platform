@@ -8,7 +8,7 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import MagicMock, patch, Mock
@@ -22,11 +22,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
 
-from courseware.access import _course_staff_group_name
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
+from courseware.roles import CourseStaffRole
 from mitxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 
@@ -52,9 +52,7 @@ def make_instructor(course, user_email):
     """
     Makes a given user an instructor in a course.
     """
-    group_name = _course_staff_group_name(course.location)
-    group = Group.objects.create(name=group_name)
-    group.user_set.add(User.objects.get(email=user_email))
+    CourseStaffRole(course.location).add_users(User.objects.get(email=user_email))
 
 
 class StudentProblemListMockQuery(object):

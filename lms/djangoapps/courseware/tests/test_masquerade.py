@@ -12,11 +12,11 @@ import json
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 
-from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
@@ -42,9 +42,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.activate_user(self.instructor)
 
         def make_instructor(course):
-            group_name = _course_staff_group_name(course.location)
-            g = Group.objects.create(name=group_name)
-            g.user_set.add(User.objects.get(email=self.instructor))
+            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
 
         make_instructor(self.graded_course)
 
