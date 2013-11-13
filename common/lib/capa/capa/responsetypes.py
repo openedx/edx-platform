@@ -1805,7 +1805,10 @@ class FormulaResponse(LoncapaResponse):
     def get_score(self, student_answers):
         given = student_answers[self.answer_id]
         correctness = self.check_formula(
-            self.correct_answer, given, self.samples)
+            self.correct_answer,
+            given,
+            self.samples
+        )
         return CorrectMap(self.answer_id, correctness)
 
     def tupleize_answers(self, answer, var_dict_list):

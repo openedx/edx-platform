@@ -941,6 +941,9 @@ class CapaModule(CapaFields, XModule):
             log.warning("StudentInputError in capa_module:problem_check",
                         exc_info=True)
 
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
@@ -955,6 +958,9 @@ class CapaModule(CapaFields, XModule):
             return {'success': msg}
 
         except Exception as err:
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             if self.system.DEBUG:
                 msg = u"Error checking problem: {}".format(err.message)
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
