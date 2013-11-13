@@ -98,16 +98,16 @@ def preview_component(request, location):
     component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
 
     try:
-        content = component.render('studio_view').content
+        fragment = component.render('studio_view')
     # catch exceptions indiscriminately, since after this point they escape the
     # dungeon and surface as uneditable, unsaveable, and undeletable
     # component-goblins.
     except Exception as exc:                          # pylint: disable=W0703
-        content = render_to_string('html_error.html', {'message': str(exc)})
+        fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
     return render_to_response('component.html', {
-        'preview': get_preview_html(request, component),
-        'editor': content
+        'preview': get_preview_fragment(request, component),
+        'fragment': fragment
     })
 
 
@@ -177,14 +177,14 @@ def load_preview_module(request, descriptor):
     return descriptor
 
 
-def get_preview_html(request, descriptor):
+def get_preview_fragment(request, descriptor):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
     module = load_preview_module(request, descriptor)
     try:
-        content = module.render("student_view").content
+        fragment = module.render("student_view")
     except Exception as exc:                          # pylint: disable=W0703
-        content = render_to_string('html_error.html', {'message': str(exc)})
-    return content
+        fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+    return fragment

@@ -7,11 +7,16 @@ from static_replace import replace_static_urls
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
+from xblock.core import XBlock
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
 
@@ -21,10 +26,6 @@ from ..utils import get_modulestore, get_course_for_item
 
 from .access import has_access
 from .helpers import _xmodule_recurse
-from xmodule.x_module import XModuleDescriptor
-from django.views.decorators.http import require_http_methods
-from xmodule.modulestore.locator import BlockUsageLocator
-from student.models import CourseEnrollment
 from xblock.fields import Scope
 
 __all__ = ['save_item', 'create_item', 'orphan', 'xblock_handler']
@@ -188,7 +189,7 @@ def create_item(request):
     data = None
     template_id = request.json.get('boilerplate')
     if template_id is not None:
-        clz = XModuleDescriptor.load_class(category)
+        clz = XBlock.load_class(category, select=prefer_xmodules)
         if clz is not None:
             template = clz.get_template(template_id)
             if template is not None:
