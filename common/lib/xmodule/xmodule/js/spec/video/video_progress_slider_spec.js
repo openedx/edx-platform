@@ -248,6 +248,43 @@
                 });
             });
         });
+
+        it('getRangeParams' , function() {
+            var testCases = [
+                    {
+                        startTime: 10,
+                        endTime: 20,
+                        duration: 150
+                    },
+                    {
+                        startTime: 90,
+                        endTime: 100,
+                        duration: 100
+                    },
+                    {
+                        startTime: 0,
+                        endTime: 200,
+                        duration: 200
+                    }
+                ];
+
+            initialize();
+
+            $.each(testCases, function(index, testCase) {
+                var step = 100/testCase.duration,
+                    left = testCase.startTime*step,
+                    width = testCase.endTime*step - left,
+                    expectedParams = {
+                        left: left + '%',
+                        width: width + '%'
+                    },
+                    params = videoProgressSlider.getRangeParams(
+                        testCase.startTime, testCase.endTime, testCase.duration
+                    );
+
+                expect(params).toEqual(expectedParams);
+            });
+        });
     });
 
 }).call(this);

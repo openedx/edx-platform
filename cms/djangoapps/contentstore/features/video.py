@@ -8,7 +8,8 @@ from selenium.webdriver.common.keys import Keys
 VIDEO_BUTTONS = {
     'CC': '.hide-subtitles',
     'volume': '.volume',
-    'Play': '.video_control.play',
+    'play': '.video_control.play',
+    'pause': '.video_control.pause',
 }
 
 SELECTORS = {
@@ -183,17 +184,11 @@ def caption_line_has_class(_step, index, className):
     world.css_has_class(SELECTOR, className.strip())
 
 
-@step('I see a range on slider with styles "left" set to (.+) px and "width" set to (.+) px$')
-def see_a_range_slider_with_proper_range(_step, left, width):
-    left = int(left.strip())
-    width = int(width.strip())
+@step('I see a range on slider$')
+def see_a_range_slider_with_proper_range(_step):
+    world.wait_for_visible(VIDEO_BUTTONS['pause'])
 
-    world.wait_for_visible(".slider-range")
-    world.wait(4)
-    slider_range = world.browser.driver.find_element_by_css_selector(".slider-range")
-
-    assert int(round(float(slider_range.value_of_css_property("left")[:-2]))) == left
-    assert int(round(float(slider_range.value_of_css_property("width")[:-2]))) == width
+    assert world.css_visible(".slider-range")
 
 
 @step('I click video button "([^"]*)"$')
