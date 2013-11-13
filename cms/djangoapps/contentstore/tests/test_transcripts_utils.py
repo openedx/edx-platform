@@ -227,7 +227,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
 
         self.clear_subs_content(bad_youtube_subs)
 
-    def test_success_downloading_chinise_transcripts(self):
+    def test_success_downloading_chinese_transcripts(self):
         good_youtube_subs = {
             1.0: 'j_jEn79vS3g',  # Chinese, utf-8
         }
