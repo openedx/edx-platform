@@ -81,14 +81,19 @@ Feature: CMS.Problem Editor
     When I edit and select Settings
     Then Edit High Level Source is visible
 
+  # Disabled 11/13/2013 after failing in master
+  # The screenshot showed that the LaTeX editor had the text "hi",
+  # but Selenium timed out waiting for the text to appear.
+  # It also caused later tests to fail with "UnexpectedAlertPresent"
+  #
   # This feature will work in Firefox only when Firefox is the active window
   # IE will not interact with the high level source in sauce labs
-  @skip_internetexplorer
-  Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
-    Given I have created a LaTeX Problem
-    When I edit and compile the High Level Source
-    Then my change to the High Level Source is persisted
-    And when I view the High Level Source I see my changes
+  #@skip_internetexplorer
+  #Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
+  #  Given I have created a LaTeX Problem
+  #  When I edit and compile the High Level Source
+  #  Then my change to the High Level Source is persisted
+  #  And when I view the High Level Source I see my changes
 
     # Disabled 10/28/13 due to flakiness observed in master
     #  Scenario: Exceptions don't cause problem to be uneditable (bug STUD-786)
