@@ -10,6 +10,10 @@
  *          assign this return value to an img's src attribute.
  *   reset() restarts the the video.
  *   imageDataUrl() returns the same thing as snap() -- 
+ *
+ * Note that this file is merely the source code for CameraCapture.swf; to make
+ * changes, you must edit this file, compile it to .swf, and check in the .swf
+ * file separately
  */
 
 package
@@ -37,7 +41,6 @@ package
 		private var camera:Camera;
 		private var video:Video;
 		private var b64EncodedImage:String = null;
-		private var permissionGiven:Boolean = false;
 		
 		public function CameraCapture()
 		{
@@ -47,7 +50,6 @@ package
 		protected function init(e:Event):void {
 			camera = Camera.getCamera();
 			camera.setMode(VIDEO_WIDTH, VIDEO_HEIGHT, 30);
-			camera.addEventListener(StatusEvent.STATUS, statusHandler);
 			
 			video = new Video(VIDEO_WIDTH, VIDEO_HEIGHT);
 			video.attachCamera(camera);
@@ -106,25 +108,11 @@ package
 		}
 		
 		public function cameraAuthorized():Boolean {
-			return permissionGiven;
+			return !(camera.muted);
 		}
 		
 		public function hasCamera():Boolean {
 			return (Camera.names.length != 0);
-		}
-		
-		public function statusHandler(event:StatusEvent):void {
-			switch (event.code) 
-			{ 
-				case "Camera.Muted": 
-					// User clicked Deny.
-					permissionGiven = false;
-					break; 
-				case "Camera.Unmuted": 
-					// "User clicked Accept.
-					permissionGiven = true;
-					break; 
-			} 			
 		}
 	}
 }
