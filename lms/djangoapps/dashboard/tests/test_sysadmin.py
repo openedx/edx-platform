@@ -33,6 +33,8 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
+MITX_FEATURES_WITH_SSL_AUTH = settings.MITX_FEATURES.copy()
+MITX_FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
 
 class SysadminBaseTestCase(ModuleStoreTestCase):
     """ Base class with common methods used in XML and Mongo tests"""
@@ -164,12 +166,13 @@ class TestSysadmin(SysadminBaseTestCase):
         self.assertIn('test_user', response.content)
         self.assertTrue(2, len(response.content.splitlines()))
 
+    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH)
     def test_authmap_repair(self):
         """Run authmap check and repair"""
 
         self._setstaff_login()
 
-        create_user('test0', 'test test', do_mit=True)
+        create_user('test0', 'test test')
         # Will raise exception, so no assert needed
         eamap = ExternalAuthMap.objects.get(external_name='test test')
         mitu = User.objects.get(username='test0')
@@ -393,15 +396,3 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._rm_edx4edx()
 
-    @override_settings(GIT_ADD_COURSE_SCRIPT='')
-    def test_no_script_set(self):
-        """ Test if settings are right on mongo store import"""
-
-        self._setstaff_login()
-
-        response = self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Courses'),
-            'repo_location': 'https://github.com/mitocw/edx4edx_lite.git',
-            'action': _('Load new course from github'), })
-        self.assertIn(_('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'),
-                      response.content)

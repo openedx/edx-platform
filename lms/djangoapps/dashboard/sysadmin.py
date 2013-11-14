@@ -20,11 +20,10 @@ from student.models import CourseEnrollment, UserProfile, Registration
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 
-from courseware.access import get_access_group_name
-from courseware.courses import get_course_by_id
-
 from django.contrib.auth import authenticate
 from django.core.exceptions import PermissionDenied
+from django.core import management
+from django.core.management.base import CommandError
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import IntegrityError
@@ -36,12 +35,14 @@ from django.http import Http404
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
-
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.store_utilities import delete_course
-from courseware.access import has_access
+from courseware.access import has_access, get_access_group_name
+from courseware.courses import get_course_by_id
+
 import mongoengine
+import dashboard.management.commands.git_add_course as git_add_course
 
 import track.views
 
@@ -89,24 +90,15 @@ def import_mongo_course(gitloc, def_ms):
     at debug level for display in template
     """
 
-    acscript = getattr(settings, 'GIT_ADD_COURSE_SCRIPT', '')
-    if not acscript or not os.path.exists(acscript):
-        msg = u"<font color='red'>{0} - {1}</font>".format(
-            _('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
-        return msg
+    msg = u''
 
-    # import course script directly and call add_repo function
-    git_add_script = imp.load_source('git_add_script', acscript)
-    logging.debug(
-        _('Adding course using add repo from {0} and repo {1}').format(
-            acscript, gitloc))
+    logging.debug(_('Adding course using git repo {0}').format(gitloc))
 
     # Grab logging output for debugging imports
     output = StringIO.StringIO()
 
-    import_logger = logging.getLogger(
-        'xmodule.modulestore.xml_importer')
-    git_logger = logging.getLogger('git_add_script')
+    import_logger = logging.getLogger('xmodule.modulestore.xml_importer')
+    git_logger = logging.getLogger('dashboard.management.commands.git_add_course')
     xml_logger = logging.getLogger('xmodule.modulestore.xml')
     xml_seq_logger = logging.getLogger('xmodule.seq_module')
 
@@ -118,15 +110,15 @@ def import_mongo_course(gitloc, def_ms):
         logger.setLevel(logging.DEBUG)
         logger.addHandler(import_log_handler)
 
-    git_add_script.add_repo(gitloc, None)
 
+    git_add_course.add_repo(gitloc, None)
     ret = output.getvalue()
 
     # Remove handler hijacks
     for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
         logger.setLevel(logger.old_level)
         logger.removeHandler(import_log_handler)
-    msg = u"<font color='red'>{0} {1}</font>".format(
+    msg = u"<h4 style='color:blue'>{0} {1}</h4>".format(
         _('Added course from'), gitloc)
     msg += _("<pre>{0}</pre>").format(escape(ret))
     return msg
@@ -134,6 +126,7 @@ def import_mongo_course(gitloc, def_ms):
 def import_xml_course(gitloc, def_ms, datatable):
     """Imports a git course into the XMLModuleStore"""
 
+    msg = u''
     cdir = (gitloc.rsplit('/', 1)[1])[:-4]
     gdir = settings.DATA_DIR / cdir
     if os.path.exists(gdir):
@@ -171,11 +164,9 @@ def import_xml_course(gitloc, def_ms, datatable):
 def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
     """This downloads and runs the checks for importing a course in git"""
 
-    msg = u''
     if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
             gitloc.startswith('https:') or gitloc.startswith('git:')):
-        msg += _("The git repo location should end with '.git', and be a valid url")
-        return msg
+        return _("The git repo location should end with '.git', and be a valid url")
 
     if is_using_mongo:
         return import_mongo_course(gitloc, def_ms)

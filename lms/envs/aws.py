@@ -202,7 +202,6 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 # git repo loading  environment
 GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', None)
 GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
-GIT_ADD_COURSE_SCRIPT = ENV_TOKENS.get('GIT_ADD_COURSE_SCRIPT', GIT_ADD_COURSE_SCRIPT)
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)

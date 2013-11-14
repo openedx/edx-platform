@@ -1,17 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# pylint: disable-msg=C0111
-# python script to pull a git repo and import into cms / edge mongodb content database.
-#
-# usage:
-#
-#    python git_add_course.py <git-ssh-url> [<directory>]
-#
-# argument is git ssh url, like: git@github.com:mitocw/edx4edx_lite.git
-# if the directory is given, that is used and presumed to contain the git repo
-#
-
+"""
+Script for importing courseware from git/xml into a mongo modulestore
+"""
 import os
 import sys
 import re
@@ -21,18 +10,17 @@ import StringIO
 import logging
 
 from django.utils.translation import ugettext as _
-
 from django.conf import settings
 from django.core import management
-from django.core.management.base import CommandError
+from django.core.management.base import BaseCommand, CommandError, make_option
+
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
 
 log = logging.getLogger(__name__)
 
-GIT_REPO_DIR = getattr(settings,
-                       'GIT_REPO_DIR', '/opt/edx/course_repos')
+GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
-
 
 class CourseImportLog(mongoengine.Document):
     """Mongoengine model for git log"""
@@ -46,7 +34,6 @@ class CourseImportLog(mongoengine.Document):
     created = mongoengine.DateTimeField()
     meta = {'indexes': ['course_id', 'created'],
             'allow_inheritance': False}
-
 
 def add_repo(repo, rdir_in):
     """This will add a git repo into the mongo modulestore"""
@@ -203,26 +190,30 @@ def add_repo(repo, rdir_in):
     mdb.disconnect()
     return 0
 
-if __name__ == '__main__':
-    # pylint: disable-msg=C0103
+class Command(BaseCommand):
+    """
+    Pull a git repo and import into the mongo based content database.
+    """
 
-    if len(sys.argv) < 2:
-        print(_('This script requires at least one argument, the git URL'))
-        sys.exit(1)
+    help = _('Import the specified git repository into the modulestore and directory')
 
-    if len(sys.argv) > 3:
-        print(_('This script requires no more than two arguments.'))
-        sys.exit(1)
+    def handle(self, *args, **options):
+        """Check inputs and run the command"""
+        # pylint: disable-msg=C0103
 
-    rdir_arg = None
+        if isinstance(modulestore, XMLModuleStore):
+            raise CommandError(_('This script requires a mongo module store'))
 
-    # check that we are using mongo modulestore
-    if not 'mongo' in str(modulestore().__class__):
-        print _('This script requires a mongo module store')
-        sys.exit(1)
+        if len(args) < 1:
+            raise CommandError(_('This script requires at least one argument, the git URL'))
 
-    if len(sys.argv) > 2:
-        rdir_arg = sys.argv[2]
+        if len(args) > 2:
+            raise CommandError(_('This script requires no more than two arguments.'))
 
-    if add_repo(sys.argv[1], rdir_arg) != 0:
-        sys.exit(1)
+        rdir_arg = None
+
+        if len(args) > 1:
+            rdir_arg = args[1]
+
+        if add_repo(args[0], rdir_arg) != 0:
+            raise CommandError(_('Repo was not added, check log output for details'))
