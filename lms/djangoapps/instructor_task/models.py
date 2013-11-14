@@ -12,9 +12,20 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from cStringIO import StringIO
+from gzip import GzipFile
 from uuid import uuid4
+import csv
 import json
+import hashlib
+import os
+import os.path
+import urllib
 
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 
@@ -176,3 +187,172 @@ class InstructorTask(models.Model):
     def create_output_for_revoked():
         """Creates standard message to store in output format for revoked tasks."""
         return json.dumps({'message': 'Task revoked before running'})
+
+
+class GradesStore(object):
+    """
+    Simple abstraction layer that can fetch and store CSV files for grades
+    download. Should probably refactor later to create a GradesFile object that
+    can simply be appended to for the sake of memory efficiency, rather than
+    passing in the whole dataset. Doing that for now just because it's simpler.
+    """
+    @classmethod
+    def from_config(cls):
+        """
+        Return one of the GradesStore subclasses depending on django
+        configuration. Look at subclasses for expected configuration.
+        """
+        storage_type = settings.GRADES_DOWNLOAD.get("STORAGE_TYPE")
+        if storage_type.lower() == "s3":
+            return S3GradesStore.from_config()
+        elif storage_type.lower() == "localfs":
+            return LocalFSGradesStore.from_config()
+
+
+class S3GradesStore(GradesStore):
+    """
+
+    """
+    def __init__(self, bucket_name, root_path):
+        self.root_path = root_path
+
+        conn = S3Connection(
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY
+        )
+        self.bucket = conn.get_bucket(bucket_name)
+
+    @classmethod
+    def from_config(cls):
+        return cls(
+            settings.GRADES_DOWNLOAD['BUCKET'],
+            settings.GRADES_DOWNLOAD['ROOT_PATH']
+        )
+
+    def key_for(self, course_id, filename):
+        """Return the key we would use to store and retrive the data for the
+        given filename."""
+        hashed_course_id = hashlib.sha1(course_id)
+
+        key = Key(self.bucket)
+        key.key = "{}/{}/{}".format(
+            self.root_path,
+            hashed_course_id.hexdigest(),
+            filename
+        )
+
+        return key
+
+    def store(self, course_id, filename, buff):
+        key = self.key_for(course_id, filename)
+
+        data = buff.getvalue()
+        key.size = len(data)
+        key.content_encoding = "gzip"
+        key.content_type = "text/csv"
+
+        key.set_contents_from_string(
+            data,
+            headers={
+                "Content-Encoding" : "gzip",
+                "Content-Length" : len(data),
+                "Content-Type" : "text/csv",
+            }
+        )
+
+    def store_rows(self, course_id, filename, rows):
+        """
+        Given a course_id, filename, and rows (each row is an iterable of strings),
+        write this data out.
+        """
+        output_buffer = StringIO()
+        gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
+        csv.writer(gzip_file).writerows(rows)
+        gzip_file.close()
+
+        self.store(course_id, filename, output_buffer)
+
+    def links_for(self, course_id):
+        """
+        For a given `course_id`, return a list of `(filename, url)` tuples. `url`
+        can be plugged straight into an href
+        """
+        course_dir = self.key_for(course_id, '')
+        return sorted(
+            [
+                (key.key.split("/")[-1], key.generate_url(expires_in=300))
+                for key in self.bucket.list(prefix=course_dir.key)
+            ],
+            reverse=True
+        )
+
+
+class LocalFSGradesStore(GradesStore):
+    """
+    LocalFS implementation of a GradesStore. This is meant for debugging
+    purposes and is *absolutely not for production use*. Use S3GradesStore for
+    that.
+    """
+    def __init__(self, root_path):
+        """
+        Initialize with root_path where we're going to store our files. We
+        will build a directory structure under this for each course.
+        """
+        self.root_path = root_path
+        if not os.path.exists(root_path):
+            os.makedirs(root_path)
+
+    @classmethod
+    def from_config(cls):
+        """
+        Generate an instance of this object from Django settings. It assumes
+        that there is a dict in settings named GRADES_DOWNLOAD and that it has
+        a ROOT_PATH that maps to an absolute file path that the web app has
+        write permissions to. `LocalFSGradesStore` will create any intermediate
+        directories as needed.
+        """
+        return cls(settings.GRADES_DOWNLOAD['ROOT_PATH'])
+
+    def path_to(self, course_id, filename):
+        """Return the full path to a given file for a given course."""
+        return os.path.join(self.root_path, urllib.quote(course_id, safe=''), filename)
+
+    def store(self, course_id, filename, buff):
+        """
+        Given the `course_id` and `filename`, store the contents of `buff` in
+        that file. Overwrite anything that was there previously. `buff` is
+        assumed to be a StringIO objecd (or anything that can flush its contents
+        to string using `.getvalue()`).
+        """
+        full_path = self.path_to(course_id, filename)
+        directory = os.path.dirname(full_path)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+
+        with open(full_path, "wb") as f:
+            f.write(buff.getvalue())
+
+    def store_rows(self, course_id, filename, rows):
+        """
+        Given a course_id, filename, and rows (each row is an iterable of strings),
+        write this data out.
+        """
+        output_buffer = StringIO()
+        csv.writer(output_buffer).writerows(rows)
+        self.store(course_id, filename, output_buffer)
+
+    def links_for(self, course_id):
+        """
+        For a given `course_id`, return a list of `(filename, url)` tuples. `url`
+        can be plugged straight into an href
+        """
+        course_dir = self.path_to(course_id, '')
+        if not os.path.exists(course_dir):
+            return []
+        return sorted(
+            [
+                (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
+                for filename in os.listdir(course_dir)
+            ],
+            reverse=True
+        )
