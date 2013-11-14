@@ -12,6 +12,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from util.json_request import expect_json, JsonResponse
+from util.string_utils import str_to_bool
 
 from ..transcripts_utils import manage_video_subtitles_save
 
@@ -74,12 +75,12 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         old_location = loc_mapper().translate_locator_to_location(location)
 
         if request.method == 'GET':
-            rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
+            rewrite_static_links = str_to_bool(request.GET.get('rewrite_url_links', 'True'))
             rsp = _get_module_info(location, rewrite_static_links=rewrite_static_links)
             return JsonResponse(rsp)
         elif request.method == 'DELETE':
-            delete_children = bool(request.REQUEST.get('recurse', False))
-            delete_all_versions = bool(request.REQUEST.get('all_versions', False))
+            delete_children = str_to_bool(request.REQUEST.get('recurse', False))
+            delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', False))
 
             return _delete_item_at_location(old_location, delete_children, delete_all_versions)
         else:  # Since we have a course_id, we are updating an existing xblock.
