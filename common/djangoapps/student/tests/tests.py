@@ -443,7 +443,7 @@ class EnrollInCourseTest(TestCase):
 
         # Creating an enrollment doesn't actually enroll a student
         # (calling CourseEnrollment.enroll() would have)
-        enrollment = CourseEnrollment.create_or_update_enrollment(user, course_id)
+        enrollment = CourseEnrollment.create_enrollment(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_no_events_were_emitted()
 

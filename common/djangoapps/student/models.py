@@ -713,7 +713,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def create_or_update_enrollment(cls, user, course_id, mode="honor", is_active=False):
+    def create_enrollment(cls, user, course_id):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -727,16 +727,6 @@ class CourseEnrollment(models.Model):
                adding an enrollment for it.
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
-
-        `mode` is a string specifying what kind of enrollment this is. The
-               default is "honor", meaning honor certificate. Future options
-               may include "audit", "verified_id", etc. Please don't use it
-               until we have these mapped out.
-
-        `is_active` is a boolean. If the CourseEnrollment object has
-                    `is_active=False`, then calling
-                    `CourseEnrollment.is_enrolled()` for that user/course_id
-                    will return False.
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
@@ -753,30 +743,41 @@ class CourseEnrollment(models.Model):
             course_id=course_id,
         )
 
+        # If we *did* just create a new enrollment, set some defaults
+        if created:
+            enrollment.mode = "honor"
+            enrollment.is_active = False
+            enrollment.save()
+
+        return enrollment
+
+    def update_enrollment(self, mode=None, is_active=None):
+        """
+        Updates an enrollment for a user in a class.  This includes options
+        like changing the mode, toggling is_active True/False, etc.
+
+        Also emits relevant events for analytics purposes.
+
+        This saves immediately.
+        """
         activation_changed = False
-        if enrollment.is_active != is_active:
-            enrollment.is_active = is_active
+        if self.is_active != is_active and is_active is not None:
+            self.is_active = is_active
             activation_changed = True
 
         mode_changed = False
-        if enrollment.mode != mode:
-            enrollment.mode = mode
+        if self.mode != mode and mode is not None:
+            self.mode = mode
             mode_changed = True
 
         if activation_changed or mode_changed:
-            enrollment.save()
-
-        if created:
-            if is_active:
-                enrollment.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
-        else:
-            if activation_changed:
-                if is_active:
-                    enrollment.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
-                else:
-                    enrollment.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
-
-        return enrollment
+            self.save()
+        if activation_changed:
+            if self.is_active:
+                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+            else:
+                unenroll_done.send(sender=None, course_enrollment=self)
+                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
     def emit_event(self, event_name):
         """
@@ -818,7 +819,9 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        return cls.create_or_update_enrollment(user, course_id, mode, is_active=True)
+        enrollment = cls.create_enrollment(user, course_id)
+        enrollment.update_enrollment(is_active=True)
+        return enrollment
 
     @classmethod
     def enroll_by_email(cls, email, course_id, mode="honor", ignore_errors=True):
@@ -872,8 +875,7 @@ class CourseEnrollment(models.Model):
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            cls.create_or_update_enrollment(user, course_id, record.mode, is_active=False)
-            unenroll_done.send(sender=cls, course_enrollment=record)
+            record.update_enrollment(is_active=False)
 
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
@@ -962,22 +964,17 @@ class CourseEnrollment(models.Model):
 
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""
-        if not self.is_active:
-            self.is_active = True
-            CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, self.mode, True)
+        self.update_enrollment(is_active=True)
 
     def deactivate(self):
         """Makes this `CourseEnrollment` record inactive. Saves immediately. An
         inactive record means that the student is not enrolled in this course.
         """
-        if self.is_active:
-            self.is_active = False
-            CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, self.mode, False)
+        self.update_enrollment(is_active=False)
 
     def change_mode(self, mode):
         """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
-        self.mode = mode
-        CourseEnrollment.create_or_update_enrollment(self.user, self.course_id, mode, self.is_active)
+        self.update_enrollment(mode=mode)
 
     def refundable(self):
         """

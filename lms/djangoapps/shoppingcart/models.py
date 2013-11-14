@@ -400,8 +400,8 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done, sender=CourseEnrollment)
-    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
+    @receiver(unenroll_done)
+    def refund_cert_callback(sender, course_enrollment=course_enrollment, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
@@ -467,7 +467,8 @@ class CertificateItem(OrderItem):
         try:
             course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
         except ObjectDoesNotExist:
-            course_enrollment = CourseEnrollment.create_or_update_enrollment(order.user, course_id, mode=mode)
+            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id)
+            course_enrollment.update_enrollment(mode=mode)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)
