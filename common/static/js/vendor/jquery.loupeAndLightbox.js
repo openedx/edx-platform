@@ -28,7 +28,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function($){
   $.fn.loupeAndLightbox = function(options) {
     var settings = $.extend({}, $.fn.loupeAndLightbox.defaults, options);
-    
+
     return this.each(function() {
       var $this = $(this),
           $targetImage = $this.find('> img'),
@@ -40,10 +40,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       ///////////
       // Setup //
-      ///////////      
+      ///////////
       $this.css({
         cursor:'default'
-      });  
+      });
       $targetImage.css({
         cursor: 'pointer'
       });
@@ -57,8 +57,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         border:settings.border,
         height:settings.height,
         overflow:'hidden',
-        position:'relative',
-        top:-settings.height,
+        position:'absolute',
+        bottom:0,
         left:-settings.width,
         width:settings.width,
         zIndex:settings.zIndex,
@@ -84,31 +84,31 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           height:settings.height,
           width:settings.width
         });
-        
+
       ////////////
       // Events //
       ////////////
       $this.click(function(event) {
         event.preventDefault();
       });
-      $targetImage.click(function(event) {              
-        if(!$loupe.hasClass('visible')) {   
+      $targetImage.click(function(event) {
+        if(!$loupe.hasClass('visible')) {
           var left = event.pageX,
               top = event.pageY;
-              
+
           if(!$magnifiedImage.hasClass('appended')) {
             getMagnifiedImage();
           }
-          
+
           setTimeout(function() {
-            appendLoupe();   
+            appendLoupe();
             magnify(left, top);
-            if(settings.lightbox == true) {  
+            if(settings.lightbox == true) {
               appendLightbox();
             }
-          }, 100);     
+          }, 100);
         }
-      });      
+      });
       $targetImage.mousemove(function(event) {
         var left = event.pageX,
             top = event.pageY,
@@ -131,18 +131,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }).mouseleave(function() {
         pulseLoupe();
       });
-      
+
       // Detach when clicking outside of the loupe
       $(document).click(function(event) {
         if($loupe.hasClass('visible')) {
           detachLoupe();
-          
-          if(settings.lightbox == true) {  
+
+          if(settings.lightbox == true) {
             detachLightbox();
-          }       
+          }
         }
       });
-      
+
       // Resizes lightbox with window
       $(window).resize(function() {
         if($loupe.is(':visible')) {
@@ -150,29 +150,29 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             //left:$targetImage.offset().left+($targetImage.width()/2)-($loupe.width()/2),
             //top:$targetImage.offset().top+($targetImage.height()/2)-($loupe.height()/2)
           });
-          
+
           $magnifiedImage.css({
             left:-($magnifiedImage.width()/2)+($loupe.width()/2),
             top:-($magnifiedImage.height()/2)+($loupe.height()/2)
           });
-          
+
           $lightbox.css({
             height:$(document).height(),
             width:$(document).width()
           });
         }
       });
-      
+
       ///////////////////////
       // Private functions //
       ///////////////////////
-      function magnify(left, top) {        
+      function magnify(left, top) {
         $loupe
-          .css({ 
+          .css({
             //left:left-(settings.width/2),
             //top:top-(settings.height/2)
           });
-          
+
         var heightDiff = $magnifiedImage.height()/$targetImage.height(),
             widthDiff = $magnifiedImage.width()/$targetImage.width(),
             magnifierTop = (-(top - $targetImage.offset().top)*heightDiff)+(settings.height/2),
@@ -183,7 +183,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             left:magnifierLeft
         });
       };
-      
+
       function appendLoupe() {
         $loupe
           .appendTo($('div.place'))
@@ -192,11 +192,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             $(this).addClass('visible');
           });
       };
-      
+
       function getMagnifiedImage() {
         var src = $this.attr('href');
         $loader.appendTo($loupe);
-        
+
         $magnifiedImage
           .load(function() {
             $(this).addClass('appended');
@@ -206,12 +206,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             $(this).hide();
             $loupe
               .append($errorMessage)
-              .addClass('lal_loadError');         
+              .addClass('lal_loadError');
             $loader.detach();
           })
           .attr('src', src);
       };
-      
+
       function detachLoupe() {
         $loupe.fadeOut(settings.fadeSpeed, function() {
           $(this)
@@ -219,8 +219,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             .detach();
         });
       };
-      
-      function appendLightbox() {        
+
+      function appendLightbox() {
         $lightbox
           .appendTo('body')
           .css({
@@ -229,13 +229,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           })
           .fadeIn(settings.fadeSpeed);
       };
-      
+
       function detachLightbox() {
         $lightbox.fadeOut(settings.fadeSpeed, function() {
           $(this).detach();
         });
       };
-      
+
       function pulseLoupe() {
         $loupe.fadeTo(150, 0.25, function() {
           $(this).fadeTo(150, 1.0);
