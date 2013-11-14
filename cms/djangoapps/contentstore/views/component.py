@@ -15,6 +15,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.x_module import prefer_xmodules, XModuleDescriptor
 
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
@@ -41,12 +42,14 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
+XMODULE_TYPES = set(name for name, _ in XModuleDescriptor.load_classes())
+XBLOCK_TYPES = set(name for name, _ in XBlock.load_classes()) - XMODULE_TYPES
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'word_cloud',
     'graphical_slider_tool',
     'lti',
-] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES + list(XBLOCK_TYPES)
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -192,30 +195,28 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         course_advanced_keys = course.advanced_modules
 
         # Set component types according to course policy file
-        if isinstance(course_advanced_keys, list):
-            for category in course_advanced_keys:
-                if category in ADVANCED_COMPONENT_TYPES:
-                    # Do I need to allow for boilerplates or just defaults on the
-                    # class? i.e., can an advanced have more than one entry in the
-                    # menu? one for default and others for prefilled boilerplates?
-                    try:
-                        component_class = _load_mixed_class(category)
+        for category in ADVANCED_COMPONENT_TYPES:
+            # Do I need to allow for boilerplates or just defaults on the
+            # class? i.e., can an advanced have more than one entry in the
+            # menu? one for default and others for prefilled boilerplates?
+            try:
+                component_class = _load_mixed_class(category)
 
-                        component_templates['advanced'].append(
-                            (
-                                component_class.display_name.default or category,
-                                category,
-                                False,
-                                None  # don't override default data
-                            )
-                        )
-                    except PluginMissingError:
-                        # dhm: I got this once but it can happen any time the
-                        # course author configures an advanced component which does
-                        # not exist on the server. This code here merely
-                        # prevents any authors from trying to instantiate the
-                        # non-existent component type by not showing it in the menu
-                        pass
+                component_templates['advanced'].append(
+                    (
+                        component_class.display_name.default or category,
+                        category,
+                        False,
+                        None  # don't override default data
+                    )
+                )
+            except PluginMissingError:
+                # dhm: I got this once but it can happen any time the
+                # course author configures an advanced component which does
+                # not exist on the server. This code here merely
+                # prevents any authors from trying to instantiate the
+                # non-existent component type by not showing it in the menu
+                pass
         else:
             log.error(
                 "Improper format for course advanced keys! %s",
