@@ -37,14 +37,17 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       analytics.track "Reordered Static Pages",
         course: course_location_analytics
 
+      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving.show()
+
       $.ajax({
         type:'POST',
-        url: '/reorder_static_tabs',
+        url: @model.url(),
         data: JSON.stringify({
           tabs : tabs
         }),
         contentType: 'application/json'
-      })
+      }).success(=> saving.hide())
 
     addNewTab: (event) =>
       event.preventDefault()

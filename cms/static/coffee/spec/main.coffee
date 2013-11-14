@@ -197,7 +197,8 @@ define([
     "js/spec/transcripts/videolist_spec", "js/spec/transcripts/message_manager_spec",
     "js/spec/transcripts/file_uploader_spec",
 
-    "js/spec/utils/module_spec"
+    "js/spec/utils/module_spec",
+    "js/spec/models/explicit_url_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

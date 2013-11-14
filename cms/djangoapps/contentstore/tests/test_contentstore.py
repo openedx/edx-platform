@@ -179,7 +179,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             # TODO: uncomment after edit_unit not using locations.
             # _test_no_locations(self, resp)
 
-    def lockAnAsset(self, content_store, course_location):
+    def _lock_an_asset(self, content_store, course_location):
         """
         Lock an arbitrary asset in the course
         :param course_location:
@@ -407,15 +407,63 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs, expected_tabs)
 
     def test_static_tab_reordering(self):
-        def get_tab_locator(tab):
-            tab_location = 'i4x://MITx/999/static_tab/{0}'.format(tab['url_slug'])
-            return unicode(loc_mapper().translate_location(
-                course.location.course_id, Location(tab_location), False, True
-            ))
+        module_store, course_location, new_location = self._create_static_tabs()
 
+        course = module_store.get_item(course_location)
+
+        # reverse the ordering
+        reverse_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                reverse_tabs.insert(0, unicode(self._get_tab_locator(course, tab)))
+
+        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': reverse_tabs})
+
+        course = module_store.get_item(course_location)
+
+        # compare to make sure that the tabs information is in the expected order after the server call
+        course_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                course_tabs.append(unicode(self._get_tab_locator(course, tab)))
+
+        self.assertEqual(reverse_tabs, course_tabs)
+
+    def test_static_tab_deletion(self):
+        module_store, course_location, _ = self._create_static_tabs()
+
+        course = module_store.get_item(course_location)
+        num_tabs = len(course.tabs)
+        last_tab = course.tabs[num_tabs - 1]
+        url_slug = last_tab['url_slug']
+        delete_url = self._get_tab_locator(course, last_tab).url_reverse('xblock')
+
+        self.client.delete(delete_url)
+
+        course = module_store.get_item(course_location)
+        self.assertEqual(num_tabs - 1, len(course.tabs))
+
+        def tab_matches(tab):
+            """ Checks if the tab matches the one we deleted """
+            return tab['type'] == 'static_tab' and tab['url_slug'] == url_slug
+
+        tab_found = any(tab_matches(tab) for tab in course.tabs)
+
+        self.assertFalse(tab_found, "tab should have been deleted")
+
+    def _get_tab_locator(self, course, tab):
+        """ Returns the locator for a given tab. """
+        tab_location = 'i4x://MITx/999/static_tab/{0}'.format(tab['url_slug'])
+        return loc_mapper().translate_location(
+            course.location.course_id, Location(tab_location), False, True
+        )
+
+    def _create_static_tabs(self):
+        """ Creates two static tabs in a dummy course. """
         module_store = modulestore('direct')
-        locator = _course_factory_create_course()
-        course_location = loc_mapper().translate_locator_to_location(locator)
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        new_location = loc_mapper().translate_location(course_location.course_id, course_location, False, True)
 
         ItemFactory.create(
             parent_location=course_location,
@@ -426,25 +474,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             category="static_tab",
             display_name="Static_2")
 
-        course = module_store.get_item(course_location)
-
-        # reverse the ordering
-        reverse_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, get_tab_locator(tab))
-
-        self.client.ajax_post(reverse('reorder_static_tabs'), {'tabs': reverse_tabs})
-
-        course = module_store.get_item(course_location)
-
-        # compare to make sure that the tabs information is in the expected order after the server call
-        course_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                course_tabs.append(get_tab_locator(tab))
-
-        self.assertEqual(reverse_tabs, course_tabs)
+        return module_store, course_location, new_location
 
     def test_import_polls(self):
         module_store = modulestore('direct')
@@ -633,7 +663,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
             self.assertIsNotNone(thumbnail)
 
-    def _delete_asset_in_course (self):
+    def _delete_asset_in_course(self):
         """
         Helper method for:
           1) importing course from xml
@@ -972,7 +1002,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertIn(private_location_no_draft.url(), sequential.children)
 
-        locked_asset = self.lockAnAsset(content_store, location)
+        locked_asset = self._lock_an_asset(content_store, location)
         locked_asset_attrs = content_store.get_attrs(locked_asset)
         # the later import will reupload
         del locked_asset_attrs['uploadDate']
@@ -1027,7 +1057,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         shutil.rmtree(root_dir)
 
     def check_import(self, module_store, root_dir, draft_store, content_store, stub_location, course_location,
-        locked_asset, locked_asset_attrs):
+                     locked_asset, locked_asset_attrs):
         # reimport
         import_from_xml(
             module_store, root_dir, ['test_export'], draft_store=draft_store,
@@ -1226,7 +1256,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handouts_locator = loc_mapper().translate_location('edX/toy/2012_Fall', handout_location)
 
         # get module info (json)
-        resp = self.client.get(handouts_locator.url_reverse('/xblock', ''))
+        resp = self.client.get(handouts_locator.url_reverse('/xblock'))
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
@@ -1403,7 +1433,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
 
         # unseed the forums for the first course
-        course_id =_get_course_id(test_course_data)
+        course_id = _get_course_id(test_course_data)
         delete_course_and_groups(course_id, commit=True)
         self.assertFalse(are_permissions_roles_seeded(course_id))
 
@@ -1625,6 +1655,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         test_get_html('course_info')
         test_get_html('checklists')
         test_get_html('assets')
+        test_get_html('tabs')
 
         # settings_details
         resp = self.client.get_html(reverse('settings_details',
@@ -1676,13 +1707,6 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         # TODO: uncomment when edit_unit not using old locations.
         # _test_no_locations(self, resp)
-
-        resp = self.client.get_html(reverse('edit_tabs',
-                                            kwargs={'org': loc.org,
-                                                    'course': loc.course,
-                                                    'coursename': loc.name}))
-        self.assertEqual(resp.status_code, 200)
-        _test_no_locations(self, resp)
 
         def delete_item(category, name):
             """ Helper method for testing the deletion of an xblock item. """
@@ -1997,7 +2021,7 @@ def _create_course(test, course_data):
     test.assertEqual(response.status_code, 200)
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
-    test.assertEqual(data['url'], new_location.url_reverse("course/", ""))
+    test.assertEqual(data['url'], new_location.url_reverse("course"))
 
 
 def _course_factory_create_course():

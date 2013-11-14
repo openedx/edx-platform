@@ -9,12 +9,15 @@
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) {
+require(["js/models/explicit_url", "coffee/src/views/tabs"], function(TabsModel, TabsEditView) {
+    var model = new TabsModel({
+        id: "${course_locator}",
+        explicit_url: "${course_locator.url_reverse('tabs')}"
+    });
+
     new TabsEditView({
       el: $('.main-wrapper'),
-      model: new Backbone.Model({
-        id: '${locator}'
-      }),
+      model: model,
       mast: $('.wrapper-mast')
     });
 });
