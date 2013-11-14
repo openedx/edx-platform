@@ -124,8 +124,11 @@ if Backbone?
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"><span class="sr">Loading more threads</span></div>')
+      @$(".more-pages").html('<div class="loading-animation" tabindex=0><span class="sr" role="alert">Loading more threads</span></div>')
       @$(".more-pages").addClass("loading")
+      loadingDiv = @$(".more-pages .loading-animation")
+      DiscussionUtil.makeFocusTrap(loadingDiv)
+      loadingDiv.focus()
       options = {}
       switch @mode
         when 'search'
