@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 
 # TODO: This should be removed once the CMS is running via wsgi on all production servers
 import cms.startup as startup
+from django.conf.urls.static import static
 from xmodule.modulestore import parsers
 startup.run()
 
@@ -152,3 +153,7 @@ if settings.DEBUG:
 #pylint: disable=C0103
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

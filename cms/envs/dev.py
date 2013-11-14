@@ -195,3 +195,9 @@ try:
     from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
+
+if DEBUG:
+    # Static content
+    STATIC_URL = '/static/'
+    STATIC_ROOT = ENV_ROOT / "staticfiles"
+
