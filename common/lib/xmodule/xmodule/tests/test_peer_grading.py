@@ -277,7 +277,6 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
             self.field_data,
             self.scope_ids,
         )
-        self.test_system.xmodule_instance = peer_grading
 
         return peer_grading
 

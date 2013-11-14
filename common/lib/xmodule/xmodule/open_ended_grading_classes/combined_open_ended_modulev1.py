@@ -224,6 +224,7 @@ class CombinedOpenEndedV1Module():
                 task.get_html(self.system)
             except Exception as err:
                 #If one task doesn't match, the state is invalid.
+                log.exception("Failed to parse task. Resetting task state")
                 self.reset_task_state("Could not parse task. {0}".format(err))
                 break
 
