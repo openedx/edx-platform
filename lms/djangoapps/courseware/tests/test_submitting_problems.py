@@ -236,11 +236,14 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id})
-        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.student_user, self.course)
 
-        return grades.grade(self.student_user, fake_request, self.course)
+        fake_request = self.factory.get(reverse('progress',
+                                        kwargs={'course_id': self.course.id}))
+
+        return grades.grade(self.student_user, fake_request,
+                            self.course, field_data_cache)
 
     def get_progress_summary(self):
         """
@@ -254,13 +257,16 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id})
-        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.student_user, self.course)
 
-        progress_summary = grades.progress_summary(
-            self.student_user, fake_request, self.course
-        )
+        fake_request = self.factory.get(reverse('progress',
+                                        kwargs={'course_id': self.course.id}))
+
+        progress_summary = grades.progress_summary(self.student_user,
+                                                   fake_request,
+                                                   self.course,
+                                                   field_data_cache)
         return progress_summary
 
     def check_grade_percent(self, percent):

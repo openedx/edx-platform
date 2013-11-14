@@ -4,11 +4,9 @@ from __future__ import division
 import random
 import logging
 
-from contextlib import contextmanager
 from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import transaction
 
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from xblock.fields import Scope
@@ -123,20 +121,8 @@ def answer_distributions(request, course):
     return counts
 
 
-@transaction.commit_manually
-def grade(student, request, course, keep_raw_scores=False):
+def grade(student, request, course, field_data_cache=None, keep_raw_scores=False):
     """
-    Wraps "_grade" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    """
-    with manual_transaction():
-        return _grade(student, request, course, keep_raw_scores)
-
-
-def _grade(student, request, course, keep_raw_scores):
-    """
-    Unwrapped version of "grade"
-
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
@@ -146,16 +132,19 @@ def _grade(student, request, course, keep_raw_scores):
     - grade : A final letter grade.
     - percent : The final percent for the class (rounded up).
     - section_breakdown : A breakdown of each section that makes
-      up the grade. (For display)
+        up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
-      make up the final grade. (For display)
-    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores
-      for every graded module
+        make up the final grade. (For display)
+    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores for every graded module
 
     More information on the format is in the docstring for CourseGrader.
     """
+
     grading_context = course.grading_context
     raw_scores = []
+
+    if field_data_cache is None:
+        field_data_cache = FieldDataCache(grading_context['all_descriptors'], course.id, student)
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -166,22 +155,26 @@ def _grade(student, request, course, keep_raw_scores):
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.display_name_with_default
 
-            # some problems have state that is updated independently of interaction
-            # with the LMS, so they need to always be scored. (E.g. foldit.)
-            should_grade_section = any(
-                descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
-            )
-
+            should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
-            if not should_grade_section:
-                with manual_transaction():
-                    should_grade_section = StudentModule.objects.filter(
-                        student=student,
-                        module_type='problem',
-                        module_state_key__in=[
-                            descriptor.location for descriptor in section['xmoduledescriptors']
-                        ]
-                    ).exists()
+            for moduledescriptor in section['xmoduledescriptors']:
+                # some problems have state that is updated independently of interaction
+                # with the LMS, so they need to always be scored. (E.g. foldit.)
+                if moduledescriptor.always_recalculate_grades:
+                    should_grade_section = True
+                    break
+
+                # Create a fake key to pull out a StudentModule object from the FieldDataCache
+
+                key = DjangoKeyValueStore.Key(
+                    Scope.user_state,
+                    student.id,
+                    moduledescriptor.location,
+                    None
+                )
+                if field_data_cache.find(key):
+                    should_grade_section = True
+                    break
 
             if should_grade_section:
                 scores = []
@@ -190,13 +183,11 @@ def _grade(student, request, course, keep_raw_scores):
                     '''creates an XModule instance given a descriptor'''
                     # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
-                    with manual_transaction():
-                        field_data_cache = FieldDataCache([descriptor], course.id, student)
                     return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
-                    (correct, total) = get_score(course.id, student, module_descriptor, create_module)
+                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, field_data_cache)
                     if correct is None and total is None:
                         continue
 
@@ -265,23 +256,11 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-@transaction.commit_manually
-def progress_summary(student, request, course):
-    """
-    Wraps "_progress_summary" with the manual_transaction context manager just
-    in case there are unanticipated errors.
-    """
-    with manual_transaction():
-        return _progress_summary(student, request, course)
-
-
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def _progress_summary(student, request, course):
+def progress_summary(student, request, course, field_data_cache):
     """
-    Unwrapped version of "progress_summary".
-
     This pulls a summary of all problems in the course.
 
     Returns
@@ -294,21 +273,20 @@ def _progress_summary(student, request, course):
     Arguments:
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
+        field_data_cache: A FieldDataCache initialized with all
+             instance_modules for the student
 
     If the student does not have access to load the course module, this function
     will return None.
 
     """
-    with manual_transaction():
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, student, course, depth=None
-        )
-        # TODO: We need the request to pass into here. If we could
-        # forego that, our arguments would be simpler
-        course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
-        if not course_module:
-            # This student must not have access to the course.
-            return None
+
+    # TODO: We need the request to pass into here. If we could forego that, our arguments
+    # would be simpler
+    course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
+    if not course_module:
+        # This student must not have access to the course.
+        return None
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
@@ -318,52 +296,50 @@ def _progress_summary(student, request, course):
             continue
 
         sections = []
-
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            with manual_transaction():
-                if section_module.hide_from_toc:
+            if section_module.hide_from_toc:
+                continue
+
+            # Same for sections
+            graded = section_module.graded
+            scores = []
+
+            module_creator = section_module.xmodule_runtime.get_module
+
+            for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
+
+                course_id = course.id
+                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, field_data_cache)
+                if correct is None and total is None:
                     continue
 
-                graded = section_module.graded
-                scores = []
+                scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
-                module_creator = section_module.xmodule_runtime.get_module
+            scores.reverse()
+            section_total, _ = graders.aggregate_scores(
+                scores, section_module.display_name_with_default)
 
-                for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
+            module_format = section_module.format if section_module.format is not None else ''
+            sections.append({
+                'display_name': section_module.display_name_with_default,
+                'url_name': section_module.url_name,
+                'scores': scores,
+                'section_total': section_total,
+                'format': module_format,
+                'due': section_module.due,
+                'graded': graded,
+            })
 
-                    course_id = course.id
-                    (correct, total) = get_score(course_id, student, module_descriptor, module_creator)
-                    if correct is None and total is None:
-                        continue
-
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
-
-                scores.reverse()
-                section_total, _ = graders.aggregate_scores(
-                    scores, section_module.display_name_with_default)
-
-                module_format = section_module.format if section_module.format is not None else ''
-                sections.append({
-                    'display_name': section_module.display_name_with_default,
-                    'url_name': section_module.url_name,
-                    'scores': scores,
-                    'section_total': section_total,
-                    'format': module_format,
-                    'due': section_module.due,
-                    'graded': graded,
-                })
-
-        chapters.append({
-            'course': course.display_name_with_default,
-            'display_name': chapter_module.display_name_with_default,
-            'url_name': chapter_module.url_name,
-            'sections': sections
-        })
+        chapters.append({'course': course.display_name_with_default,
+                         'display_name': chapter_module.display_name_with_default,
+                         'url_name': chapter_module.url_name,
+                         'sections': sections})
 
     return chapters
 
-def get_score(course_id, user, problem_descriptor, module_creator):
+
+def get_score(course_id, user, problem_descriptor, module_creator, field_data_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -396,15 +372,15 @@ def get_score(course_id, user, problem_descriptor, module_creator):
         # These are not problems, and do not have a score
         return (None, None)
 
-    try:
-        student_module = StudentModule.objects.get(
-            student=user,
-            course_id=course_id,
-            module_type='problem',
-            module_state_key=problem_descriptor.location
-        )
-    except StudentModule.DoesNotExist:
-        student_module = None
+    # Create a fake KeyValueStore key to pull out the StudentModule
+    key = DjangoKeyValueStore.Key(
+        Scope.user_state,
+        user.id,
+        problem_descriptor.location,
+        None
+    )
+
+    student_module = field_data_cache.find(key)
 
     if student_module is not None and student_module.max_grade is not None:
         correct = student_module.grade if student_module.grade is not None else 0
@@ -435,16 +411,3 @@ def get_score(course_id, user, problem_descriptor, module_creator):
         total = weight
 
     return (correct, total)
-
-
-@contextmanager
-def manual_transaction():
-    """A context manager for managing manual transactions"""
-    try:
-        yield
-    except Exception:
-        transaction.rollback()
-        log.exception('Due to an error, this transaction has been rolled back')
-        raise
-    else:
-        transaction.commit()

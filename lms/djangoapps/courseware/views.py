@@ -14,7 +14,6 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
@@ -644,9 +643,8 @@ def mktg_course_about(request, course_id):
     except (ValueError, Http404) as e:
         # if a course does not exist yet, display a coming
         # soon button
-        return render_to_response(
-            'courseware/mktg_coming_soon.html', {'course_id': course_id}
-        )
+        return render_to_response('courseware/mktg_coming_soon.html',
+                                  {'course_id': course_id})
 
     registered = registered_for_course(course, request.user)
 
@@ -661,36 +659,21 @@ def mktg_course_about(request, course_id):
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
-    return render_to_response(
-        'courseware/mktg_course_about.html',
-        {
-            'course': course,
-            'registered': registered,
-            'allow_registration': allow_registration,
-            'course_target': course_target,
-            'show_courseware_link': show_courseware_link,
-            'course_modes': course_modes,
-        }
-    )
+    return render_to_response('courseware/mktg_course_about.html',
+                              {
+                                  'course': course,
+                                  'registered': registered,
+                                  'allow_registration': allow_registration,
+                                  'course_target': course_target,
+                                  'show_courseware_link': show_courseware_link,
+                                  'course_modes': course_modes,
+                              })
 
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
 def progress(request, course_id, student_id=None):
-    """
-    Wraps "_progress" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    """
-    with grades.manual_transaction():
-        return _progress(request, course_id, student_id)
-
-
-def _progress(request, course_id, student_id):
-    """
-    Unwrapped version of "progress".
-
-    User progress. We show the grade bar and every problem score.
+    """ User progress. We show the grade bar and every problem score.
 
     Course staff are allowed to see the progress of students in their class.
     """
@@ -706,33 +689,33 @@ def _progress(request, course_id, student_id):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-        # NOTE: To make sure impersonation by instructor works, use
-        # student instead of request.user in the rest of the function.
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
 
-        # The pre-fetching of groups is done to make auth checks not require an
-        # additional DB lookup (this kills the Progress page in particular).
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, request, course)
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course_id, student, course, depth=None)
 
-    grade_summary = grades.grade(student, request, course)
+    courseware_summary = grades.progress_summary(student, request, course,
+                                                 field_data_cache)
+    grade_summary = grades.grade(student, request, course, field_data_cache)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
-    context = {
-        'course': course,
-        'courseware_summary': courseware_summary,
-        'grade_summary': grade_summary,
-        'staff_access': staff_access,
-        'student': student,
-    }
+    context = {'course': course,
+               'courseware_summary': courseware_summary,
+               'grade_summary': grade_summary,
+               'staff_access': staff_access,
+               'student': student,
+               }
+    context.update()
 
-    with grades.manual_transaction():
-        response = render_to_response('courseware/progress.html', context)
-
-    return response
+    return render_to_response('courseware/progress.html', context)
 
 
 @login_required
