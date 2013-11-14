@@ -110,24 +110,6 @@ class @DiscussionUtil
           params["$loading"].loaded()
     return request
 
-  @get: ($elem, url, data, success) ->
-    @safeAjax
-      $elem: $elem
-      url: url
-      type: "GET"
-      dataType: "json"
-      data: data
-      success: success
-
-  @post: ($elem, url, data, success) ->
-    @safeAjax
-      $elem: $elem
-      url: url
-      type: "POST"
-      dataType: "json"
-      data: data
-      success: success
-
   @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
@@ -201,38 +183,6 @@ class @DiscussionUtil
   @setWmdContent: ($content, $local, cls_identifier, text) ->
     @getWmdInput($content, $local, cls_identifier).val(text)
     @getWmdEditor($content, $local, cls_identifier).refreshPreview()
-
-  @subscriptionLink: (type, id) ->
-    followLink = ->
-      @generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
-
-    unfollowLink = ->
-      @generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
-
-    handleFollow = (elem) ->
-      @safeAjax
-        $elem: $(elem)
-        url: @urlFor("follow_#{type}", id)
-        type: "POST"
-        success: (response, textStatus) ->
-          if textStatus == "success"
-            $(elem).replaceWith unfollowLink()
-        dataType: 'json'
-
-    handleUnfollow = (elem) ->
-      @safeAjax
-        $elem: $(elem)
-        url: @urlFor("unfollow_#{type}", id)
-        type: "POST"
-        success: (response, textStatus) ->
-          if textStatus == "success"
-            $(elem).replaceWith followLink()
-        dataType: 'json'
-
-    if @isSubscribed(id, type)
-        unfollowLink()
-    else
-      followLink()
 
   @processEachMathAndCode: (text, processor) ->
 
