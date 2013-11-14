@@ -1064,9 +1064,6 @@ VERIFY_STUDENT = {
     "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
 }
 
-########################## QUERYABLE TABLES ########################
-INSTALLED_APPS += ('queryable_student_module',)
-
 ########################## CLASS DASHBOARD ########################
 INSTALLED_APPS += ('class_dashboard',)
 MITX_FEATURES['CLASS_DASHBOARD'] = False

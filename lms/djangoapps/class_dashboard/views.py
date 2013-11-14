@@ -16,28 +16,32 @@ def has_instructor_access_for_class(user, course_id):
     """
 
     course = get_course_with_access(user, course_id, 'staff', depth=None)
-    return has_access(user, course, 'instructor')
+    
+    #ToDo returning false hangs page.
+    return has_access(user, course, 'staff')
+
+    
 
 
-def all_problem_attempt_distribution(request, course_id):
-    """
-    Creates a json with the attempt distribution for all the problems in the course.
-
-    `request` django request
-
-    `course_id` the course ID for the course interested in
-
-    Returns the format in dashboard_data.get_d3_problem_attempt_distribution
-    """
-    json = {}
-
-    # Only instructor for this particular course can request this information
-    if has_instructor_access_for_class(request.user, course_id):
-        json = dashboard_data.get_d3_problem_attempt_distribution(course_id)
-    else:
-        json = {'error': "Access Denied: User does not have access to this course's data"}
-
-    return HttpResponse(simplejson.dumps(json), mimetype="application/json")
+# def all_problem_attempt_distribution(request, course_id):
+#     """
+#     Creates a json with the attempt distribution for all the problems in the course.
+# 
+#     `request` django request
+# 
+#     `course_id` the course ID for the course interested in
+# 
+#     Returns the format in dashboard_data.get_d3_problem_attempt_distribution
+#     """
+#     json = {}
+# 
+#     # Only instructor for this particular course can request this information
+#     if has_instructor_access_for_class(request.user, course_id):
+#         json = dashboard_data.get_d3_problem_attempt_distribution(course_id)
+#     else:
+#         json = {'error': "Access Denied: User does not have access to this course's data"}
+# 
+#     return HttpResponse(simplejson.dumps(json), mimetype="application/json")
 
 
 def all_sequential_open_distribution(request, course_id):

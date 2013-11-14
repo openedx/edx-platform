@@ -29,6 +29,8 @@ $(function () {
         barGraphOpened.scale.stackColor.range(["#555555","#555555"]);
         
         barGraphOpened.drawGraph();
+        
+        $('svg').siblings('.loading').remove();
       }
 
       i+=1;
@@ -57,36 +59,8 @@ $(function () {
         barGraphGrade.legend.width += 2;
         
         barGraphGrade.drawGraph();
-      }
-
-      i+=1;
-    }
-  });
-
-  d3.json("${reverse('all_problem_attempt_distribution', kwargs=dict(course_id=course_id))}", function(error, json) {
-    var section, paramAttempt, barGraphAttempt;
-    var i, curr_id;
-
-    i = 0;
-    for (section in json) {
-      curr_id = "#${id_attempt_prefix}"+i;
-      paramAttempt = {
-        data: json[section].data,
-        width: $(curr_id).width(),
-        height: $(curr_id).height()-25, // Account for header
-        tag: "attempt"+i,
-        bVerticalXAxisLabel : true,
-      };
-      
-      if ( paramAttempt.data.length > 0 ) {
-        barGraphAttempt = edx_d3CreateStackedBarGraph(paramAttempt, d3.select(curr_id).append("svg"),
-                                                       d3.select("#${id_tooltip_prefix}"+i));
-        barGraphAttempt.scale.stackColor
-          .range(["#c3c4cd","#b0b4d1","#9ca3d6","#8993da","#7682de","#6372e3",
-                  "#4f61e7","#3c50eb","#2940ef","#1530f4","#021ff8"]);
-        barGraphAttempt.legend.width += 2;
         
-        barGraphAttempt.drawGraph();
+        $('svg').siblings('.loading').remove();
       }
 
       i+=1;
