@@ -63,7 +63,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
         def_ms = modulestore()
         try:
-            # using XML stor
+            # using XML store
             course = def_ms.courses.get('{0}/edx4edx_lite'.format(os.path.abspath(settings.DATA_DIR)), None)
         except AttributeError:
             # Using mongo store
@@ -79,7 +79,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysadmin(SysadminBaseTestCase):
     """
-    Check that landing page is the status page
+    Test sysadmin dashboard features using XMLModuleStore
     """
 
     def test_staff_access(self):

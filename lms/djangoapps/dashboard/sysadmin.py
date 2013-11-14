@@ -6,6 +6,7 @@ import csv
 import json
 import logging
 import os
+import subprocess
 import time
 import imp
 import StringIO
@@ -15,8 +16,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext as _
-from student.models import CourseEnrollment
-from student.models import UserProfile, Registration
+from student.models import CourseEnrollment, UserProfile, Registration
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 
@@ -36,7 +36,9 @@ from django.http import Http404
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
+
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.store_utilities import delete_course
 from courseware.access import has_access
 import mongoengine
@@ -65,71 +67,72 @@ def git_info_for_course(cdir):
 
     cmd = ''
     gdir = settings.DATA_DIR / cdir
-    info = [gdir, '', '']
-    if os.path.exists(gdir):
-        cmd = 'cd {0}; git log -1'.format(gdir)
-        for k in os.popen(cmd).readlines():
-            if 'commit' in k:
-                info[0] = k.split()[1]
-            elif 'Author' in k:
-                info[2] = k.split()[1]
-            elif 'Date' in k:
-                info[1] = k.split(' ', 1)[1].strip()
+    info = ['', '', '']
+    if not os.path.exists(gdir):
+        return info
+
+    cmd = ['git', 'log', '-1',
+           '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}',]
+    try:
+        output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+        info = [ output_json['commit'],
+                 output_json['date'], 
+                 output_json['author'], ]
+    except (ValueError, subprocess.CalledProcessError):
+        pass
+
     return info
 
+def import_mongo_course(gitloc, def_ms):
+    """
+    Imports course using management command and captures logging output
+    at debug level for display in template
+    """
 
-def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
-    """This downloads and runs the checks for importing a course in git"""
-
-    msg = u''
-    if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
-       gitloc.startswith('https:') or gitloc.startswith('git:')):
-        msg += \
-            _("The git repo location should end with '.git', and be a valid url")
+    acscript = getattr(settings, 'GIT_ADD_COURSE_SCRIPT', '')
+    if not acscript or not os.path.exists(acscript):
+        msg = u"<font color='red'>{0} - {1}</font>".format(
+            _('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
         return msg
 
-    if is_using_mongo:
-        acscript = getattr(settings, 'GIT_ADD_COURSE_SCRIPT', '')
-        if not acscript or not os.path.exists(acscript):
-            msg = u"<font color='red'>{0} - {1}</font>".format(
-                _('Must configure GIT_ADD_COURSE_SCRIPT in settings first!'), acscript)
-            return msg
+    # import course script directly and call add_repo function
+    git_add_script = imp.load_source('git_add_script', acscript)
+    logging.debug(
+        _('Adding course using add repo from {0} and repo {1}').format(
+            acscript, gitloc))
 
-        # import course script directly and call add_repo function
-        git_add_script = imp.load_source('git_add_script', acscript)
-        logging.debug(
-            _('Adding course using add repo from {0} and repo {1}').format(
-                acscript, gitloc))
+    # Grab logging output for debugging imports
+    output = StringIO.StringIO()
 
-        # Grab logging output for debugging imports
-        output = StringIO.StringIO()
+    import_logger = logging.getLogger(
+        'xmodule.modulestore.xml_importer')
+    git_logger = logging.getLogger('git_add_script')
+    xml_logger = logging.getLogger('xmodule.modulestore.xml')
+    xml_seq_logger = logging.getLogger('xmodule.seq_module')
 
-        import_logger = logging.getLogger(
-            'xmodule.modulestore.xml_importer')
-        git_logger = logging.getLogger('git_add_script')
-        xml_logger = logging.getLogger('xmodule.modulestore.xml')
-        xml_seq_logger = logging.getLogger('xmodule.seq_module')
+    import_log_handler = logging.StreamHandler(output)
+    import_log_handler.setLevel(logging.DEBUG)
 
-        import_log_handler = logging.StreamHandler(output)
-        import_log_handler.setLevel(logging.DEBUG)
+    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        logger.old_level = logger.level
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(import_log_handler)
 
-        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
-            logger.old_level = logger.level
-            logger.setLevel(logging.DEBUG)
-            logger.addHandler(import_log_handler)
+    git_add_script.add_repo(gitloc, None)
 
-        git_add_script.add_repo(gitloc, None)
+    ret = output.getvalue()
 
-        ret = output.getvalue()
+    # Remove handler hijacks
+    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        logger.setLevel(logger.old_level)
+        logger.removeHandler(import_log_handler)
+    msg = u"<font color='red'>{0} {1}</font>".format(
+        _('Added course from'), gitloc)
+    msg += _("<pre>{0}</pre>").format(escape(ret))
+    return msg
 
-        # Remove handler hijacks
-        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
-            logger.setLevel(logger.old_level)
-            logger.removeHandler(import_log_handler)
-        msg = u"<font color='red'>{0} {1}</font>".format(
-            _('Added course from'), gitloc)
-        msg += _("<pre>{0}</pre>").format(escape(ret))
-        return msg
+def import_xml_course(gitloc, def_ms, datatable):
+    """Imports a git course into the XMLModuleStore"""
 
     cdir = (gitloc.rsplit('/', 1)[1])[:-4]
     gdir = settings.DATA_DIR / cdir
@@ -165,6 +168,19 @@ def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
                                  + git_info_for_course(cdir))
     return msg
 
+def get_course_from_git(gitloc, is_using_mongo, def_ms, datatable):
+    """This downloads and runs the checks for importing a course in git"""
+
+    msg = u''
+    if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
+            gitloc.startswith('https:') or gitloc.startswith('git:')):
+        msg += _("The git repo location should end with '.git', and be a valid url")
+        return msg
+
+    if is_using_mongo:
+        return import_mongo_course(gitloc, def_ms)
+
+    return import_xml_course(gitloc, def_ms, datatable)
 
 def fix_external_auth_map_passwords():
     """
@@ -195,7 +211,7 @@ def fix_external_auth_map_passwords():
     return msg
 
 
-def create_user(uname, name, password=None, do_mit=False):
+def create_user(uname, name, password=None):
     """ Creates a user (both SSL and regular)"""
 
     if not uname:
@@ -203,10 +219,8 @@ def create_user(uname, name, password=None, do_mit=False):
     if not name:
         return _('Must provide full name')
 
-    make_eamap = False
-
     msg = u''
-    if do_mit:
+    if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
         if not '@' in uname:
             email = '{0}@MIT.EDU'.format(uname)
         else:
@@ -220,7 +234,6 @@ def create_user(uname, name, password=None, do_mit=False):
             msg += _('Failed - email {0} already exists as external_id'
                      ).format(email)
             return msg
-        make_eamap = True
         new_password = generate_password()
     else:
         if not password:
@@ -249,9 +262,8 @@ def create_user(uname, name, password=None, do_mit=False):
     profile.name = name
     profile.save()
 
-    if make_eamap:
-        credentials = \
-            '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}'.format(name, email)
+    if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        credentials = '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}'.format(name, email)
         eamap = ExternalAuthMap(
             external_id=email,
             external_email=email,
@@ -348,7 +360,11 @@ def sysadmin_dashboard(request):
     datatable = {}
 
     def_ms = modulestore()
-    is_using_mongo = 'mongo' in str(def_ms.__class__)
+
+    # Prefer mongo if using mixed or mongo store
+    is_using_mongo = True
+    if isinstance(def_ms, XMLModuleStore):
+        is_using_mongo = False
 
     if is_using_mongo:
         courses = def_ms.get_courses()
@@ -379,6 +395,8 @@ def sysadmin_dashboard(request):
         else:
             course_iter = courses
         for (cdir, course) in course_iter:
+            if '/' in cdir:
+                cdir = cdir.rsplit('/', 1)[1]
             data.append([course.display_name, cdir]
                         + git_info_for_course(cdir))
 
@@ -429,8 +447,7 @@ def sysadmin_dashboard(request):
         name = request.POST.get('student_fullname', '').strip()
         password = request.POST.get('student_password', '').strip()
 
-        msg += create_user(uname, name, password,
-                           do_mit=settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'])
+        msg += create_user(uname, name, password)
     elif _('Delete user') in action:
         uname = request.POST.get('student_uname', '').strip()
         msg += delete_user(uname)
