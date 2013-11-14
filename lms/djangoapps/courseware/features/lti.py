@@ -236,7 +236,6 @@ def check_lti_popup():
 
 @step('I open gradebook$')
 def check_gradebook(_step):
-    #import ipdb; ipdb.set_trace()
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiLaunchFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
@@ -249,13 +248,14 @@ def check_gradebook(_step):
 @step('I wiew result in Progress page$')
 def check_progress(_step):
     world.click_link('Progress')
-    assert world.browser.is_text_present('Practice Scores:  0.99/1')
+    assert world.browser.is_text_present('Problem Scores: 0.99/1')
 
 @step('I click on Grade link$')
 def check_progress(_step):
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiLaunchFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
-        world.click_link('Grade')
-        assert world.browser.is_text_present('I have stored grades.')
+        iframe.find_by_name('submit-button').first.click()
+        # This test waits no matter how long the text will appear. Timeouts?
+        assert iframe.is_text_present('I have stored grades.')
 

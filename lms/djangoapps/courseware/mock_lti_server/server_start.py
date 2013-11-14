@@ -1,7 +1,7 @@
 import threading
 from mock_lti_server import MockLTIServer
 server_port = 8034
-server_host = '127.0.0.1'
+server_host = 'localhost'
 address = (server_host, server_port)
 server = MockLTIServer(address)
 server.oauth_settings = {

@@ -59,20 +59,21 @@ class AnonymousUsers(models.Model):
 
 def unique_id_for_user(user, course_id):
     """
-    Return a unique id for a user, suitable for inserting into
-    e.g. personalized survey links.
+    Return a unique id for a (user, course) pair, suitable for inserting into e.g. personalized survey links.
     """
-    def _unique_id_for_user(user):
+    def _unique_id_for_user(user, course_id):
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         h = hashlib.md5()
         h.update(settings.SECRET_KEY)
         h.update(str(user.id))
+        h.update(course_id)
         return h.hexdigest()
 
+    # import ipdb; ipdb.set_trace()
     return AnonymousUsers.objects.get_or_create(
         user=user,
         course_id=course_id,
-        anonymous_user_id=_unique_id_for_user(user)
+        anonymous_user_id=_unique_id_for_user(user, course_id)
     )[0].anonymous_user_id
 
 

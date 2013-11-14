@@ -5,10 +5,7 @@ from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 
-import courseware.grades as grades
 from xmodule.modulestore.django import modulestore
-from student.tests.factories import UserFactory
-from django.test.client import RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -110,40 +107,3 @@ class TestLTI(BaseTestXmodule):
             generated_context,
             self.runtime.render_template('lti.html', expected_context),
         )
-
-    @mock.patch('xmodule.lti_module.LTIModule.get_score')
-    def test_lti_grading(self, get_score):
-        """
-        Makes sure that LTI is graded.
-        """
-        weight = 0.15
-        grading_policy = {
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "short_label": "HW",
-                    "weight": weight
-                },
-            ]
-        }
-        mocked_score = {'score': 0.7, 'total': 1}
-        get_score.return_value = mocked_score
-
-        course = self.set_up_course(grading_policy=grading_policy)
-        request_factory = RequestFactory()
-        user = UserFactory.create()
-        request = request_factory.get("foo")
-        request.user = user
-
-        grade_summary = grades.grade(user, request, course)
-        actual_score = grade_summary['grade_breakdown'][0]['percent']
-
-        self.assertEqual(
-            actual_score,
-            mocked_score['score']*weight
-        )
-
-
-

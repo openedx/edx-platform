@@ -28,10 +28,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                          (self.client_address[0],
                           self.log_date_time_string(),
                           format % args))
-
+    '''
     def do_HEAD(self):
         self._send_head()
-
+    '''
     def do_GET(self):
         '''
         Handle a GET request from the client and sends response back.
@@ -90,14 +90,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 status_message = "Incorrect LTI header"
             else:
                 params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
-                '''
-                if self.server.check_oauth_signature(params, post_dict['oauth_signature']):
+                if self.server.check_oauth_signature(params, self.post_dict['oauth_signature']):
                     status_message = "This is LTI tool. Success."
                 else:
                     status_message = "Wrong LTI signature"
-                '''
-                status_message = "This is LTI tool. Success."
-
             # set data for grades
             # what need to be stored as server data
             self.server.grade_data = {
@@ -109,6 +105,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
         self._send_head()
         self._send_response(status_message)
+
 
     def _send_head(self):
         '''
@@ -153,7 +150,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
     def _send_graded_result(self):
 
         values = {
-            'textString': 0.9,
+            'textString': 0.99,
             'sourcedId': self.server.grade_data['user_id'],
             'imsx_messageIdentifier': uuid4().hex,
         }
@@ -211,7 +208,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 <h3>Server response is:</h3>\
                 <h3 class="result">{}</h3></div>
                 <form action="{url}/grade" method="post">
-                <input type="submit" value="Submit">
+                <input type="submit" name="submit-button" value="Submit">
                 </form>
 
                 </body></html>""".format(message, url="http://%s:%s" % self.server.server_address)
@@ -227,7 +224,6 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         logger.debug("LTI: sent response {}".format(response_str))
 
         self.wfile.write(response_str)
-
 
     def _is_correct_lti_request(self):
         '''If url to LTI tool is correct.'''
@@ -283,6 +279,5 @@ class MockLTIServer(HTTPServer):
         request.uri = unicode(url)
         request.http_method = u'POST'
         request.signature = unicode(client_signature)
-
         return signature.verify_hmac_sha1(request, client_secret)
 
