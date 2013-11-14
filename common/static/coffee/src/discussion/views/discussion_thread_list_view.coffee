@@ -156,7 +156,11 @@ if Backbone?
           $(".post-list a").first()?.focus()
         )
 
-      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
+      error = =>
+        @renderThreads()
+        DiscussionUtil.discussionAlert("Sorry", "We had some trouble loading more threads. Please try again.")
+
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy}, error)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
