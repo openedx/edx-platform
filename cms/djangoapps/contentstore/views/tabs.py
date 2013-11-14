@@ -15,7 +15,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..utils import get_course_for_item, get_modulestore
+from ..utils import get_modulestore
 
 from django.utils.translation import ugettext as _
 
@@ -53,10 +53,12 @@ def reorder_static_tabs(request):
         return loc_mapper().translate_locator_to_location(tab_locator)
 
     tabs = request.json['tabs']
-    course = get_course_for_item(get_location_for_tab(tabs[0]))
+    course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(tabs[0]), get_course=True)
 
-    if not has_access(request.user, course.location):
+    if not has_access(request.user, course_location):
         raise PermissionDenied()
+
+    course = get_modulestore(course_location).get_item(course_location)
 
     # get list of existing static tabs in course
     # make sure they are the same lengths (i.e. the number of passed in tabs equals the number

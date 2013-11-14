@@ -108,7 +108,7 @@ urlpatterns += patterns(
         ),
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
-    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
+    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),

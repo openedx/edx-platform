@@ -187,11 +187,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # We expect the children IDs to always be the non-draft version. With view refactoring
         # for split, we are now passing the draft version in some cases.
-        children_ids = [
-            Location(child).replace(revision=None).url()
-            for child
-            in children
-        ]
+        children_ids = [as_published(child).url() for child in children]
 
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)

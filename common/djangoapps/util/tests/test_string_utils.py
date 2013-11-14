@@ -21,6 +21,13 @@ class StringUtilsTest(TestCase):
         self.assertFalse(str_to_bool(''))
         self.assertFalse(str_to_bool(None))
         self.assertFalse(str_to_bool('anything'))
-        self.assertFalse(str_to_bool([]))
-        self.assertFalse(str_to_bool({}))
-        self.assertFalse(str_to_bool(1))
+
+    def test_str_to_bool_errors(self):
+        def test_raises_error(val):
+            with self.assertRaises(AttributeError):
+                self.assertFalse(str_to_bool(val))
+
+        test_raises_error({})
+        test_raises_error([])
+        test_raises_error(1)
+        test_raises_error(True)
