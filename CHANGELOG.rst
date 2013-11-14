@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix answer choices rearranging if user tries to stylize something in the
+text like with bold or italics. (BLD-449)
+
 LMS: Beta instructor dashboard will only count actively enrolled students for
 course enrollment numbers.
 
