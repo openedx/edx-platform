@@ -547,7 +547,7 @@ def instructor_dashboard(request, course_id):
         ).order_by('id')
 
         datatable = {'header': ['User ID', 'Anonymized user ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s)] for s in students]
+        datatable['data'] = [[s.id, unique_id_for_user(s, course_id)] for s in students]
         return return_csv(course_id.replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------

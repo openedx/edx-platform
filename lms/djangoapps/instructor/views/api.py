@@ -448,7 +448,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
         courseenrollment__course_id=course_id,
     ).order_by('id')
     header = ['User ID', 'Anonymized user ID']
-    rows = [[s.id, unique_id_for_user(s)] for s in students]
+    rows = [[s.id, unique_id_for_user(s, course_id)] for s in students]
     return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
 
 

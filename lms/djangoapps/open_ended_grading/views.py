@@ -149,7 +149,7 @@ def student_problem_list(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
 
     # The anonymous student id is needed for communication with ORA.
-    student_id = unique_id_for_user(request.user)
+    student_id = unique_id_for_user(request.user, course_id)
     base_course_url = reverse('courses')
     error_text = ""
 
@@ -186,7 +186,7 @@ def flagged_problem_list(request, course_id):
     Show a student problem list
     '''
     course = get_course_with_access(request.user, course_id, 'staff')
-    student_id = unique_id_for_user(request.user)
+    student_id = unique_id_for_user(request.user, course_id)
 
     # call problem list service
     success = False

@@ -45,18 +45,19 @@ AUDIT_LOG = logging.getLogger("audit")
 
 class AnonymousUsers(models.Model):
     """
-    This table contains user and anonymous_user_id
+    This table contains user, course_Id and anonymous_user_id
 
     Purpose of this table is to provide user by anonymous_user_id.
 
     We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
     http://docs.python.org/2/library/md5.html#md5.digest_size
     """
-    user = models.ForeignKey(User, db_index=True, related_name='anonymous', unique=True)
-    anonymous_user_id = models.CharField(db_index=True, blank=False, unique=True, max_length=16)
+    user = models.ForeignKey(User, db_index=True, related_name='anonymous')
+    anonymous_user_id = models.CharField(unique=True, max_length=16)
+    course_id = models.CharField(db_index=True, max_length=255)
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, course_id):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
@@ -70,6 +71,7 @@ def unique_id_for_user(user):
 
     return AnonymousUsers.objects.get_or_create(
         user=user,
+        course_id=course_id,
         anonymous_user_id=_unique_id_for_user(user)
     )[0].anonymous_user_id
 
@@ -87,6 +89,18 @@ def user_by_anonymous_id(id):
     except ObjectDoesNotExist:
         return None
     return obj.user
+
+
+def unique_id_for_foldit_user(user):
+    """
+    Return a unique id for a user, suitable for inserting into foldit module table
+    """
+    # include the secret key as a salt, and to make the ids unique across
+    # different LMS installs.
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    return h.hexdigest()
 
 
 class UserStanding(models.Model):

@@ -11,8 +11,9 @@ class Migration(SchemaMigration):
         # Adding model 'AnonymousUsers'
         db.create_table('student_anonymoususers', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='anonymous', unique=True, to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='anonymous', to=orm['auth.User'])),
             ('anonymous_user_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=16)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
         ))
         db.send_create_signal('student', ['AnonymousUsers'])
 
@@ -62,8 +63,9 @@ class Migration(SchemaMigration):
         'student.anonymoususers': {
             'Meta': {'object_name': 'AnonymousUsers'},
             'anonymous_user_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '16'}),
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'anonymous'", 'unique': 'True', 'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'anonymous'", 'to': "orm['auth.User']"})
         },
         'student.courseenrollment': {
             'Meta': {'ordering': "('user', 'course_id')", 'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},

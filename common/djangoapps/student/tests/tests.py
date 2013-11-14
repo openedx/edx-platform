@@ -138,15 +138,18 @@ class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
 
     def test_process_survey_link(self):
+        course = Mock(id="test_id")
+
         username = "fred"
         user = Mock(username=username)
         id = unique_id_for_user(user)
         link1 = "http://www.mysurvey.com"
-        self.assertEqual(process_survey_link(link1, user), link1)
+        self.assertEqual(process_survey_link(link1, user, course.id), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
         link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=id)
-        self.assertEqual(process_survey_link(link2, user), link2_expected)
+
+        self.assertEqual(process_survey_link(link2, user, course.id), link2_expected)
 
     def test_cert_info(self):
         user = Mock(username="fred")

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 from foldit.models import Score, PuzzleComplete
-from student.models import unique_id_for_user
+from student.models import unique_id_for_foldit_user
 
 import re
 
@@ -124,7 +124,7 @@ def save_scores(user, puzzle_scores):
         try:
             obj = Score.objects.get(
                 user=user,
-                unique_user_id=unique_id_for_user(user),
+                unique_user_id=unique_id_for_foldit_user(user),
                 puzzle_id=puzzle_id,
                 score_version=score_version)
             obj.current_score = current_score
@@ -133,7 +133,7 @@ def save_scores(user, puzzle_scores):
         except Score.DoesNotExist:
             obj = Score(
                 user=user,
-                unique_user_id=unique_id_for_user(user),
+                unique_user_id=unique_id_for_foldit_user(user),
                 puzzle_id=puzzle_id,
                 current_score=current_score,
                 best_score=best_score,

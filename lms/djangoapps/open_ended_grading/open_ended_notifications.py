@@ -33,7 +33,7 @@ def staff_grading_notifications(course, user):
     pending_grading = False
     img_path = ""
     course_id = course.id
-    student_id = unique_id_for_user(user)
+    student_id = unique_id_for_user(user, course_id)
     notification_type = "staff"
 
     success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
@@ -74,7 +74,7 @@ def peer_grading_notifications(course, user):
     pending_grading = False
     img_path = ""
     course_id = course.id
-    student_id = unique_id_for_user(user)
+    student_id = unique_id_for_user(user, course_id)
     notification_type = "peer"
 
     success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
@@ -132,7 +132,7 @@ def combined_notifications(course, user):
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
-    student_id = unique_id_for_user(user)
+    student_id = unique_id_for_user(user, course.id)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
     notification_type = "combined"

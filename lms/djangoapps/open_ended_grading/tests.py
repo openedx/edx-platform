@@ -455,7 +455,7 @@ class TestStudentProblemList(ModuleStoreTestCase):
         Mock the get_grading_status_list function using StudentProblemListMockQuery.
         """
         # Initialize a StudentProblemList object.
-        student_problem_list = utils.StudentProblemList(self.course.id, unique_id_for_user(self.user))
+        student_problem_list = utils.StudentProblemList(self.course.id, unique_id_for_user(self.user, self.course.id))
         # Get the initial problem list from ORA.
         success = student_problem_list.fetch_from_grading_service()
         # Should be successful, and we should have three problems.  See mock class for details.

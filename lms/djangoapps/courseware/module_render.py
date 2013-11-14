@@ -397,7 +397,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=unique_id_for_user(user),
+        anonymous_student_id=unique_id_for_user(user, course_id),
         course_id=course_id,
         open_ended_grading_interface=open_ended_grading_interface,
         s3_interface=s3_interface,
