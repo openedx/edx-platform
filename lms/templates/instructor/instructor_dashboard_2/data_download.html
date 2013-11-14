@@ -7,11 +7,6 @@
 <input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }">
 <input type="button" name="list-profiles" value="CSV" data-csv="true">
 <br>
-## <input type="button" name="list-grades" value="Student grades">
-## <input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv">
-## <br>
-## <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
-## <br>
 <input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }">
 <input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}">
 
@@ -20,15 +15,23 @@
   <div class="data-display-table"></div>
   <div class="request-response-error"></div>
 
+%if settings.MITX_FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
+  <div>
+    <h2> ${_("Grades")}</h2>
+    <input type="button" name="calculate-grades-csv" value="${_('Calculate Grades')}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+    <br/>
+    <p>${_("Available grades downloads:")}</p>
+    <div class="grade-downloads-table" data-endpoint="${ section_data['list_grade_downloads_url'] }" ></div>
+  </div>
+%endif
+
 %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>
     <p>${_("The status for any active tasks appears in a table below.")} </p>
     <br />
-
     <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
   </div>
-
 %endif
 </div>

@@ -16,7 +16,8 @@ from instructor_task.models import InstructorTask
 from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
                                    delete_problem_state,
-                                   send_bulk_course_email)
+                                   send_bulk_course_email,
+                                   calculate_grades_csv)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
@@ -205,4 +206,15 @@ def submit_bulk_course_email(request, course_id, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+
+def submit_calculate_grades_csv(request, course_id):
+    """
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    task_type = 'grade_course'
+    task_class = calculate_grades_csv
+    task_input = {}
+    task_key = ""
+
     return submit_task(request, task_type, task_class, course_id, task_input, task_key)
