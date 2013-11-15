@@ -1229,11 +1229,8 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-        return HttpResponse(json.dumps({'success': True,
+    return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
-    else:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Invalid e-mail or user')}))
 
 
 def password_reset_confirm_wrapper(
@@ -1515,4 +1512,4 @@ def change_email_settings(request):
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
-    return HttpResponse(json.dumps({'success': True}))
+    return HttpResponse(json.dumps({'success': True}))                                                  
