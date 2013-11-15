@@ -31,7 +31,7 @@
     </div>
 
     <div class="sidebar">
-      <div class="unit-settings window id-holder" data-id="${subsection.location}">
+      <div class="unit-settings window id-holder" data-locator="${locator}">
     <h4 class="header">${_("Subsection Settings")}</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
@@ -115,7 +115,6 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     // but we really should change that behavior.
     if (!window.graderTypes) {
         window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
-        window.graderTypes.course_location = new Location('${parent_location}');
     }
 
     $(".gradable-status").each(function(index, ele) {

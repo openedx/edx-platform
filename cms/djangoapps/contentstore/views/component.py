@@ -2,15 +2,11 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import (HttpResponse, HttpResponseBadRequest,
-        HttpResponseForbidden)
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
-from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from xmodule.modulestore.exceptions import (ItemNotFoundError,
-        InvalidLocationError)
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
@@ -19,7 +15,7 @@ from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 
 from xblock.fields import Scope
-from util.json_request import expect_json, JsonResponse
+from util.json_request import expect_json
 
 from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item
 
@@ -35,7 +31,6 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
            'edit_subsection',
            'edit_unit',
-           'assignment_type_update',
            'create_draft',
            'publish_draft',
            'unpublish_unit',
@@ -75,12 +70,8 @@ def edit_subsection(request, location):
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
-    lms_link = get_lms_link_for_item(
-            location, course_id=course.location.course_id
-    )
-    preview_link = get_lms_link_for_item(
-            location, course_id=course.location.course_id, preview=True
-    )
+    lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
+    preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
 
     # make sure that location references a 'sequential', otherwise return
     # BadRequest
@@ -92,8 +83,8 @@ def edit_subsection(request, location):
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
         logging.error(
-                'Multiple (or none) parents have been found for %s',
-                location
+            'Multiple (or none) parents have been found for %s',
+            location
         )
 
     # this should blow up if we don't find any parents, which would be erroneous
@@ -109,7 +100,7 @@ def edit_subsection(request, location):
         for field
         in fields.values()
         if field.name not in ['display_name', 'start', 'due', 'format']
-            and field.scope == Scope.settings
+        and field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -120,6 +111,9 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    course_locator = loc_mapper().translate_location(
+        course.location.course_id, course.location, False, True
+    )
     locator = loc_mapper().translate_location(
         course.location.course_id, item.location, False, True
     )
@@ -127,19 +121,17 @@ def edit_subsection(request, location):
     return render_to_response(
         'edit_subsection.html',
         {
-           'subsection': item,
-           'context_course': course,
-           'new_unit_category': 'vertical',
-           'lms_link': lms_link,
-           'preview_link': preview_link,
-           'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-           # For grader, which is not yet converted
-           'parent_location': course.location,
-           'parent_item': parent,
-           'locator': locator,
-           'policy_metadata': policy_metadata,
-           'subsection_units': subsection_units,
-           'can_view_live': can_view_live
+            'subsection': item,
+            'context_course': course,
+            'new_unit_category': 'vertical',
+            'lms_link': lms_link,
+            'preview_link': preview_link,
+            'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
+            'parent_item': parent,
+            'locator': locator,
+            'policy_metadata': policy_metadata,
+            'subsection_units': subsection_units,
+            'can_view_live': can_view_live
         }
     )
 
@@ -175,8 +167,8 @@ def edit_unit(request, location):
     except ItemNotFoundError:
         return HttpResponseBadRequest()
     lms_link = get_lms_link_for_item(
-            item.location,
-            course_id=course.location.course_id
+        item.location,
+        course_id=course.location.course_id
     )
 
     # Note that the unit_state (draft, public, private) does not match up with the published value
@@ -234,7 +226,7 @@ def edit_unit(request, location):
                         category,
                         False,
                         None  # don't override default data
-                        ))
+                    ))
                 except PluginMissingError:
                     # dhm: I got this once but it can happen any time the
                     # course author configures an advanced component which does
@@ -260,12 +252,10 @@ def edit_unit(request, location):
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
 
-    containing_subsection_locs = modulestore().get_parent_locations(
-            location, None
-    )
+    containing_subsection_locs = modulestore().get_parent_locations(location, None)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
     containing_section_locs = modulestore().get_parent_locations(
-            containing_subsection.location, None
+        containing_subsection.location, None
     )
     containing_section = modulestore().get_item(containing_section_locs[0])
 
@@ -283,18 +273,18 @@ def edit_unit(request, location):
     preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
 
     preview_lms_link = (
-            '//{preview_lms_base}/courses/{org}/{course}/'
-            '{course_name}/courseware/{section}/{subsection}/{index}'
-        ).format(
-            preview_lms_base=preview_lms_base,
-            lms_base=settings.LMS_BASE,
-            org=course.location.org,
-            course=course.location.course,
-            course_name=course.location.name,
-            section=containing_section.location.name,
-            subsection=containing_subsection.location.name,
-            index=index
-        )
+        '//{preview_lms_base}/courses/{org}/{course}/'
+        '{course_name}/courseware/{section}/{subsection}/{index}'
+    ).format(
+        preview_lms_base=preview_lms_base,
+        lms_base=settings.LMS_BASE,
+        org=course.location.org,
+        course=course.location.course,
+        course_name=course.location.name,
+        section=containing_section.location.name,
+        subsection=containing_subsection.location.name,
+        index=index
+    )
 
     return render_to_response('unit.html', {
         'context_course': course,
@@ -319,28 +309,6 @@ def edit_unit(request, location):
             if item.published_date is not None else None
         ),
     })
-
-
-@expect_json
-@login_required
-@require_http_methods(("GET", "POST", "PUT"))
-@ensure_csrf_cookie
-def assignment_type_update(request, org, course, category, name):
-    """
-    CRUD operations on assignment types for sections and subsections and
-    anything else gradable.
-    """
-    location = Location(['i4x', org, course, category, name])
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
-
-    if request.method == 'GET':
-        rsp = CourseGradingModel.get_section_grader_type(location)
-    elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-        rsp = CourseGradingModel.update_section_grader_type(
-                    location, request.json
-        )
-    return JsonResponse(rsp)
 
 
 @login_required
@@ -374,8 +342,8 @@ def publish_draft(request):
 
     item = modulestore().get_item(location)
     _xmodule_recurse(
-            item,
-            lambda i: modulestore().publish(i.location, request.user.id)
+        item,
+        lambda i: modulestore().publish(i.location, request.user.id)
     )
 
     return HttpResponse()
