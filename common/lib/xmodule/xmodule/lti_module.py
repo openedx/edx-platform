@@ -8,21 +8,21 @@ play and test:
 http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 """
 
-from uuid import uuid4
-
 import logging
 import oauthlib.oauth1
 import urllib
 import textwrap
 from lxml import etree
+from webob import Response
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List
 from xblock.fields import Boolean, Float
+
 
 log = logging.getLogger(__name__)
 
@@ -251,7 +251,7 @@ class LTIModule(LTIFields, XModule):
         if self.TEST_BASE_PATH:
             return 'http://{host}{path}'.format(
                 host=self.TEST_BASE_PATH,
-                path=self.system.ajax_url,
+                path=self.system.ajax_url(third_party=True),
             )
         else:
             # return self.system.hostname + self.system.ajax_url
@@ -377,7 +377,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
     def get_maxscore(self):
         return self.weight
 
-    def handle_ajax(self, dispatch, data):
+    def custom_handler(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
@@ -451,8 +451,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 </imsx_POXEnvelopeRequest>
         \""")
         """
-        data = data.keys()[0] + '=' + data.values()[0]
-        data = data.strip().encode('utf-8')
+        data = request.body.strip().encode('utf-8')
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         try:  # get data from request
             root = etree.fromstring(data, parser=parser)
@@ -466,8 +465,9 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 sourcedId = root.xpath("//sourcedId")[0].text
                 score = root.xpath("//textString")[0].text
         except:
-            return response_xml_template.format(**unsupported_values), "application/xml"
+            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
 
+        real_user = self.system.get_real_user(sourcedId.split('::')[-1])
         action = dispatch.lower()
         if action == 'replaceresult':
             self.system.publish(
@@ -476,7 +476,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                     'value': score,
                     'max_value': self.get_maxscore(),
                 },
-                custom_user=self.system.get_real_user(sourcedId.split('::')[-1])
+                custom_user=real_user
             )
 
             values = {
@@ -485,11 +485,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 'imsx_messageIdentifier': imsx_messageIdentifier,
                 'response': '<replaceResultResponse/>'
             }
-            return response_xml_template.format(**values), "application/xml"
+            return Response(response_xml_template.format(**values), content_type="application/xml")
 
         # return "unsupported" response
         unsupported_values['imsx_messageIdentifier'] = imsx_messageIdentifier
-        return response_xml_template.format(**unsupported_values), "application/xml"
+        return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
@@ -500,3 +500,71 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
     graded = True
 
     module_class = LTIModule
+
+    custom_handler = module_attr('custom_handler')
+
+    def authenticate(self, request, course):
+        # self course_id produces runtime assertion error
+
+        # Obtains client_key and client_secret credentials from current course:
+        client_key = client_secret = ''
+
+        for lti_passport in course.lti_passports:
+            try:
+                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
+            except ValueError:
+                raise LTIError('Could not parse LTI passport: {0!r}. \
+                    Should be "id:key:secret" string.'.format(lti_passport))
+            if lti_id == self.lti_id.strip():
+                client_key, client_secret = key, secret
+                break
+
+        # what should come from LTI provider:
+        """
+        data_example = textwrap.dedent(\"""
+            <?xml version = "1.0" encoding = "UTF-8"?>
+                <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
+                  <imsx_POXHeader>
+                    <imsx_POXRequestHeaderInfo>
+                      <imsx_version>V1.0</imsx_version>
+                      <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
+                    </imsx_POXRequestHeaderInfo>
+                  </imsx_POXHeader>
+                  <imsx_POXBody>
+                    <replaceResultRequest>
+                      <resultRecord>
+                        <sourcedGUID>
+                          <sourcedId>feb-123-456-2929::28883::5afe5d9bb03796557ee2614f5c9611fb</sourcedId>
+                        </sourcedGUID>
+                        <result>
+                          <resultScore>
+                            <language>en-us</language>
+                            <textString>0.4</textString>
+                          </resultScore>
+                        </result>
+                      </resultRecord>
+                    </replaceResultRequest>
+                  </imsx_POXBody>
+                </imsx_POXEnvelopeRequest>
+        \""")
+        """
+        data = request.body.strip().encode('utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        try:  # get data from request
+            root = etree.fromstring(data, parser=parser)
+            if root.nsmap:
+                namespaces = {'def': root.nsmap.values()[0]}
+                imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+                sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
+                score = root.xpath("//def:textString", namespaces=namespaces)[0].text
+            else:
+                imsx_messageIdentifier = root.xpath("//imsx_messageIdentifier")[0].text
+                sourcedId = root.xpath("//sourcedId")[0].text
+                score = root.xpath("//textString")[0].text
+        except:
+            # return response_xml_template.format(**unsupported_values), "application/xml"
+            return None, False
+
+        anonymous_user_id  = sourcedId.split('::')[-1]
+        return anonymous_user_id, True
+

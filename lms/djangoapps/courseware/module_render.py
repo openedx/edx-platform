@@ -509,8 +509,9 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     if not Location.is_valid(location):
         raise Http404("Invalid location")
 
-    if not request.user.is_authenticated():
-        raise PermissionDenied
+    if handler != 'custom_handler':
+        if not request.user.is_authenticated():
+            raise PermissionDenied
 
     # Check submitted files
     files = request.FILES or {}
@@ -528,14 +529,23 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
             )
         )
         raise Http404
+    # import ipdb; ipdb.set_trace()
+    custom_user = None
+    if handler == 'custom_handler':
+        from courseware.courses import get_course_by_id
+        course = get_course_by_id(course_id)
+        anonymous_user_id, status = descriptor.authenticate(request, course)
+        if not status:
+            raise PermissionDenied
+        from student.models import user_by_anonymous_id
+        custom_user = user_by_anonymous_id(anonymous_user_id)
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
-        request.user,
+        custom_user or request.user,
         descriptor
     )
-
-    instance = get_module(request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(custom_user or request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
