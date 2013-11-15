@@ -144,6 +144,11 @@
             <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
             <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
+          <li class="field required text" id="field-city">
+            <label for="city">${_('City')}</label>
+            <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito')}" required aria-required="true" aria-describedby="city-tip"/>
+            <span class="tip tip-input" id="city-tip">${_("City where you live")}</span>
+          </li>
         </ol>
 
         % else:
