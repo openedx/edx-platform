@@ -44,7 +44,7 @@
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
-      <a href="#before-transcript" class="nav-skip">${_("Skip to a navigable version of this video's transcript.")}</a>
+      <a href="#before-transcript_${id}" class="nav-skip sr">${_("Skip to a navigable version of this video's transcript.")}</a>
 
       <article class="video-wrapper">
           <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
@@ -83,7 +83,7 @@
                   </div>
               </div>
           </section>
-          <a class="nav-skip" id="before-transcript" href="#after-transcript">${_('Skip to end of transcript.')}</a>
+          <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
 
       <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
@@ -91,7 +91,7 @@
       </ol>
     </div>
 
-    <a class="nav-skip" id="after-transcript" href="#before-transcript">${_('Go back to start of transcript.')}</a>
+    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
