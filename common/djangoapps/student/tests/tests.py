@@ -28,7 +28,7 @@ from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from mock import Mock, patch, sentinel
 from textwrap import dedent
 
-from student.models import unique_id_for_user, CourseEnrollment
+from student.models import unique_id_for_user, simple_unique_id_for_user, CourseEnrollment
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
@@ -137,24 +137,29 @@ class ResetPasswordTests(TestCase):
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
 
-    def test_process_survey_link(self):
+    @patch('student.views.unique_id_for_user')
+    def test_process_survey_link(self, mock_unique_id_for_user):
         course = Mock(id="test_id")
+        user = Mock(username="fred", id="test_user_id")
+        mock_unique_id_for_user.return_value = simple_unique_id_for_user(user)
 
-        username = "fred"
-        user = Mock(username=username)
-        id = unique_id_for_user(user)
         link1 = "http://www.mysurvey.com"
         self.assertEqual(process_survey_link(link1, user, course.id), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=id)
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=simple_unique_id_for_user(user))
 
         self.assertEqual(process_survey_link(link2, user, course.id), link2_expected)
 
-    def test_cert_info(self):
-        user = Mock(username="fred")
+    # patching student.views.unique_id_for_user, not student.models.unique_id_for_user,
+    # look at http://www.voidspace.org.uk/python/mock/patch.html#where-to-patch for explanation.
+    @patch('student.views.unique_id_for_user')
+    def test_cert_info(self, mock_unique_id_for_user):
+        user = Mock(username="fred", id="test_user_id")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url)
+        mock_unique_id_for_user.return_value = simple_unique_id_for_user(user)
+
+        course = Mock(end_of_course_survey_url=survey_url, id="test_id")
 
         self.assertEqual(_cert_info(user, course, None),
                          {'status': 'processing',
@@ -214,7 +219,7 @@ class CourseEndingTest(TestCase):
                           })
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None)
+        course2 = Mock(end_of_course_survey_url=None, id="test_course_id2")
         cert_status = {'status': 'notpassing', 'grade': '67',
                        'download_url': download_url}
         self.assertEqual(_cert_info(user, course2, cert_status),

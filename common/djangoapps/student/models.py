@@ -92,9 +92,10 @@ def user_by_anonymous_id(id):
     return obj.user
 
 
-def unique_id_for_foldit_user(user):
+def simple_unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into foldit module table
+    or into unit tests.
     """
     # include the secret key as a salt, and to make the ids unique across
     # different LMS installs.
