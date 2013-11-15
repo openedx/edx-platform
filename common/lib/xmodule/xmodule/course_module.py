@@ -597,6 +597,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def raw_grader(self):
+        # force the caching of the xblock value so that it can detect the change
+        # pylint: disable=pointless-statement
+        self.grading_policy['GRADER']
         return self._grading_policy['RAW_GRADER']
 
     @raw_grader.setter

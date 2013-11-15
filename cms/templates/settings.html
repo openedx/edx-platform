@@ -4,7 +4,6 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from contentstore import utils
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
   from django.core.urlresolvers import reverse
@@ -69,17 +68,20 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">${_("Organization")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">${_("Course Number")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">${_("Course Name")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
 
@@ -87,12 +89,14 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
+              <p><a class="link-courseURL" rel="external" href="https:${lms_link_for_about_page}" />https:${lms_link_for_about_page}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
+                <a title="${_('Send a note to students via email')}" 
+                    href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${lms_link_for_about_page}%20to%20enroll." class="action action-primary">
+                    <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
@@ -199,7 +203,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <%def name='overview_text()'><%
                     a_link_start = '<a class="link-courseURL" rel="external" href="'
                     a_link_end = '">' + _("your course summary page") + '</a>'
-                    a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
+                    a_link = a_link_start + lms_link_for_about_page + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
                   <span class="tip tip-stacked">${overview_text()}</span>
@@ -211,15 +215,14 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
-                      <img class="course-image" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
                     </span>
 
-                    <% ctx_loc = context_course.location %>
                     <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href='${upload_asset_url}'>${_("files &amp; uploads")}</a></span>
 
                     % else:
                     <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
                     </span>
                     <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
@@ -286,14 +289,13 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
      <div class="bit">
      % if context_course:
           <%
+            course_team_url = course_locator.url_reverse('course_team/', '')
             ctx_loc = context_course.location
-            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-            course_team_url = location.url_reverse('course_team/', '')
           %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${course_locator.url_reverse('settings/grading/')}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>

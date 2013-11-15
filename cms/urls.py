@@ -32,23 +32,12 @@ urlpatterns = patterns('',  # nopep8
     url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)$',
-        'contentstore.views.get_course_settings', name='settings_details'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)$',
-        'contentstore.views.course_config_graders_page', name='settings_grading'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$',
-        'contentstore.views.course_settings_updates', name='course_settings'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)/(?P<grader_index>.*)$',
-        'contentstore.views.course_grader_updates', name='course_settings'),
     # This is the URL to initially render the course advanced settings.
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)$',
         'contentstore.views.course_config_advanced_page', name='course_advanced_settings'),
     # This is the URL used by BackBone for updating and re-fetching the model.
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)/update.*$',
         'contentstore.views.course_advanced_updates', name='course_advanced_settings_updates'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$',
-        'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
@@ -113,7 +102,10 @@ urlpatterns += patterns(
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
     url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
+    url(r'(?ix)^xblock/{}/gradeas/(?P<assignment_type>\w+)$'.format(parsers.URL_RE_SOURCE), 'assignment_type_update'),
     url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
+    url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
+    url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
 )
 
 js_info_dict = {

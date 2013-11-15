@@ -36,7 +36,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
     
             appendSetFixtures """
                               <section class="courseware-section branch" data-locator="a-location-goes-here">
-                                  <li class="branch collapsed id-holder" data-id="an-id-goes-here" data-locator="an-id-goes-here">
+                                  <li class="branch collapsed id-holder" data-locator="an-id-goes-here">
                                     <a href="#" class="delete-section-button"></a>
                                   </li>
                               </section>

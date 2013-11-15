@@ -113,14 +113,12 @@ def expand_checklist_action_url(course_module, checklist):
     The method does a copy of the input checklist and does not modify the input argument.
     """
     expanded_checklist = copy.deepcopy(checklist)
-    oldurlconf_map = {
-        "SettingsDetails": "settings_details",
-        "SettingsGrading": "settings_grading"
-    }
 
     urlconf_map = {
         "ManageUsers": "course_team",
-        "CourseOutline": "course"
+        "CourseOutline": "course",
+        "SettingsDetails": "settings/details",
+        "SettingsGrading": "settings/grading",
     }
 
     for item in expanded_checklist.get('items'):
@@ -130,12 +128,5 @@ def expand_checklist_action_url(course_module, checklist):
             ctx_loc = course_module.location
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             item['action_url'] = location.url_reverse(url_prefix, '')
-        elif action_url in oldurlconf_map:
-            urlconf_name = oldurlconf_map[action_url]
-            item['action_url'] = reverse(urlconf_name, kwargs={
-                'org': course_module.location.org,
-                'course': course_module.location.course,
-                'name': course_module.location.name,
-            })
 
     return expanded_checklist
