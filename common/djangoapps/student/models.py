@@ -713,7 +713,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def create_enrollment(cls, user, course_id):
+    def get_or_create_enrollment(cls, user, course_id):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -761,11 +761,15 @@ class CourseEnrollment(models.Model):
         This saves immediately.
         """
         activation_changed = False
+        # if is_active is None, then the call to update_enrollment didn't specify
+        # any value, so just leave is_active as it is
         if self.is_active != is_active and is_active is not None:
             self.is_active = is_active
             activation_changed = True
 
         mode_changed = False
+        # if mode is None, the call to update_enrollment didn't specify a new 
+        # mode, so leave as-is
         if self.mode != mode and mode is not None:
             self.mode = mode
             mode_changed = True
@@ -819,7 +823,7 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        enrollment = cls.create_enrollment(user, course_id)
+        enrollment = cls.get_or_create_enrollment(user, course_id)
         enrollment.update_enrollment(is_active=True)
         return enrollment
 
