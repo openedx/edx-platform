@@ -61,8 +61,8 @@ require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) 
 
       <div class="tab-list">
         <ol class='components'>
-          % for id, locator in components:
-          <li class="component" data-id="${id}" data-locator="${locator}"/>
+          % for locator in components:
+          <li class="component" data-locator="${locator}"/>
           % endfor
 
           <li class="new-component-item">

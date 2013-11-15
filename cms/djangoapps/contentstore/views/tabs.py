@@ -125,12 +125,9 @@ def edit_tabs(request, org, course, coursename):
         static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
     components = [
-        [
-            static_tab.location.url(),
-            loc_mapper().translate_location(
-                course_item.location.course_id, static_tab.location, False, True
-            )
-        ]
+        loc_mapper().translate_location(
+            course_item.location.course_id, static_tab.location, False, True
+        )
         for static_tab
         in static_tabs
     ]

@@ -14,7 +14,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
-    url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
