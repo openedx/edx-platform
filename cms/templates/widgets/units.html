@@ -11,12 +11,15 @@ This def will enumerate through a passed in subsection and list all of the units
     if subsection_units is None:
       subsection_units = subsection.get_children()
   %>
+  <%
+    subsection_locator = loc_mapper().translate_location(context_course.location.course_id, subsection.location, False, True)
+  %>
   % for unit in subsection_units:
   <%
-    unit_update_url = loc_mapper().translate_location(context_course.location.course_id, unit.location, False, True).url_reverse('xblock')
+    unit_locator = loc_mapper().translate_location(context_course.location.course_id, unit.location, False, True)
   %>
-  <li class="courseware-unit leaf unit is-draggable" data-id="${unit.location}" data-parent-id="${subsection.location.url()}"
-      data-update_url="${unit_update_url}" >
+  <li class="courseware-unit leaf unit is-draggable" data-locator="${unit_locator}"
+      data-parent="${subsection_locator}">
 
     <%include file="_ui-dnd-indicator-before.html" />
 
@@ -34,8 +37,7 @@ This def will enumerate through a passed in subsection and list all of the units
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"
-       data-update_url="${unit_update_url}">
+	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-locator="${unit_locator}">
         <span class="delete-icon"></span></a>
 	<span data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></span>
       </div>
@@ -48,7 +50,7 @@ This def will enumerate through a passed in subsection and list all of the units
   <li>
     <%include file="_ui-dnd-indicator-initial.html" />
 
-    <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection.location}">
+    <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection_locator}">
       <span class="new-unit-icon"></span>New Unit
     </a>
   </li>

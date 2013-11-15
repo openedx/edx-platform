@@ -184,12 +184,17 @@ class DraftModuleStore(MongoModuleStore):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
+
+        # We expect the children IDs to always be the non-draft version. With view refactoring
+        # for split, we are now passing the draft version in some cases.
+        children_ids = [as_published(child).url() for child in children]
+
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
         if not getattr(draft_item, 'is_draft', False):
             self.convert_to_draft(as_published(location))
 
-        return super(DraftModuleStore, self).update_children(draft_loc, children)
+        return super(DraftModuleStore, self).update_children(draft_loc, children_ids)
 
     def update_metadata(self, location, metadata):
         """

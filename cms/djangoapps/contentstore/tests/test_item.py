@@ -3,109 +3,110 @@
 import json
 import datetime
 from pytz import UTC
-from django.core.urlresolvers import reverse
 
 from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 
 
-class DeleteItem(CourseTestCase):
-    """Tests for '/xblock' DELETE url."""
+class ItemTest(CourseTestCase):
+    """ Base test class for create, save, and delete """
     def setUp(self):
-        """ Creates the test course with a static page in it. """
-        super(DeleteItem, self).setUp()
-        self.course = CourseFactory.create(org='mitX', number='333', display_name='Dummy Course')
+        super(ItemTest, self).setUp()
 
+        self.unicode_locator = unicode(loc_mapper().translate_location(
+            self.course.location.course_id, self.course.location, False, True
+        ))
+
+    def get_old_id(self, locator):
+        """
+        Converts new locator to old id format.
+        """
+        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator))
+
+    def get_item_from_modulestore(self, locator, draft=False):
+        """
+        Get the item referenced by the locator from the modulestore
+        """
+        store = modulestore('draft') if draft else modulestore()
+        return store.get_item(self.get_old_id(locator))
+
+    def response_locator(self, response):
+        """
+        Get the locator (unicode representation) from the response payload
+        :param response:
+        """
+        parsed = json.loads(response.content)
+        return parsed['locator']
+
+    def create_xblock(self, parent_locator=None, display_name=None, category=None, boilerplate=None):
+        data = {
+            'parent_locator': self.unicode_locator if parent_locator is None else parent_locator,
+            'category': category
+        }
+        if display_name is not None:
+            data['display_name'] = display_name
+        if boilerplate is not None:
+            data['boilerplate'] = boilerplate
+        return self.client.ajax_post('/xblock', json.dumps(data))
+
+
+class DeleteItem(ItemTest):
+    """Tests for '/xblock' DELETE url."""
     def test_delete_static_page(self):
         # Add static tab
-        data = json.dumps({
-            'parent_location': 'i4x://mitX/333/course/Dummy_Course',
-            'category': 'static_tab'
-        })
-
-        resp = self.client.post(
-            reverse('create_item'),
-            data,
-            content_type="application/json"
-        )
+        resp = self.create_xblock(category='static_tab')
         self.assertEqual(resp.status_code, 200)
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
         resp_content = json.loads(resp.content)
-        resp = self.client.delete(resp_content['update_url'])
+        resp = self.client.delete('/xblock/' + resp_content['locator'])
         self.assertEqual(resp.status_code, 204)
 
 
-class TestCreateItem(CourseTestCase):
+class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
     """
-    def response_id(self, response):
-        """
-        Get the id from the response payload
-        :param response:
-        """
-        parsed = json.loads(response.content)
-        return parsed['id']
-
     def test_create_nicely(self):
         """
         Try the straightforward use cases
         """
         # create a chapter
         display_name = 'Nicely created'
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps({
-                'parent_location': self.course.location.url(),
-                'display_name': display_name,
-                'category': 'chapter'
-            }),
-            content_type="application/json"
-        )
+        resp = self.create_xblock(display_name=display_name, category='chapter')
         self.assertEqual(resp.status_code, 200)
 
         # get the new item and check its category and display_name
-        chap_location = self.response_id(resp)
-        new_obj = modulestore().get_item(chap_location)
+        chap_locator = self.response_locator(resp)
+        new_obj = self.get_item_from_modulestore(chap_locator)
         self.assertEqual(new_obj.scope_ids.block_type, 'chapter')
         self.assertEqual(new_obj.display_name, display_name)
         self.assertEqual(new_obj.location.org, self.course.location.org)
         self.assertEqual(new_obj.location.course, self.course.location.course)
 
         # get the course and ensure it now points to this one
-        course = modulestore().get_item(self.course.location)
-        self.assertIn(chap_location, course.children)
+        course = self.get_item_from_modulestore(self.unicode_locator)
+        self.assertIn(self.get_old_id(chap_locator).url(), course.children)
 
         # use default display name
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps({
-                'parent_location': chap_location,
-                'category': 'vertical'
-            }),
-            content_type="application/json"
-        )
+        resp = self.create_xblock(parent_locator=chap_locator, category='vertical')
         self.assertEqual(resp.status_code, 200)
 
-        vert_location = self.response_id(resp)
+        vert_locator = self.response_locator(resp)
 
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps({
-                'parent_location': vert_location,
-                'category': 'problem',
-                'boilerplate': template_id
-            }),
-            content_type="application/json"
+        resp = self.create_xblock(
+            parent_locator=vert_locator,
+            category='problem',
+            boilerplate=template_id
         )
         self.assertEqual(resp.status_code, 200)
-        prob_location = self.response_id(resp)
-        problem = modulestore('draft').get_item(prob_location)
+        prob_locator = self.response_locator(resp)
+        problem = self.get_item_from_modulestore(prob_locator, True)
         # ensure it's draft
         self.assertTrue(problem.is_draft)
         # check against the template
@@ -119,133 +120,102 @@ class TestCreateItem(CourseTestCase):
         Negative tests for create_item
         """
         # non-existent boilerplate: creates a default
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps(
-                {'parent_location': self.course.location.url(),
-                 'category': 'problem',
-                 'boilerplate': 'nosuchboilerplate.yaml'
-                 }),
-            content_type="application/json"
-        )
+        resp = self.create_xblock(category='problem', boilerplate='nosuchboilerplate.yaml')
         self.assertEqual(resp.status_code, 200)
 
 
-class TestEditItem(CourseTestCase):
+class TestEditItem(ItemTest):
     """
-    Test contentstore.views.item.save_item
+    Test xblock update.
     """
-    def response_id(self, response):
-        """
-        Get the id from the response payload
-        :param response:
-        """
-        parsed = json.loads(response.content)
-        return parsed['id']
-
     def setUp(self):
         """ Creates the test course structure and a couple problems to 'edit'. """
         super(TestEditItem, self).setUp()
         # create a chapter
         display_name = 'chapter created'
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps(
-                {'parent_location': self.course.location.url(),
-                 'display_name': display_name,
-                 'category': 'chapter'
-                 }),
-            content_type="application/json"
-        )
-        chap_location = self.response_id(resp)
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps({
-                'parent_location': chap_location,
-                'category': 'sequential',
-            }),
-            content_type="application/json"
-        )
-        self.seq_location = self.response_id(resp)
+        resp = self.create_xblock(display_name=display_name, category='chapter')
+        chap_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=chap_locator, category='sequential')
+        self.seq_locator = self.response_locator(resp)
+        self.seq_update_url = '/xblock/' + self.seq_locator
+
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
-        resp = self.client.post(
-            reverse('create_item'),
-            json.dumps({
-                'parent_location': self.seq_location,
-                'category': 'problem',
-                'boilerplate': template_id,
-            }),
-            content_type="application/json"
-        )
-        self.problems = [self.response_id(resp)]
+        resp = self.create_xblock(parent_locator=self.seq_locator, category='problem', boilerplate=template_id)
+        self.problem_locator = self.response_locator(resp)
+        self.problem_update_url = '/xblock/' + self.problem_locator
+
+        self.course_update_url = '/xblock/' + self.unicode_locator
 
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'metadata': {'rerandomize': 'onreset'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'metadata': {'rerandomize': 'onreset'}}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertEqual(problem.rerandomize, 'onreset')
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'metadata': {'rerandomize': None}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'metadata': {'rerandomize': None}}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertEqual(problem.rerandomize, 'never')
 
     def test_null_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertIsNotNone(problem.markdown)
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.problems[0],
-                'nullout': ['markdown']
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'nullout': ['markdown']}
         )
-        problem = modulestore('draft').get_item(self.problems[0])
+        problem = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertIsNone(problem.markdown)
 
     def test_date_fields(self):
         """
         Test setting due & start dates on sequential
         """
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = self.get_item_from_modulestore(self.seq_locator)
         self.assertIsNone(sequential.due)
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.seq_location,
-                'metadata': {'due': '2010-11-22T04:00Z'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'due': '2010-11-22T04:00Z'}}
         )
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = self.get_item_from_modulestore(self.seq_locator)
         self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
-        self.client.post(
-            reverse('save_item'),
-            json.dumps({
-                'id': self.seq_location,
-                'metadata': {'start': '2010-09-12T14:00Z'}
-            }),
-            content_type="application/json"
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'start': '2010-09-12T14:00Z'}}
         )
-        sequential = modulestore().get_item(self.seq_location)
+        sequential = self.get_item_from_modulestore(self.seq_locator)
         self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
+    def test_children(self):
+        # Create 2 children of main course.
+        resp_1 = self.create_xblock(display_name='child 1', category='chapter')
+        resp_2 = self.create_xblock(display_name='child 2', category='chapter')
+        chapter1_locator = self.response_locator(resp_1)
+        chapter2_locator = self.response_locator(resp_2)
+
+        course = self.get_item_from_modulestore(self.unicode_locator)
+        self.assertIn(self.get_old_id(chapter1_locator).url(), course.children)
+        self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
+
+        # Remove one child from the course.
+        resp = self.client.ajax_post(
+            self.course_update_url,
+            data={'children': [chapter2_locator]}
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        # Verify that the child is removed.
+        course = self.get_item_from_modulestore(self.unicode_locator)
+        self.assertNotIn(self.get_old_id(chapter1_locator).url(), course.children)
+        self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
