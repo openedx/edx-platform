@@ -6,7 +6,7 @@
 ## and attach them to the global context manually.
 define(["jquery", "underscore", "youtube", "mathjax", "codemirror", "tinymce",
         "jquery.tinymce", "jquery.qtip", "jquery.scrollTo", "jquery.flot",
-        "jquery.cookie",
+        "jquery.cookie", "jquery.loupeAndLightbox",
         "utility"],
        function($, _, YT, MathJax, CodeMirror, tinymce) {
     window.$ = $;

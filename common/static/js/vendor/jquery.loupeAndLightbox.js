@@ -186,7 +186,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function appendLoupe() {
         $loupe
-          .appendTo($('div.place'))
+          .appendTo($('div.zooming-image-place'))
           .append($magnifiedImage)
           .fadeIn(settings.fadeSpeed, function() {
             $(this).addClass('visible');

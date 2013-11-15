@@ -19,12 +19,12 @@ Feature: CMS.Component Adding
            | Component               |
            | Text                    |
            | Announcement            |
-           | Zooming Diagrams        |
+           | Zooming Image           |
        Then I see HTML components in this order:
            | Component               |
            | Text                    |
            | Announcement            |
-           | Zooming Diagrams        |
+           | Zooming Image           |
 
     Scenario: I can add Latex HTML components
        Given I am in Studio editing a new unit
