@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from dashboard.sysadmin import create_user
+from dashboard.sysadmin import Users
 from external_auth.models import ExternalAuthMap
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import Group
@@ -23,7 +23,8 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.utils.html import escape
 from courseware.access import get_access_group_name, has_access
-from dashboard.sysadmin import CourseImportLog
+from dashboard.models import CourseImportLog
+from xmodule.modulestore.xml import XMLModuleStore
 import mongoengine
 
 TEST_MONGODB_LOG = {
@@ -54,10 +55,9 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
     def _add_edx4edx(self):
         """Adds the edx4edx sample course"""
 
-        return self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Courses'),
+        return self.client.post(reverse('sysadmin_courses'), {
             'repo_location': 'https://github.com/mitocw/edx4edx_lite.git',
-            'action': _('Load new course from github'), })
+            'action': 'add_course', })
 
     def _rm_edx4edx(self):
         """Deletes the sample course from the XML store"""
@@ -72,10 +72,9 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
             course = def_ms.get_course('MITx/edx4edx/edx4edx')
 
         # Delete git loaded course
-        return self.client.post(reverse('sysadmin'),
-                                {'dash_mode': _('Courses'),
-                                 'course_id': course.id,
-                                 'action': _('Delete course from site'), })
+        return self.client.post(reverse('sysadmin_courses'), 
+                                 { 'course_id': course.id,
+                                 'action': 'del_course', })
 
 
 @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'), "ENABLE_SYSADMIN_DASHBOARD not set")
@@ -87,15 +86,18 @@ class TestSysadmin(SysadminBaseTestCase):
     def test_staff_access(self):
         # pylint: disable-msg=E1103
 
-        response = self.client.get(reverse('sysadmin'))
-        self.assertEqual('/sysadmin', response.context['next'])
+        test_views = ['sysadmin', 'sysadmin_courses', 'sysadmin_staffing',] 
+        for view in test_views:
+            response = self.client.get(reverse(view))
+            self.assertEqual(response.status_code, 302)
 
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
         self.assertTrue(logged_in)
 
-        response = self.client.get(reverse('sysadmin'))
-        self.assertEqual('/sysadmin', response.context['next'])
+        for view in test_views:
+            response = self.client.get(reverse(view))
+            self.assertEqual(response.status_code, 404)
 
         response = self.client.get(reverse('gitlogs'))
         self.assertEqual(response.status_code, 404)
@@ -106,11 +108,12 @@ class TestSysadmin(SysadminBaseTestCase):
         self.client.logout()
         self.client.login(username=self.user.username, password='foo')
 
-        response = self.client.get(reverse('sysadmin'))
-        self.assertFalse(hasattr(response.context, 'next'))
+        for view in test_views:
+            response = self.client.get(reverse(view))
+            self.assertTrue(response.status_code, 200)
 
         response = self.client.get(reverse('gitlogs'))
-        self.assertFalse(hasattr(response.context, 'next'))
+        self.assertTrue(response.status_code, 200)
 
     def test_user_mod(self):
         """Create and delete a user"""
@@ -121,8 +124,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         # Create user
         self.client.post(reverse('sysadmin'),
-                         {'dash_mode': _('Status'),
-                          'action': _('Create user'),
+                         {'action': 'create_user',
                           'student_uname': 'test_cuser+sysadmin@edx.org',
                           'student_fullname': 'test cuser',
                           'student_password': 'foozor', })
@@ -140,10 +142,9 @@ class TestSysadmin(SysadminBaseTestCase):
 
         # Delete user
         self.client.post(reverse('sysadmin'),
-                         {'dash_mode': _('Status'),
-                          'action': _('Delete user'),
-                          'student_uname': 'test_cuser+sysadmin@edx.org',
-                          'student_fullname': 'test cuser', })
+                         {'action': 'del_user',
+                         'student_uname': 'test_cuser+sysadmin@edx.org',
+                         'student_fullname': 'test cuser', })
 
         self.assertEqual(0, len(User.objects.filter(
             username='test_cuser+sysadmin@edx.org',
@@ -156,10 +157,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self._setstaff_login()
 
-        response = self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Status'),
-            'action': _('Download list of all users (csv file)'),
-        })
+        response = self.client.post(reverse('sysadmin'), {'action': 'download_users',})
 
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
@@ -172,7 +170,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self._setstaff_login()
 
-        create_user('test0', 'test test')
+        Users().create_user('test0', 'test test')
         # Will raise exception, so no assert needed
         eamap = ExternalAuthMap.objects.get(external_name='test test')
         mitu = User.objects.get(username='test0')
@@ -184,9 +182,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self.assertFalse(check_password(eamap.internal_password, mitu.password))
 
-        response = self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Status'),
-            'action': _('Check and repair external Auth Map'), })
+        response = self.client.post(reverse('sysadmin'), {'action': 'repair_eamap', })
 
         self.assertIn('{0} test0'.format(_('Failed in authenticating')), response.content)
         self.assertIn(_('fixed password'), response.content)
@@ -195,9 +191,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         # Check for all OK
         self._setstaff_login()
-        response = self.client.post(reverse('sysadmin'),
-                                    {'dash_mode': _('Status'),
-                                     'action': _('Check and repair external Auth Map'), })
+        response = self.client.post(reverse('sysadmin'),{ 'action': 'repair_eamap', })
         self.assertIn(_('All ok!'), response.content)
 
     def test_xml_course_add_delete(self):
@@ -206,10 +200,9 @@ class TestSysadmin(SysadminBaseTestCase):
         self._setstaff_login()
 
         # Try bad git repo
-        response = self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Courses'),
+        response = self.client.post(reverse('sysadmin_courses'), {
             'repo_location': 'github.com/mitocw/edx4edx_lite',
-            'action': _('Load new course from github'), })
+            'action': 'add_course', })
         self.assertIn(_("The git repo location should end with '.git', and be a valid url"), response.content.decode('utf-8'))
 
         # Create git loaded course
@@ -244,10 +237,7 @@ class TestSysadmin(SysadminBaseTestCase):
         self._setstaff_login()
         self._add_edx4edx()
 
-        response = self.client.post(reverse('sysadmin'), {
-            'dash_mode': _('Staffing and Enrollment'),
-            'action': _('Download staff and instructor list (csv file)'),
-        })
+        response = self.client.post(reverse('sysadmin_staffing'), {'action': 'get_staff_csv', })
 
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
@@ -264,8 +254,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self._setstaff_login()
         self._add_edx4edx()
-        response = self.client.post(reverse('sysadmin'), {'dash_mode': _('Staffing and Enrollment')})
-        print(response.content)
+        response = self.client.get(reverse('sysadmin_staffing'))
         self.assertIn('edx4edx', response.content)
         self._rm_edx4edx()
 
@@ -325,7 +314,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             pass
 
         def_ms = modulestore()
-        self.assertIn('mongo', str(def_ms.__class__))
+        self.assertFalse(isinstance(def_ms, XMLModuleStore))
 
         self._add_edx4edx()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')

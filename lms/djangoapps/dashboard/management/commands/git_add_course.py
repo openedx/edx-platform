@@ -5,7 +5,6 @@ import os
 import sys
 import re
 import datetime
-import mongoengine  # used to store import log
 import StringIO
 import logging
 
@@ -17,23 +16,13 @@ from django.core.management.base import BaseCommand, CommandError, make_option
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 
+import mongoengine
+from dashboard.models import CourseImportLog
+
 log = logging.getLogger(__name__)
 
 GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
-
-class CourseImportLog(mongoengine.Document):
-    """Mongoengine model for git log"""
-    # pylint: disable-msg=R0924
-
-    course_id = mongoengine.StringField(max_length=128)
-    location = mongoengine.StringField(max_length=168)
-    import_log = mongoengine.StringField(max_length=20 * 65535)
-    git_log = mongoengine.StringField(max_length=65535)
-    repo_dir = mongoengine.StringField(max_length=128)
-    created = mongoengine.DateTimeField()
-    meta = {'indexes': ['course_id', 'created'],
-            'allow_inheritance': False}
 
 def add_repo(repo, rdir_in):
     """This will add a git repo into the mongo modulestore"""

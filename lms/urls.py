@@ -86,10 +86,7 @@ urlpatterns += (
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 if settings.MITX_FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
     urlpatterns += (
-        url(r'^sysadmin$', 'dashboard.sysadmin.sysadmin_dashboard', name="sysadmin"),
-        url(r'^gitlogs$', 'dashboard.sysadmin.view_git_logs', name="gitlogs"),
-        url(r'^gitlogs/(?P<course_id>.+)$', 'dashboard.sysadmin.view_git_logs',
-            name="gitlogs_detail"),
+        url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
     )
 
 #Semi-static views (these need to be rendered and have the login bar, but don't change)

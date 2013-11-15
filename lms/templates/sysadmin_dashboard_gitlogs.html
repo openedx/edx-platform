@@ -8,14 +8,13 @@
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
 </%block>
-<script language="JavaScript" type="text/javascript">
-function goto( mode)
-{
-  document.dashform.dash_mode.value = mode;
-  document.dashform.submit() ;
-}
-</script>
 <style type="text/css">
+a.active-section {
+	color: #551A8B;
+}
+.sysadmin-dashboard-content h2 a {
+	margin-right: 1.2em;
+}
 table.stat_table {
 	font-family: verdana,arial,sans-serif;
 	font-size:11px;
@@ -49,15 +48,19 @@ textarea {
 <section class="container">
 <div class="sysadmin-dashboard-wrapper">
 
+<section class="container">
+<div class="sysadmin-dashboard-wrapper">
+
   <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
     <h1>${_('Sysadmin Dashboard')}</h1>
-
-    <h2>[ <a href="#" onclick="goto('Status');">${_('Status')}</a> |
-          <a href="#" onclick="goto('Courses');">${_('Courses')}</a> |
-         <a href="#" onclick="goto('Staffing and Enrollment');">${_('Staffing and Enrollment')}</a> |
-           <a href="${reverse('gitlogs')}" class="selectedmode">${_('GitLogs')}</a>
-           ]
+	<hr />
+    <h2 class="instructor-nav">
+	  <a href="${reverse('sysadmin')}">${_('Users')}</a>
+      <a href="${reverse('sysadmin_courses')}">${_('Courses')}</a>
+      <a href="${reverse('sysadmin_staffing')}">${_('Staffing and Enrollment')}</a> 
+      <a href="${reverse('gitlogs')}" class="active-section">${_('Git Logs')}</a>
     </h2>
+	<hr />
 
     <form name="dashform" method="POST" action="${reverse('sysadmin')}">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -66,16 +69,19 @@ textarea {
     <h3>${_('Git Logs')}</h3>
 
 %if course_id is None:
-
     <table class="stat_table">
 	  <thead>
-		<tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>${_('Git Action')}</th></tr>
+		<tr>
+		  <th>${_('Date')}</th>
+		  <th>${_('Course ID')}</th>
+		  <th>${_('Git Action')}</th>
+		</tr>
 	  </thead>
 	  <tbody>
 		%for cil in cilset[:10]:
         <tr>
 	      <td>${cil.created}</td>
-	      <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
+	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
 	      <td>${cil.git_log}</td>
 		</tr>
 		%endfor
@@ -87,22 +93,28 @@ textarea {
     <h2>${_('Recent git load activity for')} ${course_id}</h2>
 
     <table class="stat_table">
-    <tr><th>${_('Date')}</th><th>${_('Course ID')}</th><th>${_('git action')}</th></tr>
-
-    % for cil in cilset[:2]:
-
+	  <thead>
+		<tr>
+		  <th>${_('Date')}</th>
+		  <th>${_('Course ID')}</th>
+		  <th>${_('git action')}</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		% for cil in cilset[:2]:
         <tr>
-	    <td>${cil.created}</td>
-	    <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
-	    <td>${cil.git_log}</td>
-	</tr>
+	      <td>${cil.created}</td>
+	      <td><a href="${reverse('gitlogs')}/${cil.course_id}">${cil.course_id}</a></td>
+	      <td>${cil.git_log}</td>
+		</tr>
 	
-	<tr><td colspan="3">
-	    <pre>${cil.import_log | h}</pre>
-	</td></tr>
-
-    % endfor
-    
+		<tr>
+		  <td colspan="3">
+			<pre>${cil.import_log | h}</pre>
+		  </td>
+		</tr>
+		% endfor
+      </tbody>
     </table>
 
 % endif
