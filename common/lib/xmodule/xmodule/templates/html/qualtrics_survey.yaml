@@ -1,0 +1,15 @@
+---
+metadata:
+    display_name: Qualtrics Survey
+data: |
+      <p>Your explanatory text here.</p>
+      <p><a href="https://YOUR_UNIVERSITY.qualtrics.com/SE/?SID=SV_###############&a=%%USER_ID%%" target="_blank">Link to Survey</a></p>
+      
+      <!-- Replace the "###############" with your Survey ID.
+        ALso replace YOUR_UNIVERSITY with your qualtrics ID.
+        Leave the "%%USER_ID%%" as it is; It will pass each user's ID to qualtrics.
+        If you wish to embed your survey into the courseware instead of opening a new tab, replace the above HTML with what is provided below.
+           
+        <p>Your explanatory text here.</p>
+        <iframe src="https://stanforduniversity.qualtrics.com/SE/?SID=SV_###############&a=%%USER_ID%%" height="1000" width="800" />
+      -->
