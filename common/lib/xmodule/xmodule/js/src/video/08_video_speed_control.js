@@ -8,15 +8,12 @@ function () {
 
     // VideoSpeedControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoSpeedControl = {};
 
-        if (state.videoType === 'html5') {
-            _initialize(state);
-        } else if (state.videoType === 'youtube' && state.youtubeXhr) {
-            state.youtubeXhr.always(function () {
-                _initialize(state);
-            });
-        }
+        _initialize(state);
+        dfd.resolve();
 
         if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
             console.log(
@@ -24,9 +21,9 @@ function () {
             );
 
             _hideSpeedControl(state);
-
-            return;
         }
+
+        return dfd.promise();
     };
 
     // ***************************************************************

@@ -11,6 +11,11 @@ VIDEO_BUTTONS = {
     'Play': '.video_control.play',
 }
 
+SELECTORS = {
+    'spinner': '.video-wrapper .spinner',
+    'controls': 'section.video-controls',
+}
+
 # We should wait 300 ms for event handler invocation + 200ms for safety.
 DELAY = 0.5
 
@@ -22,6 +27,13 @@ def i_created_a_video_component(step):
         step=step,
         category='video',
     )
+
+    world.wait_for_xmodule()
+    world.disable_jquery_animations()
+
+    world.wait_for_present('.is-initialized')
+    world.wait(DELAY)
+    assert not world.css_visible(SELECTORS['spinner'])
 
 
 @step('I have created a Video component with subtitles$')
@@ -41,7 +53,13 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
 
     # Return to the video
     world.visit(video_url)
+
     world.wait_for_xmodule()
+    world.disable_jquery_animations()
+
+    world.wait_for_present('.is-initialized')
+    world.wait(DELAY)
+    assert not world.css_visible(SELECTORS['spinner'])
 
 
 @step('I have uploaded subtitles "([^"]*)"$')
@@ -52,7 +70,6 @@ def i_have_uploaded_subtitles(_step, sub_id):
 
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
-    world.wait_for_xmodule()
     assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
@@ -73,7 +90,6 @@ def i_edit_the_component(_step):
 
 @step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
-    world.wait_for_xmodule()
     button_css = 'a.hide-subtitles'
     if shown == 'hidden':
         world.css_click(button_css)
@@ -118,18 +134,18 @@ def xml_only_video(step):
 
 @step('The correct Youtube video is shown$')
 def the_youtube_video_is_shown(_step):
-    world.wait_for_xmodule()
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
 
 
 @step('Make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
+    SELECTOR = '.closed .subtitles'
     if captions_state == 'closed':
-        if world.css_visible('.subtitles'):
+        if not world.is_css_present(SELECTOR):
             world.browser.find_by_css('.hide-subtitles').click()
     else:
-        if not world.css_visible('.subtitles'):
+        if world.is_css_present(SELECTOR):
             world.browser.find_by_css('.hide-subtitles').click()
 
 
@@ -139,18 +155,7 @@ def hover_over_button(_step, button):
 
 
 @step('Captions (?:are|become) "([^"]*)"$')
-def are_captions_visibile(_step, visibility_state):
-    _step.given('Captions become "{0}" after 0 seconds'.format(visibility_state))
-
-
-@step('Captions (?:are|become) "([^"]*)" after (.+) seconds$')
-def check_captions_visibility_state(_step, visibility_state, timeout):
-    timeout = int(timeout.strip())
-
-    # Captions become invisible by fading out. We must wait by a specified
-    # time.
-    world.wait(timeout)
-
+def check_captions_visibility_state(_step, visibility_state):
     if visibility_state == 'visible':
         assert world.css_visible('.subtitles')
     else:
@@ -162,17 +167,17 @@ def find_caption_line_by_data_index(index):
     return world.css_find(SELECTOR).first
 
 
-@step('I focus on caption line with data-index (\d+)$')
+@step('I focus on caption line with data-index "([^"]*)"$')
 def focus_on_caption_line(_step, index):
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
 
 
-@step('I press "enter" button on caption line with data-index (\d+)$')
-def focus_on_caption_line(_step, index):
+@step('I press "enter" button on caption line with data-index "([^"]*)"$')
+def click_on_the_caption(_step, index):
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
 
 
-@step('I see caption line with data-index (\d+) has class "([^"]*)"$')
+@step('I see caption line with data-index "([^"]*)" has class "([^"]*)"$')
 def caption_line_has_class(_step, index, className):
     SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
     world.css_has_class(SELECTOR, className.strip())
