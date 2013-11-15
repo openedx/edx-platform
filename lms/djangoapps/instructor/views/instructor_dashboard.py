@@ -54,6 +54,9 @@ def instructor_dashboard_2(request, course_id):
         _section_student_admin(course_id, access),
         _section_data_download(course_id, access),
         _section_analytics(course_id, access),
+      # The metrics tab has been implemented in the beta dashboard but is
+      # currently turned off due to some problems. There is code including some
+      # coffee files that are included but will not run.
 #        _section_metrics(course_id, access),
     ]
 
