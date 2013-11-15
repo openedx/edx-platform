@@ -10,11 +10,11 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network :private_network, ip: "192.168.20.40"
+  config.vm.network :private_network, ip: "192.168.10.40"
 
   nfs_setting = RUBY_PLATFORM =~ /darwin/ || RUBY_PLATFORM =~ /linux/
   config.vm.synced_folder ".", "/opt/edx/edx-platform", id: "vagrant-root", :nfs => nfs_setting
-
+  config.vm.synced_folder "../themes", "/opt/edx/themes", id: "vagrant-theems", :nfs => nfs_setting
   # Make it so that network access from the vagrant guest is able to
   # use SSH private keys that are present on the host without copying
   # them into the VM.
