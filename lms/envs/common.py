@@ -36,7 +36,7 @@ from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "EVEX"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
@@ -461,9 +461,9 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGES = ()
+LANGUAGES = ( ('es_419', 'Spanish'), )
+TIME_ZONE = 'America/Guayaquil'
+LANGUAGE_CODE = 'es_419'
 
 # We want i18n to be turned off in production, at least until we have full localizations.
 # Thus we want the Django translation engine to be disabled. Otherwise even without
@@ -911,6 +911,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    #Cities EVEX
+    'cities',    
+
     # Monitor the status of services
     'service_status',
 
@@ -988,6 +991,7 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
 )
 
 ######################### MARKETING SITE ###############################
