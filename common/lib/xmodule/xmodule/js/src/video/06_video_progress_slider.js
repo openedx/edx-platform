@@ -41,7 +41,8 @@ function () {
             onSlide: onSlide,
             onStop: onStop,
             updatePlayTime: updatePlayTime,
-            updateStartEndTimeRegion: updateStartEndTimeRegion
+            updateStartEndTimeRegion: updateStartEndTimeRegion,
+            notifyThroughHandleEnd: notifyThroughHandleEnd
         };
 
         state.bindTo(methodsDict, state.videoProgressSlider, state);
@@ -109,11 +110,6 @@ function () {
             return;
         } else {
             duration = params.duration;
-        }
-
-        // If the range spans the entire length of video, we don't do anything.
-        if (!this.videoPlayer.startTime && !this.videoPlayer.endTime) {
-            return;
         }
 
         start = this.videoPlayer.startTime;
@@ -199,8 +195,6 @@ function () {
         }, 200);
     }
 
-    // Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera
-    // noticed
     function updatePlayTime(params) {
         var time = Math.floor(params.time),
             duration = Math.floor(params.duration);
@@ -212,6 +206,32 @@ function () {
             this.videoProgressSlider.slider
                 .slider('option', 'max', duration)
                 .slider('option', 'value', time);
+        }
+    }
+
+    // When the video stops playing (either because the end was reached, or
+    // because endTime was reached), the screen reader must be notified that
+    // the video is no longer playing. We do this by a little trick. Setting
+    // the title attribute of the slider know to "video ended", and focusing
+    // on it. The screen reader will read the attr text.
+    //
+    // The user can then tab his way forward, landing on the next control
+    // element, the Play button.
+    //
+    // @param params  -  object with property `end`. If set to true, the
+    //                   function must set the title attribute to
+    //                   `video ended`;
+    //                   if set to false, the function must reset the attr to
+    //                   it's original state.
+    //
+    // This function will be triggered from VideoPlayer methods onEnded(),
+    // onPlay(), and update() (update method handles endTime).
+    function notifyThroughHandleEnd(params) {
+        if (params.end) {
+            this.videoProgressSlider.handle.attr('title', 'video ended');
+            this.videoProgressSlider.handle.focus();
+        } else {
+            this.videoProgressSlider.handle.attr('title', 'video position');
         }
     }
 
