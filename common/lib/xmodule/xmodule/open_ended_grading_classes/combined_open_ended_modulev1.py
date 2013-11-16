@@ -11,6 +11,7 @@ from  xmodule.open_ended_grading_classes import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 log = logging.getLogger("mitx.courseware")
 
@@ -249,14 +250,14 @@ class CombinedOpenEndedV1Module():
         idx, task_states = idx_task_states
 
         state_values = {
-            self.INITIAL: 0,
-            self.ASSESSING: 1,
-            self.INTERMEDIATE_DONE: 2,
-            self.DONE: 3
+            OpenEndedChild.INITIAL: 0,
+            OpenEndedChild.ASSESSING: 1,
+            OpenEndedChild.POST_ASSESSMENT: 2,
+            OpenEndedChild.DONE: 3
         }
 
         if not task_states:
-            return (0, 0, state_values[self.INITITIAL], idx)
+            return (0, 0, state_values[OpenEndedChild.INITIAL], idx)
 
         final_child_state = json.loads(task_states[-1])
         scores = [attempt.get('score', 0) for attempt in final_child_state.get('child_history', [])]
@@ -267,7 +268,7 @@ class CombinedOpenEndedV1Module():
         return (
             len(task_states),
             best_score,
-            state_values[final_child_state.get('child_state', self.INITIAL)],
+            state_values.get(final_child_state.get('child_state', OpenEndedChild.INITIAL), 0),
             idx
         )
 
