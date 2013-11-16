@@ -259,7 +259,11 @@ class CombinedOpenEndedV1Module():
             return (0, 0, state_values[self.INITITIAL], idx)
 
         final_child_state = json.loads(task_states[-1])
-        best_score = max(attempt.get('score', 0) for attempt in final_child_state.get('child_history', []))
+        scores = [attempt.get('score', 0) for attempt in final_child_state.get('child_history', [])]
+        if scores:
+            best_score = max(scores)
+        else:
+            best_score = 0
         return (
             len(task_states),
             best_score,
