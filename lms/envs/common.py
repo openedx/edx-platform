@@ -551,6 +551,12 @@ CC_PROCESSOR = {
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
+
+# Members of this group are allowed to generate payment reports
+PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
+# Maximum number of rows the report can contain
+PAYMENT_REPORT_MAX_ITEMS = 10000
+
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
@@ -903,6 +909,8 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # value depending on the number of workers that might be sending email in
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
+
+
 
 ################################### APPS ######################################
 INSTALLED_APPS = (

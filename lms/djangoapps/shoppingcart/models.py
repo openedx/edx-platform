@@ -2,6 +2,7 @@ from datetime import datetime
 import pytz
 import logging
 import smtplib
+import unicodecsv
 
 from model_utils.managers import InheritanceManager
 from collections import namedtuple
@@ -205,6 +206,8 @@ class OrderItem(models.Model):
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True)
+    # general purpose field, not user-visible.  Used for reporting
+    report_comments = models.TextField(default="")
 
     @property
     def line_cost(self):
@@ -251,6 +254,66 @@ class OrderItem(models.Model):
         Default implementation is to return an empty set
         """
         return self.pk_with_subclass, set([])
+
+    @classmethod
+    def purchased_items_btw_dates(cls, start_date, end_date):
+        """
+        Returns a QuerySet of the purchased items between start_date and end_date inclusive.
+        """
+        return cls.objects.filter(
+            status="purchased",
+            fulfilled_time__gte=start_date,
+            fulfilled_time__lt=end_date,
+        )
+
+    @classmethod
+    def csv_purchase_report_btw_dates(cls, filelike, start_date, end_date):
+        """
+        Outputs a CSV report into "filelike" (a file-like python object, such as an actual file, an HttpRequest,
+        or sys.stdout) of purchased items between start_date and end_date inclusive.
+        Opening and closing filelike (if applicable) should be taken care of by the caller
+        """
+        items = cls.purchased_items_btw_dates(start_date, end_date).order_by("fulfilled_time")
+
+        writer = unicodecsv.writer(filelike, encoding="utf-8")
+        writer.writerow(OrderItem.csv_report_header_row())
+
+        for item in items:
+            writer.writerow(item.csv_report_row)
+
+    @classmethod
+    def csv_report_header_row(cls):
+        """
+        Returns the "header" row for a csv report of purchases
+        """
+        return [
+            "Purchase Time",
+            "Order ID",
+            "Status",
+            "Quantity",
+            "Unit Cost",
+            "Total Cost",
+            "Currency",
+            "Description",
+            "Comments"
+        ]
+
+    @property
+    def csv_report_row(self):
+        """
+        Returns an array which can be fed into csv.writer to write out one csv row
+        """
+        return [
+            self.fulfilled_time,
+            self.order_id,  # pylint: disable=no-member
+            self.status,
+            self.qty,
+            self.unit_cost,
+            self.line_cost,
+            self.currency,
+            self.line_desc,
+            self.report_comments,
+        ]
 
     @property
     def pk_with_subclass(self):
@@ -343,13 +406,13 @@ class PaidCourseRegistration(OrderItem):
 
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
-
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(course.display_name_with_default)
         item.currency = currency
         order.currency = currency
+        item.report_comments = item.csv_report_comments
         order.save()
         item.save()
         log.info("User {} added course registration {} to cart: order {}"
@@ -388,6 +451,31 @@ class PaidCourseRegistration(OrderItem):
                         .format(dashboard_link=reverse('dashboard')))
 
         return self.pk_with_subclass, set([notification])
+
+    @property
+    def csv_report_comments(self):
+        """
+        Tries to fetch an annotation associated with the course_id from the database.  If not found, returns u"".
+        Otherwise returns the annotation
+        """
+        try:
+            return PaidCourseRegistrationAnnotation.objects.get(course_id=self.course_id).annotation
+        except PaidCourseRegistrationAnnotation.DoesNotExist:
+            return u""
+
+
+class PaidCourseRegistrationAnnotation(models.Model):
+    """
+    A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
+    generates report for the paid courses, each report item must contain the payment account associated with a course.
+    And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
+    so this is to retrofit it.
+    """
+    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    annotation = models.TextField(null=True)
+
+    def __unicode__(self):
+        return u"{} : {}".format(self.course_id, self.annotation)
 
 
 class CertificateItem(OrderItem):
