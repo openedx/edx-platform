@@ -3,15 +3,6 @@ from paver.easy import *
 from paver.setuputils import setup
 from pavelib import prereqs
 
-import json
-import glob
-import os
-import platform
-import subprocess
-import signal
-import psutil
-
-
 setup(
     name="OpenEdX",
     packages=['OpenEdX'],
@@ -22,6 +13,7 @@ setup(
 )
 
 # Build Constants
+
 REPO_ROOT = path(__file__).abspath().dirname().dirname()  # /project_dir/edx-platform/
 PROJECT_ROOT = REPO_ROOT.dirname()      # /project_dir
 REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
@@ -33,6 +25,7 @@ env_data = None
 try:
     with open('env.json') as env_file:
         env_data = json.load(env_file)
+
 except IOError:
     print("Warning: File env.json not found - some configuration requires this")
 
@@ -144,7 +137,6 @@ def compile_assets(options):
         print("compile_assets ending")
     except:
         pass
-
     finally:
         if run_watch:
             try:
