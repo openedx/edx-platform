@@ -26,8 +26,6 @@ from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
 
-unicode = unicode  # to disable pylint unicode warnings
-
 
 class LTIError(Exception):
     pass
