@@ -176,7 +176,6 @@ def _grade(student, request, course, keep_raw_scores):
                 with transaction.commit_on_success():
                     should_grade_section = StudentModule.objects.filter(
                         student=student,
-                        module_type_in=['problem', 'combinedopenended'],
                         module_state_key__in=[
                             descriptor.location for descriptor in section['xmoduledescriptors']
                         ]
@@ -400,7 +399,6 @@ def get_score(course_id, user, problem_descriptor, module_creator):
         student_module = StudentModule.objects.get(
             student=user,
             course_id=course_id,
-            module_type__in=['problem', 'combinedopenended'],
             module_state_key=problem_descriptor.location
         )
     except StudentModule.DoesNotExist:
