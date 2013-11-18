@@ -179,7 +179,7 @@ class WordCloudModule(WordCloudFields, XModule):
 
         Args:
             dispatch: string request slug
-            data: dict request get parameters
+            data: dict request get parameters, as a WebOb MultiDict
 
         Returns:
             json string

@@ -632,6 +632,7 @@ class CapaModule(CapaFields, XModule):
         """
         Is it now past this problem's due date, including grace period?
         """
+        #return False       # DEBUG_IGNORE_DUE_DATES
         return (self.close_date is not None and
                 datetime.datetime.now(UTC()) > self.close_date)
 

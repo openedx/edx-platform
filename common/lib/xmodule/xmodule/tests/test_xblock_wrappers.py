@@ -257,7 +257,7 @@ class TestXModuleHandler(TestXBlockWrapper):
     def setUp(self):
         self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
         self.module.handle_ajax = Mock(return_value='{}')
-        self.request = Mock()
+        self.request = webob.Request({})
 
     def test_xmodule_handler_passed_data(self):
         self.module.xmodule_handler(self.request)

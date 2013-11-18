@@ -8,9 +8,11 @@ Tests of the Capa XModule
 #pylint: disable=C0302
 
 import datetime
-import unittest
-import random
 import json
+import random
+import os
+import textwrap
+import unittest
 
 from mock import Mock, patch
 from webob.multidict import MultiDict
@@ -33,42 +35,47 @@ class CapaFactory(object):
     A helper class to create problem modules with various parameters for testing.
     """
 
-    sample_problem_xml = """<?xml version="1.0"?>
-<problem>
-  <text>
-    <p>What is pi, to two decimal placs?</p>
-  </text>
-<numericalresponse answer="3.14">
-<textline math="1" size="30"/>
-</numericalresponse>
-</problem>
-"""
+    sample_problem_xml = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <problem>
+            <text>
+                <p>What is pi, to two decimal placs?</p>
+            </text>
+        <numericalresponse answer="3.14">
+        <textline math="1" size="30"/>
+        </numericalresponse>
+        </problem>
+    """)
 
     num = 0
 
-    @staticmethod
-    def next_num():
-        CapaFactory.num += 1
-        return CapaFactory.num
+    @classmethod
+    def next_num(cls):
+        cls.num += 1
+        return cls.num
 
-    @staticmethod
-    def input_key():
+    @classmethod
+    def input_key(cls, id=2):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + CapaFactory.answer_key())
+        return ("input_" + cls.answer_key(id))
 
-    @staticmethod
-    def answer_key():
+    @classmethod
+    def answer_key(cls, id=2):
         """
         Return the key stored in the capa problem answer dict
         """
-        return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
-                         'SampleProblem%d' % CapaFactory.num]) +
-                "_2_1")
+        return (
+            "%s_%d_1" % (
+                "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
+                id,
+            )
+        )
 
-    @staticmethod
-    def create(graceperiod=None,
+    @classmethod
+    def create(cls,
+               graceperiod=None,
                due=None,
                max_attempts=None,
                showanswer=None,
@@ -97,8 +104,8 @@ class CapaFactory(object):
             attempts: also added to instance state.  Will be converted to an int.
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(CapaFactory.next_num())])
-        field_data = {'data': CapaFactory.sample_problem_xml}
+                             "SampleProblem{0}".format(cls.next_num())])
+        field_data = {'data': cls.sample_problem_xml}
 
         if graceperiod is not None:
             field_data['graceperiod'] = graceperiod
@@ -490,6 +497,106 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_with_files(self):
+        from xmodule.tests import DATA_DIR
+        from capa.xqueue_interface import XQueueInterface
+
+        fnames = ["asset.html", "image.jpg", "textbook.pdf"]
+        fpaths = [os.path.join(DATA_DIR, "uploads", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+        xqueue_interface = XQueueInterface(
+            "http://example.com/xqueue",
+            Mock(),
+        )
+        xqueue_interface._http_post = Mock()
+        xqueue_interface._http_post.return_value = (0, "ok")
+        module.system.xqueue['interface'] = xqueue_interface
+
+        get_request_dict = {
+            CapaFactoryWithFiles.input_key(id=2): fileobjs,
+            CapaFactoryWithFiles.input_key(id=3): 'None',
+        }
+
+        module.check_problem(get_request_dict)
+
+        # _http_post is called like this:
+        #   _http_post(
+        #       'http://example.com/xqueue/xqueue/submit/',
+        #       {
+        #           'xqueue_header': '{"lms_key": "df34fb702620d7ae892866ba57572491", "lms_callback_url": "/", "queue_name": "BerkeleyX-cs188x"}',
+        #           'xqueue_body': '{"student_info": "{\\"anonymous_student_id\\": \\"student\\", \\"submission_time\\": \\"20131117183318\\"}", "grader_payload": "{\\"project\\": \\"p3\\"}", "student_response": ""}',
+        #       },
+        #       files={
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html', mode 'r' at 0x49c5f60>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg', mode 'r' at 0x49c56f0>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf', mode 'r' at 0x49c5a50>,
+        #       },
+        #   )
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        args, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fpaths, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
+
+    def test_check_problem_with_files_as_xblock(self):
+        from xmodule.tests import DATA_DIR
+        from capa.xqueue_interface import XQueueInterface
+
+        fnames = ["asset.html", "image.jpg", "textbook.pdf"]
+        fpaths = [os.path.join(DATA_DIR, "uploads", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+        xqueue_interface = XQueueInterface(
+            "http://example.com/xqueue",
+            Mock(),
+        )
+        xqueue_interface._http_post = Mock()
+        xqueue_interface._http_post.return_value = (0, "ok")
+        module.system.xqueue['interface'] = xqueue_interface
+
+        import webob
+        post_data = []
+        for fname, fileobj in zip(fnames, fileobjs):
+            post_data.append((CapaFactoryWithFiles.input_key(id=2), (fname, fileobj)))
+        post_data.append((CapaFactoryWithFiles.input_key(id=3), 'None'))
+
+        request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
+        module.handle('xmodule_handler', request, 'problem_check')
+
+        # _http_post is called like this:
+        #   _http_post(
+        #       'http://example.com/xqueue/xqueue/submit/',
+        #       {
+        #           'xqueue_header': '{"lms_key": "df34fb702620d7ae892866ba57572491", "lms_callback_url": "/", "queue_name": "BerkeleyX-cs188x"}',
+        #           'xqueue_body': '{"student_info": "{\\"anonymous_student_id\\": \\"student\\", \\"submission_time\\": \\"20131117183318\\"}", "grader_payload": "{\\"project\\": \\"p3\\"}", "student_response": ""}',
+        #       },
+        #       files={
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html', mode 'r' at 0x49c5f60>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg', mode 'r' at 0x49c56f0>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf', mode 'r' at 0x49c5a50>,
+        #       },
+        #   )
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        args, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fnames, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
 
     def test_check_problem_error(self):
 
@@ -1264,6 +1371,42 @@ class CapaModuleTest(unittest.TestCase):
         """
         module = CapaFactory.create()
         self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
+
+
+class CapaFactoryWithFiles(CapaFactory):
+    sample_problem_xml = textwrap.dedent("""\
+        <problem>
+            <coderesponse queuename="BerkeleyX-cs188x">
+                <filesubmission
+                    points="25"
+                    allowed_files="analysis.py qlearningAgents.py valueIterationAgents.py"
+                    required_files="analysis.py qlearningAgents.py valueIterationAgents.py"
+                />
+                <codeparam>
+                    <answer_display>
+                        If you're having trouble with this Project,
+                        please refer to the Lecture Slides and attend office hours.
+                    </answer_display>
+                    <grader_payload>{"project": "p3"}</grader_payload>
+                </codeparam>
+            </coderesponse>
+
+            <customresponse>
+                <text>
+                    If you worked with a partner, enter their username or email address. If you
+                    worked alone, enter None.
+                </text>
+
+                <textline points="0" size="40" correct_answer="Your partner's username or 'None'"/>
+                <answer type="loncapa/python">
+correct=['correct']
+s = str(submission[0]).strip()
+if submission[0] == '':
+    correct[0] = 'incorrect'
+                </answer>
+            </customresponse>
+        </problem>
+    """)
 
 
 class ComplexEncoderTest(unittest.TestCase):
