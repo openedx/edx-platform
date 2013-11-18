@@ -144,8 +144,6 @@ class LTIModule(LTIFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = "LTI"
 
-    TEST_BASE_PATH = None
-
     def get_html(self):
         """
         Renders parameters to template.
@@ -245,15 +243,14 @@ class LTIModule(LTIFields, XModule):
         assert user_id is not None
         return user_id
 
-    def get_base_path(self):
-        if self.TEST_BASE_PATH:
-            return 'http://{host}{path}'.format(
-                host=self.TEST_BASE_PATH,
-                path=self.system.ajax_url(third_party=True),
+    def get_base_url(self):
+        """
+        Return url for storing grades
+        """
+        return 'http://{host}{path}'.format(
+                host=self.system.hostname,
+                path=self.system.get_handler_url('custom_handler'),
             )
-        else:
-            # return self.system.hostname + self.system.ajax_url
-            return self.system.ajax_url
 
     def get_context_id(self):
         # This is an opaque identifier that uniquely identifies the context that contains
@@ -325,7 +322,7 @@ class LTIModule(LTIFields, XModule):
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': '{}/replaceResult'.format(self.get_base_path()) if self.is_graded else '',
+            u'lis_outcome_service_url': '{}/replaceResult'.format(self.get_base_url()) if self.is_graded else '',
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
             # u'lis_person_sourcedid': self.get_lis_person_sourcedid(),  # optional, do not use for now.
 

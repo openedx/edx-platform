@@ -106,7 +106,6 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         self._send_head()
         self._send_response(status_message)
 
-
     def _send_head(self):
         '''
         Send the response code and MIME headers
@@ -140,11 +139,12 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             return {}
         try:
             cookie = self.headers.getheader('cookie')
-            self.server.cookie = {k.strip():v[0]  for k,v in urlparse.parse_qs(cookie).items()}
+            self.server.cookie = {k.strip(): v[0] for k, v in urlparse.parse_qs(cookie).items()}
         except:
             self.server.cookie = {}
         referer = urlparse.urlparse(self.headers.getheader('referer'))
         self.server.referer_host = "{}://{}".format(referer.scheme, referer.netloc)
+        self.server.referer_netloc = referer.netloc
         return post_dict
 
     def _send_graded_result(self):
@@ -183,19 +183,26 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         """)
         data = payload.format(**values)
         # temporarily changed to get for easy view in browser
-        url = self.server.referer_host + self.server.grade_data['callback_url']
-        cookies = self.server.cookie
-        headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': 'update_me'}
-        headers['X-CSRFToken'] = cookies.get('csrftoken')
+        # get relative part, because host name is different in a) manual tests b) acceptance tests c) demos
+        relative_url = urlparse.urlparse(self.server.grade_data['callback_url']).path
+        url = self.server.referer_host + relative_url
+
+        cookies_to_send = {}
+        headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest'}
+        if self.server.server_host in self.server.referer_netloc:  # request from localhost to localhost:
+            cookies = self.server.cookie
+            headers['X-CSRFToken'] = cookies.get('csrftoken')
+            cookies_to_send = {k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']}
+
         headers['Authorization'] = self.oauth_sign(url, data)
 
         response = requests.post(
             url,
             data=data,
-            cookies={k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']},
+            cookies=cookies_to_send,
             headers=headers
         )
-        assert response.status_code == 200
+        # assert response.status_code == 200
         return response
 
     def _send_response(self, message):

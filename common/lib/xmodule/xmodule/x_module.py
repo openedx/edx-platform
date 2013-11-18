@@ -1064,13 +1064,16 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         return str(self.__dict__)
 
     @property
-    def ajax_url(self, third_party=False):
+    def ajax_url(self):
         """
         The url prefix to be used by XModules to call into handle_ajax
         """
-        handler_name = 'xmodule_handler'
-        if third_party:
-            handler_name = 'custom_handler'
+        return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
+
+    def get_handler_url(self, handler_name):
+        """
+        The url prefix to be used by XModules to call into handler_name
+        """
         return self.handler_url(self.xmodule_instance, handler_name, '', '').rstrip('/?')
 
 
