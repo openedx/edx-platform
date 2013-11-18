@@ -130,24 +130,20 @@
             <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
-          <li class="field required text" id="field-cedula">
-            <label for="cedula">${_('Cedula')}</label>
-            <input id="cedula" type="text" name="cedula" value="" placeholder="${_('ejemplo: 0102030405')}" aria-describedby="name-tip" />
-          </li>
           <li class="field required text" id="field-username">
             <label for="username">${_('Public Username')}</label>
             <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
+          <li class="field required text" id="field-cedula">
+            <label for="name">${_('Cedula')}</label>
+            <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>
+            <span class="tip tip-input" id="cedula-tip">${_("Don't input '-' in your ID")}</span>
+          </li>
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
             <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
-          </li>
-          <li class="field required text" id="field-city">
-            <label for="city">${_('City')}</label>
-            <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito')}" required aria-required="true" aria-describedby="city-tip"/>
-            <span class="tip tip-input" id="city-tip">${_("City where you live")}</span>
           </li>
         </ol>
 
@@ -173,11 +169,6 @@
             <label for="username">${_('Public Display Name')}</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip" />
             <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
-          </li>
-
-          <li class="field required text" id="field-cedula">
-            <label for="cedula">${_('Cedula')}</label>
-            <input id="cedula" type="text" name="cedula" value="" placeholder="${_('ejemplo: 0102030405')}" aria-describedby="name-tip" />
           </li>
 
           % if ask_for_fullname:

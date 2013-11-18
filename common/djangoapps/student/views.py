@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student Views
 """
@@ -45,6 +46,7 @@ from student.models import (
     get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
 )
 from student.forms import PasswordResetFormNoActive
+from student.validators import validate_cedula
 
 from verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -774,6 +776,7 @@ def _do_create_account(post_vars):
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
     profile.goals = post_vars.get('goals')
+    profile.cedula = post_vars.get('cedula')
 
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
@@ -854,15 +857,21 @@ def create_account(request, post_override=None):
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
-            error_str = {'username': 'Username must be minimum of two characters long.',
-                         'email': 'A properly formatted e-mail is required.',
-                         'name': 'Your legal name must be a minimum of two characters long.',
-                         'password': 'A valid password is required.',
-                         'terms_of_service': 'Accepting Terms of Service is required.',
-                         'honor_code': 'Agreeing to the Honor Code is required.'}
+            error_str = {'username': _('Username must be minimum of two characters long.'),
+                         'email': _('A properly formatted e-mail is required.'),
+                         'name': _('Your legal name must be a minimum of two characters long.'),
+                         'password': _('A valid password is required.'),
+                         'terms_of_service': _('Accepting Terms of Service is required.'),
+                         'honor_code': _('Agreeing to the Honor Code is required.')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
+    try:
+        validate_cedula(post_vars['cedula'])
+    except ValidationError:
+        js['value'] = _("A valid ID is required.").format(field=a)
+        js['field'] = 'cedula'
+        return HttpResponse(json.dumps(js))
 
     try:
         validate_email(post_vars['email'])
