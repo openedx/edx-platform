@@ -1,19 +1,16 @@
-# edx-mobile-api
+# edx-api
 
 ## Overview
 
-**edx-mobile-api** is a specialized API contract to support the development of a MVP Mobile Application. This API will only support the following use cases
+**edx-api** is a MVP API contract to support the development of a MVP Mobile Application.
+This API will only support the following use cases
 
 - Signup
-- Login/Logout
+- Login
 - Enroll/Unenroll in course
 - Get list of enrolled courses
-- Get course catalog
-- Get course navigational items
-- Get course videos
 
 The amount of data returned to the client will be restricted to only contain information for these use cases. For example, the "get course navigational items" method will not - say - return due dates or gradable related information.
-
 
 This document is a design document and will not delve into the implementation of this API contract
 
@@ -24,12 +21,13 @@ There are two HTTP headers that are defined in the API contract:
 | header | value |
 | ------ | ----- |
 | **X-edx-api-key** | shared secret between client and server. This identifies the calling software |
-| **X-edx-security-token** | security token returned from the auth endpoint |
+| **Authorization** | Bearer <access-token> |
 
-The **X-edx-api-key** is required for all methods. The **X-edx-security-token** is required for all authenticated methods.
+This API will use OAuth2 for authentication. The access token reflects the OAuth2 token that will be returned when calling 'access_token' method (see below).
+
 
 ## General Notes
-Unauthenticated access will return a HTTP 403 status code.
+Unauthenticated access will return a HTTP 403 status code. All successful API calls will return HTTP Status code 200. Errors will return a different status code that will be documented for each method.
 
 ## Functional Endpoints
 
@@ -39,7 +37,7 @@ The following methods are related to user identity and authentication. These onl
 
 ##### Signup
 
-**Request: HTTPS POST /edx-mobile-api/v1/auth/register**
+**Request: HTTPS POST /edx-api/signup/v1/register**
 
 
 ```
@@ -58,7 +56,6 @@ application/json
 StatusCode: 200
 application/json
 {
-	"status": "success",
 	"token": "…securitytoken…"
 }
 ```
@@ -69,7 +66,6 @@ application/json
 StatusCode: 400
 application/json
 {
-	"status": "err",
 	"err_type": "MissingParameter",
 	"err_msg": "Missing required parameters"
 }
@@ -81,7 +77,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "err",
 	"err_type": "UserAlreadyExists",
 	"err_msg": "User Already Exists"
 }
@@ -93,7 +88,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "err",
 	"err_type": "InvalidEmail",
 	"err_msg": "Email provided is invalid"
 }
@@ -105,7 +99,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "err",
 	"err_type": "InvalidPassword",
 	"err_msg": "Password provided is invalid"
 }
@@ -113,14 +106,14 @@ application/json
 
 ##### Login
 
-**Request: HTTPS POST /edx-mobile-api/v1/auth/login**
+This uses the OAuth2 provider for Django (django-oauth2-provider). As such it uses a slightly different HTTP POST Body format (application/x-www-form-urlencoded rather than JSON)
+
+**Request: HTTPS POST /edx-api/auth/v1/access_token**
 
 ```
-application/json
-{
-	"email": "foo@bar.com",
-	"password": "password"
-}
+application/x-www-form-urlencoded
+
+client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD
 ```
 
 **Response: success**
@@ -129,8 +122,10 @@ application/json
 StatusCode: 200
 application/json
 {
-	"status": "success",
-	"token": "…securitytoken…"
+	"access_token": "<your-access-token>", 
+	"scope": "read", 
+	"expires_in": 86399, 
+	"refresh_token": "<your-refresh-token>"
 }
 ```
 
@@ -140,7 +135,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "error",
 	"err_type": "InvalidEmailPassword"
 	"err_msg": "Invalid email or password"
 }
@@ -149,7 +143,7 @@ application/json
 
 ##### Logout
 
-**Request: HTTPS GET /edx-mobile-api/v1/auth/logout**
+**Request: HTTPS GET /edx-api/auth/v1/logout**
 
 Note: Requires authentication token passed in the headers as indicated above
 
@@ -157,10 +151,6 @@ Response:
 
 ```
 StatusCode: 200
-application/json
-{
-	"status": "success"
-}
 ```
 
 ### Registrar
@@ -170,7 +160,7 @@ The methods below expose functionality regarding enrollment in courses
 
 ##### Enroll in Course
 
-**Request: HTTPS POST /edx-mobile-api/v1/registrar/enroll**
+**Request: HTTPS POST /edx-api/enrollment/v1/enroll**
 
 Note: Requires authentication token passed in the headers as indicated above
 
@@ -185,10 +175,6 @@ application/json
 
 ```
 StatusCode: 200
-application/json
-{
-	"status": "success"
-}
 ```
 
 **Response: Course does not exist**
@@ -197,7 +183,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "error",
 	"err_type": "CourseDoesNotExist"
 	"err_msg": "Course does not exist"
 }
@@ -205,7 +190,7 @@ application/json
 
 ##### Unenroll in Course
 
-**Request: HTTPS POST /edx-mobile-api/v1/registrar/unenroll**
+**Request: HTTPS POST /edx-api/registrar/v1/unenroll**
 
 Note: Requires authentication token passed in the headers as indicated above
 
@@ -222,7 +207,6 @@ application/json
 StatusCode: 500
 application/json
 {
-	"status": "error",
 	"err_type": "UserNotEnrolled"
 	"err_msg": "User is not enrolled in course"
 }
@@ -230,7 +214,7 @@ application/json
 
 ##### Get list of enrolled courses for user
 
-**Request: HTTPS GET /edx-mobile-api/v1/registrar/get_enrollments_for_user**
+**Request: HTTPS GET /edx-api/registrar/v1/get_enrollments_for_user**
 
 Note: Requires authentication token passed in the headers as indicated above
 
@@ -240,7 +224,6 @@ Note: Requires authentication token passed in the headers as indicated above
 StatusCode: 200
 application/json
 {
-	"status": "success",
 	"enrollments": [
 		{
 			"course_id": "foo/bar/2013_Spring",
