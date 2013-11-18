@@ -806,7 +806,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     xmodule_handler = module_attr('xmodule_handler')
 
     # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
-    def studio_view(self, _context):
+    def studio_view(self, context):
         """
         Return a fragment with the html from this XModuleDescriptor's editing view
 
