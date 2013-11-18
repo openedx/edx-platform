@@ -3,6 +3,8 @@ from uuid import uuid4
 import textwrap
 import urlparse
 from oauthlib.oauth1.rfc5849 import signature
+import oauthlib.oauth1
+import hashlib
 import mock
 import sys
 import requests
@@ -28,10 +30,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                          (self.client_address[0],
                           self.log_date_time_string(),
                           format % args))
-    '''
-    def do_HEAD(self):
-        self._send_head()
-    '''
+
     def do_GET(self):
         '''
         Handle a GET request from the client and sends response back.
@@ -187,11 +186,12 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         cookies = self.server.cookie
         headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': 'update_me'}
         headers['X-CSRFToken'] = cookies.get('csrftoken')
+        signed_headers = self.oauth_sign(url, data)
         response = requests.post(
             url,
             data=data,
             cookies={k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']},
-            headers=headers
+            headers=signed_headers
         )
         assert response.status_code == 200
         return response
@@ -229,6 +229,41 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''If url to LTI tool is correct.'''
         return self.server.oauth_settings['lti_endpoint'] in self.path
 
+    def oauth_sign(self, url, body):
+        """
+        Signs request and returns signed body and headers.
+
+        """
+
+        client = oauthlib.oauth1.Client(
+            client_key=unicode(self.server.oauth_settings['client_key']),
+            client_secret=unicode(self.server.oauth_settings['client_secret'])
+        )
+        headers = {
+            # This is needed for body encoding:
+            'Content-Type': 'application/xml',
+        }
+
+        try:
+            __, headers, __ = client.sign(
+                unicode(url.strip()),
+                http_method=u'POST',
+                body=body,
+                headers=headers
+                )
+        except ValueError:  # scheme not in url
+            #https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
+            #Stubbing headers for now:
+            headers = {
+                u'Content-Type': u'application/x-www-form-urlencoded',
+                u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
+oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", \
+oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
+        # Add oauth_body_hash to headers
+        sha1 = hashlib.sha1()
+        sha1.update(body)
+        headers['Authorization'] = headers['Authorization'] + ', oauth_body_hash="{}"'.format(sha1.hexdigest())
+        return headers
 
 class MockLTIServer(HTTPServer):
     '''
