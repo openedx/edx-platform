@@ -5,6 +5,7 @@ import urlparse
 from oauthlib.oauth1.rfc5849 import signature
 import oauthlib.oauth1
 import hashlib
+import base64
 import mock
 import sys
 import requests
@@ -149,7 +150,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
     def _send_graded_result(self):
 
         values = {
-            'textString': 0.99,
+            'textString': 0.1,
             'sourcedId': self.server.grade_data['user_id'],
             'imsx_messageIdentifier': uuid4().hex,
         }
@@ -186,12 +187,13 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         cookies = self.server.cookie
         headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': 'update_me'}
         headers['X-CSRFToken'] = cookies.get('csrftoken')
-        signed_headers = self.oauth_sign(url, data)
+        headers['Authorization'] = self.oauth_sign(url, data)
+
         response = requests.post(
             url,
             data=data,
             cookies={k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']},
-            headers=signed_headers
+            headers=headers
         )
         assert response.status_code == 200
         return response
@@ -241,30 +243,22 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         )
         headers = {
             # This is needed for body encoding:
-            'Content-Type': 'application/xml',
+            'Content-Type': 'application/x-www-form-urlencoded',
         }
 
-        # Add oauth_body_hash to headers
+        #Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
         sha1.update(body)
+        oauth_body_hash = base64.b64encode(sha1.hexdigest())
 
         __, headers, __ = client.sign(
             unicode(url.strip()),
             http_method=u'POST',
-            body={'oauth_body_hash': sha1.hexdigest()},
+            body={u'oauth_body_hash': oauth_body_hash},
             headers=headers
             )
-        #headers example
-        """
-        headers = {
-            u'Content-Type': u'application/x-www-form-urlencoded',
-            u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
-oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", \
-oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
-        """
-
-    headers['Authorization'] = headers['Authorization'] + ', oauth_body_hash="{}"'.format()
-    return headers
+        headers = headers['Authorization'] + ', oauth_body_hash="{}"'.format(oauth_body_hash)
+        return headers
 
 class MockLTIServer(HTTPServer):
     '''
