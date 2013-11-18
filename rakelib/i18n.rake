@@ -67,7 +67,8 @@ namespace :i18n do
   desc "Run tests for the internationalization library"
   task :test => "i18n:validate:gettext" do
     test = File.join(REPO_ROOT, "i18n", "tests")
-    sh("nosetests #{test}")
+    pythonpath_prefix = "PYTHONPATH=#{REPO_ROOT}/i18n:$PYTHONPATH"
+    sh("#{pythonpath_prefix} nosetests #{test}")
   end
 
 end
