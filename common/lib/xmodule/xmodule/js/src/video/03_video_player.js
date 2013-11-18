@@ -83,9 +83,9 @@ function (HTML5Video, Resizer) {
 
         state.videoPlayer.initialSeekToStartTime = true;
 
-        // The initial value of the variable `seekToStartTimeOldSpeed`
-        // should always differ from the value returned by the duration
-        // function.
+        // At the start, the initial value of the variable
+        // `seekToStartTimeOldSpeed` should always differ from the value
+        // returned by the duration function.
         state.videoPlayer.seekToStartTimeOldSpeed = 'void';
 
         state.videoPlayer.playerVars = {
@@ -616,20 +616,6 @@ function (HTML5Video, Resizer) {
                 }
             }
 
-            // If this is not a duration change (if it is, we continue playing
-            // from current time), then we need to seek the video to the start
-            // time.
-            //
-            // We seek only if start time differs from zero, and we haven't
-            // performed already such a seek.
-            if (
-                durationChange === false &&
-                this.videoPlayer.startTime > 0 &&
-                !(tempStartTime === 0 && tempEndTime === null)
-            ) {
-                this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
-            }
-
             // Rebuild the slider start-end range (if it doesn't take up the
             // whole slider). Remember that endTime === null means the end time
             // is set to the end of video by default.
@@ -643,6 +629,20 @@ function (HTML5Video, Resizer) {
                         duration: duration
                     }
                 );
+            }
+
+            // If this is not a duration change (if it is, we continue playing
+            // from current time), then we need to seek the video to the start
+            // time.
+            //
+            // We seek only if start time differs from zero, and we haven't
+            // performed already such a seek.
+            if (
+                durationChange === false &&
+                this.videoPlayer.startTime > 0 &&
+                !(tempStartTime === 0 && tempEndTime === null)
+            ) {
+                this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
             }
 
             // Reset back the actual startTime and endTime if they have been

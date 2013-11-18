@@ -4,11 +4,26 @@
             videoProgressSlider, videoSpeedControl, videoVolumeControl,
             oldOTBD;
 
-        function initialize(fixture) {
-            if (typeof fixture === 'undefined') {
-                loadFixtures('video_all.html');
+        function initialize(config) {
+            if (config) {
+                if (config.fixture) {
+                    loadFixtures(config.fixture);
+                } else {
+                    loadFixtures('video_all.html');
+                }
+
+                if (config.startTime) {
+                    $('#example')
+                        .find('#video_id')
+                        .data('start', config.startTime);
+                }
+                if (config.endTime) {
+                    $('#example')
+                        .find('#video_id')
+                        .data('end', config.endTime);
+                }
             } else {
-                loadFixtures(fixture);
+                loadFixtures('video_all.html');
             }
 
             state = new Video('#example');
@@ -41,7 +56,7 @@
         }
 
         function initializeYouTube() {
-            initialize('video.html');
+            initialize({fixture: 'video.html'});
         }
 
         beforeEach(function () {
@@ -532,8 +547,54 @@
             });
         });
 
-        // Disabled 10/24/13 due to flakiness in master
-        xdescribe('updatePlayTime', function () {
+        describe('update with start & end time', function () {
+            var START_TIME = 2, END_TIME = 4;
+
+            beforeEach(function () {
+                initialize({startTime: START_TIME, endTime: END_TIME});
+
+                spyOn(videoPlayer, 'update').andCallThrough();
+                spyOn(videoPlayer, 'pause').andCallThrough();
+                spyOn(videoProgressSlider, 'notifyThroughHandleEnd')
+                    .andCallThrough();
+            });
+
+            it('video is paused on first endTime, start & end time are reset', function () {
+                var checkForStartEndTimeSet = true;
+
+                videoProgressSlider.notifyThroughHandleEnd.reset();
+                videoPlayer.pause.reset();
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    if (
+                        !isFinite(videoPlayer.currentTime) ||
+                        videoPlayer.currentTime <= 0
+                    ) {
+                        return false;
+                    }
+
+                    if (checkForStartEndTimeSet) {
+                        checkForStartEndTimeSet = false;
+
+                        expect(videoPlayer.startTime).toBe(START_TIME);
+                        expect(videoPlayer.endTime).toBe(END_TIME);
+                    }
+
+                    return videoPlayer.pause.calls.length === 1
+                }, 5000, 'pause() has been called');
+
+                runs(function () {
+                    expect(videoPlayer.startTime).toBe(0);
+                    expect(videoPlayer.endTime).toBe(null);
+
+                    expect(videoProgressSlider.notifyThroughHandleEnd)
+                        .toHaveBeenCalledWith({end: true});
+                });
+            });
+        });
+
+        describe('updatePlayTime', function () {
             beforeEach(function () {
                 initialize();
 
@@ -548,7 +609,7 @@
                     duration = videoPlayer.duration();
 
                     if (duration > 0) {
-                    return true;
+                        return true;
                     }
 
                     return false;
@@ -608,6 +669,73 @@
                             time: 60,
                             duration: duration
                         });
+                });
+            });
+        });
+
+        describe('updatePlayTime with start & end times', function () {
+            beforeEach(function () {
+                initialize({startTime: 2, endTime: 4});
+
+                spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
+                spyOn(videoPlayer.player, 'seekTo').andCallThrough();
+                spyOn(videoProgressSlider, 'updateStartEndTimeRegion')
+                    .andCallThrough();
+            });
+
+            it('when duration becomes available, updatePlayTime() is called', function () {
+                var duration;
+
+                expect(videoPlayer.initialSeekToStartTime).toBeTruthy();
+                expect(videoPlayer.seekToStartTimeOldSpeed).toBe('void');
+
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    duration = videoPlayer.duration();
+
+                    return duration > 0 &&
+                        videoPlayer.initialSeekToStartTime === false;
+                }, 'duration becomes available', 1000);
+
+                runs(function () {
+                    expect(videoPlayer.startTime).toBe(2);
+                    expect(videoPlayer.endTime).toBe(4);
+
+                    expect(videoPlayer.player.seekTo).toHaveBeenCalledWith(2);
+
+                    expect(videoProgressSlider.updateStartEndTimeRegion)
+                        .toHaveBeenCalledWith({duration: duration});
+
+                    // videoProgressSlider.updateStartEndTimeRegion
+
+                    expect(videoPlayer.seekToStartTimeOldSpeed).toBe(state.speed);
+                });
+            });
+        });
+
+        describe('updatePlayTime with invalid endTime', function () {
+            beforeEach(function () {
+                initialize({endTime: 100000});
+
+                spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
+            });
+
+            it('invalid endTime is reset to null', function () {
+                var duration;
+
+                videoPlayer.updatePlayTime.reset();
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    duration = videoPlayer.duration();
+
+                    return duration > 0 &&
+                        videoPlayer.initialSeekToStartTime === false;
+                }, 'updatePlayTime was invoked and duration is set', 5000);
+
+                runs(function () {
+                    expect(videoPlayer.endTime).toBe(null);
                 });
             });
         });
