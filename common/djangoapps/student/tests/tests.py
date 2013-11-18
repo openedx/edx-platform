@@ -59,23 +59,28 @@ class ResetPasswordTests(TestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD
         self.user_bad_passwd.save()
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
         """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD"""
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
+        # If they've got an unusable password, fine, we should let them reset it
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': False,
-                                                            'error': 'Invalid e-mail or user'}))
+        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
+                                                            'value': "('registration/password_reset_done.html', [])"}))
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email+"makeItFail"})
         bad_email_resp = password_reset(bad_email_req)
+        # Note: even if the email is bad, we return a successful response code
+        # This prevents someone potentially trying to "brute-force" find out which emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        self.assertEquals(bad_email_resp.content, json.dumps({'success': False,
-                                                              'error': 'Invalid e-mail or user'}))
+        self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
+                                                              'value': "('registration/password_reset_done.html', [])"}))
 
     @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
