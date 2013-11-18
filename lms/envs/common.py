@@ -1065,7 +1065,3 @@ REGISTRATION_OPTIONAL_FIELDS = set([
     'mailing_address',
     'goals',
 ])
-
-# Years allowed range
-DELTA_YEAR = 12
-MAX_YEAR_ALLOWED = 70

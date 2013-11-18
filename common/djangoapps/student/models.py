@@ -103,8 +103,8 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
-    this_year = datetime.now(UTC).year - settings.DELTA_YEAR
-    VALID_YEARS = range(this_year, datetime.now(UTC).year - settings.MAX_YEAR_ALLOWED, -1)
+    this_year = datetime.now(UTC).year
+    VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (('m', _('Male')), ('f', _('Female')), ('o', _('Other')))
     gender = models.CharField(
