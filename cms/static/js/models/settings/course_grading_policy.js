@@ -3,15 +3,11 @@ define(["backbone", "js/models/location", "js/collections/course_grader"],
 
 var CourseGradingPolicy = Backbone.Model.extend({
     defaults : {
-        course_location : null,
         graders : null,  // CourseGraderCollection
         grade_cutoffs : null,  // CourseGradeCutoff model
         grace_period : null // either null or { hours: n, minutes: m, ...}
     },
     parse: function(attributes) {
-        if (attributes['course_location']) {
-            attributes.course_location = new Location(attributes.course_location, {parse:true});
-        }
         if (attributes['graders']) {
             var graderCollection;
             // interesting race condition: if {parse:true} when newing, then parse called before .attributes created
@@ -34,10 +30,6 @@ var CourseGradingPolicy = Backbone.Model.extend({
             }
         }
         return attributes;
-    },
-    url : function() {
-        var location = this.get('course_location');
-        return '/' + location.get('org') + "/" + location.get('course') + '/settings-details/' + location.get('name') + '/section/grading';
     },
     gracePeriodToDate : function() {
         var newDate = new Date();

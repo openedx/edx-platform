@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from xmodule.modulestore.django import loc_mapper
 
 
 def parse_json(response):
@@ -41,6 +42,7 @@ class AjaxEnabledTestClient(Client):
         if not isinstance(data, basestring):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        kwargs.setdefault("HTTP_ACCEPT", "application/json")
         return self.post(path=path, data=data, content_type=content_type, **kwargs)
 
     def get_html(self, path, data=None, follow=False, **extra):
@@ -88,6 +90,9 @@ class CourseTestCase(ModuleStoreTestCase):
             display_name='Robot Super Course',
         )
         self.course_location = self.course.location
+        self.course_locator = loc_mapper().translate_location(
+            self.course.location.course_id, self.course.location, False, True
+        )
 
     def createNonStaffAuthedUserClient(self):
         """

@@ -30,6 +30,7 @@ from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
+from xmodule.modulestore.locator import BlockUsageLocator
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -120,6 +121,9 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    course_locator = loc_mapper().translate_location(
+        course.location.course_id, course.location, False, True
+    )
     locator = loc_mapper().translate_location(
         course.location.course_id, item.location, False, True
     )
@@ -132,7 +136,7 @@ def edit_subsection(request, location):
            'new_unit_category': 'vertical',
            'lms_link': lms_link,
            'preview_link': preview_link,
-           'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+           'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
            # For grader, which is not yet converted
            'parent_location': course.location,
            'parent_item': parent,
@@ -328,20 +332,22 @@ def edit_unit(request, location):
 @login_required
 @require_http_methods(("GET", "POST", "PUT"))
 @ensure_csrf_cookie
-def assignment_type_update(request, org, course, category, name):
+def assignment_type_update(
+    request, tag=None, course_id=None, branch=None, version_guid=None, block=None, assignment_type=None
+):
     """
     CRUD operations on assignment types for sections and subsections and
     anything else gradable.
     """
-    location = Location(['i4x', org, course, category, name])
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
 
     if request.method == 'GET':
-        rsp = CourseGradingModel.get_section_grader_type(location)
+        rsp = CourseGradingModel.get_section_grader_type(locator)
     elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
         rsp = CourseGradingModel.update_section_grader_type(
-                    location, request.json
+                    locator, request.json
         )
     return JsonResponse(rsp)
 

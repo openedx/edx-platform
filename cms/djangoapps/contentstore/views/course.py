@@ -53,13 +53,12 @@ from student.models import CourseEnrollment
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
+from contentstore import utils
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
-           'get_course_settings',
-           'course_config_graders_page',
+           'settings_handler',
+           'grading_handler',
            'course_config_advanced_page',
-           'course_settings_updates',
-           'course_grader_updates',
            'course_advanced_updates', 'textbook_index', 'textbook_by_id',
            'create_textbook']
 
@@ -190,7 +189,7 @@ def course_index(request, course_id, branch, version_guid, block):
         'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(
-            CourseGradingModel.fetch(course.location).graders
+            CourseGradingModel.fetch(location).graders
         ),
         # This is used by course grader, which has not yet been updated.
         'parent_location': course.location,
@@ -394,54 +393,102 @@ def course_info_update_handler(
 
 @login_required
 @ensure_csrf_cookie
-def get_course_settings(request, org, course, name):
+@require_http_methods(("GET", "PUT", "POST"))
+@expect_json
+def settings_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    Send models and views as well as html for editing the course settings to
-    the client.
-
-    org, course, name: Attributes of the Location for the item to edit
+    Course settings for dates and about pages
+    GET
+        html: get the page
+        json: get the CourseDetails model
+    PUT
+        json: update the Course and About xblocks through the CourseDetails model
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    course_module = modulestore().get_item(location)
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+        course_old_location = loc_mapper().translate_locator_to_location(location)
+        course_module = modulestore().get_item(course_old_location)
 
-    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
-    upload_asset_url = new_loc.url_reverse('assets/', '')
+        upload_asset_url = location.url_reverse('assets/')
 
-    return render_to_response('settings.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'details_url': reverse(course_settings_updates,
-                               kwargs={"org": org,
-                                       "course": course,
-                                       "name": name,
-                                       "section": "details"}),
-        'about_page_editable': not settings.MITX_FEATURES.get(
-            'ENABLE_MKTG_SITE', False
-        ),
-        'upload_asset_url': upload_asset_url
-    })
+        return render_to_response('settings.html', {
+            'context_course': course_module,
+            'course_locator': location,
+            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_old_location),
+            'course_image_url': utils.course_image_url(course_module),
+            'details_url': location.url_reverse('/settings/details/'),
+            'about_page_editable': not settings.MITX_FEATURES.get(
+                'ENABLE_MKTG_SITE', False
+            ),
+            'upload_asset_url': upload_asset_url
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            # Cannot just do a get w/o knowing the course name :-(
+            return JsonResponse(
+                CourseDetails.fetch(location),
+                encoder=CourseSettingsEncoder
+            )
+        elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+            return JsonResponse(
+                CourseDetails.update_from_json(location, request.json),
+                encoder=CourseSettingsEncoder
+            )
 
 
 @login_required
 @ensure_csrf_cookie
-def course_config_graders_page(request, org, course, name):
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
+@expect_json
+def grading_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, grader_index=None):
     """
-    Send models and views as well as html for editing the course settings to
-    the client.
-
-    org, course, name: Attributes of the Location for the item to edit
+    Course Grading policy configuration
+    GET
+        html: get the page
+        json: get the CourseGrading model
+    PUT
+        json: update the Course through the CourseGrading model
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    course_module = modulestore().get_item(location)
-    course_details = CourseGradingModel.fetch(location)
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+        course_old_location = loc_mapper().translate_locator_to_location(location)
+        course_module = modulestore().get_item(course_old_location)
+        course_details = CourseGradingModel.fetch(location)
 
-    return render_to_response('settings_graders.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
-    })
+        return render_to_response('settings_graders.html', {
+            'context_course': course_module,
+            'course_locator': location,
+            'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
+            'grading_url': location.url_reverse('/settings/grading/'),
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            if grader_index is None:
+                return JsonResponse(
+                    CourseGradingModel.fetch(location),
+                    encoder=CourseSettingsEncoder
+                )
+            else:
+                return JsonResponse(CourseGradingModel.fetch_grader(location, grader_index))
+        elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+            if grader_index is None:
+                return JsonResponse(
+                    CourseGradingModel.update_from_json(location, request.json),
+                    encoder=CourseSettingsEncoder
+                )
+            else:
+                return JsonResponse(
+                    CourseGradingModel.update_grader_from_json(location, request.json)
+                )
+        elif request.method == "DELETE" and grader_index is not None:
+            CourseGradingModel.delete_grader(location, grader_index)
+            return JsonResponse()
 
 
 @login_required
@@ -460,73 +507,9 @@ def course_config_advanced_page(request, org, course, name):
     return render_to_response('settings_advanced.html', {
         'context_course': course_module,
         'course_location': location,
+        'course_locator': loc_mapper().translate_location(location.course_id, location, False, True),
         'advanced_dict': json.dumps(CourseMetadata.fetch(location)),
     })
-
-
-@expect_json
-@login_required
-@ensure_csrf_cookie
-def course_settings_updates(request, org, course, name, section):
-    """
-    Restful CRUD operations on course settings. This differs from
-    get_course_settings by communicating purely through json (not rendering any
-    html) and handles section level operations rather than whole page.
-
-    org, course: Attributes of the Location for the item to edit
-    section: one of details, faculty, grading, problems, discussions
-    """
-    get_location_and_verify_access(request, org, course, name)
-
-    if section == 'details':
-        manager = CourseDetails
-    elif section == 'grading':
-        manager = CourseGradingModel
-    else:
-        return
-
-    if request.method == 'GET':
-        # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(
-            manager.fetch(Location(['i4x', org, course, 'course', name])),
-            encoder=CourseSettingsEncoder
-        )
-    elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-        return JsonResponse(
-            manager.update_from_json(request.json),
-            encoder=CourseSettingsEncoder
-        )
-
-
-@expect_json
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
-@login_required
-@ensure_csrf_cookie
-def course_grader_updates(request, org, course, name, grader_index=None):
-    """
-    Restful CRUD operations on course_info updates. This differs from
-    get_course_settings by communicating purely through json (not rendering any
-    html) and handles section level operations rather than whole page.
-
-    org, course: Attributes of the Location for the item to edit
-    """
-
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'GET':
-        # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(CourseGradingModel.fetch_grader(
-            Location(location), grader_index
-        ))
-    elif request.method == "DELETE":
-        # ??? Should this return anything? Perhaps success fail?
-        CourseGradingModel.delete_grader(Location(location), grader_index)
-        return JsonResponse()
-    else:  # post or put, doesn't matter.
-        return JsonResponse(CourseGradingModel.update_grader_from_json(
-            Location(location),
-            request.json
-        ))
 
 
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))

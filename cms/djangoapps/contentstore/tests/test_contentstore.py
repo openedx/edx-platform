@@ -1612,17 +1612,11 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # settings_details
-        resp = self.client.get(reverse('settings_details',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get_html(new_location.url_reverse('settings/details'))
         self.assertEqual(resp.status_code, 200)
 
         # settings_details
-        resp = self.client.get(reverse('settings_grading',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get_html(new_location.url_reverse('settings/grading'))
         self.assertEqual(resp.status_code, 200)
 
         # assets_handler (HTML for full page content)
