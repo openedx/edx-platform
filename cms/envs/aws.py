@@ -86,6 +86,9 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+# STATIC_URL specifies the url to use for static files
+STATIC_URL = ENV_TOKENS.get('STATIC_URL', STATIC_URL)
+
 # STATIC_ROOT specifies the directory where static files are
 # collected
 
