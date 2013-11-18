@@ -664,7 +664,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                static_data=self.static_data,
                                                metadata=self.metadata,
                                                instance_state=instance_state)
-        self.test_system.xmodule_instance = module
         return combinedoe
 
     def ai_state_reset(self, task_state, task_number=None):

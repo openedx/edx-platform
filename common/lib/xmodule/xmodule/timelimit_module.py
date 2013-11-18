@@ -31,9 +31,6 @@ class TimeLimitModule(TimeLimitFields, XModule):
     Wrapper module which imposes a time constraint for the completion of its child.
     '''
 
-    def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-
     # For a timed activity, we are only interested here
     # in time-related accommodations, and these should be disjoint.
     # (For proctored exams, it is possible to have multiple accommodations
