@@ -1,5 +1,5 @@
 .. raw:: latex
-  
+
       \newpage %
 
 .. _Appendix E:
@@ -25,7 +25,7 @@ differences between the two include the following.
 Sample Problem:
 
 .. image:: ../Images/image287.png
-    :width: 600  
+    :width: 600
 
 **Problem Code:**
 
@@ -70,7 +70,7 @@ Sample Problem:
       <div class="detailed-solution">
       </div>
     </solution>
-  </problem> 
+  </problem>
 
 
 
@@ -88,11 +88,11 @@ Sample Problem:
 
 
 .. raw:: latex
-  
+
       \newpage %
 
 
-Multiple Choice 
+Multiple Choice
 ===============
 
 
@@ -110,14 +110,14 @@ differences between the two include the following.
 
 • The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question.
 
-• The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which areintended to get the student to pause and think. 
+• The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
 
 Sample Problem:
 
 .. image:: ../Images/image289.png
- :width: 600  
+ :width: 600
 
-**Problem Code:** 
+**Problem Code:**
 
 .. code-block:: xml
 
@@ -137,7 +137,7 @@ Sample Problem:
   <solution>
         <div class="detailed-solution">
           <p>Explanation</p>
-            <p>It depends on how many choices are marked as correct in the underlying XML.</p>                  
+            <p>It depends on how many choices are marked as correct in the underlying XML.</p>
   <p>Note that if all choices are marked as incorrect, there is no
           correct response.</p>
         </div>
@@ -145,7 +145,7 @@ Sample Problem:
   </problem>
 
 
-**Template** 
+**Template**
 
 .. code-block:: xml
 
@@ -185,7 +185,7 @@ Sample Problem:
 
 
 .. raw:: latex
-  
+
       \newpage %
 
 
@@ -206,7 +206,7 @@ have zero correct responses.
 Sample Problem:
 
 .. image:: ../Images/image290.png
- :width: 600  
+ :width: 600
 
 
 **Problem Code:**
@@ -244,7 +244,7 @@ Sample Problem:
   </problem>
 
 .. raw:: latex
-  
+
      \newpage %
 
 
@@ -266,7 +266,7 @@ clear.
 Sample Problem:
 
 .. image:: ../Images/image291.png
- :width: 600   
+ :width: 600
 
 **Problem Code:**
 
@@ -301,19 +301,104 @@ Sample Problem:
     </solution>
   </problem>
 
+
+This response type allows to add more than one answer. Use `additional_answer`  tag to add more answers.
+
+You can add `regexp` to value of `type` attribute, for example: `type="ci regexp"` or `type="regexp"` or `type="regexp cs"`.
+In this case, any answer and hint will be treated as regular expressions.
+Regular expression has to match whole answer, for answer to be correct.
+Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has set answer=".*foo.*" with type="regexp".
+
+**Template**
+
+.. code-block:: xml
+
+    <problem>
+        <stringresponse answer="a1" type="ci regexp">
+            <additional_answer>\d5</additional_answer>
+            <additional_answer>a3</additional_answer>
+            <textline size="20"/>
+            <hintgroup>
+                <stringhint answer="a0" type="ci" name="ha0" />
+                <stringhint answer="a4" type="ci" name="ha4" />
+                <stringhint answer="^\d" type="ci" name="re1" />
+                <hintpart on="ha0">
+                    <startouttext />+1<endouttext />
+                </hintpart >
+                <hintpart on="ha4">
+                    <startouttext />-1<endouttext />
+                </hintpart >
+                <hintpart on="re1">
+                    <startouttext />Any number+5<endouttext />
+                </hintpart >
+            </hintgroup>
+        </stringresponse>
+    </problem>
+
+
 **XML Attribute Information**
 
 <stringresponse>
 
-  .. image:: ../Images/stringresponse.png
+ .. raw:: html
+
+      <table border="1" class="docutils" width="60%">
+        <colgroup>
+        <col width="15%">
+        <col width="75%">
+        <col width="10%">
+        </colgroup>
+        <thead valign="bottom">
+        <tr class="row-odd"><th class="head">Attribute</th>
+        <th class="head">Description</th>
+        <th class="head">Notes</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr class="row-even"><td>type</td>
+        <td>(optional) “[ci] [regex]”. Add “ci” if the student response should be graded case-insensitively. The default is to take case into consideration when grading. Add “regexp” for correct answer to be treated as regular expression.</td>
+        <td>&nbsp;</td>
+        </tr>
+        <tr class="row-odd"><td>answer</td>
+        <td>The string that is used to compare with student answer. If "regexp" is not presented in value of <em>type</em> attribute, student should enter value equal to exact value of this attribute in order to get credit. If  "regexp" is presented in value of <em>type</em> attribute, value of <em>answer</em> is treated as regular expression and exact match of this expression and student answer will be done. If search is successful, student will get credit.</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <table border="1" class="docutils" width="60%">
+        <colgroup>
+        <col width="15%">
+        <col width="75%">
+        <col width="10%">
+        </colgroup>
+        <thead valign="bottom">
+        <tr class="row-odd"><th class="head">Children</th>
+        <th class="head">Description</th>
+        <th class="head">Notes</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr class="row-even"><td>textline</td>
+        <td>used to accept student input. See description below.</td>
+        <td>&nbsp;</td>
+        </tr>
+        <tr class="row-odd"><td>additional_answer</td>
+        <td>todo</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+      </table>
+
 
 <textline>
 
   .. image:: ../Images/stringresponse2.png
 
+<additional_answer> - Can be unlimited number of this tags. Any tag adds one more additional answer for matching.
 
 .. raw:: latex
-  
+
       \newpage %
 
 
@@ -339,7 +424,7 @@ only, and the examples below show its use.
 Sample Problem:
 
 .. image:: ../Images/image292.png
- :width: 600   
+ :width: 600
 
 
 **Problem Code**:
@@ -366,7 +451,7 @@ Sample Problem:
   <script type="loncapa/python">
   computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
   </script>
-    
+
   <p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
       <numericalresponse answer="$computed_response">
           <responseparam type="tolerance" default="0.0001" />
@@ -383,7 +468,7 @@ Sample Problem:
          the square root of the sum of the squares of the differences of each coordinate.
         Even though an exact numerical value is checked in this case, the
         easiest way to enter this answer is to type
-        <code>sqrt(pi^2+e^2)</code> into the editor. 
+        <code>sqrt(pi^2+e^2)</code> into the editor.
         Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
       </p>
     </div>
@@ -589,7 +674,7 @@ default. These include:
 Operators and Functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-As expected, the normal operators apply (with normal order of operations): 
+As expected, the normal operators apply (with normal order of operations):
 ``+ - * / ^``. Also provided is a special "parallel resistors" operator given
 by ``||``. For example, an input of ``1 || 2`` would represent the resistance
 of a pair of parallel resistors (of resistance 1 and 2 ohms), evaluating to 2/3
@@ -610,7 +695,7 @@ The default included functions are the following:
   coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
 
 .. raw:: latex
-  
+
       \newpage %
 
 
@@ -651,7 +736,7 @@ backward 3.
 Sample Problem:
 
 .. image:: ../Images/image293.png
- :width: 600   
+ :width: 600
 
 **Problem Code**:
 
@@ -663,7 +748,7 @@ Sample Problem:
 
     <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
     <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
-      <responseparam type="tolerance" default="0.00001"/> 
+      <responseparam type="tolerance" default="0.00001"/>
       <formulaequationinput size="40" />
     </formularesponse>
 
@@ -672,7 +757,7 @@ Sample Problem:
   VoVi = "(R_1*R_2)/R_3"
   </script>
     <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
-      <responseparam type="tolerance" default="0.00001"/> 
+      <responseparam type="tolerance" default="0.00001"/>
       <text><i>E</i> =</text> <formulaequationinput size="40"/>
     </formularesponse>
 
@@ -681,13 +766,13 @@ Sample Problem:
   derivative = "n*x^(n-1)"
   </script>
     <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
-      <responseparam type="tolerance" default="0.00001"/> 
+      <responseparam type="tolerance" default="0.00001"/>
       <formulaequationinput size="40" />
     </formularesponse>
 
     <!-- Example problem specifying only one variable -->
     <formularesponse type="ci" samples="x@1,9#10" answer="x**2 - x + 4">
-      <responseparam type="tolerance" default="0.00001"/> 
+      <responseparam type="tolerance" default="0.00001"/>
       <formulaequationinput size="40" />
     </formularesponse>
 
@@ -736,7 +821,7 @@ size      (optional) defines the size (i.e. the width)
 ========= ============================================= =====
 
 .. raw:: latex
-  
+
       \newpage %
 
 
@@ -751,7 +836,7 @@ Images have to be uploaded to the courseware Assets directory. Response clicks a
 Sample Problem:
 
 .. image:: ../Images/image294.png
- :width: 600   
+ :width: 600
 
 
 **Problem Code**:
@@ -771,7 +856,7 @@ Sample Problem:
   <problem>
       <imageresponse>
       <imageinput src="Path_to_Image_File.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
-      </imageresponse> 
+      </imageresponse>
   </problem>
 
 XML Attribute Information
@@ -786,7 +871,7 @@ XML Attribute Information
   .. image:: ../Images/imageresponse2.png
 
 .. raw:: latex
-  
+
       \newpage %
 
 .. _Custom Response:
@@ -799,7 +884,7 @@ A Custom Response input type accepts one or more lines of text input from the st
 Sample Problem:
 
 .. image:: ../Images/image295.png
- :width: 600  
+ :width: 600
 
 
 **Problem Code**:
@@ -846,7 +931,7 @@ Sample Problem:
           <div class="detailed-solution">
               <p>Explanation</p>
             <p>For the first part, any two numbers of the form <i>n</i>
-              and <i>10-n</i>, where <i>n</i> is any integer, will work. 
+              and <i>10-n</i>, where <i>n</i> is any integer, will work.
               One possible answer would be the pair 0 and 10.
             </p>
             <p>For the second part, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.
@@ -915,7 +1000,7 @@ Sample Problem:
 
 
 .. raw:: latex
-  
+
       \newpage %
 
 .. _Chemical Equation Response:
@@ -924,12 +1009,12 @@ Chemical Equation Response
 ==========================
 
 The Chemical Equation Response input type is a special type of Custom Response
-that allows the student to enter chemical equations as answers. 
+that allows the student to enter chemical equations as answers.
 
 Sample Problem:
 
 .. image:: ../Images/image296.png
- :width: 600   
+ :width: 600
 
 **Problem Code**:
 
@@ -945,7 +1030,7 @@ Sample Problem:
       <chemicalequationinput size="50"/>
       <answer type="loncapa/python">
 
-  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'): 
+  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
       correct = ['correct']
   else:
       correct = ['incorrect']
@@ -955,28 +1040,28 @@ Sample Problem:
     <p> Some tips:<ul><li>Only real element symbols are permitted.</li><li>Subscripts are entered with plain text.</li><li>Superscripts are indicated with a caret (^).</li><li>The reaction arrow (\(\longrightarrow\)) is indicated with "->".</li></ul>
      So, you can enter "H2SO4 -> H^+ + HSO4^-".</p>
     <endouttext/>
-  </problem> 
+  </problem>
 
 .. raw:: latex
-  
+
       \newpage %
 
 Schematic Response
 ==================
 
 The Schematic Response input type provides an interactive grid on which the
-student can construct a schematic answer, such as a circuit. 
+student can construct a schematic answer, such as a circuit.
 
 Sample Problem:
 
 .. image:: ../Images/image297.png
- :width: 600 
+ :width: 600
 
 .. image:: ../Images/image298.png
- :width: 600   
+ :width: 600
 
 .. image:: ../Images/image299.png
- :width: 600   
+ :width: 600
 
 **Problem Code**:
 
