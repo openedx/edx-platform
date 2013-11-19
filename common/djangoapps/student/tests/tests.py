@@ -65,7 +65,7 @@ class ResetPasswordTests(TestCase):
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
-        # If they've got an unusable password, fine, we should let them reset it
+        # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
         self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
                                                             'value': "('registration/password_reset_done.html', [])"}))

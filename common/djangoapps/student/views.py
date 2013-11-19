@@ -1512,4 +1512,4 @@ def change_email_settings(request):
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
-    return HttpResponse(json.dumps({'success': True}))                                                  
+    return HttpResponse(json.dumps({'success': True}))
