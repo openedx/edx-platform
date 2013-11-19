@@ -22,6 +22,7 @@ class TrackMiddleware(object):
 
     def process_request(self, request):
         try:
+
             self.enter_request_context(request)
 
             if not self.should_process_request(request):

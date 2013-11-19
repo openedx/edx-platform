@@ -187,19 +187,13 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         relative_url = urlparse.urlparse(self.server.grade_data['callback_url']).path
         url = self.server.referer_host + relative_url
 
-        cookies_to_send = {}
         headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest'}
-        if self.server.server_host in self.server.referer_netloc:  # request from localhost to localhost:
-            cookies = self.server.cookie
-            headers['X-CSRFToken'] = cookies.get('csrftoken')
-            cookies_to_send = {k: v for k, v in cookies.items() if k in ['csrftoken', 'sessionid']}
 
         headers['Authorization'] = self.oauth_sign(url, data)
 
         response = requests.post(
             url,
             data=data,
-            cookies=cookies_to_send,
             headers=headers
         )
         # assert response.status_code == 200
@@ -263,9 +257,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             http_method=u'POST',
             body={u'oauth_body_hash': oauth_body_hash},
             headers=headers
-            )
+        )
         headers = headers['Authorization'] + ', oauth_body_hash="{}"'.format(oauth_body_hash)
         return headers
+
 
 class MockLTIServer(HTTPServer):
     '''

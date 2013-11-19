@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
@@ -488,6 +488,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
+@csrf_exempt
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -503,15 +504,21 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
+
+    @csrf_protect
+    def get_protected_user(request):
+        return request.user
+
+    if handler != 'custom_handler':
+        user = get_protected_user(request)
+        if not user.is_authenticated():
+            raise PermissionDenied
+
     location = unquote_slashes(usage_id)
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
         raise Http404("Invalid location")
-
-    if handler != 'custom_handler':
-        if not request.user.is_authenticated():
-            raise PermissionDenied
 
     # Check submitted files
     files = request.FILES or {}
@@ -530,7 +537,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         )
         raise Http404
     # import ipdb; ipdb.set_trace()
-    custom_user = None
+
     if handler == 'custom_handler':
         from courseware.courses import get_course_by_id
         course = get_course_by_id(course_id)
@@ -538,18 +545,18 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         if not status:
             raise PermissionDenied
         from student.models import user_by_anonymous_id
-        custom_user = user_by_anonymous_id(anonymous_user_id)
+        user = user_by_anonymous_id(anonymous_user_id)
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
-        custom_user or request.user,
+        user,
         descriptor
     )
-    instance = get_module(custom_user or request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", location, request.user)
+        log.debug("No module %s for user %s -- access denied?", location, user)
         raise Http404
 
     req = django_to_webob_request(request)
