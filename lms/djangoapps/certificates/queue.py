@@ -175,14 +175,14 @@ class XQueueCertInterface(object):
             grade = grades.grade(student, self.request, course)
             is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
-            enrollment = CourseEnrollment.objects.get(user=student, course_id=course_id)
+            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
-            cert_mode = enrollment.mode
-            if enrollment.mode == CertificateModes.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
+            cert_mode = enrollment_mode
+            if enrollment_mode == CertificateModes.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
                 template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
                     org, course_num)
-            elif (enrollment.mode == CertificateModes.verified and not
+            elif (enrollment_mode == CertificateModes.verified and not
                     SoftwareSecurePhotoVerification.user_is_verified(student)):
                 template_pdf = "certificate-template-{0}-{1}.pdf".format(
                     org, course_num)
