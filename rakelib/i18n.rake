@@ -18,7 +18,7 @@ namespace :i18n do
   desc "Simulate international translation by generating dummy strings corresponding to source strings."
   task :dummy do
     source_files = Dir["#{REPO_ROOT}/conf/locale/en/LC_MESSAGES/*.po"]
-    dummy_locale = 'fr'
+    dummy_locale = 'eo'
     cmd = File.join(REPO_ROOT, "i18n", "make_dummy.py")
     for file in source_files do
       sh("#{cmd} #{file} #{dummy_locale}")

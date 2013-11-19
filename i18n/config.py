@@ -49,7 +49,7 @@ class Configuration:
     @property
     def dummy_locale(self):
         """
-        Returns a locale to use for the dummy text, e.g. 'fr'.
+        Returns a locale to use for the dummy text, e.g. 'eo'.
         Throws exception if no dummy-locale is declared. 
         The locale is a string.
         """

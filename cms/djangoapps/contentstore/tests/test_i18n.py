@@ -73,8 +73,8 @@ class InternationalizationTest(ModuleStoreTestCase):
     # ****
     #
     # This test will break when we replace this fake 'test' language
-    # with actual French. This test will need to be updated with
-    # actual French at that time.
+    # with actual Esperanto. This test will need to be updated with
+    # actual Esperanto at that time.
     # Test temporarily disable since it depends on creation of dummy strings
     @skip
     def test_course_with_accents(self):
@@ -82,10 +82,11 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get_html('/course',
-                               {},
-                               HTTP_ACCEPT_LANGUAGE='fr'
-                               )
+        resp = self.client.get_html(
+            '/course',
+            {},
+            HTTP_ACCEPT_LANGUAGE='eo'
+        )
 
         TEST_STRING = (
             u'<h1 class="title-1">'
