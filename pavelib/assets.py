@@ -29,13 +29,11 @@ COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = PROJECT_ROOT  # virtualenv dir /mitx is in
 COURSES_ROOT = ENV_ROOT / "data"
 
-env_file = None
 env_data = None
 
 try:
-    env_file = open('env.json')
-    env_data = json.load(env_file)
-    env_file.close()
+    with open('env.json') as env_file:
+        env_data = json.load(env_file)
 except IOError:
     print("Warning: File env.json not found - some configuration requires this")
 
