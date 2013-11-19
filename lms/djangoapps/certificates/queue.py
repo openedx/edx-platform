@@ -178,9 +178,15 @@ class XQueueCertInterface(object):
             enrollment = CourseEnrollment.objects.get(user=student, course_id=course_id)
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
-            if enrollment.mode == CertificateModes.verified:
+            cert_mode = enrollment.mode
+            if enrollment.mode == CertificateModes.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
                 template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
                     org, course_num)
+            elif (enrollment.mode == CertificateModes.verified and not
+                    SoftwareSecurePhotoVerification.user_is_verified(student)):
+                template_pdf = "certificate-template-{0}-{1}.pdf".format(
+                    org, course_num)
+                cert_mode = CertificateModes.honor
             else:
                 # honor code and audit students
                 template_pdf = "certificate-template-{0}-{1}.pdf".format(
@@ -189,8 +195,7 @@ class XQueueCertInterface(object):
             cert, created = GeneratedCertificate.objects.get_or_create(
                 user=student, course_id=course_id)
 
-            cert.mode = enrollment.mode
-
+            cert.mode = cert_mode
             cert.user = student
             cert.grade = grade['percent']
             cert.course_id = course_id
