@@ -53,8 +53,12 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'edx',
+        'USER': 'vagrant',
+        'PASSWORD': 'vagrant',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 

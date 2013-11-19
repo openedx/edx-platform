@@ -365,6 +365,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # cities
+    'cities',
+
     # Monitor the status of services
     'service_status',
 
