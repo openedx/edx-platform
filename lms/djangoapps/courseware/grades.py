@@ -123,6 +123,7 @@ def answer_distributions(request, course):
     return counts
 
 
+@transaction.commit_on_success
 def grade(student, request, course, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It returns the
@@ -141,6 +142,9 @@ def grade(student, request, course, keep_raw_scores=False):
       for every graded module
 
     More information on the format is in the docstring for CourseGrader.
+
+    The function has django's transaction.commit_on_success decorator to be sure
+    to commit at the end of the function.
     """
     grading_context = course.grading_context
     raw_scores = []
