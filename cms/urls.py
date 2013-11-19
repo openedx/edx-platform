@@ -15,8 +15,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
-    url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
-    url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
@@ -110,12 +108,12 @@ urlpatterns += patterns(
         ),
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
-    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
+    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
     url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
-    url(r'(?ix)^xblock/{}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
+    url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
 )
 
 js_info_dict = {

@@ -12,14 +12,18 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
-
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoProgressSlider = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         // No callbacks to DOM events (click, mousemove, etc.).
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -47,7 +51,7 @@ function () {
     //     Create any necessary DOM elements, attach them, and set their
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
-    // have to do repeated jQuery element selects.
+    //     have to do repeated jQuery element selects.
     function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;

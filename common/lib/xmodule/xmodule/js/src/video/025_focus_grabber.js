@@ -33,11 +33,16 @@ define(
 [],
 function () {
     return function (state) {
+        var dfd = $.Deferred();
+
         state.focusGrabber = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
 

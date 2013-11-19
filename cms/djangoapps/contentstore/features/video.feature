@@ -46,11 +46,11 @@ Feature: CMS.Video Component
   Scenario: Closed captions become visible when the mouse hovers over CC button
     Given I have created a Video component with subtitles
     And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
+    Then Captions become "invisible"
     And I hover over button "CC"
     Then Captions become "visible"
     And I hover over button "volume"
-    Then Captions become "invisible" after 3 seconds
+    Then Captions become "invisible"
 
   # 8
   Scenario: Open captions never become invisible
@@ -66,7 +66,7 @@ Feature: CMS.Video Component
   Scenario: Closed captions are invisible when mouse doesn't hover on CC button
     Given I have created a Video component with subtitles
     And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
+    Then Captions become "invisible"
     And I hover over button "volume"
     Then Captions are "invisible"
 
@@ -74,9 +74,9 @@ Feature: CMS.Video Component
   Scenario: When enter key is pressed on a caption shows an outline around it
     Given I have created a Video component with subtitles
     And Make sure captions are opened
-    Then I focus on caption line with data-index 0
-    Then I press "enter" button on caption line with data-index 0
-    And I see caption line with data-index 0 has class "focused"
+    Then I focus on caption line with data-index "0"
+    Then I press "enter" button on caption line with data-index "0"
+    And I see caption line with data-index "0" has class "focused"
 
   # 11
   # Disabled until we come up with a more solid test, as this one is brittle.

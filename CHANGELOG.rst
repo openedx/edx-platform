@@ -5,13 +5,24 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add template for checkboxes response to studio. BLD-193.
+
+Blades: Video player:
+  - Add spinner;
+  - Improve initialization of modules;
+  - Speed up video resizing during page loading;
+  - Speed up acceptance tests. (BLD-502)
+  - Fix transcripts bug - when show_captions is set to false. BLD-467.
+
+Studio: change create_item, delete_item, and save_item to RESTful API (STUD-847).
+
 Blades: Fix answer choices rearranging if user tries to stylize something in the
 text like with bold or italics. (BLD-449)
 
 LMS: Beta instructor dashboard will only count actively enrolled students for
 course enrollment numbers.
 
-Blades: Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
+Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
 
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.

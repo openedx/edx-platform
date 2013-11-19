@@ -120,6 +120,10 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    locator = loc_mapper().translate_location(
+        course.location.course_id, item.location, False, True
+    )
+
     return render_to_response(
         'edit_subsection.html',
         {
@@ -129,8 +133,10 @@ def edit_subsection(request, location):
            'lms_link': lms_link,
            'preview_link': preview_link,
            'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+           # For grader, which is not yet converted
            'parent_location': course.location,
            'parent_item': parent,
+           'locator': locator,
            'policy_metadata': policy_metadata,
            'subsection_units': subsection_units,
            'can_view_live': can_view_live
@@ -175,9 +181,9 @@ def edit_unit(request, location):
 
     # Note that the unit_state (draft, public, private) does not match up with the published value
     # passed to translate_location. The two concepts are different at this point.
-    unit_update_url = loc_mapper().translate_location(
+    unit_locator = loc_mapper().translate_location(
         course.location.course_id, Location(location), False, True
-    ).url_reverse("xblock", "")
+    )
 
     component_templates = defaultdict(list)
     for category in COMPONENT_TYPES:
@@ -247,7 +253,7 @@ def edit_unit(request, location):
             component.location.url(),
             loc_mapper().translate_location(
                 course.location.course_id, component.location, False, True
-            ).url_reverse("xblock")
+            )
         ]
         for component
         in item.get_children()
@@ -296,8 +302,9 @@ def edit_unit(request, location):
     return render_to_response('unit.html', {
         'context_course': course,
         'unit': item,
+        # Still needed for creating a draft.
         'unit_location': location,
-        'unit_update_url': unit_update_url,
+        'unit_locator': unit_locator,
         'components': components,
         'component_templates': component_templates,
         'draft_preview_link': preview_lms_link,

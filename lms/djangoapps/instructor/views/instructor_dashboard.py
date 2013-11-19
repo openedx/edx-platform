@@ -26,6 +26,7 @@ from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from lms.lib.xblock.runtime import handler_prefix
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):

@@ -31,7 +31,7 @@ REQUIREJS_WAIT = {
 
     # Individual Unit (editing)
     re.compile('^Individual Unit \|'): [
-        "js/base", "coffee/src/models/module", "coffee/src/views/unit",
+        "js/base", "coffee/src/views/unit",
         "coffee/src/views/module_edit"],
 
     # Content - Outline

@@ -10,9 +10,9 @@ from xmodule.modulestore.django import loc_mapper
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/unit", "jquery.ui"],
+require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui"],
     function(doc, $, ModuleModel, UnitEditView, ui) {
-  window.unit_location_analytics = '${unit_location}';
+  window.unit_location_analytics = '${unit_locator}';
 
   // tabs
   $('.tab-group').tabs();
@@ -20,7 +20,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
   new UnitEditView({
     el: $('.main-wrapper'),
     model: new ModuleModel({
-      id: '${unit_location}',
+      id: '${unit_locator}',
       state: '${unit_state}'
     })
   });
@@ -34,7 +34,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
 
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-update_url="${unit_update_url}">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-locator="${unit_locator}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
@@ -48,8 +48,8 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
         <article class="unit-body window">
         <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for id, component_update_url in components:
-            <li class="component" data-id="${id}" data-update_url="${component_update_url}"/>
+            % for id, locator in components:
+            <li class="component" data-id="${id}" data-locator="${locator}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
@@ -141,7 +141,7 @@ require(["domReady!", "jquery", "coffee/src/models/module", "coffee/src/views/un
           <div class="window-contents">
             <div class="row visibility">
               <label class="inline-label">${_("Visibility:")}</label>
-              <select class='visibility-select'>
+              <select name="visibility-select" class='visibility-select'>
                 <option value="public">${_("Public")}</option>
                 <option value="private">${_("Private")}</option>
               </select>

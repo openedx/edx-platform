@@ -1,0 +1,23 @@
+---
+metadata:
+    display_name: Checkboxes
+    markdown: |
+      A checkboxes problem presents checkbox buttons for student input. Students can select more
+      than one option presented.
+
+      [x] correct
+      [ ] incorrect
+      [x] correct
+
+data: |
+      <problem>
+        <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
+        <choiceresponse>
+          <checkboxgroup direction="vertical">
+            <choice correct="true">correct</choice>
+            <choice correct="false">incorrect</choice>
+            <choice correct="true">correct</choice>
+          </checkboxgroup>
+        </choiceresponse>
+      </problem>
+

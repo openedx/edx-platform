@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import loc_mapper
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -47,14 +48,17 @@ class Basetranscripts(CourseTestCase):
     def setUp(self):
         """Create initial data."""
         super(Basetranscripts, self).setUp()
+        self.unicode_locator = unicode(loc_mapper().translate_location(
+            self.course.location.course_id, self.course.location, False, True
+        ))
 
         # Add video module
         data = {
-            'parent_location': str(self.course_location),
+            'parent_locator': self.unicode_locator,
             'category': 'video',
             'type': 'video'
         }
-        resp = self.client.ajax_post(reverse('create_item'), data)
+        resp = self.client.ajax_post('/xblock', data)
         self.item_location = json.loads(resp.content).get('id')
         self.assertEqual(resp.status_code, 200)
 
@@ -196,11 +200,11 @@ class TestUploadtranscripts(Basetranscripts):
     def test_fail_for_non_video_module(self):
         # non_video module: setup
         data = {
-            'parent_location': str(self.course_location),
+            'parent_locator': self.unicode_locator,
             'category': 'non_video',
             'type': 'non_video'
         }
-        resp = self.client.ajax_post(reverse('create_item'), data)
+        resp = self.client.ajax_post('/xblock', data)
         item_location = json.loads(resp.content).get('id')
         data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item_location, data)
@@ -407,11 +411,11 @@ class TestDownloadtranscripts(Basetranscripts):
     def test_fail_for_non_video_module(self):
         # Video module: setup
         data = {
-            'parent_location': str(self.course_location),
+            'parent_locator': self.unicode_locator,
             'category': 'videoalpha',
             'type': 'videoalpha'
         }
-        resp = self.client.ajax_post(reverse('create_item'), data)
+        resp = self.client.ajax_post('/xblock', data)
         item_location = json.loads(resp.content).get('id')
         subs_id = str(uuid4())
         data = textwrap.dedent("""
@@ -657,11 +661,11 @@ class TestChecktranscripts(Basetranscripts):
     def test_fail_for_non_video_module(self):
         # Not video module: setup
         data = {
-            'parent_location': str(self.course_location),
+            'parent_locator': self.unicode_locator,
             'category': 'not_video',
             'type': 'not_video'
         }
-        resp = self.client.ajax_post(reverse('create_item'), data)
+        resp = self.client.ajax_post('/xblock', data)
         item_location = json.loads(resp.content).get('id')
         subs_id = str(uuid4())
         data = textwrap.dedent("""
