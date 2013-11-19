@@ -12,7 +12,7 @@ DEBUG = True
 USE_I18N = True
 # For displaying the dummy text, we need to provide a language mapping.
 LANGUAGES = (
-    ('fr', 'Francais'),
+    ('eo', 'Esperanto'),
 )
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
