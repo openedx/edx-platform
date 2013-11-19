@@ -13,7 +13,7 @@ from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
-from xmodule.modulestore import inheritance, ModuleStoreBase, Location
+from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 #==============================================================================
 
 
-class SplitMongoModuleStore(ModuleStoreBase):
+class SplitMongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
@@ -1455,3 +1455,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if 'category' in fields:
             del fields['category']
         return fields
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
+        """
+        return SPLIT_MONGO_MODULESTORE_TYPE

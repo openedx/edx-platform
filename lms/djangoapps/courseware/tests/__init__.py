@@ -21,7 +21,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.xblock.field_data import LmsFieldData
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -127,8 +128,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     def get_url(self, dispatch):
         """Return item url with dispatch."""
         return reverse(
-            'modx_dispatch',
-            args=(self.course.id, self.item_url, dispatch)
+            'xblock_handler',
+            args=(self.course.id, quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 

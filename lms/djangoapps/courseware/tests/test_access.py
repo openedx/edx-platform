@@ -1,15 +1,21 @@
 from mock import Mock
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from xmodule.modulestore import Location
 import courseware.access as access
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from .factories import CourseEnrollmentAllowedFactory
 import datetime
-from django.utils.timezone import UTC
+import pytz
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AccessTestCase(TestCase):
+    """
+    Tests for the various access controls on the student dashboard
+    """
     def test__has_global_staff_access(self):
         u = Mock(is_staff=False)
         self.assertFalse(access._has_global_staff_access(u))
@@ -71,7 +77,7 @@ class AccessTestCase(TestCase):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         u = Mock()
         d = Mock()
-        d.start = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        d.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(u, d, 'load'))
@@ -79,8 +85,8 @@ class AccessTestCase(TestCase):
 
     def test__has_access_course_desc_can_enroll(self):
         u = Mock()
-        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates

@@ -1,48 +1,69 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-<h2>${_("Course Information")}</h2>
+<div class="enrollment-wrapper">
+  <h2>${_("Enrollment Information")}</h2>
+  <span class="tip">${_("Total number of enrollees (instructors, staff members, and students)")}</span>
+  <br/><br/>
+  <span style="color: green;"><b>${ section_data['enrollment_count'] }</b></span>
 
-<div class="basic-data">
-  ${_("Course Name")}:
-  ${ section_data['course_display_name'] }
+</div>
+<hr>
+
+<div class="basic-wrapper">
+  <h2>${_("Basic Course Information")}</h2>
+
+  <ul class="list-input">
+    <li class="field text is-not-editable" id="field-course-organization">
+      <label for="course-organization">${_("Organization:")}</label>
+      <b>${ section_data['course_org'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-number">
+      <label for="course-number">${_("Course Number:")}</label>
+      <b>${ section_data['course_num'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-name">
+      <label for="course-name">${_("Course Name:")}</label>
+      <b>${ section_data['course_name'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-display-name">
+      <label for="course-display-name">${_("Course Display Name:")}</label>
+      <b>${ section_data['course_display_name'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-started">
+      <label for="start-date">${_("Has the course started?")}</label>
+
+      <b>${_("Yes") if section_data['grade_cutoffs'] else _("No")}</b>
+
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-ended">
+      <label for="start-date">${_("Has the course ended?")}</label>
+      %if section_data['has_ended']:
+      <b>${_("Yes")}</b>
+      %else:
+      <b>${_("No")}</b>
+      %endif
+    </li>
+
+    <li class="field text is-not-editable" id="field-grade-cutoffs">
+      <label for="start-date">${_("Grade Cutoffs:")}</label>
+      <b>${ section_data['grade_cutoffs'] }</b>
+    </li>
+  </ul>
 </div>
 
-<div class="basic-data">
-  ${_("Course ID")}:
-  ${ section_data['course_id'] }
-</div>
 
-<div class="basic-data">
-  ${_("Students Enrolled")}:
-  ${ section_data['enrollment_count'] }
-</div>
-
-<div class="basic-data">
-  ${_("Started")}:
-  ${ section_data['has_started'] }
-</div>
-
-<div class="basic-data">
-  ${_("Ended")}:
-  ${ section_data['has_ended'] }
-</div>
-
-<div class="basic-data">
-  ${_("Grade Cutoffs")}:
-  ${ section_data['grade_cutoffs'] }
-</div>
-
-## <div class="basic-data">
-##   Offline Grades Available:
-##   ${ section_data['offline_grades'] }
-## </div>
-
-%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>
     <p>${_("The status for any active tasks appears in a table below.")} </p>
+    <br />
 
     <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
   </div>
@@ -69,6 +90,3 @@
   </div>
 <br>
 %endif
-
-
-

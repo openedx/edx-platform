@@ -17,6 +17,13 @@
     width: flex-grid(3,12);
   }
 
+  // UI: export controls
+  .export-controls {
+    @extend %ui-window;
+    @include clearfix;
+    padding: 30px 40px;
+  }
+
   // UI: import form
   .import-form {
     @include box-sizing(border-box);
@@ -46,11 +53,23 @@
 
   // UI: default
   .action-choose-file {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-green;
     @extend %t-action1;
     display: block;
     margin: $baseline 0;
     padding: ($baseline*0.75) $baseline;
+
+    [class^="icon"] {
+      @extend %t-icon2;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: ($baseline/4);
+    }
+
+    .copy {
+      display: inline-block;
+      vertical-align: middle;
+    }
   }
 
   // ====================

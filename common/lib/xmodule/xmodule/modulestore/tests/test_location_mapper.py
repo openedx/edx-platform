@@ -258,13 +258,17 @@ class TestLocationMapper(unittest.TestCase):
             new_style_course_id,
             block_map={
                 'abc123': {'problem': 'problem2'},
-                '48f23a10395384929234': {'chapter': 'chapter48f'}
+                '48f23a10395384929234': {'chapter': 'chapter48f'},
+                'baz_run': {'course': 'root'},
             }
         )
         # only one course matches
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # default branch
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
+        # test get_course keyword
+        prob_location = loc_mapper().translate_locator_to_location(prob_locator, get_course=True)
+        self.assertEqual(prob_location, Location('i4x', org, course, 'course', 'baz_run', None))
         # explicit branch
         prob_locator = BlockUsageLocator(
             course_id=prob_locator.course_id, branch='draft', usage_id=prob_locator.usage_id

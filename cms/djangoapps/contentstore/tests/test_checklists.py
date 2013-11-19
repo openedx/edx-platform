@@ -105,7 +105,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertEqual('CourseOutline', get_first_item(payload).get('action_url'))
         get_first_item(payload)['is_checked'] = True
 
-        returned_checklist = json.loads(self.client.post(update_url, json.dumps(payload), "application/json").content)
+        returned_checklist = json.loads(self.client.ajax_post(update_url, payload).content)
         self.assertTrue(get_first_item(returned_checklist).get('is_checked'))
         persisted_checklist = self.get_persisted_checklists()[1]
         # Verify that persisted checklist does not have expanded action URLs.

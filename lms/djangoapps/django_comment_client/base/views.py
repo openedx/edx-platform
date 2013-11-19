@@ -6,7 +6,7 @@ import logging
 import urlparse
 import functools
 
-import comment_client as cc
+import lms.lib.comment_client as cc
 import django_comment_client.utils as utils
 import django_comment_client.settings as cc_settings
 
@@ -23,7 +23,7 @@ from mitxmako.shortcuts import render_to_string
 from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
-from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
+from django_comment_client.utils import JsonResponse, JsonError, extract, add_courseware_context
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from django_comment_common.models import Role
@@ -72,7 +72,7 @@ def create_thread(request, course_id, commentable_id):
     """
     Given a course and commentble ID, create the thread
     """
-    
+
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
@@ -128,10 +128,8 @@ def create_thread(request, course_id, commentable_id):
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
-    courseware_context = get_courseware_context(thread, course)
     data = thread.to_dict()
-    if courseware_context:
-        data.update(courseware_context)
+    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_id, data, 'discussion/ajax_create_thread.html')
     else:

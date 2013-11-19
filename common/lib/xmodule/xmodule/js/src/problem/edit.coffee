@@ -268,18 +268,24 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
           return selectString;
       });
+      
+      // replace code blocks
+      xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
+          var selectString = '<pre><code>\n' + p1 + '</code></pre>';
+          return selectString;
+      });
 
-      // split scripts and wrap paragraphs
-      var splits = xml.split(/(\<\/?script.*?\>)/g);
+      // split scripts and preformatted sections, and wrap paragraphs
+      var splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
       var scriptFlag = false;
       for(var i = 0; i < splits.length; i++) {
-        if(/\<script/.test(splits[i])) {
+        if(/\<(script|pre)/.test(splits[i])) {
           scriptFlag = true;
         }
         if(!scriptFlag) {
           splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
         }
-        if(/\<\/script/.test(splits[i])) {
+        if(/\<\/(script|pre)/.test(splits[i])) {
           scriptFlag = false;
         }
       }

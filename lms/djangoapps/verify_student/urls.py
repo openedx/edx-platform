@@ -35,4 +35,15 @@ urlpatterns = patterns(
         name="verify_student_results_callback",
     ),
 
+    url(
+        r'^reverify$',
+        views.ReverifyView.as_view(),
+        name="verify_student_reverify"
+    ),
+
+    url(
+        r'^reverification_confirmation$',
+        views.reverification_submission_confirmation,
+        name="verify_student_reverification_confirmation"
+    ),
 )

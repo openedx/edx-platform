@@ -64,12 +64,13 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
 
     createItem: (parent, payload) ->
       payload.parent_location = parent
-      $.post(
+      $.postJSON(
           "/create_item"
           payload
           (data) =>
               @model.set(id: data.id)
               @$el.data('id', data.id)
+              @$el.data('update_url', data.update_url)
               @render()
       )
 

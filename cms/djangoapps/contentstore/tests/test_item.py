@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 
 
 class DeleteItem(CourseTestCase):
-    """Tests for '/delete_item' url."""
+    """Tests for '/xblock' DELETE url."""
     def setUp(self):
         """ Creates the test course with a static page in it. """
         super(DeleteItem, self).setUp()
@@ -33,11 +33,8 @@ class DeleteItem(CourseTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
-        resp = self.client.post(
-            reverse('delete_item'),
-            resp.content,
-            "application/json"
-        )
+        resp_content = json.loads(resp.content)
+        resp = self.client.delete(resp_content['update_url'])
         self.assertEqual(resp.status_code, 204)
 
 

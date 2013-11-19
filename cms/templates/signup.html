@@ -228,7 +228,7 @@ require(["jquery", "jquery.cookie"], function($) {
       submit_data,
       function(json) {
         if(json.success) {
-          location.href = "${reverse('index')}";
+          location.href = "${'/course'}";
         } else {
           $('#register_error').html(json.value).stop().addClass('is-shown');
         }

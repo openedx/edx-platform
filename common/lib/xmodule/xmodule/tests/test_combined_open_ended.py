@@ -6,14 +6,15 @@ OpenEndedModule
 
 """
 
-from datetime import datetime
 import json
 import logging
 import unittest
 
+from datetime import datetime
 from lxml import etree
 from mock import Mock, MagicMock, ANY, patch
 from pytz import UTC
+from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
@@ -24,7 +25,7 @@ from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (
-    MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+    DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
     TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile
 )
@@ -212,6 +213,39 @@ class OpenEndedModuleTest(unittest.TestCase):
     definition = {'oeparam': oeparam}
     descriptor = Mock()
 
+    feedback = {
+        "success": True,
+        "feedback": "Grader Feedback"
+    }
+
+    single_score_msg = {
+        'correct': True,
+        'score': 4,
+        'msg': 'Grader Message',
+        'feedback': json.dumps(feedback),
+        'grader_type': 'IN',
+        'grader_id': '1',
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [0],
+        'rubric_scores_complete': True,
+        'rubric_xml': etree.tostring(rubric)
+    }
+
+    multiple_score_msg = {
+        'correct': True,
+        'score': [0, 1],
+        'msg': 'Grader Message',
+        'feedback': [json.dumps(feedback), json.dumps(feedback)],
+        'grader_type': 'PE',
+        'grader_id': ['1', '2'],
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [[0], [0]],
+        'rubric_scores_complete': [True, True],
+        'rubric_xml': [etree.tostring(rubric), etree.tostring(rubric)]
+    }
+
     def setUp(self):
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
@@ -269,62 +303,15 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': "Grader Feedback"
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': score_msg}
-        self.openendedmodule.update_score(get, self.test_system)
-
-    def update_score_single(self):
-        self.openendedmodule.new_history_entry("New Entry")
-        feedback = {
-            "success": True,
-            "feedback": "Grader Feedback"
-        }
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': json.dumps(feedback),
-            'grader_type': 'IN',
-            'grader_id': '1',
-            'submission_id': '1',
-            'success': True,
-            'rubric_scores': [0],
-            'rubric_scores_complete': True,
-            'rubric_xml': etree.tostring(self.rubric)
-        }
-        get = {'queuekey': "abcd",
-               'xqueue_body': json.dumps(score_msg)}
+               'xqueue_body': json.dumps(self.single_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
 
     def update_score_multiple(self):
         self.openendedmodule.new_history_entry("New Entry")
-        feedback = {
-            "success": True,
-            "feedback": "Grader Feedback"
-        }
-        score_msg = {
-            'correct': True,
-            'score': [0, 1],
-            'msg': 'Grader Message',
-            'feedback': [json.dumps(feedback), json.dumps(feedback)],
-            'grader_type': 'PE',
-            'grader_id': ['1', '2'],
-            'submission_id': '1',
-            'success': True,
-            'rubric_scores': [[0], [0]],
-            'rubric_scores_complete': [True, True],
-            'rubric_xml': [etree.tostring(self.rubric), etree.tostring(self.rubric)]
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': json.dumps(score_msg)}
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
-
 
     def test_latest_post_assessment(self):
         self.update_score_single()
@@ -345,6 +332,24 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.update_score_multiple()
         score = self.openendedmodule.latest_score()
         self.assertEquals(score, 1)
+
+    @patch('xmodule.open_ended_grading_classes.open_ended_module.log.error')
+    def test_update_score_nohistory(self, error_logger):
+        """
+        Tests error handling when there is no child_history
+        """
+        # NOTE that we are not creating any history items
+        get = {'queuekey': "abcd",
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
+        error_msg = ("Trying to update score without existing studentmodule child_history:\n"
+                     "   location: i4x://edX/sa_test/selfassessment/SampleQuestion\n"
+                     "   score: 1\n"
+                     "   grader_ids: [u'1', u'2']\n"
+                     "   submission_ids: [u'1', u'1']")
+        self.openendedmodule.update_score(get, self.test_system)
+        (msg,), _ = error_logger.call_args
+        self.assertTrue(error_logger.called)
+        self.assertEqual(msg, error_msg)
 
     def test_open_ended_display(self):
         """
@@ -642,9 +647,13 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         """
         Return a combined open ended module with the specified parameters
         """
-        definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric),
-                      'task_xml': task_xml}
+        definition = {
+            'prompt': etree.XML(self.prompt),
+            'rubric': etree.XML(self.rubric),
+            'task_xml': task_xml
+        }
         descriptor = Mock(data=definition)
+        module = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
         instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
             instance_state.update({'current_task_number': task_number})
@@ -655,6 +664,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                static_data=self.static_data,
                                                metadata=self.metadata,
                                                instance_state=instance_state)
+        self.test_system.xmodule_instance = module
         return combinedoe
 
     def ai_state_reset(self, task_state, task_number=None):
@@ -760,8 +770,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.save()
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])
@@ -803,8 +814,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertIsInstance(status, basestring)
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])
@@ -901,8 +913,9 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         module.save()
 
         # Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
         module.save()
         task_one_json = json.loads(module.task_states[0])

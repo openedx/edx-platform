@@ -284,7 +284,7 @@ def progress_summary(student, request, course, field_data_cache):
 
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
-    course_module = get_module(student, request, course.location, field_data_cache, course.id, depth=None)
+    course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
     if not course_module:
         # This student must not have access to the course.
         return None

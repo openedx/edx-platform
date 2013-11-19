@@ -26,10 +26,10 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseNotAllowed, Http404)
+                         Http404)
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date, base36_to_int, urlencode
+from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.utils.functional import Promise
@@ -38,7 +38,6 @@ from django.utils.simplejson import JSONEncoder
 from django.utils.translation import get_language
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.translation import ugettext as _u
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -53,6 +52,7 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 
+from verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
@@ -77,6 +77,7 @@ from dogapi import dog_stats_api
 from pytz import UTC
 
 from util.json_request import JsonResponse
+
 
 log = logging.getLogger("mitx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -273,18 +274,41 @@ def register_user(request, extra_context=None):
     return render_to_response('register.html', context)
 
 
+def complete_course_mode_info(course_id, enrollment):
+    """
+    We would like to compute some more information from the given course modes
+    and the user's current enrollment
+
+    Returns the given information:
+        - whether to show the course upsell information
+        - numbers of days until they can't upsell anymore
+    """
+    modes = CourseMode.modes_for_course_dict(course_id)
+    mode_info = {'show_upsell': False, 'days_for_upsell': None}
+    # we want to know if the user is already verified and if verified is an
+    # option
+    if 'verified' in modes and enrollment.mode != 'verified':
+        mode_info['show_upsell'] = True
+        # if there is an expiration date, find out how long from now it is
+        if modes['verified'].expiration_datetime:
+            today = datetime.datetime.now(UTC).date()
+            mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
+
+    return mode_info
+
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
 
-    # Build our courses list for the user, but ignore any courses that no longer
-    # exist (because the course IDs have changed). Still, we don't delete those
+    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
-    courses = []
+    course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            courses.append((course_from_id(enrollment.course_id), enrollment))
+            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -303,19 +327,27 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
+    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
-        course.id for course, _enrollment in courses if (
+        course.id for course, _enrollment in course_enrollment_pairs if (
             settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
             modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
+
+    # Verification Attempts
+    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+
+    show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                       if _enrollment.refundable())
+
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -323,15 +355,19 @@ def dashboard(request):
     except ExternalAuthMap.DoesNotExist:
         pass
 
-    context = {'courses': courses,
+    context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
                'external_auth_map': external_auth_map,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
+               'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
+               'verification_status': verification_status,
+               'verification_msg': verification_msg,
+               'show_refund_option_for': show_refund_option_for,
                }
 
     return render_to_response('dashboard.html', context)
@@ -439,20 +475,17 @@ def change_enrollment(request):
         )
 
     elif action == "unenroll":
-        try:
-            CourseEnrollment.unenroll(user, course_id)
-
-            org, course_num, run = course_id.split("/")
-            dog_stats_api.increment(
-                "common.student.unenrollment",
-                tags=["org:{0}".format(org),
-                      "course:{0}".format(course_num),
-                      "run:{0}".format(run)]
-            )
-
-            return HttpResponse()
-        except CourseEnrollment.DoesNotExist:
+        if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
+        CourseEnrollment.unenroll(user, course_id)
+        org, course_num, run = course_id.split("/")
+        dog_stats_api.increment(
+            "common.student.unenrollment",
+            tags=["org:{0}".format(org),
+                  "course:{0}".format(course_num),
+                  "run:{0}".format(run)]
+        )
+        return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
@@ -639,10 +672,10 @@ def manage_user_standing(request):
         row = [user.username, user.standing.all()[0].changed_by]
         rows.append(row)
 
-
     context = {'headers': headers, 'rows': rows}
 
     return render_to_response("manage_user_standing.html", context)
+
 
 @require_POST
 @login_required
@@ -657,34 +690,34 @@ def disable_account_ajax(request):
     username = request.POST.get('username')
     context = {}
     if username is None or username.strip() == '':
-        context['message'] = _u('Please enter a username')
+        context['message'] = _('Please enter a username')
         return JsonResponse(context, status=400)
 
     account_action = request.POST.get('account_action')
     if account_action is None:
-        context['message'] = _u('Please choose an option')
+        context['message'] = _('Please choose an option')
         return JsonResponse(context, status=400)
 
     username = username.strip()
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        context['message'] = _u("User with username {} does not exist").format(username)
+        context['message'] = _("User with username {} does not exist").format(username)
         return JsonResponse(context, status=400)
     else:
-        user_account, _ = UserStanding.objects.get_or_create(
+        user_account, _success = UserStanding.objects.get_or_create(
             user=user, defaults={'changed_by': request.user},
         )
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
-            context['message'] = _u("Successfully disabled {}'s account").format(username)
+            context['message'] = _("Successfully disabled {}'s account").format(username)
             log.info("{} disabled {}'s account".format(request.user, username))
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
-            context['message'] = _u("Successfully reenabled {}'s account").format(username)
+            context['message'] = _("Successfully reenabled {}'s account").format(username)
             log.info("{} reenabled {}'s account".format(request.user, username))
         else:
-            context['message'] = _u("Unexpected account status")
+            context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
         user_account.changed_by = request.user
         user_account.standing_last_changed_at = datetime.datetime.now(UTC)
@@ -948,7 +981,7 @@ def create_account(request, post_override=None):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
-    # dont send email if we are doing load testing or random user generation for some reason
+    # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
@@ -1404,8 +1437,9 @@ def confirm_email_change(request, key):
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)
         except PendingEmailChange.DoesNotExist:
+            response = render_to_response("invalid_email_key.html", {})
             transaction.rollback()
-            return render_to_response("invalid_email_key.html", {})
+            return response
 
         user = pec.user
         address_context = {
@@ -1414,8 +1448,9 @@ def confirm_email_change(request, key):
         }
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
+            response = render_to_response("email_exists.html", {})
             transaction.rollback()
-            return render_to_response("email_exists.html", {})
+            return response
 
         subject = render_to_string('emails/email_change_subject.txt', address_context)
         subject = ''.join(subject.splitlines())
@@ -1431,9 +1466,10 @@ def confirm_email_change(request, key):
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
-            transaction.rollback()
             log.warning('Unable to send confirmation email to old address', exc_info=True)
-            return render_to_response("email_change_failed.html", {'email': user.email})
+            response = render_to_response("email_change_failed.html", {'email': user.email})
+            transaction.rollback()
+            return response
 
         user.email = pec.new_email
         user.save()
@@ -1442,12 +1478,14 @@ def confirm_email_change(request, key):
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
-            transaction.rollback()
             log.warning('Unable to send confirmation email to new address', exc_info=True)
-            return render_to_response("email_change_failed.html", {'email': pec.new_email})
+            response = render_to_response("email_change_failed.html", {'email': pec.new_email})
+            transaction.rollback()
+            return response
 
+        response = render_to_response("email_change_successful.html", address_context)
         transaction.commit()
-        return render_to_response("email_change_successful.html", address_context)
+        return response
     except Exception:
         # If we get an unexpected exception, be sure to rollback the transaction
         transaction.rollback()

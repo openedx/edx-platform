@@ -1,10 +1,14 @@
 """
 A Django command that exports a course to a tar.gz file.
+
+If <filename> is '-', it pipes the file to stdout
+
 """
 
+import os
 import shutil
 import tarfile
-from tempfile import mkdtemp
+from tempfile import mktemp, mkdtemp
 from textwrap import dedent
 
 from path import path
@@ -25,13 +29,37 @@ class Command(BaseCommand):
     help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
+        course_id, filename, pipe_results = self._parse_arguments(args)
+
+        export_course_to_tarfile(course_id, filename)
+
+        results = self._get_results(filename) if pipe_results else None
+
+        return results
+
+    def _parse_arguments(self, args):
+        """Parse command line arguments"""
         try:
             course_id = args[0]
             filename = args[1]
         except IndexError:
             raise CommandError("Insufficient arguments")
 
-        export_course_to_tarfile(course_id, filename)
+        # If filename is '-' save to a temp file
+        pipe_results = False
+        if filename == '-':
+            filename = mktemp()
+            pipe_results = True
+
+        return course_id, filename, pipe_results
+
+    def _get_results(self, filename):
+        """Load results from file"""
+        results = None
+        with open(filename) as f:
+            results = f.read()
+            os.remove(filename)
+        return results
 
 
 def export_course_to_tarfile(course_id, filename):

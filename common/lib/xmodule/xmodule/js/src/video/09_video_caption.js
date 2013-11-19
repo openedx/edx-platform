@@ -37,53 +37,40 @@ function () {
     //     Functions which will be accessible via 'state' object. When called,
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoCaption.autoShowCaptions    = _.bind(
-            autoShowCaptions, state
-        );
-        state.videoCaption.autoHideCaptions    = _.bind(
-            autoHideCaptions, state
-        );
-        state.videoCaption.resize              = _.bind(resize, state);
-        state.videoCaption.toggle              = _.bind(toggle, state);
-        state.videoCaption.onMouseEnter        = _.bind(onMouseEnter, state);
-        state.videoCaption.onMouseLeave        = _.bind(onMouseLeave, state);
-        state.videoCaption.onMovement          = _.bind(onMovement, state);
-        state.videoCaption.renderCaption       = _.bind(renderCaption, state);
-        state.videoCaption.captionHeight       = _.bind(captionHeight, state);
-        state.videoCaption.topSpacingHeight    = _.bind(
-            topSpacingHeight, state
-        );
-        state.videoCaption.bottomSpacingHeight = _.bind(
-            bottomSpacingHeight, state
-        );
-        state.videoCaption.scrollCaption       = _.bind(scrollCaption, state);
-        state.videoCaption.search              = _.bind(search, state);
-        state.videoCaption.play                = _.bind(play, state);
-        state.videoCaption.pause               = _.bind(pause, state);
-        state.videoCaption.seekPlayer          = _.bind(seekPlayer, state);
-        state.videoCaption.hideCaptions        = _.bind(hideCaptions, state);
-        state.videoCaption.calculateOffset     = _.bind(
-            calculateOffset, state
-        );
-        state.videoCaption.updatePlayTime      = _.bind(updatePlayTime, state);
-        state.videoCaption.setSubtitlesHeight  = _.bind(
-            setSubtitlesHeight, state
-        );
+        var methodsDict = {
+            autoHideCaptions: autoHideCaptions,
+            autoShowCaptions: autoShowCaptions,
+            bindHandlers: bindHandlers,
+            bottomSpacingHeight: bottomSpacingHeight,
+            calculateOffset: calculateOffset,
+            captionBlur: captionBlur,
+            captionClick: captionClick,
+            captionFocus: captionFocus,
+            captionHeight: captionHeight,
+            captionKeyDown: captionKeyDown,
+            captionMouseDown: captionMouseDown,
+            captionMouseOverOut: captionMouseOverOut,
+            captionURL: captionURL,
+            fetchCaption: fetchCaption,
+            hideCaptions: hideCaptions,
+            onMouseEnter: onMouseEnter,
+            onMouseLeave: onMouseLeave,
+            onMovement: onMovement,
+            pause: pause,
+            play: play,
+            renderCaption: renderCaption,
+            renderElements: renderElements,
+            resize: resize,
+            scrollCaption: scrollCaption,
+            search: search,
+            seekPlayer: seekPlayer,
+            setSubtitlesHeight: setSubtitlesHeight,
+            toggle: toggle,
+            topSpacingHeight: topSpacingHeight,
+            updatePlayTime: updatePlayTime
+        };
 
-        state.videoCaption.renderElements      = _.bind(renderElements, state);
-        state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
-        state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
-        state.videoCaption.captionURL          = _.bind(captionURL, state);
-        state.videoCaption.captionMouseOverOut = _.bind(
-            captionMouseOverOut, state
-        );
-        state.videoCaption.captionMouseDown    = _.bind(
-            captionMouseDown, state
-        );
-        state.videoCaption.captionClick        = _.bind(captionClick, state);
-        state.videoCaption.captionFocus        = _.bind(captionFocus, state);
-        state.videoCaption.captionBlur         = _.bind(captionBlur, state);
-        state.videoCaption.captionKeyDown      = _.bind(captionKeyDown, state);
+        state.bindTo(methodsDict, state.videoCaption, state);
     }
 
     // ***************************************************************
@@ -241,9 +228,10 @@ function () {
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log('ERROR while fetching captions.');
+                console.log('[Video info]: ERROR while fetching captions.');
                 console.log(
-                    'STATUS:', textStatus + ', MESSAGE:', '' + errorThrown
+                    '[Video info]: STATUS:', textStatus +
+                    ', MESSAGE:', '' + errorThrown
                 );
 
                 _this.videoCaption.hideCaptions(true, false);

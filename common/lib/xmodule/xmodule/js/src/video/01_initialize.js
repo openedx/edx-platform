@@ -60,23 +60,23 @@ function (VideoPlayer) {
      *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
-        state.setSpeed      = _.bind(setSpeed, state);
-        state.youtubeId     = _.bind(youtubeId, state);
-        state.getDuration   = _.bind(getDuration, state);
-        state.trigger       = _.bind(trigger, state);
-        state.stopBuffering = _.bind(stopBuffering, state);
+        var methodsDict = {
+            bindTo: bindTo,
+            checkStartEndTimes: checkStartEndTimes,
+            fetchMetadata: fetchMetadata,
+            getDuration: getDuration,
+            getVideoMetadata: getVideoMetadata,
+            initialize: initialize,
+            parseSpeed: parseSpeed,
+            parseVideoSources: parseVideoSources,
+            parseYoutubeStreams: parseYoutubeStreams,
+            setSpeed: setSpeed,
+            stopBuffering: stopBuffering,
+            trigger: trigger,
+            youtubeId: youtubeId
+        };
 
-        // Old private functions. Now also public so that can be
-        // tested by Jasmine.
-
-        state.initialize          = _.bind(initialize, state);
-        state.parseSpeed          = _.bind(parseSpeed, state);
-        state.fetchMetadata       = _.bind(fetchMetadata, state);
-        state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
-        state.parseVideoSources   = _.bind(parseVideoSources, state);
-        state.getVideoMetadata    = _.bind(getVideoMetadata, state);
-
-        state.checkStartEndTimes  = _.bind(checkStartEndTimes, state);
+        bindTo(methodsDict, state, state);
     }
 
     // function _renderElements(state)
@@ -97,7 +97,7 @@ function (VideoPlayer) {
         if(state.videoType === 'youtube') {
             YT.ready(function() {
                 VideoPlayer(state);
-            })
+            });
         } else {
             VideoPlayer(state);
         }
@@ -233,6 +233,25 @@ function (VideoPlayer) {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
+
+    // function bindTo(methodsDict, obj, context, rewrite)
+    // Creates a new function with specific context and assigns it to the provided
+    // object.
+    function bindTo(methodsDict, obj, context, rewrite) {
+        $.each(methodsDict, function(name, method) {
+            if (_.isFunction(method)) {
+
+                if (_.isUndefined(rewrite)) {
+                    rewrite = true;
+                }
+
+                if (_.isUndefined(obj[name]) || rewrite) {
+                    obj[name] = _.bind(method, context);
+                }
+            }
+        });
+    }
+
     // function initialize(element)
     // The function set initial configuration and preparation.
 
@@ -262,8 +281,8 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
-            start:              data['start'],
-            end:                data['end'],
+            startTime:          data['start'],
+            endTime:            data['end'],
             caption_data_dir:   data['captionDataDir'],
             caption_asset_path: data['captionAssetPath'],
             show_captions:      regExp.test(data['showCaptions'].toString()),
@@ -369,7 +388,7 @@ function (VideoPlayer) {
     /*
      * function checkStartEndTimes()
      *
-     * Validate config.start and config.end times.
+     * Validate config.startTime and config.endTime times.
      *
      * We can check at this time if the times are proper integers, and if they
      * make general sense. I.e. if start time is => 0 and <= end time.
@@ -379,14 +398,18 @@ function (VideoPlayer) {
      * if start time and/or end time are greater than the length of the video.
      */
     function checkStartEndTimes() {
-        this.config.start = parseInt(this.config.start, 10);
-        if ((!isFinite(this.config.start)) || (this.config.start < 0)) {
-            this.config.start = 0;
+        this.config.startTime = parseInt(this.config.startTime, 10);
+        if (!isFinite(this.config.startTime) || this.config.startTime < 0) {
+            this.config.startTime = 0;
         }
 
-        this.config.end = parseInt(this.config.end, 10);
-        if ((!isFinite(this.config.end)) || (this.config.end < this.config.start)) {
-            this.config.end = null;
+        this.config.endTime = parseInt(this.config.endTime, 10);
+        if (
+            !isFinite(this.config.endTime) ||
+            this.config.endTime < this.config.startTime ||
+            this.config.endTime === 0
+        ) {
+            this.config.endTime = null;
         }
     }
 

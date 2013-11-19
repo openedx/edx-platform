@@ -6,6 +6,15 @@ plantTimeout = (ms, cb) -> setTimeout cb, ms
 plantInterval = (ms, cb) -> setInterval cb, ms
 
 
+# get jquery element and assert its existance
+find_and_assert = ($root, selector) ->
+  item = $root.find selector
+  if item.length != 1
+    console.error "element selection failed for '#{selector}' resulted in length #{item.length}"
+    throw "Failed Element Selection"
+  else
+    item
+
 # standard ajax error wrapper
 #
 # wraps a `handler` function so that first
@@ -17,6 +26,72 @@ std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
   handler.apply this, arguments
 
 
+# render a task list table to the DOM
+# `$table_tasks` the $element in which to put the table
+# `tasks_data`
+create_task_list_table = ($table_tasks, tasks_data) ->
+  $table_tasks.empty()
+
+  options =
+    enableCellNavigation: true
+    enableColumnReorder: false
+    autoHeight: true
+    rowHeight: 100
+    forceFitColumns: true
+
+  columns = [
+    id: 'task_type'
+    field: 'task_type'
+    name: 'Task Type'
+    minWidth: 100
+  ,
+    id: 'task_input'
+    field: 'task_input'
+    name: 'Task inputs'
+    minWidth: 150
+  ,
+    id: 'task_id'
+    field: 'task_id'
+    name: 'Task ID'
+    minWidth: 150
+  ,
+    id: 'requester'
+    field: 'requester'
+    name: 'Requester'
+    minWidth: 80
+  ,
+    id: 'created'
+    field: 'created'
+    name: 'Submitted'
+    minWidth: 120
+  ,
+    id: 'duration_sec'
+    field: 'duration_sec'
+    name: 'Duration (sec)'
+    minWidth: 80
+  ,
+    id: 'task_state'
+    field: 'task_state'
+    name: 'State'
+    minWidth: 80
+  ,
+    id: 'status'
+    field: 'status'
+    name: 'Task Status'
+    minWidth: 80
+  ,
+    id: 'task_message'
+    field: 'task_message'
+    name: 'Task Progress'
+    minWidth: 120
+  ]
+
+  table_data = tasks_data
+
+  $table_placeholder = $ '<div/>', class: 'slickgrid'
+  $table_tasks.append $table_placeholder
+  grid = new Slick.Grid($table_placeholder, table_data, columns, options)
+
 # Helper class for managing the execution of interval tasks.
 # Handles pausing and restarting.
 class IntervalManager
@@ -26,8 +101,8 @@ class IntervalManager
     @intervalID = null
 
   # Start or restart firing every `ms` milliseconds.
-  # Soes not fire immediately.
   start: ->
+    @fn()
     if @intervalID is null
       @intervalID = setInterval @fn, @ms
 
@@ -36,6 +111,34 @@ class IntervalManager
     clearInterval @intervalID
     @intervalID = null
 
+
+class PendingInstructorTasks
+  ### Pending Instructor Tasks Section ####
+  constructor: (@$section) ->
+    # Currently running tasks
+    @$table_running_tasks = find_and_assert @$section, ".running-tasks-table"
+
+    # start polling for task list
+    # if the list is in the DOM
+    if @$table_running_tasks.length
+      # reload every 20 seconds.
+      TASK_LIST_POLL_INTERVAL = 20000
+      @reload_running_tasks_list()
+      @task_poller = new IntervalManager(TASK_LIST_POLL_INTERVAL, => @reload_running_tasks_list())
+
+  # Populate the running tasks list
+  reload_running_tasks_list: =>
+    list_endpoint = @$table_running_tasks.data 'endpoint'
+    $.ajax
+      dataType: 'json'
+      url: list_endpoint
+      success: (data) =>
+        if data.tasks.length
+          create_task_list_table @$table_running_tasks, data.tasks
+        else
+          console.log "No pending instructor tasks to display"
+      error: std_ajax_err => console.error "Error finding pending instructor tasks to display"
+    ### /Pending Instructor Tasks Section ####
 
 # export for use
 # create parent namespaces if they do not already exist.
@@ -47,3 +150,5 @@ if _?
     plantInterval: plantInterval
     std_ajax_err: std_ajax_err
     IntervalManager: IntervalManager
+    create_task_list_table: create_task_list_table
+    PendingInstructorTasks: PendingInstructorTasks

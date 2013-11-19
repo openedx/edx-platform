@@ -168,15 +168,18 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                         return (displayNameValue !== "" && displayNameValue != "video_id");
                     }, "Defaults never loaded", 1000);
 
-                    var displayNameValue = collection[0].getValue();
-                    var videoUrlValue = collection[1].getValue();
+                    runs(function() {
 
-                    expect(displayNameValue).toBe('default');
-                    expect(videoUrlValue).toEqual([
-                        'http://youtu.be/OEoXaMPEzfM',
-                        'default.mp4',
-                        'default.webm'
-                    ]);
+                        var displayNameValue = collection[0].getValue();
+                        var videoUrlValue = collection[1].getValue();
+
+                        expect(displayNameValue).toBe('default');
+                        expect(videoUrlValue).toEqual([
+                            'http://youtu.be/OEoXaMPEzfM',
+                            'default.mp4',
+                            'default.webm'
+                        ]);
+                    });
                 });
 
                 it('If metadataCollection is not defined', function () {
@@ -220,19 +223,28 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                 it('Correct data', function () {
                     transcripts.syncAdvancedTab(metadataCollection);
 
-                    var collection = metadataCollection.models,
-                        displayNameValue = collection[0].getValue(),
-                        subValue = collection[1].getValue(),
-                        html5SourcesValue = collection[2].getValue(),
-                        youtubeValue = collection[3].getValue();
+                    var collection = metadataCollection.models;
 
-                    expect(displayNameValue).toBe('display value');
-                    expect(subValue).toBe('default');
-                    expect(html5SourcesValue).toEqual([
-                        'video.mp4',
-                        'video.webm'
-                    ]);
-                    expect(youtubeValue).toBe('12345678901');
+                    waitsFor(function() {
+                        var displayNameValue = collection[0].getValue();
+                        return (displayNameValue !== "" && displayNameValue != "video_id");
+                    }, "Defaults never loaded", 1000);
+
+                    runs(function() {
+
+                        var displayNameValue = collection[0].getValue();
+                        var subValue = collection[1].getValue();
+                        var html5SourcesValue = collection[2].getValue();
+                        var youtubeValue = collection[3].getValue();
+
+                        expect(displayNameValue).toBe('display value');
+                        expect(subValue).toBe('default');
+                        expect(html5SourcesValue).toEqual([
+                            'video.mp4',
+                            'video.webm'
+                        ]);
+                        expect(youtubeValue).toBe('12345678901');
+                    });
                 });
 
                 it('metadataCollection is not defined', function () {

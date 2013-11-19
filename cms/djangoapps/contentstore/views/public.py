@@ -9,7 +9,6 @@ from django.conf import settings
 from mitxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut
-from .user import index
 
 __all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks']
 
@@ -39,13 +38,13 @@ def login_page(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('login.html', {
         'csrf': csrf_token,
-        'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
+        'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
 
 def howitworks(request):
     "Proxy view"
     if request.user.is_authenticated():
-        return index(request)
+        return redirect('/course')
     else:
         return render_to_response('howitworks.html', {})

@@ -74,20 +74,6 @@ class MockUploadedFile(object):
         return self.mock_file.read()
 
 
-class MockQueryDict(dict):
-    """
-    Mock a query dict so that it can be used in test classes.  This will only work with the combinedopenended tests,
-    and does not mock the full query dict, only the behavior that is needed there (namely get_list).
-    """
-    def getlist(self, key, default=None):
-        try:
-            return super(MockQueryDict, self).__getitem__(key)
-        except KeyError:
-            if default is None:
-                return []
-        return default
-
-
 class DummyModulestore(object):
     """
     A mixin that allows test classes to have convenience functions to get a module given a location

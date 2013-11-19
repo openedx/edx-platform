@@ -132,7 +132,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 'display_name': display_name
             });
 
-            $.post('/create_item', {
+            $.postJSON('/create_item', {
                     'parent_location': parent,
                     'category': category,
                     'display_name': display_name
@@ -182,7 +182,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             });
 
 
-            $.post('/create_item', {
+            $.postJSON('/create_item', {
                     'parent_location': parent,
                     'category': category,
                     'display_name': display_name

@@ -22,7 +22,7 @@ class CourseUpdateTest(CourseTestCase):
                                   'course': self.course.location.course,
                                   'provided_id': ''})
 
-            resp = self.client.post(url, json.dumps(payload), "application/json")
+            resp = self.client.ajax_post(url, payload)
 
             return json.loads(resp.content)
 
@@ -66,7 +66,6 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == 2)
 
-        # can't test non-json paylod b/c expect_json throws error
         # try json w/o required fields
         self.assertContains(self.client.post(url, json.dumps({'garbage': 1}),
                                              "application/json"),
@@ -86,7 +85,7 @@ class CourseUpdateTest(CourseTestCase):
         payload = {'content': content,
                    'date': 'January 21, 2013'}
         self.assertContains(
-            self.client.post(url, json.dumps(payload), "application/json"),
+            self.client.ajax_post(url, payload),
             'Failed to save', status_code=400)
 
         # update w/ malformed html
@@ -98,7 +97,7 @@ class CourseUpdateTest(CourseTestCase):
                                                   'provided_id': ''})
 
         self.assertContains(
-            self.client.post(url, json.dumps(payload), "application/json"),
+            self.client.ajax_post(url, payload),
             '<garbage')
 
         # set to valid html which would break an xml parser
@@ -152,7 +151,7 @@ class CourseUpdateTest(CourseTestCase):
                               'course': self.course.location.course,
                               'provided_id': ''})
 
-        resp = self.client.post(url, json.dumps(payload), "application/json")
+        resp = self.client.ajax_post(url, payload)
 
         payload = json.loads(resp.content)
 

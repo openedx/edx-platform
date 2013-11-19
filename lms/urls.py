@@ -152,7 +152,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
 
 if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)
+    urlpatterns += (url(r'^reprofile$', 'lms.lib.perfstats.views.end_profile'),)
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
@@ -183,9 +183,9 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
             'courseware.views.jump_to_id', name="jump_to_id"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.modx_dispatch',
-            name='modx_dispatch'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+            'courseware.module_render.handle_xblock_callback',
+            name='xblock_handler'),
 
 
         # Software Licenses
@@ -282,8 +282,6 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
             'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
             'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
 
@@ -337,8 +335,6 @@ if settings.COURSEWARE_ENABLED:
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
-                'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),

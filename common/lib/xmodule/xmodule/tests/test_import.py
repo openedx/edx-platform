@@ -385,7 +385,7 @@ class ImportTestCase(BaseCourseTestCase):
         print("course errors:")
 
         # Expect to find an error/exception about characters in "®esources"
-        expect = "Invalid characters in '®esources'"
+        expect = "Invalid characters"
         errors = [(msg.encode("utf-8"), err.encode("utf-8"))
                     for msg, err in
                     modulestore.get_item_errors(course.location)]

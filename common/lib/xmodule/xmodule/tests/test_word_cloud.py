@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Test for Word cloud Xmodule functional logic."""
 
+from webob.multidict import MultiDict
 from xmodule.word_cloud_module import WordCloudDescriptor
-from . import PostData, LogicTest
+from . import LogicTest
 
 
 class WordCloudModuleTest(LogicTest):
@@ -24,7 +25,7 @@ class WordCloudModuleTest(LogicTest):
 
     def test_good_ajax_request(self):
         "Make shure that ajax request works correctly"
-        post_data = PostData({'student_words[]': ['cat', 'cat', 'dog', 'sun']})
+        post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
         response = self.ajax_request('submit', post_data)
         self.assertEqual(response['status'], 'success')
         self.assertEqual(response['submitted'], True)

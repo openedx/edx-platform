@@ -158,6 +158,11 @@ class CapaFields(object):
         # TODO: someday it should be possible to not duplicate this definition here
         # and in inheritance.py
     )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):
@@ -598,7 +603,7 @@ class CapaModule(CapaFields, XModule):
         )
 
         if dispatch not in handlers:
-            return 'Error'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
 
@@ -799,7 +804,7 @@ class CapaModule(CapaFields, XModule):
         """
         Make dictionary of student responses (aka "answers")
 
-        `data` is POST dictionary (Django QueryDict).
+        `data` is POST dictionary (webob.multidict.MultiDict).
 
         The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -831,7 +836,10 @@ class CapaModule(CapaFields, XModule):
         """
         answers = dict()
 
-        for key in data:
+        # webob.multidict.MultiDict is a view of a list of tuples,
+        # so it will return a multi-value key once for each value.
+        # We only want to consider each key a single time, so we use set(data.keys())
+        for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
@@ -853,7 +861,7 @@ class CapaModule(CapaFields, XModule):
                 name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
-                    val = data.getlist(key)
+                    val = data.getall(key)
                 elif is_dict_key:
                     try:
                         val = json.loads(data[key])
@@ -1176,10 +1184,23 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown,
-                         'enable_markdown': self.markdown is not None})
+        _context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # VS[compat]
@@ -1195,9 +1216,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
-                                    CapaDescriptor.text_customization])
+        non_editable_fields.extend([
+            CapaDescriptor.due,
+            CapaDescriptor.graceperiod,
+            CapaDescriptor.force_save_button,
+            CapaDescriptor.markdown,
+            CapaDescriptor.text_customization,
+            CapaDescriptor.use_latex_compiler,
+        ])
         return non_editable_fields
 
     # Proxy to CapaModule for access to any of its attributes

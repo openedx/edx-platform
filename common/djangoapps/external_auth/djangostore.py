@@ -87,7 +87,7 @@ class DjangoOpenIDStore(OpenIDStore):
                 cache.delete(key)
                 removed = True
             else:
-                assoc = associations.pop(handle)
+                assoc = associations.pop(handle, None)
                 if assoc:
                     cache.set(key, associations, DEFAULT_ASSOCIATIONS_TIMEOUT)
                     removed = True
