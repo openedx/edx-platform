@@ -43,11 +43,11 @@ require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) 
 <div class="wrapper-content wrapper">
   <section class="content">
     <div class="introduction has-links">
-      <p class="copy">${_("Static Pages are additional pages that supplement your Courseware. Other course authors have used them to share a syllabus, calendar, handouts, and more.")}</p>
+      <p class="copy">${_("Use Static Pages to share a syllabus, a calendar, handouts, or other supplements to your courseware.")}</p>
       <nav class="nav-introduction-supplementary">
         <ul>
           <li class="nav-item">
-          <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("How do Static Pages look to students in my course?")}</a>
+          <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("What do static pages look like in my course?")}</a>
           </li>
         </ul>
       </nav>
@@ -75,10 +75,10 @@ require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) 
 </div>
 
 <div class="content-modal" id="preview-lms-staticpages">
-  <h3 class="title">${_("How Static Pages are Used in Your Course")}</h3>
+  <h3 class="title">${_("Static Pages in Your Course")}</h3>
   <figure>
-    <img src="${static.url("img/preview-lms-staticpages.png")}" alt="${_('Preview of how Static Pages are used in your course')}" />
-    <figcaption class="description">${_("These pages will be presented in your course's main navigation alongside Courseware, Course Info, Discussion, etc.")}</figcaption>
+    <img src="${static.url("img/preview-lms-staticpages.png")}" alt="${_('Preview of Static Pages in your course')}" />
+    <figcaption class="description">${_("The names of your Static Pages appear in your course's main navigation bar, along with Courseware, Course Info, Discussion, Wiki, and Progress.")}</figcaption>
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">
