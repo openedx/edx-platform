@@ -25,7 +25,6 @@ env_data = None
 try:
     with open('env.json') as env_file:
         env_data = json.load(env_file)
-
 except IOError:
     print("Warning: File env.json not found - some configuration requires this")
 
