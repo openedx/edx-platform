@@ -10,10 +10,15 @@ http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 
 import logging
 import oauthlib.oauth1
+from oauthlib.oauth1.rfc5849 import signature
+import hashlib
+import base64
 import urllib
 import textwrap
 from lxml import etree
 from webob import Response
+import mock
+import re
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -252,6 +257,17 @@ class LTIModule(LTIFields, XModule):
                 path=self.system.get_handler_url('custom_handler'),
             )
 
+    def get_outcome_service_url(self):
+        """
+        Return url for storing grades
+        """
+        uri = 'http://{host}{path}'.format(
+                host=self.system.hostname,
+                path=self.system.get_handler_url('custom_handler'),
+            )
+        return '{}/replaceResult'.format(uri) if self.is_graded else ''
+
+
     def get_context_id(self):
         # This is an opaque identifier that uniquely identifies the context that contains
         # the link being launched. This parameter is recommended.
@@ -322,7 +338,7 @@ class LTIModule(LTIFields, XModule):
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': '{}/replaceResult'.format(self.get_base_url()) if self.is_graded else '',
+            u'lis_outcome_service_url': self.get_outcome_service_url(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
             # u'lis_person_sourcedid': self.get_lis_person_sourcedid(),  # optional, do not use for now.
 
@@ -543,6 +559,31 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
                 </imsx_POXEnvelopeRequest>
         \""")
         """
+        import ipdb; ipdb.set_trace()
+        #verify oauth signing
+        mock_request = mock.Mock()
+        headers = {
+            'Authorization':unicode(request.META['HTTP_AUTHORIZATION']),
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+        sha1 = hashlib.sha1()
+        sha1.update(request.body)
+        oauth_body_hash = base64.b64encode(sha1.hexdigest())
+
+        mock_request.params = signature.collect_parameters(
+            body = {u'oauth_body_hash': unicode(oauth_body_hash)},
+            headers=headers
+            )
+
+        mock_request.uri = request.META['HTTP_HOST'] + request.META['PATH_INFO']
+        mock_request.http_method = unicode(request.META['REQUEST_METHOD'])
+
+        client_signature = re.search(r'(?<=oauth_signature=")[^"]*', request.META['HTTP_AUTHORIZATION']).group(0)
+        mock_request.signature = unicode(client_signature)
+        result = signature.verify_hmac_sha1(mock_request, client_secret)
+
+
         data = request.body.strip().encode('utf-8')
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         try:  # get data from request

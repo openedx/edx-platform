@@ -150,7 +150,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
     def _send_graded_result(self):
 
         values = {
-            'textString': 0.1,
+            'textString': 0.5,
             'sourcedId': self.server.grade_data['user_id'],
             'imsx_messageIdentifier': uuid4().hex,
         }
