@@ -31,11 +31,6 @@ NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
 
-
-def _(s):
-    return s
-
-
 def randomization_bin(seed, problem_id):
     """
     Pick a randomization bin for the problem given the user's seed and a problem id.

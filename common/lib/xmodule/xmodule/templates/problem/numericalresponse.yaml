@@ -2,72 +2,68 @@
 metadata:
     display_name: Числовой ответ
     markdown: |
-       A numerical input problem accepts a line of text input from the
-       student, and evaluates the input for correctness based on its
-       numerical value.
+       Текстовый ответ проверяет число введенное студентом в специальное поле с правильным ответом.
 
-       The answer is correct if it is within a specified numerical tolerance
-       of the expected answer.
+       Ответ сравнивается с правильным с заданной точностью.
 
-       Enter the numerical value of Pi:
+       Введите значение числа Пи:
        = 3.14159 +- .02
        
-       Enter the approximate value of 502*9:
+       Оцените чему равно 502*9:
        = 4518 +- 15%
 
-       Enter the number of fingers on a human hand:
+       Количество пальцев на руке обычного человека:
        = 5
 
        [explanation]
-       Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number 
-       known to extreme precision. It is value is approximately equal to 3.14.
+       Число Пи, отношение длинны окружности к её диаметру. Иррациональное число, если оставлять только первые два знака после запятой,
+        то число пи равно 3.14
 
-       Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 
-       500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you 
-       can use any estimation technique that you like.
+       Вы можете точно посчитать в столбик или прикинуть, что 502 не сильно отличается от 500, а значит и ответ
+       не сильно отличается от 500*9 = 4500
 
-       If you look at your hand, you can count that you have five fingers.
+       Посмотрите на свою руку.
        [explanation]
 data: |
    <problem>
    <p>
-   A numerical input problem accepts a line of text input from the
-   student, and evaluates the input for correctness based on its
-   numerical value.  
-   </p>
+   Текстовый ответ проверяет число введенное студентом в специальное поле с правильным ответом.
+    </p>
 
    <p>
-   The answer is correct if it is within a specified numerical tolerance
-   of the expected answer.
+   Ответ сравнивается с правильным с заданной точностью.
    </p>
+
    <script type="loncapa/python">
    computed_response = 502*9
    </script>
 
-   <p>Enter the numerical value of Pi:
+   <p>Введите значение числа Пи:
        <numericalresponse answer="3.14159">
            <responseparam type="tolerance" default=".02" />
            <formulaequationinput />
        </numericalresponse>
    </p>
-   <p>Enter the approximate value of 502*9:
+   <p>Оцените чему равно 502*9:
        <numericalresponse answer="$computed_response">
            <responseparam type="tolerance" default="15%"/>
            <formulaequationinput />
        </numericalresponse>
    </p>
 
-   <p>Enter the number of fingers on a human hand:
+   <p>Количество пальцев на руке обычного человека:
        <numericalresponse answer="5">
            <formulaequationinput />
        </numericalresponse>
    </p>
        <solution>
            <div class="detailed-solution">
-               <p>Explanation</p>
-               <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-               <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-               <p>If you look at your hand, you can count that you have five fingers.</p>
+               <p>Объяснение</p>
+               <p>Число Пи, отношение длинны окружности к её диаметру. Иррациональное число, если оставлять только первые два знака после запятой,
+        то число пи равно 3.14</p>
+               <p>Вы можете точно посчитать в столбик или прикинуть, что 502 не сильно отличается от 500, а значит и ответ
+       не сильно отличается от 500*9 = 4500</p>
+               <p>Посмотрите на свою руку.</p>
            </div>
        </solution>
    </problem>

@@ -62,6 +62,7 @@
             "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
             "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
             "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
+            "jquery.datapicker-ru": "js/vendor/jquery.ui.datepicker-ru",
             "datepair": "js/vendor/timepicker/datepair",
             "date": "js/vendor/date",
             "tzAbbr": "js/vendor/tzAbbr",
@@ -131,7 +132,7 @@
             },
             "jquery.scrollTo": {
                 deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
+                exports: "jQuery.fn.scrollTo"
             },
             "jquery.flot": {
                 deps: ["jquery"],
@@ -212,13 +213,16 @@
             "coffee/src/logger": {
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
+            },
+            "jquery.datapicker-ru" : {
+                deps: ["jquery.ui"]
             }
         },
         // load jquery and gettext automatically
-        deps: ["jquery", "gettext", "js/vendor/jquery.ui.datepicker-ru"],
+        deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "jquery.datapicker-ru"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }

@@ -5,9 +5,9 @@ metadata:
 data: |
       <problem>
       <p>
-      A custom python-evaluated input problem accepts one or more lines of text input from the
-      student, and evaluates the inputs for correctness based on evaluation using a 
-      python script embedded within the problem.
+      Можно использовать вычисления на python для составления заданий.
+      Вы можете попросить студента ввести необходимые данные в разные строчки,
+      а затем проверить его ответ с помощью скрипта, написанного на языке python.
       </p>
 
       <script type="loncapa/python">
@@ -25,13 +25,13 @@ data: |
 
       </script>
 
-      <p>Enter two integers which sum to 10: </p>
+      <p>Введите два целых числа с суммой 10: </p>
       <customresponse cfn="test_add_to_ten">
               <textline size="40" correct_answer="3"/><br/>
               <textline size="40" correct_answer="7"/>
       </customresponse>
 
-      <p>Enter two integers which sum to 20: </p>
+      <p>Введите два целых числа с суммой 20: </p>
       <customresponse cfn="test_add" expect="20">
               <textline size="40" correct_answer="11"/><br/>
               <textline size="40" correct_answer="9"/>
@@ -39,8 +39,8 @@ data: |
     
           <solution>
               <div class="detailed-solution">
-                  <p>Explanation</p>
-                  <p>Any set of integers on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
+                  <p>Комментарий</p>
+                  <p>Любое множество целых числе на прямых \(y = 10 - x\) и \(y = 20 - x\) удовлятворяет условию задачи.</p>
                   <img src="/static/images/simple_graph.png"/>
               </div>
           </solution>

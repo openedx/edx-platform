@@ -2,40 +2,42 @@
 metadata:
     display_name: Выпадающий список
     markdown: |
-        Dropdown problems give a limited set of options for students to respond with, and present those options
-        in a format that encourages them to search for a specific answer rather than being immediately presented 
-        with options from which to recognize the correct answer.
+        Задача с выпадающим списком содержит небольшое количество ответов, из которых студент должен выбрать правильный.
 
-        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
+        Организация выпадающего списока(варианты ответа, указание правильного ответа) происходит
+        внутри <b>специальной конструкции</b>
 
-        Translation between Dropdown and __________ is extremely straightforward:
-
-        [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
+        Выпадающий список очень похож на ___________:
+        [[(Переключатели), Текстовый ответ, Числовой ответ, Расширенный ответ, Изображения]]
 
         [explanation]
-        Multiple Choice also allows students to select from a variety of pre-written responses, although the 
-        format makes it easier for students to read very long response options. Dropdowns also differ
-        slightly because students are more likely to think of an answer and then search for it rather than 
-        relying purely on recognition to answer the question.
+
+        Переключатели так же позволяют студенту выбрать ответ среди предоставленных, хотя формат
+        может быть более удобным в случае очень большого количества вариантов ответа.
+        Также выпадающий список немного отличается тем, что заставляет студентов подумать перед тем
+        как искать правильный ответ среди других вариантов.
         [explanation]
 data: |
   <problem>
-  <p>Dropdown problems give a limited set of options for students to respond with, and present those options
-  in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
+  <p>Задача с выпадающим списком содержит небольшое количество ответов, из которых студент должен выбрать правильный.</p>
 
   <p>
-  The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag. 
+  Организация выпадающего списока(варианты ответа, указание правильного ответа) происходит
+  внутри <b>специальной конструкции</b>
   </p>
-  <p>Translation between Dropdown and __________ is extremely straightforward:
+  <p>Выпадающий список очень похож на ___________:
       
   <optionresponse>
-        <optioninput options="('Multiple Choice','Text Input','Numerical Input','External Response','Image Response')" correct="Multiple Choice"></optioninput>
+        <optioninput options="('Переключатели','Текстовый ответ','Числовой ответ','Расширенный ответ','Изображения')" correct="Переключатели"></optioninput>
   </optionresponse>
   </p>
       <solution>
           <div class="detailed-solution">
-              <p>Explanation</p>
-              <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
+              <p>Комментарий</p>
+              <p>Переключатели так же позволяют студенту выбрать ответ среди предоставленных, хотя формат
+        может быть более удобным в случае очень большого количества вариантов ответа.
+        Также выпадающий список немного отличается тем, что заставляет студентов подумать перед тем
+        как искать правильный ответ среди других вариантов.</p>
           </div>
       </solution>
   </problem>
