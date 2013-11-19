@@ -10,6 +10,10 @@ from logsettings import get_logger_config
 
 DEBUG = True
 USE_I18N = True
+# For displaying the dummy text, we need to provide a language mapping.
+LANGUAGES = (
+    ('fr', 'Francais'),
+)
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
