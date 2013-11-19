@@ -778,7 +778,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         children: A list of child item identifiers
         """
 
-        self._update_single_item(location, {'definition.children': children})
+        # We expect the children IDs to always be the non-draft version. With view refactoring
+        # for split, we are now passing the draft version in some cases.
+        children_ids = [Location(child).replace(revision=None).url() for child in children]
+
+        self._update_single_item(location, {'definition.children': children_ids})
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         # fire signal that we've written to DB
