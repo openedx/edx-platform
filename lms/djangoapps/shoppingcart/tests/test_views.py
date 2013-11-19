@@ -83,6 +83,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def test_add_course_to_cart_success(self):
         self.login_user()
+        reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id])
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id]))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_id))

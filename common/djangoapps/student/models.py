@@ -16,6 +16,12 @@ import json
 import logging
 import uuid
 
+import crum
+
+from track import contexts
+from track.views import server_track
+from eventtracking import tracker
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -35,9 +41,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 
-
 unenroll_done = Signal(providing_args=["course_enrollment"])
-
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 

@@ -94,5 +94,7 @@ Feature: LMS.Verified certificates
         And I navigate to my dashboard
         Then I see the course on my dashboard
         And I see that I am on the verified track
+        And a "edx.user.upgrade.clicked" server event is emitted
+        And a "edx.user.upgrade.purchased" sever event is emitted
         And a "edx.course.enrollment.activated" server event is emitted
 

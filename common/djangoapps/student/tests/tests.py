@@ -340,7 +340,14 @@ class EnrollInCourseTest(TestCase):
             user=user,
             course_id=course_id
         )
-        self.assertFalse(enrollment_record.is_active)
+
+    def test_user_emitted_events(self):
+        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        course_id = "edX/Test101/2013"
+        course_id_partial = "edX/Test101"
+        with patch('eventtracking.tracker.get_tracker', side_effect=Exception):
+            UserMethods.emit_event(user, course_id, "fake")
+        self.assertTrue(True)
 
         # Make sure mode is updated properly if user unenrolls & re-enrolls
         enrollment = CourseEnrollment.enroll(user, course_id, "verified")

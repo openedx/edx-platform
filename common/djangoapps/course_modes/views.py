@@ -17,9 +17,11 @@ from edxmako.shortcuts import render_to_response
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, UserMethods
 from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
+
+EVENT_NAME_USER_CLICKED_UPGRADE = 'edx.user.upgrade.clicked'
 
 
 class ChooseModeView(View):
@@ -37,6 +39,8 @@ class ChooseModeView(View):
 
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
+        if upgrade == "True":
+            UserMethods.emit_event(request.user, course_id, EVENT_NAME_USER_CLICKED_UPGRADE)
 
         # verified users do not need to register or upgrade
         if enrollment_mode == 'verified':
