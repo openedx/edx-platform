@@ -298,10 +298,9 @@ def progress_summary(student, request, course):
 
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
+            if section_module.hide_from_toc:
+                continue
             with transaction.commit_on_success():
-                if section_module.hide_from_toc:
-                    continue
-
                 graded = section_module.graded
                 scores = []
 

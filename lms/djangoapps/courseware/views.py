@@ -693,11 +693,11 @@ def progress(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-        # NOTE: To make sure impersonation by instructor works, use
-        # student instead of request.user in the rest of the function.
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
 
-        # The pre-fetching of groups is done to make auth checks not require an
-        # additional DB lookup (this kills the Progress page in particular).
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, request, course)
