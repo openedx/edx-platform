@@ -10,6 +10,12 @@
 </%block>
 
 <style type="text/css">
+a.active-section {
+	color: #551A8B;
+}
+.sysadmin-dashboard-content h2 a {
+	margin-right: 1.2em;
+}
 table.stat_table {
 	font-family: verdana,arial,sans-serif;
 	font-size:11px;
@@ -40,34 +46,25 @@ textarea {
 }
 </style>
 
-<script language="JavaScript" type="text/javascript">
-function goto( mode)
-{
-  document.dashform.dash_mode.value = mode;
-  document.dashform.submit() ;
-}
-</script>
-
 <section class="container">
 <div class="sysadmin-dashboard-wrapper">
 
   <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
     <h1>${_('Sysadmin Dashboard')}</h1>
-
-    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">${_('Status')}</a> |
-          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">${_('Courses')}</a> |
-          <a href="#" onclick="goto('Staffing and Enrollment');" class="${modeflag.get('Staffing and Enrollment')}">${_('Staffing and Enrollment')}</a> |
-          <a href="/gitlogs">${_('GitLogs')}</a>
-           ]
+	<hr />
+    <h2 class="instructor-nav">
+	  <a href="${reverse('sysadmin')}" class="${modeflag.get('users')}">${_('Users')}</a>
+      <a href="${reverse('sysadmin_courses')}" class="${modeflag.get('courses')}">${_('Courses')}</a>
+      <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a> 
+      <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
     </h2>
-
-    <form name="dashform" method="POST">
-    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-    <input type="hidden" name="dash_mode" value="">
-
-##----------------------------------------------------------------------------- 
-%if modeflag.get('Status'):
+	<hr />
+%if modeflag.get('users'):
 	<h3>${_('User Management')}</h3>
+
+    <form name="action" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+
 	<ul class="list-input">
 	  <li class="field text" style="padding-bottom: 1.2em">
 		<label for="student_uname">${_('Email or username')}</label>
@@ -86,75 +83,76 @@ function goto( mode)
 
 	<div class="form-actions">
 	  <p>
-		<input type="submit" name="action" value="${_('Delete user')}" />
-		<input type="submit" name="action" value="${_('Create user')}">
+		<button type="submit" name="action" value="del_user">${_('Delete user')}</button>
+		<button type="submit" name="action" value="create_user">${_('Create user')}</button>
 	  </p>
     </div>
 
 	<hr />
     <p>
-    <input type="submit" name="action" value="${_('Download list of all users (csv file)')}" style="width: 300px;">
+      <button type="submit" name="action" value="download_users" style="width: 350px;">
+		${_('Download list of all users (csv file)')}
+	  </button>
     </p>
 
     <p>
-    <input type="submit" name="action" value="${_('Check and repair external Auth Map')}" style="width: 300px;">
+    <button type="submit" name="action" value="repair_eamap" style="width: 350px;">
+	  ${_('Check and repair external authentication map')}
+	</button>
     </p>
 
     <hr width="40%" style="align:left">
+	</form>
  %endif
 
-##----------------------------------------------------------------------------- 
-%if modeflag.get('Staffing and Enrollment'):
+%if modeflag.get('staffing'):
 
 <p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
 <hr />
 
 <h3>${_('Manage course staff and instructors')}</h3><br/>
-
-    <p>
-    <input type="submit" name="action" value="${_('Download staff and instructor list (csv file)')}">
-    </p>
+<form name="action" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+  <button type="submit" name="action" value="get_staff_csv">${_('Download staff and instructor list (csv file)')}</button>
+</form>
 
 %endif
 
-##----------------------------------------------------------------------------- 
-%if modeflag.get('Courses'):
-    <h3>${_('Administer Courses')}</h3><br/>
+%if modeflag.get('courses'):
+<h3>${_('Administer Courses')}</h3><br/>
 
-    <ul class="list-input">
-	  <li class="field text">
-		<label for="repo_location">
-		  ${_('Repo location')}:
-		</label>
-		<input type="text" name="repo_location" style="width:60%" />
-	  </li>
-	</ul>
-	<div class="form-actions">
-	  <input type="submit" name="action" value="${_('Load new course from github')}">
-	</div>
-	<hr />
-    <ul class="list-input">
-	  <li class="field text">
-		<label for="course_id">
-		  ${_('Course ID or dir')}:
-		</label>
-		<input type="text" name="course_id" style="width:60%" />
-	  </li>
-	</ul>
-	<div class="form-actions">
-      <input type="submit" name="action" value="${_('Delete course from site')}">
-	</div>
-	<hr style="width:40%" />
+<form name="action" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+  <ul class="list-input">
+	<li class="field text">
+	  <label for="repo_location">
+		${_('Repo location')}:
+	  </label>
+	  <input type="text" name="repo_location" style="width:60%" />
+	</li>
+  </ul>
+  <div class="form-actions">
+	<button type="submit" name="action" value="add_course">${_('Load new course from github')}</button>
+  </div>
+  <hr />
+  <ul class="list-input">
+	<li class="field text">
+	  <label for="course_id">
+		${_('Course ID or dir')}:
+	  </label>
+	  <input type="text" name="course_id" style="width:60%" />
+	</li>
+  </ul>
+  <div class="form-actions">
+	<button type="submit" name="action" value="del_course">${_('Delete course from site')}</button>
+  </div>
+</form>
+<hr style="width:40%" />
 %endif
-
-##----------------------------------------------------------------------------- 
-    </form>
 
 %if msg:
     <p>${msg}</p>
 %endif
-##----------------------------------------------------------------------------- 
-##----------------------------------------------------------------------------- 
 
 %if datatable:
 
@@ -180,7 +178,6 @@ function goto( mode)
     </p>
 %endif
 
-##-----------------------------------------------------------------------------  
 %if plots:
 
     %for plot in plots:

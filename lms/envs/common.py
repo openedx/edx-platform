@@ -89,7 +89,7 @@ MITX_FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
-    'ENABLE_SYSADMIN_DASHBOARD': False, # sysadmin dashboard, to see what courses are loaded, to delete & load courses
+    'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -484,7 +484,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # These are listed, eg at https://github.com/MITx/mitx/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
-GIT_ADD_COURSE_SCRIPT = REPO_ROOT / "scripts/git_add_course.py"
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it
@@ -918,6 +917,7 @@ INSTALLED_APPS = (
     'eventtracking.django',
     'util',
     'certificates',
+    'dashboard',
     'instructor',
     'instructor_task',
     'open_ended_grading',

@@ -202,7 +202,6 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 # git repo loading  environment
 GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', None)
 GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
-GIT_ADD_COURSE_SCRIPT = ENV_TOKENS.get('GIT_ADD_COURSE_SCRIPT', GIT_ADD_COURSE_SCRIPT)
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)
@@ -217,6 +216,11 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
+
+# SSL external authentication settings
+SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
+SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get("SSL_AUTH_DN_FORMAT_STRING",
+                                           "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}")
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.

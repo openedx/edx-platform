@@ -1,56 +1,33 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# pylint: disable-msg=C0111
-# python script to pull a git repo and import into cms / edge mongodb content database.
-#
-# usage:
-#
-#    python git_add_course.py <git-ssh-url> [<directory>]
-#
-# argument is git ssh url, like: git@github.com:mitocw/edx4edx_lite.git
-# if the directory is given, that is used and presumed to contain the git repo
-#
+"""
+Script for importing courseware from git/xml into a mongo modulestore
+"""
 
 import os
-import sys
 import re
 import datetime
-import mongoengine  # used to store import log
 import StringIO
 import logging
 
 from django.utils.translation import ugettext as _
-
 from django.conf import settings
 from django.core import management
-from django.core.management.base import CommandError
+from django.core.management.base import BaseCommand, CommandError
+
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
+
+import mongoengine
+from dashboard.models import CourseImportLog
 
 log = logging.getLogger(__name__)
 
-GIT_REPO_DIR = getattr(settings,
-                       'GIT_REPO_DIR', '/opt/edx/course_repos')
+GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
-
-
-class CourseImportLog(mongoengine.Document):
-    """Mongoengine model for git log"""
-    # pylint: disable-msg=R0924
-
-    course_id = mongoengine.StringField(max_length=128)
-    location = mongoengine.StringField(max_length=168)
-    import_log = mongoengine.StringField(max_length=20 * 65535)
-    git_log = mongoengine.StringField(max_length=65535)
-    repo_dir = mongoengine.StringField(max_length=128)
-    created = mongoengine.DateTimeField()
-    meta = {'indexes': ['course_id', 'created'],
-            'allow_inheritance': False}
 
 
 def add_repo(repo, rdir_in):
     """This will add a git repo into the mongo modulestore"""
-    # pylint: disable-msg=R0915
+    # pylint: disable=R0915
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -67,17 +44,18 @@ def add_repo(repo, rdir_in):
                 config_item, mongo_db[config_item])
 
     if not os.path.isdir(GIT_REPO_DIR):
-        log.critical(_("Path {0} doesn't exist, please create it, or configure a "
-                       "different path with GIT_REPO_DIR").format(GIT_REPO_DIR))
+        log.critical(_("Path {0} doesn't exist, please create it, "
+                       "or configure a different path with "
+                       "GIT_REPO_DIR").format(GIT_REPO_DIR))
         return -1
 
-    # -----------------------------------------------------------------------------
     # pull from git
     if not (repo.endswith('.git') or repo.startswith('http:') or
        repo.startswith('https:') or repo.startswith('git:')):
 
         log.error(_('Oops, not a git ssh url?'))
-        log.error(_('Expecting something like git@github.com:mitocw/edx4edx_lite.git'))
+        log.error(_('Expecting something like '
+                    'git@github.com:mitocw/edx4edx_lite.git'))
         return -1
 
     if rdir_in:
@@ -90,7 +68,8 @@ def add_repo(repo, rdir_in):
 
     rdirp = '{0}/{1}'.format(GIT_REPO_DIR, rdir)
     if os.path.exists(rdirp):
-        log.info(_('directory already exists, doing a git pull instead of git clone'))
+        log.info(_('directory already exists, doing a git pull instead '
+                   'of git clone'))
         cmd = 'cd {0}/{1}; git pull'.format(GIT_REPO_DIR, rdir)
     else:
         cmd = 'cd {0}; git clone "{1}"'.format(GIT_REPO_DIR, repo)
@@ -104,7 +83,8 @@ def add_repo(repo, rdir_in):
         return -1
 
     # get commit id
-    commit_id = os.popen('cd {0}; git log -n 1 | head -1'.format(rdirp)).read().strip().split(' ')[1]
+    commit_id = os.popen('cd {0}; git log -n 1 | head -1'.format(
+        rdirp)).read().strip().split(' ')[1]
 
     ret_git += _('\nCommit ID: {0}').format(commit_id)
 
@@ -173,7 +153,6 @@ def add_repo(repo, rdir_in):
                       cdir)).read())
             log.debug(os.popen('ls -l {0}'.format(cdir)).read())
 
-    # -----------------------------------------------------------------------------
     # store import-command-run output in mongo
     mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
         mongo_db['user'], mongo_db['password'],
@@ -203,26 +182,34 @@ def add_repo(repo, rdir_in):
     mdb.disconnect()
     return 0
 
-if __name__ == '__main__':
-    # pylint: disable-msg=C0103
 
-    if len(sys.argv) < 2:
-        print(_('This script requires at least one argument, the git URL'))
-        sys.exit(1)
+class Command(BaseCommand):
+    """
+    Pull a git repo and import into the mongo based content database.
+    """
 
-    if len(sys.argv) > 3:
-        print(_('This script requires no more than two arguments.'))
-        sys.exit(1)
+    help = _('Import the specified git repository into the '
+             'modulestore and directory')
 
-    rdir_arg = None
+    def handle(self, *args, **options):
+        """Check inputs and run the command"""
 
-    # check that we are using mongo modulestore
-    if not 'mongo' in str(modulestore().__class__):
-        print _('This script requires a mongo module store')
-        sys.exit(1)
+        if isinstance(modulestore, XMLModuleStore):
+            raise CommandError(_('This script requires a mongo module store'))
 
-    if len(sys.argv) > 2:
-        rdir_arg = sys.argv[2]
+        if len(args) < 1:
+            raise CommandError(_('This script requires at least one argument, '
+                                 'the git URL'))
 
-    if add_repo(sys.argv[1], rdir_arg) != 0:
-        sys.exit(1)
+        if len(args) > 2:
+            raise CommandError(_('This script requires no more than two '
+                                 'arguments.'))
+
+        rdir_arg = None
+
+        if len(args) > 1:
+            rdir_arg = args[1]
+
+        if add_repo(args[0], rdir_arg) != 0:
+            raise CommandError(_('Repo was not added, check log output '
+                                 'for details'))
