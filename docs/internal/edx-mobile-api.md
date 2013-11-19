@@ -2,17 +2,22 @@
 
 ## Overview
 
-**edx-api** is a MVP API contract to support the development of a MVP Mobile Application.
-This API will only support the following use cases
+**edx-api** is a MVP API contract to support the development
+of a MVP Mobile Application. This API will only support the
+following use cases
 
 - Signup
 - Login
 - Enroll/Unenroll in course
 - Get list of enrolled courses
 
-The amount of data returned to the client will be restricted to only contain information for these use cases. For example, the "get course navigational items" method will not - say - return due dates or gradable related information.
+The amount of data returned to the client will be restricted
+to only contain information for these use cases. For example,
+the "get course navigational items" method will not - say - 
+return due dates or gradable related information.
 
-This document is a design document and will not delve into the implementation of this API contract
+This document is a design document and will not delve into the
+implementation of this API contract
 
 ## HTTP Headers
 
@@ -23,19 +28,31 @@ There are two HTTP headers that are defined in the API contract:
 | **X-edx-api-key** | shared secret between client and server. This identifies the calling software |
 | **Authorization** | Bearer <access-token> |
 
-This API will use OAuth2 for authentication. The access token reflects the OAuth2 token that will be returned when calling 'access_token' method (see below).
+This API will use OAuth2 for authentication. The access token
+reflects the OAuth2 token that will be returned when calling
+'access_token' method (see below).
 
 
 ## General Notes
-Unauthenticated access will return a HTTP 403 status code. All successful API calls will return HTTP Status code 200. Errors will return a different status code that will be documented for each method.
+Unauthenticated access will return a HTTP 403 status code. All
+successful API calls will return HTTP Status code 200. Errors
+will return a different status code that will be documented for
+each method.
 
 ## Functional Endpoints
 
 ### Authentication
 
-The following methods are related to user identity and authentication. These only support authentication against the Django-based user database.
+The following methods are related to user identity and
+authentication. These only support authentication against the
+Django-based user database.
 
 ##### Signup
+
+Signup creates a new Open edX user in the database. Since we are
+using OAuth2 as the authentication provider, after the signup
+is completed, API clients will have to call into the
+login method to get an OAuth2 security token
 
 **Request: HTTPS POST /edx-api/signup/v1/register**
 
@@ -54,10 +71,6 @@ application/json
 
 ```
 StatusCode: 200
-application/json
-{
-	"token": "…securitytoken…"
-}
 ```
 
 **Response: Missing Parameter**
@@ -74,7 +87,7 @@ application/json
 **Response: User Already Exists**
 
 ```
-StatusCode: 500
+StatusCode: 400
 application/json
 {
 	"err_type": "UserAlreadyExists",
@@ -84,8 +97,10 @@ application/json
 
 **Response: Invalid Email**
 
+This is returned if the email provided does
+not appear to be a well formed email address
 ```
-StatusCode: 500
+StatusCode: 400
 application/json
 {
 	"err_type": "InvalidEmail",
@@ -95,8 +110,10 @@ application/json
 
 **Response: Invalid Password**
 
+This is returned if the password does not meet
+password policy requirements
 ```
-StatusCode: 500
+StatusCode: 400
 application/json
 {
 	"err_type": "InvalidPassword",
@@ -106,14 +123,17 @@ application/json
 
 ##### Login
 
-This uses the OAuth2 provider for Django (django-oauth2-provider). As such it uses a slightly different HTTP POST Body format (application/x-www-form-urlencoded rather than JSON)
+This uses the OAuth2 provider for Django (django-oauth2-provider).
+As such it uses a slightly different HTTP POST Body format
+(application/x-www-form-urlencoded rather than JSON)
 
-**Request: HTTPS POST /edx-api/auth/v1/access_token**
+**Request: HTTPS POST /edx-api/auth/v1/oauth2/access_token**
 
 ```
 application/x-www-form-urlencoded
 
-client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD
+client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&
+grant_type=password&username=YOUR_USERNAME&password=YOUR_PASSWORD
 ```
 
 **Response: success**
@@ -132,44 +152,25 @@ application/json
 **Response: Invalid email or password**
 
 ```
-StatusCode: 500
-application/json
-{
-	"err_type": "InvalidEmailPassword"
-	"err_msg": "Invalid email or password"
-}
+@TODO (need to look at django-oauth2-provider)
 ```
 
 
-##### Logout
+### Enrollments
 
-**Request: HTTPS GET /edx-api/auth/v1/logout**
-
-Note: Requires authentication token passed in the headers as indicated above
-
-Response:
-
-```
-StatusCode: 200
-```
-
-### Registrar
-
-The methods below expose functionality regarding enrollment in courses
+The methods below expose functionality regarding enrollment
+in courses
 
 
 ##### Enroll in Course
 
-**Request: HTTPS POST /edx-api/enrollment/v1/enroll**
+**Request: HTTPS POST /edx-api/enrollments/v1/<course.id>**
 
-Note: Requires authentication token passed in the headers as indicated above
+Example: /edx-api/enrollment/v1/foo.bar.2013_Spring
 
-```
-application/json
-{
-	"course_id": "foo/bar/2013_Spring"
-}
-```
+Note: Requires authentication token passed in the headers as
+indicated above
+
 
 **Response: success**
 
@@ -180,7 +181,7 @@ StatusCode: 200
 **Response: Course does not exist**
 
 ```
-StatusCode: 500
+StatusCode: 400
 application/json
 {
 	"err_type": "CourseDoesNotExist"
@@ -190,21 +191,21 @@ application/json
 
 ##### Unenroll in Course
 
-**Request: HTTPS POST /edx-api/registrar/v1/unenroll**
+**Request: HTTPS DELETE /edx-api/enrollments/v1/<course.id>**
 
-Note: Requires authentication token passed in the headers as indicated above
+Example: /edx-api/enrollment/v1/foo.bar.2013_Spring
+
+Note: Requires authentication token passed in the headers
+as indicated above
 
 ```
-application/json
-{
-	"course_id": "foo/bar/2013_Spring"
-}
+StatusCode: 200
 ```
 
 **Response: User not enrolled**
 
 ```
-StatusCode: 500
+StatusCode: 403
 application/json
 {
 	"err_type": "UserNotEnrolled"
@@ -214,9 +215,10 @@ application/json
 
 ##### Get list of enrolled courses for user
 
-**Request: HTTPS GET /edx-api/registrar/v1/get_enrollments_for_user**
+**Request: HTTPS GET /edx-api/enrollments/v1/**
 
-Note: Requires authentication token passed in the headers as indicated above
+Note: Requires authentication token passed in the headers
+as indicated above
 
 **Response: success**
 
@@ -226,7 +228,7 @@ application/json
 {
 	"enrollments": [
 		{
-			"course_id": "foo/bar/2013_Spring",
+			"course_id": "foo.bar.2013_Spring",
 			"display_name": "Course Name",
 			"display_org": "Foo",
 			"display_coursenum": "Bar",
@@ -240,13 +242,15 @@ application/json
 
 ### Courseware
 
-The following methods involve accessing the courseware database which is stored in MongoDB
+The following methods involve accessing the courseware database
+which is stored in MongoDB
 
 ##### Get list of courses
 
-**Request: HTTPS GET /edx-mobile-api/v1/courseware/get_all_courses**
+**Request: HTTPS GET /edx-mobile-api/courseware/v1**
 
-Note: Requires authentication token passed in the headers as indicated above
+Note: Requires authentication token passed in the headers as
+indicated above
 
 **Response: success**
 
@@ -257,7 +261,7 @@ application/json
 	"status": "success",
 	"courses": [
 		{
-			"course_id": "foo/bar/2013_Spring",
+			"course_id": "foo.bar.2013_Spring",
 			"display_name": "Course Name",
 			"display_org": "Foo",
 			"display_coursenum": "Bar",
@@ -274,11 +278,15 @@ application/json
 
 ##### Get course navigational elements
 
-This method will return all non-leaf nodes in a course tree, e.g. Course, Chapters, Sections, Subsections.
+This method will return all non-leaf nodes in a course tree,
+e.g. Course, Chapters, Sections, Subsections.
 
-**Request: HTTPS GET /edx-mobile-api/v1/courseware/get_course_navigation**
+**Request: HTTPS GET /edx-mobile-api/courseware/v1/<course.id>**
 
-Note: Requires authentication token passed in the headers as indicated above
+example: /edx-mobile-api/courseware/v1/foo.bar.2013_Spring
+
+Note: Requires authentication token passed in the headers as
+indicated above
 
 **Response: success**
 
@@ -320,9 +328,15 @@ HTTP Status code 403
 
 This method will return all videos within a course
 
-**Request: HTTPS GET /edx-mobile-api/v1/courseware/get_course_videos**
+**Request: HTTPS GET /edx-mobile-api/courseware/v1/<course.id>?type=video**
 
-Note: Requires authentication token passed in the headers as indicated above
+example: example: /edx-mobile-api/courseware/v1/foo.bar.2013_Spring?type=video
+
+Note: Requires authentication token passed in the headers
+as indicated above
+
+Note: For this version of the API, the only type which will be honored
+is 'video', all other types will have a StatusCode of 400
 
 **Response: success**
 
@@ -353,3 +367,7 @@ application/json
 	]
 }
 ```
+
+**Response: not enrolled in course**
+
+HTTP Status code 403
