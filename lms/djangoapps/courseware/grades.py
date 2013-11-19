@@ -112,12 +112,16 @@ def answer_distributions(request, course):
     enrolled_students = User.objects.filter(courseenrollment__course_id=course.id)
 
     for student in enrolled_students:
-        for capa_desc in yield_problems(request, course, student):
-            for problem_id in capa_desc.lcp.student_answers:
-                # Answer can be a list or some other unhashable element.  Convert to string.
-                answer = str(capa_desc.lcp.student_answers[problem_id])
-                key = (capa_desc.url_name, capa_desc.display_name_with_default, problem_id)
-                counts[key][answer] += 1
+        try:
+            for capa_desc in yield_problems(request, course, student):
+                for problem_id in capa_desc.lcp.student_answers:
+                    # Answer can be a list or some other unhashable element.  Convert to string.
+                    answer = str(capa_desc.lcp.student_answers[problem_id])
+                    key = (capa_desc.url_name, capa_desc.display_name_with_default, problem_id)
+                    counts[key][answer] += 1
+        except AssertionError as e:
+            log.exception(e)
+            continue
 
     return counts
 

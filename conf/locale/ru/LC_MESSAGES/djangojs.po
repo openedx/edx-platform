@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-01 18:06+0400\n"
-"PO-Revision-Date: 2013-11-01 14:12+0300\n"
+"POT-Creation-Date: 2013-11-15 16:03+0400\n"
+"PO-Revision-Date: 2013-11-05 19:24+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -588,6 +588,14 @@ msgstr "Скрыть дискуссии"
 msgid "Show Discussion"
 msgstr "Показать дискуссии"
 
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:152
+msgid "Load more"
+msgstr "Загрузить еще"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:161
+msgid "Loading more threads"
+msgstr "Загрузить больше тем"
+
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:84
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:157
 msgid "Misuse Reported"
@@ -1031,9 +1039,6 @@ msgstr "Показать"
 
 #~ msgid "Upload New File"
 #~ msgstr "Загрузка нового файла"
-
-#~ msgid "Load Another File"
-#~ msgstr "Загрузить другой файл"
 
 #~ msgid "Fullscreen"
 #~ msgstr "Полный экран"

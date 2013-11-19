@@ -59,6 +59,7 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
+from django.utils.translation import ungettext
 from lms.lib.xblock.runtime import handler_prefix
 
 log = logging.getLogger(__name__)
@@ -581,7 +582,7 @@ def instructor_dashboard(request, course_id):
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
-            msg += _u("Found %d records to dump ") % len(smdat)
+            msg += (ungettext("Found {number} record to dump","Found {number} records to dump",len(smdat))).format(number = len(smdat))
         except Exception as err:
             msg += "<font color='red'>" + _u("Couldn't find module with that urlname.") + "  </font>"
             msg += "<pre>%s</pre>" % escape(err)
@@ -1477,7 +1478,7 @@ def get_answers_distribution(request, course_id):
     dist = grades.answer_distributions(request, course)
 
     d = {}
-    d['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
+    d['header'] = [_u('url_name'), _u('display name'), _u('answer id'), _u('answer'), _u('count')]
 
     d['data'] = [[url_name, display_name, answer_id, a, answers[a]]
                  for (url_name, display_name, answer_id), answers in dist.items()

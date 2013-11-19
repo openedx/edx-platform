@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Dropdown
+    display_name: Выпадающий список
     markdown: |
         Dropdown problems give a limited set of options for students to respond with, and present those options
         in a format that encourages them to search for a specific answer rather than being immediately presented 
