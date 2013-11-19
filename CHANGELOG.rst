@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Put 2nd "Hide output" button at top of test box & increase text size for
+code response questions. BLD-126.
+
 Blades: Update the calculator hints tooltip with full information. BLD-400.
 
 Blades: Fix transcripts 500 error in studio (BLD-530)
