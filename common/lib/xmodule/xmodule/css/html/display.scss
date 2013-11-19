@@ -149,12 +149,13 @@ th {
 
 //---------------------------------------- Image Modal Styling ----------------------------------------//
 
-.imageModal-trigger p a.imageModal-link {
+.imageModal-trigger .imageModal-link {
   display: block;                                                                             
   position: relative;
+  cursor: pointer;
 }
 
-.imageModal-trigger p a.imageModal-link i {
+.imageModal-trigger .imageModal-link i {
   font-style: normal;
   color: #666;
   position: absolute;
@@ -162,14 +163,13 @@ th {
   left: 10px;
   opacity: 0;
 }
-.imageModal-trigger p a.imageModal-link:hover i {
+.imageModal-trigger .imageModal-link:hover i {
   opacity: 1;
 }
 
-.imageModal {
+.imageModal-trigger .imageModal-link .imageModal {
   display: none;
   position: fixed;
-  cursor: pointer;
   z-index: 1000;
   top: 0;
   left: 0;
@@ -178,7 +178,7 @@ th {
   padding: 2.5%;
   background-color: rgba(0, 0, 0, 0.7);
 }
-.imageModal img {
+.imageModal-trigger .imageModal-link .imageModal img {
   height: 97%;
   margin: 0 auto;
   display: block;

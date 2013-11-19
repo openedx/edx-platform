@@ -1,10 +1,7 @@
 $(function() {
-  $(".imageModal-link").click(function() {
-    event.preventDefault();
-    $(this).closest(".imageModal-trigger").siblings(".imageModal").show();
-  });
-  
-  $(".imageModal").click(function() {
-    $(this).hide();
+  $(".imageModal-link").toggle(function() {
+    $(".imageModal", this).show();
+  }, function() {
+    $(".imageModal", this).hide();
   });
 });

@@ -5,12 +5,13 @@ data: |
       <div class="imageModal-trigger">
         <h2>Title of Unit</h2>
         <p>
-          <a class="imageModal-link" href="#"> 
+          <div class="imageModal-link"> 
             <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-small.jpg" />
             <i class="icon-zoom-in icon-3x"></i>
-          </a>
+            
+            <div class="imageModal">
+              <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-big.jpg" />
+            </div>
+          </div>
         </p>
-      </div>
-      <div class="imageModal">
-        <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-big.jpg" />
       </div>
