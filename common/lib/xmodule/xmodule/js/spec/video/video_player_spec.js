@@ -4,26 +4,21 @@
             videoProgressSlider, videoSpeedControl, videoVolumeControl,
             oldOTBD;
 
-        function initialize(config) {
-            if (config) {
-                if (config.fixture) {
-                    loadFixtures(config.fixture);
-                } else {
-                    loadFixtures('video_all.html');
+        function initialize(fixture, params) {
+            if (_.isString(fixture)) {
+                loadFixtures(fixture);
+            } else {
+                if (_.isObject(fixture)) {
+                    params = fixture;
                 }
 
-                if (config.startTime) {
-                    $('#example')
-                        .find('#video_id')
-                        .data('start', config.startTime);
-                }
-                if (config.endTime) {
-                    $('#example')
-                        .find('#video_id')
-                        .data('end', config.endTime);
-                }
-            } else {
                 loadFixtures('video_all.html');
+            }
+
+            if (_.isObject(params)) {
+                $('#example')
+                    .find('#video_id')
+                    .data(params);
             }
 
             state = new Video('#example');
@@ -56,7 +51,7 @@
         }
 
         function initializeYouTube() {
-            initialize({fixture: 'video.html'});
+            initialize('video.html');
         }
 
         beforeEach(function () {
@@ -548,10 +543,10 @@
         });
 
         describe('update with start & end time', function () {
-            var START_TIME = 2, END_TIME = 4;
+            var START_TIME = 1, END_TIME = 2;
 
             beforeEach(function () {
-                initialize({startTime: START_TIME, endTime: END_TIME});
+                initialize({start: START_TIME, end: END_TIME});
 
                 spyOn(videoPlayer, 'update').andCallThrough();
                 spyOn(videoPlayer, 'pause').andCallThrough();
@@ -673,9 +668,12 @@
             });
         });
 
-        describe('updatePlayTime with start & end times', function () {
+        describe('updatePlayTime when start & end times are defined', function () {
+            var START_TIME = 1,
+                END_TIME = 2;
+
             beforeEach(function () {
-                initialize({startTime: 2, endTime: 4});
+                initialize({start: START_TIME, end: END_TIME});
 
                 spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
                 spyOn(videoPlayer.player, 'seekTo').andCallThrough();
@@ -699,15 +697,13 @@
                 }, 'duration becomes available', 1000);
 
                 runs(function () {
-                    expect(videoPlayer.startTime).toBe(2);
-                    expect(videoPlayer.endTime).toBe(4);
+                    expect(videoPlayer.startTime).toBe(START_TIME);
+                    expect(videoPlayer.endTime).toBe(END_TIME);
 
-                    expect(videoPlayer.player.seekTo).toHaveBeenCalledWith(2);
+                    expect(videoPlayer.player.seekTo).toHaveBeenCalledWith(START_TIME);
 
                     expect(videoProgressSlider.updateStartEndTimeRegion)
                         .toHaveBeenCalledWith({duration: duration});
-
-                    // videoProgressSlider.updateStartEndTimeRegion
 
                     expect(videoPlayer.seekToStartTimeOldSpeed).toBe(state.speed);
                 });
@@ -716,7 +712,7 @@
 
         describe('updatePlayTime with invalid endTime', function () {
             beforeEach(function () {
-                initialize({endTime: 100000});
+                initialize({end: 100000});
 
                 spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
             });

@@ -228,8 +228,9 @@ function () {
     // onPlay(), and update() (update method handles endTime).
     function notifyThroughHandleEnd(params) {
         if (params.end) {
-            this.videoProgressSlider.handle.attr('title', 'video ended');
-            this.videoProgressSlider.handle.focus();
+            this.videoProgressSlider.handle
+                .attr('title', 'video ended')
+                .focus();
         } else {
             this.videoProgressSlider.handle.attr('title', 'video position');
         }
