@@ -89,7 +89,8 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
-    STATIC_URL = STATIC_URL_BASE + "/" + git.revision + "/"
+    # collectstatic will fail if STATIC_URL is a unicode string
+    STATIC_URL = STATIC_URL_BASE.encode('ascii', 'ignore') + "/" + git.revision + "/"
 
 # GITHUB_REPO_ROOT is the base directory
 # for course data
