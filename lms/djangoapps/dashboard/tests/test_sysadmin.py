@@ -8,12 +8,10 @@ import shutil
 
 from django.test.client import Client
 from django.test.utils import override_settings
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-
 from dashboard.sysadmin import Users
 from external_auth.models import ExternalAuthMap
 from django.contrib.auth.hashers import check_password
@@ -22,9 +20,10 @@ from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.utils.html import escape
-from courseware.access import get_access_group_name, has_access
+from courseware.roles import CourseStaffRole
 from dashboard.models import CourseImportLog
 from xmodule.modulestore.xml import XMLModuleStore
+
 import mongoengine
 
 TEST_MONGODB_LOG = {
@@ -403,11 +402,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         def_ms = modulestore()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')
 
-        staff_groupname = get_access_group_name(course, 'staff')
-        group, _ = Group.objects.get_or_create(name=staff_groupname)
-        self.user.groups.add(group)
+        CourseStaffRole(course.location).add_users(self.user)
 
-        self.assertTrue(has_access(self.user, course, 'staff'))
+        self.assertTrue(CourseStaffRole(course.location).has_user(self.user))
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
         self.assertTrue(logged_in)
