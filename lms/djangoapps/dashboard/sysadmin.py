@@ -8,7 +8,6 @@ import logging
 import os
 import subprocess
 import time
-import imp
 import StringIO
 
 from datetime import datetime
@@ -22,15 +21,13 @@ from external_auth.views import generate_password
 
 from django.contrib.auth import authenticate
 from django.core.exceptions import PermissionDenied
-from django.core import management
-from django.core.management.base import CommandError
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import condition
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.utils.html import escape
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.generic.base import TemplateView
@@ -51,26 +48,34 @@ import track.views
 
 log = logging.getLogger(__name__)
 
+
 class SysadminDashboardView(TemplateView):
     """Base class for sysadmin dashboard views with common methods"""
 
     template_name = 'sysadmin_dashboard.html'
 
     def __init__(self, **kwargs):
+        """Determine modulestore type"""
+
         self.def_ms = modulestore()
         self.is_using_mongo = True
         if isinstance(self.def_ms, XMLModuleStore):
             self.is_using_mongo = False
         self.msg = u''
-        return super(SysadminDashboardView, self).__init__(**kwargs)
+        self.datatable = []
+        super(SysadminDashboardView, self).__init__(**kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
-    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(cache_control(no_cache=True, no_store=True,
+                                    must_revalidate=True))
+    @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
         return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
 
     def get_courses(self):
+        """ Get an iterable list of courses regardless of module store type."""
+
         # Prefer mongo if using mixed or mongo store
         if self.is_using_mongo:
             courses = self.def_ms.get_courses()
@@ -79,18 +84,36 @@ class SysadminDashboardView(TemplateView):
             courses = self.def_ms.courses.items()
         return courses
 
-    def return_csv(self, filename, datatable):
-        """Convenient function for handling the http response of a csv"""
+    def return_csv(self, filename, header, data):
+        """
+        Convenient function for handling the http response of a csv.
+        data should be iterable and is used to stream object over http
+        """
 
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-
-        writer = csv.writer(response, dialect='excel', quotechar='"',
+        csv_file = StringIO.StringIO()
+        writer = csv.writer(csv_file, dialect='excel', quotechar='"',
                             quoting=csv.QUOTE_ALL)
-        writer.writerow(datatable['header'])
-        for datarow in datatable['data']:
-            encoded_row = [unicode(s).encode('utf-8') for s in datarow]
-            writer.writerow(encoded_row)
+
+        writer.writerow(header)
+        
+        # Setup streaming of the data
+        def read_and_flush():
+            """Read and clear buffer for optimization"""
+            csv_file.seek(0)
+            csv_data = csv_file.read()
+            csv_file.seek(0)
+            csv_file.truncate()
+            return csv_data
+
+        def csv_data():
+            """Generator for handling potentially large CSVs"""
+            for row in data:
+                writer.writerow(row)
+            csv_data = read_and_flush()
+            yield csv_data
+        response = HttpResponse(csv_data(), mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(
+            filename)
         return response
 
 
@@ -136,14 +159,16 @@ class Users(SysadminDashboardView):
         if not name:
             return _('Must provide full name')
 
+        email_domain = getattr(settings, 'SSL_AUTH_EMAIL_DOMAIN', 'MIT.EDU')
+
         msg = u''
         if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             if not '@' in uname:
-                email = '{0}@MIT.EDU'.format(uname)
+                email = '{0}@{1}'.format(uname, email_domain)
             else:
                 email = uname
-            if not email.endswith('@MIT.EDU'):
-                msg += u'email must end in @MIT.EDU'
+            if not email.endswith('@{0}'.format(email_domain)):
+                msg += u'{0} @{1}'.format(_('email must end in'), email_domain)
                 return msg
             mit_domain = 'ssl:MIT'
             if ExternalAuthMap.objects.filter(external_id=email,
@@ -180,7 +205,9 @@ class Users(SysadminDashboardView):
         profile.save()
 
         if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
-            credentials = '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}'.format(name, email)
+            credential_string = getattr(settings, 'SSL_AUTH_DN_FORMAT_STRING',
+                                        '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}')
+            credentials = credential_string.format(name, email)
             eamap = ExternalAuthMap(
                 external_id=email,
                 external_email=email,
@@ -205,8 +232,7 @@ class Users(SysadminDashboardView):
             try:
                 user = User.objects.get(email=uname)
             except User.DoesNotExist, err:
-                msg = _('Cannot find user with email address {0}'
-                        ).format(uname)
+                msg = _('Cannot find user with email address {0}').format(uname)
                 return msg
         else:
             try:
@@ -225,9 +251,9 @@ class Users(SysadminDashboardView):
         courses = self.get_courses()
 
         self.datatable = dict(header=[_('Statistic'), _('Value')],
-                         title=_('Site statistics'))
+                              title=_('Site statistics'))
         self.datatable['data'] = [[_('Total number of users'),
-                              User.objects.all().count()]]
+                                   User.objects.all().count()]]
 
         if hasattr(courses, 'items'):
             course_iter = courses.items()
@@ -269,22 +295,24 @@ class Users(SysadminDashboardView):
         track.views.server_track(request, action, {}, page='user_sysdashboard')
 
         if action == 'download_users':
-            self.datatable = dict(header=[_('username'), _('email')],
-                             title=_('List of all users'),
-                             data=[[u.username, u.email] for u in
-                                   User.objects.all()])
+            header = [_('username'), _('email'), ]
+            data = [[u.username, u.email] for u in
+                    User.objects.all().iterator()]
             return self.return_csv('users_{0}.csv'.format(
-                request.META['SERVER_NAME']), self.datatable)
+                request.META['SERVER_NAME']), header, data)
         elif action == 'repair_eamap':
             self.msg = u'<h4>{0}</h4><pre>{1}</pre>{2}'.format(
-                _('Repair Results'), self.fix_external_auth_map_passwords(), self.msg)
+                _('Repair Results'),
+                self.fix_external_auth_map_passwords(),
+                self.msg)
             self.datatable = {}
         elif action == 'create_user':
             uname = request.POST.get('student_uname', '').strip()
             name = request.POST.get('student_fullname', '').strip()
             password = request.POST.get('student_password', '').strip()
             self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
-                _('Create User Results'), self.create_user(uname, name, password), self.msg)
+                _('Create User Results'),
+                self.create_user(uname, name, password), self.msg)
         elif action == 'del_user':
             uname = request.POST.get('student_uname', '').strip()
             self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
@@ -298,6 +326,7 @@ class Users(SysadminDashboardView):
             'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
+
 
 class Courses(SysadminDashboardView):
     """
@@ -315,12 +344,12 @@ class Courses(SysadminDashboardView):
             return info
 
         cmd = ['git', 'log', '-1',
-               '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}',]
+               '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
             output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
-            info = [ output_json['commit'],
-                     output_json['date'], 
-                     output_json['author'], ]
+            info = [output_json['commit'],
+                    output_json['date'],
+                    output_json['author'], ]
         except (ValueError, subprocess.CalledProcessError):
             pass
 
@@ -331,7 +360,8 @@ class Courses(SysadminDashboardView):
 
         if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
                 gitloc.startswith('https:') or gitloc.startswith('git:')):
-            return _("The git repo location should end with '.git', and be a valid url")
+            return _("The git repo location should end with '.git', "
+                     "and be a valid url")
 
         if self.is_using_mongo:
             return self.import_mongo_course(gitloc)
@@ -364,7 +394,6 @@ class Courses(SysadminDashboardView):
             logger.setLevel(logging.DEBUG)
             logger.addHandler(import_log_handler)
 
-
         git_add_course.add_repo(gitloc, None)
         ret = output.getvalue()
 
@@ -393,14 +422,14 @@ class Courses(SysadminDashboardView):
         if not os.path.exists(gdir):
             msg += _('Failed to clone repository to {0}').format(gdir)
             return msg
-        self.def_ms.try_load_course(os.path.abspath(gdir))  # load into modulestore
+        self.def_ms.try_load_course(os.path.abspath(gdir))
         errlog = self.def_ms.errored_courses.get(cdir, '')
         if errlog:
             msg += u'<hr width="50%"><pre>{0}</pre>'.format(escape(errlog))
         else:
             course = self.def_ms.courses[os.path.abspath(gdir)]
-            msg += _('Loaded course {0} {1}<br/>Errors:').format(cdir,
-                                                                 course.display_name)
+            msg += _('Loaded course {0} {1}<br/>Errors:').format(
+                cdir, course.display_name)
             errors = self.def_ms.get_item_errors(course.location)
             if not errors:
                 msg += u'None'
@@ -417,7 +446,7 @@ class Courses(SysadminDashboardView):
 
     def make_datatable(self):
         """Creates course information datatable"""
-        
+
         data = []
         courses = self.get_courses()
         if hasattr(courses, 'items'):
@@ -431,11 +460,11 @@ class Courses(SysadminDashboardView):
             data.append([course.display_name, cdir]
                         + self.git_info_for_course(gdir))
 
-        return  dict(header=[_('Course Name'), _('Directory/ID'),
-                         _('Git Commit'), _('Last Change'),
-                         _('Last Editor')],
-                         title=_('Information about all courses'),
-                         data=data)
+        return dict(header=[_('Course Name'), _('Directory/ID'),
+                            _('Git Commit'), _('Last Change'),
+                            _('Last Editor')],
+                    title=_('Information about all courses'),
+                    data=data)
 
     def get(self, request):
         """Displays forms and course information"""
@@ -459,7 +488,8 @@ class Courses(SysadminDashboardView):
             raise Http404
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='courses_sysdashboard')
+        track.views.server_track(request, action, {},
+                                 page='courses_sysdashboard')
 
         courses = self.get_courses()
         if action == _('add_course'):
@@ -479,8 +509,10 @@ class Courses(SysadminDashboardView):
                     course = get_course_by_id(course_id)
                     course_found = True
                 except Exception, err:
-                    self.msg += _('Error - cannot get course with ID {0}<br/><pre>{1}</pre>').format(
-                        course_id, escape(str(err)))
+                    self.msg += _('Error - cannot get course with ID '
+                                  '{0}<br/><pre>{1}</pre>').format(
+                                      course_id, escape(str(err))
+                                  )
 
             if course_found and not self.is_using_mongo:
                 cdir = course.data_dir
@@ -490,8 +522,9 @@ class Courses(SysadminDashboardView):
                 new_dir = cdir + '_deleted_{0}'.format(int(time.time()))
                 os.rename(settings.DATA_DIR / cdir, settings.DATA_DIR / new_dir)
 
-                self.msg += u"<font color='red'>Deleted {0} = {1} ({2})</font>".format(
-                    cdir, course.id, course.display_name)
+                self.msg += (u"<font color='red'>Deleted "
+                             u"{0} = {1} ({2})</font>".format(
+                                 cdir, course.id, course.display_name))
 
             elif course_found and self.is_using_mongo:
                 # delete course that is stored with mongodb backend
@@ -547,15 +580,16 @@ class Staffing(SysadminDashboardView):
             course_iter = courses
         for (cdir, course) in course_iter:
             datum = [course.display_name, course.id]
-            datum += \
-                [CourseEnrollment.objects.filter(course_id=course.id).count()]
+            datum += [CourseEnrollment.objects.filter(
+                course_id=course.id).count()]
             datum += [self.get_group(course, 'staff').user_set.all().count()]
             datum += [','.join([x.username for x in self.get_group(course,
                       'instructor').user_set.all()])]
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
-                                 _('# enrolled'), _('# staff'), _('instructors')],
+                                 _('# enrolled'), _('# staff'),
+                                 _('instructors')],
                          title=_('Enrollment information for all courses'),
                          data=data)
         context = {
@@ -571,7 +605,8 @@ class Staffing(SysadminDashboardView):
         """Handle all actions from staffing and enrollment view"""
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='staffing_sysdashboard')
+        track.views.server_track(request, action, {},
+                                 page='staffing_sysdashboard')
 
         if action == 'get_staff_csv':
             data = []
@@ -588,13 +623,11 @@ class Staffing(SysadminDashboardView):
                         datum = [course.id, role, user.username, user.email,
                                  user.profile.name]
                         data.append(datum)
-            datatable = dict(header=[_('course_id'),
-                                     _('role'), _('username'),
-                                     _('email'), _('full_name')],
-                             title=_('List of all course staff and instructors'),
-                             data=data)
+            header = [_('course_id'),
+                      _('role'), _('username'),
+                      _('email'), _('full_name'), ]
             return self.return_csv('staff_{0}.csv'.format(
-                request.META['SERVER_NAME']), datatable)
+                request.META['SERVER_NAME']), header, data)
 
         return self.get(request)
 
@@ -612,7 +645,7 @@ class GitLogs(TemplateView):
     def get(self, request, course_id=None):
         """Shows logs of imports that happened as a result of a git import"""
 
-        # Set defaults even if it isn't defined in settings
+        # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
             'host': 'localhost',
             'user': '',
@@ -638,8 +671,9 @@ class GitLogs(TemplateView):
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
         except mongoengine.connection.ConnectionError, ex:
-            logging.critical(_('Unable to connect to mongodb to save log, please check '
-                               'MONGODB_LOG settings. error: {0}').format(str(ex)))
+            logging.critical(_('Unable to connect to mongodb to save log, '
+                               'please check MONGODB_LOG settings. '
+                               'error: {0}').format(str(ex)))
 
         if course_id is None:
             # Require staff if not going to specific course
@@ -650,8 +684,8 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:
-                    cilset = None
-                    error_msg = _('Cannot find course {0}').format(course_id)
+                cilset = None
+                error_msg = _('Cannot find course {0}').format(course_id)
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
@@ -663,6 +697,8 @@ class GitLogs(TemplateView):
                 course_id=course_id).order_by('-created')
             log.debug('cilset length={0}'.format(len(cilset)))
         mdb.disconnect()
-        context = {'cilset': cilset, 'course_id': course_id, 'error_msg': error_msg}
+        context = {'cilset': cilset,
+                   'course_id': course_id,
+                   'error_msg': error_msg}
 
         return render_to_response(self.template_name, context)

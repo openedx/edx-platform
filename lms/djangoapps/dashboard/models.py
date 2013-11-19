@@ -1,7 +1,11 @@
+"""Models for dashboard application"""
+
 import mongoengine
+
 
 class CourseImportLog(mongoengine.Document):
     """Mongoengine model for git log"""
+    # pylint: disable=R0924
 
     course_id = mongoengine.StringField(max_length=128)
     location = mongoengine.StringField(max_length=168)
@@ -11,4 +15,3 @@ class CourseImportLog(mongoengine.Document):
     created = mongoengine.DateTimeField()
     meta = {'indexes': ['course_id', 'created'],
             'allow_inheritance': False}
-
