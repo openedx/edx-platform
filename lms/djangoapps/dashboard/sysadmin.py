@@ -642,8 +642,9 @@ class GitLogs(TemplateView):
         # Allow overrides
         if hasattr(settings, 'MONGODB_LOG'):
             for config_item in ['host', 'user', 'password', 'db', ]:
-                mongo_db[config_item] = settings.MONGODB_LOG.get(
-                    config_item, mongo_db[config_item])
+                if hasattr(settings.MONGODB_LOG, config_item):
+                    mongo_db[config_item] = settings.MONGODB_LOG.get(
+                        config_item, mongo_db[config_item])
 
         mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
             mongo_db['user'], mongo_db['password'],
