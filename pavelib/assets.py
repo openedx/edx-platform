@@ -13,7 +13,6 @@ setup(
 )
 
 # Build Constants
-
 REPO_ROOT = path(__file__).abspath().dirname().dirname()  # /project_dir/edx-platform/
 PROJECT_ROOT = REPO_ROOT.dirname()      # /project_dir
 REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
