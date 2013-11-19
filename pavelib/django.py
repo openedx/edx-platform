@@ -3,20 +3,9 @@ from paver.setuputils import setup
 
 import os
 import psutil
-from pavelib import prereqs
+from pavelib import prereqs, assets
 
 default_options = {"lms": '8000', "cms": '8001'}
-
-"""
-
-desc "Set the staff bit for a user"
-task :set_staff, [:user, :system, :env] do |t, args|
-    args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
-    sh(django_admin(args.system, args.env, 'set_staff', args.user))
-end
-
-"""
-
 
 setup(
     name="OpenEdX",
@@ -69,9 +58,10 @@ def run_server():
 
     prereqs.install_prereqs()
     pre_django()
+    assets.compile_assets()
 
     try:
-        sh('django-admin.py runserver --traceback ' + ('--settings=%s.envs.%s' % (system, env)) + '--pythonpath=. ' + default_options[system])
+        sh('django-admin.py runserver --traceback ' + ('--settings=%s.envs.%s' % (system, env)) + ' --pythonpath=. ' + default_options[system])
     except:
         print("Failed to runserver")
         return
@@ -88,12 +78,8 @@ def resetdb():
     env = getattr(options, 'env', 'dev')
     pre_django()
 
-    try:
-        sh('django-admin.py syncdb --traceback ' + ('--settings=lms.envs.%s' % (env)) + '--pythonpath=. ')
-        sh('django-admin.py migrate --traceback ' + ('--settings=lms.envs.%s' % (env)) + '--pythonpath=. ')
-    except:
-        print("Failed to import settings")
-        return
+    sh('django-admin.py syncdb --traceback ' + ('--settings=lms.envs.%s' % (env)) + ' --pythonpath=. ')
+    sh('django-admin.py migrate --traceback ' + ('--settings=lms.envs.%s' % (env)) + ' --pythonpath=. ')
 
 
 @task
@@ -125,8 +111,9 @@ def run_all_servers():
     """
     env = getattr(options, 'env', 'dev')
 
-    # prereqs.install_prereqs()
-    # pre_django()
+    prereqs.install_prereqs()
+    pre_django()
+    assets.compile_assets()
 
     kwargs = {'shell': True, 'cwd': None}
 

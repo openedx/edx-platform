@@ -1,6 +1,7 @@
 
 from paver.easy import *
 from paver.setuputils import setup
+from pavelib import prereqs
 
 import json
 import glob
@@ -21,13 +22,11 @@ setup(
 )
 
 # Build Constants
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
-print(PROJECT_ROOT)
-REPO_ROOT = PROJECT_ROOT.dirname()
-REPORT_DIR = REPO_ROOT / "reports"
-COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = PROJECT_ROOT  # virtualenv dir /mitx is in
-COURSES_ROOT = ENV_ROOT / "data"
+REPO_ROOT = path(__file__).abspath().dirname().dirname()  # /project_dir/edx-platform/
+PROJECT_ROOT = REPO_ROOT.dirname()      # /project_dir
+REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
+COMMON_ROOT = PROJECT_ROOT / "common"   # /project_dir/common
+COURSES_ROOT = PROJECT_ROOT / "data"    # /project_dir/data
 
 env_data = None
 
@@ -44,15 +43,10 @@ if env_data:
 
     if USE_CUSTOM_THEME:
         THEME_NAME = env_data['THEME_NAME']
-        THEME_ROOT = ENV_ROOT / "themes" / THEME_NAME
+        THEME_ROOT = PROJECT_ROOT / "themes" / THEME_NAME
         THEME_SASS = THEME_ROOT / "static" / "sass"
 
 MINIMAL_DARWIN_NOFILE_LIMIT = 8000
-
-
-# Environment constants
-# SERVICE_VARIANT = environ['SERVICE_VARIANT']
-# CONFIG_PREFIX = SERVICE_VARIANT ? SERVICE_VARIANT + "." : ""
 
 
 def xmodule_cmd(watch=False, debug=False):
@@ -77,11 +71,6 @@ def coffee_clean():
 
 
 def coffee_cmd(watch=False, debug=False):
-    # if watch && Launchy::Application.new.host_os_family.darwin?
-    #    available_files = Process::getrlimit(:NOFILE)[0]
-    #    if available_files < MINIMAL_DARWIN_NOFILE_LIMIT
-    #        Process.setrlimit(:NOFILE, MINIMAL_DARWIN_NOFILE_LIMIT)
-
     cmd = ''
 
     if platform.system() == 'Darwin':
@@ -103,7 +92,6 @@ def sass_cmd(watch=False, debug=False):
 
 
 # This task takes arguments purely to pass them via dependencies to the preprocess task
-# desc "Compile all assets"
 @task
 @cmdopts([
     ("system=", "s", "System to act on"),
@@ -129,12 +117,12 @@ def compile_assets(options):
         print("asset preprocessing failed!")
         return
 
-#    prereqs.install_prereqs()
+    prereqs.install_prereqs()
 
-#    coffee_clean()
+    coffee_clean()
     kwargs = {'shell': True, 'cwd': None}
 
-#    sh(coffee_cmd(False, run_debug))
+    sh(coffee_cmd(False, run_debug))
     sh(xmodule_cmd(False, run_debug))
     sh(sass_cmd(False, run_debug))
 
@@ -151,16 +139,17 @@ def compile_assets(options):
             p2 = subprocess.Popen(xmodule_cmd(run_watch, run_debug), **kwargs)
             p3 = subprocess.Popen(sass_cmd(run_watch, run_debug), **kwargs)
 
-            input("enter a key to end")
-
+            input("Enter CTL-C to end")
+    except KeyboardInterrupt:
+        print("compile_assets ending")
     except:
-        print("collectstatic ended")
+        pass
 
     finally:
         if run_watch:
             try:
                 p2.terminate()
-                p3.terminate()
+                os.kill(p3.pid, signal.SIGKILL)
 
                 p1_group = psutil.Process(p1.pid)
 
@@ -168,5 +157,5 @@ def compile_assets(options):
 
                 for pid in child_pid:
                     os.kill(pid.pid, signal.SIGKILL)
-            except:
+            except KeyboardInterrupt:
                 pass
