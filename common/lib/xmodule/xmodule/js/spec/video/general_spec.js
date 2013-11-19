@@ -271,7 +271,17 @@
         });
 
         // Disabled 10/29/13 due to flakiness in master
-        xdescribe('multiple YT on page', function () {
+        //
+        // Update: Turned on test back again. Passing locally and on
+        // Jenkins in a large number of runs.
+        //
+        // Will observe for a little while to see if any failures arise.
+        // Most probable cause of test passing is:
+        //
+        // https://github.com/edx/edx-platform/pull/1642
+        //
+        // : )
+        describe('multiple YT on page', function () {
             var state1, state2, state3;
 
             beforeEach(function () {

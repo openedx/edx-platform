@@ -154,7 +154,17 @@
             });
 
             // Turned off test due to flakiness (30.10.2013).
-            xit('trigger seek event', function() {
+            //
+            // Update: Turned on test back again. Passing locally and on
+            // Jenkins in a large number of runs.
+            //
+            // Will observe for a little while to see if any failures arise.
+            // Most probable cause of test passing is:
+            //
+            //     https://github.com/edx/edx-platform/pull/1642
+            //
+            // : )
+            it('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 20 }
@@ -220,7 +230,17 @@
             });
 
             // Turned off test due to flakiness (30.10.2013).
-            xit('trigger seek event', function() {
+            //
+            // Update: Turned on test back again. Passing locally and on
+            // Jenkins in a large number of runs.
+            //
+            // Will observe for a little while to see if any failures arise.
+            // Most probable cause of test passing is:
+            //
+            //     https://github.com/edx/edx-platform/pull/1642
+            //
+            // : )
+            it('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onStop(
                         jQuery.Event('stop'), { value: 20 }
