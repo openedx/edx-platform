@@ -58,6 +58,7 @@ class CodeMirror(BaseEditor):
         js = ("js/vendor/CodeMirror/codemirror.js",
               "js/vendor/CodeMirror/xml.js",
               "js/vendor/CodeMirror/mitx_markdown.js",
+              "js/wiki/accessible.js",
               "js/wiki/CodeMirror.init.js",
               "js/wiki/cheatsheet.js",
               )

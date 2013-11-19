@@ -12,14 +12,18 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
-
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoProgressSlider = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         // No callbacks to DOM events (click, mousemove, etc.).
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -28,21 +32,27 @@ function () {
 
     // function _makeFunctionsPublic(state)
     //
-    //     Functions which will be accessible via 'state' object. When called, these functions will
-    //     get the 'state' object as a context.
+    //     Functions which will be accessible via 'state' object. When called,
+    //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
-        state.videoProgressSlider.onStop         = _.bind(onStop, state);
-        state.videoProgressSlider.updatePlayTime = _.bind(updatePlayTime, state);
-        //Added for tests -- JM
-        state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
+        var methodsDict = {
+            buildSlider: buildSlider,
+            getRangeParams: getRangeParams,
+            onSlide: onSlide,
+            onStop: onStop,
+            updatePlayTime: updatePlayTime,
+            updateStartEndTimeRegion: updateStartEndTimeRegion
+        };
+
+        state.bindTo(methodsDict, state.videoProgressSlider, state);
     }
 
     // function _renderElements(state)
     //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+    //     Create any necessary DOM elements, attach them, and set their
+    //     initial configuration. Also make the created DOM elements available
+    //     via the 'state' object. Much easier to work this way - you don't
+    //     have to do repeated jQuery element selects.
     function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;
@@ -53,8 +63,9 @@ function () {
     }
 
     function _buildHandle(state) {
-        state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
-        
+        state.videoProgressSlider.handle = state.videoProgressSlider.el
+            .find('.ui-slider-handle');
+
         // ARIA
         // We just want the knob to be selectable with keyboard
         state.videoProgressSlider.el.attr('tabindex', -1);
@@ -64,28 +75,103 @@ function () {
             'role': 'slider',
             'title': 'video position',
             'aria-disabled': false,
-            'aria-valuetext': getTimeDescription(state.videoProgressSlider.slider.slider('option', 'value'))
+            'aria-valuetext': getTimeDescription(state.videoProgressSlider
+                .slider.slider('option', 'value'))
         });
     }
 
     // ***************************************************************
     // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // These are available via the 'state' object. Their context ('this'
+    // keyword) is the 'state' object. The magic private function that makes
+    // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
     function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
-            range: 'min',
-            slide: state.videoProgressSlider.onSlide,
-            stop: state.videoProgressSlider.onStop
-        });
+        state.videoProgressSlider.slider = state.videoProgressSlider.el
+            .slider({
+                range: 'min',
+                slide: state.videoProgressSlider.onSlide,
+                stop: state.videoProgressSlider.onStop
+            });
+
+        state.videoProgressSlider.sliderProgress = state.videoProgressSlider
+            .slider
+            .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
+    }
+
+    function updateStartEndTimeRegion(params) {
+        var left, width, start, end, duration, rangeParams;
+
+        // We must have a duration in order to determine the area of range.
+        // It also must be non-zero.
+        if (!params.duration) {
+            return;
+        } else {
+            duration = params.duration;
+        }
+
+        // If the range spans the entire length of video, we don't do anything.
+        if (!this.videoPlayer.startTime && !this.videoPlayer.endTime) {
+            return;
+        }
+
+        start = this.videoPlayer.startTime;
+
+        // If end is set to null, then we set it to the end of the video. We
+        // know that start is not a the beginning, therefore we must build a
+        // range.
+        end = this.videoPlayer.endTime || duration;
+
+        // Because JavaScript has weird rounding rules when a series of
+        // mathematical operations are performed in a single statement, we will
+        // split everything up into smaller statements.
+        //
+        // This will ensure that visually, the start-end range aligns nicely
+        // with actual starting and ending point of the video.
+
+        rangeParams = getRangeParams(start, end, duration);
+
+        if (!this.videoProgressSlider.sliderRange) {
+            this.videoProgressSlider.sliderRange = $('<div />', {
+                class: 'ui-slider-range ' +
+                       'ui-widget-header ' +
+                       'ui-corner-all ' +
+                       'slider-range'
+            }).css({
+                left: rangeParams.left,
+                width: rangeParams.width
+            });
+
+            this.videoProgressSlider.sliderProgress
+                .after(this.videoProgressSlider.sliderRange);
+        } else {
+            this.videoProgressSlider.sliderRange
+                .css({
+                    left: rangeParams.left,
+                    width: rangeParams.width
+                });
+        }
+    }
+
+    function getRangeParams(startTime, endTime, duration) {
+        var step = 100 / duration,
+            left = startTime * step,
+            width = endTime * step - left;
+
+        return {
+            left: left + '%',
+            width: width + '%'
+        };
     }
 
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
 
-        this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+        this.trigger(
+            'videoPlayer.onSlideSeek',
+            {'type': 'onSlideSeek', 'time': ui.value}
+        );
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -98,7 +184,10 @@ function () {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
+        this.trigger(
+            'videoPlayer.onSlideSeek',
+            {'type': 'onSlideSeek', 'time': ui.value}
+        );
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -110,23 +199,30 @@ function () {
         }, 200);
     }
 
-    //Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera noticed
+    // Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera
+    // noticed
     function updatePlayTime(params) {
-        if ((this.videoProgressSlider.slider) && (!this.videoProgressSlider.frozen)) {
-            /*this.videoProgressSlider.slider
-                .slider('option', 'max', params.duration)
-                .slider('value', params.time);*/
-            this.videoProgressSlider.slider.slider('option', 'max', params.duration);
-            this.videoProgressSlider.slider.slider('option', 'value', params.time);
+        var time = Math.floor(params.time),
+            duration = Math.floor(params.duration);
+
+        if (
+            (this.videoProgressSlider.slider) &&
+            (!this.videoProgressSlider.frozen)
+        ) {
+            this.videoProgressSlider.slider
+                .slider('option', 'max', duration)
+                .slider('option', 'value', time);
         }
     }
 
-    // Returns a string describing the current time of video in hh:mm:ss format.
+    // Returns a string describing the current time of video in hh:mm:ss
+    // format.
     function getTimeDescription(time) {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
             hrStr, minStr, secStr;
+
         seconds = seconds % 60;
         minutes = minutes % 60;
 
@@ -136,30 +232,36 @@ function () {
 
         if (hours) {
             hrStr += (hours < 2 ? ' hour ' : ' hours ');
-            if (minutes) {  
+
+            if (minutes) {
                 minStr += (minutes < 2 ? ' minute ' : ' minutes ');
             } else {
                 minStr += ' 0 minutes ';
             }
-            if (seconds) {   
-                secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            } else {
-                secStr += ' 0 seconds ';
-            }    
-            return hrStr + minStr + secStr;
-        } else if (minutes) {
-            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-            if (seconds) {   
+
+            if (seconds) {
                 secStr += (seconds < 2 ? ' second ' : ' seconds ');
             } else {
                 secStr += ' 0 seconds ';
             }
+
+            return hrStr + minStr + secStr;
+        } else if (minutes) {
+            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
+
+            if (seconds) {
+                secStr += (seconds < 2 ? ' second ' : ' seconds ');
+            } else {
+                secStr += ' 0 seconds ';
+            }
+
             return minStr + secStr;
         } else if (seconds) {
             secStr += (seconds < 2 ? ' second ' : ' seconds ');
+
             return secStr;
         }
-        
+
         return '0 seconds';
     }
 

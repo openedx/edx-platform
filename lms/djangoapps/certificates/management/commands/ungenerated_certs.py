@@ -14,12 +14,13 @@ from pytz import UTC
 class Command(BaseCommand):
 
     help = """
-    Find all students that need certificates
-    for courses that have finished and
-    put their cert requests on the queue
+    Find all students that need certificates for courses that have finished and
+    put their cert requests on the queue.
 
-    Use the --noop option to test without actually
-    putting certificates on the queue to be generated.
+    If --user is given, only grade and certify the requested username.
+
+    Use the --noop option to test without actually putting certificates on the
+    queue to be generated.
     """
 
     option_list = BaseCommand.option_list + (
@@ -28,6 +29,11 @@ class Command(BaseCommand):
                     dest='noop',
                     default=False,
                     help="Don't add certificate requests to the queue"),
+        make_option('--insecure',
+                    action='store_true',
+                    dest='insecure',
+                    default=False,
+                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course',
@@ -80,7 +86,10 @@ class Command(BaseCommand):
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_id).prefetch_related(
                     "groups").order_by('username')
+
             xq = XQueueCertInterface()
+            if options['insecure']:
+                xq.use_https = False
             total = enrolled_students.count()
             count = 0
             start = datetime.datetime.now(UTC)

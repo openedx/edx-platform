@@ -13,13 +13,14 @@
 
   // hide all actions
   .home > header .title .actions,
-  .home > header .title:hover .actions {
+  .home > header .title:hover .actions,
+  .home > header .title:focus .actions {
     display: none;
     height: auto;
   }
 
   .home > header .title {
-    &:hover {
+    &:hover, &:focus {
 
       > hgroup {
         h1 {
@@ -49,7 +50,7 @@
       position: static;
     }
 
-    &:hover {
+    &:hover, &:focus {
       text-decoration: none;
 
       &::before {
@@ -117,7 +118,7 @@
       }
     }
 
-    &:hover {
+    &:hover, &:focus {
       background: rgb(245,245,245);
       border-color: rgb(170,170,170);
       box-shadow: 0 1px 16px 0 rgba($blue, 0.4);

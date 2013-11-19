@@ -17,6 +17,10 @@ from logsettings import get_logger_config
 
 DEBUG = True
 USE_I18N = True
+# For displaying the dummy text, we need to provide a language mapping.
+LANGUAGES = (
+    ('fr', 'Francais'),
+)
 TEMPLATE_DEBUG = True
 
 
@@ -29,7 +33,8 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
-MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
+MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 MITX_FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True

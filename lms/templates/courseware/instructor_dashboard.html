@@ -522,10 +522,11 @@ function goto( mode)
       <li class="field">
         <label for="id_subject">${_("Subject: ")}</label>
         %if subject:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
         %else:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
         %endif
+        <span class="tip">${_("(Max 128 characters)")}</span>
       </li>
 
       <li class="field">
@@ -538,11 +539,17 @@ function goto( mode)
     </ul>
 
     <div class="submit-email-action">
-      ${_("Please try not to email students more than once a day. Important things to consider before sending:")}
+      <p class="copy">${_("Please try not to email students more than once per week. Important things to consider before sending:")}</p>
       <ul class="list-advice">
         <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
       </ul>
+      <div class="submit-email-warning">
+	<p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+	  ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+	<b>${_("A queued email CANNOT be cancelled.")}</b></p>
+      </div>
+      <br />
       <input type="submit" name="action" value="Send email">
     </div>
     <script type="text/javascript">
@@ -555,6 +562,7 @@ function goto( mode)
       });
     </script>
 
+    <br />
     <p>These email actions run in the background, and status for active email tasks will appear in a table below.
        To see status for all bulk email tasks submitted for this course, click on this button:
     </p>

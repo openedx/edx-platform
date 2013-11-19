@@ -1,4 +1,4 @@
-from .utils import *
+from .utils import extract, perform_request, CommentClientRequestError
 
 
 class Model(object):
@@ -119,13 +119,13 @@ class Model(object):
     @classmethod
     def url(cls, action, params={}):
         if cls.base_url is None:
-            raise CommentClientError("Must provide base_url when using default url function")
+            raise CommentClientRequestError("Must provide base_url when using default url function")
         if action not in cls.DEFAULT_ACTIONS:
             raise ValueError("Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS)))
         elif action in cls.DEFAULT_ACTIONS_WITH_ID:
             try:
                 return cls.url_with_id(params)
             except KeyError:
-                raise CommentClientError("Cannot perform action {0} without id".format(action))
+                raise CommentClientRequestError("Cannot perform action {0} without id".format(action))
         else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()

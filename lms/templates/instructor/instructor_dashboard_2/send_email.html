@@ -24,7 +24,12 @@
   <br/>
   <li class="field">
     <label for="id_subject">${_("Subject: ")}</label><br/>
-    <input type="text" id="id_subject" name="subject">
+     %if subject:
+      <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
+     %else:
+      <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
+     %endif
+     <span class="tip">${_("(Max 128 characters)")}</span>
   </li>
   <li class="field">
     <label>Message:</label>
@@ -35,12 +40,42 @@
   </li>
   </ul>
  <div class="submit-email-action">
-  ${_("Please try not to email students more than once a day. Before sending your email, consider:")}
+  <p class="copy">${_("Please try not to email students more than once per week. Before sending your email, consider:")}</p>
   <ul class="list-advice">
    <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
   </ul>
  </div>
+ <div class="submit-email-warning">
+   <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+     ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+   <b>${_("A queued email CANNOT be cancelled.")}</b></p>
+</div>
+ <br />
   <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
   <div class="request-response-error"></div>
+
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("Email actions run in the background. The status for any active tasks - including email tasks - appears in a table below.")} </p>
+    <br />
+
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+
+
+<hr>
+
+<div class="vert-left email-background" id="section-task-history">
+    <h2> ${_("Email Task History")} </h2>
+    <p>${_("To see the status for all bulk email tasks ever submitted for this course, click on this button:")}</p>
+    <br/>
+  <input type="button" name="task-history-email" value="${_("Show Email Task History")}" data-endpoint="${ section_data['email_background_tasks_url'] }" >
+  <div class="history-request-response-error msg msg-warning copy"></div>
+  <div class="task-history-email-table"></div>
 </div>
+%endif
+
+</div> <!-- end section send-email -->

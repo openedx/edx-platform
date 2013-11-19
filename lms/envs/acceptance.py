@@ -82,6 +82,13 @@ TRACKING_BACKENDS.update({
     }
 })
 
+
+# Enable asset pipeline
+# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
+PIPELINE = True
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
+
 BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
@@ -91,10 +98,6 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
-# Don't actually send any requests to Software Secure for student identity
-# verification.
-MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-
 # Enable fake payment processing page
 MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
@@ -102,6 +105,9 @@ MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
+# Don't actually send any requests to Software Secure for student identity
+# verification.
+MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using

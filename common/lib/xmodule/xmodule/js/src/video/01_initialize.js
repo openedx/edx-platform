@@ -16,7 +16,6 @@ define(
 'video/01_initialize.js',
 ['video/03_video_player.js'],
 function (VideoPlayer) {
-
     // window.console.log() is expected to be available. We do not support
     // browsers which lack this functionality.
 
@@ -42,7 +41,20 @@ function (VideoPlayer) {
      */
     return function (state, element) {
         _makeFunctionsPublic(state);
-        state.initialize(element);
+
+        state.initialize(element)
+            .done(function () {
+                _initializeModules(state)
+                    .done(function () {
+                        state.el
+                            .addClass('is-initialized')
+                            .find('.spinner')
+                            .attr({
+                                'aria-hidden': 'true',
+                                'tabindex': -1
+                            });
+                    });
+            });
     };
 
     // ***************************************************************
@@ -60,21 +72,23 @@ function (VideoPlayer) {
      *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
-        state.setSpeed      = _.bind(setSpeed, state);
-        state.youtubeId     = _.bind(youtubeId, state);
-        state.getDuration   = _.bind(getDuration, state);
-        state.trigger       = _.bind(trigger, state);
-        state.stopBuffering = _.bind(stopBuffering, state);
+        var methodsDict = {
+            bindTo: bindTo,
+            checkStartEndTimes: checkStartEndTimes,
+            fetchMetadata: fetchMetadata,
+            getDuration: getDuration,
+            getVideoMetadata: getVideoMetadata,
+            initialize: initialize,
+            parseSpeed: parseSpeed,
+            parseVideoSources: parseVideoSources,
+            parseYoutubeStreams: parseYoutubeStreams,
+            setSpeed: setSpeed,
+            stopBuffering: stopBuffering,
+            trigger: trigger,
+            youtubeId: youtubeId
+        };
 
-        // Old private functions. Now also public so that can be
-        // tested by Jasmine.
-
-        state.initialize          = _.bind(initialize, state);
-        state.parseSpeed          = _.bind(parseSpeed, state);
-        state.fetchMetadata       = _.bind(fetchMetadata, state);
-        state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
-        state.parseVideoSources   = _.bind(parseVideoSources, state);
-        state.getVideoMetadata    = _.bind(getVideoMetadata, state);
+        bindTo(methodsDict, state, state);
     }
 
     // function _renderElements(state)
@@ -92,12 +106,20 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
+        var video;
+
         if(state.videoType === 'youtube') {
             YT.ready(function() {
-                VideoPlayer(state);
-            })
+                video = VideoPlayer(state);
+
+                state.modules.push(video);
+                state.__dfd__.resolve();
+            });
         } else {
-            VideoPlayer(state);
+            video = VideoPlayer(state);
+
+            state.modules.push(video);
+            state.__dfd__.resolve();
         }
     }
 
@@ -165,7 +187,7 @@ function (VideoPlayer) {
     // function _prepareHTML5Video(state)
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
-    function _prepareHTML5Video(state, html5Mode) {
+    function _prepareHTML5Video(state) {
         state.parseVideoSources(
             {
                 mp4: state.config.mp4Source,
@@ -174,15 +196,13 @@ function (VideoPlayer) {
             }
         );
 
-        if (html5Mode) {
-            state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-            state.videos = {
-                '0.75': state.config.sub,
-                '1.0':  state.config.sub,
-                '1.25': state.config.sub,
-                '1.5':  state.config.sub
-            };
-        }
+        state.speeds = ['0.75', '1.0', '1.25', '1.50'];
+        state.videos = {
+            '0.75': state.config.sub,
+            '1.0':  state.config.sub,
+            '1.25': state.config.sub,
+            '1.5':  state.config.sub
+        };
 
         // We must have at least one non-YouTube video source available.
         // Otherwise, return a negative.
@@ -191,6 +211,8 @@ function (VideoPlayer) {
             state.html5Sources.mp4 === null &&
             state.html5Sources.ogg === null
         ) {
+
+            // TODO: use 1 class to work with.
             state.el.find('.video-player div').addClass('hidden');
             state.el.find('.video-player h3').removeClass('hidden');
 
@@ -224,12 +246,47 @@ function (VideoPlayer) {
         state.captionHideTimeout = null;
     }
 
+    function _initializeModules(state) {
+        var dfd = $.Deferred(),
+            modulesList = $.map(state.modules, function(module) {
+                if ($.isFunction(module)) {
+                    return module(state);
+                } else if ($.isPlainObject(module)) {
+                    return module;
+                }
+        });
+
+        $.when.apply(null, modulesList)
+            .done(dfd.resolve);
+
+        return dfd.promise();
+    }
+
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this'
     // keyword) is the 'state' object. The magic private function that makes
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+
+    // function bindTo(methodsDict, obj, context, rewrite)
+    // Creates a new function with specific context and assigns it to the provided
+    // object.
+    function bindTo(methodsDict, obj, context, rewrite) {
+        $.each(methodsDict, function(name, method) {
+            if (_.isFunction(method)) {
+
+                if (_.isUndefined(rewrite)) {
+                    rewrite = true;
+                }
+
+                if (_.isUndefined(obj[name]) || rewrite) {
+                    obj[name] = _.bind(method, context);
+                }
+            }
+        });
+    }
 
     // function initialize(element)
     // The function set initial configuration and preparation.
@@ -240,6 +297,7 @@ function (VideoPlayer) {
             data, tempYtTestTimeout;
         // This is used in places where we instead would have to check if an
         // element has a CSS class 'fullscreen'.
+        this.__dfd__ = $.Deferred();
         this.isFullScreen = false;
 
         // The parent element of the video, and the ID.
@@ -260,8 +318,8 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
-            start:              data['start'],
-            end:                data['end'],
+            startTime:          data['start'],
+            endTime:            data['end'],
             caption_data_dir:   data['captionDataDir'],
             caption_asset_path: data['captionAssetPath'],
             show_captions:      regExp.test(data['showCaptions'].toString()),
@@ -277,6 +335,10 @@ function (VideoPlayer) {
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
+        // Make sure that start end end times are valid. If not, they will be
+        // set to `null` and will not be used later on.
+        this.checkStartEndTimes();
+
         // Check if the YT test timeout has been set. If not, or it is in
         // improper format, then set to default value.
         tempYtTestTimeout = parseInt(data['ytTestTimeout'], 10);
@@ -288,10 +350,11 @@ function (VideoPlayer) {
         if (!(_parseYouTubeIDs(this))) {
 
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
-            if (!_prepareHTML5Video(this, true)) {
+            if (!_prepareHTML5Video(this)) {
 
+                this.__dfd__.reject();
                 // Non-YouTube sources were not found either.
-                return;
+                return this.__dfd__.promise();
             }
 
             console.log('[Video info]: Start player in HTML5 mode.');
@@ -357,6 +420,36 @@ function (VideoPlayer) {
                     _setConfigurations(_this);
                     _renderElements(_this);
                 });
+        }
+
+        return this.__dfd__.promise();
+    }
+
+    /*
+     * function checkStartEndTimes()
+     *
+     * Validate config.startTime and config.endTime times.
+     *
+     * We can check at this time if the times are proper integers, and if they
+     * make general sense. I.e. if start time is => 0 and <= end time.
+     *
+     * An invalid start time will be reset to 0. An invalid end time will be
+     * set to `null`. It the task for the appropriate player API to figure out
+     * if start time and/or end time are greater than the length of the video.
+     */
+    function checkStartEndTimes() {
+        this.config.startTime = parseInt(this.config.startTime, 10);
+        if (!isFinite(this.config.startTime) || this.config.startTime < 0) {
+            this.config.startTime = 0;
+        }
+
+        this.config.endTime = parseInt(this.config.endTime, 10);
+        if (
+            !isFinite(this.config.endTime) ||
+            this.config.endTime < this.config.startTime ||
+            this.config.endTime === 0
+        ) {
+            this.config.endTime = null;
         }
     }
 

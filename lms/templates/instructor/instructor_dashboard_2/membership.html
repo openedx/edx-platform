@@ -32,8 +32,7 @@
   <p> ${_("Enter student emails separated by new lines or commas.")} </p>
   <textarea rows="6" cols="50" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
   <br>
-  <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
-  <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
+
   <input type="checkbox" name="auto-enroll" value="${_("Auto-Enroll")}" style="margin-top: 1em;">
   <label for="auto-enroll">${_("Auto Enroll")}</label>
   <div class="auto-enroll-hint">
@@ -41,6 +40,21 @@
         ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}
     </p>
   </div>
+  
+  <div>
+    <input type="checkbox" name="email-students" value="${_("Notify-students-by-email")}">
+    <label for="email-students">${_("Notify students by email")}</label>
+    <div class="email-students-hint">
+      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
+      </p>
+    </div>
+  </div>
+  
+  <div>
+    <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
+    <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
+  </div>
+
   <div class="request-response"></div>
   <div class="request-response-error"></div>
 </div>

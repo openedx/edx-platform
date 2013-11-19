@@ -80,6 +80,12 @@ DATABASES = {
     }
 }
 
+# Enable asset pipeline
+# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
+PIPELINE = True
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
+
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
@@ -114,3 +120,16 @@ if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
     LETTUCE_SERVER_PORT = choice(PORTS)
 else:
     LETTUCE_SERVER_PORT = randint(1024, 65535)
+
+
+# Set up Video information so that the cms will send
+# requests to a mock Youtube server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    VIDEO_PORT = choice(PORTS)
+    PORTS.remove(VIDEO_PORT)
+else:
+    VIDEO_PORT = randint(1024, 65535)
+
+# for testing Youtube
+YOUTUBE_API['url'] = "http://127.0.0.1:" + str(VIDEO_PORT) + '/test_transcripts_youtube/'
+

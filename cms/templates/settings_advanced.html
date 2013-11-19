@@ -4,6 +4,8 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from xmodule.modulestore.django import loc_mapper
+  from django.core.urlresolvers import reverse
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
@@ -86,14 +88,17 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
 
       <div class="bit">
       % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+        <%
+          ctx_loc = context_course.location
+          location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+          course_team_url = location.url_reverse('course_team/', '')
+        %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
           </ul>
         </nav>
       % endif

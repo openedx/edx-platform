@@ -14,9 +14,16 @@
 
   .olddash-button-wrapper {
     position: absolute;
-    top: 17px;
+    top: 16px;
     right: 15px;
-    font-size: 11pt;
+    @include font-size(16);
+  }
+
+  .studio-edit-link{
+    position: absolute;
+    top: 40px;
+    right: 15px;
+    @include font-size(16);
   }
 
   // system feedback - messages
@@ -35,10 +42,8 @@
   .msg-warning {
     border-top: 2px solid $warning-color;
     background: tint($warning-color,95%);
-
-    .copy {
-      color: $warning-color;
-    }
+    display: none;
+    color: $warning-color;
   }
 
   // TYPE: confirm
@@ -254,6 +259,12 @@ section.instructor-dashboard-content-2 {
       &:last-child {
         margin-bottom: 0;
       }
+      .tip {
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint(rgb(127,127,127),50%);
+        @include font-size(12);
+      }
     }
   }
 }
@@ -287,6 +298,23 @@ section.instructor-dashboard-content-2 {
   }
 
   .auto-enroll-hint {
+    position: absolute;
+    display: none;
+    padding: $baseline;
+    width: $half_width;
+    border: 1px solid $light-gray;
+    background-color: $white;
+
+    span.emph {
+      font-weight: bold;
+    }
+  }
+  
+  label[for="email-students"]:hover + .email-students-hint {
+    display: block;
+  }
+
+  .email-students-hint {
     position: absolute;
     display: none;
     padding: $baseline;
@@ -344,7 +372,7 @@ section.instructor-dashboard-content-2 {
       height: 10px;
       background: url('../images/moderator-delete-icon.png') left center no-repeat;
       opacity: 0.7;
-      &:hover  { opacity: 0.8; }
+      &:hover, &:focus  { opacity: 0.8; }
       &:active { opacity: 0.9; }
 
       // @include idashbutton($danger-red);
@@ -432,7 +460,7 @@ section.instructor-dashboard-content-2 {
 
   .last-updated {
     line-height: 2.2em;
-    font-size: 10pt;
+    @include font-size(10);
   }
 
   .display-graph .graph-placeholder {
@@ -470,7 +498,7 @@ section.instructor-dashboard-content-2 {
   }
 
   .title {
-    font-size: 16pt;
+    @include font-size(16);
   }
 
   .label {
@@ -487,7 +515,7 @@ section.instructor-dashboard-content-2 {
     height: 17px;
     background: url('../images/info-icon-dark.png') left center no-repeat;
     opacity: 0.35;
-    &:hover  { opacity: 0.45; }
+    &:hover, &:focus  { opacity: 0.45; }
     &:active { opacity: 0.5; }
   }
 

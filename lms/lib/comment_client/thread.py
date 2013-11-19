@@ -1,5 +1,5 @@
 from .utils import merge_dict, strip_blank, strip_none, extract, perform_request
-from .utils import CommentClientError
+from .utils import CommentClientRequestError
 import models
 import settings
 
@@ -34,7 +34,7 @@ class Thread(models.Model):
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
 
-        if query_params.get('text') or query_params.get('tags') or query_params.get('commentable_ids'):
+        if query_params.get('text') or query_params.get('tags'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
@@ -88,7 +88,7 @@ class Thread(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_flag_comment(voteable.id)
         else:
-            raise CommentClientError("Can only flag/unflag threads or comments")
+            raise CommentClientRequestError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)
@@ -99,7 +99,7 @@ class Thread(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_unflag_comment(voteable.id)
         else:
-            raise CommentClientError("Can only flag/unflag for threads or comments")
+            raise CommentClientRequestError("Can only flag/unflag for threads or comments")
         params = {'user_id': user.id}
         #if you're an admin, when you unflag, remove ALL flags
         if removeAll:

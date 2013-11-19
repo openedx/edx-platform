@@ -5,7 +5,7 @@ desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs, [:type, :quiet] do |t, args|
     args.with_defaults(:quiet => "quiet")
     if args.type == 'dev'
-        path = "docs/developer"
+        path = "docs/developers"
     elsif args.type == 'author'
         path = "docs/course_authors"
     elsif args.type == 'data'
@@ -26,7 +26,7 @@ end
 desc "Show docs in browser (mac and ubuntu)."
 task :showdocs, [:options] do |t, args|
     if args.options == 'dev'
-        path = "docs/developer"
+        path = "docs/developers"
     elsif args.options == 'author'
         path = "docs/course_authors"
     elsif args.options == 'data'

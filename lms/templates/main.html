@@ -16,10 +16,10 @@
 </%def>
 
 <!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9"><![endif]-->
-<!--[if gt IE 9]><!--><html><!--<![endif]-->
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="en-us"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="en-us"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9" lang="en-us"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en-us"><!--<![endif]-->
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
@@ -78,6 +78,8 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
+
   <%include file="mathjax_accessible.html" />
 
 % if theme_enabled():
@@ -86,7 +88,7 @@
   <%include file="navigation.html" />
 % endif
 
-  <section class="content-wrapper">
+  <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>

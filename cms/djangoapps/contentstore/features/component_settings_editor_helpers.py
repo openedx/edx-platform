@@ -51,6 +51,13 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
         module_count_before + 1))
 
 
+@world.absorb
+def click_new_component_button(step, component_button_css):
+    step.given('I have clicked the new unit button')
+
+    world.css_click(component_button_css)
+
+
 def _click_advanced():
     css = 'ul.problem-type-tabs a[href="#tab2"]'
     world.css_click(css)
@@ -122,24 +129,29 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
     ----------
     setting: the WebDriverElement object found in the browser
     display_name: the string expected as the label
-    value: the expected field value
+    html: the expected field value
     explicitly_set: True if the value is expected to have been explicitly set
         for the problem, rather than derived from the defaults. This is verified
         by the existence of a "Clear" button next to the field value.
     """
-    assert_equal(display_name, setting.find_by_css('.setting-label')[0].value)
+    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html)
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
     if setting.has_class('metadata-list-enum'):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
+    elif setting.has_class('metadata-videolist-enum'):
+        list_value = ', '.join(ele.find_by_css('input')[0].value for ele in setting.find_by_css('.videolist-settings-item'))
+        assert_equal(value, list_value)
     else:
         assert_equal(value, setting.find_by_css('.setting-input')[0].value)
 
-    settingClearButton = setting.find_by_css('.setting-clear')[0]
-    assert_equal(explicitly_set, settingClearButton.has_class('active'))
-    assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
+    # VideoList doesn't have clear button
+    if not setting.has_class('metadata-videolist-enum'):
+        settingClearButton = setting.find_by_css('.setting-clear')[0]
+        assert_equal(explicitly_set, settingClearButton.has_class('active'))
+        assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
 
 
 @world.absorb

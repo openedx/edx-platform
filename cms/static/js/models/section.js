@@ -1,4 +1,6 @@
-define(["backbone", "gettext", "js/views/feedback_notification"], function(Backbone, gettext, NotificationView) {
+define(["backbone", "gettext", "js/views/feedback_notification", "js/utils/module"],
+    function(Backbone, gettext, NotificationView, ModuleUtils) {
+
     var Section = Backbone.Model.extend({
         defaults: {
             "name": ""
@@ -8,10 +10,9 @@ define(["backbone", "gettext", "js/views/feedback_notification"], function(Backb
                 return gettext("You must specify a name");
             }
         },
-        url: "/save_item",
+        urlRoot: ModuleUtils.urlRoot,
         toJSON: function() {
             return {
-                id: this.get("id"),
                 metadata: {
                     display_name: this.get("name")
                 }

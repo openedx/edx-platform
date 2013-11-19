@@ -109,8 +109,8 @@
     }
 
     .modal-form-error {
-      background: $error-red;
-      border: 1px solid rgb(202, 17, 17);
+      background: tint($red,90%);
+      border: 1px solid rgb(143, 14, 14);
       color: rgb(143, 14, 14);
       display: none;
       margin-bottom: 20px;
@@ -195,7 +195,7 @@
         margin-bottom: 20px;
         padding: 8px 10px;
 
-        &:hover {
+        &:hover, &:focus {
           background: rgb(230,230,230);
         }
 
@@ -262,7 +262,7 @@
           font-style: italic;
           text-decoration: underline;
 
-          &:hover {
+          &:hover, &:focus {
             color: $base-font-color;
           }
         }
@@ -288,14 +288,14 @@
       text-shadow: 0 1px rgba(255,255,255, 0.8);
       @include transition(all 0.15s ease-out 0s);
 
-      &:hover {
+      &:hover, &:focus {
         color: $base-font-color;
         text-decoration: none;
       }
     }
   }
 
-  #help_wrapper {
+  #help_wrapper, .discussion-alert-wrapper {
     padding: 0 ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
 
     header {
@@ -305,6 +305,11 @@
     }
 
 
+  }
+
+  .discussion-alert-wrapper button {
+    display: block;
+    margin: 0 auto;
   }
 
   .tip {

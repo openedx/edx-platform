@@ -81,6 +81,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           value: ["the first display value", "the second"]
       }
 
+      timeEntry = {
+          default_value: "00:00:00",
+          display_name: "Time",
+          explicitly_set: true,
+          field_name: "relative_time",
+          help: "Specifies the name for this component.",
+          options: [],
+          type: MetadataModel.RELATIVE_TIME_TYPE,
+          value: "12:12:12"
+      }
+
+
       # Test for the editor that creates the individual views.
       describe "MetadataView.Editor creates editors for each field", ->
           beforeEach ->
@@ -103,17 +115,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
                           type: "unknown type",
                           value: null
                       },
-                      listEntry
+                      listEntry,
+                      timeEntry
                   ]
               )
 
           it "creates child views on initialize, and sorts them alphabetically", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              expect(childModels.length).toBe(6)
+              expect(childModels.length).toBe(7)
               # Be sure to check list view as well as other input types
               childViews = view.$el.find('.setting-input, .list-settings')
-              expect(childViews.length).toBe(6)
+              expect(childViews.length).toBe(7)
 
               verifyEntry = (index, display_name, type) ->
                   expect(childModels[index].get('display_name')).toBe(display_name)
@@ -123,8 +136,9 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyEntry(1, 'Inputs', 'number')
               verifyEntry(2, 'List', '')
               verifyEntry(3, 'Show Answer', 'select-one')
-              verifyEntry(4, 'Unknown', 'text')
-              verifyEntry(5, 'Weight', 'number')
+              verifyEntry(4, 'Time', 'text')
+              verifyEntry(5, 'Unknown', 'text')
+              verifyEntry(6, 'Weight', 'number')
 
           it "returns its display name", ->
               view = new MetadataView.Editor({collection: @model})
@@ -361,3 +375,23 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           @el.find('input').last().val('third setting')
           @el.find('input').last().trigger('input')
           expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
+
+      describe "MetadataView.RelativeTime allows the user to enter time string in HH:mm:ss format", ->
+          beforeEach ->
+              model = new MetadataModel(timeEntry)
+              @view = new MetadataView.RelativeTime({model: model})
+
+          it "uses a text input type", ->
+              assertInputType(@view, 'text')
+
+          it "returns the intial value upon initialization", ->
+              assertValueInView(@view, '12:12:12')
+
+          it "can update its value in the view", ->
+              assertCanUpdateView(@view, "23:59:59")
+
+          it "has a clear method to revert to the model default", ->
+              assertClear(@view, '00:00:00')
+
+          it "has an update model method", ->
+              assertUpdateModel(@view, '12:12:12', '23:59:59')

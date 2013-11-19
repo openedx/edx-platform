@@ -9,11 +9,11 @@
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["coffee/src/views/tabs", "coffee/src/models/module"], function(TabsEditView, ModuleModel) {
+require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) {
     new TabsEditView({
       el: $('.main-wrapper'),
-      model: new ModuleModel({
-        id: '${context_course.location}'
+      model: new Backbone.Model({
+        id: '${locator}'
       }),
       mast: $('.wrapper-mast')
     });
@@ -61,8 +61,8 @@ require(["coffee/src/views/tabs", "coffee/src/models/module"], function(TabsEdit
 
       <div class="tab-list">
         <ol class='components'>
-          % for id in components:
-          <li class="component" data-id="${id}"/>
+          % for id, locator in components:
+          <li class="component" data-id="${id}" data-locator="${locator}"/>
           % endfor
 
           <li class="new-component-item">

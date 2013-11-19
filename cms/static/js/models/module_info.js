@@ -1,6 +1,6 @@
-define(["backbone"], function(Backbone) {
+define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
     var ModuleInfo = Backbone.Model.extend({
-      url: function() {return "/module_info/" + this.id;},
+      urlRoot: ModuleUtils.urlRoot,
 
       defaults: {
         "id": null,

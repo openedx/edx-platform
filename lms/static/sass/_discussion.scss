@@ -2619,7 +2619,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  color: #666;
+  color: #333;
 }
 
 .pinned .icon {
@@ -2640,7 +2640,7 @@ body.discussion {
 }
 
 .notpinned span {
-  color: #666;
+  color: #333;
   font-style: italic;
 }
 
@@ -2665,7 +2665,7 @@ display:none;
     
 .notflagged .icon {
   display: block;
-  color: #666;
+  color: #333;
   float: left;
   margin: 3px;
   width: 10px;
@@ -2690,6 +2690,6 @@ display:none;
 }
 
 .notflagged span {
-  color: #666;
+  color: #333;
   font-style: italic;
 }

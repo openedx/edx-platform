@@ -40,7 +40,7 @@ def js_test_tool(env, command, do_coverage)
         cmd += " --coverage-xml #{report_dir}"
     end
 
-    sh(cmd)
+    test_sh(cmd)
 end
 
 # Print a list of js_test commands for

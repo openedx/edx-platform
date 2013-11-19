@@ -11,6 +11,7 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
 @step(u'I go to the textbooks page')
 def go_to_uploads(_step):
+    world.wait_for_js_to_load()
     world.click_course_content()
     menu_css = 'li.nav-course-courseware-textbooks a'
     world.css_click(menu_css)

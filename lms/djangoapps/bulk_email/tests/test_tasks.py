@@ -31,7 +31,7 @@ from django.core.management import call_command
 from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
 
 from instructor_task.tasks import send_bulk_course_email
-from instructor_task.subtasks import update_subtask_status
+from instructor_task.subtasks import update_subtask_status, SubtaskStatus
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
@@ -63,16 +63,9 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
     entry = InstructorTask.objects.get(pk=entry_id)
     subtask_dict = json.loads(entry.subtasks)
     subtask_status_info = subtask_dict['status']
-    current_subtask_status = subtask_status_info[current_task_id]
-
-    def _get_retry_count(subtask_result):
-        """Return the number of retries counted for the given subtask."""
-        retry_count = subtask_result.get('retried_nomax', 0)
-        retry_count += subtask_result.get('retried_withmax', 0)
-        return retry_count
-
-    current_retry_count = _get_retry_count(current_subtask_status)
-    new_retry_count = _get_retry_count(new_subtask_status)
+    current_subtask_status = SubtaskStatus.from_dict(subtask_status_info[current_task_id])
+    current_retry_count = current_subtask_status.get_retry_count()
+    new_retry_count = new_subtask_status.get_retry_count()
     if current_retry_count <= new_retry_count:
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 

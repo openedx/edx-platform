@@ -52,6 +52,10 @@ class MockS3Connection(object):
     def create_bucket(self, bucket_name, **kwargs):
         return "edX Bucket"
 
+    def lookup(self, bucket_name):
+        return None
+
+
 class MockUploadedFile(object):
     """
     Create a mock uploaded file for image submission tests.
@@ -68,20 +72,6 @@ class MockUploadedFile(object):
 
     def read(self):
         return self.mock_file.read()
-
-
-class MockQueryDict(dict):
-    """
-    Mock a query dict so that it can be used in test classes.  This will only work with the combinedopenended tests,
-    and does not mock the full query dict, only the behavior that is needed there (namely get_list).
-    """
-    def getlist(self, key, default=None):
-        try:
-            return super(MockQueryDict, self).__getitem__(key)
-        except KeyError:
-            if default is None:
-                return []
-        return default
 
 
 class DummyModulestore(object):

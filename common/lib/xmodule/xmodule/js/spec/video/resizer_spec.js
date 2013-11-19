@@ -6,13 +6,19 @@ function (Resizer) {
 
     describe('Resizer', function () {
         var html = [
-                '<div class="rszr-wrapper" style="width:200px; height: 200px;">',
-                    '<div class="rszr-el" style="width:100px; height: 150px;">',
+                '<div ' +
+                    'class="rszr-wrapper" ' +
+                    'style="width:200px; height: 200px;"' +
+                '>',
+                    '<div ' +
+                        'class="rszr-el" ' +
+                        'style="width:100px; height: 150px;"' +
+                    '>',
                         'Content',
                     '</div>',
                 '</div>'
             ].join(''),
-            config, container, element;
+            config, container, element, originalConsoleLog;
 
         beforeEach(function () {
             setFixtures(html);
@@ -23,12 +29,17 @@ function (Resizer) {
                 container: container,
                 element: element
             };
+
+            originalConsoleLog = window.console.log;
+            spyOn(console, 'log');
+        });
+
+        afterEach(function () {
+            window.console.log = originalConsoleLog;
         });
 
         it('When Initialize without required parameters, log message is shown',
             function () {
-                spyOn(console, 'log');
-
                 new Resizer({ });
                 expect(console.log).toHaveBeenCalled();
             }
@@ -84,6 +95,85 @@ function (Resizer) {
             realWidth = element.width();
 
             expect(realWidth).toBe(expectedWidth);
+        });
+
+        describe('Callbacks', function () {
+            var resizer,
+                spiesList = [];
+
+            beforeEach(function () {
+                var spiesCount = _.range(3);
+
+                spiesList = $.map(spiesCount, function() {
+                    return jasmine.createSpy();
+                });
+
+                resizer = new Resizer(config);
+            });
+
+
+            it('callbacks are called', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.align();
+
+                $.each(spiesList, function(index, spy) {
+                    expect(spy).toHaveBeenCalled();
+                });
+            });
+
+            it('callback called just once', function () {
+                resizer.callbacks.once(spiesList[0]);
+
+                resizer
+                    .align()
+                    .alignByHeightOnly();
+
+                expect(spiesList[0].calls.length).toEqual(1);
+            });
+
+            it('All callbacks are removed', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.callbacks.removeAll();
+                resizer.align();
+
+                $.each(spiesList, function(index, spy) {
+                    expect(spy).not.toHaveBeenCalled();
+                });
+            });
+
+            it('Specific callback is removed', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.callbacks.remove(spiesList[1]);
+                resizer.align();
+
+                expect(spiesList[1]).not.toHaveBeenCalled();
+            });
+
+            it('Error message is shown when wrong argument type is passed', function () {
+                var methods = ['add', 'once'],
+                    errorMessage = 'TypeError: Argument is not a function.',
+                    arg = {};
+
+                spyOn(console, 'error');
+
+                $.each(methods, function(index, methodName) {
+                     resizer.callbacks[methodName](arg);
+                     expect(console.error).toHaveBeenCalledWith(errorMessage);
+                     //reset spy
+                     console.log.reset();
+                });
+
+            });
+
         });
 
     });

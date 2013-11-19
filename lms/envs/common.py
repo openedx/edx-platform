@@ -21,7 +21,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614
+# pylint: disable=W0401, W0611, W0614, C0103
 
 import sys
 import os
@@ -30,7 +30,7 @@ from path import path
 
 from .discussionsettings import *
 
-from lms.xblock.mixin import LmsBlockMixin
+from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 
@@ -120,7 +120,8 @@ MITX_FEATURES = {
     'ENABLE_INSTRUCTOR_EMAIL': True,
     # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
     #   for each course via django-admin interface.
-    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default for all courses.
+    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default
+    #   for all Mongo-backed courses.
     'REQUIRE_COURSE_EMAIL_AUTH': True,
 
     # enable analytics server.
@@ -176,7 +177,7 @@ MITX_FEATURES = {
     'ENABLE_CHAT': False,
 
     # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES' : False,
+    'MULTIPLE_ENROLLMENT_ROLES': False,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
@@ -214,9 +215,9 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
+# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
@@ -224,10 +225,11 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
-node_paths = [COMMON_ROOT / "static/js/vendor",
-              COMMON_ROOT / "static/coffee/src",
-              system_node_path
-              ]
+node_paths = [
+    COMMON_ROOT / "static/js/vendor",
+    COMMON_ROOT / "static/coffee/src",
+    system_node_path,
+]
 NODE_PATH = ':'.join(node_paths)
 
 
@@ -439,12 +441,12 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+SERVER_EMAIL = 'devops@example.com'
+TECH_SUPPORT_EMAIL = 'technical@example.com'
+CONTACT_EMAIL = 'info@example.com'
+BUGS_EMAIL = 'bugs@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -463,6 +465,7 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = ()
 
 # We want i18n to be turned off in production, at least until we have full localizations.
 # Thus we want the Django translation engine to be disabled. Otherwise even without
@@ -498,12 +501,17 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
+from course_wiki import settings as course_wiki_settings
+
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
-WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
-WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
+
+WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
+WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
+WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
+WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
@@ -512,7 +520,7 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ################################# Pearson TestCenter config  ################
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
-# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@example.com"
 
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
@@ -523,7 +531,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
+PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
@@ -541,7 +549,7 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'url': 'http://example.com/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
     'staff_grading': 'staff_grading',
@@ -572,6 +580,7 @@ WAFFLE_MAX_AGE = 1209600
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -649,10 +658,11 @@ main_vendor_js = [
     'js/vendor/annotator.tags.min.js'
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
+notes_js = ['coffee/src/notes.js']
+instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -711,7 +721,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -719,6 +729,7 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
             'js/src/utility.js',
+            'js/src/accessibility_tools.js',
         ],
         'output_filename': 'js/lms-application.js',
 
@@ -763,6 +774,11 @@ PIPELINE_JS = {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
         'test_order': 7
+    },
+    'instructor_dash': {
+        'source_filenames': instructor_dash_js,
+        'output_filename': 'js/instructor_dash.js',
+        'test_order': 9,
     },
 }
 
@@ -853,7 +869,7 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 # Suffix used to construct 'from' email address for bulk emails.
 # A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@courseupdates.edx.org'
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
@@ -909,7 +925,7 @@ INSTALLED_APPS = (
     # Our courseware
     'circuit',
     'courseware',
-    'perfstats',
+    'lms.lib.perfstats',
     'student',
     'static_template_view',
     'staticbook',
@@ -991,7 +1007,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy_edx',
 
     # Verified Certificates
-    'WHAT_IS_VERIFIED_CERT' : 'verified-certificate',
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
 
@@ -1024,7 +1040,7 @@ def enable_theme(theme_name):
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
-    "DAYS_GOOD_FOR" : 365, # How many days is a verficiation good for?
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
 ######################## CAS authentication ###########################
@@ -1037,3 +1053,14 @@ if MITX_FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+
+###################### Registration ##################################
+
+# Remove some of the fields from the list to not display them
+REGISTRATION_OPTIONAL_FIELDS = set([
+    'level_of_education',
+    'gender',
+    'year_of_birth',
+    'mailing_address',
+    'goals',
+])

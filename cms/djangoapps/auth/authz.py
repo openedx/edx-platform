@@ -11,6 +11,7 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import CourseLocator, Locator
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.exceptions import InvalidLocationError
 
 
 # define a couple of simple roles, we just need ADMIN and EDITOR now for our purposes
@@ -32,11 +33,14 @@ def get_course_groupname_for_role(location, role):
     # if it exists, then use that one, otherwise use a <role>_<course_id> which contains
     # more information
     groupnames = []
-    groupnames.append('{0}_{1}'.format(role, location.course_id))
+    try:
+        groupnames.append('{0}_{1}'.format(role, location.course_id))
+    except InvalidLocationError:  # will occur on old locations where location is not of category course
+        pass
     if isinstance(location, Location):
         groupnames.append('{0}_{1}'.format(role, location.course))
     elif isinstance(location, CourseLocator):
-        old_location = loc_mapper().translate_locator_to_location(location)
+        old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
         if old_location:
             groupnames.append('{0}_{1}'.format(role, old_location.course_id))
 
@@ -195,7 +199,7 @@ def is_user_in_course_group_role(user, location, role, check_staff=True):
         # all "is_staff" flagged accounts belong to all groups
         if check_staff and user.is_staff:
             return True
-        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        return user.groups.filter(name=get_course_groupname_for_role(location, role)).exists()
 
     return False
 

@@ -2,6 +2,8 @@
 Test for LMS courseware app.
 """
 import mock
+from mock import Mock
+from unittest import TestCase
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -18,6 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_DIR, \
     TEST_DATA_MONGO_MODULESTORE, \
     TEST_DATA_DRAFT_MONGO_MODULESTORE, \
     TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.field_data import LmsFieldData
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -183,3 +186,24 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was
         # not allowed to be passed in (i.e. was throwing exception)
+
+
+class TestLmsFieldData(TestCase):
+    """
+    Tests of the LmsFieldData class
+    """
+    def test_lms_field_data_wont_nest(self):
+        # Verify that if an LmsFieldData is passed into LmsFieldData as the
+        # authored_data, that it doesn't produced a nested field data.
+        #
+        # This fixes a bug where re-use of the same descriptor for many modules
+        # would cause more and more nesting, until the recursion depth would be
+        # reached on any attribute access
+
+        # pylint: disable=protected-access
+        base_authored = Mock()
+        base_student = Mock()
+        first_level = LmsFieldData(base_authored, base_student)
+        second_level = LmsFieldData(first_level, base_student)
+        self.assertEquals(second_level._authored_data, first_level._authored_data)
+        self.assertNotIsInstance(second_level._authored_data, LmsFieldData)

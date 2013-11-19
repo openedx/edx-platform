@@ -104,7 +104,12 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
-STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT))
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE)
+
+# STATIC_URL specifies the url to use for static files
+STATIC_URL = ENV_TOKENS.get('STATIC_URL', STATIC_URL)
 
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
@@ -117,6 +122,7 @@ EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is Fals
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+REGISTRATION_OPTIONAL_FIELDS = ENV_TOKENS.get('REGISTRATION_OPTIONAL_FIELDS', REGISTRATION_OPTIONAL_FIELDS)
 
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
 
@@ -161,6 +167,11 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
+# Workaround for setting THEME_NAME to an empty
+# string which is the default due to this ansible
+# bug: https://github.com/ansible/ansible/issues/4812
+if THEME_NAME == "":
+    THEME_NAME = None
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
     FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
@@ -170,6 +181,11 @@ MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
 # Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
+
+# Translation overrides
+LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
+LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
+USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):

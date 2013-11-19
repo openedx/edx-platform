@@ -38,6 +38,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
   <%static:js group='module-descriptor-js'/>
+  <%static:js group='instructor_dash'/>
 </%block>
 
 ## NOTE that instructor is set as the active page so that the instructor button lights up, even though this is the instructor_2 page.
@@ -50,10 +51,14 @@
 <section class="container">
 <div class="instructor-dashboard-wrapper-2">
 <div class="olddash-button-wrapper"><a href="${ old_dashboard_url }"> ${_("Back to Standard Dashboard")} </a></div>
+%if studio_url:
+  ## not checking access because if user can see this, they are at least course staff (with studio edit access)
+  <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
+%endif
 <section class="instructor-dashboard-content-2">
 
-  ## <h1>Instructor Dashboard</h1>
-
+  <h1>${_("Instructor Dashboard")}</h1>
+  <hr />
   ## links which are tied to idash-sections below.
   ## the links are acativated and handled in instructor_dashboard.coffee
   ## when the javascript loads, it clicks on the first section

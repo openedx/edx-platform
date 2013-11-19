@@ -42,6 +42,15 @@
           });
         });
 
+        it('add ARIA attributes to speed control', function () {
+          var speedControl = $('div.speeds>a');
+          expect(speedControl).toHaveAttrs({
+            'role': 'button',
+            'title': 'Speeds',
+            'aria-disabled': 'false'
+          }); 
+        });
+
         it('bind to change video speed link', function() {
           expect($('.video_speeds a')).toHandleWith('click', videoSpeedControl.changeVideoSpeed);
         });

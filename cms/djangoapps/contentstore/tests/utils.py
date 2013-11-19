@@ -29,6 +29,32 @@ def registration(email):
     return Registration.objects.get(user__email=email)
 
 
+class AjaxEnabledTestClient(Client):
+    """
+    Convenience class to make testing easier.
+    """
+    def ajax_post(self, path, data=None, content_type="application/json", **kwargs):
+        """
+        Convenience method for client post which serializes the data into json and sets the accept type
+        to json
+        """
+        if not isinstance(data, basestring):
+            data = json.dumps(data or {})
+        kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        return self.post(path=path, data=data, content_type=content_type, **kwargs)
+
+    def get_html(self, path, data=None, follow=False, **extra):
+        """
+        Convenience method for client.get which sets the accept type to html
+        """
+        return self.get(path, data or {}, follow, HTTP_ACCEPT="text/html", **extra)
+
+    def get_json(self, path, data=None, follow=False, **extra):
+        """
+        Convenience method for client.get which sets the accept type to json
+        """
+        return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
+
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -53,7 +79,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.user.is_staff = True
         self.user.save()
 
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=uname, password=password)
 
         self.course = CourseFactory.create(
@@ -61,10 +87,11 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
+        self.course_location = self.course.location
 
     def createNonStaffAuthedUserClient(self):
         """
-        Create a non-staff user, log them in, and return the client to use for testing.
+        Create a non-staff user, log them in, and return the client, user to use for testing.
         """
         uname = 'teststudent'
         password = 'foo'

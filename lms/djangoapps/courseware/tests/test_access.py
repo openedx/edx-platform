@@ -1,62 +1,54 @@
+import courseware.access as access
+import datetime
+
 from mock import Mock
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
+from courseware.tests.factories import UserFactory, CourseEnrollmentAllowedFactory, StaffFactory, InstructorFactory
+from student.tests.factories import AnonymousUserFactory
 from xmodule.modulestore import Location
-import courseware.access as access
-from .factories import CourseEnrollmentAllowedFactory
-import datetime
-from django.utils.timezone import UTC
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+import pytz
 
 
+# pylint: disable=protected-access
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AccessTestCase(TestCase):
-    def test__has_global_staff_access(self):
-        u = Mock(is_staff=False)
-        self.assertFalse(access._has_global_staff_access(u))
+    """
+    Tests for the various access controls on the student dashboard
+    """
 
-        u = Mock(is_staff=True)
-        self.assertTrue(access._has_global_staff_access(u))
+    def setUp(self):
+        self.course = Location('i4x://edX/toy/course/2012_Fall')
+        self.anonymous_user = AnonymousUserFactory()
+        self.student = UserFactory()
+        self.global_staff = UserFactory(is_staff=True)
+        self.course_staff = StaffFactory(course=self.course)
+        self.course_instructor = InstructorFactory(course=self.course)
 
     def test__has_access_to_location(self):
-        location = Location('i4x://edX/toy/course/2012_Fall')
+        self.assertFalse(access._has_access_to_location(None, self.course, 'staff', None))
 
-        self.assertFalse(access._has_access_to_location(None, location,
-                                                        'staff', None))
-        u = Mock()
-        u.is_authenticated.return_value = False
-        self.assertFalse(access._has_access_to_location(u, location,
-                                                        'staff', None))
-        u = Mock(is_staff=True)
-        self.assertTrue(access._has_access_to_location(u, location,
-                                                       'instructor', None))
+        self.assertFalse(access._has_access_to_location(self.anonymous_user, self.course, 'staff', None))
+        self.assertFalse(access._has_access_to_location(self.anonymous_user, self.course, 'instructor', None))
+
+        self.assertTrue(access._has_access_to_location(self.global_staff, self.course, 'staff', None))
+        self.assertTrue(access._has_access_to_location(self.global_staff, self.course, 'instructor', None))
+
         # A user has staff access if they are in the staff group
-        u = Mock(is_staff=False)
-        g = Mock()
-        g.name = 'staff_edX/toy/2012_Fall'
-        u.groups.all.return_value = [g]
-        self.assertTrue(access._has_access_to_location(u, location,
-                                                        'staff', None))
-        # A user has staff access if they are in the instructor group
-        g.name = 'instructor_edX/toy/2012_Fall'
-        self.assertTrue(access._has_access_to_location(u, location,
-                                                        'staff', None))
+        self.assertTrue(access._has_access_to_location(self.course_staff, self.course, 'staff', None))
+        self.assertFalse(access._has_access_to_location(self.course_staff, self.course, 'instructor', None))
 
-        # A user has instructor access if they are in the instructor group
-        g.name = 'instructor_edX/toy/2012_Fall'
-        self.assertTrue(access._has_access_to_location(u, location,
-                                                        'instructor', None))
+        # A user has staff and instructor access if they are in the instructor group
+        self.assertTrue(access._has_access_to_location(self.course_instructor, self.course, 'staff', None))
+        self.assertTrue(access._has_access_to_location(self.course_instructor, self.course, 'instructor', None))
 
-        # A user does not have staff access if they are
+        # A user does not have staff or instructor access if they are
         # not in either the staff or the the instructor group
-        g.name = 'student_only'
-        self.assertFalse(access._has_access_to_location(u, location,
-                                                        'staff', None))
-
-        # A user does not have instructor access if they are
-        # not in the instructor group
-        g.name = 'student_only'
-        self.assertFalse(access._has_access_to_location(u, location,
-                                                        'instructor', None))
+        self.assertFalse(access._has_access_to_location(self.student, self.course, 'staff', None))
+        self.assertFalse(access._has_access_to_location(self.student, self.course, 'instructor', None))
 
     def test__has_access_string(self):
         u = Mock(is_staff=True)
@@ -71,7 +63,7 @@ class AccessTestCase(TestCase):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         u = Mock()
         d = Mock()
-        d.start = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        d.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(u, d, 'load'))
@@ -79,8 +71,8 @@ class AccessTestCase(TestCase):
 
     def test__has_access_course_desc_can_enroll(self):
         u = Mock()
-        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)
-        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates

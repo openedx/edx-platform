@@ -14,15 +14,15 @@
     right: 2em;
   }
 
-	section.instructor-dashboard-content {
-		@extend .content;
+  section.instructor-dashboard-content {
+    @extend .content;
     padding: 40px;
     width: 100%;
 
     h1 {
       @extend .top-header;
     }
-	}
+  }
 
   // form fields
   .list-fields {
@@ -37,7 +37,16 @@
       &:last-child {
         margin-bottom: 0;
       }
+
+      .tip {
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint(rgb(127,127,127),50%);
+        @include font-size(12);
+      }
+
     }
+
   }
 
   // ====================

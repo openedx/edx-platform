@@ -1,7 +1,7 @@
 define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "jquery.inputnumber", "xmodule"],
-(Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection) ->
+        "js/utils/modal", "jquery.inputnumber", "xmodule"],
+(Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
     className: 'component'
@@ -37,6 +37,8 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
             collection: new MetadataCollection(models)
         })
 
+        @module.setMetadataEditor(@metadataEditor) if @module.setMetadataEditor
+
         # Need to update set "active" class on data editor if there is one.
         # If we are only showing settings, hide the data editor controls and update settings accordingly.
         if @hasDataEditor()
@@ -61,19 +63,21 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
     createItem: (parent, payload) ->
-      payload.parent_location = parent
-      $.post(
-          "/create_item"
+      payload.parent_locator = parent
+      $.postJSON(
+          @model.urlRoot
           payload
           (data) =>
-              @model.set(id: data.id)
+              @model.set(id: data.locator)
+              @model.set(old_id: data.id)
               @$el.data('id', data.id)
+              @$el.data('locator', data.locator)
               @render()
       )
 
     render: ->
-      if @model.id
-        @$el.load("/preview_component/#{@model.id}", =>
+      if @model.get('old_id')
+        @$el.load("/preview_component/#{@model.get('old_id')}", =>
           @loadDisplay()
           @delegateEvents()
         )
@@ -87,7 +91,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         id: _this.model.id
 
       data.metadata = _.extend(data.metadata || {}, @changedMetadata())
-      @hideModal()
+      ModalUtils.hideModalCover()
       saving = new NotificationView.Mini
         title: gettext('Saving&hellip;')
       saving.show()
@@ -102,17 +106,12 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       event.preventDefault()
       @$el.removeClass('editing')
       @$component_editor().slideUp(150)
-      @hideModal()
-
-    hideModal: ->
-      $modalCover = $(".modal-cover")
-      $modalCover.hide()
-      $modalCover.removeClass('is-fixed')
+      ModalUtils.hideModalCover()
 
     clickEditButton: (event) ->
       event.preventDefault()
       @$el.addClass('editing')
-      $(".modal-cover").show().addClass('is-fixed')
+      ModalUtils.showModalCover(true)
       @$component_editor().slideDown(150)
       @loadEdit()
 

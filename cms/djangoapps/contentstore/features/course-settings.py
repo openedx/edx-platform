@@ -179,7 +179,9 @@ def verify_date_or_time(css, date_or_time):
     """
     Verifies date or time field.
     """
-    assert_equal(date_or_time, world.css_value(css))
+    # We need to wait for JavaScript to fill in the field, so we use
+    # css_has_value(), which first checks that the field is not blank
+    assert_true(world.css_has_value(css, date_or_time))
 
 
 @step('I do not see the changes')

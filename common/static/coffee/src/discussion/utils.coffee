@@ -26,7 +26,7 @@ class @DiscussionUtil
     @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
-    staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
+    staff = _.union(@roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @isTA: (user_id) ->
@@ -87,6 +87,32 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status"
     }[name]
 
+  @discussionAlert: (header, body) ->
+    if $("#discussion-alert").length == 0
+      alertDiv = $("<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'/>").css("display", "none")
+      alertDiv.html(
+        "<div class='inner-wrapper discussion-alert-wrapper'>" +
+        "  <button class='close-modal dismiss' aria-hidden='true'>&#10005;</button>" +
+        "  <header><h2/><hr/></header>" +
+        "  <p id='discussion-alert-message'/>" +
+        "  <hr/>" +
+        "  <button class='dismiss'>OK</button>" +
+        "</div>"
+      )
+      # Capture focus
+      alertDiv.find("button").keydown(
+        (event) ->
+          if event.which == 9 # Tab
+            event.preventDefault()
+      )
+      alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css("display", "none")
+      alertTrigger.leanModal({closeButton: "#discussion-alert .dismiss", overlay: 1, top: 200})
+      $("body").append(alertDiv).append(alertTrigger)
+    $("#discussion-alert header h2").html(header)
+    $("#discussion-alert p").html(body)
+    $("#discussion-alert-trigger").click()
+    $("#discussion-alert button").focus()
+
   @safeAjax: (params) ->
     $elem = params.$elem
     if $elem and $elem.attr("disabled")
@@ -100,6 +126,13 @@ class @DiscussionUtil
           params["loadingCallback"].apply(params["$loading"])
         else
           params["$loading"].loading()
+    if !params["error"]
+      params["error"] = =>
+        @discussionAlert(
+          "Sorry",
+          "We had some trouble processing your request. Please ensure you" +
+          " have copied any unsaved work and then reload the page."
+        )
     request = $.ajax(params).always ->
       if $elem
         $elem.removeAttr("disabled")
@@ -109,24 +142,6 @@ class @DiscussionUtil
         else
           params["$loading"].loaded()
     return request
-
-  @get: ($elem, url, data, success) ->
-    @safeAjax
-      $elem: $elem
-      url: url
-      type: "GET"
-      dataType: "json"
-      data: data
-      success: success
-
-  @post: ($elem, url, data, success) ->
-    @safeAjax
-      $elem: $elem
-      url: url
-      type: "POST"
-      dataType: "json"
-      data: data
-      success: success
 
   @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
@@ -201,38 +216,6 @@ class @DiscussionUtil
   @setWmdContent: ($content, $local, cls_identifier, text) ->
     @getWmdInput($content, $local, cls_identifier).val(text)
     @getWmdEditor($content, $local, cls_identifier).refreshPreview()
-
-  @subscriptionLink: (type, id) ->
-    followLink = ->
-      @generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
-
-    unfollowLink = ->
-      @generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
-
-    handleFollow = (elem) ->
-      @safeAjax
-        $elem: $(elem)
-        url: @urlFor("follow_#{type}", id)
-        type: "POST"
-        success: (response, textStatus) ->
-          if textStatus == "success"
-            $(elem).replaceWith unfollowLink()
-        dataType: 'json'
-
-    handleUnfollow = (elem) ->
-      @safeAjax
-        $elem: $(elem)
-        url: @urlFor("unfollow_#{type}", id)
-        type: "POST"
-        success: (response, textStatus) ->
-          if textStatus == "success"
-            $(elem).replaceWith followLink()
-        dataType: 'json'
-
-    if @isSubscribed(id, type)
-        unfollowLink()
-    else
-      followLink()
 
   @processEachMathAndCode: (text, processor) ->
 

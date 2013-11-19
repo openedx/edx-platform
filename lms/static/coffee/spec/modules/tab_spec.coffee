@@ -1,7 +1,7 @@
 describe 'Tab', ->
   beforeEach ->
-    loadFixtures 'tab.html'
-    @items = $.parseJSON readFixtures('items.json')
+    loadFixtures 'coffee/fixtures/tab.html'
+    @items = $.parseJSON readFixtures('coffee/fixtures/items.json')
 
   describe 'constructor', ->
     beforeEach ->

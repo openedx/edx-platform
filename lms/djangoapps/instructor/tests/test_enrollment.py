@@ -4,7 +4,6 @@ Unit tests for instructor.enrollment methods.
 
 import json
 from abc import ABCMeta
-from django.contrib.auth.models import User
 from courseware.models import StudentModule
 from django.test import TestCase
 from student.tests.factories import UserFactory

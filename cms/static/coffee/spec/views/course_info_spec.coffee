@@ -34,6 +34,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             @xhrRestore = courseUpdatesXhr.restore
 
             @collection = new CourseUpdateCollection()
+            @collection.url = 'course_info_update/'
             @courseInfoEdit = new CourseInfoUpdateView({
                 el: $('.course-updates'),
                 collection: @collection,
@@ -54,17 +55,14 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @courseInfoEdit.$el.find('.save-button').click()
 
             @cancelNewCourseInfo = (useCancelButton) ->
-                spyOn(@courseInfoEdit.$modalCover, 'show').andCallThrough()
-                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
-
                 @courseInfoEdit.onNew(@event)
-                expect(@courseInfoEdit.$modalCover.show).toHaveBeenCalled()
+                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
 
                 spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
                 model = @collection.at(0)
                 spyOn(model, "save").andCallThrough()
 
-                cancelEditingUpdate(useCancelButton)
+                cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
 
                 expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
                 expect(model.save).not.toHaveBeenCalled()
@@ -73,28 +71,25 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
             @cancelExistingCourseInfo = (useCancelButton) ->
                 @createNewUpdate('existing update')
-
-                spyOn(@courseInfoEdit.$modalCover, 'show').andCallThrough()
-                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
                 @courseInfoEdit.$el.find('.edit-button').click()
-                expect(@courseInfoEdit.$modalCover.show).toHaveBeenCalled()
+                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
 
                 spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('modification')
                 model = @collection.at(0)
                 spyOn(model, "save").andCallThrough()
-
-                cancelEditingUpdate(useCancelButton)
+                model.id = "saved_to_server"
+                cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
 
                 expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
                 expect(model.save).not.toHaveBeenCalled()
                 previewContents = @courseInfoEdit.$el.find('.update-contents').html()
                 expect(previewContents).toEqual('existing update')
 
-            cancelEditingUpdate = (update, useCancelButton) ->
+            cancelEditingUpdate = (update, modalCover, useCancelButton) ->
                 if useCancelButton
                     update.$el.find('.cancel-button').click()
                 else
-                    $('.modal-cover').click()
+                    modalCover.click()
 
         afterEach ->
             @xhrRestore()

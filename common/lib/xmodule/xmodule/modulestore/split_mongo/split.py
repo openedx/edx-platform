@@ -13,7 +13,7 @@ from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
-from xmodule.modulestore import inheritance, ModuleStoreBase, Location
+from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 #==============================================================================
 
 
-class SplitMongoModuleStore(ModuleStoreBase):
+class SplitMongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
@@ -420,6 +420,24 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 if locator.usage_id == child_id:
                     items.append(BlockUsageLocator(url=locator.as_course_locator(), usage_id=parent_id))
         return items
+
+    def get_orphans(self, course_id, detached_categories, branch):
+        """
+        Return a dict of all of the orphans in the course.
+
+        :param course_id:
+        """
+        course = self._lookup_course(CourseLocator(course_id=course_id, branch=branch))
+        items = set(course['structure']['blocks'].keys())
+        items.remove(course['structure']['root'])
+        for block_id, block_data in course['structure']['blocks'].iteritems():
+            items.difference_update(block_data.get('fields', {}).get('children', []))
+            if block_data['category'] in detached_categories:
+                items.discard(block_id)
+        return [
+            BlockUsageLocator(course_id=course_id, branch=branch, usage_id=block_id)
+            for block_id in items
+        ]
 
     def get_course_index_info(self, course_locator):
         """
@@ -1437,3 +1455,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if 'category' in fields:
             del fields['category']
         return fields
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
+        """
+        return SPLIT_MONGO_MODULESTORE_TYPE

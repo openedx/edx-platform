@@ -1,4 +1,6 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! 
+    from django.utils.translation import ugettext as _
+%>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -17,16 +19,16 @@
 
 <%block name="jsextra">
   <script type="text/javascript" charset="utf-8">
+  
 require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
   function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
     var course_updates = new CourseUpdateCollection();
-    course_updates.urlbase = '${url_base}';
+    course_updates.url = '${updates_url}';
     course_updates.fetch({reset: true});
 
     var course_handouts = new ModuleInfoModel({
-        id: '${handouts_location}'
+        id: '${handouts_locator}'
       });
-    course_handouts.urlbase = '${url_base}';
 
     var editor = new CourseInfoEditView({
       el: $('.main-wrapper'),
@@ -77,7 +79,7 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
             <ol class="update-list" id="course-update-list"></ol>
           </article>
         </div>
-        <div class="sidebar window course-handouts" id="course-handouts-view"></div>
+        <div class="sidebar course-handouts" id="course-handouts-view"></div>
       </div>
     </div>
   </div>
