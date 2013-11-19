@@ -9,7 +9,6 @@ import os
 import subprocess
 import time
 import StringIO
-
 from datetime import datetime
 
 from django.conf import settings
@@ -18,7 +17,6 @@ from django.utils.translation import ugettext as _
 from student.models import CourseEnrollment, UserProfile, Registration
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
-
 from django.contrib.auth import authenticate
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
@@ -31,13 +29,12 @@ from django.utils.html import escape
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.generic.base import TemplateView
-
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.store_utilities import delete_course
-from courseware.access import has_access, get_access_group_name
+from courseware.roles import CourseStaffRole, CourseInstructorRole
 from courseware.courses import get_course_by_id
 
 import mongoengine
@@ -95,7 +92,7 @@ class SysadminDashboardView(TemplateView):
                             quoting=csv.QUOTE_ALL)
 
         writer.writerow(header)
-        
+
         # Setup streaming of the data
         def read_and_flush():
             """Read and clear buffer for optimization"""
@@ -554,17 +551,6 @@ class Staffing(SysadminDashboardView):
     courses that include an option to download the data as a csv.
     """
 
-    def get_group(self, course, groupname):
-        """Gets the course group"""
-
-        grpname = get_access_group_name(course, groupname)
-        try:
-            group = Group.objects.get(name=grpname)
-        except Group.DoesNotExist:
-            group = Group(name=grpname)  # create the group
-            group.save()
-        return group
-
     def get(self, request):
         """Displays course Enrollment and staffing course statistics"""
 
@@ -582,9 +568,9 @@ class Staffing(SysadminDashboardView):
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
-            datum += [self.get_group(course, 'staff').user_set.all().count()]
-            datum += [','.join([x.username for x in self.get_group(course,
-                      'instructor').user_set.all()])]
+            datum += [CourseStaffRole(course.location).users_with_role().count()]
+            datum += [','.join([x.username for x in CourseInstructorRole(
+                course.location).users_with_role()])]
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
@@ -610,7 +596,7 @@ class Staffing(SysadminDashboardView):
 
         if action == 'get_staff_csv':
             data = []
-            roles = ['instructor', 'staff']
+            roles = [CourseInstructorRole, CourseStaffRole, ]
 
             courses = self.get_courses()
             if hasattr(courses, 'items'):
@@ -619,7 +605,7 @@ class Staffing(SysadminDashboardView):
                 course_iter = courses
             for (cdir, course) in course_iter:
                 for role in roles:
-                    for user in self.get_group(course, role).user_set.all():
+                    for user in role(course.location).users_with_role():
                         datum = [course.id, role, user.username, user.email,
                                  user.profile.name]
                         data.append(datum)
@@ -689,8 +675,8 @@ class GitLogs(TemplateView):
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
-                    has_access(request.user, course, 'instructor') or
-                    has_access(request.user, course, 'staff')):
+                    CourseInstructorRole(course.location).has_user(request.user) or
+                    CourseStaffRole(course.location).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
             cilset = CourseImportLog.objects.filter(
