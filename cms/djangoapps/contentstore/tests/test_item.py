@@ -22,9 +22,9 @@ class ItemTest(CourseTestCase):
 
     def get_old_id(self, locator):
         """
-        Converts new locator to old id format.
+        Converts new locator to old id format (forcing to non-draft).
         """
-        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator))
+        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).replace(revision=None)
 
     def get_item_from_modulestore(self, locator, draft=False):
         """
@@ -197,7 +197,10 @@ class TestEditItem(ItemTest):
         self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
 
-    def test_children(self):
+    def test_delete_child(self):
+        """
+        Test deleting a child.
+        """
         # Create 2 children of main course.
         resp_1 = self.create_xblock(display_name='child 1', category='chapter')
         resp_2 = self.create_xblock(display_name='child 2', category='chapter')
@@ -219,3 +222,32 @@ class TestEditItem(ItemTest):
         course = self.get_item_from_modulestore(self.unicode_locator)
         self.assertNotIn(self.get_old_id(chapter1_locator).url(), course.children)
         self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
+
+    def test_reorder_children(self):
+        """
+        Test reordering children that can be in the draft store.
+        """
+        # Create 2 child units and re-order them. There was a bug about @draft getting added
+        # to the IDs.
+        unit_1_resp = self.create_xblock(parent_locator=self.seq_locator, category='vertical')
+        unit_2_resp = self.create_xblock(parent_locator=self.seq_locator, category='vertical')
+        unit1_locator = self.response_locator(unit_1_resp)
+        unit2_locator = self.response_locator(unit_2_resp)
+
+        # The sequential already has a child defined in the setUp (a problem).
+        # Children must be on the sequential to reproduce the original bug,
+        # as it is important that the parent (sequential) NOT be in the draft store.
+        children = self.get_item_from_modulestore(self.seq_locator).children
+        self.assertEqual(self.get_old_id(unit1_locator).url(), children[1])
+        self.assertEqual(self.get_old_id(unit2_locator).url(), children[2])
+
+        resp = self.client.ajax_post(
+            self.seq_update_url,
+            data={'children': [self.problem_locator, unit2_locator, unit1_locator]}
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        children = self.get_item_from_modulestore(self.seq_locator).children
+        self.assertEqual(self.get_old_id(self.problem_locator).url(), children[0])
+        self.assertEqual(self.get_old_id(unit1_locator).url(), children[2])
+        self.assertEqual(self.get_old_id(unit2_locator).url(), children[1])
