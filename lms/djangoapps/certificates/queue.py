@@ -10,6 +10,7 @@ from capa.xqueue_interface import make_xheader, make_hashkey
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
 from student.models import UserProfile, CourseEnrollment
+from verify_student.models import SoftwareSecurePhotoVerification
 
 import json
 import random
@@ -174,7 +175,7 @@ class XQueueCertInterface(object):
             grade = grades.grade(student, self.request, course)
             is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
-            enrollment = CourseEnrollment.objects.get(user=student)
+            enrollment = CourseEnrollment.objects.get(user=student, course_id=course_id)
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
             if enrollment.mode == CertificateModes.verified:
