@@ -247,7 +247,7 @@ which is stored in MongoDB
 
 ##### Get list of courses
 
-**Request: HTTPS GET /edx-mobile-api/courseware/v1**
+**Request: HTTPS GET /edx-api/courseware/v1**
 
 Note: Requires authentication token passed in the headers as
 indicated above
@@ -281,9 +281,9 @@ application/json
 This method will return all non-leaf nodes in a course tree,
 e.g. Course, Chapters, Sections, Subsections.
 
-**Request: HTTPS GET /edx-mobile-api/courseware/v1/<course.id>**
+**Request: HTTPS GET /edx-pi/courseware/v1/<course.id>**
 
-example: /edx-mobile-api/courseware/v1/foo.bar.2013_Spring
+example: /edx-api/courseware/v1/foo.bar.2013_Spring
 
 Note: Requires authentication token passed in the headers as
 indicated above
@@ -328,9 +328,9 @@ HTTP Status code 403
 
 This method will return all videos within a course
 
-**Request: HTTPS GET /edx-mobile-api/courseware/v1/<course.id>?type=video**
+**Request: HTTPS GET /edx-api/courseware/v1/<course.id>?type=video**
 
-example: example: /edx-mobile-api/courseware/v1/foo.bar.2013_Spring?type=video
+example: example: /edx-api/courseware/v1/foo.bar.2013_Spring?type=video
 
 Note: Requires authentication token passed in the headers
 as indicated above
