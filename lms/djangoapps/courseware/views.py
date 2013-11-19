@@ -14,7 +14,6 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
@@ -678,17 +677,6 @@ def mktg_course_about(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def progress(request, course_id, student_id=None):
     """
-    Wraps "_progress" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    """
-    with transaction.commit_on_success():
-        return _progress(request, course_id, student_id)
-
-
-def _progress(request, course_id, student_id):
-    """
-    Unwrapped version of "progress".
-
     User progress. We show the grade bar and every problem score.
 
     Course staff are allowed to see the progress of students in their class.
@@ -728,10 +716,7 @@ def _progress(request, course_id, student_id):
         'student': student,
     }
 
-    with transaction.commit_on_success():
-        response = render_to_response('courseware/progress.html', context)
-
-    return response
+    return render_to_response('courseware/progress.html', context)
 
 
 @login_required

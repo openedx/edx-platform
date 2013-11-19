@@ -125,17 +125,6 @@ def answer_distributions(request, course):
 
 def grade(student, request, course, keep_raw_scores=False):
     """
-    Wraps "_grade" with the commit_on_success context manager just in case
-    there are unanticipated errors.
-    """
-    with transaction.commit_on_success():
-        return _grade(student, request, course, keep_raw_scores)
-
-
-def _grade(student, request, course, keep_raw_scores):
-    """
-    Unwrapped version of "grade"
-
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
@@ -265,22 +254,11 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, request, course):
-    """
-    Wraps "_progress_summary" with the commit_on_success context manager just
-    in case there are unanticipated errors.
-    """
-    with transaction.commit_on_success():
-        return _progress_summary(student, request, course)
-
-
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def _progress_summary(student, request, course):
+def progress_summary(student, request, course):
     """
-    Unwrapped version of "progress_summary".
-
     This pulls a summary of all problems in the course.
 
     Returns
