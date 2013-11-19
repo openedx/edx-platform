@@ -86,7 +86,11 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
-# STATIC_URL specifies the url to use for static files
+# STATIC_URL_BASE specifies the base url to use for static files
+STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
+if STATIC_URL_BASE:
+    STATIC_URL = STATIC_URL_BASE + git.revision + "/"
+
 STATIC_URL = ENV_TOKENS.get('STATIC_URL', STATIC_URL)
 # GITHUB_REPO_ROOT is the base directory
 # for course data
