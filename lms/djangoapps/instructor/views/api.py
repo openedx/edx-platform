@@ -778,10 +778,12 @@ def calculate_grades_csv(request, course_id):
     """
     try:
         instructor_task.api.submit_calculate_grades_csv(request, course_id)
-        return JsonResponse({"status" : "Grade calculation started"})
+        success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
     except AlreadyRunningError:
+        already_running_status = _("A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
         return JsonResponse({
-            "status" : "Grade calculation already running"
+            "status": already_running_status
         })
 
 
