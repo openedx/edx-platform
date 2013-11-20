@@ -664,7 +664,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                static_data=self.static_data,
                                                metadata=self.metadata,
                                                instance_state=instance_state)
-        self.test_system.xmodule_instance = module
         return combinedoe
 
     def ai_state_reset(self, task_state, task_number=None):
@@ -717,6 +716,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def test_state_pe_single(self):
         self.ai_state_success(TEST_STATE_PE_SINGLE, iscore=0, tasks=[self.task_xml2])
 
+
 class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
     Test the student flow in the combined open ended xmodule
@@ -764,7 +764,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         task_one_json = json.loads(self._module().task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 
-    @unittest.expectedFailure
     def test_open_ended_flow_reset(self):
         """
         Test the flow of the module if we complete the self assessment step and then reset
@@ -803,7 +802,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self._handle_ajax("reset", {})
         self.assertEqual(self._module().current_task_number, 0)
 
-    @unittest.expectedFailure
     def test_open_ended_flow_correct(self):
         """
         Test a two step problem where the student first goes through the self assessment step, and then the
@@ -915,7 +913,6 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
     def _module(self):
         return self.get_module_from_location(self.problem_location, COURSE)
 
-    @unittest.expectedFailure
     def test_reset_fail(self):
         """
        Test the flow of the module if we complete the self assessment step and then reset
