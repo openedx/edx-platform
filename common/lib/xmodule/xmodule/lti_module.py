@@ -562,8 +562,14 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         import ipdb; ipdb.set_trace()
         #verify oauth signing
         mock_request = mock.Mock()
+
+        try:
+            authorization_header = request.META['HTTP_AUTHORIZATION']
+        except KeyError:
+            return None, False
+
         headers = {
-            'Authorization':unicode(request.META['HTTP_AUTHORIZATION']),
+            'Authorization':unicode(authorization_header),
             'Content-Type': 'application/x-www-form-urlencoded',
         }
 
@@ -571,8 +577,6 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         sha1 = hashlib.sha1()
         sha1.update(request.body)
         oauth_body_hash = base64.b64encode(sha1.hexdigest())
-
-
 
         mock_request.params = signature.collect_parameters(
             #body = {u'oauth_body_hash': unicode(oauth_body_hash)},
@@ -582,13 +586,16 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         oauth_headers = {i[0]:i[1] for i in mock_request.params}
 
         #compare hash from request body and body hash from Authorization header
-        if oauth_body_hash != oauth_headers.get('oauth_body_hash')
+        if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
             return None, False
 
         mock_request.uri = request.META['HTTP_HOST'] + request.META['PATH_INFO']
         mock_request.http_method = unicode(request.META['REQUEST_METHOD'])
 
-        client_signature = re.search(r'(?<=oauth_signature=")[^"]*', request.META['HTTP_AUTHORIZATION']).group(0)
+        oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
+        oauth_headers = {i[0]:i[1] for i in oauth_params}
+        client_signature = oauth_headers.get('oauth_signature')
+
         mock_request.signature = unicode(client_signature)
         result = signature.verify_hmac_sha1(mock_request, client_secret)
 
