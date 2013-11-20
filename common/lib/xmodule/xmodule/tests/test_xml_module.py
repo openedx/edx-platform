@@ -26,7 +26,6 @@ class CrazyJsonString(String):
     def to_json(self, value):
         return value + " JSON"
 
-
 class TestFields(object):
     # Will be returned by editable_metadata_fields.
     max_attempts = Integer(scope=Scope.settings, default=1000, values={'min': 1, 'max': 10})

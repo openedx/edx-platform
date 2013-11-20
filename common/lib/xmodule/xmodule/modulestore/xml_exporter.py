@@ -10,6 +10,9 @@ from json import dumps
 import json
 import datetime
 
+#from django.utils.functional import Promise
+#from django.utils.encoding import force_unicode
+
 
 class EdxJSONEncoder(json.JSONEncoder):
     """
@@ -19,6 +22,8 @@ class EdxJSONEncoder(json.JSONEncoder):
     ISO date strings
     """
     def default(self, obj):
+       # if isinstance(obj, Promise):
+       #     return force_unicode(obj)
         if isinstance(obj, Location):
             return obj.url()
         elif isinstance(obj, datetime.datetime):

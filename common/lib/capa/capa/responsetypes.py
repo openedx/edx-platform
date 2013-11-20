@@ -44,6 +44,7 @@ import capa.safe_exec as safe_exec
 
 log = logging.getLogger(__name__)
 
+from django.utils.translation import ugettext as _
 
 CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
 CORRECTMAP_PY = None
@@ -52,8 +53,6 @@ CORRECTMAP_PY = None
 #-----------------------------------------------------------------------------
 # Exceptions
 
-def _(s):
-    return s
 
 class LoncapaProblemError(Exception):
     '''
@@ -1437,7 +1436,7 @@ class CodeResponse(LoncapaResponse):
         if self.system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Error checking problem: no external queueing server is configured.')
+                     msg=_('Error checking problem: no external queueing server is configured.'))
             return cmap
 
         # Prepare xqueue request
@@ -1497,8 +1496,8 @@ class CodeResponse(LoncapaResponse):
         cmap = CorrectMap()
         if error:
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Unable to deliver your submission to grader. (Reason: %s.)'
-                         ' Please try again later.' % msg)
+                     msg=_('Unable to deliver your submission to grader. (Reason: {msg}.)'
+                         ' Please try again later.').format(msg = msg))
         else:
             # Queueing mechanism flags:
             #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
@@ -1517,7 +1516,7 @@ class CodeResponse(LoncapaResponse):
          msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
-                        msg='Invalid grader reply. Please contact the course staff.')
+                        msg=_('Invalid grader reply. Please contact the course staff.'))
             return oldcmap
 
         correctness = 'correct' if correct else 'incorrect'
@@ -1830,7 +1829,7 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    "Invalid input: " + err.message + " not permitted in answer"
+                    _("Invalid input: {msg} not permitted in answer").format(msg = err.message)
                 )
             except ValueError as err:
                 if 'factorial' in err.message:
@@ -1845,19 +1844,19 @@ class FormulaResponse(LoncapaResponse):
                         cgi.escape(answer)
                     )
                     raise StudentInputError(
-                        ("factorial function not permitted in answer "
+                        _("factorial function not permitted in answer "
                          "for this problem. Provided answer was: "
                          "{0}").format(cgi.escape(answer))
                     )
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error %s in formula', err)
-                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(answer))
+                raise StudentInputError(_("Invalid input: Could not parse '{answer}' as a formula").format(
+                                        answer = cgi.escape(answer)))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula', err)
-                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(answer))
+                raise StudentInputError(_("Invalid input: Could not parse '{answer}' as a formula").format(
+                                        answer = cgi.escape(answer)))
         return out
 
     def randomize_variables(self, samples):
@@ -2562,7 +2561,7 @@ class ChoiceTextResponse(LoncapaResponse):
                     "'{0}' is not a valid complex number".format(correct_ans)
                 )
                 raise StudentInputError(
-                    "The Staff answer could not be interpreted as a number."
+                    _("The Staff answer could not be interpreted as a number.")
                 )
             # Compare the student answer to the staff answer/ or to 0
             # if all that is important is verifying numericality
@@ -2578,10 +2577,9 @@ class ChoiceTextResponse(LoncapaResponse):
                 _, _, trace = sys.exc_info()
 
                 raise StudentInputError(
-                    "Could not interpret '{0}' as a number{1}".format(
-                        cgi.escape(answer_value),
-                        trace
-                    )
+                        _("Could not interpret '{answer}' as a number{number}").format(
+                          answer = cgi.escape(answer_value),
+                          number = trace)
                 )
             # Ignore the results of the comparisons which were just for
             # Numerical Validation.

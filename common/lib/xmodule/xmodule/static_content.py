@@ -15,6 +15,7 @@ from path import path
 
 from xmodule.x_module import XModuleDescriptor
 
+from django.conf import settings
 
 LOG = logging.getLogger(__name__)
 
@@ -183,6 +184,9 @@ def main():
     Generate
     Usage: static_content.py <output_root>
     """
+
+    settings.configure(USE_I18N = True)
+
     args = docopt(main.__doc__)
     root = path(args['<output_root>'])
 
