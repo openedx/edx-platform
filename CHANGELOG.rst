@@ -5,6 +5,11 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Trap focus on the loading element when a user loads more threads
+in the forum sidebar to improve accessibility.
+
+LMS: Add error recovery when a user loads more threads in the forum sidebar.
+
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 
 Blades: Add template for checkboxes response to studio. BLD-193.
