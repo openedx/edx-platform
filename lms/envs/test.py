@@ -247,13 +247,6 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
-###################### Grade Downloads ######################
-GRADES_DOWNLOAD = {
-    'STORAGE_TYPE' : 'localfs',
-    'BUCKET' : 'edx-grades',
-    'ROOT_PATH' : '/tmp/edx-s3/grades',
-}
-
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:

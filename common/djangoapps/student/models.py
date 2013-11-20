@@ -769,7 +769,7 @@ class CourseEnrollment(models.Model):
             activation_changed = True
 
         mode_changed = False
-        # if mode is None, the call to update_enrollment didn't specify a new 
+        # if mode is None, the call to update_enrollment didn't specify a new
         # mode, so leave as-is
         if self.mode != mode and mode is not None:
             self.mode = mode
@@ -966,6 +966,14 @@ class CourseEnrollment(models.Model):
     @classmethod
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
+
+    @classmethod
+    def users_enrolled_in(cls, course_id):
+        """Return a queryset of User for every user enrolled in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
 
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""

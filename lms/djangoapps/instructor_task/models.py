@@ -211,7 +211,15 @@ class GradesStore(object):
 
 class S3GradesStore(GradesStore):
     """
+    Grades store backed by S3. The directory structure we use to store things
+    is::
 
+        `{bucket}/{root_path}/{sha1 hash of course_id}/filename`
+
+    We might later use subdirectories or metadata to do more intelligent
+    grouping and querying, but right now it simply depends on its own
+    conventions on where files are stored to know what to display. Clients using
+    this class can name the final file whatever they want.
     """
     def __init__(self, bucket_name, root_path):
         self.root_path = root_path
@@ -224,13 +232,26 @@ class S3GradesStore(GradesStore):
 
     @classmethod
     def from_config(cls):
+        """
+        The expected configuration for an `S3GradesStore` is to have a
+        `GRADES_DOWNLOAD` dict in settings with the following fields::
+
+            STORAGE_TYPE : "s3"
+            BUCKET : Your bucket name, e.g. "grades-bucket"
+            ROOT_PATH : The path you want to store all course files under. Do not
+                        use a leading or trailing slash. e.g. "staging" or
+                        "staging/2013", not "/staging", or "/staging/"
+
+        Since S3 access relies on boto, you must also define `AWS_ACCESS_KEY_ID`
+        and `AWS_SECRET_ACCESS_KEY` in settings.
+        """
         return cls(
             settings.GRADES_DOWNLOAD['BUCKET'],
             settings.GRADES_DOWNLOAD['ROOT_PATH']
         )
 
     def key_for(self, course_id, filename):
-        """Return the key we would use to store and retrive the data for the
+        """Return the S3 key we would use to store and retrive the data for the
         given filename."""
         hashed_course_id = hashlib.sha1(course_id)
 
@@ -244,6 +265,16 @@ class S3GradesStore(GradesStore):
         return key
 
     def store(self, course_id, filename, buff):
+        """
+        Store the contents of `buff` in a directory determined by hashing
+        `course_id`, and name the file `filename`. `buff` is typically a
+        `StringIO`, but can be anything that implements `.getvalue()`.
+
+        This method assumes that the contents of `buff` are gzip-encoded (it
+        will add the appropriate headers to S3 to make the decompression
+        transparent via the browser). Filenames should end in whatever
+        suffix makes sense for the original file, so `.txt` instead of `.gz`
+        """
         key = self.key_for(course_id, filename)
 
         data = buff.getvalue()
@@ -251,19 +282,26 @@ class S3GradesStore(GradesStore):
         key.content_encoding = "gzip"
         key.content_type = "text/csv"
 
+        # Just setting the content encoding and type above should work
+        # according to the docs, but when experimenting, this was necessary for
+        # it to actually take.
         key.set_contents_from_string(
             data,
             headers={
-                "Content-Encoding" : "gzip",
-                "Content-Length" : len(data),
-                "Content-Type" : "text/csv",
+                "Content-Encoding": "gzip",
+                "Content-Length": len(data),
+                "Content-Type": "text/csv",
             }
         )
 
     def store_rows(self, course_id, filename, rows):
         """
-        Given a course_id, filename, and rows (each row is an iterable of strings),
-        write this data out.
+        Given a `course_id`, `filename`, and `rows` (each row is an iterable of
+        strings), create a buffer that is a gzip'd csv file, and then `store()`
+        that buffer.
+
+        Even though we store it in gzip format, browsers will transparently
+        download and decompress it. Filenames should end in `.csv`, not `.gz`.
         """
         output_buffer = StringIO()
         gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
@@ -291,7 +329,11 @@ class LocalFSGradesStore(GradesStore):
     """
     LocalFS implementation of a GradesStore. This is meant for debugging
     purposes and is *absolutely not for production use*. Use S3GradesStore for
-    that.
+    that. We use this in tests and for local development. When it generates
+    links, it will make file:/// style links. That means you actually have to
+    copy them and open them in a separate browser window, for security reasons.
+    This lets us do the cheap thing locally for debugging without having to open
+    up a separate URL that would only be used to send files in dev.
     """
     def __init__(self, root_path):
         """
@@ -309,7 +351,10 @@ class LocalFSGradesStore(GradesStore):
         that there is a dict in settings named GRADES_DOWNLOAD and that it has
         a ROOT_PATH that maps to an absolute file path that the web app has
         write permissions to. `LocalFSGradesStore` will create any intermediate
-        directories as needed.
+        directories as needed. Example::
+
+            STORAGE_TYPE : "localfs"
+            ROOT_PATH : /tmp/edx/grade-downloads/
         """
         return cls(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
@@ -344,7 +389,10 @@ class LocalFSGradesStore(GradesStore):
     def links_for(self, course_id):
         """
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
-        can be plugged straight into an href
+        can be plugged straight into an href. Note that `LocalFSGradesStore`
+        will generate `file://` type URLs, so you'll need to copy the URL and
+        open it in a new browser window. Again, this class is only meant for
+        local development.
         """
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):

@@ -195,10 +195,10 @@ MITX_FEATURES = {
 
     # Grade calculation started from the new instructor dashboard will write
     # grades CSV files to S3 and give links for downloads.
-    'ENABLE_S3_GRADE_DOWNLOADS' : True,
+    'ENABLE_S3_GRADE_DOWNLOADS': True,
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
-    'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS' : False,
+    'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 }
 
 # Used for A/B testing
@@ -1071,11 +1071,11 @@ REGISTRATION_OPTIONAL_FIELDS = set([
     'goals',
 ])
 
-# Grades download
+###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = {
-    'STORAGE_TYPE' : 'localfs',
-    'BUCKET' : 'edx-grades',
-    'ROOT_PATH' : '/tmp/edx-s3/grades',
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': '/tmp/edx-s3/grades',
 }

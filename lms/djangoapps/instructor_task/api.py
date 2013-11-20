@@ -208,6 +208,7 @@ def submit_bulk_course_email(request, course_id, email_id):
     task_key = hashlib.md5(task_key_stub).hexdigest()
     return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
+
 def submit_calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
