@@ -251,7 +251,6 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         sha1 = hashlib.sha1()
         sha1.update(body)
         oauth_body_hash = base64.b64encode(sha1.hexdigest())
-
         __, headers, __ = client.sign(
             unicode(url.strip()),
             http_method=u'POST',

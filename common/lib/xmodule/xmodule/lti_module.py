@@ -559,7 +559,7 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
                 </imsx_POXEnvelopeRequest>
         \""")
         """
-        import ipdb; ipdb.set_trace()
+
         #verify oauth signing
         mock_request = mock.Mock()
 
@@ -578,10 +578,7 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         sha1.update(request.body)
         oauth_body_hash = base64.b64encode(sha1.hexdigest())
 
-        mock_request.params = signature.collect_parameters(
-            #body = {u'oauth_body_hash': unicode(oauth_body_hash)},
-            headers=headers
-        )
+        mock_request.params = signature.collect_parameters(headers=headers)
 
         oauth_headers = {i[0]:i[1] for i in mock_request.params}
 
@@ -589,34 +586,35 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
             return None, False
 
-        mock_request.uri = request.META['HTTP_HOST'] + request.META['PATH_INFO']
-        mock_request.http_method = unicode(request.META['REQUEST_METHOD'])
+        mock_request.uri = unicode(request.build_absolute_uri())
+        mock_request.http_method = unicode(request.method)
 
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
         oauth_headers = {i[0]:i[1] for i in oauth_params}
         client_signature = oauth_headers.get('oauth_signature')
-
         mock_request.signature = unicode(client_signature)
-        result = signature.verify_hmac_sha1(mock_request, client_secret)
 
+        correct_request = signature.verify_hmac_sha1(mock_request, client_secret)
+        if correct_request:
+            data = request.body.strip().encode('utf-8')
+            parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+            try:  # get data from request
+                root = etree.fromstring(data, parser=parser)
+                if root.nsmap:
+                    namespaces = {'def': root.nsmap.values()[0]}
+                    imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+                    sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
+                    score = root.xpath("//def:textString", namespaces=namespaces)[0].text
+                else:
+                    imsx_messageIdentifier = root.xpath("//imsx_messageIdentifier")[0].text
+                    sourcedId = root.xpath("//sourcedId")[0].text
+                    score = root.xpath("//textString")[0].text
+            except:
+                # return response_xml_template.format(**unsupported_values), "application/xml"
+                return None, False
 
-        data = request.body.strip().encode('utf-8')
-        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-        try:  # get data from request
-            root = etree.fromstring(data, parser=parser)
-            if root.nsmap:
-                namespaces = {'def': root.nsmap.values()[0]}
-                imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
-                sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
-                score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-            else:
-                imsx_messageIdentifier = root.xpath("//imsx_messageIdentifier")[0].text
-                sourcedId = root.xpath("//sourcedId")[0].text
-                score = root.xpath("//textString")[0].text
-        except:
-            # return response_xml_template.format(**unsupported_values), "application/xml"
+            anonymous_user_id  = sourcedId.split('::')[-1]
+            return anonymous_user_id, True
+        else:
             return None, False
-
-        anonymous_user_id  = sourcedId.split('::')[-1]
-        return anonymous_user_id, True
 
