@@ -8,13 +8,12 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.core.handlers.base import BaseHandler
 from django.test.client import RequestFactory
 
 from dogapi import dog_stats_api
 
 from courseware import courses
-from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from courseware.model_data import FieldDataCache
 from xblock.fields import Scope
 from xmodule import graders
 from xmodule.capa_module import CapaModule
@@ -431,6 +430,7 @@ def manual_transaction():
     else:
         transaction.commit()
 
+
 def iterate_grades_for(course_id, students):
     """Given a course_id and an iterable of students (User), yield a tuple of:
 
@@ -447,7 +447,7 @@ def iterate_grades_for(course_id, students):
         up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
         make up the final grade. (For display)
-    - raw_scores contains scores for every graded module
+    - raw_scores: contains scores for every graded module
     """
     course = courses.get_course_by_id(course_id)
 
@@ -460,11 +460,16 @@ def iterate_grades_for(course_id, students):
         with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=['action:{}'.format(course_id)]):
             try:
                 request.user = student
+                # Grading calls problem rendering, which calls masquerading,
+                # which checks session vars -- thus the empty session dict below.
+                # It's not pretty, but untangling that is currently beyond the
+                # scope of this feature.
+                request.session = {}
                 gradeset = grade(student, request, course)
                 yield student, gradeset, ""
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-except
                 # Keep marching on even if this student couldn't be graded for
-                # some reason.
+                # some reason, but log it for future reference.
                 log.exception(
                     'Cannot grade student %s (%s) in course %s because of exception: %s',
                     student.username,

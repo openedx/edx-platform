@@ -761,7 +761,7 @@ def list_grade_downloads(_request, course_id):
     grades_store = GradesStore.from_config()
 
     response_payload = {
-        'downloads' : [
+        'downloads': [
             dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
             for name, url in grades_store.links_for(course_id)
         ]
