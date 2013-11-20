@@ -63,7 +63,6 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @$('.component').each (idx, element) =>
         model = new ModuleModel
             id: $(element).data('locator')
-            old_id: $(element).data('id')
         new ModuleEditView
           el: element,
           onDelete: @deleteComponent,

@@ -6,8 +6,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
     initialize: =>
       @$('.component').each((idx, element) =>
           model = new ModuleModel({
-              id: $(element).data('locator'),
-              old_id:$(element).data('id')
+              id: $(element).data('locator')
           })
 
           new ModuleEditView(

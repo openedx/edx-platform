@@ -3,7 +3,9 @@
 import logging
 from uuid import uuid4
 
+from functools import partial
 from static_replace import replace_static_urls
+from xmodule_modifiers import wrap_xblock
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -27,6 +29,8 @@ from xmodule.modulestore.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 from django.http import HttpResponseBadRequest
 from xblock.fields import Scope
+from preview import handler_prefix, get_preview_html
+from mitxmako.shortcuts import render_to_response, render_to_string
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
@@ -51,6 +55,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         all children and "all_versions" to delete from all (mongo) versions.
     GET
         json: returns representation of the xblock (locator id, data, and metadata).
+        html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
     PUT or POST
         json: if xblock location is specified, update the xblock instance. The json payload can contain
               these fields, all optional:
@@ -76,8 +81,27 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         old_location = loc_mapper().translate_locator_to_location(location)
 
         if request.method == 'GET':
-            rsp = _get_module_info(location)
-            return JsonResponse(rsp)
+            if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+                rsp = _get_module_info(location)
+                return JsonResponse(rsp)
+            else:
+                component = modulestore().get_item(old_location)
+                # Wrap the generated fragment in the xmodule_editor div so that the javascript
+                # can bind to it correctly
+                component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
+
+                try:
+                    content = component.render('studio_view').content
+                # catch exceptions indiscriminately, since after this point they escape the
+                # dungeon and surface as uneditable, unsaveable, and undeletable
+                # component-goblins.
+                except Exception as exc:                          # pylint: disable=W0703
+                    content = render_to_string('html_error.html', {'message': str(exc)})
+
+                return render_to_response('component.html', {
+                    'preview': get_preview_html(request, component),
+                    'editor': content
+                })
         elif request.method == 'DELETE':
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
