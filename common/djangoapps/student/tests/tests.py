@@ -152,38 +152,43 @@ class CourseEndingTest(TestCase):
                          {'status': 'processing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
-                          'show_survey_button': False, })
+                          'show_survey_button': False,
+                          })
 
         cert_status = {'status': 'unavailable'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'processing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
-                          'show_survey_button': False})
-
-        cert_status = {'status': 'generating', 'grade': '67'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'generating',
-                          'show_disabled_download_button': True,
-                          'show_download_url': False,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67'
+                          'show_survey_button': False,
+                          'mode': None
                           })
 
-        cert_status = {'status': 'regenerating', 'grade': '67'}
+        cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'generating',
                           'show_disabled_download_button': True,
                           'show_download_url': False,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
+                          })
+
+        cert_status = {'status': 'regenerating', 'grade': '67', 'mode': 'verified'}
+        self.assertEqual(_cert_info(user, course, cert_status),
+                         {'status': 'generating',
+                          'show_disabled_download_button': True,
+                          'show_download_url': False,
+                          'show_survey_button': True,
+                          'survey_url': survey_url,
+                          'grade': '67',
+                          'mode': 'verified'
                           })
 
         download_url = 'http://s3.edx/cert'
         cert_status = {'status': 'downloadable', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'ready',
                           'show_disabled_download_button': False,
@@ -191,30 +196,33 @@ class CourseEndingTest(TestCase):
                           'download_url': download_url,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
         cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'notpassing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
         # Test a course that doesn't have a survey specified
         course2 = Mock(end_of_course_survey_url=None)
         cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course2, cert_status),
                          {'status': 'notpassing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
                           'show_survey_button': False,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
 
