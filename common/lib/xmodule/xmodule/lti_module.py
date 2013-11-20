@@ -577,12 +577,13 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         mock_request.params = signature.collect_parameters(
             #body = {u'oauth_body_hash': unicode(oauth_body_hash)},
             headers=headers
-            )
+        )
+
+        oauth_headers = {i[0]:i[1] for i in mock_request.params}
+
         #compare hash from request body and body hash from Authorization header
-        if oauth_body_hash == mock_request.params[0][1]:
-            #bodies are identical
-        else:
-            #bodies are different
+        if oauth_body_hash != oauth_headers.get('oauth_body_hash')
+            return None, False
 
         mock_request.uri = request.META['HTTP_HOST'] + request.META['PATH_INFO']
         mock_request.http_method = unicode(request.META['REQUEST_METHOD'])
