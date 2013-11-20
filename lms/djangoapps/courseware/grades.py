@@ -343,6 +343,8 @@ def progress_summary(student, request, course):
 
     return chapters
 
+
+@transaction.commit_on_success
 def get_score(course_id, user, problem_descriptor, module_creator):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
