@@ -1,6 +1,5 @@
 #pylint: disable=E1101
 
-import json
 import shutil
 import mock
 
@@ -15,6 +14,7 @@ from fs.osfs import OSFS
 import copy
 from json import loads
 from datetime import timedelta
+from django.test import TestCase
 
 from django.contrib.auth.models import User
 from django.dispatch import Signal
@@ -53,6 +53,7 @@ from pytz import UTC
 from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
+import re
 
 from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import loc_mapper
@@ -135,6 +136,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment after edit_unit no longer using locations.
+        # _test_no_locations(self, resp)
 
         for expected in expected_types:
             self.assertIn(expected, resp.content)
@@ -160,15 +163,21 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         resp = self.client.get_html(reverse('edit_unit', kwargs={'location': location.url()}))
         self.assertEqual(resp.status_code, 400)
+        _test_no_locations(self, resp, status_code=400)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
-        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
+        items = modulestore().get_items(Location('i4x', 'edX', test_course_name, 'vertical', None, None))
+        # Assert is here to make sure that the course being tested actually has verticals.
+        self.assertGreater(len(items), 0)
+        for descriptor in items:
             print "Checking ", descriptor.location.url()
             print descriptor.__class__, descriptor.location
             resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
+            # TODO: uncomment after edit_unit not using locations.
+            # _test_no_locations(self, resp)
 
     def lockAnAsset(self, content_store, course_location):
         """
@@ -483,6 +492,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         resp = self.client.get_html(locator.url_reverse('xblock'))
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment when preview no longer has locations being returned.
+        # _test_no_locations(self, resp)
         return resp
 
     def test_delete(self):
@@ -841,6 +852,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_bad_contentstore_request(self):
         resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
+        _test_no_locations(self, resp, 400)
 
     def test_rewrite_nonportable_links_on_import(self):
         module_store = modulestore('direct')
@@ -1026,12 +1038,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(stub_location.replace(category='vertical', name=None))
         self.assertGreater(len(items), 0)
         for descriptor in items:
-            # don't try to look at private verticals. Right now we're running
-            # the service in non-draft aware
-            if getattr(descriptor, 'is_draft', False):
-                print "Checking {0}....".format(descriptor.location.url())
-                resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
-                self.assertEqual(resp.status_code, 200)
+            print "Checking {0}....".format(descriptor.location.url())
+            resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+            # TODO: uncomment when edit_unit no longer has locations.
+            # _test_no_locations(self, resp)
 
         # verify that we have the content in the draft store as well
         vertical = draft_store.get_item(
@@ -1508,6 +1519,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             status_code=200,
             html=True
         )
+        _test_no_locations(self, resp)
 
     def test_course_factory(self):
         """Test that the course factory works correctly."""
@@ -1530,6 +1542,8 @@ class ContentStoreTest(ModuleStoreTestCase):
             status_code=200,
             html=True
         )
+        # TODO: uncomment when course index no longer has locations being returned.
+        # _test_no_locations(self, resp)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -1589,6 +1603,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         Import and walk through some common URL endpoints. This just verifies non-500 and no other
         correct behavior, so it is not a deep test
         """
+        def test_get_html(page):
+            # Helper function for getting HTML for a page in Studio and
+            # checking that it does not error.
+            resp = self.client.get_html(new_location.url_reverse(page))
+            self.assertEqual(resp.status_code, 200)
+            _test_no_locations(self, resp)
+
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
         loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
         new_location = loc_mapper().translate_location(loc.course_id, loc, False, True)
@@ -1598,42 +1619,46 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
-
-        # import page
-        resp = self.client.get_html(new_location.url_reverse('import/', ''))
-        self.assertEqual(resp.status_code, 200)
-
-        # export page
-        resp = self.client.get_html(new_location.url_reverse('export/', ''))
-        self.assertEqual(resp.status_code, 200)
-
-        # course team
-        url = new_location.url_reverse('course_team/', '')
-        resp = self.client.get_html(url)
-        self.assertEqual(resp.status_code, 200)
-
-        # course info
-        resp = self.client.get(new_location.url_reverse('course_info'))
-        self.assertEqual(resp.status_code, 200)
+        test_get_html('import')
+        test_get_html('export')
+        test_get_html('course_team')
+        test_get_html('course_info')
+        test_get_html('checklists')
+        test_get_html('assets')
 
         # settings_details
-        resp = self.client.get(reverse('settings_details',
+        resp = self.client.get_html(reverse('settings_details',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
+        _test_no_locations(self, resp)
 
         # settings_details
-        resp = self.client.get(reverse('settings_grading',
+        resp = self.client.get_html(reverse('settings_grading',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment when grading is not using old locations.
+        # _test_no_locations(self, resp)
 
-        # assets_handler (HTML for full page content)
-        url = new_location.url_reverse('assets/', '')
-        resp = self.client.get_html(url)
+        # advanced settings
+        resp = self.client.get_html(reverse('course_advanced_settings',
+                                            kwargs={'org': loc.org,
+                                                    'course': loc.course,
+                                                    'name': loc.name}))
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment when advanced settings not using old locations.
+        # _test_no_locations(self, resp)
+
+        # textbook index
+        resp = self.client.get_html(reverse('textbook_index',
+                                            kwargs={'org': loc.org,
+                                                    'course': loc.course,
+                                                    'name': loc.name}))
+        self.assertEqual(resp.status_code, 200)
+        _test_no_locations(self, resp)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
@@ -1641,12 +1666,23 @@ class ContentStoreTest(ModuleStoreTestCase):
             reverse('edit_subsection', kwargs={'location': subsection_location.url()})
         )
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment when grading and outline not using old locations.
+        # _test_no_locations(self, resp)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get_html(
             reverse('edit_unit', kwargs={'location': unit_location.url()}))
         self.assertEqual(resp.status_code, 200)
+        # TODO: uncomment when edit_unit not using old locations.
+        # _test_no_locations(self, resp)
+
+        resp = self.client.get_html(reverse('edit_tabs',
+                                            kwargs={'org': loc.org,
+                                                    'course': loc.course,
+                                                    'coursename': loc.name}))
+        self.assertEqual(resp.status_code, 200)
+        _test_no_locations(self, resp)
 
         def delete_item(category, name):
             """ Helper method for testing the deletion of an xblock item. """
@@ -1654,6 +1690,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             del_location = loc_mapper().translate_location(loc.course_id, del_loc, False, True)
             resp = self.client.delete(del_location.url_reverse('xblock'))
             self.assertEqual(resp.status_code, 204)
+            _test_no_locations(self, resp, status_code=204, html=False)
 
         # delete a component
         delete_item(category='html', name='test_html')
@@ -1853,7 +1890,10 @@ class ContentStoreTest(ModuleStoreTestCase):
         Show the course overview page.
         """
         new_location = loc_mapper().translate_location(location.course_id, location, False, True)
-        return self.client.get_html(new_location.url_reverse('course/', ''))
+        resp = self.client.get_html(new_location.url_reverse('course/', ''))
+        # TODO: uncomment when i4x no longer in overview.
+        # _test_no_locations(self, resp)
+        return resp
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -1920,6 +1960,32 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
         pass
 
 
+class EntryPageTestCase(TestCase):
+    """
+    Tests entry pages that aren't specific to a course.
+    """
+    def setUp(self):
+        self.client = AjaxEnabledTestClient()
+
+    def _test_page(self, page, status_code=200):
+        resp = self.client.get_html(reverse(page))
+        self.assertEqual(resp.status_code, status_code)
+        _test_no_locations(self, resp, status_code)
+
+    def test_how_it_works(self):
+        self._test_page("howitworks")
+
+    def test_signup(self):
+        self._test_page("signup")
+
+    def test_login(self):
+        self._test_page("login")
+
+    def test_logout(self):
+        # Logout redirects.
+        self._test_page("logout", 302)
+
+
 def _create_course(test, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
@@ -1945,3 +2011,21 @@ def _course_factory_create_course():
 def _get_course_id(test_course_data):
     """Returns the course ID (org/number/run)."""
     return "{org}/{number}/{run}".format(**test_course_data)
+
+
+def _test_no_locations(test, resp, status_code=200, html=True):
+    """
+    Verifies that "i4x", which appears in old locations, but not
+    new locators, does not appear in the HTML response output.
+    Used to verify that database refactoring is complete.
+    """
+    test.assertNotContains(resp, 'i4x', status_code=status_code, html=html)
+    if html:
+        # For HTML pages, it is nice to call the method with html=True because
+        # it checks that the HTML properly parses. However, it won't find i4x usages
+        # in JavaScript blocks.
+        content = resp.content
+        num_jump_to = len(re.findall(r"8000(\S)*jump_to/i4x", content))
+        total_i4x = len(re.findall(r"i4x", content))
+
+        test.assertEqual(total_i4x - num_jump_to, 0, "i4x found outside of LMS jump-to links")
