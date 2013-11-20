@@ -639,9 +639,6 @@ MIDDLEWARE_CLASSES = (
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
-
-    # Experimentation with anonymous users,
-    'unauth_experiment.middleware.ExperimentalUserMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -1005,9 +1002,6 @@ INSTALLED_APPS = (
 
     # CME Registration
     'cme_registration',
-
-    # Experimental
-    'unauth_experiment',
 
 )
 
