@@ -257,6 +257,7 @@ class LTIModule(LTIFields, XModule):
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
+            u'resource_link_id': self.location.html_id(),
             u'role': u'student'
         }
 
