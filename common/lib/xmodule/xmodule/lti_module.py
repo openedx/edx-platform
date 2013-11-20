@@ -567,14 +567,22 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
             'Content-Type': 'application/x-www-form-urlencoded',
         }
 
+        #get request body and calculate body hash
         sha1 = hashlib.sha1()
         sha1.update(request.body)
         oauth_body_hash = base64.b64encode(sha1.hexdigest())
 
+
+
         mock_request.params = signature.collect_parameters(
-            body = {u'oauth_body_hash': unicode(oauth_body_hash)},
+            #body = {u'oauth_body_hash': unicode(oauth_body_hash)},
             headers=headers
             )
+        #compare hash from request body and body hash from Authorization header
+        if oauth_body_hash == mock_request.params[0][1]:
+            #bodies are identical
+        else:
+            #bodies are different
 
         mock_request.uri = request.META['HTTP_HOST'] + request.META['PATH_INFO']
         mock_request.http_method = unicode(request.META['REQUEST_METHOD'])
