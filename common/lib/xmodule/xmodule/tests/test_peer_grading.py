@@ -41,13 +41,16 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     })
     save_dict.extend(('rubric_scores[]', val) for val in (0, 1))
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
         self.coe = self.get_module_from_location(self.coe_location, COURSE)
@@ -173,13 +176,16 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         ["i4x", "edX", "open_ended", "peergrading", "PeerGradingScored"]
     )
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
@@ -213,12 +219,15 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                              "SampleQuestion"])
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system.
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     @property
@@ -270,14 +279,16 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         else:
             pg_descriptor.get_required_module_descriptors = lambda: []
 
+        test_system = self.get_module_system(pg_descriptor)
+
         # Initialize the peer grading module.
         peer_grading = PeerGradingModule(
             pg_descriptor,
-            self.test_system,
+            test_system,
             self.field_data,
             self.scope_ids,
         )
-        self.test_system.xmodule_instance = peer_grading
+        test_system.xmodule_instance = peer_grading
 
         return peer_grading
 
@@ -384,13 +395,16 @@ class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
     mock_track_changes_problem = Mock(side_effect=[MockedTrackChangesProblem()])
     pgm_location = Location(["i4x", "edX", "open_ended", "peergrading", "PeerGradingSample"])
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.pgm_location, COURSE)
 
