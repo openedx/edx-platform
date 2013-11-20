@@ -2,16 +2,7 @@
 metadata:
     display_name: Image Modal
 data: |
-      <div class="imageModal-trigger">
         <h2>Title of Unit</h2>
         <p>
-          <div class="imageModal-link"> 
-            <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-small.jpg" />
-            <i class="icon-zoom-in icon-3x"></i>
-            
-            <div class="imageModal">
-              <img class="imageModal-image" alt="" src="http://static.class.stanford.edu/stanford-hills-big.jpg" />
-            </div>
-          </div>
+          <a href="http://static.class.stanford.edu/stanford-hills-big.jpg" class="zoomable"><img alt="" src="http://static.class.stanford.edu/stanford-hills-small.jpg" /></a>
         </p>
-      </div>
