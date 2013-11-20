@@ -271,7 +271,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
         return True
 
-    def _update_score(self, score_msg, queuekey, system):
+    def _update_score(self, score_msg, queuekey, system, submission = None):
         """
         Called by xqueue to update the score
         @param score_msg: The message from xqueue
@@ -304,6 +304,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     submission_ids=new_score_msg['submission_ids']
                 )
             )
+            self.new_history_entry(submission['student_response'])
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
 
         return True
 
@@ -692,8 +696,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         queuekey = data['queuekey']
         score_msg = data['xqueue_body']
+        submission = data['xqueue_submission']
         # TODO: Remove need for cmap
-        self._update_score(score_msg, queuekey, system)
+        self._update_score(score_msg, queuekey, system, submission)
 
         return dict()  # No AJAX return is needed
 
