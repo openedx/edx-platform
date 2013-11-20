@@ -34,7 +34,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-locator="${unit_locator}">
+  <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_locator}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
@@ -135,6 +135,13 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         </article>
       </div>
 
+      <%
+        ctx_loc = context_course.location
+        index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course')
+        subsection_url = loc_mapper().translate_location(
+            ctx_loc.course_id, subsection.location, False, True
+        ).url_reverse('subsection')
+      %>
       <div class="sidebar">
         <div class="unit-settings window">
           <h4 class="header">${_("Unit Settings")}</h4>
@@ -157,7 +164,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
               % endif
               ${_("with the subsection {link_start}{name}{link_end}").format(
                   name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=reverse('edit_subsection', kwargs={'location': subsection.location})),
+                  link_start='<a href="{url}">'.format(url=subsection_url),
                   link_end='</a>',
                 )}
               </p>
@@ -180,14 +187,10 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
             </div>
             <ol>
               <li>
-                <%
-                  ctx_loc = context_course.location
-                  index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
-                %>
                 <a href="${index_url}" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
-                    <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
+                    <a href="${subsection_url}" class="section-item">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                     </a>
