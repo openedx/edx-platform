@@ -216,7 +216,7 @@ FEEDBACK_SUBMISSION_EMAIL = ENV_TOKENS.get("FEEDBACK_SUBMISSION_EMAIL")
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
 # git repo loading  environment
-GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', None)
+GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
 GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():

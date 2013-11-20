@@ -3,6 +3,7 @@ Urls for sysadmin dashboard feature
 """
 
 from django.conf.urls import patterns, url
+
 from dashboard import sysadmin
 
 urlpatterns = patterns(
