@@ -1968,22 +1968,22 @@ class EntryPageTestCase(TestCase):
         self.client = AjaxEnabledTestClient()
 
     def _test_page(self, page, status_code=200):
-        resp = self.client.get_html(reverse(page))
+        resp = self.client.get_html(page)
         self.assertEqual(resp.status_code, status_code)
         _test_no_locations(self, resp, status_code)
 
     def test_how_it_works(self):
-        self._test_page("howitworks")
+        self._test_page("/howitworks")
 
     def test_signup(self):
-        self._test_page("signup")
+        self._test_page("/signup")
 
     def test_login(self):
-        self._test_page("login")
+        self._test_page("/signin")
 
     def test_logout(self):
         # Logout redirects.
-        self._test_page("logout", 302)
+        self._test_page("/logout", 302)
 
 
 def _create_course(test, course_data):

@@ -11,7 +11,6 @@ from ratelimitbackend import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',  # nopep8
-    url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
 
@@ -78,18 +77,12 @@ urlpatterns = patterns('',  # nopep8
 # User creation and updating views
 urlpatterns += patterns(
     '',
-    url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
-    url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
 
-    # form page
-    url(r'^login$', 'contentstore.views.old_login_redirect', name='old_login'),
-    url(r'^signin$', 'contentstore.views.login_page', name='login'),
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
-
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 )
 
@@ -97,7 +90,12 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     'contentstore.views',
 
+    url(r'^$', 'howitworks', name='homepage'),
+    url(r'^howitworks$', 'howitworks'),
+    url(r'^signup$', 'signup', name='signup'),
+    url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
+
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
     url(r'(?ix)^course_info/{}$'.format(parsers.URL_RE_SOURCE), 'course_info_handler'),
