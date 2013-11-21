@@ -55,6 +55,7 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
+from django.utils.translation import ugettext as _
 #########################################################################
 
 registry = TagRegistry()
@@ -599,7 +600,7 @@ class FileSubmission(InputTypeBase):
     tags = ['filesubmission']
 
     # pulled out for testing
-    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
+    submitted_msg = _("Your file(s) have been submitted; as soon as your submission is"
                      " graded, this message will be replaced with the grader's feedback.")
 
     @staticmethod
@@ -653,7 +654,7 @@ class CodeInput(InputTypeBase):
             ]
 
     # pulled out for testing
-    submitted_msg = ("Submitted.  As soon as your submission is"
+    submitted_msg = _("Submitted.  As soon as your submission is"
                      " graded, this message will be replaced with the grader's feedback.")
 
     @classmethod
@@ -720,7 +721,7 @@ class MatlabInput(CodeInput):
     template = "matlabinput.html"
     tags = ['matlabinput']
 
-    plot_submitted_msg = ("Submitted. As soon as a response is returned, "
+    plot_submitted_msg = _("Submitted. As soon as a response is returned, "
                           "this message will be replaced by that feedback.")
 
     def setup(self):
@@ -1047,7 +1048,7 @@ class ChemicalEquationInput(InputTypeBase):
         try:
             formula = data['formula']
         except KeyError:
-            result['error'] = "No formula specified."
+            result['error'] = _("No formula specified.")
             return result
 
         try:
@@ -1058,7 +1059,7 @@ class ChemicalEquationInput(InputTypeBase):
             # this is unexpected, so log
             log.warning(
                 "Error while previewing chemical formula", exc_info=True)
-            result['error'] = "Error while rendering preview"
+            result['error'] = _("Error while rendering preview")
 
         return result
 
@@ -1136,7 +1137,7 @@ class FormulaEquationInput(InputTypeBase):
         try:
             formula = get['formula']
         except KeyError:
-            result['error'] = "No formula specified."
+            result['error'] = _("No formula specified.")
             return result
 
         result['request_start'] = int(get.get('request_start', 0))
@@ -1147,14 +1148,14 @@ class FormulaEquationInput(InputTypeBase):
             # or something, and this is where we would need to pass those in.
             result['preview'] = latex_preview(formula)
         except pyparsing.ParseException as err:
-            result['error'] = "Sorry, couldn't parse formula"
+            result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
         except Exception:
             # this is unexpected, so log
             log.warning(
                 "Error while previewing formula", exc_info=True
             )
-            result['error'] = "Error while rendering preview"
+            result['error'] = _("Error while rendering preview")
 
         return result
 

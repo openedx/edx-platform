@@ -18,8 +18,8 @@ from xblock.fields import Scope, Dict, Boolean, List, Integer, String
 
 log = logging.getLogger(__name__)
 
-def _(s):
-    return s;
+from django.utils.translation import ugettext as _
+
 
 def pretty_bool(value):
     """Check value for possible `True` value.
@@ -37,7 +37,7 @@ class MasterClassFields(object):
         display_name=_("Display Name"),
         help=_("Display name for this module"),
         scope=Scope.settings,
-        default="Master Class"
+        default=_("Master Class")
     )
     total_places = Integer(
         display_name=_("Max places"),

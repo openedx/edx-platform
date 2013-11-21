@@ -82,7 +82,7 @@ def _change_access(course, user, level, action):
         raise ValueError("unrecognized action '{}'".format(action))
 
 
-def update_forum_role_membership(course_id, user, rolename, action):
+def update_forum_role(course_id, user, rolename, action):
     """
     Change forum access of user.
 

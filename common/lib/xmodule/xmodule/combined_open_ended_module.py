@@ -11,10 +11,9 @@ from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-def _(s):
-    return s
-
 log = logging.getLogger("mitx.courseware")
+
+from django.utils.translation import ugettext as _
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",
@@ -50,7 +49,7 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
-DEFAULT_DATA = textwrap.dedent("""\
+DEFAULT_DATA = textwrap.dedent(_("""\
 <combinedopenended>
     <prompt>
         <h3>Censorship in the Libraries</h3>
@@ -169,7 +168,7 @@ DEFAULT_DATA = textwrap.dedent("""\
     </task>
 
 </combinedopenended>
-""")
+"""))
 
 
 class VersionInteger(Integer):
@@ -317,7 +316,7 @@ class CombinedOpenEndedFields(object):
     )
     markdown = String(
         help=_("Markdown source of this module"),
-        default=textwrap.dedent("""\
+        default=textwrap.dedent(_("""\
                     [prompt]
                         <h3>Censorship in the Libraries</h3>
 
@@ -356,7 +355,7 @@ class CombinedOpenEndedFields(object):
                     (Self), ({4-12}AI), ({9-12}Peer)
                     [tasks]
 
-        """),
+        """)),
         scope=Scope.settings
     )
 

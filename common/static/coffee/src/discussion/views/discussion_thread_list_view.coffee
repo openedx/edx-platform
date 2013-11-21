@@ -119,12 +119,12 @@ if Backbone?
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
-        @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
+        @$(".post-list").append("<li class='more-pages'><a href='#'>" + gettext('Load more')+ "</a></li>")
 
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"><span class="sr">Loading more threads</span></div>')
+      @$(".more-pages").html('<div class="loading-animation"><span class="sr">' + gettext("Loading more threads") + '</span></div>')
       @$(".more-pages").addClass("loading")
       options = {}
       switch @mode

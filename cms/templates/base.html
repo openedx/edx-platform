@@ -3,7 +3,10 @@
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
-<html>
+<!--[if IE 7]><html class="ie7 lte9 lte8 lte7"><![endif]-->
+<!--[if IE 8]><html class="ie8 lte9 lte8"><![endif]-->
+<!--[if IE 9]><html class="ie9 lte9"><![endif]-->
+<!--[if gt IE 9]><!--><html><!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -19,10 +22,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${MITX_ROOT_URL}">
 
-    <%static:css group='base-style'/>
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
-    <link rel="stylesheet" href="${static.url('js/vendor/CodeMirror/codemirror.css')}" type="text/css" media="all" />
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-app'/>
+    <%static:css group='style-xmodule'/>
 
     <%include file="widgets/segment-io.html" />
 
@@ -60,6 +62,7 @@
             "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
             "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
             "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
+            "jquery.datapicker-ru": "js/vendor/jquery.ui.datepicker-ru",
             "datepair": "js/vendor/timepicker/datepair",
             "date": "js/vendor/date",
             "tzAbbr": "js/vendor/tzAbbr",
@@ -78,10 +81,15 @@
             // externally hosted files
             "tender": "//edxedge.tenderapp.com/tender_widget",
             "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
-            // youtube URL does not end in ".js". We add "?noext" to the path so
-            // that require.js adds the ".js" to the query component of the URL,
-            // and leaves the path component intact.
-            "youtube": "//www.youtube.com/player_api?noext"
+            "youtube": [
+                // youtube URL does not end in ".js". We add "?noext" to the path so
+                // that require.js adds the ".js" to the query component of the URL,
+                // and leaves the path component intact.
+                "//www.youtube.com/player_api?noext",
+                // if youtube fails to load, fallback on a local file
+                // so that require doesn't fall over
+                "js/src/youtube_fallback"
+            ]
         },
         shim: {
             "gettext": {
@@ -124,7 +132,7 @@
             },
             "jquery.scrollTo": {
                 deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
+                exports: "jQuery.fn.scrollTo"
             },
             "jquery.flot": {
                 deps: ["jquery"],
@@ -205,13 +213,16 @@
             "coffee/src/logger": {
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
+            },
+            "jquery.datapicker-ru" : {
+                deps: ["jquery.ui"]
             }
         },
         // load jquery and gettext automatically
-        deps: ["jquery", "gettext", "js/vendor/jquery.ui.datepicker-ru"],
+        deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "jquery.datapicker-ru"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }

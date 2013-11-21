@@ -263,7 +263,7 @@ class CourseLocator(Locator):
                              version_guid=self.version_guid,
                              branch=self.branch)
 
-    def url_reverse(self, prefix, postfix):
+    def url_reverse(self, prefix, postfix=''):
         """
         Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
         :param prefix: the beginning of the url (will be forced to begin and end with / if non-empty)

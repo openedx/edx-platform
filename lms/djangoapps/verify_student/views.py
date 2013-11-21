@@ -44,12 +44,15 @@ class VerifyView(View):
               before proceeding to payment
 
         """
+        upgrade = request.GET.get('upgrade', False)
+
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
             return redirect(
                 reverse('verify_student_verified',
-                        kwargs={'course_id': course_id}))
+                        kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade)
+            )
         elif CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         else:
@@ -85,6 +88,7 @@ class VerifyView(View):
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
             "min_price": verify_mode.min_price,
+            "upgrade": upgrade,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -100,6 +104,7 @@ class VerifiedView(View):
         """
         Handle the case where we have a get request
         """
+        upgrade = request.GET.get('upgrade', False)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
@@ -117,6 +122,7 @@ class VerifiedView(View):
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
+            "upgrade": upgrade,
         }
         return render_to_response('verify_student/verified.html', context)
 
@@ -250,6 +256,7 @@ def show_requirements(request, course_id):
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
 
+    upgrade = request.GET.get('upgrade', False)
     course = course_from_id(course_id)
     context = {
         "course_id": course_id,
@@ -257,5 +264,69 @@ def show_requirements(request, course_id):
         "course_org": course.display_org_with_default,
         "course_num": course.display_number_with_default,
         "is_not_active": not request.user.is_active,
+        "upgrade": upgrade,
     }
     return render_to_response("verify_student/show_requirements.html", context)
+
+
+class ReverifyView(View):
+    """
+    The main reverification view. Under similar constraints as the main verification view.
+    Has to perform these functions:
+        - take new face photo
+        - take new id photo
+        - submit photos to photo verification service
+
+    Does not need to be attached to a particular course.
+    Does not need to worry about pricing
+    """
+    @method_decorator(login_required)
+    def get(self, request):
+        """
+        display this view
+        """
+        context = {
+            "user_full_name": request.user.profile.name,
+            "error": False,
+        }
+
+        return render_to_response("verify_student/photo_reverification.html", context)
+
+    @method_decorator(login_required)
+    def post(self, request):
+        """
+        submits the reverification to SoftwareSecure
+        """
+
+        try:
+            attempt = SoftwareSecurePhotoVerification(user=request.user)
+            b64_face_image = request.POST['face_image'].split(",")[1]
+            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
+
+            attempt.upload_face_image(b64_face_image.decode('base64'))
+            attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
+            attempt.mark_ready()
+
+            # save this attempt
+            attempt.save()
+            # then submit it across
+            attempt.submit()
+            return HttpResponseRedirect(reverse('verify_student_reverification_confirmation'))
+        except Exception:
+            log.exception(
+                "Could not submit verification attempt for user {}".format(request.user.id)
+            )
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True,
+            }
+            return render_to_response("verify_student/photo_reverification.html", context)
+
+
+@login_required
+def reverification_submission_confirmation(_request):
+    """
+    Shows the user a confirmation page if the submission to SoftwareSecure was successful
+    """
+
+    return render_to_response("verify_student/reverification_confirmation.html")

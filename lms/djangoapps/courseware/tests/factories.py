@@ -10,6 +10,7 @@ from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCou
 from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from instructor.access import allow_access
 
 from xmodule.modulestore import Location
 from pytz import UTC
@@ -31,6 +32,26 @@ class UserFactory(StudentUserFactory):
     last_name = 'Tester'
     last_login = datetime.now(UTC)
     date_joined = datetime.now(UTC)
+
+
+def InstructorFactory(course):  # pylint: disable=invalid-name
+    """
+    Given a course object, returns a User object with instructor
+    permissions for `course`.
+    """
+    user = StudentUserFactory.create(last_name="Instructor")
+    allow_access(course, user, "instructor")
+    return user
+
+
+def StaffFactory(course):  # pylint: disable=invalid-name
+    """
+    Given a course object, returns a User object with staff
+    permissions for `course`.
+    """
+    user = StudentUserFactory.create(last_name="Staff")
+    allow_access(course, user, "staff")
+    return user
 
 
 class GroupFactory(StudentGroupFactory):

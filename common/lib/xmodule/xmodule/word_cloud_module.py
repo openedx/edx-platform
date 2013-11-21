@@ -18,6 +18,7 @@ from xblock.fields import Scope, Dict, Boolean, List, Integer, String
 
 log = logging.getLogger(__name__)
 
+from django.utils.translation import ugettext as _
 
 def pretty_bool(value):
     """Check value for possible `True` value.
@@ -32,49 +33,49 @@ def pretty_bool(value):
 class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
         scope=Scope.settings,
-        default="Word cloud"
+        default=_("Word cloud")
     )
     num_inputs = Integer(
-        display_name="Inputs",
-        help="Number of text boxes available for students to input words/sentences.",
+        display_name=_("Inputs"),
+        help=_("Number of text boxes available for students to input words/sentences."),
         scope=Scope.settings,
         default=5,
         values={"min": 1}
     )
     num_top_words = Integer(
-        display_name="Maximum Words",
-        help="Maximum number of words to be displayed in generated word cloud.",
+        display_name=_("Maximum Words"),
+        help=_("Maximum number of words to be displayed in generated word cloud."),
         scope=Scope.settings,
         default=250,
         values={"min": 1}
     )
     display_student_percents = Boolean(
-        display_name="Show Percents",
-        help="Statistics are shown for entered words near that word.",
+        display_name=_("Show Percents"),
+        help=_("Statistics are shown for entered words near that word."),
         scope=Scope.settings,
         default=True
     )
 
     # Fields for descriptor.
     submitted = Boolean(
-        help="Whether this student has posted words to the cloud.",
+        help=_("Whether this student has posted words to the cloud."),
         scope=Scope.user_state,
         default=False
     )
     student_words = List(
-        help="Student answer.",
+        help=_("Student answer."),
         scope=Scope.user_state,
         default=[]
     )
     all_words = Dict(
-        help="All possible words from all students.",
+        help=_("All possible words from all students."),
         scope=Scope.user_state_summary
     )
     top_words = Dict(
-        help="Top num_top_words words for word cloud.",
+        help=_("Top num_top_words words for word cloud."),
         scope=Scope.user_state_summary
     )
 
@@ -193,7 +194,7 @@ class WordCloudModule(WordCloudFields, XModule):
 
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
-            raw_student_words = data.getlist('student_words[]')
+            raw_student_words = data.getall('student_words[]')
             student_words = filter(None, map(self.good_word, raw_student_words))
 
             self.student_words = student_words

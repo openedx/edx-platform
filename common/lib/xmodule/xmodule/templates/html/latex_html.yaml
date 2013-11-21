@@ -1,21 +1,21 @@
 ---
 metadata:
-    display_name: E-text Written in LaTeX
+    display_name: Документ LaTeX
     source_code: |
-        \subsection{Example of E-text in LaTeX}
+        \subsection{Пример документа с использованием LaTeX}
 
-        It is very convenient to write complex equations in LaTeX.
+        Это наглядный пример для записи сложных уравнений с помощью LaTeX.
 
         \begin{equation}
                 x = \frac{-b\pm\sqrt{b^2-4*a*c}}{2a}
         \end{equation}
 
-        Seize the moment.
+        Лови момент.
 
 data: |
     <html>
-        <h2>Example: E-text page</h2>
+        <h2>Пример страницы с использованием LaTeX</h2>
         <p>
-          It is very convenient to write complex equations in LaTeX.
+          Это наглядный пример для записи сложных уравнений с помощью LaTeX.
         </p>
     </html>

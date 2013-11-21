@@ -134,9 +134,10 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 title: gettext('Deleting&hellip;'),
               deleting.show()
               $component = $(event.currentTarget).parents('.component')
-              $.post('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type: 'DELETE',
+                url: $component.data('update_url')
+              }).success(=>
                 deleting.hide()
                 analytics.track "Deleted a Component",
                   course: course_location_analytics
@@ -162,22 +163,22 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
     deleteDraft: (event) ->
       @wait(true)
+      $.ajax({
+          type: 'DELETE',
+          url: @$el.data('update_url') + "?" + $.param({recurse: true})
+      }).success(=>
 
-      $.post('/delete_item', {
-        id: @$el.data('id')
-        delete_children: true
-      }, =>
-        analytics.track "Deleted Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+          analytics.track "Deleted Draft",
+              course: course_location_analytics
+              unit_id: unit_location_analytics
 
-        window.location.reload()
+          window.location.reload()
       )
 
     createDraft: (event) ->
       @wait(true)
 
-      $.post('/create_draft', {
+      $.postJSON('/create_draft', {
         id: @$el.data('id')
       }, =>
         analytics.track "Created Draft",
@@ -191,7 +192,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @wait(true)
       @saveDraft()
 
-      $.post('/publish_draft', {
+      $.postJSON('/publish_draft', {
         id: @$el.data('id')
       }, =>
         analytics.track "Published Draft",
@@ -211,7 +212,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
       @wait(true)
 
-      $.post(target_url, {
+      $.postJSON(target_url, {
         id: @$el.data('id')
       }, =>
         analytics.track "Set Unit Visibility",

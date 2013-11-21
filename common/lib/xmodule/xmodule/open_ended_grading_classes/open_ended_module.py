@@ -271,7 +271,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
         return True
 
-    def _update_score(self, score_msg, queuekey, system):
+    def _update_score(self, score_msg, queuekey, system, submission = None):
         """
         Called by xqueue to update the score
         @param score_msg: The message from xqueue
@@ -283,9 +283,31 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self.record_latest_score(new_score_msg['score'])
-        self.record_latest_post_assessment(score_msg)
-        self.child_state = self.POST_ASSESSMENT
+        # self.child_history is initialized as [].  record_latest_score() and record_latest_post_assessment()
+        # operate on self.child_history[-1].  Thus we have to make sure child_history is not [].
+        # Handle at this level instead of in record_*() because this is a good place to reduce the number of conditions
+        # and also keep the persistent state from changing.
+        if self.child_history:
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
+        else:
+            log.error((
+                "Trying to update score without existing studentmodule child_history:\n"
+                "   location: {location}\n"
+                "   score: {score}\n"
+                "   grader_ids: {grader_ids}\n"
+                "   submission_ids: {submission_ids}").format(
+                    location=self.location_string,
+                    score=new_score_msg['score'],
+                    grader_ids=new_score_msg['grader_ids'],
+                    submission_ids=new_score_msg['submission_ids']
+                )
+            )
+            self.new_history_entry(submission['student_response'])
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
 
         return True
 
@@ -674,8 +696,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         queuekey = data['queuekey']
         score_msg = data['xqueue_body']
+        submission = data['xqueue_submission']
         # TODO: Remove need for cmap
-        self._update_score(score_msg, queuekey, system)
+        self._update_score(score_msg, queuekey, system, submission)
 
         return dict()  # No AJAX return is needed
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-05 16:21+0400\n"
-"PO-Revision-Date: 2013-11-05 16:28+0300\n"
+"POT-Creation-Date: 2013-11-15 16:03+0400\n"
+"PO-Revision-Date: 2013-11-15 16:13+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -27,6 +27,26 @@ msgstr "Мои заметки"
 #: cms/djangoapps/contentstore/views/assets.py:172
 msgid "Upload completed"
 msgstr "Загрузка завершена"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "discussion"
+msgstr "дискуссии"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "html"
+msgstr "html"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "problem"
+msgstr "задачи"
+
+#: cms/djangoapps/contentstore/views/component.py:52
+msgid "video"
+msgstr "видео"
+
+#: cms/djangoapps/contentstore/views/component.py:224
+msgid "advanced"
+msgstr "другие"
 
 #: cms/djangoapps/contentstore/views/course.py:165
 msgid ""
@@ -207,6 +227,7 @@ msgstr "Удаление&hellip;"
 #: cms/templates/overview.html:61
 #: cms/templates/overview.html:99
 #: cms/templates/overview.html:245
+#: cms/templates/unit.html:129
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:92
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:204
 #: lms/templates/discussion/_inline_new_post.html:51
@@ -2208,11 +2229,11 @@ msgstr "Добавить новый компонент"
 
 #: cms/templates/unit.html:81
 msgid "Common Problem Types"
-msgstr "Общие типы проблем"
+msgstr "Обычные"
 
 #: cms/templates/unit.html:84
 msgid "Advanced"
-msgstr "Расширенное"
+msgstr "Расширенные"
 
 #: cms/templates/unit.html:140
 msgid "Unit Settings"
@@ -2441,7 +2462,7 @@ msgstr "Заголовок 1"
 #: cms/templates/widgets/problem-edit.html:12
 #: cms/templates/widgets/problem-edit.html:51
 msgid "Multiple Choice"
-msgstr "Множественный выбор"
+msgstr "Переключатели"
 
 #: cms/templates/widgets/problem-edit.html:14
 #: cms/templates/widgets/problem-edit.html:62
@@ -2451,17 +2472,17 @@ msgstr "Флажки"
 #: cms/templates/widgets/problem-edit.html:16
 #: cms/templates/widgets/problem-edit.html:73
 msgid "Text Input"
-msgstr "Исходный текст"
+msgstr "Текстовое поле"
 
 #: cms/templates/widgets/problem-edit.html:18
 #: cms/templates/widgets/problem-edit.html:82
 msgid "Numerical Input"
-msgstr "Цифровое задание"
+msgstr "Числовое поле"
 
 #: cms/templates/widgets/problem-edit.html:20
 #: cms/templates/widgets/problem-edit.html:91
 msgid "Dropdown"
-msgstr "Выпадающий"
+msgstr "Выпадающий список"
 
 #: cms/templates/widgets/problem-edit.html:22
 #: cms/templates/widgets/problem-edit.html:100
@@ -3090,30 +3111,139 @@ msgstr "Неправильный синтаксис формулы '{0}'"
 msgid "CustomResponse: check function returned an invalid dict"
 msgstr "CustomResponse: функция проверки вернула недопустимый словарь"
 
-#: common/lib/xmodule/xmodule/capa_module.py:357
-msgid "Check"
-msgstr "Проверка"
-
-#: common/lib/xmodule/xmodule/capa_module.py:358
-msgid "Final Check"
-msgstr "Последняя проверка"
-
-#: common/lib/xmodule/xmodule/capa_module.py:946
-msgid "Error: {msg}"
-msgstr "Ошибка: {msg}"
-
+#: common/lib/xmodule/xmodule/capa_module.py:86
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:195
-#: common/lib/xmodule/xmodule/master_class_module.py:37
+#: common/lib/xmodule/xmodule/master_class_module.py:39
+#: common/lib/xmodule/xmodule/peer_grading_module.py:68
 msgid "Display Name"
 msgstr "Отображаемое имя:"
 
+#: common/lib/xmodule/xmodule/capa_module.py:87
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:196
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr "Данное имя появится в горизонтальной навигации сверху страницы"
 
+#: common/lib/xmodule/xmodule/capa_module.py:91
+msgid "Blank Advanced Problem"
+msgstr "Пустая задача"
+
+#: common/lib/xmodule/xmodule/capa_module.py:93
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:228
+msgid "Number of attempts taken by the student on this problem"
+msgstr "Количество попыток, использованных студентом по этой задаче"
+
+#: common/lib/xmodule/xmodule/capa_module.py:96
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
+msgid "Maximum Attempts"
+msgstr "Максимальное число попыток"
+
+#: common/lib/xmodule/xmodule/capa_module.py:97
+#, fuzzy
+msgid "Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed."
+msgstr ""
+"Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
+"оценивается в 1 балл."
+
+#: common/lib/xmodule/xmodule/capa_module.py:101
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:265
+msgid "Date that this problem is due by"
+msgstr "Срок, до которого можно сдавать эту задачу"
+
+#: common/lib/xmodule/xmodule/capa_module.py:103
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:269
+msgid "Amount of time after the due date that submissions will be accepted"
+msgstr "Промежуток времени после даты сдачи, в течение которого задачу еще можно сдавать"
+
+#: common/lib/xmodule/xmodule/capa_module.py:107
+#, fuzzy
+msgid "Show Answer"
+msgstr "Показать ответы:"
+
+#: common/lib/xmodule/xmodule/capa_module.py:108
+msgid "Defines when to show the answer to the problem. A default value can be set in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:122
+msgid "Whether to force the save button to appear on the page"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:127
+#, fuzzy
+msgid "Randomization"
+msgstr "Организация"
+
+#: common/lib/xmodule/xmodule/capa_module.py:128
+msgid "Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:140
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:273
+msgid "XML data for the problem"
+msgstr "XML данные для задачи"
+
+#: common/lib/xmodule/xmodule/capa_module.py:141
+msgid "Dictionary with the correctness of current student answers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:143
+msgid "Dictionary for maintaining the state of inputtypes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:144
+#, fuzzy
+msgid "Dictionary with the current student responses"
+msgstr "На каком шаге в текущей задаче сейчас находится студент."
+
+#: common/lib/xmodule/xmodule/capa_module.py:145
+#, fuzzy
+msgid "Whether the student has answered the problem"
+msgstr "Число попыток студента ответить на эту задачу."
+
+#: common/lib/xmodule/xmodule/capa_module.py:146
+msgid "Random seed for this student"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:148
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
+#: common/lib/xmodule/xmodule/peer_grading_module.py:62
+msgid "Problem Weight"
+msgstr "Вес задачи"
+
+#: common/lib/xmodule/xmodule/capa_module.py:149
+#, fuzzy
+msgid "Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point."
+msgstr ""
+"Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
+"оценивается в 1 балл."
+
+#: common/lib/xmodule/xmodule/capa_module.py:154
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:319
+msgid "Markdown source of this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:156
+msgid "Source code for LaTeX and Word problems. This feature is not well-supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:160
+msgid "String customization substitutions for particular locations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:361
+msgid "Check"
+msgstr "Проверка"
+
+#: common/lib/xmodule/xmodule/capa_module.py:362
+msgid "Final Check"
+msgstr "Последняя проверка"
+
+#: common/lib/xmodule/xmodule/capa_module.py:950
+msgid "Error: {msg}"
+msgstr "Ошибка: {msg}"
+
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:197
 msgid "Open Response Assessment"
-msgstr "Открытый ответ"
+msgstr "Задание с открытым ответом"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:201
 msgid "Current task that the student is on."
@@ -3136,6 +3266,7 @@ msgid "initial"
 msgstr "начальный"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:222
+#: common/lib/xmodule/xmodule/peer_grading_module.py:45
 #: lms/templates/peer_grading/peer_grading.html:33
 msgid "Graded"
 msgstr "Оценено"
@@ -3144,17 +3275,9 @@ msgstr "Оценено"
 msgid "Defines whether the student gets credit for grading this problem."
 msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:228
-msgid "Number of attempts taken by the student on this problem"
-msgstr "Количество попыток, использованных студентом по этой задаче"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:233
 msgid "If the problem is ready to be reset or not."
 msgstr "Готова ли задача к очистке или нет."
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:238
-msgid "Maximum Attempts"
-msgstr "Максимальное число попыток"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:239
 msgid "The number of times the student can try to answer this problem."
@@ -3184,27 +3307,12 @@ msgstr ""
 msgid "EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  If set to 'True', peer graders will be able to make changes to the student submission and those changes will be tracked and shown along with the graded feedback."
 msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ОСОБЕННОСТЬ ПЕРЕКРЕСТНОЙ ПРОВЕРКИ: если установлено в 'True', проверяющие смогут вносить изменения в посылку студента. Эти изменения будут сохранены и отображены вместе с оцененной обратной связью."
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:265
-msgid "Date that this problem is due by"
-msgstr "Срок, до которого можно сдавать эту задачу"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:269
-msgid "Amount of time after the due date that submissions will be accepted"
-msgstr "Промежуток времени после даты сдачи, в течение которого задачу еще можно сдавать"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:272
 msgid "Current version number"
 msgstr "Номер текущей версии"
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:273
-msgid "XML data for the problem"
-msgstr "XML данные для задачи"
-
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:276
-msgid "Problem Weight"
-msgstr "Вес задачи"
-
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:277
+#: common/lib/xmodule/xmodule/peer_grading_module.py:63
 msgid "Defines the number of points each problem is worth. If the value is not set, each problem is worth one point."
 msgstr ""
 "Определяет число баллов за задачу. Если значение не задано, каждая задача\n"
@@ -3252,53 +3360,97 @@ msgstr "Разрешить \"перепроверку\" работ"
 msgid "EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, but ONLY WHEN all submissions they are eligible to grade already have enough graders.  This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"
 msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ВОЗМОЖНОСТЬ. Разрешить студентам выполнять перекрестную проверку работ, которые уже проверены достаточным количеством студентов, но только тогда, когда все работы уже проверены достаточным количеством студентов. Эта возможность предназначена для использования, когда 'Требуемая перекрестная проверка' > 'Число проверяющих'"
 
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py:319
-msgid "Markdown source of this module"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:38
+#: common/lib/xmodule/xmodule/master_class_module.py:40
+#: common/lib/xmodule/xmodule/peer_grading_module.py:69
 msgid "Display name for this module"
 msgstr "Отображаемое имя для этого объекта"
 
-#: common/lib/xmodule/xmodule/master_class_module.py:43
+#: common/lib/xmodule/xmodule/master_class_module.py:42
+msgid "Master Class"
+msgstr "Мастер-класс"
+
+#: common/lib/xmodule/xmodule/master_class_module.py:45
 msgid "Max places"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:44
+#: common/lib/xmodule/xmodule/master_class_module.py:46
 msgid "Number of text boxes available for students to input words/sentences."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:50
+#: common/lib/xmodule/xmodule/master_class_module.py:52
 msgid "Autopass score"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:51
+#: common/lib/xmodule/xmodule/master_class_module.py:53
 msgid "Maximum number of words to be displayed in generated word cloud."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/master_class_module.py:59
+#: common/lib/xmodule/xmodule/master_class_module.py:61
 msgid "Whether this student has been register for this master class."
 msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:64
+#: common/lib/xmodule/xmodule/master_class_module.py:66
 msgid "All registrations from all students."
 msgstr "Все регистрации от всех студентов."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:68
+#: common/lib/xmodule/xmodule/master_class_module.py:70
 msgid "Passed registrations."
 msgstr "Прошедшие регистрацию."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:89
+#: common/lib/xmodule/xmodule/master_class_module.py:91
 msgid "You have been registered for this master class. We will provide addition information soon."
 msgstr "Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в скором времени."
 
-#: common/lib/xmodule/xmodule/master_class_module.py:91
+#: common/lib/xmodule/xmodule/master_class_module.py:93
 msgid "You are pending for registration for this master class. Please visit this page later for result."
 msgstr "Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите данную страницу позже для результатов."
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:32
+msgid "Show Single Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:33
+msgid "When True, only the single problem specified by \"Link to Problem Location\" is shown. When False, a panel is displayed with all problems available for peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:39
+#, fuzzy
+msgid "Link to Problem Location"
+msgstr "Проблема рандомизации:"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:40
+msgid "The location of the problem being graded. Only used when \"Show Single Problem\" is True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:46
+#, fuzzy
+msgid "Defines whether the student gets credit for grading this problem. Only used when \"Show Single Problem\" is True."
+msgstr "Определяет, получит ли студент кредит за оценивание данной задачи."
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:51
+msgid "Due date that should be displayed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:54
+msgid "Amount of grace to give on the due date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:58
+msgid "Student data for a given peer grading problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:71
+msgid "Peer Grading Interface"
+msgstr "Перекрестная проверка"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:74
+#, fuzzy
+msgid "Html contents to display for this module"
+msgstr "Отображаемое имя для этого объекта"
 
 #: common/lib/xmodule/xmodule/video_module.py:312
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
@@ -3557,280 +3709,284 @@ msgstr "Эл. почта"
 msgid "Analytics"
 msgstr "Аналитика"
 
-#: lms/djangoapps/instructor/views/legacy.py:111
+#: lms/djangoapps/instructor/views/legacy.py:112
 msgid "Course Statistics At A Glance"
 msgstr "Обзор статистики курса"
 
-#: lms/djangoapps/instructor/views/legacy.py:200
+#: lms/djangoapps/instructor/views/legacy.py:201
 msgid "Found a single student.  "
 msgstr "Найден один студент.  "
 
-#: lms/djangoapps/instructor/views/legacy.py:203
+#: lms/djangoapps/instructor/views/legacy.py:204
 msgid "Couldn't find student with that email or username."
 msgstr "Невозможно найти студента с таким почтовым адресом или именем пользователя"
 
-#: lms/djangoapps/instructor/views/legacy.py:241
+#: lms/djangoapps/instructor/views/legacy.py:242
 msgid "List of students enrolled in {0}"
 msgstr "Список студентов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:247
+#: lms/djangoapps/instructor/views/legacy.py:248
 msgid "Summary Grades of students enrolled in {0}"
 msgstr "Общие оценки студентов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:254
+#: lms/djangoapps/instructor/views/legacy.py:255
 msgid "Raw Grades of students enrolled in {0}"
 msgstr "Сырые оценки студетнов зачисленных на {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:282
+#: lms/djangoapps/instructor/views/legacy.py:283
 msgid "Failed to create a background task for rescoring \"{0}\"."
 msgstr "Ошибка при создании фонового процесса для перепроверки \"{0}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:286
+#: lms/djangoapps/instructor/views/legacy.py:287
 msgid "Failed to create a background task for rescoring \"{0}\": problem not found."
 msgstr "Ошибка при создании фонового процесса для перепроверки \"{0}\". Задача не найдена."
 
-#: lms/djangoapps/instructor/views/legacy.py:289
+#: lms/djangoapps/instructor/views/legacy.py:290
 msgid "Failed to create a background task for rescoring \"{url}\": {message}."
 msgstr "Ошибка при создании фонового процесса для перепроверки \"{url}\": {message}."
 
-#: lms/djangoapps/instructor/views/legacy.py:297
+#: lms/djangoapps/instructor/views/legacy.py:298
 msgid "Failed to create a background task for resetting \"{0}\"."
 msgstr "Ошибка при создании фонового процесса для сброса \"{0}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:302
+#: lms/djangoapps/instructor/views/legacy.py:303
 msgid "Failed to create a background task for resetting \"{0}\": problem not found."
 msgstr "\"Ошибка при создании фонового процесса для сброса \"{0}\": задача не найдена.\""
 
-#: lms/djangoapps/instructor/views/legacy.py:305
+#: lms/djangoapps/instructor/views/legacy.py:306
 msgid "Failed to create a background task for resetting \"{url}\": {message}."
 msgstr "Ошибка при создании фонового процесса для сброса \"{url}\": {message}."
 
-#: lms/djangoapps/instructor/views/legacy.py:346
+#: lms/djangoapps/instructor/views/legacy.py:347
 msgid "Found module.  "
 msgstr "Найден модуль.   "
 
-#: lms/djangoapps/instructor/views/legacy.py:348
+#: lms/djangoapps/instructor/views/legacy.py:349
 msgid "Couldn't find module with that urlname: {0}. "
 msgstr "Невозможно найти объект с таким адресом: {0}."
 
-#: lms/djangoapps/instructor/views/legacy.py:359
+#: lms/djangoapps/instructor/views/legacy.py:360
 msgid "Deleted student module state for {0}!"
 msgstr "Состояние объекта для студента {0} удалено!"
 
-#: lms/djangoapps/instructor/views/legacy.py:372
+#: lms/djangoapps/instructor/views/legacy.py:373
 msgid "Failed to delete module state for {id}/{url}. "
 msgstr "Ошибка удаления состояния объекта для {id}/{url}. "
 
-#: lms/djangoapps/instructor/views/legacy.py:395
+#: lms/djangoapps/instructor/views/legacy.py:396
 msgid "Module state successfully reset!"
 msgstr "Состояния объекта успешно сброшено!"
 
-#: lms/djangoapps/instructor/views/legacy.py:397
+#: lms/djangoapps/instructor/views/legacy.py:398
 msgid "Couldn't reset module state for {id}/{url}. "
 msgstr "Невозможно сбросить состояние объекта для {id}/{url}. "
 
-#: lms/djangoapps/instructor/views/legacy.py:407
+#: lms/djangoapps/instructor/views/legacy.py:408
 msgid "Failed to create a background task for rescoring \"{key}\" for student {id}."
 msgstr "Ошибка при создании фонового процесса для перепроверки \"{key}\" для студента {id}."
 
-#: lms/djangoapps/instructor/views/legacy.py:411
+#: lms/djangoapps/instructor/views/legacy.py:412
 msgid "Failed to create a background task for rescoring \"{key}\": {id}."
 msgstr "Ошибка при создании фонового процесса для перепроверки \"{key}\": {id}."
 
-#: lms/djangoapps/instructor/views/legacy.py:426
+#: lms/djangoapps/instructor/views/legacy.py:427
 msgid "Progress page for username: {username} with email address: {email}"
 msgstr "Страница прогресса пользователя {username} с почтовым адресом {email}"
 
-#: lms/djangoapps/instructor/views/legacy.py:441
+#: lms/djangoapps/instructor/views/legacy.py:442
 msgid "Assignment Name"
 msgstr "Название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:465
+#: lms/djangoapps/instructor/views/legacy.py:466
 msgid "Please enter an assignment name"
 msgstr "Введите название задания"
 
-#: lms/djangoapps/instructor/views/legacy.py:469
+#: lms/djangoapps/instructor/views/legacy.py:470
 #, python-format
 msgid "Invalid assignment name '%s'"
 msgstr "Неправильное название задания '%s'"
 
-#: lms/djangoapps/instructor/views/legacy.py:472
-#: lms/djangoapps/instructor/views/legacy.py:1134
+#: lms/djangoapps/instructor/views/legacy.py:473
+#: lms/djangoapps/instructor/views/legacy.py:1135
 msgid "External email"
 msgstr "Внешний почтовый адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:481
+#: lms/djangoapps/instructor/views/legacy.py:482
 #, python-format
 msgid "Grades for assignment \"%s\""
 msgstr "Оценки для задания \"%s\""
 
-#: lms/djangoapps/instructor/views/legacy.py:500
+#: lms/djangoapps/instructor/views/legacy.py:501
 msgid "Staff group = {0}"
 msgstr "Группа преподавателей = {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:501
+#: lms/djangoapps/instructor/views/legacy.py:502
 msgid "List of Staff"
 msgstr "Список преподавателей"
 
-#: lms/djangoapps/instructor/views/legacy.py:506
+#: lms/djangoapps/instructor/views/legacy.py:507
 msgid "Instructor group = {0}"
 msgstr "Инструктор group = {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:509
-#: lms/djangoapps/instructor/views/legacy.py:967
-#: lms/djangoapps/instructor/views/legacy.py:1041
-#: lms/djangoapps/instructor/views/legacy.py:1134
+#: lms/djangoapps/instructor/views/legacy.py:510
+#: lms/djangoapps/instructor/views/legacy.py:968
+#: lms/djangoapps/instructor/views/legacy.py:1042
+#: lms/djangoapps/instructor/views/legacy.py:1135
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: lms/djangoapps/instructor/views/legacy.py:509
-#: lms/djangoapps/instructor/views/legacy.py:967
-#: lms/djangoapps/instructor/views/legacy.py:1041
+#: lms/djangoapps/instructor/views/legacy.py:510
+#: lms/djangoapps/instructor/views/legacy.py:968
+#: lms/djangoapps/instructor/views/legacy.py:1042
 msgid "Full name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:511
+#: lms/djangoapps/instructor/views/legacy.py:512
 msgid "List of Instructors in course {0}"
 msgstr "Список инструкторов курса {0}"
 
-#: lms/djangoapps/instructor/views/legacy.py:524
-#: lms/djangoapps/instructor/views/legacy.py:543
-#: lms/djangoapps/instructor/views/legacy.py:997
+#: lms/djangoapps/instructor/views/legacy.py:525
+#: lms/djangoapps/instructor/views/legacy.py:544
+#: lms/djangoapps/instructor/views/legacy.py:998
 msgid "Error: unknown username \"{0}\""
 msgstr "Ошибка: неизвестное имя пользователя \"{0}\""
 
-#: lms/djangoapps/instructor/views/legacy.py:528
+#: lms/djangoapps/instructor/views/legacy.py:529
 msgid "Added {user} to instructor group = {group}"
 msgstr "Добавить {user} в группу инструкторов = {group}"
 
-#: lms/djangoapps/instructor/views/legacy.py:547
+#: lms/djangoapps/instructor/views/legacy.py:548
 msgid "Removed {user} from instructor group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:569
+#: lms/djangoapps/instructor/views/legacy.py:570
 #, python-format
 msgid "Student profile data for course %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:583
-#, python-format
-msgid "Found %d records to dump "
-msgstr ""
+#: lms/djangoapps/instructor/views/legacy.py:584
+msgid "Found {number} record to dump"
+msgid_plural "Found {number} records to dump"
+msgstr[0] "Найдена {number} запись"
+msgstr[1] "Найдено {number} записи"
+msgstr[2] "Найдено {number} записей"
 
-#: lms/djangoapps/instructor/views/legacy.py:585
+#: lms/djangoapps/instructor/views/legacy.py:586
 msgid "Couldn't find module with that urlname."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:592
+#: lms/djangoapps/instructor/views/legacy.py:593
 #, python-format
 msgid "Student state for problem %s"
 msgstr "Удалить состояние студента для задания %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:609
+#: lms/djangoapps/instructor/views/legacy.py:610
 msgid "Beta test group = {0}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:610
+#: lms/djangoapps/instructor/views/legacy.py:611
 msgid "List of beta_testers"
 msgstr "Список бета-тестеров"
 
-#: lms/djangoapps/instructor/views/legacy.py:735
+#: lms/djangoapps/instructor/views/legacy.py:736
+#: lms/templates/courseware/instructor_dashboard.html:555
 msgid "Email subject can not be empty."
 msgstr "Тема сообщения не может быть пустой."
 
-#: lms/djangoapps/instructor/views/legacy.py:737
+#: lms/djangoapps/instructor/views/legacy.py:738
+#: lms/templates/courseware/instructor_dashboard.html:558
 msgid "Email body can not be empty."
 msgstr "Сообщение не может быть пустым."
 
-#: lms/djangoapps/instructor/views/legacy.py:752
+#: lms/djangoapps/instructor/views/legacy.py:753
 msgid "Failed to send email! ({error_message})"
 msgstr "Не удалось отправить электронное письмо. Причина: {error_message}"
 
-#: lms/djangoapps/instructor/views/legacy.py:759
+#: lms/djangoapps/instructor/views/legacy.py:760
 msgid "Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails."
-msgstr ""
+msgstr "Ваше электронное письмо успешно поставлено в очередь для отправки. Не забудьте, что для больших открытых курсов (~10к), это можнт занять около 1-2 часов для отправки всех писем."
 
-#: lms/djangoapps/instructor/views/legacy.py:761
+#: lms/djangoapps/instructor/views/legacy.py:762
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "Ваше электронное письмо успешно поставлено в очередь для отправки."
 
-#: lms/djangoapps/instructor/views/legacy.py:914
+#: lms/djangoapps/instructor/views/legacy.py:915
 msgid "No remote gradebook defined in course metadata"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:919
+#: lms/djangoapps/instructor/views/legacy.py:920
 msgid "No remote gradebook url defined in settings.MITX_FEATURES"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:924
+#: lms/djangoapps/instructor/views/legacy.py:925
 msgid "No gradebook name defined in course remote_gradebook metadata"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py:936
-#, python-format
-msgid "Failed to communicate with gradebook server at %s<br/>"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py:937
 #, python-format
+msgid "Failed to communicate with gradebook server at %s<br/>"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:938
+#, python-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
 
-#: lms/djangoapps/instructor/views/legacy.py:948
+#: lms/djangoapps/instructor/views/legacy.py:949
 #, python-format
 msgid "Remote gradebook response for %s"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:967
+#: lms/djangoapps/instructor/views/legacy.py:968
 msgid "Roles"
 msgstr "Роли"
 
-#: lms/djangoapps/instructor/views/legacy.py:968
+#: lms/djangoapps/instructor/views/legacy.py:969
 msgid "List of Forum {name}s in course {id}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:973
-#: lms/djangoapps/instructor/views/legacy.py:1001
+#: lms/djangoapps/instructor/views/legacy.py:974
+#: lms/djangoapps/instructor/views/legacy.py:1002
 msgid "Error: unknown rolename \"{0}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1009
+#: lms/djangoapps/instructor/views/legacy.py:1010
 msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1012
+#: lms/djangoapps/instructor/views/legacy.py:1013
 msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1015
+#: lms/djangoapps/instructor/views/legacy.py:1016
 msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1018
+#: lms/djangoapps/instructor/views/legacy.py:1019
 msgid "Error: user \"{0}\" should first be added as staff before adding as a forum administrator, cannot add"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1021
+#: lms/djangoapps/instructor/views/legacy.py:1022
 msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1043
+#: lms/djangoapps/instructor/views/legacy.py:1044
 msgid "{0} in course {1}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1060
+#: lms/djangoapps/instructor/views/legacy.py:1061
 msgid "Error: unknown username or email \"{0}\""
-msgstr ""
+msgstr "Ошибка: неизвестное имя пользователя или почтовый адрес \"{0}\""
 
-#: lms/djangoapps/instructor/views/legacy.py:1066
+#: lms/djangoapps/instructor/views/legacy.py:1067
 msgid "{action} {user} {prep} {title} group = {group}"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1134
+#: lms/djangoapps/instructor/views/legacy.py:1135
 msgid "ID"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py:1134
+#: lms/djangoapps/instructor/views/legacy.py:1135
 #: lms/templates/dashboard.html:185
 #: lms/templates/register-shib.html:139
 #: lms/templates/register.html:162
@@ -3839,23 +3995,43 @@ msgstr ""
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: lms/djangoapps/instructor/views/legacy.py:1134
+#: lms/djangoapps/instructor/views/legacy.py:1135
 msgid "edX email"
 msgstr "edX адрес"
 
-#: lms/djangoapps/instructor/views/legacy.py:1317
+#: lms/djangoapps/instructor/views/legacy.py:1318
 msgid "Enrollment of students"
 msgstr "Зачислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1390
+#: lms/djangoapps/instructor/views/legacy.py:1391
 msgid "Un-enrollment of students"
 msgstr "Отчислить несколько студентов"
 
-#: lms/djangoapps/instructor/views/legacy.py:1578
+#: lms/djangoapps/instructor/views/legacy.py:1476
+msgid "url_name"
+msgstr "url задачи"
+
+#: lms/djangoapps/instructor/views/legacy.py:1476
+msgid "display name"
+msgstr "отображаемое имя"
+
+#: lms/djangoapps/instructor/views/legacy.py:1476
+msgid "answer id"
+msgstr "идентификатор ответа"
+
+#: lms/djangoapps/instructor/views/legacy.py:1476
+msgid "answer"
+msgstr "ответ"
+
+#: lms/djangoapps/instructor/views/legacy.py:1476
+msgid "count"
+msgstr "количество"
+
+#: lms/djangoapps/instructor/views/legacy.py:1579
 msgid "Failed to find any background tasks for course \"{course}\", module \"{problem}\" and student \"{student}\"."
 msgstr "Невозможно найти фоновые задачи объекта \"{problem}\" курса \"{course}\" для студента \"{student}\"."
 
-#: lms/djangoapps/instructor/views/legacy.py:1581
+#: lms/djangoapps/instructor/views/legacy.py:1582
 msgid "Failed to find any background tasks for course \"{course}\" and module \"{problem}\"."
 msgstr "Невозможно найти фоновые задачи объекта \"{problem}\" курса \"{course}\"."
 
@@ -4689,7 +4865,7 @@ msgid "Level"
 msgstr "Уровень"
 
 #: lms/templates/folditbasic.html:23
-#: lms/templates/courseware/instructor_dashboard.html:783
+#: lms/templates/courseware/instructor_dashboard.html:791
 msgid "Submitted"
 msgstr "Отправлено"
 
@@ -6018,6 +6194,12 @@ msgstr "Дополнительные комментарии:"
 msgid "Submit Feedback"
 msgstr "Отправить отчет"
 
+#: lms/templates/combinedopenended/openended/open_ended.html:10
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:11
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:34
+msgid "Response"
+msgstr "Ответ"
+
 #: lms/templates/combinedopenended/openended/open_ended.html:17
 msgid "Unanswered"
 msgstr "Неотвечено"
@@ -6666,101 +6848,110 @@ msgstr "Вы отправили письмо себе чтобы убедить�
 msgid "Send email"
 msgstr "Отослать письмо"
 
-#: lms/templates/courseware/instructor_dashboard.html:579
+#: lms/templates/courseware/instructor_dashboard.html:587
 msgid "No Analytics are available at this time."
 msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:584
+#: lms/templates/courseware/instructor_dashboard.html:592
 msgid "Students enrolled:"
 msgstr "Участвующие студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:592
+#: lms/templates/courseware/instructor_dashboard.html:600
 msgid "Students active in the last week:"
 msgstr "Студенты, активные на прошлой неделе"
 
-#: lms/templates/courseware/instructor_dashboard.html:600
+#: lms/templates/courseware/instructor_dashboard.html:608
 msgid "Student activity day by day"
 msgstr "Активность студентов день за днем"
 
-#: lms/templates/courseware/instructor_dashboard.html:606
+#: lms/templates/courseware/instructor_dashboard.html:614
 msgid "Day"
 msgstr "День"
 
-#: lms/templates/courseware/instructor_dashboard.html:607
+#: lms/templates/courseware/instructor_dashboard.html:615
 #: lms/templates/static_templates/faq.html:73
 #: lms/templates/static_templates/faq.html:131
 msgid "Students"
 msgstr "Студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:622
+#: lms/templates/courseware/instructor_dashboard.html:630
 msgid "Answer distribution for problems"
 msgstr "Распределение ответов по задачам"
 
-#: lms/templates/courseware/instructor_dashboard.html:628
-#: lms/templates/courseware/instructor_dashboard.html:665
+#: lms/templates/courseware/instructor_dashboard.html:636
+#: lms/templates/courseware/instructor_dashboard.html:673
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:22
 msgid "Problem"
 msgstr "Задача"
 
-#: lms/templates/courseware/instructor_dashboard.html:629
+#: lms/templates/courseware/instructor_dashboard.html:637
 msgid "Max"
 msgstr "Максимальный"
 
-#: lms/templates/courseware/instructor_dashboard.html:630
+#: lms/templates/courseware/instructor_dashboard.html:638
 msgid "Points Earned (Num Students)"
 msgstr "Получено баллов (число студентов)"
 
-#: lms/templates/courseware/instructor_dashboard.html:659
+#: lms/templates/courseware/instructor_dashboard.html:667
 msgid "Students answering correctly"
 msgstr "Студенты, ответившие корректно"
 
-#: lms/templates/courseware/instructor_dashboard.html:666
+#: lms/templates/courseware/instructor_dashboard.html:674
 msgid "Number of students"
 msgstr "Число студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:679
+#: lms/templates/courseware/instructor_dashboard.html:687
 msgid "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):"
 msgstr "Распределение студентов по странам, все курсы, сен-2012, окт-2017, 1 сервер (показано для примера):"
 
-#: lms/templates/courseware/instructor_dashboard.html:775
+#: lms/templates/courseware/instructor_dashboard.html:783
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:44
 msgid "Pending Instructor Tasks"
 msgstr "Ожидающие задачи инструктора"
 
-#: lms/templates/courseware/instructor_dashboard.html:779
+#: lms/templates/courseware/instructor_dashboard.html:787
 msgid "Task Type"
 msgstr "Тип задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:780
+#: lms/templates/courseware/instructor_dashboard.html:788
 msgid "Task inputs"
 msgstr "Входные данные задач"
 
-#: lms/templates/courseware/instructor_dashboard.html:781
+#: lms/templates/courseware/instructor_dashboard.html:789
 msgid "Task Id"
 msgstr "ID задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:782
+#: lms/templates/courseware/instructor_dashboard.html:790
 msgid "Requester"
 msgstr "Запрашивающий"
 
-#: lms/templates/courseware/instructor_dashboard.html:784
+#: lms/templates/courseware/instructor_dashboard.html:792
 msgid "Task State"
 msgstr "Состояние задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:785
+#: lms/templates/courseware/instructor_dashboard.html:793
 msgid "Duration (sec)"
 msgstr "Длительность (в секундах)"
 
-#: lms/templates/courseware/instructor_dashboard.html:786
+#: lms/templates/courseware/instructor_dashboard.html:794
 msgid "Task Progress"
 msgstr "Ход выполнения задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:798
-#: lms/templates/courseware/instructor_dashboard.html:799
+#: lms/templates/courseware/instructor_dashboard.html:806
+#: lms/templates/courseware/instructor_dashboard.html:807
 msgid "unknown"
 msgstr "неизвестный"
 
-#: lms/templates/courseware/instructor_dashboard.html:863
+#: lms/templates/courseware/instructor_dashboard.html:827
+msgid "Hide course statistics"
+msgstr "Скрыть статистику курса"
+
+#: lms/templates/courseware/instructor_dashboard.html:830
+#: lms/templates/courseware/instructor_dashboard.html:836
+msgid "Show course statistics"
+msgstr "Показать статистику курса"
+
+#: lms/templates/courseware/instructor_dashboard.html:889
 msgid "Course errors"
 msgstr "Ошибки курса"
 
@@ -7005,6 +7196,12 @@ msgstr "Моя когорта"
 #: lms/templates/discussion/_new_post.html:69
 msgid "new post title"
 msgstr "заголовок нового сообщения"
+
+#: lms/templates/discussion/_inline_new_post.html:39
+#: lms/templates/discussion/_new_post.html:70
+#: lms/templates/discussion/_underscore_templates.html:87
+msgid "Title"
+msgstr "Заголовок"
 
 #: lms/templates/discussion/_inline_new_post.html:50
 #: lms/templates/discussion/_new_post.html:81
@@ -7654,10 +7851,6 @@ msgstr "Вот список открытых задач в курсе, кото�
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:28
 msgid "No flagged problems exist."
 msgstr "Нет отмеченных задач."
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:34
-msgid "Response"
-msgstr "Ответ"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html:47
 msgid "Unflag"
@@ -10072,6 +10265,10 @@ msgstr ""
 msgid "{span_start}active{span_end}"
 msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
+#, fuzzy
+#~ msgid "title"
+#~ msgstr "Заголовок"
+
 #~ msgid "Missing key {0} from submission.  Please reload and try again."
 #~ msgstr ""
 #~ "Отсутствует ключ {0} проверяемой работы. Пожалуйста, перезагрузите работу."
@@ -10158,9 +10355,6 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 #~ msgid "Course-wide settings for all problems"
 #~ msgstr "Глобальные настройки курса для всех проблем"
 
-#~ msgid "Problem Randomization:"
-#~ msgstr "Проблема рандомизации:"
-
 #~ msgid "Always"
 #~ msgstr "Всегда"
 
@@ -10178,9 +10372,6 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
 #~ msgid "randomize problems <strong>per student</strong>"
 #~ msgstr "рандомизировать проблемы<strong>для студента</strong>"
-
-#~ msgid "Show Answers:"
-#~ msgstr "Показать ответы:"
 
 #~ msgid "Answers will be shown after the number of attempts has been met"
 #~ msgstr "Ответы будут показаны после определенного числа попыток"

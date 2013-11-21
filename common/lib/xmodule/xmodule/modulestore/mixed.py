@@ -6,14 +6,14 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 IMPORTANT: This modulestore only supports READONLY applications, e.g. LMS
 """
 
-from . import ModuleStoreBase
+from . import ModuleStoreWriteBase
 from xmodule.modulestore.django import create_modulestore_instance
 import logging
 
 log = logging.getLogger(__name__)
 
 
-class MixedModuleStore(ModuleStoreBase):
+class MixedModuleStore(ModuleStoreWriteBase):
     """
     ModuleStore that can be backed by either XML or Mongo
     """
@@ -138,8 +138,11 @@ class MixedModuleStore(ModuleStoreBase):
 
     def get_modulestore_type(self, course_id):
         """
-        Returns a type which identifies which modulestore is servicing the given
-        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        Returns a type which identifies which modulestore is servicing the given course_id.
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
         """
         return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
 

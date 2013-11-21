@@ -1,23 +1,24 @@
 ---
 metadata:
-    display_name: Drag and Drop
+    display_name: Перемещение объектов
     markdown: !!null
 data: |
     <problem>
-        Here's an example of a "Drag and Drop" question set. Click and drag each word in the scrollbar below, up to the numbered bucket which matches the number of letters in the word. 
+        Здесь представлен пример задачи с перемещением объектов. Переместите указанные слова в ведра так,
+        чтобы слово из k букв лежало в ведре с номером k.
        <customresponse>
             <drag_and_drop_input img="https://studio.edx.org/c4x/edX/DemoX/asset/L9_buckets.png">
-                <draggable id="1" label="a"/>
-                <draggable id="2" label="cat"/>
-                <draggable id="3" label="there"/>
-                <draggable id="4" label="pear"/>
-                <draggable id="5" label="kitty"/>
-                <draggable id="6" label="in"/>
-                <draggable id="7" label="them"/>
-                <draggable id="8" label="za"/>
-                <draggable id="9" label="dog"/>
-                <draggable id="10" label="slate"/>
-                <draggable id="11" label="few"/>
+                <draggable id="1" label="я"/>
+                <draggable id="2" label="кот"/>
+                <draggable id="3" label="вечер"/>
+                <draggable id="4" label="торт"/>
+                <draggable id="5" label="милый"/>
+                <draggable id="6" label="он"/>
+                <draggable id="7" label="трон"/>
+                <draggable id="8" label="во"/>
+                <draggable id="9" label="пес"/>
+                <draggable id="10" label="салат"/>
+                <draggable id="11" label="ток"/>
             </drag_and_drop_input>
             <answer type="loncapa/python">
     correct_answer = {

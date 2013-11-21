@@ -28,7 +28,7 @@ import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
-from lms.xblock.mixin import LmsBlockMixin
+from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.xmodule_namespace import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -240,16 +240,29 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 from rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
-    'base-style': {
+    'style-vendor': {
         'source_filenames': [
+            'css/vendor/normalize.css',
+            'css/vendor/font-awesome.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/base-style.css',
-            'xmodule/modules.css',
-            'xmodule/descriptor.css',
+            'js/vendor/markitup/skins/simple/style.css',
+            'js/vendor/markitup/sets/wiki/style.css',
         ],
-        'output_filename': 'css/cms-base-style.css',
+        'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-app': {
+        'source_filenames': [
+            'sass/style-app.css',
+        ],
+        'output_filename': 'css/cms-style-app.css',
+    },
+    'style-xmodule': {
+        'source_filenames': [
+            'sass/style-xmodule.css',
+        ],
+        'output_filename': 'css/cms-style-xmodule.css',
     },
 }
 

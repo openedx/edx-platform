@@ -98,6 +98,7 @@ class SequenceModule(SequenceFields, XModule):
                   'item_id': self.id,
                   'position': self.position,
                   'tag': self.location.category,
+                  'ajax_url': self.system.ajax_url,
                   }
 
         fragment.add_content(self.system.render_template('seq_module.html', params))

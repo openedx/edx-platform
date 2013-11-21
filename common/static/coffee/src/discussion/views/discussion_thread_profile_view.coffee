@@ -4,6 +4,7 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .action-follow": "toggleFollowing"
+      "keypress .action-follow": "toggleFollowingKeypress"
       "click .expand-post": "expandPost"
       "click .collapse-post": "collapsePost"
 
@@ -25,7 +26,6 @@ if Backbone?
       @$el.html(Mustache.render(@template, params))
       @initLocal()
       @delegateEvents()
-      @renderDogear()
       @renderVoted()
       @renderAttrs()
       @$("span.timeago").timeago()
@@ -33,10 +33,6 @@ if Backbone?
       if @expanded
         @renderResponses()
       @
-
-    renderDogear: ->
-      if window.user.following(@model)
-        @$(".dogear").addClass("is-followed")
 
     renderVoted: =>
       if window.user.voted(@model)
@@ -80,20 +76,6 @@ if Backbone?
         @unvote()
       else
         @vote()
-
-    toggleFollowing: (event) ->
-      $elem = $(event.target)
-      url = null
-      if not @model.get('subscribed')
-        @model.follow()
-        url = @model.urlFor("follow")
-      else
-        @model.unfollow()
-        url = @model.urlFor("unfollow")
-      DiscussionUtil.safeAjax
-        $elem: $elem
-        url: url
-        type: "POST"
 
     vote: ->
       window.user.vote(@model)

@@ -11,11 +11,13 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
-from instructor_task.subtasks import increment_subtask_status
+from instructor_task.subtasks import update_subtask_status
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -29,13 +31,13 @@ class MockCourseEmailResult(object):
     """
     emails_sent = 0
 
-    def get_mock_increment_subtask_status(self):
+    def get_mock_update_subtask_status(self):
         """Wrapper for mock email function."""
-        def mock_increment_subtask_status(original_status, **kwargs):  # pylint: disable=W0613
+        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=W0613
             """Increments count of number of emails sent."""
-            self.emails_sent += kwargs.get('succeeded', 0)
-            return increment_subtask_status(original_status, **kwargs)
-        return mock_increment_subtask_status
+            self.emails_sent += new_subtask_status.succeeded
+            return update_subtask_status(entry_id, current_task_id, new_subtask_status)
+        return mock_update_subtask_status
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -47,16 +49,11 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
-        # Create instructor group for course
-        instructor_group = GroupFactory.create(name="instructor_MITx/999/Robot_Super_Course")
-        instructor_group.user_set.add(self.instructor)
+
+        self.instructor = InstructorFactory(self.course)
 
         # Create staff
-        self.staff = [UserFactory() for _ in xrange(STAFF_COUNT)]
-        staff_group = GroupFactory()
-        for staff in self.staff:
-            staff_group.user_set.add(staff)  # pylint: disable=E1101
+        self.staff = [StaffFactory(self.course) for _ in xrange(STAFF_COUNT)]
 
         # Create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
@@ -244,13 +241,13 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
-    @patch('bulk_email.tasks.increment_subtask_status')
+    @patch('bulk_email.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying
         """
         mock_factory = MockCourseEmailResult()
-        email_mock.side_effect = mock_factory.get_mock_increment_subtask_status()
+        email_mock.side_effect = mock_factory.get_mock_update_subtask_status()
         added_users = []
         for _ in xrange(LARGE_NUM_EMAILS):
             user = UserFactory()

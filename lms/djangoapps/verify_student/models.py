@@ -26,6 +26,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 from model_utils.models import StatusModel
 from model_utils import Choices
 
@@ -114,9 +115,6 @@ class PhotoVerification(StatusModel):
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
     """
-    # We can make this configurable later...
-    DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
     STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
@@ -175,20 +173,29 @@ class PhotoVerification(StatusModel):
 
     ##### Methods listed in the order you'd typically call them
     @classmethod
+    def _earliest_allowed_date(cls):
+        """
+        Returns the earliest allowed date given the settings
+
+        """
+        DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        allowed_date = (
+            datetime.now(pytz.UTC) - timedelta(days=DAYS_GOOD_FOR)
+        )
+        return allowed_date
+
+    @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None):
         """
         Return whether or not a user has satisfactorily proved their
         identity. Depending on the policy, this can expire after some period of
         time, so a user might have to renew periodically.
         """
-        earliest_allowed_date = (
-            earliest_allowed_date or
-            datetime.now(pytz.UTC) - timedelta(days=cls.DAYS_GOOD_FOR)
-        )
         return cls.objects.filter(
             user=user,
             status="approved",
-            created_at__gte=earliest_allowed_date
+            created_at__gte=(earliest_allowed_date
+                             or cls._earliest_allowed_date())
         ).exists()
 
     @classmethod
@@ -201,14 +208,11 @@ class PhotoVerification(StatusModel):
         on the contents of the attempt, and we have not yet received a denial.
         """
         valid_statuses = ['must_retry', 'submitted', 'approved']
-        earliest_allowed_date = (
-            earliest_allowed_date or
-            datetime.now(pytz.UTC) - timedelta(days=cls.DAYS_GOOD_FOR)
-        )
         return cls.objects.filter(
             user=user,
             status__in=valid_statuses,
-            created_at__gte=earliest_allowed_date
+            created_at__gte=(earliest_allowed_date
+                             or cls._earliest_allowed_date())
         ).exists()
 
     @classmethod
@@ -224,6 +228,55 @@ class PhotoVerification(StatusModel):
             return active_attempts[0]
         else:
             return None
+
+    @classmethod
+    def user_status(cls, user):
+        """
+        Returns the status of the user based on their past verification attempts
+
+        If no such verification exists, returns 'none'
+        If verification has expired, returns 'expired'
+        If the verification has been approved, returns 'approved'
+        If the verification process is still ongoing, returns 'pending'
+        If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
+        """
+        status = 'none'
+        error_msg = ''
+
+        if cls.user_is_verified(user):
+            status = 'approved'
+        elif cls.user_has_valid_or_pending(user):
+            # user_has_valid_or_pending does include 'approved', but if we are
+            # here, we know that the attempt is still pending
+            status = 'pending'
+        else:
+            # we need to check the most recent attempt to see if we need to ask them to do
+            # a retry
+            try:
+                attempts = cls.objects.filter(user=user).order_by('-updated_at')
+                attempt = attempts[0]
+            except IndexError:
+                return ('none', error_msg)
+            if attempt.created_at < cls._earliest_allowed_date():
+                return ('expired', error_msg)
+
+            # right now, this is the only state at which they must reverify. It
+            # may change later
+            if attempt.status == 'denied':
+                status = 'must_reverify'
+            if attempt.error_msg:
+                error_msg = attempt.parsed_error_msg()
+
+        return (status, error_msg)
+
+    def parsed_error_msg(self):
+        """
+        Sometimes, the error message we've received needs to be parsed into
+        something more human readable
+
+        The default behavior is to return the current error message as is.
+        """
+        return self.error_msg
 
     @status_before_must_be("created")
     def upload_face_image(self, img):
@@ -485,6 +538,42 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             log.exception(error)
             self.status = "must_retry"
             self.save()
+
+    def parsed_error_msg(self):
+        """
+        Parse the error messages we receive from SoftwareSecure
+
+        Error messages are written in the form:
+
+            `[{"photoIdReasons": ["Not provided"]}]`
+
+        Returns a list of error messages
+        """
+        # Translates the category names and messages into something more human readable
+        message_dict = {
+            ("photoIdReasons", "Not provided"): _("No photo ID was provided."),
+            ("photoIdReasons", "Text not clear"): _("We couldn't read your name from your photo ID image."),
+            ("generalReasons", "Name mismatch"): _("The name associated with your account and the name on your ID do not match."),
+            ("userPhotoReasons", "Image not clear"): _("The image of your face was not clear."),
+            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo"),
+        }
+
+        try:
+            msg_json = json.loads(self.error_msg)
+            msg_dict = msg_json[0]
+
+            msg = []
+            for category in msg_dict:
+                # find the messages associated with this category
+                category_msgs = msg_dict[category]
+                for category_msg in category_msgs:
+                    msg.append(message_dict[(category, category_msg)])
+            return u", ".join(msg)
+        except (ValueError, KeyError):
+            # if we can't parse the message as JSON or the category doesn't
+            # match one of our known categories, show a generic error
+            log.error('PhotoVerification: Error parsing this error message: %s', self.error_msg)
+            return _("There was an error verifying your ID photos.")
 
     def image_url(self, name):
         """

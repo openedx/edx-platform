@@ -26,7 +26,6 @@
 
 <script type="text/template" id="thread-show-template">
   <div class="discussion-post">
-      <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="${_('follow')}"></a></div>
       <header>
       ${"<% if (obj.group_id) { %>"}
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
@@ -45,6 +44,9 @@
                 ${_("&bull; This thread is closed.")}
               </span>
           </p>
+          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="${_('follow')}" role="checkbox" aria-checked="false">
+            <span class="sr">${_("Follow this post")}</span>
+          </a>
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
@@ -84,7 +86,7 @@
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
-      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
+      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${'<%-title %>'}" placeholder='${_("Title")}'>
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>

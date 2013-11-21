@@ -1,22 +1,21 @@
 ---
 metadata:
-    display_name: Image Mapped Input
+    display_name: Изображение
     markdown: !!null
 data: |
   <problem>
     <p>
-      An image mapped input problem presents an image for the student.
-      Input is given by the location of mouse clicks on the image.
-      Correctness of input can be evaluated based on expected dimensions of a rectangle.
+      Можно показать студентам любое изображение. И попросить найти их указанный элемент.
+      Проверка того, что они его нашли осуществляется по клику мышки в заданном вами прямоугольнике.
     </p>
-    <p>Which animal shown below is a kitten?</p>
+    <p>Найдите котенка на изображении</p>
     <imageresponse>
       <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)"/>
     </imageresponse>
     <solution>
       <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>The animal on the right is a kitten. The animal on the left is a puppy, not a kitten.</p>
+        <p>Комментарий</p>
+        <p>Котенок находится справа. Слева лежит щенок, не котенок. </p>
       </div>
     </solution>
   </problem>

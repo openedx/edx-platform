@@ -61,8 +61,8 @@ require(["coffee/src/views/tabs", "coffee/src/models/module"], function(TabsEdit
 
       <div class="tab-list">
         <ol class='components'>
-          % for id in components:
-          <li class="component" data-id="${id}"/>
+          % for id, update_url in components:
+          <li class="component" data-id="${id}" data-update_url="${update_url}"/>
           % endfor
 
           <li class="new-component-item">

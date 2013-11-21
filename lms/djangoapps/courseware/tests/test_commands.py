@@ -96,10 +96,15 @@ class CommandsTestBase(object):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_export_course_stdout(self):
+        output = self.run_export_course('-')
+        with tarfile.open(fileobj=StringIO(output)) as tar_file:
+            self.check_export_file(tar_file)
+
     def run_export_course(self, filename):  # pylint: disable=missing-docstring
         args = ['edX/simple/2012_Fall', filename]
         kwargs = {'modulestore': 'default'}
-        self.call_command('export_course', *args, **kwargs)
+        return self.call_command('export_course', *args, **kwargs)
 
     def check_export_file(self, tar_file):  # pylint: disable=missing-docstring
         names = tar_file.getnames()

@@ -1,10 +1,10 @@
 ---
 metadata:
-    display_name: Circuit Schematic Builder
+    display_name: Принципиальная схема
     markdown: !!null
 data: |
       <problem >
-        Please make a voltage divider that splits the provided voltage evenly.
+        Пожалуйста, постройте делитель напряжения так, чтобы напряжение делилось равномерно.
     
       <schematicresponse>
       <center>
@@ -26,7 +26,7 @@ data: |
       </answer>
       </schematicresponse>
       <schematicresponse>
-      <p>Make a high pass filter</p>
+      <p>Сделайте фильтр высоких частот</p>
       <center>
       <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
       submit_analyses="{&quot;ac&quot;:[[&quot;NodeA&quot;,1,9]]}"
@@ -50,10 +50,13 @@ data: |
     
           <solution>
               <div class="detailed-solution">
-                  <p>Explanation</p>
-                  <p>A voltage divider that evenly divides the input voltage can be formed with two identically valued resistors, with the sampled voltage taken in between the two.</p>
+                  <p>Комментарий</p>
+                  <p>Делитель напряжения, который равномерно делит входное напряжение может быть получен из двух
+                   резисторов одинакого сопротивления.</p>
                   <p><img src="/static/images/voltage_divider.png"/></p>
-                  <p>A simple high-pass filter without any further constaints can be formed by simply putting a resister in series with a capacitor. The actual values of the components do not really matter in order to meet the constraints of the problem.</p>
+                  <p>Простой фильтр высоких частот без каких-либо дополнительных ограничений может
+                  быть получен если просто поставить резистор последовательно с конденсатором.
+                  Фактические характеристики компонентов в действительности не имеют значения в условиях этой задачи.</p>
                   <p><img src="/static/images/high_pass_filter.png"/></p>
               </div>
           </solution>

@@ -234,10 +234,10 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/create_item', {
+    $.postJSON('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': 'New Unit'
+        'display_name': gettext('New Unit')
     },
 
     function(data) {
@@ -248,23 +248,23 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'), 'Unit');
+    _deleteItem($(this).parents('li.leaf'), gettext('Unit'));
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'), 'Subsection');
+    _deleteItem($(this).parents('li.branch'), gettext('Subsection'));
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'), 'Section');
+    _deleteItem($(this).parents('section.branch'), gettext('Section'));
 }
 
 function _deleteItem($el, type) {
     var confirm = new PromptView.Warning({
-        title: gettext('Delete this ' + type + '?'),
-        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        title: interpolate(gettext('Delete this %(type)s?'), {type: type}, true),
+        message: interpolate(gettext('Deleting this %(type)s is permanent and cannot be undone.'), {type: type}, true),
         actions: {
             primary: {
                 text: gettext('Yes, delete this ' + type),
@@ -283,15 +283,14 @@ function _deleteItem($el, type) {
                     });
                     deleting.show();
 
-                    $.post('/delete_item',
-                           {'id': id,
-                            'delete_children': true,
-                            'delete_all_versions': true},
-                           function(data) {
-                               $el.remove();
-                               deleting.hide();
-                           }
-                          );
+                    $.ajax({
+                        type: 'DELETE',
+                        url: $el.data('update_url')+'?'+ $.param({recurse: true, all_versions: true}),
+                        success: function () {
+                            $el.remove();
+                            deleting.hide();
+                        }
+                    });
                 }
             },
             secondary: {

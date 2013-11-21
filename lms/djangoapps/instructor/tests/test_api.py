@@ -5,6 +5,7 @@ Unit tests for instructor.api methods.
 import unittest
 import json
 import requests
+import datetime
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -12,13 +13,15 @@ from mock import Mock, patch
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
 
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
@@ -28,8 +31,7 @@ import instructor_task.api
 
 from instructor.access import allow_access
 import instructor.views.api
-from instructor.views.api import (
-    _split_input_list, _msk_from_problem_urlname, common_exceptions_400)
+from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 
 
@@ -96,56 +98,145 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Ensure that users cannot access endpoints they shouldn't be able to.
     """
     def setUp(self):
-        self.user = UserFactory.create()
         self.course = CourseFactory.create()
+        self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.client.login(username=self.user.username, password='test')
 
-    def test_deny_students_update_enrollment(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {})
-        self.assertEqual(response.status_code, 403)
+        self.problem_urlname = 'robot-some-problem-urlname'
+        _module = StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course.id,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
+            state=json.dumps({'attempts': 10}),
+        )
 
-    def test_staff_level(self):
+        # Endpoints that only Staff or Instructors can access
+        self.staff_level_endpoints = [
+            ('students_update_enrollment', {'emails': 'foo@example.org', 'action': 'enroll'}),
+            ('get_grading_config', {}),
+            ('get_students_features', {}),
+            ('get_distribution', {}),
+            ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
+            ('reset_student_attempts', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            ('update_forum_role_membership', {'email': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
+            ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
+            ('proxy_legacy_analytics', {'aname': 'ProblemGradeDistribution'}),
+            ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
+            ('list_instructor_tasks', {}),
+            ('list_background_email_tasks', {}),
+        ]
+        # Endpoints that only Instructors can access
+        self.instructor_level_endpoints = [
+            ('modify_access', {'email': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
+            ('list_course_role_members', {'rolename': 'beta'}),
+            ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+        ]
+
+    def _access_endpoint(self, endpoint, args, status_code, msg):
+        """
+        Asserts that accessing the given `endpoint` gets a response of `status_code`.
+
+        endpoint: string, endpoint for instructor dash API
+        args: dict, kwargs for `reverse` call
+        status_code: expected HTTP status code response
+        msg: message to display if assertion fails.
+        """
+        url = reverse(endpoint, kwargs={'course_id': self.course.id})
+        if endpoint in 'send_email':
+            response = self.client.post(url, args)
+        else:
+            response = self.client.get(url, args)
+        print endpoint
+        print response
+        self.assertEqual(
+            response.status_code,
+            status_code,
+            msg=msg
+        )
+
+    def test_student_level(self):
         """
         Ensure that an enrolled student can't access staff or instructor endpoints.
         """
-        staff_level_endpoints = [
-            'students_update_enrollment',
-            'modify_access',
-            'list_course_role_members',
-            'get_grading_config',
-            'get_students_features',
-            'get_distribution',
-            'get_student_progress_url',
-            'reset_student_attempts',
-            'rescore_problem',
-            'list_instructor_tasks',
-            'list_forum_members',
-            'update_forum_role_membership',
-            'proxy_legacy_analytics',
-            'send_email',
-        ]
-        for endpoint in staff_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(response.status_code, 403)
+        self.client.login(username=self.user.username, password='test')
 
-    def test_instructor_level(self):
+        for endpoint, args in self.staff_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+    def test_staff_level(self):
         """
         Ensure that a staff member can't access instructor endpoints.
         """
-        instructor_level_endpoints = [
-            'modify_access',
-            'list_course_role_members',
-            'reset_student_attempts',
-            'list_instructor_tasks',
-            'update_forum_role_membership',
-        ]
-        for endpoint in instructor_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(response.status_code, 403)
+        staff_member = StaffFactory(self.course)
+        CourseEnrollment.enroll(staff_member, self.course.id)
+        self.client.login(username=staff_member.username, password='test')
+        # Try to promote to forums admin - not working
+        # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics', 'list_forum_members']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Staff member should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Staff member should not be allowed to access endpoint " + endpoint
+            )
+
+    def test_instructor_level(self):
+        """
+        Ensure that an instructor member can access all endpoints.
+        """
+        inst = InstructorFactory(self.course)
+        CourseEnrollment.enroll(inst, self.course.id)
+        self.client.login(username=inst.username, password='test')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            # TODO: make this work
+            if endpoint in ['rescore_problem']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
+            )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -157,8 +248,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.enrolled_student = UserFactory()
@@ -284,8 +375,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     response yet, so only the status code is tested.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.other_instructor = UserFactory()
@@ -421,8 +512,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     Test endpoints that show data without side effects.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -558,8 +649,8 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     database, that is the job of task tests and test_enrollment.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -691,6 +782,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         })
         print response.content
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -701,8 +793,8 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     only with valid email messages.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
@@ -761,6 +853,18 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 400)
 
 
+class MockCompletionInfo(object):
+    """Mock for get_task_completion_info"""
+    times_called = 0
+
+    def mock_get_task_completion_info(self, *args):  # pylint: disable=unused-argument
+        """Mock for get_task_completion_info"""
+        self.times_called += 1
+        if self.times_called % 2 == 0:
+            return True, 'Task Completed'
+        return False, 'Task Errored In Some Way'
+
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -769,19 +873,50 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     class FakeTask(object):
         """ Fake task object """
-        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        FEATURES = [
+            'task_type',
+            'task_input',
+            'task_id',
+            'requester',
+            'task_state',
+            'created',
+            'status',
+            'task_message',
+            'duration_sec'
+        ]
 
-        def __init__(self):
+        def __init__(self, completion):
             for feature in self.FEATURES:
                 setattr(self, feature, 'expected')
+            # created needs to be a datetime
+            self.created = datetime.datetime(2013, 10, 25, 11, 42, 35)
+            # set 'status' and 'task_message' attrs
+            success, task_message = completion()
+            if success:
+                self.status = "Complete"
+            else:
+                self.status = "Incomplete"
+            self.task_message = task_message
+            # Set 'task_output' attr, which will be parsed to the 'duration_sec' attr.
+            self.task_output = '{"duration_ms": 1035000}'
+            self.duration_sec = 1035000 / 1000.0
+
+        def make_invalid_output(self):
+            """Munge task_output to be invalid json"""
+            self.task_output = 'HI MY NAME IS INVALID JSON'
+            # This should be given the value of 'unknown' if the task output
+            # can't be properly parsed
+            self.duration_sec = 'unknown'
 
         def to_dict(self):
             """ Convert fake task to dictionary representation. """
-            return {key: 'expected' for key in self.FEATURES}
+            attr_dict = {key: getattr(self, key) for key in self.FEATURES}
+            attr_dict['created'] = attr_dict['created'].isoformat()
+            return attr_dict
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -797,58 +932,97 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ),
             state=json.dumps({'attempts': 10}),
         )
+        mock_factory = MockCompletionInfo()
+        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(7)]
+        self.tasks[-1].make_invalid_output()
 
-        self.tasks = [self.FakeTask() for _ in xrange(6)]
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
 
     @patch.object(instructor_task.api, 'get_running_instructor_tasks')
     def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {})
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
+
+    @patch.object(instructor_task.api, 'get_instructor_task_history')
+    def test_list_background_email_tasks(self, act):
+        """Test list of background email tasks."""
+        act.return_value = self.tasks
+        url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id})
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_tasks = [ftask.to_dict() for ftask in self.tasks]
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-            'unique_student_identifier': self.student.email,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+                'unique_student_identifier': self.student.email,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+
+        self.assertEqual(actual_tasks, expected_tasks)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -872,8 +1046,8 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.content = '{"test_content": "robot test content"}'
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(self.course)
         self.client.login(username=self.instructor.username, password='test')
 
     @patch.object(instructor.views.api.requests, 'get')

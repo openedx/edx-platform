@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Problem Written in LaTeX
+    display_name: Задача, написанная в LaTeX
     source_code: |
         % Nearly any kind of edX problem can be authored using Latex as
         % the source language.  Write latex as usual, including equations.  The
@@ -9,82 +9,83 @@ metadata:
         % epxected (correct) answer is.
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "option" problem}
+        \subsection{Пример выпадающего списка}
         
-        Where is the earth?
+        Где обычно находится земля?
         
-        \edXabox{options='up','down' expect='down'}
+        \edXabox{options='сверху','снизу' expect='снизу'}
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "symbolic" problem}
+        \subsection{пример текстовой задачи}
         
-        What is Einstein's equation for the energy equivalent of a mass $m$?
+        Какому количеству энергии, согласно равенству Эйнштейна эквивалентно тело массой $m$?
         
         \edXabox{type='symbolic' size='90' expect='m*c^2' }
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "numerical" problem}
+        \subsection{пример числовой задачи}
         
-        Estimate the energy savings (in J/y) if all the people
-        ($3\times 10^8$) in the U.~S. switched from U.~S. code to low flow
-        shower heads.
+        %Оцените сэкономленную энергию(в Джоулях), если все жители США ($3\times 10^8$) перейдут
+        %Estimate the energy savings (in J/y) if all the people
+        %($3\times 10^8$) in the U.~S. switched from U.~S. code to low flow
+        %shower heads.
         
-        \edXinline{Energy saved = }\edXabox{expect="0.52" type="numerical" tolerance='0.02' inline='1' } %
-        \edXinline{~EJ/year}
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "multiple choice" problem}
-        
-        What color is a banana?
-        
-        \edXabox{ type="multichoice" expect="Yellow" options="Red","Green","Yellow","Blue" }
+        %\edXinline{Energy saved = }\edXabox{expect="0.52" type="numerical" tolerance='0.02' inline='1' } %
+        %\edXinline{~EJ/year}
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "string response" problem}
+        \subsection{Пример множественного выбора}
         
-        In what U.S. state is Detroit located?
+        Какого цвета банан?
         
-        \edXabox{ type="string" expect="Michigan" options="ci" }
+        \edXabox{ type="multichoice" expect="желтый" options="красный","зеленый","желтый","голубой" }
         
-        An explanation of the answer can be provided by using the edXsolution
-        macro.  Click on "Show Answer" to see the solution.
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %\subsection{Example "string response" problem}
         
-        \begin{edXsolution}
-        Detroit is near Canada, but it is actually in the United States.
-        \end{edXsolution}
+        %In what U.S. state is Detroit located?
+        
+        %\edXabox{ type="string" expect="Michigan" options="ci" }
+        
+        %An explanation of the answer can be provided by using the edXsolution
+        %macro.  Click on "Show Answer" to see the solution.
+        
+        %\begin{edXsolution}
+        %Detroit is near Canada, but it is actually in the United States.
+        %\end{edXsolution}
                 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example "custom response" problem}
+        %\subsection{Example "custom response" problem}
         
-        This problem demonstrates the use of a custom python script used for
-        checking the answer.
+        %This problem demonstrates the use of a custom python script used for
+        %checking the answer.
         
-        \begin{edXscript}
-        def sumtest(expect,ans):
-            (a1,a2) = map(float,eval(ans))
-            return (a1+a2)==10
-        \end{edXscript}
+        %\begin{edXscript}
+        %def sumtest(expect,ans):
+        %    (a1,a2) = map(float,eval(ans))
+        %    return (a1+a2)==10
+        %\end{edXscript}
         
-        Enter a python list of two numbers which sum to 10, eg [9,1]:
+        %Enter a python list of two numbers which sum to 10, eg [9,1]:
         
-        \edXabox{expect="[1,9]" type="custom" cfn="sumtest"}
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example image}
-        
-        Include image by using the edXxml macro:
-        
-        \edXxml{<img src="http://autoid.mit.edu/images/mit_dome.jpg"/>}
+        %\edXabox{expect="[1,9]" type="custom" cfn="sumtest"}
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        \subsection{Example show/hide explanation}
+        %\subsection{Example image}
         
-        Extra explanations can be tucked away behind a "showhide" toggle flag:
+        %Include image by using the edXxml macro:
         
-        \edXshowhide{sh1}{More explanation}{This is a hidden explanation.  It
-        can contain equations: $\alpha = \frac{2}{\sqrt{1+\gamma}}$ }
+        %\edXxml{<img src="http://autoid.mit.edu/images/mit_dome.jpg"/>}
         
-        This is some text after the showhide example.
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %\subsection{Example show/hide explanation}
+        
+        %Extra explanations can be tucked away behind a "showhide" toggle flag:
+        
+        %\edXshowhide{sh1}{More explanation}{This is a hidden explanation.  It
+        %can contain equations: $\alpha = \frac{2}{\sqrt{1+\gamma}}$ }
+        
+        %This is some text after the showhide example.
     markdown: !!null
 
 data: |
@@ -92,20 +93,20 @@ data: |
     <problem>
       <text>
         <p>
-          <h4>Example "option" problem</h4>
+          <h4>Пример выпадающего списка</h4>
         </p>
         <p>
-    Where is the earth? </p>
+    Где обычно находится земля? </p>
         <p>
           <optionresponse>
-            <optioninput options="('up','down')" correct="down"/>
+            <optioninput options="('сверху','снизу')" correct="снизу"/>
           </optionresponse>
         </p>
         <p>
-          <h4>Example "symbolic" problem</h4>
+          <h4>пример текстовой задачи</h4>
         </p>
         <p>
-    What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]? </p>
+    Какому количеству энергии, согласно равенству Эйнштейна эквивалентно тело массой [mathjaxinline]m[/mathjaxinline]? </p>
         <p>
           <symbolicresponse expect="m*c^2">
             <textline size="90" correct_answer="m*c^2" math="1"/>
@@ -115,7 +116,7 @@ data: |
           <h4>Example "numerical" problem</h4>
         </p>
         <p>
-    Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low flow shower heads. </p>
+    <!--Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low flow shower heads. </p>
         <p>
           <p style="display:inline">Energy saved = </p>
           <numericalresponse inline="1" answer="0.52">
@@ -124,29 +125,30 @@ data: |
           </numericalresponse>
           <p style="display:inline">&#xA0;EJ/year</p>
         </p>
-        <p>
-          <h4>Example "multiple choice" problem</h4>
+        <p>-->
+          <h4>Пример множественного выбора</h4>
         </p>
         <p>
-    What color is a banana? </p>
+    Какого цвета банан? </p>
         <p>
           <choiceresponse>
             <checkboxgroup>
               <choice correct="false" name="1">
-                <text>Red</text>
+                <text>красный</text>
               </choice>
               <choice correct="false" name="2">
-                <text>Green</text>
+                <text>зеленый</text>
               </choice>
               <choice correct="true" name="3">
-                <text>Yellow</text>
+                <text>желтый</text>
               </choice>
               <choice correct="false" name="4">
-                <text>Blue</text>
+                <text>голубой</text>
               </choice>
             </checkboxgroup>
           </choiceresponse>
         </p>
+       <!--
         <p>
           <h4>Example "string response" problem</h4>
         </p>
@@ -212,5 +214,6 @@ data: |
             </tbody>
           </table>
         </p>
+         -->
       </text>
     </problem>

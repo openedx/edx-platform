@@ -46,7 +46,8 @@ class CourseFactory(XModuleFactory):
         # passed in via **kwargs. However, some of those aren't actual field values,
         # so pop those off for use separately
         org = kwargs.pop('org', None)
-        number = kwargs.pop('number', kwargs.pop('course', None))
+        # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
+        number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
 
         location = Location('i4x', org, number, 'course', Location.clean(kwargs.get('display_name')))

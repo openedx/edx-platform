@@ -1,12 +1,11 @@
 from unittest import skip
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.test.client import Client
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from contentstore.tests.utils import AjaxEnabledTestClient
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -45,10 +44,10 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get(reverse('index'))
+        resp = self.client.get_html('/course')
         self.assertContains(resp,
                             '<h1 class="page-header">My Courses</h1>',
                             status_code=200,
@@ -56,10 +55,10 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get(reverse('index'),
+        resp = self.client.get_html('/course',
                                {},
                                HTTP_ACCEPT_LANGUAGE='en'
                                )
@@ -80,10 +79,10 @@ class InternationalizationTest(ModuleStoreTestCase):
     @skip
     def test_course_with_accents(self):
         """Test viewing the index page with no courses"""
-        self.client = Client()
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get(reverse('index'),
+        resp = self.client.get_html('/course',
                                {},
                                HTTP_ACCEPT_LANGUAGE='fr'
                                )

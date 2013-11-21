@@ -6,13 +6,16 @@ wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
 ###
 
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
+# Load utilities
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
-
+PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 # Data Download Section
 class DataDownload
   constructor: (@$section) ->
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
+    @$section.data 'wrapper', @
     # gather elements
     @$display                = @$section.find '.data-display'
     @$display_text           = @$display.find '.data-display-text'
@@ -21,9 +24,9 @@ class DataDownload
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
+    @instructor_tasks = new (PendingInstructorTasks()) @$section
 
     # attach click handlers
-
     # The list-anon case is always CSV
     @$list_anon_btn.click (e) =>
       url = @$list_anon_btn.data 'endpoint'
@@ -80,6 +83,11 @@ class DataDownload
           @clear_display()
           @$display_text.html data['grading_config_summary']
 
+  # handler for when the section title is clicked.
+  onClickTitle: -> @instructor_tasks.task_poller.start()
+
+  # handler for when the section is closed
+  onExit: -> @instructor_tasks.task_poller.stop()
 
   clear_display: ->
     @$display_text.empty()
@@ -89,9 +97,7 @@ class DataDownload
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    DataDownload: DataDownload
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  DataDownload: DataDownload

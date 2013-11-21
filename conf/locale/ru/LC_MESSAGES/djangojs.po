@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-01 18:06+0400\n"
-"PO-Revision-Date: 2013-11-01 14:12+0300\n"
+"POT-Creation-Date: 2013-11-15 16:03+0400\n"
+"PO-Revision-Date: 2013-11-05 19:24+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -16,6 +16,9 @@ msgstr ""
 "X-POOTLE-MTIME: 1379953606.0\n"
 
 #: cms/static/coffee/src/main.js:35
+#: test_root/staticfiles/coffee/src/main.1e20e6c21663.js:35
+#: test_root/staticfiles/coffee/src/main.cb4083881220.js:35
+#: test_root/staticfiles/coffee/src/main.js:35
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -25,10 +28,16 @@ msgstr ""
 "подключены к Интернету."
 
 #: cms/static/coffee/src/main.js:38
+#: test_root/staticfiles/coffee/src/main.1e20e6c21663.js:38
+#: test_root/staticfiles/coffee/src/main.cb4083881220.js:38
+#: test_root/staticfiles/coffee/src/main.js:38
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
 #: cms/static/coffee/src/views/module_edit.js:71
+#: test_root/staticfiles/coffee/src/views/module_edit.0f3f2eb81dd7.js:71
+#: test_root/staticfiles/coffee/src/views/module_edit.3977163c4848.js:71
+#: test_root/staticfiles/coffee/src/views/module_edit.js:71
 #, c-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
@@ -39,26 +48,65 @@ msgstr "<em>Редактирование:</em> %s"
 #: cms/static/js/views/course_info_handout.js:55
 #: cms/static/js/views/course_info_update.js:80
 #: cms/static/js/views/overview.js:67 cms/static/js/views/overview.js.c:432
+#: test_root/staticfiles/coffee/src/views/module_edit.0f3f2eb81dd7.js:125
+#: test_root/staticfiles/coffee/src/views/module_edit.3977163c4848.js:125
+#: test_root/staticfiles/coffee/src/views/module_edit.js:125
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:69
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:69
+#: test_root/staticfiles/coffee/src/views/unit.js:69
+#: test_root/staticfiles/js/base.90e03faf88c7.js:560
+#: test_root/staticfiles/js/base.js:560
+#: test_root/staticfiles/js/models/section.53e0f3c52a7e.js:27
+#: test_root/staticfiles/js/models/section.js:27
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:79
+#: test_root/staticfiles/js/views/asset.js:79
+#: test_root/staticfiles/js/views/course_info_handout.9c1f144a01a8.js:59
+#: test_root/staticfiles/js/views/course_info_handout.js:59
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:82
+#: test_root/staticfiles/js/views/course_info_update.js:82
+#: test_root/staticfiles/js/views/overview.70018d2d1b2e.js:233
+#: test_root/staticfiles/js/views/overview.js:233
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js:89
+#: test_root/staticfiles/coffee/src/views/tabs.648822a123a7.js:89
+#: test_root/staticfiles/coffee/src/views/tabs.d8a8e5b0a639.js:89
+#: test_root/staticfiles/coffee/src/views/tabs.js:89
 msgid "Delete Component Confirmation"
 msgstr "Подверждение удаления компонента"
 
 #: cms/static/coffee/src/views/tabs.js:90
+#: test_root/staticfiles/coffee/src/views/tabs.648822a123a7.js:90
+#: test_root/staticfiles/coffee/src/views/tabs.d8a8e5b0a639.js:90
+#: test_root/staticfiles/coffee/src/views/tabs.js:90
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы уверены, что хотите удалить этот компонент? Операция необратима."
 
 #: cms/static/coffee/src/views/tabs.js:93
 #: cms/static/js/views/course_info_update.js:140
+#: test_root/staticfiles/coffee/src/views/tabs.648822a123a7.js:93
+#: test_root/staticfiles/coffee/src/views/tabs.d8a8e5b0a639.js:93
+#: test_root/staticfiles/coffee/src/views/tabs.js:93
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:140
+#: test_root/staticfiles/js/views/course_info_update.js:140
 msgid "OK"
 msgstr "ОК"
 
 #: cms/static/coffee/src/views/tabs.js:104
 #: cms/static/coffee/src/views/unit.js:169 cms/static/js/base.js:282
 #: cms/static/js/views/course_info_update.js:148
+#: test_root/staticfiles/coffee/src/views/tabs.648822a123a7.js:104
+#: test_root/staticfiles/coffee/src/views/tabs.d8a8e5b0a639.js:104
+#: test_root/staticfiles/coffee/src/views/tabs.js:104
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:169
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:169
+#: test_root/staticfiles/coffee/src/views/unit.js:169
+#: test_root/staticfiles/js/base.90e03faf88c7.js:358
+#: test_root/staticfiles/js/base.js:358
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:148
+#: test_root/staticfiles/js/views/course_info_update.js:148
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
@@ -70,47 +118,85 @@ msgstr "Удаление&hellip;"
 #: cms/static/js/views/validation.js:115
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:92
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:204
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:92
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:204
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:92
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:204
+#: test_root/staticfiles/coffee/src/views/tabs.648822a123a7.js:117
+#: test_root/staticfiles/coffee/src/views/tabs.d8a8e5b0a639.js:117
+#: test_root/staticfiles/coffee/src/views/tabs.js:117
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:192
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:192
+#: test_root/staticfiles/coffee/src/views/unit.js:192
+#: test_root/staticfiles/js/base.90e03faf88c7.js:374
+#: test_root/staticfiles/js/base.js:374
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:67
+#: test_root/staticfiles/js/views/asset.js:67
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:166
+#: test_root/staticfiles/js/views/course_info_update.js:166
+#: test_root/staticfiles/js/views/show_textbook.9d51b01bad70.js:50
+#: test_root/staticfiles/js/views/show_textbook.js:50
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:115
+#: test_root/staticfiles/js/views/validation.js:115
 msgid "Cancel"
 msgstr "Отмена"
 
 #: cms/static/coffee/src/views/unit.js:160
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:160
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:160
+#: test_root/staticfiles/coffee/src/views/unit.js:160
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
 #: cms/static/coffee/src/views/unit.js:161
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:161
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:161
+#: test_root/staticfiles/coffee/src/views/unit.js:161
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Удаление этого компонента необратимо."
 
 #: cms/static/coffee/src/views/unit.js:164
+#: test_root/staticfiles/coffee/src/views/unit.98f22d81708f.js:164
+#: test_root/staticfiles/coffee/src/views/unit.f8b64eacc8d9.js:164
+#: test_root/staticfiles/coffee/src/views/unit.js:164
 msgid "Yes, delete this component"
 msgstr "Да, удалить"
 
 #: cms/static/js/base.js:72 lms/static/js/verify_student/photocapture.js:300
+#: test_root/staticfiles/js/base.90e03faf88c7.js:80
+#: test_root/staticfiles/js/base.js:80
 msgid "This link will open in a new browser window/tab"
 msgstr "Эта ссылка откроется в новом окне или в новой вкладке браузера."
 
-#: cms/static/js/base.js:75
+#: cms/static/js/base.js:75 test_root/staticfiles/js/base.90e03faf88c7.js:83
+#: test_root/staticfiles/js/base.js:83
 msgid "This link will open in a modal window"
 msgstr "Эта ссылка откроется в новом модальном окне."
 
-#: cms/static/js/base.js:266
+#: cms/static/js/base.js:266 test_root/staticfiles/js/base.90e03faf88c7.js:342
+#: test_root/staticfiles/js/base.js:342
 msgid "Delete this "
 msgstr "Удалить"
 
-#: cms/static/js/base.js:267
+#: cms/static/js/base.js:267 test_root/staticfiles/js/base.90e03faf88c7.js:343
+#: test_root/staticfiles/js/base.js:343
 msgid "Deleting this "
 msgstr "Удаление"
 
-#: cms/static/js/base.js:270
+#: cms/static/js/base.js:270 test_root/staticfiles/js/base.90e03faf88c7.js:346
+#: test_root/staticfiles/js/base.js:346
 msgid "Yes, delete this "
 msgstr "Да, удалить"
 
-#: cms/static/js/index.js:88
+#: cms/static/js/index.js:88 test_root/staticfiles/js/index.11223e09393c.js:88
+#: test_root/staticfiles/js/index.js:88
 msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 "Пожалуйста, в этом поле не используйте пробелов или специальных символов."
 
 #: cms/static/js/index.js:103
+#: test_root/staticfiles/js/index.11223e09393c.js:103
+#: test_root/staticfiles/js/index.js:103
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
@@ -119,22 +205,32 @@ msgstr ""
 "превышать 65 символов."
 
 #: cms/static/js/index.js:138
+#: test_root/staticfiles/js/index.11223e09393c.js:138
+#: test_root/staticfiles/js/index.js:138
 msgid "Required field."
 msgstr "Обязательное поле."
 
-#: cms/static/js/sock.js:22
+#: cms/static/js/sock.js:22 test_root/staticfiles/js/sock.2294d6255314.js:22
+#: test_root/staticfiles/js/sock.js:22
 msgid "Hide Studio Help"
 msgstr "Скрытая помощь студии"
 
-#: cms/static/js/sock.js:24
+#: cms/static/js/sock.js:24 test_root/staticfiles/js/sock.2294d6255314.js:24
+#: test_root/staticfiles/js/sock.js:24
 msgid "Looking for Help with Studio?"
 msgstr "Нужна помощь со студией?"
 
 #: cms/static/js/models/course.js:8 cms/static/js/models/section.js:8
+#: test_root/staticfiles/js/models/course.23960233f138.js:8
+#: test_root/staticfiles/js/models/course.js:8
+#: test_root/staticfiles/js/models/section.53e0f3c52a7e.js:8
+#: test_root/staticfiles/js/models/section.js:8
 msgid "You must specify a name"
 msgstr "Вы должны указать имя"
 
 #: cms/static/js/models/uploads.js:18
+#: test_root/staticfiles/js/models/uploads.5d431ac03df0.js:18
+#: test_root/staticfiles/js/models/uploads.js:18
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in <"
 "%= fileExtensions %> to upload."
@@ -143,63 +239,93 @@ msgstr ""
 "выберите для загрузки файл с расширением <%= fileExtensions %>."
 
 #: cms/static/js/models/uploads.js:43
+#: test_root/staticfiles/js/models/uploads.5d431ac03df0.js:43
+#: test_root/staticfiles/js/models/uploads.js:43
 msgid "or"
 msgstr "или"
 
 #: cms/static/js/models/settings/course_details.js:43
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:43
+#: test_root/staticfiles/js/models/settings/course_details.js:43
 msgid "The course must have an assigned start date."
 msgstr "Для курса должна быть указана дата начала."
 
 #: cms/static/js/models/settings/course_details.js:46
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:46
+#: test_root/staticfiles/js/models/settings/course_details.js:46
 msgid "The course end date cannot be before the course start date."
 msgstr "Конец курса не может предшествовать началу курса. "
 
 #: cms/static/js/models/settings/course_details.js:49
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:49
+#: test_root/staticfiles/js/models/settings/course_details.js:49
 msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
 "Дата начала курса не может предшествовать дате начала регистрации на курс."
 
 #: cms/static/js/models/settings/course_details.js:52
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:52
+#: test_root/staticfiles/js/models/settings/course_details.js:52
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 "Дата конца регистрации на курс не может предшествовать дате начала "
 "регистрации на курс."
 
 #: cms/static/js/models/settings/course_details.js:55
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:55
+#: test_root/staticfiles/js/models/settings/course_details.js:55
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
 "Дата конца курса не может предшествовать дате конца регистрации на курс."
 
 #: cms/static/js/models/settings/course_details.js:59
+#: test_root/staticfiles/js/models/settings/course_details.0756ffcbb955.js:59
+#: test_root/staticfiles/js/models/settings/course_details.js:59
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr "Ключ должен содержать только буквы, цифры, _ или -"
 
 #: cms/static/js/models/settings/course_grader.js:33
+#: test_root/staticfiles/js/models/settings/course_grader.e17ff24e9b41.js:33
+#: test_root/staticfiles/js/models/settings/course_grader.js:33
 msgid "There's already another assignment type with this name."
 msgstr "Задание с таким именем уже существует."
 
 #: cms/static/js/models/settings/course_grader.js:40
+#: test_root/staticfiles/js/models/settings/course_grader.e17ff24e9b41.js:40
+#: test_root/staticfiles/js/models/settings/course_grader.js:40
 msgid "Please enter an integer between 0 and 100."
 msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
 
 #: cms/static/js/models/settings/course_grader.js:54
 #: cms/static/js/models/settings/course_grader.js:60
+#: test_root/staticfiles/js/models/settings/course_grader.e17ff24e9b41.js:54
+#: test_root/staticfiles/js/models/settings/course_grader.e17ff24e9b41.js:60
+#: test_root/staticfiles/js/models/settings/course_grader.js:54
+#: test_root/staticfiles/js/models/settings/course_grader.js:60
 msgid "Please enter an integer."
 msgstr "Пожалуйста, введите целое число."
 
 #: cms/static/js/models/settings/course_grader.js:66
+#: test_root/staticfiles/js/models/settings/course_grader.e17ff24e9b41.js:66
+#: test_root/staticfiles/js/models/settings/course_grader.js:66
 msgid "Cannot drop more <% attrs.types %> than will assigned."
 msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
 
 #: cms/static/js/models/settings/course_grading_policy.js:71
+#: test_root/staticfiles/js/models/settings/course_grading_policy.747aa739b7ec.js:71
+#: test_root/staticfiles/js/models/settings/course_grading_policy.js:71
 msgid "Grace period must be specified in HH:MM format."
 msgstr "Время оценивания должно быть задано в формате ЧЧ:ММ."
 
 #: cms/static/js/views/asset.js:47
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:47
+#: test_root/staticfiles/js/views/asset.js:47
 msgid "Delete File Confirmation"
 msgstr "Удалить файл подтверждения"
 
 #: cms/static/js/views/asset.js:48
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:48
+#: test_root/staticfiles/js/views/asset.js:48
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
@@ -213,35 +339,55 @@ msgstr ""
 "будет работать (например, поломка изображения и/или ссылки)"
 
 #: cms/static/js/views/asset.js:51 cms/static/js/views/show_textbook.js:36
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:51
+#: test_root/staticfiles/js/views/asset.js:51
+#: test_root/staticfiles/js/views/show_textbook.9d51b01bad70.js:36
+#: test_root/staticfiles/js/views/show_textbook.js:36
 msgid "Delete"
 msgstr "Удалить"
 
 #: cms/static/js/views/asset.js:58
+#: test_root/staticfiles/js/views/asset.566f37a0a16d.js:58
+#: test_root/staticfiles/js/views/asset.js:58
 msgid "Your file has been deleted."
 msgstr "Ваш файл был удален."
 
 #: cms/static/js/views/course_info_update.js:136
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:136
+#: test_root/staticfiles/js/views/course_info_update.js:136
 msgid "Are you sure you want to delete this update?"
 msgstr "Вы уверены, что хотите удалить это обновление?"
 
 #: cms/static/js/views/course_info_update.js:137
+#: test_root/staticfiles/js/views/course_info_update.01b2709baf5b.js:137
+#: test_root/staticfiles/js/views/course_info_update.js:137
 msgid "This action cannot be undone."
 msgstr "Действие необратимо."
 
 #: cms/static/js/views/edit_chapter.js:55
+#: test_root/staticfiles/js/views/edit_chapter.d36cdac10a20.js:55
+#: test_root/staticfiles/js/views/edit_chapter.js:55
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "Загрузить новый PDF в <%= name %>"
 
 #: cms/static/js/views/edit_textbook.js:63
 #: cms/static/js/views/overview_assignment_grader.js:62
+#: test_root/staticfiles/js/views/edit_textbook.f1841bc39127.js:63
+#: test_root/staticfiles/js/views/edit_textbook.js:63
+#: test_root/staticfiles/js/views/overview_assignment_grader.842f06987eba.js:62
+#: test_root/staticfiles/js/views/overview_assignment_grader.js:62
 msgid "Saving"
 msgstr "Сохранение"
 
 #: cms/static/js/views/import.js:141
+#: test_root/staticfiles/js/views/import.a3c7d5701b74.js:141
+#: test_root/staticfiles/js/views/import.js:141
 msgid "There was an error with the upload"
 msgstr ""
 
 #: cms/static/js/views/import.js:159
+#: test_root/staticfiles/js/views/import.a3c7d5701b74.js:159
+#: test_root/staticfiles/js/views/import.js:159
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
@@ -250,38 +396,56 @@ msgstr ""
 "<code>tar.gz</code>."
 
 #: cms/static/js/views/overview.js:13
+#: test_root/staticfiles/js/base.90e03faf88c7.js:181
+#: test_root/staticfiles/js/base.js:181
 msgid "Collapse All Sections"
 msgstr "Свернуть все разделы"
 
 #: cms/static/js/views/overview.js:15
+#: test_root/staticfiles/js/base.90e03faf88c7.js:183
+#: test_root/staticfiles/js/base.js:183
 msgid "Expand All Sections"
 msgstr "Развернуть все разделы"
 
 #: cms/static/js/views/overview.js:92
+#: test_root/staticfiles/js/base.90e03faf88c7.js:585
+#: test_root/staticfiles/js/base.js:585
 msgid "Will Release:"
 msgstr "Будет начат:"
 
 #: cms/static/js/views/overview.js:93
+#: test_root/staticfiles/js/base.90e03faf88c7.js:586
+#: test_root/staticfiles/js/base.js:586
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
 msgstr "{month}/{day}/{year} в {hour}:{minute} UTC"
 
 #: cms/static/js/views/overview.js:96
+#: test_root/staticfiles/js/base.90e03faf88c7.js:589
+#: test_root/staticfiles/js/base.js:589
 msgid "Edit"
 msgstr "Редактировать"
 
 #: cms/static/js/views/section_edit.js:50
+#: test_root/staticfiles/js/views/section_edit.261745381d85.js:50
+#: test_root/staticfiles/js/views/section_edit.js:50
 msgid "Your change could not be saved"
 msgstr "Ваши изменения не были сохранены"
 
 #: cms/static/js/views/section_edit.js:54
+#: test_root/staticfiles/js/views/section_edit.261745381d85.js:54
+#: test_root/staticfiles/js/views/section_edit.js:54
 msgid "Return and resolve this issue"
 msgstr "Вернитесь и решите эту проблему"
 
 #: cms/static/js/views/show_textbook.js:31
+#: test_root/staticfiles/js/views/show_textbook.9d51b01bad70.js:31
+#: test_root/staticfiles/js/views/show_textbook.js:31
 msgid "Delete “<%= name %>”?"
 msgstr "Удалить “<%= name %>”?"
 
 #: cms/static/js/views/show_textbook.js:33
+#: test_root/staticfiles/js/views/show_textbook.9d51b01bad70.js:33
+#: test_root/staticfiles/js/views/show_textbook.js:33
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in "
 "your courseware's navigation will also be removed."
@@ -290,39 +454,57 @@ msgstr ""
 "на него в вашей навигации курсов также будут удалены."
 
 #: cms/static/js/views/show_textbook.js:40
+#: test_root/staticfiles/js/views/show_textbook.9d51b01bad70.js:40
+#: test_root/staticfiles/js/views/show_textbook.js:40
 msgid "Deleting"
 msgstr "Удаление"
 
 #: cms/static/js/views/uploads.js:104
+#: test_root/staticfiles/js/views/uploads.3e913abf7d18.js:104
+#: test_root/staticfiles/js/views/uploads.js:104
 msgid "We're sorry, there was an error"
 msgstr "Извините, произошла ошибка"
 
 #: cms/static/js/views/validation.js:15
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:15
+#: test_root/staticfiles/js/views/validation.js:15
 msgid "You've made some changes"
 msgstr "Вы сделали некоторые изменения"
 
 #: cms/static/js/views/validation.js:16
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:16
+#: test_root/staticfiles/js/views/validation.js:16
 msgid "Your changes will not take effect until you save your progress."
 msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
 
 #: cms/static/js/views/validation.js:17
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:17
+#: test_root/staticfiles/js/views/validation.js:17
 msgid "You've made some changes, but there are some errors"
 msgstr "Вы сделали некоторые изменения, но возникли ошибки"
 
 #: cms/static/js/views/validation.js:18
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:18
+#: test_root/staticfiles/js/views/validation.js:18
 msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr "Пожалуйста, присылайте ошибки на эту страницу, а затем сохраните."
 
 #: cms/static/js/views/validation.js:106
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:106
+#: test_root/staticfiles/js/views/validation.js:106
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
 #: cms/static/js/views/validation.js:134
+#: test_root/staticfiles/js/views/validation.31a5f63a2bf8.js:134
+#: test_root/staticfiles/js/views/validation.js:134
 msgid "Your changes have been saved."
 msgstr "Ваши изменения были сохранены."
 
 #: cms/static/js/views/settings/advanced.js:56
+#: test_root/staticfiles/js/views/settings/advanced.b56c181d8843.js:56
+#: test_root/staticfiles/js/views/settings/advanced.js:56
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
@@ -331,10 +513,14 @@ msgstr ""
 "с редактированием ключей и значений, так как проверка не реализована."
 
 #: cms/static/js/views/settings/advanced.js:105
+#: test_root/staticfiles/js/views/settings/advanced.b56c181d8843.js:105
+#: test_root/staticfiles/js/views/settings/advanced.js:105
 msgid "Your policy changes have been saved."
 msgstr "Ваши политические изменения были сохранены."
 
 #: cms/static/js/views/settings/advanced.js:106
+#: test_root/staticfiles/js/views/settings/advanced.b56c181d8843.js:106
+#: test_root/staticfiles/js/views/settings/advanced.js:106
 msgid ""
 "Please note that validation of your policy key and value pairs is not "
 "currently in place yet. If you are having difficulties, please review your "
@@ -358,149 +544,50 @@ msgid "Fail"
 msgstr "Незачет"
 
 #: cms/static/js/views/settings/main.js:256
+#: test_root/staticfiles/js/views/settings/main.d78fd8a44ff1.js:256
+#: test_root/staticfiles/js/views/settings/main.js:256
 msgid "Upload your course image."
 msgstr "Загрузить образ курса."
 
 #: cms/static/js/views/settings/main.js:257
+#: test_root/staticfiles/js/views/settings/main.d78fd8a44ff1.js:257
+#: test_root/staticfiles/js/views/settings/main.js:257
 msgid "Files must be in JPEG or PNG format."
 msgstr "Файлы должны быть в формате PNG или JPEG."
 
-#: common/lib/xmodule/xmodule/js/spec/combinedopenended/display_spec.js:131
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:376
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:376
-#: lms/static/coffee/src/staff_grading/staff_grading.js:443
-msgid "Submit"
-msgstr "Отправить"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:69
-#: common/static/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:69
-msgid "points"
-msgstr "баллов"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:73
-#: common/static/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:73
-#, c-format
-msgid "%s point possible"
-msgid_plural "%s points possible"
-msgstr[0] "%s балл"
-msgstr[1] "%s балла"
-msgstr[2] "%s баллов"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:520
-#: common/static/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:520
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:523
+#: common/static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:523
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:8909
+#: test_root/staticfiles/js/cms-modules.js:8909
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.2e55a7856b77.js:523
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.3bf2b685d47c.js:523
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:523
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.2e55a7856b77.js:523
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.3bf2b685d47c.js:523
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:523
+#: test_root/staticfiles/xmodule_js/src/capa/display.2e55a7856b77.js:523
+#: test_root/staticfiles/xmodule_js/src/capa/display.3bf2b685d47c.js:523
+#: test_root/staticfiles/xmodule_js/src/capa/display.js:523
 msgid "unanswered"
 msgstr "не отвечен"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:550
-#: common/static/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:550
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:553
+#: common/static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:553
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:8939
+#: test_root/staticfiles/js/cms-modules.js:8939
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.2e55a7856b77.js:553
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.3bf2b685d47c.js:553
+#: test_root/staticfiles/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:553
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.2e55a7856b77.js:553
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.3bf2b685d47c.js:553
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js:553
+#: test_root/staticfiles/xmodule_js/src/capa/display.2e55a7856b77.js:553
+#: test_root/staticfiles/xmodule_js/src/capa/display.3bf2b685d47c.js:553
+#: test_root/staticfiles/xmodule_js/src/capa/display.js:553
 msgid "Status: unsubmitted"
 msgstr "Статус: не сдан"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:265
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:265
-msgid "The problem state got out of sync.  Try reloading the page."
-msgstr ""
-"Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:327
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:327
-msgid "You need to pick a rating before you can submit."
-msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:372
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:661
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:372
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:661
-msgid "Your score did not meet the criteria to move to the next step."
-msgstr ""
-"Ваши оценки не соответствуют критериям для того что приступить к следующему "
-"этапу."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:385
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:385
-msgid "Submit assessment"
-msgstr "Отправить задание"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:392
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:392
-msgid ""
-"Your response has been submitted.  Please check back later for your grade."
-msgstr ""
-"Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
-"оценки."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:403
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:403
-msgid "Submit post-assessment"
-msgstr "Отправить ответ"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:446
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:446
-msgid "Answer saved, but not yet submitted."
-msgstr "Ваш ответ сохранен, но еще не отправлен."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:477
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:477
-msgid ""
-"Please confirm that you wish to submit your work. You will not be able to "
-"make any changes after submitting."
-msgstr ""
-"Пожалуйста, подтвердите, что вы хотите отправить вашу работу. Вы не сможете "
-"вносить какие-либо изменения после отправки."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:613
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:613
-msgid ""
-"Are you sure you want to remove your previous response to this question?"
-msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:659
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:659
-msgid "Moved to next step."
-msgstr "Перейти к следующему шагу."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:717
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:717
-msgid ""
-"File uploads are required for this question, but are not supported in this "
-"browser. Try the newest version of google chrome.  Alternatively, if you "
-"have uploaded the image to the web, you can paste a link to it into the "
-"answer box."
-msgstr ""
-"Для данной задачи требуется отправка файлов, но данная функциональность не "
-"поддерживается вашим браузером. Попробуйте обновить ваш браузер , либо вы "
-"можете загрузить ваш фаил в интернет и вставить ссылку в поле для ответа."
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:746
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:755
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:575
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:584
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:746
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:755
-#: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:575
-#: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:584
-msgid "Hide Question"
-msgstr "Скрыть задание"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
-#: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:576
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:747
-#: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:576
-msgid "Show Question"
-msgstr "Показать задание"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:826
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:826
-msgid "See full feedback"
-msgstr "Посмотреть полную обратную связь"
-
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:828
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:828
-msgid "Respond to Feedback"
-msgstr "Ответить на обратную связь"
-
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:177
-#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:177
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -509,7 +596,6 @@ msgstr ""
 "скором времени."
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:178
-#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:178
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
@@ -519,36 +605,92 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:72
 #: common/static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:72
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:14981
+#: test_root/staticfiles/js/cms-modules.js:14981
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:72
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:72
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.1be5ba2ee27b.js:72
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.js:72
 msgid "video slider"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:152
 #: common/static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:152
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15061
+#: test_root/staticfiles/js/cms-modules.js:15061
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:152
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:152
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:152
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:152
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.1be5ba2ee27b.js:152
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.js:152
 msgid "Pause"
 msgstr "Пауза"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:157
 #: common/static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:157
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15066
+#: test_root/staticfiles/js/cms-modules.js:15066
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:157
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:157
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:157
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:157
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.1be5ba2ee27b.js:157
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.js:157
 msgid "Play"
 msgstr "Воспроизвести"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:180
 #: common/static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:180
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15089
+#: test_root/staticfiles/js/cms-modules.js:15089
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:180
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:180
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:180
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:180
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.1be5ba2ee27b.js:180
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.js:180
 msgid "Fill browser"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:194
 #: common/static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:194
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15103
+#: test_root/staticfiles/js/cms-modules.js:15103
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:194
+#: test_root/staticfiles/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:194
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.1be5ba2ee27b.js:194
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/005-1be5ba2ee27b6aa44e356c16369d41c8.js:194
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.1be5ba2ee27b.js:194
+#: test_root/staticfiles/xmodule_js/src/video/04_video_control.js:194
 msgid "Exit full browser"
 msgstr "Выйти из полноэкранного режима"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:66
 #: common/static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:66
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15367
+#: test_root/staticfiles/js/cms-modules.js:15367
+#: test_root/staticfiles/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.3abcac3b93be.js:66
+#: test_root/staticfiles/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:66
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.3abcac3b93be.js:66
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:66
+#: test_root/staticfiles/xmodule_js/src/video/05_video_quality_control.3abcac3b93be.js:66
+#: test_root/staticfiles/xmodule_js/src/video/05_video_quality_control.js:66
 msgid "HD on"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:72
 #: common/static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:72
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:15373
+#: test_root/staticfiles/js/cms-modules.js:15373
+#: test_root/staticfiles/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.3abcac3b93be.js:72
+#: test_root/staticfiles/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.3abcac3b93be.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/006-3abcac3b93be85d1c694682b75401837.js:72
+#: test_root/staticfiles/xmodule_js/src/video/05_video_quality_control.3abcac3b93be.js:72
+#: test_root/staticfiles/xmodule_js/src/video/05_video_quality_control.js:72
 msgid "HD off"
 msgstr ""
 
@@ -556,26 +698,74 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:188
 #: common/static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:72
 #: common/static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:188
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:17496
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:17612
+#: test_root/staticfiles/js/cms-modules.js:17496
+#: test_root/staticfiles/js/cms-modules.js:17612
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:72
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:188
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:72
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:188
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:188
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:72
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:188
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.809f04557769.js:72
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.809f04557769.js:188
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.js:72
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.js:188
 msgid "Volume muted"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:189
 #: common/static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:189
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:17613
+#: test_root/staticfiles/js/cms-modules.js:17613
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:189
+#: test_root/staticfiles/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:189
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.809f04557769.js:189
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/008-809f0455776945572b5193e6f9156869.js:189
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.809f04557769.js:189
+#: test_root/staticfiles/xmodule_js/src/video/07_video_volume_control.js:189
 msgid "Volume"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:235
 #: common/static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:235
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:18239
+#: test_root/staticfiles/js/cms-modules.js:18239
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:235
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:235
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:235
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:235
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.d99903173776.js:235
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.js:235
 msgid "Caption will be displayed when "
 msgstr "Заголовки будут отображаться, когда"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:719
 #: common/static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:719
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:18723
+#: test_root/staticfiles/js/cms-modules.js:18723
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:719
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:719
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:719
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:719
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.d99903173776.js:719
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.js:719
 msgid "Turn on captions"
 msgstr "Включить заголовки"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:727
 #: common/static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:727
+#: test_root/staticfiles/js/cms-modules.131991f028eb.js:18731
+#: test_root/staticfiles/js/cms-modules.js:18731
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:727
+#: test_root/staticfiles/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:727
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.d99903173776.js:727
+#: test_root/staticfiles/xmodule_js/common_static/xmodule/modules/js/010-d999031737767982f98134bd2da2d5c3.js:727
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.d99903173776.js:727
+#: test_root/staticfiles/xmodule_js/src/video/09_video_caption.js:727
 msgid "Turn off captions"
 msgstr "Отключить заголовки"
 
@@ -587,6 +777,14 @@ msgstr "Скрыть дискуссии"
 #: common/static/coffee/src/discussion/discussion_module_view.js:74
 msgid "Show Discussion"
 msgstr "Показать дискуссии"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:152
+msgid "Load more"
+msgstr "Загрузить еще"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:161
+msgid "Loading more threads"
+msgstr "Загрузить больше тем"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:84
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:157
@@ -619,12 +817,25 @@ msgstr "аноним"
 msgid "staff"
 msgstr "преподаватель"
 
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:48
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:80
+msgid "votes (click to remove your vote)"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:83
+msgid "votes (click to vote)"
+msgstr ""
+
 #: lms/static/admin/js/SelectFilter2.js:45
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:45
+#: test_root/staticfiles/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
 msgstr "Доступно %s"
 
 #: lms/static/admin/js/SelectFilter2.js:46
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:46
+#: test_root/staticfiles/admin/js/SelectFilter2.js:46
 #, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
@@ -634,37 +845,53 @@ msgstr ""
 "ниже, а затем кликнуть стрелку \"Выбрать\" между двумя полями. "
 
 #: lms/static/admin/js/SelectFilter2.js:53
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:53
+#: test_root/staticfiles/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Введите значение в это поле, чтобы внизу появился фильтр доступных %s."
 
 #: lms/static/admin/js/SelectFilter2.js:57
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:57
+#: test_root/staticfiles/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Фильтр"
 
 #: lms/static/admin/js/SelectFilter2.js:61
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:61
+#: test_root/staticfiles/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Выбрать все"
 
 #: lms/static/admin/js/SelectFilter2.js:61
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:61
+#: test_root/staticfiles/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
 msgstr "Кликните, чтобы выбрать все %s один раз."
 
 #: lms/static/admin/js/SelectFilter2.js:67
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:67
+#: test_root/staticfiles/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Выбрать "
 
 #: lms/static/admin/js/SelectFilter2.js:69
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:69
+#: test_root/staticfiles/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Удалить"
 
 #: lms/static/admin/js/SelectFilter2.js:75
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:75
+#: test_root/staticfiles/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
 msgstr "Выбрано %s"
 
 #: lms/static/admin/js/SelectFilter2.js:76
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:76
+#: test_root/staticfiles/admin/js/SelectFilter2.js:76
 #, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
@@ -674,15 +901,23 @@ msgstr ""
 "ниже, кликните стрелку \"Удалить\" между двумя полями."
 
 #: lms/static/admin/js/SelectFilter2.js:80
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:80
+#: test_root/staticfiles/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Удалить все"
 
 #: lms/static/admin/js/SelectFilter2.js:80
+#: test_root/staticfiles/admin/js/SelectFilter2.15c78c79b0ba.js:80
+#: test_root/staticfiles/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Кликните, чтобы удалить все выбранные %s один раз."
 
 #: lms/static/admin/js/actions.js:18 lms/static/admin/js/actions.min.js:1
+#: test_root/staticfiles/admin/js/actions.0f1d7ea3b04a.js:18
+#: test_root/staticfiles/admin/js/actions.js:18
+#: test_root/staticfiles/admin/js/actions.min.15856d879af7.js:1
+#: test_root/staticfiles/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s из %(cnt)s выбранного"
@@ -690,6 +925,10 @@ msgstr[1] "%(sel)s из %(cnt)s выбранных"
 msgstr[2] "%(sel)s из %(cnt)s выбранных"
 
 #: lms/static/admin/js/actions.js:109 lms/static/admin/js/actions.min.js:5
+#: test_root/staticfiles/admin/js/actions.0f1d7ea3b04a.js:109
+#: test_root/staticfiles/admin/js/actions.js:109
+#: test_root/staticfiles/admin/js/actions.min.15856d879af7.js:5
+#: test_root/staticfiles/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -698,6 +937,10 @@ msgstr ""
 "ваши несохраненные изменения будут утеряны. "
 
 #: lms/static/admin/js/actions.js:121 lms/static/admin/js/actions.min.js:6
+#: test_root/staticfiles/admin/js/actions.0f1d7ea3b04a.js:121
+#: test_root/staticfiles/admin/js/actions.js:121
+#: test_root/staticfiles/admin/js/actions.min.15856d879af7.js:6
+#: test_root/staticfiles/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -708,6 +951,10 @@ msgstr ""
 "перезапустить действие."
 
 #: lms/static/admin/js/actions.js:123 lms/static/admin/js/actions.min.js:6
+#: test_root/staticfiles/admin/js/actions.0f1d7ea3b04a.js:123
+#: test_root/staticfiles/admin/js/actions.js:123
+#: test_root/staticfiles/admin/js/actions.min.15856d879af7.js:6
+#: test_root/staticfiles/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -717,6 +964,8 @@ msgstr ""
 "вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
 
 #: lms/static/admin/js/calendar.js:26 lms/static/admin/js/dateparse.js:32
+#: test_root/staticfiles/admin/js/calendar.73e6c8503401.js:26
+#: test_root/staticfiles/admin/js/calendar.js:26
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -725,15 +974,27 @@ msgstr ""
 "Декабрь"
 
 #: lms/static/admin/js/calendar.js:27
+#: test_root/staticfiles/admin/js/calendar.73e6c8503401.js:27
+#: test_root/staticfiles/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "Пн Вт Ср Чт Пт Сб Вс"
 
 #: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js.c:19
 #: lms/static/admin/js/collapse.min.js:1
+#: test_root/staticfiles/admin/js/collapse.ac25f18141ae.js:8
+#: test_root/staticfiles/admin/js/collapse.ac25f18141ae.js:19
+#: test_root/staticfiles/admin/js/collapse.js:8
+#: test_root/staticfiles/admin/js/collapse.js:19
+#: test_root/staticfiles/admin/js/collapse.min.53fbfa90fde7.js:1
+#: test_root/staticfiles/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Показать"
 
 #: lms/static/admin/js/collapse.js:15 lms/static/admin/js/collapse.min.js:1
+#: test_root/staticfiles/admin/js/collapse.ac25f18141ae.js:15
+#: test_root/staticfiles/admin/js/collapse.js:15
+#: test_root/staticfiles/admin/js/collapse.min.53fbfa90fde7.js:1
+#: test_root/staticfiles/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Спрятать"
 
@@ -743,43 +1004,67 @@ msgstr "Понедельник Вторник Среда Четверг Пятн
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:49
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:85
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:49
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:85
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:49
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "Сейчас"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:53
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:53
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Часы"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:81
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:81
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "Выбрать время"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:86
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:86
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "Полночь"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:87
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:87
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "6 часов утра"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:88
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:88
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "Полдень"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:144
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:197
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:144
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:197
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:144
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:197
 msgid "Today"
 msgstr "Сегодня"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:148
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:148
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:148
 msgid "Calendar"
 msgstr "Календарь"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:195
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:195
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:195
 msgid "Yesterday"
 msgstr "Вчера"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:199
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.116c2824468f.js:199
+#: test_root/staticfiles/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "Завтра"
 
@@ -944,70 +1229,150 @@ msgstr ""
 msgid "Error listing task history for this student and problem."
 msgstr ""
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:346
+#: lms/static/coffee/src/staff_grading/staff_grading.js:295
+msgid "Grades saved.  Fetching the next submission to grade."
+msgstr ""
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:347
 msgid "Problem Name"
 msgstr "Имя задачи"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:346
+#: lms/static/coffee/src/staff_grading/staff_grading.js:347
 msgid "Graded"
 msgstr "Оценено"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:346
+#: lms/static/coffee/src/staff_grading/staff_grading.js:347
 msgid "Available to Grade"
 msgstr "Доступно для оценивания"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:346
+#: lms/static/coffee/src/staff_grading/staff_grading.js:347
 msgid "Required"
 msgstr "Требуется"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:346
+#: lms/static/coffee/src/staff_grading/staff_grading.js:347
 msgid "Progress"
 msgstr "Прогресс"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:375
-msgid "Problem without name"
-msgstr "Задача без названия"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js:422
+#: lms/static/coffee/src/staff_grading/staff_grading.js:419
 msgid "Back to problem list"
 msgstr "Вернуться к списку заданий"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:427
+#: lms/static/coffee/src/staff_grading/staff_grading.js:424
 msgid "Try loading again"
 msgstr "Пытаюсь загрузить снова"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:432
+#: lms/static/coffee/src/staff_grading/staff_grading.js:429
 msgid "available"
 msgstr "доступно"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:433
+#: lms/static/coffee/src/staff_grading/staff_grading.js:430
 msgid "graded"
 msgstr "оценено"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:434
+#: lms/static/coffee/src/staff_grading/staff_grading.js:431
 msgid "more needed to start ML"
 msgstr "требуется еще для начала автоматической проверки"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:447
+#: lms/static/coffee/src/staff_grading/staff_grading.js:440
+msgid "Submit"
+msgstr "Отправить"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:444
 msgid "Re-check for submissions"
 msgstr "Проверить наличие заданий"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:449
+#: lms/static/coffee/src/staff_grading/staff_grading.js:446
 msgid "System got into invalid state "
 msgstr "Кажется что-то пошло не так"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:464
+#: lms/static/coffee/src/staff_grading/staff_grading.js:461
 msgid "System got into invalid state for submission: "
 msgstr "Кажется что-то пошло не так для посылки: "
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:472
-#: lms/static/coffee/src/staff_grading/staff_grading.js:481
+#: lms/static/coffee/src/staff_grading/staff_grading.js:469
+#: lms/static/coffee/src/staff_grading/staff_grading.js:478
 msgid "(Hide)"
 msgstr "Спрятать"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:476
+#: lms/static/coffee/src/staff_grading/staff_grading.js:473
 msgid "(Show)"
 msgstr "Показать"
+
+#~ msgid "points"
+#~ msgstr "баллов"
+
+#~ msgid "%s point possible"
+#~ msgid_plural "%s points possible"
+#~ msgstr[0] "%s балл"
+#~ msgstr[1] "%s балла"
+#~ msgstr[2] "%s баллов"
+
+#~ msgid "The problem state got out of sync.  Try reloading the page."
+#~ msgstr ""
+#~ "Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
+
+#~ msgid "You need to pick a rating before you can submit."
+#~ msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
+
+#~ msgid "Your score did not meet the criteria to move to the next step."
+#~ msgstr ""
+#~ "Ваши оценки не соответствуют критериям для того что приступить к "
+#~ "следующему этапу."
+
+#~ msgid "Submit assessment"
+#~ msgstr "Отправить задание"
+
+#~ msgid ""
+#~ "Your response has been submitted.  Please check back later for your grade."
+#~ msgstr ""
+#~ "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
+#~ "оценки."
+
+#~ msgid "Submit post-assessment"
+#~ msgstr "Отправить ответ"
+
+#~ msgid "Answer saved, but not yet submitted."
+#~ msgstr "Ваш ответ сохранен, но еще не отправлен."
+
+#~ msgid ""
+#~ "Please confirm that you wish to submit your work. You will not be able to "
+#~ "make any changes after submitting."
+#~ msgstr ""
+#~ "Пожалуйста, подтвердите, что вы хотите отправить вашу работу. Вы не "
+#~ "сможете вносить какие-либо изменения после отправки."
+
+#~ msgid ""
+#~ "Are you sure you want to remove your previous response to this question?"
+#~ msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
+
+#~ msgid "Moved to next step."
+#~ msgstr "Перейти к следующему шагу."
+
+#~ msgid ""
+#~ "File uploads are required for this question, but are not supported in "
+#~ "this browser. Try the newest version of google chrome.  Alternatively, if "
+#~ "you have uploaded the image to the web, you can paste a link to it into "
+#~ "the answer box."
+#~ msgstr ""
+#~ "Для данной задачи требуется отправка файлов, но данная функциональность "
+#~ "не поддерживается вашим браузером. Попробуйте обновить ваш браузер , либо "
+#~ "вы можете загрузить ваш фаил в интернет и вставить ссылку в поле для "
+#~ "ответа."
+
+#~ msgid "Hide Question"
+#~ msgstr "Скрыть задание"
+
+#~ msgid "Show Question"
+#~ msgstr "Показать задание"
+
+#~ msgid "See full feedback"
+#~ msgstr "Посмотреть полную обратную связь"
+
+#~ msgid "Respond to Feedback"
+#~ msgstr "Ответить на обратную связь"
+
+#~ msgid "Problem without name"
+#~ msgstr "Задача без названия"
 
 #~ msgid ""
 #~ "You are trying to upload a file that is too large for our system.  Please "
@@ -1031,9 +1396,6 @@ msgstr "Показать"
 
 #~ msgid "Upload New File"
 #~ msgstr "Загрузка нового файла"
-
-#~ msgid "Load Another File"
-#~ msgstr "Загрузить другой файл"
 
 #~ msgid "Fullscreen"
 #~ msgstr "Полный экран"

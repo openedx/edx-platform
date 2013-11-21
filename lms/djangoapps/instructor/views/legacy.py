@@ -1,17 +1,17 @@
 """
 Instructor Views
 """
-from collections import defaultdict
 import csv
 import json
 import logging
-from markupsafe import escape
 import os
 import re
 import requests
-from requests.status_codes import codes
-from collections import OrderedDict
 
+from collections import defaultdict, OrderedDict
+from functools import partial
+from markupsafe import escape
+from requests.status_codes import codes
 from StringIO import StringIO
 
 from django.conf import settings
@@ -34,7 +34,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
-from courseware.courses import get_course_with_access, get_cms_course_link_by_id
+from courseware.courses import get_course_with_access, get_cms_course_link
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -59,6 +59,8 @@ from mitxmako.shortcuts import render_to_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
+from django.utils.translation import ungettext
+from lms.lib.xblock.runtime import handler_prefix
 
 log = logging.getLogger(__name__)
 
@@ -477,7 +479,7 @@ def instructor_dashboard(request, course_id):
                     except IndexError:
                         log.debug('No grade for assignment %s (%s) for student %s'  % (aidx, aname, x.email))
                 datatable['data'] = ddata
-                    
+
                 datatable['title'] = _u('Grades for assignment "%s"') % aname
 
                 if 'Export CSV' in action:
@@ -580,7 +582,7 @@ def instructor_dashboard(request, course_id):
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
-            msg += _u("Found %d records to dump ") % len(smdat)
+            msg += (ungettext("Found {number} record to dump","Found {number} records to dump",len(smdat))).format(number = len(smdat))
         except Exception as err:
             msg += "<font color='red'>" + _u("Couldn't find module with that urlname.") + "  </font>"
             msg += "<pre>%s</pre>" % escape(err)
@@ -756,7 +758,7 @@ def instructor_dashboard(request, course_id):
         else:
             # If sending the task succeeds, deliver a success message to the user.
             if email_to_option == "all":
-                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.') + '</p></div>'
+                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.') + '</p></div>'
             else:
                 email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending.') + '</p></div>'
 
@@ -838,14 +840,18 @@ def instructor_dashboard(request, course_id):
 
     studio_url = None
     if is_studio_course:
-        studio_url = get_cms_course_link_by_id(course_id)
+        studio_url = get_cms_course_link(course)
 
     email_editor = None
     # HTML editor for email
     if idash_mode == 'Email' and is_studio_course:
-        html_module = HtmlDescriptor(course.system, DictFieldData({'data': html_message}), ScopeIds(None, None, None, None))
+        html_module = HtmlDescriptor(
+            course.system,
+            DictFieldData({'data': html_message}),
+            ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+        )
         fragment = html_module.render('studio_view')
-        fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+        fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:
@@ -1472,7 +1478,7 @@ def get_answers_distribution(request, course_id):
     dist = grades.answer_distributions(request, course)
 
     d = {}
-    d['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
+    d['header'] = [_u('url_name'), _u('display name'), _u('answer id'), _u('answer'), _u('count')]
 
     d['data'] = [[url_name, display_name, answer_id, a, answers[a]]
                  for (url_name, display_name, answer_id), answers in dist.items()
@@ -1601,14 +1607,16 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
             success, task_message = get_task_completion_info(instructor_task)
             status = "Complete" if success else "Incomplete"
             # generate row for this task:
-            row = [str(instructor_task.task_type),
-                   str(instructor_task.task_id),
-                   str(instructor_task.requester),
-                   instructor_task.created.isoformat(' '),
-                   duration_sec,
-                   str(instructor_task.task_state),
-                   status,
-                   task_message]
+            row = [
+                str(instructor_task.task_type),
+                str(instructor_task.task_id),
+                str(instructor_task.requester),
+                instructor_task.created.isoformat(' '),
+                duration_sec,
+                str(instructor_task.task_state),
+                status,
+                task_message
+            ]
             datatable['data'].append(row)
 
         if problem_url is None:

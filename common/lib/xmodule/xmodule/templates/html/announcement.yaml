@@ -1,23 +1,17 @@
 ---
 metadata:
-    display_name: Announcement
+    display_name: Объявление
 data: |
-      <ol>
-      <li>  
-      <h2> September 21 </h2>
+      <h2> 21 сентября </h2>
       <section class='update-description'>
       	       <section class='primary'>
-      	       		<p> Words of encouragement! This is a short note that most students will read. </p>
-      	       		<p class='author'>Anant  Agarwal (6.002x Principle Instructor)</p>
+      	       		<p> Это небольшая заметка содержит наставления, которые каждый студент обязан прочесть. </p>
+      	       		<p class='author'>Анант Агарвал (6.002x Основной инструктор)</p>
       	       </section>		  
-      	       <p><h3>Primary versus Secondary Updates:</h3> Unfortunately, the internet throws a lot of text at students, and they 
-      	       do not read everything that they are given. However, many students <em>do</em> read all that they are
-      	       given, and so detailed explainations in this section will benefit the most concientious.
-      	       Any essential information should be extremely quickly summarized in the primary section for skimmers.</p>
-      	       <p><h3>Star Forum Poster</h3>
-      	       Students appriciate knowing that the course staff is reading what they post, and one of several ways
-      	       that you can do this is by acknowledging the start posters in your announcements.
-      	       </p>
+      	       <p><h3>Различные подходы к обучению</h3>
+      	       Интернет предоставляет студентам много текстов для чтения, и, к сожалению,
+      	       они часто не читают все, что им дают. Тем не менее, некоторые студенты <em>читают</em> все,
+      	       что им дают, и подробный разбор текста идет только на пользу добросовестным читателям.
+      	       Любая существенная идея должна быть кратко сформулирована в вводной части для невнимательного читателя.</p>
       </section>
-      </li>
-      </ol>
+

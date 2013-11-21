@@ -20,6 +20,7 @@ from contentstore.views import tabs
 def print_course(course):
     "Prints out the course id and a numbered list of tabs."
     print course.id
+    print 'num type name'
     for index, item in enumerate(course.tabs):
         print index + 1, '"' + item.get('type') + '"', '"' + item.get('name', '') + '"'
 
@@ -31,13 +32,16 @@ def print_course(course):
 
 
 class Command(BaseCommand):
-    help = """See and edit a course's tabs list.
-Only supports insertion and deletion. Move and
-rename etc. can be done with a delete
-followed by an insert.
-The tabs are numbered starting with 1.
-Tabs 1 and 2 cannot be changed, and tabs of type
-static_tab cannot be edited (use Studio for those).
+    help = """See and edit a course's tabs list. Only supports insertion
+and deletion. Move and rename etc. can be done with a delete
+followed by an insert. The tabs are numbered starting with 1.
+Tabs 1 and 2 cannot be changed, and tabs of type static_tab cannot
+be edited (use Studio for those).
+
+As a first step, run the command with a courseid like this:
+  --course Stanford/CS99/2013_spring
+This will print the existing tabs types and names. Then run the
+command again, adding --insert or --delete to edit the list.
 """
     # Making these option objects separately, so can refer to their .help below
     course_option = make_option('--course',

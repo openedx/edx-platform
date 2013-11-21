@@ -24,7 +24,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 
-from . import ModuleStoreBase, Location, XML_MODULESTORE_TYPE
+from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata
@@ -292,7 +292,7 @@ class ParentTracker(object):
         return list(self._parents[child])
 
 
-class XMLModuleStore(ModuleStoreBase):
+class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
     """
@@ -651,7 +651,10 @@ class XMLModuleStore(ModuleStoreBase):
 
     def get_modulestore_type(self, course_id):
         """
-        Returns a type which identifies which modulestore is servicing the given
-        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
         """
         return XML_MODULESTORE_TYPE
