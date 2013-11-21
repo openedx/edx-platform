@@ -1,0 +1,37 @@
+<%namespace name='static' file='static_content.html'/>
+<link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}">
+<style>
+.ui-autocomplete-loading {
+    background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat;
+}
+</style>
+<script type="text/javascript">
+  $(function(){
+      $("#city").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/lookup/",
+                dataType: 'json',
+                data: {
+                    query: request.term
+                },
+                success: function(data){
+                    response( $.map(data, function(item){
+                      $("#city_id").val(item[0]); 
+                      return {
+                          label: item[1],
+                          value: item[1]
+                      }
+                    }));
+                }
+            });
+        },
+        open: function(){
+            $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+        },
+        close: function(){
+            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+        }
+      })
+  });
+</script>

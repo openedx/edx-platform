@@ -47,7 +47,7 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 from student.validators import validate_cedula
-
+from cities.models import City
 from verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -769,6 +769,7 @@ def _do_create_account(post_vars):
         raise
 
     registration.register(user)
+    city = City.objects.get(id=post_vars['city_id'])
 
     profile = UserProfile(user=user)
     profile.name = post_vars['name']
@@ -777,6 +778,7 @@ def _do_create_account(post_vars):
     profile.mailing_address = post_vars.get('mailing_address')
     profile.goals = post_vars.get('goals')
     profile.cedula = post_vars.get('cedula')
+    profile.city = city
 
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
@@ -866,12 +868,15 @@ def create_account(request, post_override=None):
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
-    try:
-        validate_cedula(post_vars['cedula'])
-    except ValidationError:
-        js['value'] = _("A valid ID is required.").format(field=a)
-        js['field'] = 'cedula'
-        return HttpResponse(json.dumps(js))
+    
+    city = City.objects.get(id=post_vars['city_id'])
+    if city.state.country.code == 'EC':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = _("A valid ID is required.").format(field=a)
+            js['field'] = 'cedula'
+            return HttpResponse(json.dumps(js))
 
     try:
         validate_email(post_vars['email'])
