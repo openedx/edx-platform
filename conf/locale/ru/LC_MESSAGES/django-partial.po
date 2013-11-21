@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-21 09:56+0400\n"
-"PO-Revision-Date: 2013-11-08 16:41+0300\n"
+"PO-Revision-Date: 2013-11-21 10:11+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -29,25 +29,24 @@ msgid "Upload completed"
 msgstr "Загрузка завершена"
 
 #: cms/djangoapps/contentstore/views/component.py:53
-#, fuzzy
 msgid "discussion"
-msgstr "Дискуссии"
+msgstr "дискуссии"
 
 #: cms/djangoapps/contentstore/views/component.py:53
 msgid "html"
-msgstr ""
+msgstr "html"
 
 #: cms/djangoapps/contentstore/views/component.py:53
 msgid "problem"
-msgstr ""
+msgstr "задача"
 
 #: cms/djangoapps/contentstore/views/component.py:53
 msgid "video"
-msgstr ""
+msgstr "видео"
 
 #: cms/djangoapps/contentstore/views/component.py:233
 msgid "advanced"
-msgstr ""
+msgstr "другие"
 
 #: cms/djangoapps/contentstore/views/course.py:221
 msgid ""

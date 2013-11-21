@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-21 09:57+0400\n"
-"PO-Revision-Date: 2013-11-05 19:24+0300\n"
+"PO-Revision-Date: 2013-11-21 10:09+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -95,31 +95,27 @@ msgstr "Эта ссылка откроется в новом модальном 
 
 #: cms/static/js/base.js:240
 msgid "New Unit"
-msgstr ""
+msgstr "Новый Блок"
 
 #: cms/static/js/base.js:251
 msgid "Unit"
-msgstr ""
+msgstr "Блок"
 
 #: cms/static/js/base.js:256
-#, fuzzy
 msgid "Subsection"
-msgstr "Показать задание"
+msgstr "Подраздел"
 
 #: cms/static/js/base.js:261
-#, fuzzy
 msgid "Section"
-msgstr "Показать задание"
+msgstr "Раздел"
 
 #: cms/static/js/base.js:266
-#, fuzzy
 msgid "Delete this %(type)s?"
-msgstr "Удалить"
+msgstr "Удалить %(type)s?"
 
 #: cms/static/js/base.js:267
-#, fuzzy
 msgid "Deleting this %(type)s is permanent and cannot be undone."
-msgstr "Удаление этого компонента необратимо."
+msgstr "Удаление %{type}s не может быть отменено."
 
 #: cms/static/js/base.js:270
 msgid "Yes, delete this "
@@ -834,14 +830,14 @@ msgid ""
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:60
-#, fuzzy
 msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
 "Ваше письмо успешно поставленно в очередь на отправку. Заметьте, что для "
-"больших курсов (больше 10 тыс.), отправка всех писем может занять 1-2 часа."
+"больших курсов, отправка всех писем может занять от 1 часа(и больше, если "
+"несколько курсов отправляют письма одновременно)."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:63
 msgid "You are about to send an email titled \""

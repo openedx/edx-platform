@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-21 09:56+0400\n"
-"PO-Revision-Date: 2013-11-15 16:13+0300\n"
+"PO-Revision-Date: 2013-11-21 10:21+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -287,29 +287,26 @@ msgid "New Unit"
 msgstr "Новый блок"
 
 #: cms/static/js/base.js:251
-#, fuzzy
 msgid "Unit"
-msgstr "Количество часов:"
+msgstr "Блок"
 
 #: cms/static/js/base.js:256
-#, fuzzy
 msgid "Subsection"
-msgstr "CMS"
+msgstr "Подраздел"
 
 #: cms/static/js/base.js:261
-#, fuzzy
 msgid "Section"
-msgstr "Раздел:"
+msgstr "Раздел"
 
 #: cms/static/js/base.js:266
-#, fuzzy, python-format
+#, python-format
 msgid "Delete this %(type)s?"
-msgstr "Удалить?"
+msgstr "Удалить %(type)s?"
 
 #: cms/static/js/base.js:267
-#, fuzzy, python-format
+#, python-format
 msgid "Deleting this %(type)s is permanent and cannot be undone."
-msgstr "Операция удаления не может быть отменена."
+msgstr "Удаление %(type)s не может быть отменено."
 
 #: cms/static/js/base.js:270
 msgid "Yes, delete this "
@@ -4801,7 +4798,7 @@ msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
 msgstr ""
-"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
+"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста, посетите "
 "данную страницу позже для результатов."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:29
@@ -7055,11 +7052,11 @@ msgstr "Информация для преподавателей"
 
 #: lms/templates/master_class.html:31
 msgid "Students pending registration"
-msgstr "Студенты ожидащие регистрацию"
+msgstr "Студенты, ожидащие регистрацию"
 
 #: lms/templates/master_class.html:35
 msgid "Students passed registration"
-msgstr "Студенты прошедшие регистарцию"
+msgstr "Студенты, прошедшие регистарацию"
 
 #: lms/templates/mathjax_accessible.html:5
 msgid ""
@@ -10031,12 +10028,11 @@ msgid "Send Email"
 msgstr "Отослать письмо"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:43
-#, fuzzy
 msgid ""
 "Please try not to email students more than once per week. Before sending "
 "your email, consider:"
 msgstr ""
-"Пожалуйста, не пишите студентам чаще одного раза в день. Перед посылкой "
+"Пожалуйста, не пишите студентам чаще одного раза в неделю. Перед посылкой "
 "обратите внимание на следующее:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:62
@@ -10046,9 +10042,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:72
-#, fuzzy
 msgid "Email Task History"
-msgstr "Показать фоновую историю задач"
+msgstr "Историю посылок писем"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:73
 msgid ""
@@ -10057,9 +10052,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:75
-#, fuzzy
 msgid "Show Email Task History"
-msgstr "Показать фоновую историю задач"
+msgstr "Показать историю посылок писем"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:5
 msgid "Student-specific grade inspection"
