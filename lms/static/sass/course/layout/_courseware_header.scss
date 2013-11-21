@@ -1,3 +1,17 @@
+p.unauth-warning {
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  background-color: $black;
+  color: $white;
+}
+p.unauth-warning a {
+  font-weight: bold;
+  padding: 5px;
+  background-color: $white;
+  border-radius: 5px;
+}
+
 nav.course-material {
   @include clearfix;
   @include box-sizing(border-box);

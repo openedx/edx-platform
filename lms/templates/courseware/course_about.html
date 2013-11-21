@@ -4,11 +4,14 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from django.conf import settings
+  from student.models import UserProfile
 
   if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
   else:
       cart_link = ""
+
+
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -28,6 +31,26 @@
   (function() {
     $(".register").click(function(event) {
       $("#class_enroll_form").submit();
+      event.preventDefault();
+    });
+
+    sneakpeek_handler = function(jqXHR) {
+      if (jqXHR.status == 200) {
+        location.href = "${course_target}";
+      }
+      else {
+        $("#register_error")
+        .html("${_('An error occurred. Please try again later.')}")
+        .css("display", "block");
+      }
+    };
+
+    $(".course_sneakpeek").click(function(event) {
+      $.ajax({
+        url: "${reverse('course_sneakpeek', args=[course.id])}",
+        type: "POST",
+        complete: sneakpeek_handler
+      });
       event.preventDefault();
     });
 
@@ -146,7 +169,7 @@
         </hgroup>
 
         <div class="main-cta">
-        %if user.is_authenticated() and registered:
+        %if regularly_registered:
           %if show_courseware_link:
             <a href="${course_target}">
           %endif
@@ -182,6 +205,11 @@
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}
           </a>
+          % if sneakpeek_allowed and not regularly_registered:
+            <a href="#" class="course_sneakpeek"</a>
+              <span class="sneakpeek">${_("Explore Course")}</span>
+            </a>
+          % endif
           <div id="register_error"></div>
         %endif
         </div>
@@ -308,7 +336,7 @@
   </section>
 </section>
 
-%if not registered:
+%if not regularly_registered:
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">

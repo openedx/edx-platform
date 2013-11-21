@@ -8,6 +8,7 @@ from mitxmako.shortcuts import render_to_response
 import student.views
 import branding
 import courseware.views
+from student.models  import UserProfile
 from mitxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
@@ -19,7 +20,7 @@ def index(request):
     Redirects to main page -- info page if user authenticated, or marketing if not
     '''
 
-    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
+    if settings.COURSEWARE_ENABLED and UserProfile.has_registered(request.user):
         return redirect(reverse('dashboard'))
 
     if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):

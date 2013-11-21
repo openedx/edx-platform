@@ -232,3 +232,31 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id, self.created)
+
+
+class CoursePreference(models.Model):
+    """
+    This is a place to keep course preferences that are not inherent to the course.  Those should be attributes
+    of the course xmodule (advanced settings).
+    A good example is whether this course allows nonregistered users to access it.
+    """
+    course_id = models.CharField(max_length=255, db_index=True)
+    pref_key = models.CharField(max_length=255)
+    pref_value = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        unique_together = (('course_id', 'pref_key'))
+
+    @classmethod
+    def get_pref_value(cls, course_id, pref_key):
+        try:
+            return cls.objects.get(course_id=course_id, pref_key=pref_key).pref_value
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def course_allows_nonregistered_access(cls, course_id):
+        return bool(cls.get_pref_value(course_id, 'allow_nonregistered_access'))
+
+    def __unicode__(self):
+        return u"{} : {} : {}".format(self.course_id, self.pref_key, self.pref_value)

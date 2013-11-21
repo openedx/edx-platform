@@ -20,8 +20,9 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import ModelForm, forms
@@ -123,6 +124,9 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
 
+    # "nonregistered" users are auto-created and have no meaningful profile info
+    nonregistered = models.BooleanField(default=False)
+
     def get_meta(self):
         js_str = self.meta
         if not js_str:
@@ -134,6 +138,38 @@ class UserProfile(models.Model):
 
     def set_meta(self, js):
         self.meta = json.dumps(js)
+
+    @classmethod
+    def get_random_anon_username(cls):
+        candidate = "anon__{}".format(get_random_string(24))      # django 1.4 has 30 char usernames
+        while User.objects.filter(username=candidate).exists():
+            candidate = "anon__{}".format(get_random_string(24))  # get_random_string output is alphanumeric
+        return candidate
+
+    @classmethod
+    @transaction.commit_on_success
+    def create_nonregistered_user(cls):
+        anon_username = cls.get_random_anon_username()
+        email_split = settings.ANONYMOUS_USER_EMAIL.split('@')
+        anon_email = "{}+{}@{}".format(email_split[0],
+                                       anon_username,
+                                       email_split[-1])
+        anon_user = User(username=anon_username, email=anon_email, is_active=False)
+        anon_user.save()
+        profile = UserProfile(user=anon_user, nonregistered=True)
+        profile.save()
+        return anon_user
+
+    @classmethod
+    def has_registered(cls, user):
+        """
+        Handles django anonymous users.  SHOULD use this to test whether request.user has registered,
+        i.e. has a profile that says not nonregistered,
+        instead of directly accessing user.profile.nonregistered,
+        because if the user is AnonymousUser it won't have a profile.
+        """
+        return hasattr(user, 'profile') and not user.profile.nonregistered
+
 
 TEST_CENTER_STATUS_ACCEPTED = "Accepted"
 TEST_CENTER_STATUS_ERROR = "Error"

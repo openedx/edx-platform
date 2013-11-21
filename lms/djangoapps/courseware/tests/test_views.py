@@ -16,7 +16,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory
+from student.tests.factories import AdminFactory, NonRegisteredUserFactory
 from mitxmako.middleware import MakoMiddleware
 
 from xmodule.modulestore import Location
@@ -367,3 +367,22 @@ class TestAccordionDueDate(BaseDueDateTests):
         return views.render_accordion(
             self.request, course, course.get_children()[0].id, None, None
         )
+
+
+class TestNonRegisteredUser(TestCase):
+    """
+    Tests nonregistered (auto-created) users
+    """
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.user = NonRegisteredUserFactory()
+        self.course_id = "course/id/doesnt_matter"
+
+    def test_nonregistered_user_factory(self):
+        self.assertTrue(self.user.profile.nonregistered)
+
+    def test_nonregistered_progress_404(self):
+        with self.assertRaises(Http404):
+            req = self.request_factory.get(reverse('progress', args=[self.course_id]))
+            req.user = self.user
+            views.progress(req, self.course_id)

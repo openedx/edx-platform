@@ -22,7 +22,7 @@ from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import FieldDataCache
-
+from student.models import UserProfile
 from open_ended_grading import open_ended_notifications
 
 import waffle
@@ -262,6 +262,7 @@ VALID_TAB_TYPES = {
     'syllabus': TabImpl(null_validator, _syllabus)
     }
 
+NONREGISTERED_TAB_TYPES=['courseware', 'course_info', 'static_tab', 'syllabus']
 
 ### External interface below this.
 
@@ -320,6 +321,10 @@ def get_course_tabs(user, course, active_page, request):
         course_tabs = [tab for tab in course.tabs if tab['type'] != "course_info"]
     else:
         course_tabs = course.tabs
+
+    # handle nonregistered (and anonymous) users
+    if not UserProfile.has_registered(user):
+        course_tabs = [tab for tab in course.tabs if tab['type'] in NONREGISTERED_TAB_TYPES]
 
     for tab in course_tabs:
         # expect handlers to return lists--handles things that are turned off

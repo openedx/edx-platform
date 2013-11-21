@@ -410,7 +410,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.req_factory = RequestFactory()
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
-        self.user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        self.user = UserFactory(username="jack", email="jack@fake.edx.org")
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     def test_change_enrollment_add_to_cart(self):

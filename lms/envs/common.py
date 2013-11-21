@@ -215,6 +215,9 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
+# Email to give anonymous users.  Should be a black-hole email address, but not cause errors when email is sent there
+# This is actually just a base email.  We'll make it 'noreply+<username>@example.com' to ensure uniqueness
+ANONYMOUS_USER_EMAIL = 'noreply@example.com'
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms

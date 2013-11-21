@@ -179,7 +179,6 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
 
-
         # Software Licenses
 
         # TODO: for now, this is the endpoint of an ajax replay
@@ -204,6 +203,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
+
+        url(r'^course_sneakpeek/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'student.views.setup_sneakpeek', name="course_sneakpeek"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',

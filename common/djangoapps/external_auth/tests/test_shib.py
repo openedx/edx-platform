@@ -259,6 +259,8 @@ class ShibSPTest(ModuleStoreTestCase):
                         'honor_code': 'true'}
             # use RequestFactory instead of TestClient here because we want access to request.user
             request2 = self.request_factory.post('/create_account', data=postvars)
+            # saving session because create_account deletes existing sessions (due to logout then login)
+            saved_eamap = client.session['ExternalAuthMap']
             request2.session = client.session
             request2.user = AnonymousUser()
             with patch('student.views.AUDIT_LOG') as mock_audit_log:
@@ -307,14 +309,13 @@ class ShibSPTest(ModuleStoreTestCase):
                 if sn_empty and given_name_empty:
                     self.assertEqual(profile.name, postvars['name'])
                 else:
-                    self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+                    self.assertEqual(profile.name, saved_eamap.external_name)
                     self.assertNotIn(u';', profile.name)
             else:
-                self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
+                self.assertEqual(profile.name, saved_eamap.external_name)
                 self.assertEqual(profile.name, identity.get('displayName'))
 
             # clean up for next loop
-            request2.session['ExternalAuthMap'].delete()
             UserProfile.objects.filter(user=user).delete()
             Registration.objects.filter(user=user).delete()
             user.delete()

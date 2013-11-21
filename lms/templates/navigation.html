@@ -4,6 +4,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from student.models import UserProfile
 
 # App that handles subdomain specific branding
 import branding
@@ -53,7 +54,7 @@ site_status_msg = get_site_status_msg(course_id)
       <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
 
-    % if user.is_authenticated():
+    % if UserProfile.has_registered(user):
 
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
@@ -120,16 +121,19 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
 
+
     <ol class="right nav-courseware">
-    <li class="nav-courseware-01">
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
-          % else:
-          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
-          % endif
-      % endif
-    </li>
+      
+      <li class="nav-courseware-01">
+        % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
+            % else:
+            <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+            % endif
+        % endif
+      </li>
+      
     </ol>
     % endif
   </nav>

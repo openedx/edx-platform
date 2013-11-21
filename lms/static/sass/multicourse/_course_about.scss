@@ -103,6 +103,8 @@
             @include box-sizing(border-box);
             border-radius: 3px;
             display: block;
+            float: left;
+            margin-right: flex-gutter(12);
             font: normal 1.2rem/1.6rem $sans-serif;
             letter-spacing: 1px;
             padding: 10px 0px;
@@ -139,7 +141,7 @@
             }
           }
 
-          span.register, span.add-to-cart {
+          span.register, span.add-to-cart, span.sneakpeek {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
             @include box-sizing(border-box);
@@ -150,9 +152,9 @@
             text-transform: uppercase;
             text-align: center;
             float: left;
-            margin: 1px flex-gutter(8) 0 0;
+            margin: 1px 0 0 0;
             @include transition(none);
-            width: flex-grid(5, 8);
+            width: flex-grid(6);
           }
 
           #register_error {

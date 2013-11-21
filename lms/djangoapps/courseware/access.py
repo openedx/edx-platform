@@ -13,7 +13,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
-from student.models import CourseEnrollmentAllowed
+from student.models import CourseEnrollmentAllowed, UserProfile
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
@@ -134,10 +134,22 @@ def _has_access_course_desc(user, course, action):
         """
         Can this user access the forums in this course?
         """
-        return (can_load() and \
-            (CourseEnrollment.is_enrolled(user, course.id) or \
-                _has_staff_access_to_descriptor(user, course)
-            ))
+        return (
+            can_load() and
+            UserProfile.has_registered(user) and
+            (CourseEnrollment.is_enrolled(user, course.id) or
+             _has_staff_access_to_descriptor(user, course))
+        )
+
+    def within_enrollment_period():
+        """
+        Just a time boundary check, handles if start or stop were set to None
+        """
+        now = datetime.now(UTC())
+        start = course.enrollment_start
+        end = course.enrollment_end
+
+        return (start is None or now > start) and (end is None or now < end)
 
     def can_enroll():
         """
@@ -163,11 +175,7 @@ def _has_access_course_desc(user, course, action):
         else:
             reg_method_ok = True #if not using this access check, it's always OK.
 
-        now = datetime.now(UTC())
-        start = course.enrollment_start
-        end = course.enrollment_end
-
-        if reg_method_ok and (start is None or now > start) and (end is None or now < end):
+        if reg_method_ok and within_enrollment_period():
             # in enrollment period, so any user is allowed to enroll.
             debug("Allow: in enrollment period")
             return True
@@ -207,6 +215,7 @@ def _has_access_course_desc(user, course, action):
         'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
+        'within_enrollment_period': within_enrollment_period,
         'staff': lambda: _has_staff_access_to_descriptor(user, course),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
         }
@@ -247,6 +256,47 @@ def _has_access_error_desc(user, descriptor, action, course_context):
     return _dispatch(checkers, action, user, descriptor)
 
 
+NONREGISTERED_CATEGORY_WHITELIST = [
+    "about",
+    "chapter",
+    "course",
+    "course_info",
+    "problem",
+    "sequential",
+    "vertical",
+    "videoalpha",
+#    "combinedopenended",
+#    "discussion",
+    "html",
+#    "peergrading",
+    "static_tab",
+    "video",
+#    "annotatable",
+    "book",
+    "conditional",
+#    "crowdsource_hinter",
+    "custom_tag_template",
+#    "discuss",
+#    "error",
+    "hidden",
+    "image",
+    "problemset",
+    "randomize",
+    "raw",
+    "section",
+    "slides",
+    "timelimit",
+    "videodev",
+    "videosequence",
+    "word_cloud",
+    "wrapper",
+]
+
+
+def _can_load_descriptor_nonregistered(descriptor):
+    return descriptor.category in NONREGISTERED_CATEGORY_WHITELIST
+
+
 def _has_access_descriptor(user, descriptor, action, course_context=None):
     """
     Check if user has access to this descriptor.
@@ -266,6 +316,10 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        # nonregistered users shouldn't be able to access certain descriptor types
+        if not UserProfile.has_registered(user):
+            return _can_load_descriptor_nonregistered(descriptor)
+
         # If start dates are off, can always load
         if settings.MITX_FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")

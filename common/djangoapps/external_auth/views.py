@@ -528,7 +528,9 @@ def course_specific_login(request, course_id):
         return _redirect_with_get_querydict('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if (settings.MITX_FEATURES.get('AUTH_USE_SHIB') and
+        course.enrollment_domain and
+        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)):
         return _redirect_with_get_querydict('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
@@ -547,7 +549,9 @@ def course_specific_register(request, course_id):
         return _redirect_with_get_querydict('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if (settings.MITX_FEATURES.get('AUTH_USE_SHIB') and
+        course.enrollment_domain and
+        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)):
         # shib-login takes care of both registration and login flows
         return _redirect_with_get_querydict('shib-login', request.GET)
 
