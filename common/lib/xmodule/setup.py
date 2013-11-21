@@ -52,7 +52,6 @@ setup(
         'docopt',
         'capa',
         'path.py',
-        'webob',
     ],
     package_data={
         'xmodule': ['js/module/*'],

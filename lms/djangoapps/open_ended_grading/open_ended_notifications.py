@@ -8,7 +8,7 @@ from xmodule.open_ended_grading_classes import peer_grading_service
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 
 from courseware.access import has_access
-from lms.lib.xblock.runtime import LmsModuleSystem
+from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.cache import cache
@@ -64,7 +64,8 @@ def staff_grading_notifications(course, user):
 
 
 def peer_grading_notifications(course, user):
-    system = LmsModuleSystem(
+    system = ModuleSystem(
+        ajax_url=None,
         track_function=None,
         get_module = None,
         render_template=render_to_string,
@@ -123,8 +124,9 @@ def combined_notifications(course, user):
         return notification_dict
 
     #Define a mock modulesystem
-    system = LmsModuleSystem(
+    system = ModuleSystem(
         static_url="/static",
+        ajax_url=None,
         track_function=None,
         get_module = None,
         render_template=render_to_string,

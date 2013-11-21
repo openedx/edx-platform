@@ -2,14 +2,13 @@ import unittest
 import json
 import logging
 from mock import Mock
-from webob.multidict import MultiDict
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, get_test_descriptor_system
-from xmodule.tests.test_util_open_ended import DummyModulestore
+from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
 from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -30,16 +29,17 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     calibrated_dict = {'location': "blah"}
     coe_dict = {'location': coe_location.url()}
-    save_dict = MultiDict({
+    save_dict = MockQueryDict()
+    save_dict.update({
         'location': "blah",
         'submission_id': 1,
         'submission_key': "",
         'score': 1,
         'feedback': "",
+        'rubric_scores[]': [0, 1],
         'submission_flagged': False,
         'answer_unknown': False,
     })
-    save_dict.extend(('rubric_scores[]', val) for val in (0, 1))
 
     def setUp(self):
         """
@@ -277,7 +277,6 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
             self.field_data,
             self.scope_ids,
         )
-        self.test_system.xmodule_instance = peer_grading
 
         return peer_grading
 

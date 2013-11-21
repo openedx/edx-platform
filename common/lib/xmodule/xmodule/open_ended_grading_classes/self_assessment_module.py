@@ -213,10 +213,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         with 'error' only present if 'success' is False, and 'hint_html' or
         'message_html' only if success is true
-
-        :param data: A `webob.multidict.MultiDict` containing the keys
-            asasssment: The sum of assessment scores
-            score_list[]: A multivalue key containing all the individual scores
         """
 
         if self.child_state != self.ASSESSING:
@@ -224,7 +220,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         try:
             score = int(data.get('assessment'))
-            score_list = [int(x) for x in data.getall('score_list[]')]
+            score_list = data.getlist('score_list[]')
+            for i in xrange(0, len(score_list)):
+                score_list[i] = int(score_list[i])
         except (ValueError, TypeError):
             # This is a dev_facing_error
             log.error("Non-integer score value passed to save_assessment, or no score list present.")

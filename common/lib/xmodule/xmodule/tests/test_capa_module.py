@@ -8,12 +8,10 @@ Tests of the Capa XModule
 #pylint: disable=C0302
 
 import datetime
+from mock import Mock, patch
 import unittest
 import random
 import json
-
-from mock import Mock, patch
-from webob.multidict import MultiDict
 
 import xmodule
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
@@ -22,6 +20,8 @@ from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
+from django.http import QueryDict
 
 from . import get_test_system
 from pytz import UTC
@@ -133,7 +133,6 @@ class CapaFactory(object):
             DictFieldData(field_data),
             ScopeIds(None, None, location, location),
         )
-        system.xmodule_instance = module
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
@@ -331,16 +330,19 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_parse_get_params(self):
 
+        # We have to set up Django settings in order to use QueryDict
+        from django.conf import settings
+        if not settings.configured:
+            settings.configure()
+
         # Valid GET param dict
-        # 'input_5' intentionally left unset,
-        valid_get_dict = MultiDict({
-            'input_1': 'test',
-            'input_1_2': 'test',
-            'input_1_2_3': 'test',
-            'input_[]_3': 'test',
-            'input_4': None,
-            'input_6': 5
-        })
+        valid_get_dict = self._querydict_from_dict({'input_1': 'test',
+                                                    'input_1_2': 'test',
+                                                    'input_1_2_3': 'test',
+                                                    'input_[]_3': 'test',
+                                                    'input_4': None,
+                                                    'input_5': [],
+                                                    'input_6': 5})
 
         result = CapaModule.make_dict_of_responses(valid_get_dict)
 
@@ -353,30 +355,51 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
-        # Each tuple represents a single parameter in the query string
-        valid_get_dict = MultiDict((('input_2[]', 'test1'), ('input_2[]', 'test2')))
+        valid_get_dict = self._querydict_from_dict({'input_2[]': ['test1', 'test2']})
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertTrue('2' in result)
         self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
         # get a list, even if there's just one value
-        valid_get_dict = MultiDict({'input_1[]': 'test'})
+        valid_get_dict = self._querydict_from_dict({'input_1[]': 'test'})
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertEqual(result['1'], ['test'])
 
         # If we have no underscores in the name, then the key is invalid
-        invalid_get_dict = MultiDict({'input': 'test'})
+        invalid_get_dict = self._querydict_from_dict({'input': 'test'})
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
         # Two equivalent names (one list, one non-list)
         # One of the values would overwrite the other, so detect this
         # and raise an exception
-        invalid_get_dict = MultiDict({'input_1[]': 'test 1',
-                                      'input_1': 'test 2'})
+        invalid_get_dict = self._querydict_from_dict({'input_1[]': 'test 1',
+                                                      'input_1': 'test 2'})
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
+
+    def _querydict_from_dict(self, param_dict):
+        """
+        Create a Django QueryDict from a Python dictionary
+        """
+
+        # QueryDict objects are immutable by default, so we make
+        # a copy that we can update.
+        querydict = QueryDict('')
+        copyDict = querydict.copy()
+
+        for (key, val) in param_dict.items():
+
+            # QueryDicts handle lists differently from ordinary values,
+            # so we have to specifically tell the QueryDict that
+            # this is a list
+            if type(val) is list:
+                copyDict.setlist(key, val)
+            else:
+                copyDict[key] = val
+
+        return copyDict
 
     def test_check_problem_correct(self):
 

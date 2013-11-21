@@ -217,8 +217,9 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_string = "-".join(str(v) for v in self.list() if v is not None)
-        return Location.clean_for_html(id_string)
+        s = "-".join(str(v) for v in self.list()
+                     if v is not None)
+        return Location.clean_for_html(s)
 
     def dict(self):
         """

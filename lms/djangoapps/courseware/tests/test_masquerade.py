@@ -19,7 +19,6 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -92,11 +91,10 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         pun = 'H1P1'
         problem_location = "i4x://edX/graded/problem/%s" % pun
 
-        modx_url = reverse('xblock_handler',
+        modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.graded_course.id,
-                                   'usage_id': quote_slashes(problem_location),
-                                   'handler': 'xmodule_handler',
-                                   'suffix': 'problem_get'})
+                                   'location': problem_location,
+                                   'dispatch': 'problem_get', })
 
         resp = self.client.get(modx_url)
 
@@ -117,5 +115,6 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
+        print html
         sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertFalse(sabut in html)

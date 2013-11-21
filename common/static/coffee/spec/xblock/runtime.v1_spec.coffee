@@ -1,7 +1,7 @@
 describe "XBlock.runtime.v1", ->
   beforeEach ->
     setFixtures """
-      <div class='xblock' data-handler-prefix='/xblock/fake-usage-id/handler'/>
+      <div class='xblock' data-usage-id='fake-usage-id'/>
     """
     @children = [
       {name: 'childA'},
@@ -12,7 +12,7 @@ describe "XBlock.runtime.v1", ->
 
     @runtime = XBlock.runtime.v1(@element, @children)
   it "provides a handler url", ->
-    expect(@runtime.handlerUrl('foo')).toBe('/xblock/fake-usage-id/handler/foo')
+    expect(@runtime.handlerUrl('foo')).toBe('/xblock/handler/fake-usage-id/foo')
 
   it "provides a list of children", ->
     expect(@runtime.children).toBe(@children)
