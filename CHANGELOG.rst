@@ -9,6 +9,9 @@ Blades: Update the calculator hints tooltip with full information. BLD-400.
 
 Blades: Fix transcripts 500 error in studio (BLD-530)
 
+LMS: Add error recovery when a user loads or switches pages in an
+inline discussion.
+
 Blades: Allow multiple strings as the correct answer to a string response question. BLD-474.
 
 Blades: a11y - Videos will alert screenreaders when the video is over.
