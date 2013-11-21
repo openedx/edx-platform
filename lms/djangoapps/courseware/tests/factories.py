@@ -14,7 +14,7 @@ from student.tests.factories import RegistrationFactory  # Imported to re-export
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from courseware.roles import CourseInstructorRole, CourseStaffRole
+from courseware.roles import CourseInstructorRole, CourseStaffRole, CourseBetaTesterRole, GlobalStaff
 
 from xmodule.modulestore import Location
 
@@ -52,6 +52,32 @@ class StaffFactory(UserFactory):
         if extracted is None:
             raise ValueError("Must specify a course location for a course staff user")
         CourseStaffRole(extracted).add_users(self)
+
+
+class BetaTesterFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with beta-tester
+    permissions for `course`.
+    """
+    last_name = "Beta-Tester"
+
+    @post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a course staff user")
+        CourseBetaTesterRole(extracted).add_users(self)
+
+
+class GlobalStaffFactory(UserFactory):
+    """
+    Returns a User object with global staff access
+    """
+    last_name = "GlobalStaff"
+
+    @post_generation
+    def set_staff(self, create, extracted, **kwargs):
+        GlobalStaff().add_users(self)
+
 
 
 class StudentModuleFactory(DjangoModelFactory):
