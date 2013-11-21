@@ -133,7 +133,6 @@ class CapaFactory(object):
             DictFieldData(field_data),
             ScopeIds(None, None, location, location),
         )
-        system.xmodule_instance = module
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
