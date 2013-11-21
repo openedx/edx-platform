@@ -304,7 +304,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     submission_ids=new_score_msg['submission_ids']
                 )
             )
-            self.new_history_entry(submission['student_response'])
+            old_sub = json.loads(submission)
+            self.new_history_entry(old_sub['student_response'])
             self.record_latest_score(new_score_msg['score'])
             self.record_latest_post_assessment(score_msg)
             self.child_state = self.POST_ASSESSMENT
