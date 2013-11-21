@@ -62,8 +62,8 @@ $(function () {
         
         categoryData = chapters[ chapter['display_name'] ]
       
-        categoryData['data'].append( [tickIndex, section['section_total'].earned/(section['section_total'].possible + 0.05)] )
-        ticks.append( [tickIndex, section['display_name'] ] )
+        categoryData['data'].append( [tickIndex, section['section_total'].earned/(section['section_total'].possible + 0.01)] )
+        ticks.append( [tickIndex, section['format'] ] )
       
         if chapter['display_name'] in detail_tooltips:
             detail_tooltips[ chapter['display_name'] ].append( section['display_name'] + " (" + str(section['section_total'].earned) + "/" + str(section['section_total'].possible) + ")" )
@@ -77,7 +77,7 @@ $(function () {
         tickIndex += 1
 
         earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
-        total += section['section_total'].possible * category_weights.get(section['format'], 0.0)
+        total += (section['section_total'].earned / (section['section_total'].possible + 0.0001)) * category_weights.get(section['format'], 0.0)
       
       
       if chapter['display_name'] not in chapters:
@@ -87,15 +87,15 @@ $(function () {
       
       categoryData = chapters[ chapter['display_name'] ]
       
-      categoryData['data'].append( [tickIndex, earned/(total + 0.05)] )
+      categoryData['data'].append( [tickIndex, total - 0.01] )
         
 
       ticks.append( [tickIndex, chapter['display_name'] ] )
       
       if chapter['display_name'] in detail_tooltips:
-            detail_tooltips[ chapter['display_name'] ].append( section['display_name'] + " (" + str(earned) + "/" + str(total) + ")" )
+            detail_tooltips[ chapter['display_name'] ].append( chapter['display_name'] + " (" + str(total*100) + "%)" )
       else:
-            detail_tooltips[ chapter['display_name']] = [ section['display_name'] + " (" + str(earned) + "/" + str(total) + ")", ]
+            detail_tooltips[ chapter['display_name']] = [ chapter['display_name'] + " (" + str(total*100) + "%)", ]
 
       tickIndex += 1
         

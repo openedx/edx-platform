@@ -65,7 +65,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               if section['graded'] and len(section['format']) > 0:
                 chapter_earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
-                chapter_total += section['section_total'].possible * category_weights.get(section['format'], 0.0)
+                chapter_total += section['section_total'].earned / (section['section_total'].possible + 0.0001) * category_weights.get(section['format'], 0.0)
               %>
 
               <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
@@ -111,7 +111,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
             %endfor
             %if chapter_total > 0 and course.new_progress:
             <%
-            chapter_percentageString = "{0:.0%}".format( float(chapter_earned)/chapter_total) if chapter_earned > 0 and chapter_total > 0 else ""
+            chapter_percentageString = "{0:.0%}".format( float(chapter_total)) if chapter_earned > 0 and chapter_total > 0 else ""
             %>
             <li>
               <h3>${_("Total for ")}<a href="#">
@@ -122,7 +122,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                   </span></a>
                 %endif
                 %if chapter_total > 0 or chapter_earned > 0:
-                  <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(chapter_earned), float(chapter_total), chapter_percentageString )}</span>
+                  <span> ${"{0}".format( chapter_percentageString )}</span>
                 %endif
               </h3>
             </li>
