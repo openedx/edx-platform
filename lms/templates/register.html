@@ -1,9 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="main.html" />
-
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
+
+<%include file="autocomplete.html"/>
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
@@ -136,7 +137,7 @@
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
           <li class="field required text" id="field-cedula">
-            <label for="name">${_('Cedula')}</label>
+            <label for="name">${_('Cedula / Pasaporte')}</label>
             <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>
             <span class="tip tip-input" id="cedula-tip">${_("Don't input '-' in your ID")}</span>
           </li>
@@ -144,6 +145,11 @@
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
             <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+          </li>
+          <li class="field required text" id="field-city">
+            <label for="city">${_('City')}</label>
+            <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito')}" required aria-required="true"/>
+            <input type="hidden" name="city_id" value="city_pk" id="city_id"/>
           </li>
         </ol>
 
