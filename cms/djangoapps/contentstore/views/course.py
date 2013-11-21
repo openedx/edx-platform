@@ -60,7 +60,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'course_config_advanced_page',
            'course_settings_updates',
            'course_grader_updates',
-           'course_advanced_updates', 'textbook_index', 'textbook_by_id',
+           'course_advanced_updates',
+           'syllabus','textbook_index', 'textbook_by_id',
            'create_textbook']
 
 
@@ -678,6 +679,32 @@ def assign_textbook_id(textbook, used_ids=()):
         tid = tid + random.choice(string.ascii_lowercase)
     return tid
 
+@login_required
+@ensure_csrf_cookie
+def syllabus(request, org, course, name):
+    """
+    Display an editable syllabus.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=3)
+
+    
+    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+    upload_asset_url = new_loc.url_reverse('assets/', '')
+    syllabus_url = reverse('syllabus', kwargs={
+        'org': org,
+        'course': course,
+        'name': name,
+    })
+    return render_to_response('syllabus.html', {
+        'context_course': course_module,
+        'course': course_module,
+        'upload_asset_url': upload_asset_url,
+        'syllabus_url': syllabus_url,
+    })
 
 @login_required
 @ensure_csrf_cookie
@@ -687,6 +714,7 @@ def textbook_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
+
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)

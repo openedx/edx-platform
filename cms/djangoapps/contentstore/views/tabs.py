@@ -37,6 +37,7 @@ def initialize_course_tabs(course):
         {"type": "course_info", "name": _("Course Info")},
         {"type": "discussion", "name": _("Discussion")},
         {"type": "wiki", "name": _("Wiki")},
+        {"type": "syllabus", "name": _("Syllabus")},
         {"type": "progress", "name": _("Progress")},
     ] 
 
