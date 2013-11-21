@@ -9,3 +9,4 @@ networkx==1.7
 sympy==0.7.1
 pyparsing==1.5.6
 nltk==2.0.4
+sympy==0.7.1
