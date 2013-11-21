@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: a11y - Videos will alert screenreaders when the video is over.
+
 LMS: Trap focus on the loading element when a user loads more threads
 in the forum sidebar to improve accessibility.
 
