@@ -285,8 +285,7 @@ class LTIModule(LTIFields, XModule):
         context and imported into another system or context.
         This parameter is required.
         """
-        # This is unique id of edx platform instance. Ned, it is true?
-        return unicode(self.id) if self.is_graded else ''
+        return unicode(self.id)
 
     def get_lis_result_sourcedid(self):
         """
