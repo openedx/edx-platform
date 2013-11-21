@@ -55,11 +55,26 @@ describe 'Calculator', ->
     it 'show the help overlay', ->
       @calculator.helpShow()
       expect($('.help')).toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'false')
 
   describe 'helpHide', ->
     it 'show the help overlay', ->
       @calculator.helpHide()
       expect($('.help')).not.toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'true')
+
+  describe 'handleKeyDown', ->
+    it 'on pressing Esc the hint becomes hidden', ->
+      @calculator.helpShow()
+      e = jQuery.Event('keydown', { which: 27 } );
+      $(document).trigger(e);
+      expect($('.help')).not.toHaveClass 'shown'
+
+    it 'On pressing other buttons the hint continue to show', ->
+      @calculator.helpShow()
+      e = jQuery.Event('keydown', { which: 32 } );
+      $(document).trigger(e);
+      expect($('.help')).toHaveClass 'shown'
 
   describe 'calculate', ->
     beforeEach ->
