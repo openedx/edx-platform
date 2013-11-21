@@ -1,6 +1,5 @@
 import datetime
 import pytz
-import unittest
 
 from mock import patch
 
@@ -340,14 +339,13 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         # now the student should see it
         self.assertTrue(has_access(self.beta_tester, self.course, 'load'))
 
-    @unittest.expectedFailure
     @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
         """
         Check that beta-test access works for content.
         """
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, self.content, 'load'))
+        self.assertFalse(has_access(self.normal_student, self.content, 'load', self.course.id))
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, self.content, 'load'))
+        self.assertTrue(has_access(self.beta_tester, self.content, 'load', self.course.id))
