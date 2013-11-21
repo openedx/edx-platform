@@ -18,7 +18,14 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.tests.factories import BetaTesterFactory, StaffFactory, GlobalStaffFactory, InstructorFactory
+from courseware.tests.factories import (
+    BetaTesterFactory,
+    StaffFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -108,12 +115,18 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
 
         self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
-        self.sub_courseware_chapter = ItemFactory.create(parent_location=self.test_course.location,
-                                                         display_name='courseware')
-        self.sub_overview_chapter = ItemFactory.create(parent_location=self.sub_courseware_chapter.location,
-                                                       display_name='Overview')
-        self.welcome_section = ItemFactory.create(parent_location=self.overview_chapter.location,
-                                                  display_name='Welcome')
+        self.other_org_course = CourseFactory.create(org='Other_Org_Course')
+        self.sub_courseware_chapter = ItemFactory.create(
+            parent_location=self.test_course.location, display_name='courseware'
+        )
+        self.sub_overview_chapter = ItemFactory.create(
+            parent_location=self.sub_courseware_chapter.location,
+            display_name='Overview'
+        )
+        self.welcome_section = ItemFactory.create(
+            parent_location=self.overview_chapter.location,
+            display_name='Welcome'
+        )
 
         self.unenrolled_user = UserFactory(last_name="Unenrolled")
 
@@ -123,6 +136,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.staff_user = StaffFactory(course=self.course.location)
         self.instructor_user = InstructorFactory(course=self.course.location)
+        self.org_staff_user = OrgStaffFactory(course=self.course.location)
+        self.org_instructor_user = OrgInstructorFactory(course=self.course.location)
         self.global_staff_user = GlobalStaffFactory()
 
     def test_redirection_unenrolled(self):
@@ -169,7 +184,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_staff_course_access(self):
         """
-        Verify instructor can load the instructor dashboard, the grade views,
+        Verify staff can load the staff dashboard, the grade views,
         and student profile pages for their course.
         """
         self.login(self.staff_user)
@@ -193,6 +208,36 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         check_for_get_code(self, 200, url)
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 404, url)
+
+    def test_org_staff_access(self):
+        """
+        Verify org staff can load the instructor dashboard, the grade views,
+        and student profile pages for course in their org.
+        """
+        self.login(self.org_staff_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id})
+        check_for_get_code(self, 404, url)
+
+    def test_org_instructor_access(self):
+        """
+        Verify org instructor can load the instructor dashboard, the grade views,
+        and student profile pages for course in their org.
+        """
+        self.login(self.org_instructor_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id})
         check_for_get_code(self, 404, url)
 
     def test_global_staff_access(self):

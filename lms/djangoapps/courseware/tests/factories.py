@@ -14,7 +14,14 @@ from student.tests.factories import RegistrationFactory  # Imported to re-export
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from courseware.roles import CourseInstructorRole, CourseStaffRole, CourseBetaTesterRole, GlobalStaff
+from courseware.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    CourseBetaTesterRole,
+    GlobalStaff,
+    OrgStaffRole,
+    OrgInstructorRole,
+)
 
 from xmodule.modulestore import Location
 
@@ -64,8 +71,36 @@ class BetaTesterFactory(UserFactory):
     @post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
-            raise ValueError("Must specify a course location for a course staff user")
+            raise ValueError("Must specify a course location for a beta-tester user")
         CourseBetaTesterRole(extracted).add_users(self)
+
+
+class OrgStaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-staff
+    permissions for `course`.
+    """
+    last_name = "Org-Staff"
+
+    @post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for an org-staff user")
+        OrgStaffRole(extracted).add_users(self)
+
+
+class OrgInstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-instructor
+    permissions for `course`.
+    """
+    last_name = "Org-Instructor"
+
+    @post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for an org-instructor user")
+        OrgInstructorRole(extracted).add_users(self)
 
 
 class GlobalStaffFactory(UserFactory):
@@ -77,7 +112,6 @@ class GlobalStaffFactory(UserFactory):
     @post_generation
     def set_staff(self, create, extracted, **kwargs):
         GlobalStaff().add_users(self)
-
 
 
 class StudentModuleFactory(DjangoModelFactory):
