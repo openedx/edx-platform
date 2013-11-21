@@ -27,8 +27,7 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
 from xmodule.modulestore import Location
 
-from contentstore.course_info_model import (
-    get_course_updates, update_course_updates, delete_course_update)
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
     get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
     get_modulestore)
@@ -57,8 +56,8 @@ from contentstore import utils
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
            'grading_handler',
-           'course_config_advanced_page',
-           'course_advanced_updates', 'textbook_index', 'textbook_by_id',
+           'advanced_settings_handler',
+           'textbook_index', 'textbook_by_id',
            'create_textbook']
 
 
@@ -175,7 +174,6 @@ def course_index(request, course_id, branch, version_guid, block):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-
     old_location = loc_mapper().translate_locator_to_location(location)
 
     lms_link = get_lms_link_for_item(old_location)
@@ -228,14 +226,20 @@ def create_new_course(request):
         pass
     if existing_course is not None:
         return JsonResponse({
-            'ErrMsg': _('There is already a course defined with the same '
+            'ErrMsg': _(
+                'There is already a course defined with the same '
                 'organization, course number, and course run. Please '
                 'change either organization or course number to be '
-                'unique.'),
-            'OrgErrMsg': _('Please change either the organization or '
-                'course number so that it is unique.'),
-            'CourseErrMsg': _('Please change either the organization or '
-                'course number so that it is unique.'),
+                'unique.'
+            ),
+            'OrgErrMsg': _(
+                'Please change either the organization or '
+                'course number so that it is unique.'
+            ),
+            'CourseErrMsg': _(
+                'Please change either the organization or '
+                'course number so that it is unique.'
+            ),
         })
 
     # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
@@ -250,12 +254,15 @@ def create_new_course(request):
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
     if courses.count() > 0:
         return JsonResponse({
-            'ErrMsg': _('There is already a course defined with the same '
+            'ErrMsg': _(
+                'There is already a course defined with the same '
                 'organization and course number. Please '
                 'change at least one field to be unique.'),
-            'OrgErrMsg': _('Please change either the organization or '
+            'OrgErrMsg': _(
+                'Please change either the organization or '
                 'course number so that it is unique.'),
-            'CourseErrMsg': _('Please change either the organization or '
+            'CourseErrMsg': _(
+                'Please change either the organization or '
                 'course number so that it is unique.'),
         })
 
@@ -343,9 +350,8 @@ def course_info_handler(request, tag=None, course_id=None, branch=None, version_
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def course_info_update_handler(
-    request, tag=None, course_id=None, branch=None, version_guid=None, block=None, provided_id=None
-    ):
+def course_info_update_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None,
+                               provided_id=None):
     """
     restful CRUD operations on course_info updates.
     provided_id should be none if it's new (create) and index otherwise.
@@ -492,118 +498,104 @@ def grading_handler(request, tag=None, course_id=None, branch=None, version_guid
             return JsonResponse()
 
 
-@login_required
-@ensure_csrf_cookie
-def course_config_advanced_page(request, org, course, name):
+# pylint: disable=invalid-name
+def _config_course_advanced_components(request, course_module):
     """
-    Send models and views as well as html for editing the advanced course
-    settings to the client.
-
-    org, course, name: Attributes of the Location for the item to edit
+    Check to see if the user instantiated any advanced components. This
+    is a hack that does the following :
+    1) adds/removes the open ended panel tab to a course automatically
+    if the user has indicated that they want to edit the
+    combinedopendended or peergrading module
+    2) adds/removes the notes panel tab to a course automatically if
+    the user has indicated that they want the notes module enabled in
+    their course
     """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    return render_to_response('settings_advanced.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'course_locator': loc_mapper().translate_location(location.course_id, location, False, True),
-        'advanced_dict': json.dumps(CourseMetadata.fetch(location)),
-    })
-
-
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
-@login_required
-@ensure_csrf_cookie
-@expect_json
-def course_advanced_updates(request, org, course, name):
-    """
-    Restful CRUD operations on metadata. The payload is a json rep of the
-    metadata dicts. For delete, otoh, the payload is either a key or a list of
-    keys to delete.
-
-    org, course: Attributes of the Location for the item to edit
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'GET':
-        return JsonResponse(CourseMetadata.fetch(location))
-    elif request.method == 'DELETE':
-        return JsonResponse(CourseMetadata.delete_key(
-            location,
-            json.loads(request.body)
-        ))
-    else:
-        # Whether or not to filter the tabs key out of the settings metadata
-        filter_tabs = True
-
-        # Check to see if the user instantiated any advanced components. This
-        # is a hack that does the following :
-        #   1) adds/removes the open ended panel tab to a course automatically
-        #   if the user has indicated that they want to edit the
-        #   combinedopendended or peergrading module
-        #   2) adds/removes the notes panel tab to a course automatically if
-        #   the user has indicated that they want the notes module enabled in
-        #   their course
-        # TODO refactor the above into distinct advanced policy settings
-        if ADVANCED_COMPONENT_POLICY_KEY in request.json:
-            # Get the course so that we can scrape current tabs
-            course_module = modulestore().get_item(location)
-
-            # Maps tab types to components
-            tab_component_map = {
-                'open_ended': OPEN_ENDED_COMPONENT_TYPES,
-                'notes': NOTE_COMPONENT_TYPES,
-            }
-
-            # Check to see if the user instantiated any notes or open ended
-            # components
-            for tab_type in tab_component_map.keys():
-                component_types = tab_component_map.get(tab_type)
-                found_ac_type = False
-                for ac_type in component_types:
-                    if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]:
-                        # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(
-                            tab_type,
-                            course_module
-                        )
-                        # If a tab has been added to the course, then send the
-                        # metadata along to CourseMetadata.update_from_json
-                        if changed:
-                            course_module.tabs = new_tabs
-                            request.json.update({'tabs': new_tabs})
-                            # Indicate that tabs should not be filtered out of
-                            # the metadata
-                            filter_tabs = False
-                        # Set this flag to avoid the tab removal code below.
-                        found_ac_type = True
-                        break
-                # If we did not find a module type in the advanced settings,
-                # we may need to remove the tab from the course.
-                if not found_ac_type:
-                    # Remove tab from the course if needed
-                    changed, new_tabs = remove_extra_panel_tab(
-                        tab_type, course_module
-                    )
+    # TODO refactor the above into distinct advanced policy settings
+    filter_tabs = True  # Exceptional conditions will pull this to False
+    if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
+        tab_component_map = {
+            'open_ended':OPEN_ENDED_COMPONENT_TYPES,
+            'notes':NOTE_COMPONENT_TYPES,
+        }
+        # Check to see if the user instantiated any notes or open ended
+        # components
+        for tab_type in tab_component_map.keys():
+            component_types = tab_component_map.get(tab_type)
+            found_ac_type = False
+            for ac_type in component_types:
+                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]:
+                    # Add tab to the course if needed
+                    changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
+                    # If a tab has been added to the course, then send the
+                    # metadata along to CourseMetadata.update_from_json
                     if changed:
                         course_module.tabs = new_tabs
                         request.json.update({'tabs': new_tabs})
-                        # Indicate that tabs should *not* be filtered out of
+                        # Indicate that tabs should not be filtered out of
                         # the metadata
-                        filter_tabs = False
-        try:
-            return JsonResponse(CourseMetadata.update_from_json(
-                location,
-                request.json,
-                filter_tabs=filter_tabs
-            ))
-        except (TypeError, ValueError) as err:
-            return HttpResponseBadRequest(
-                "Incorrect setting format. " + str(err),
-                content_type="text/plain"
-            )
+                        filter_tabs = False  # Set this flag to avoid the tab removal code below.
+                    found_ac_type = True  #break
+
+            # If we did not find a module type in the advanced settings,
+            # we may need to remove the tab from the course.
+            if not found_ac_type:  # Remove tab from the course if needed
+                changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+                if changed:
+                    course_module.tabs = new_tabs
+                    request.json.update({'tabs':new_tabs})
+                    # Indicate that tabs should *not* be filtered out of
+                    # the metadata
+                    filter_tabs = False
+
+    return filter_tabs
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "PUT"))
+@expect_json
+def advanced_settings_handler(request, course_id=None, branch=None, version_guid=None, block=None, tag=None):
+    """
+    Course settings configuration
+    GET
+        html: get the page
+        json: get the model
+    PUT, POST
+        json: update the Course's settings. The payload is a json rep of the
+            metadata dicts. The dict can include a "unsetKeys" entry which is a list
+            of keys whose values to unset: i.e., revert to default
+    """
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
+
+    course_old_location = loc_mapper().translate_locator_to_location(locator)
+    course_module = modulestore().get_item(course_old_location)
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+
+        return render_to_response('settings_advanced.html', {
+            'context_course': course_module,
+            'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
+            'advanced_settings_url': locator.url_reverse('settings/advanced')
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            return JsonResponse(CourseMetadata.fetch(course_module))
+        else:
+            # Whether or not to filter the tabs key out of the settings metadata
+            filter_tabs = _config_course_advanced_components(request, course_module)
+            try:
+                return JsonResponse(CourseMetadata.update_from_json(
+                    course_module,
+                    request.json,
+                    filter_tabs=filter_tabs
+                ))
+            except (TypeError, ValueError) as err:
+                return HttpResponseBadRequest(
+                    "Incorrect setting format. {}".format(err),
+                    content_type="text/plain"
+                )
 
 
 class TextbookValidationError(Exception):
