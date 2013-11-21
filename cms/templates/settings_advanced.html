@@ -1,11 +1,9 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore import utils
   from xmodule.modulestore.django import loc_mapper
-  from django.core.urlresolvers import reverse
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
@@ -28,7 +26,7 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
 
   // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
   var advancedModel = new AdvancedSettingsModel(${advanced_dict | n}, {parse: true});
-  advancedModel.url = "${reverse('course_advanced_settings_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+  advancedModel.url = "${advanced_settings_url}";
 
   var editor = new AdvancedSettingsView({
     el: $('.settings-advanced'),
@@ -91,13 +89,15 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
         <%
           ctx_loc = context_course.location
           location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+          details_url = location.url_reverse('settings/details/')
+          grading_url = location.url_reverse('settings/grading/')
           course_team_url = location.url_reverse('course_team/', '')
         %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${course_locator.url_reverse('settings/details/')}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${course_locator.url_reverse('settings/grading/')}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
           </ul>
         </nav>

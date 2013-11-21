@@ -7,7 +7,6 @@
   from contentstore import utils
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
-  from django.core.urlresolvers import reverse
 %>
 
 <%block name="header_extras">
@@ -139,15 +138,16 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       <div class="bit">
       % if context_course:
         <%
-          ctx_loc = context_course.location
           course_team_url = course_locator.url_reverse('course_team/')
+          advanced_settings_url = course_locator.url_reverse('settings/advanced/')
+          detailed_settings_url = course_locator.url_reverse('settings/details/')
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${course_locator.url_reverse('settings/details/')}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif
