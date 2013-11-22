@@ -10,15 +10,19 @@ Tests of the Capa XModule
 import datetime
 import json
 import random
+import os
 import textwrap
 import unittest
 
 from mock import Mock, patch
+import webob
 from webob.multidict import MultiDict
 
 import xmodule
+from xmodule.tests import DATA_DIR
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
+from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
 from xblock.field_data import DictFieldData
@@ -147,6 +151,47 @@ class CapaFactory(object):
             module.get_score = lambda: {'score': 0, 'total': 1}
 
         return module
+
+
+class CapaFactoryWithFiles(CapaFactory):
+    """
+    A factory for creating a Capa problem with files attached.
+    """
+    sample_problem_xml = textwrap.dedent("""\
+        <problem>
+            <coderesponse queuename="BerkeleyX-cs188x">
+                <!-- actual filenames here don't matter for server-side tests,
+                     they are only acted upon in the browser. -->
+                <filesubmission
+                    points="25"
+                    allowed_files="prog1.py prog2.py prog3.py"
+                    required_files="prog1.py prog2.py prog3.py"
+                />
+                <codeparam>
+                    <answer_display>
+                        If you're having trouble with this Project,
+                        please refer to the Lecture Slides and attend office hours.
+                    </answer_display>
+                    <grader_payload>{"project": "p3"}</grader_payload>
+                </codeparam>
+            </coderesponse>
+
+            <customresponse>
+                <text>
+                    If you worked with a partner, enter their username or email address. If you
+                    worked alone, enter None.
+                </text>
+
+                <textline points="0" size="40" correct_answer="Your partner's username or 'None'"/>
+                <answer type="loncapa/python">
+correct=['correct']
+s = str(submission[0]).strip()
+if submission[0] == '':
+    correct[0] = 'incorrect'
+                </answer>
+            </customresponse>
+        </problem>
+    """)
 
 
 class CapaModuleTest(unittest.TestCase):
@@ -495,6 +540,89 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_with_files(self):
+        # Check a problem with uploaded files, using the check_problem API.
+        # pylint: disable=W0212
+
+        # The files we'll be uploading.
+        fnames = ["prog1.py", "prog2.py", "prog3.py"]
+        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+
+        # Mock the XQueueInterface.
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
+        module.system.xqueue['interface'] = xqueue_interface
+
+        # Create a request dictionary for check_problem.
+        get_request_dict = {
+            CapaFactoryWithFiles.input_key(input_num=2): fileobjs,
+            CapaFactoryWithFiles.input_key(input_num=3): 'None',
+        }
+
+        module.check_problem(get_request_dict)
+
+        # _http_post is called like this:
+        #   _http_post(
+        #       'http://example.com/xqueue/xqueue/submit/',
+        #       {
+        #           'xqueue_header': '{"lms_key": "df34fb702620d7ae892866ba57572491", "lms_callback_url": "/", "queue_name": "BerkeleyX-cs188x"}',
+        #           'xqueue_body': '{"student_info": "{\\"anonymous_student_id\\": \\"student\\", \\"submission_time\\": \\"20131117183318\\"}", "grader_payload": "{\\"project\\": \\"p3\\"}", "student_response": ""}',
+        #       },
+        #       files={
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html', mode 'r' at 0x49c5f60>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg', mode 'r' at 0x49c56f0>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf', mode 'r' at 0x49c5a50>,
+        #       },
+        #   )
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        _, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fpaths, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
+
+    @unittest.expectedFailure
+    def test_check_problem_with_files_as_xblock(self):
+        # Check a problem with uploaded files, using the XBlock API.
+        # pylint: disable=W0212
+
+        # The files we'll be uploading.
+        fnames = ["prog1.py", "prog2.py", "prog3.py"]
+        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+
+        # Mock the XQueueInterface.
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
+        module.system.xqueue['interface'] = xqueue_interface
+
+        # Create a webob Request with the files uploaded.
+        post_data = []
+        for fname, fileobj in zip(fnames, fileobjs):
+            post_data.append((CapaFactoryWithFiles.input_key(input_num=2), (fname, fileobj)))
+        post_data.append((CapaFactoryWithFiles.input_key(input_num=3), 'None'))
+        request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
+
+        module.handle('xmodule_handler', request, 'problem_check')
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        _, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fnames, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
 
     def test_check_problem_error(self):
 
