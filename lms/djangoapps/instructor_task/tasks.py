@@ -19,6 +19,7 @@ a problem URL and optionally a student.  These are used to set up the initial va
 of the query for traversing StudentModule objects.
 
 """
+from django.conf import settings
 from django.utils.translation import ugettext_noop
 from celery import task
 from functools import partial
@@ -29,6 +30,7 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
+    push_grades_to_s3,
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -127,3 +129,13 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     action_name = ugettext_noop('emailed')
     visit_fcn = perform_delegate_email_batches
     return run_main_task(entry_id, visit_fcn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+def calculate_grades_csv(entry_id, xmodule_instance_args):
+    """
+    Grade a course and push the results to an S3 bucket for download.
+    """
+    action_name = ugettext_noop('graded')
+    task_fn = partial(push_grades_to_s3, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
