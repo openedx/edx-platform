@@ -1,0 +1,1095 @@
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
+# Copyright (C) 2013 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# apardo <apardo@alabs.org>, 2013
+# juancamilom <juan.montoya@hmltda.com>, 2013
+# juancamilom <juan.montoya@hmltda.com>, 2013
+# luisli88 <luislicardo1307@gmail.com>, 2013
+# Natalia_m <natromansol@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: translation_team@edx.org\n"
+"POT-Creation-Date: 2013-10-07 17:06-0400\n"
+"PO-Revision-Date: 2013-10-21 22:50+0000\n"
+"Last-Translator: juancamilom <juan.montoya@hmltda.com>\n"
+"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_419\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: cms/djangoapps/contentstore/utils.py:22
+msgid "Open Ended Panel"
+msgstr "Panel de problemas abiertos"
+
+#: cms/djangoapps/contentstore/utils.py:23
+msgid "My Notes"
+msgstr "Mis Anotaciones"
+
+#: cms/djangoapps/contentstore/views/assets.py:143
+msgid "Upload completed"
+msgstr "Carga terminada"
+
+#: cms/djangoapps/contentstore/views/course.py:116
+msgid ""
+"Unable to create course '{name}'.\n"
+"\n"
+"{err}"
+msgstr "No ha sido posible crear el curso  '{name}'.\n\n{err}"
+
+#: cms/djangoapps/contentstore/views/course.py:127
+msgid ""
+"There is already a course defined with the same organization, course number,"
+" and course run. Please change either organization or course number to be "
+"unique."
+msgstr "Ya existe un curso en la misma organización con esta identificación. Por favor modifique la organización o el número del curso para que el registro sea único."
+
+#: cms/djangoapps/contentstore/views/course.py:131
+#: cms/djangoapps/contentstore/views/course.py:133
+#: cms/djangoapps/contentstore/views/course.py:150
+#: cms/djangoapps/contentstore/views/course.py:152
+msgid ""
+"Please change either the organization or course number so that it is unique."
+msgstr "Por favor modifique la organización o el número del curso para que el registro sea único."
+
+#: cms/djangoapps/contentstore/views/course.py:147
+msgid ""
+"There is already a course defined with the same organization and course "
+"number. Please change at least one field to be unique."
+msgstr "Ya existe un curso en la misma organización con esta identificación. Por favor modifique alguno de los dos campos para que el registro sea único."
+
+#: cms/djangoapps/contentstore/views/import_export.py:68
+msgid "We only support uploading a .tar.gz file."
+msgstr "Solo está soportado la carga de archivos .tar.gz."
+
+#: cms/djangoapps/contentstore/views/import_export.py:105
+msgid "File upload corrupted. Please try again"
+msgstr "La carga del archivo ha fallado. Por favor intente nuevamente."
+
+#: cms/djangoapps/contentstore/views/import_export.py:196
+msgid "Could not find the course.xml file in the package."
+msgstr "No se encontró el archivo course.xml en el paquete."
+
+#: cms/djangoapps/contentstore/views/user.py:123
+msgid "Insufficient permissions"
+msgstr "Permisos insuficientes"
+
+#: cms/djangoapps/contentstore/views/user.py:131
+msgid "Could not find user by email address '{email}'."
+msgstr "No se encontró ningún usuario con la dirección '{email}'."
+
+#: cms/djangoapps/contentstore/views/user.py:157
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "El usuario {email} está registrado pero todavía no ha activado su cuenta."
+
+#: cms/djangoapps/contentstore/views/user.py:175
+#: cms/djangoapps/contentstore/views/user.py:218
+msgid "You may not remove the last instructor from a course"
+msgstr "No puede remover al último instructor del curso"
+
+#: cms/djangoapps/contentstore/views/user.py:191
+msgid "malformed JSON"
+msgstr "Cadena JSON erronea"
+
+#: cms/djangoapps/contentstore/views/user.py:195
+#: cms/djangoapps/contentstore/views/user.py:198
+msgid "`role` is required"
+msgstr "el 'rol' es requerido"
+
+#: cms/djangoapps/contentstore/views/user.py:204
+msgid "Only instructors may create other instructors"
+msgstr "Solo los instructores pueden definir otros instructores"
+
+#: cms/djangoapps/course_creators/models.py:33
+msgid "unrequested"
+msgstr "No solicitado"
+
+#: cms/djangoapps/course_creators/models.py:34
+msgid "pending"
+msgstr "pendiente"
+
+#: cms/djangoapps/course_creators/models.py:35
+msgid "granted"
+msgstr "concedido"
+
+#: cms/djangoapps/course_creators/models.py:36
+msgid "denied"
+msgstr "denegado"
+
+#: cms/djangoapps/course_creators/models.py:39
+msgid "Studio user"
+msgstr "Usuario de Studio"
+
+#: cms/djangoapps/course_creators/models.py:41
+msgid "The date when state was last updated"
+msgstr "Última fecha de actualización del estado"
+
+#: cms/djangoapps/course_creators/models.py:43
+msgid "Current course creator state"
+msgstr "Estado del creador del curso actual"
+
+#: cms/djangoapps/course_creators/models.py:44
+msgid ""
+"Optional notes about this user (for example, why course creation access was "
+"denied)"
+msgstr "Anotaciones opcionales sobre este usuario (por ejemplo, por que se denegó el acceso a la creación de cursos)"
+
+#: common/djangoapps/course_modes/models.py:42
+msgid "Honor Code Certificate"
+msgstr "Certificado de Código de Honor"
+
+#: common/djangoapps/course_modes/views.py:70
+#: common/djangoapps/student/views.py:389
+msgid "Enrollment is closed"
+msgstr "Las inscripciones están cerradas"
+
+#: common/djangoapps/course_modes/views.py:79
+msgid "Enrollment mode not supported"
+msgstr "Modo de inscripciones no soportado"
+
+#: common/djangoapps/course_modes/views.py:95
+msgid "Invalid amount selected."
+msgstr "La cantidad seleccionada es inválida"
+
+#: common/djangoapps/course_modes/views.py:100
+msgid "No selected price or selected price is too low."
+msgstr "No ha seleccionado el precio o el precio es demasiado bajo"
+
+#: common/djangoapps/student/views.py:373
+msgid "Course id not specified"
+msgstr "No se especificó el ID del curso"
+
+#: common/djangoapps/student/views.py:386
+msgid "Course id is invalid"
+msgstr "El ID del curso no es válido"
+
+#: common/djangoapps/student/views.py:440
+msgid "You are not enrolled in this course"
+msgstr "Usted no está inscrito en este curso"
+
+#: common/djangoapps/student/views.py:442
+msgid "Enrollment action is invalid"
+msgstr "La Inscripción es inválida"
+
+#: common/djangoapps/student/views.py:494
+msgid "There was an error receiving your login information. Please email us."
+msgstr "Ocurrió un error en la recepción de su información de ingreso. Por favor escribanos al correo electrónico."
+
+#: common/djangoapps/student/views.py:525
+msgid "Too many failed login attempts. Try again later."
+msgstr "Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más tarde."
+
+#: common/djangoapps/student/views.py:532
+msgid "Email or password is incorrect."
+msgstr "Correo electrónico o contraseña incorrectos."
+
+#: common/djangoapps/student/views.py:579
+msgid ""
+"This account has not been activated. We have sent another activation "
+"message. Please check your e-mail for the activation instructions."
+msgstr "Esta cuenta no ha sido activada. Hemos enviado nuevamente el correo de activación. Por favor verifique su buzón de correo y siga las instrucciones de activación."
+
+#: common/djangoapps/student/views.py:641
+msgid "An account with the Public Username '{username}' already exists."
+msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
+
+#: common/djangoapps/student/views.py:646
+msgid "An account with the Email '{email}' already exists."
+msgstr "Ya existe una cuenta con el correo electrónico '{username}'."
+
+#: common/djangoapps/student/views.py:707
+msgid "Error (401 {field}). E-mail us."
+msgstr "Error (401 {field}). Escríbanos al correo electrónico."
+
+#: common/djangoapps/student/views.py:712
+msgid "To enroll, you must follow the honor code."
+msgstr "Para inscribirse, debe aceptar el código de honor."
+
+#: common/djangoapps/student/views.py:724
+msgid "You must accept the terms of service."
+msgstr "Debe aceptar los términos y condiciones del servicio."
+
+#: common/djangoapps/student/views.py:753
+msgid "Valid e-mail is required."
+msgstr "Se requiere una dirección de correo electrónico válida."
+
+#: common/djangoapps/student/views.py:760
+msgid "Username should only consist of A-Z and 0-9, with no spaces."
+msgstr "El nombre de usuario solo debe contener los caracteres A-Z y 0-9, sin espacios."
+
+#: common/djangoapps/student/views.py:792
+msgid "Could not send activation e-mail."
+msgstr "No fue posible enviar el correo de activación."
+
+#: common/djangoapps/student/views.py:1100
+msgid "Unknown error. Please e-mail us to let us know how it happened."
+msgstr "Error desconocido. Por favor escríbanos al correo electrónico con información de este error."
+
+#: common/djangoapps/student/views.py:1119
+msgid "Invalid e-mail or user"
+msgstr "Correo electrónico o usuario incorrectos"
+
+#: common/djangoapps/student/views.py:1151
+msgid "No inactive user with this e-mail exists"
+msgstr "No existe un usuario inactivo con esta dirección de correo electrónico"
+
+#: common/djangoapps/student/views.py:1164
+msgid "Unable to send reactivation email"
+msgstr "No fue posible enviar el correo de reactivación"
+
+#: common/djangoapps/student/views.py:1181
+msgid "Invalid password"
+msgstr "Contraseña invalida"
+
+#: common/djangoapps/student/views.py:1188
+msgid "Valid e-mail address required."
+msgstr "Se requiere una dirección de correo electrónico válida."
+
+#: common/djangoapps/student/views.py:1193
+msgid "An account with this e-mail already exists."
+msgstr "Ya existe una cuenta con esta dirección de correo electrónico."
+
+#: common/djangoapps/student/views.py:1209
+msgid "Old email is the same as the new email."
+msgstr "El correo electrónico nuevo es igual al anterior."
+
+#: common/djangoapps/student/views.py:1298
+msgid "Name required"
+msgstr "Nombre requerido"
+
+#: common/djangoapps/student/views.py:1333
+#: common/djangoapps/student/views.py:1343
+msgid "Invalid ID"
+msgstr "ID invalido"
+
+#: common/lib/xmodule/xmodule/capa_module.py:356
+msgid "Check"
+msgstr "Revisar"
+
+#: common/lib/xmodule/xmodule/capa_module.py:357
+msgid "Final Check"
+msgstr "Revisión Final"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
+msgid "Navigation"
+msgstr "Navegación"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:123
+msgid "About these documents"
+msgstr "Acerca de estos documentos"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:126
+msgid "Index"
+msgstr "Índice"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:129
+#: lms/templates/wiki/plugins/attachments/index.html:40
+msgid "Search"
+msgstr "Buscar"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:132
+msgid "Copyright"
+msgstr "Derechos de Autor"
+
+#: lms/djangoapps/courseware/features/video.py:114
+msgid "ERROR: No playable video sources found!"
+msgstr "ERROR: no se encontraron recursos de video que puedan ser reproducidos."
+
+#: lms/djangoapps/django_comment_client/base/views.py:603
+#, python-format
+msgid "allowed file types are '%(file_types)s'"
+msgstr "los tipos de archivo permitidos son '%(file_types)s'"
+
+#: lms/djangoapps/django_comment_client/base/views.py:618
+#, python-format
+msgid "maximum upload file size is %(file_size)sK"
+msgstr "el tamaño máximo de archivo permitido es %(file_size)sK"
+
+#: lms/djangoapps/django_comment_client/base/views.py:627
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
+msgstr "Error en la subida del archivo. Por favor contacte al administrador del sitio."
+
+#: lms/djangoapps/instructor/views/api.py:57
+msgid "User does not exist."
+msgstr "El usuario no existe."
+
+#: lms/djangoapps/instructor/views/api.py:63
+msgid "Task is already running."
+msgstr "La tarea ya se está ejecutando."
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:86
+msgid "Course Info"
+msgstr "Información del curso"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:115
+msgid "Membership"
+msgstr "Afiliación"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:131
+msgid "Student Admin"
+msgstr "Administrador de Estudiantes"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:145
+msgid "Data Download"
+msgstr "Descarga de Datos"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:157
+msgid "Analytics"
+msgstr "Analíticas"
+
+#: lms/djangoapps/open_ended_grading/utils.py:22
+msgid "AI Assessment"
+msgstr "Evaluación IA"
+
+#: lms/djangoapps/open_ended_grading/utils.py:23
+msgid "Peer Assessment"
+msgstr "Evaluación por pares"
+
+#: lms/djangoapps/open_ended_grading/utils.py:24
+msgid "Not yet available"
+msgstr "No está disponible aún"
+
+#: lms/djangoapps/open_ended_grading/utils.py:25
+msgid "Automatic Checker"
+msgstr "Verificador automático"
+
+#: lms/djangoapps/open_ended_grading/utils.py:26
+msgid "Instructor Assessment"
+msgstr "Revisión del instructor"
+
+#: lms/djangoapps/open_ended_grading/utils.py:29
+msgid ""
+"Error occurred while contacting the grading service.  Please notify course "
+"staff."
+msgstr "Ocurrió un error contactando al servicio de calificación. Por favor notifíquelo al personal de apoyo del curso."
+
+#: lms/djangoapps/open_ended_grading/utils.py:30
+msgid ""
+"Error occurred while contacting the grading service.  Please notify your edX"
+" point of contact."
+msgstr "Ocurrió un error contactando al servicio de calificación. Por favor notifíquelo a su punto de contacto de edX."
+
+#: lms/djangoapps/open_ended_grading/utils.py:103
+msgid "for course {0} and student {1}."
+msgstr "para el curso {0} y el estudiante {1}."
+
+#: lms/djangoapps/open_ended_grading/views.py:50
+msgid ""
+"View all problems that require peer assessment in this particular course."
+msgstr "Ver todos los problemas que requieren revisión de pares para este curso."
+
+#: lms/djangoapps/open_ended_grading/views.py:51
+msgid ""
+"View ungraded submissions submitted by students for the open ended problems "
+"in the course."
+msgstr "Ver los envíos de ejercicios abiertos aún no calificados para este curso."
+
+#: lms/djangoapps/open_ended_grading/views.py:52
+msgid ""
+"View open ended problems that you have previously submitted for grading."
+msgstr "Ver los ejercicios abiertos que usted ha enviado anteriormente para ser calificados."
+
+#: lms/djangoapps/open_ended_grading/views.py:53
+msgid "View submissions that have been flagged by students as inappropriate."
+msgstr "Ver los envíos que han sido marcados por los estudiantes como inapropiados."
+
+#: lms/djangoapps/open_ended_grading/views.py:57
+#: lms/djangoapps/open_ended_grading/views.py:58
+msgid "New submissions to grade"
+msgstr "Nuevos envíos para calificar"
+
+#: lms/djangoapps/open_ended_grading/views.py:59
+msgid "New grades have been returned"
+msgstr "Se han recibido nuevas calificaciones"
+
+#: lms/djangoapps/open_ended_grading/views.py:60
+msgid "Submissions have been flagged for review"
+msgstr "Los envíos han sido marcados para revisión"
+
+#: lms/djangoapps/open_ended_grading/views.py:128
+msgid ""
+"\n"
+"        Error with initializing peer grading.\n"
+"        There has not been a peer grading module created in the courseware that would allow you to grade others.\n"
+"        Please check back later for this.\n"
+"        "
+msgstr "\n        Ocurrió un error inicializando la evaluación por pares.\n        No se ha creado un modulo de evaluación por pares en el curso para permitirle a usted evaluar el trabajo de otros.\n        Por favor verifique nuevamente mas adelante.\n        "
+
+#: lms/djangoapps/shoppingcart/models.py:159
+msgid "Order Payment Confirmation"
+msgstr "Confirmación de la orden de pago"
+
+#: lms/djangoapps/shoppingcart/models.py:227
+msgid "Trying to add a different currency into the cart"
+msgstr "Intentando añadir una moneda diferente en el carrito"
+
+#: lms/djangoapps/shoppingcart/models.py:387
+msgid ""
+"Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
+" enrollments."
+msgstr "Por favor visite su <a href=\"{dashboard_link}\">panel de control</a> para ver sus nuevas inscripciones."
+
+#: lms/djangoapps/shoppingcart/models.py:432
+msgid "Mode {mode} does not exist for {course_id}"
+msgstr "El modo {mode} no existe para el curso {course_id}"
+
+#: lms/djangoapps/shoppingcart/models.py:444
+msgid "Certificate of Achievement, {mode_name} for course {course}"
+msgstr "Certificado de logro, {mode_name} para el curso {course}"
+
+#: lms/djangoapps/shoppingcart/models.py:489
+msgid ""
+"Note - you have up to 2 weeks into the course to unenroll from the Verified "
+"Certificate option and receive a full refund. To receive your refund, "
+"contact {billing_email}. Please include your order number in your e-mail. "
+"Please do NOT include your credit card information."
+msgstr "Nota - Usted tiene hasta 2 semanas una vez iniciado el curso para retirarse de la opción de certificados verificados y recibir un reembolso completo.  Para recibir este reembolso, contacte a {billing_email}. Por favor incluya en su mensaje el número de su orden y NO incluya ninguna información de su tarjeta de crédito."
+
+#: lms/djangoapps/shoppingcart/views.py:25
+msgid "You must be logged-in to add to a shopping cart"
+msgstr "Debe iniciar sesión para añadir elementos al carrito de compras"
+
+#: lms/djangoapps/shoppingcart/views.py:31
+#: lms/djangoapps/shoppingcart/tests/test_views.py:82
+msgid "The course you requested does not exist."
+msgstr "El curso que ha solicitado no existe"
+
+#: lms/djangoapps/shoppingcart/views.py:33
+#: lms/djangoapps/shoppingcart/tests/test_views.py:69
+msgid "The course {0} is already in your cart."
+msgstr "El curso {0} ya está en su carrito de compras"
+
+#: lms/djangoapps/shoppingcart/views.py:35
+#: lms/djangoapps/shoppingcart/tests/test_views.py:76
+msgid "You are already registered in course {0}."
+msgstr "Usted ya está registrado en el curso {0}"
+
+#: lms/djangoapps/shoppingcart/views.py:36
+msgid "Course added to cart."
+msgstr "Curso añadido al carrito"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:147
+msgid "The payment processor did not return a required parameter: {0}"
+msgstr "El ente que se encarga de procesar el pago no retorno un parámetro requerido: {0}"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:153
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:168
+msgid "The payment processor returned a badly-typed value {0} for param {1}."
+msgstr "El ente que se encarga de procesar el pago retornó un valor incorrecto {0} para el parámetro {1}"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:159
+msgid ""
+"The payment processor accepted an order whose number is not in our system."
+msgstr "El encargado de procesar el pago aceptó una orden cuyo número no se encuentra en nuestro sistema"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:179
+msgid ""
+"The amount charged by the processor {0} {1} is different than the total cost"
+" of the order {2} {3}."
+msgstr "La cantidad cargada por el encargado de procesar el pago {0} {1} es diferente del costo total de la orden {2} {3}."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:307
+msgid "Successful transaction."
+msgstr "Transacción existosa."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:308
+msgid "The request is missing one or more required fields."
+msgstr "La solicitud no tiene uno o más campos requeridos."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:309
+msgid "One or more fields in the request contains invalid data."
+msgstr "Uno o mas campos en la solicitud contienen información inválida"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:316
+msgid ""
+"Error: General system failure. Possible fix: retry the payment after a few "
+"minutes."
+msgstr "Error: Fallo general del sistema. Posible solución: Intente el pago nuevamente después de algunos minutos."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:328
+msgid ""
+"The issuing bank has questions about the request. Possible fix: retry with "
+"another form of payment"
+msgstr "El Banco emisor tiene preguntas sobre la solicitud.  Posible solución: intente con otra forma de pago."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:340
+msgid ""
+"Insufficient funds in the account. Possible fix: retry with another form of "
+"payment"
+msgstr "Fondos insuficientes en la cuenta. Posible solución: intente con otra forma de pago"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:342
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:353
+msgid "Unknown reason"
+msgstr "Razón desconocida"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:343
+msgid ""
+"Issuing bank unavailable. Possible fix: retry again after a few minutes"
+msgstr "El banco emisor no está disponible. Posible solución: Intente nuevamente dentro de algunos minutos"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
+msgid ""
+"The card has reached the credit limit. Possible fix: retry with another form"
+" of payment"
+msgstr "La tarjeta ha alcanzado el límite de crédito. Posible solución: Intente con otra forma de pago"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:350
+msgid ""
+"Invalid card verification number. Possible fix: retry with another form of "
+"payment"
+msgstr "Número de verificación inválido. Posible solución: Intente con otra forma de pago"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:354
+msgid ""
+"Invalid account number. Possible fix: retry with another form of payment"
+msgstr "Número de cuenta inválido. Posible solución: Intente con otra forma de pago"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:360
+msgid ""
+"General decline by the processor.  Possible fix: retry with another form of "
+"payment"
+msgstr "Solicitud rechazada. Posible solución: Intente con otra forma de pago"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:366
+msgid "The requested amount exceeds the originally authorized amount."
+msgstr "La cantidad solicitada excede el valor autorizado."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
+msgid "Processor Failure.  Possible fix: retry the payment"
+msgstr "Fallo en el procesamiento. Posible solución: Intente nuevamente"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:369
+msgid "The authorization has already been captured"
+msgstr "La autorización ya ha sido recibida"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:372
+msgid ""
+"The requested transaction amount must match the previous transaction amount."
+msgstr "La cantidad para la transacción solicitada debe corresponder con la cantidad de la transacción previa"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:380
+msgid "The request ID is invalid."
+msgstr "El ID de la solicitud es inválido"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:390
+msgid "The transaction has already been settled or reversed."
+msgstr "La transacción ya ha sido aceptada o reversada"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:398
+msgid "You requested a credit for a capture that was previously voided"
+msgstr "Usted solicitó un crédito para una captura ya ya había sido invalidada"
+
+#: lms/djangoapps/verify_student/views.py:147
+msgid "Selected price is not valid number."
+msgstr "El precio seleccionado no es un número válido"
+
+#: lms/djangoapps/verify_student/views.py:157
+msgid "This course doesn't support verified certificates"
+msgstr "Este curso no tiene soporte para certificados verificados"
+
+#: lms/djangoapps/verify_student/views.py:160
+msgid "No selected price or selected price is below minimum."
+msgstr "No se ha seleccionado un precio o el precio seleccionado está por debajo del precio mínimo"
+
+#: lms/templates/registration/password_reset_complete.html:8
+#: lms/templates/registration/password_reset_complete.html:56
+msgid "Your Password Reset is Complete"
+msgstr "Tu reseteo de contraseña está completado"
+
+#: lms/templates/registration/password_reset_complete.html:62
+#, python-format
+msgid ""
+"\n"
+"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
+"      "
+msgstr "\nTu contraseña se ha establecido. Puedes seguir adelante e %(link_start)sinciar sesión%(link_end)s ahora."
+
+#: lms/templates/registration/password_reset_confirm.html:9
+#, python-format
+msgid ""
+"\n"
+"      Reset Your %(platform_name)s Password\n"
+"  "
+msgstr "\nResetea Tu Contraseña de %(platform_name)s"
+
+#: lms/templates/registration/password_reset_confirm.html:61
+#, python-format
+msgid ""
+"\n"
+"          Reset Your %(platform_name)s Password\n"
+"          "
+msgstr "\nResetea Tu Contraseña de %(platform_name)s"
+
+#: lms/templates/registration/password_reset_confirm.html:71
+msgid "Password Reset Form"
+msgstr "Formulario de Reseteo de Contraseña"
+
+#: lms/templates/registration/password_reset_confirm.html:78
+#, python-format
+msgid ""
+"\n"
+"                We're sorry, %(platform_name)s enrollment is not available in your region\n"
+"            "
+msgstr "\nLo sentimos, las suscripciones a %(platform_name)s no están disponibles en su región"
+
+#: lms/templates/registration/password_reset_confirm.html:85
+msgid "The following errors occured while processing your registration: "
+msgstr "Los siguientes errores ocurrieron al procesar su inscripción:"
+
+#: lms/templates/registration/password_reset_confirm.html:87
+msgid "You must complete all fields."
+msgstr "Debes completar todos los campos."
+
+#: lms/templates/registration/password_reset_confirm.html:88
+msgid "The two password fields didn't match."
+msgstr "Los dos campos de contraseña no coinciden."
+
+#: lms/templates/registration/password_reset_confirm.html:93
+msgid ""
+"We're sorry, our systems seem to be having trouble processing your password "
+"reset"
+msgstr "Lo sentimos, nuestros sistemas parecen estar teniendo problemas para procesar su reseteo de contraseña"
+
+#: lms/templates/registration/password_reset_confirm.html:95
+#, python-format
+msgid ""
+"\n"
+"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
+"            "
+msgstr "\n                Alguien ya ha sido alertado de esta situación. Por favor reintente en algunos minutos. Por favor %(start_link)scontáctenos%(end_link)s para transmitirnos cualquier inquietud.\n            "
+
+#: lms/templates/registration/password_reset_confirm.html:102
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly. <br /> Required fields are noted by <strong "
+"class=\"indicator\">bold text and an asterisk (*)</strong>."
+msgstr "Por favor ingrese su nueva contraseña dos veces para que sea verificada. <br /> Los campos requeridos se identifican con <strong class=\"indicator\">texto en negrilla y un asterísco (*)</strong>."
+
+#: lms/templates/registration/password_reset_confirm.html:106
+msgid "Required Information"
+msgstr "Información Requerida"
+
+#: lms/templates/registration/password_reset_confirm.html:110
+msgid "Your New Password"
+msgstr "Tu Nueva Contraseña "
+
+#: lms/templates/registration/password_reset_confirm.html:114
+msgid "Your New Password Again"
+msgstr "Tu Nueva Contraseña de Nuevo"
+
+#: lms/templates/registration/password_reset_confirm.html:121
+msgid "Change My Password"
+msgstr "Cambiar Mi Contraseña"
+
+#: lms/templates/registration/password_reset_confirm.html:128
+msgid "Your Password Reset Was Unsuccessful"
+msgstr "Tu Reseteo de Contraseña No Tuvo Éxito"
+
+#: lms/templates/registration/password_reset_confirm.html:131
+#, python-format
+msgid ""
+"\n"
+"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
+"        "
+msgstr "\n            El vínculo de restablecimiento de contraseña es inválido, posiblemente este vínculo ya fue utilizado. Por favor regrese a la página de %(start_link)sinicio de sesión%(end_link)s y comience de nuevo el proceso de restablecer contraseña.\n        "
+
+#: lms/templates/registration/password_reset_confirm.html:141
+msgid "Password Reset Help"
+msgstr "Ayuda de Reseteo de Contraseña"
+
+#: lms/templates/registration/password_reset_confirm.html:145
+msgid "Need Help?"
+msgstr "¿Necesita ayuda?"
+
+#: lms/templates/registration/password_reset_confirm.html:147
+#, python-format
+msgid ""
+"\n"
+"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
+"          "
+msgstr "\n              Visite nuestra %(start_link)ssección de ayuda para ver la información de contacto y las respuestas a las preguntas mas comunes%(end_link)s\n          "
+
+#: lms/templates/registration/password_reset_email.html:2
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at edx.org."
+msgstr "Usted ha recibido este correo electrónico porque solicitó el restablecimiento de su contraseña de usuario para edx.org."
+
+#: lms/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Por favor visite la siguiente página y seleccione una nueva contraseña:"
+
+#: lms/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr "Gracias por usar el sitio!"
+
+#: lms/templates/registration/password_reset_email.html:13
+msgid "The edX Team"
+msgstr "El equipo de edX"
+
+#: lms/templates/wiki/article.html:31
+msgid "Last modified:"
+msgstr "Última modificación:"
+
+#: lms/templates/wiki/article.html:37
+msgid "See all children"
+msgstr "Ver todos los registros hijos"
+
+#: lms/templates/wiki/article.html:48
+msgid "This article was last modified:"
+msgstr "Última modificación de este artículo:"
+
+#: lms/templates/wiki/create.html:5 lms/templates/wiki/create.html.py:30
+msgid "Add new article"
+msgstr "Añadir nuevo artículo"
+
+#: lms/templates/wiki/create.html:37
+msgid "Create article"
+msgstr "Crear artículo"
+
+#: lms/templates/wiki/create.html:42 lms/templates/wiki/delete.html:13
+#: lms/templates/wiki/delete.html.py:54
+msgid "Go back"
+msgstr "Volver"
+
+#: lms/templates/wiki/delete.html:5 lms/templates/wiki/delete.html.py:50
+#: lms/templates/wiki/edit.html:23
+msgid "Delete article"
+msgstr "Borrar artículo"
+
+#: lms/templates/wiki/delete.html:9
+#: lms/templates/wiki/plugins/attachments/index.html:92
+msgid "Delete"
+msgstr "Borrar"
+
+#: lms/templates/wiki/delete.html:12
+msgid "You cannot delete a root article."
+msgstr "No puede borrar un artículo raíz."
+
+#: lms/templates/wiki/delete.html:18
+msgid ""
+"You cannot delete this article because you do not have permission to delete "
+"articles with children. Try to remove the children manually one-by-one."
+msgstr "No puede borrar este artículo porque no tiene permisos para borrar artículos que tengan artículos hijos. Intente borrar manualmente los artículos hijos uno por uno."
+
+#: lms/templates/wiki/delete.html:24
+msgid ""
+"You are deleting an article. This means that its children will be deleted as"
+" well. If you choose to purge, children will also be purged!"
+msgstr "Está borrando un artículo. eso significa que los artículos hijos serán borrados también. Si elige purgar el artículo, los artículos hijos serán purgados también."
+
+#: lms/templates/wiki/delete.html:26
+msgid "Articles that will be deleted"
+msgstr "Artículos que serán borrados"
+
+#: lms/templates/wiki/delete.html:32
+msgid "...and more!"
+msgstr "--- y más!"
+
+#: lms/templates/wiki/delete.html:40
+msgid "You are deleting an article. Please confirm."
+msgstr "Está a punto de borrar un artículo. Favor confirmar."
+
+#: lms/templates/wiki/edit.html:5
+msgid "Edit"
+msgstr "Editar"
+
+#: lms/templates/wiki/edit.html:14 lms/templates/wiki/edit.html.py:34
+msgid "Save changes"
+msgstr "Guardar cambios"
+
+#: lms/templates/wiki/edit.html:18
+msgid "Preview"
+msgstr "Vista previa"
+
+#: lms/templates/wiki/edit.html:39
+msgid "Back to editor"
+msgstr "Volver al editor"
+
+#: lms/templates/wiki/history.html:5
+msgid "History"
+msgstr "Historial"
+
+#: lms/templates/wiki/history.html:56
+msgid ""
+"Click each revision to see a list of edited lines. Click the Preview button "
+"to see how the article looked at this stage. At the bottom of this page, you"
+" can change to a particular revision or merge an old revision with the "
+"current one."
+msgstr "Haga clic en cada revisión para ver la lista de líneas modificadas. Haga clic en el botón Previsualizar para ver como se muestra el artículo en este momento. Al final de esta página, puede seleccionar una revisión particular o fusionar una revisión anterior con la actual."
+
+#: lms/templates/wiki/history.html:75
+msgid "no log message"
+msgstr "ningún mensaje de registro"
+
+#: lms/templates/wiki/history.html:87
+msgid "Preview this revision"
+msgstr "Previsualizar esta revisión"
+
+#: lms/templates/wiki/history.html:101
+msgid "Auto log:"
+msgstr "Auto log:"
+
+#: lms/templates/wiki/history.html:109
+msgid "Change"
+msgstr "Cambiar"
+
+#: lms/templates/wiki/history.html:127 lms/templates/wiki/history.html:132
+msgid "Merge selected with current..."
+msgstr "Fundir lo seleccionado con el actual..."
+
+#: lms/templates/wiki/history.html:137
+msgid "Switch to selected version"
+msgstr "Cambiar a la versión seleccionada"
+
+#: lms/templates/wiki/history.html:153 lms/templates/wiki/history.html:180
+msgid "Back to history view"
+msgstr "Volver a la vista del historial"
+
+#: lms/templates/wiki/history.html:158 lms/templates/wiki/history.html:163
+msgid "Switch to this version"
+msgstr "Cambiar a esta versión"
+
+#: lms/templates/wiki/history.html:171
+msgid "Merge with current"
+msgstr "Fundir con el actual"
+
+#: lms/templates/wiki/history.html:172
+msgid ""
+"When you merge a revision with the current, all data will be retained from "
+"both versions and merged at its approximate location from each revision."
+msgstr "Cuando usted funde una revisión con la actual, todos los datos de las dos revisiones se conservan y se funden en su ubicación aproximada."
+
+#: lms/templates/wiki/history.html:172
+msgid "After this, it's important to do a manual review."
+msgstr "A continuación, es importante hacer una revisión manual."
+
+#: lms/templates/wiki/history.html:185 lms/templates/wiki/history.html:190
+msgid "Create new merged version"
+msgstr "Crear una nueva versión fundida."
+
+#: lms/templates/wiki/preview_inline.html:13
+msgid "Previewing revision"
+msgstr "Previsualizando la revisión"
+
+#: lms/templates/wiki/preview_inline.html:20
+msgid "Previewing merge between"
+msgstr "Previsualizando la fusión entre"
+
+#: lms/templates/wiki/preview_inline.html:22
+msgid "and"
+msgstr "y"
+
+#: lms/templates/wiki/preview_inline.html:31
+msgid "This revision has been deleted."
+msgstr "Esta revisión se ha eliminado."
+
+#: lms/templates/wiki/preview_inline.html:32
+msgid "Restoring to this revision will mark the article as deleted."
+msgstr "La restauración de esta revisión marcará el artículo como eliminado."
+
+#: lms/templates/wiki/includes/anonymous_blocked.html:7
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
+msgstr "\n  Debe <a href=\"%(login_url)s\"><Iniciar sesión</a> o <a href=\"%(signup_url)s\">registrarse</a> para usar esta función.\n  "
+
+#: lms/templates/wiki/includes/anonymous_blocked.html:11
+msgid "You need to log in or sign up to use this function."
+msgstr "Necesita iniciar sesión o registrarse para usar esta función."
+
+#: lms/templates/wiki/includes/cheatsheet.html:7
+msgid "Wiki Syntax Help"
+msgstr "Ayuda de la Sintaxis del Wiki"
+
+#: lms/templates/wiki/includes/cheatsheet.html:8
+msgid ""
+"This wiki uses <strong>Markdown</strong> for styling. There are several "
+"useful guides online. See any of the links below for in-depth details:"
+msgstr "Este wiki usa <strong>Markdownn</strong para el estilo. Hay varias guías útiles online. Mira alguno de los siguientes enlaces para detalles en profundidad."
+
+#: lms/templates/wiki/includes/cheatsheet.html:10
+msgid "Markdown: Basics"
+msgstr "Markdown: Lo Esencial"
+
+#: lms/templates/wiki/includes/cheatsheet.html:11
+msgid "Quick Markdown Syntax Guide"
+msgstr "Guía Rápida de la Sintaxis de Markdown"
+
+#: lms/templates/wiki/includes/cheatsheet.html:12
+msgid "Miniature Markdown Guide"
+msgstr "Mini guía de Markdown"
+
+#: lms/templates/wiki/includes/cheatsheet.html:14
+msgid ""
+"To create a new wiki article, create a link to it. Clicking the link gives "
+"you the creation page."
+msgstr "Para crear un articulo de wiki nuevo, crea uno un enlace a él. Al hacer click sobre el te lleva a la creación de la página."
+
+#: lms/templates/wiki/includes/cheatsheet.html:15
+msgid "[Article Name](wiki:ArticleName)"
+msgstr "[Article Name](wiki:ArticleName)"
+
+#. Translators: Do not translate "edX"
+#: lms/templates/wiki/includes/cheatsheet.html:21
+msgid "edX Additions:"
+msgstr "Complementos edX:"
+
+#: lms/templates/wiki/includes/cheatsheet.html:31
+msgid "Useful examples:"
+msgstr "Ejemplos útiles:"
+
+#. Translators: Do not translate "edX" or "Wikipedia"
+#: lms/templates/wiki/includes/cheatsheet.html:36
+msgid "http://wikipedia.org"
+msgstr "http://wikipedia.org"
+
+#: lms/templates/wiki/includes/cheatsheet.html:37
+msgid "[Wikipedia](http://wikipedia.org)"
+msgstr "[Wikipedia](http://wikipedia.org)"
+
+#: lms/templates/wiki/includes/cheatsheet.html:38
+msgid "[edX Wiki](wiki:/edx/)"
+msgstr "[edX Wiki](wiki:/edx/)"
+
+#: lms/templates/wiki/includes/cheatsheet.html:41
+msgid "Huge Header"
+msgstr "Cabecera Grande"
+
+#: lms/templates/wiki/includes/cheatsheet.html:44
+msgid "Smaller Header"
+msgstr "Cabecera Pequeña"
+
+#: lms/templates/wiki/includes/cheatsheet.html:47
+msgid "*emphasis* or _emphasis_"
+msgstr "*emphasis* o _emphasis_"
+
+#: lms/templates/wiki/includes/cheatsheet.html:49
+msgid "**strong** or __strong__"
+msgstr "**strong** o __strong__"
+
+#: lms/templates/wiki/includes/cheatsheet.html:51
+msgid "Unordered List"
+msgstr "Lista no ordenada"
+
+#: lms/templates/wiki/includes/cheatsheet.html:52
+msgid "Sub Item 1"
+msgstr "Sub Ítem 1"
+
+#: lms/templates/wiki/includes/cheatsheet.html:53
+msgid "Sub Item 2"
+msgstr "Sub Ítem 2"
+
+#: lms/templates/wiki/includes/cheatsheet.html:55
+msgid "Ordered"
+msgstr "Ordenado"
+
+#: lms/templates/wiki/includes/cheatsheet.html:56
+msgid "List"
+msgstr "Lista"
+
+#: lms/templates/wiki/includes/cheatsheet.html:58
+msgid "Quotes"
+msgstr "Citas"
+
+#. Translators: Do not translate 'cheatsheetLink'
+#: lms/templates/wiki/includes/editor_widget.html:7
+#, python-format
+msgid ""
+"\n"
+"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
+"\t"
+msgstr "\nLa sintaxis Markdown está permitida. Mira la %(start_link)sayuda%(end_link)s para obtener ayuda."
+
+#: lms/templates/wiki/plugins/attachments/index.html:5
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#: lms/templates/wiki/plugins/attachments/index.html:14
+msgid "Upload new file"
+msgstr "Cargar nuevo archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:17
+msgid "Search and add file"
+msgstr "Buscar y añadir archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:23
+msgid "Upload File"
+msgstr "Subir archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:27
+msgid "Upload file"
+msgstr "Subir archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:35
+msgid "Search files and articles"
+msgstr "Buscar archivos y artículos"
+
+#: lms/templates/wiki/plugins/attachments/index.html:36
+msgid ""
+"You can reuse files from other articles. These files are subject to updates "
+"on other articles which may or may not be a good thing."
+msgstr "Puede reutilizar archivos de otros artículos. Estos archivos están sujetos a las actualizaciones de los otros artículos, lo cual puede o no ser conveniente."
+
+#: lms/templates/wiki/plugins/attachments/index.html:65
+msgid ""
+"The following files are available for this article. Copy the markdown tag to"
+" directly refer to a file from the article text."
+msgstr "Los siguientes archivos están disponibles para este artículo. Copie el código de etiquetas para referenciar directamente un archivo del texto del artículo."
+
+#: lms/templates/wiki/plugins/attachments/index.html:74
+msgid "deleted"
+msgstr "borrado"
+
+#: lms/templates/wiki/plugins/attachments/index.html:84
+msgid "Markdown tag"
+msgstr "Código de etiquetas"
+
+#: lms/templates/wiki/plugins/attachments/index.html:85
+msgid "Uploaded by"
+msgstr "Subido por"
+
+#: lms/templates/wiki/plugins/attachments/index.html:86
+msgid "Size"
+msgstr "Tamaño"
+
+#: lms/templates/wiki/plugins/attachments/index.html:87
+msgid "File History"
+msgstr "Historial de archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:94
+msgid "Detach"
+msgstr "Desasociar"
+
+#: lms/templates/wiki/plugins/attachments/index.html:97
+msgid "Replace"
+msgstr "Reemplazar"
+
+#: lms/templates/wiki/plugins/attachments/index.html:104
+msgid "Restore"
+msgstr "Resturar"
+
+#: lms/templates/wiki/plugins/attachments/index.html:115
+msgid "anonymous (IP logged)"
+msgstr "anónimo (IP autenticada)"
+
+#: lms/templates/wiki/plugins/attachments/index.html:122
+msgid "File history"
+msgstr "Historial de archivo"
+
+#: lms/templates/wiki/plugins/attachments/index.html:122
+msgid "revisions"
+msgstr "revisiones"
+
+#: lms/templates/wiki/plugins/attachments/index.html:130
+msgid "There are no attachments for this article."
+msgstr "No hay adjuntos para este artículo."
