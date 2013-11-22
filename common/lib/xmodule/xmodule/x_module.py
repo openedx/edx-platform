@@ -771,6 +771,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 )
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
+                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
+                # we need to clean it out so that we can set up the ErrorModule instead
+                self.xmodule_runtime.xmodule_instance = None
+
                 if isinstance(self, self.xmodule_runtime.error_descriptor_class):
                     log.exception('Error creating an ErrorModule from an ErrorDescriptor')
                     raise
