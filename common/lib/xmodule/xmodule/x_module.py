@@ -8,6 +8,7 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 from webob import Response
+from webob.multidict import MultiDict
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
@@ -405,7 +406,31 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         """
         XBlock handler that wraps `handle_ajax`
         """
-        response_data = self.handle_ajax(suffix, request.POST)
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json')
 
     def get_children(self):

@@ -591,7 +591,6 @@ class CapaModuleTest(unittest.TestCase):
         for fpath, fileobj in kwargs['files'].iteritems():
             self.assertEqual(fpath, fileobj.name)
 
-    @unittest.expectedFailure
     def test_check_problem_with_files_as_xblock(self):
         # Check a problem with uploaded files, using the XBlock API.
         # pylint: disable=W0212
