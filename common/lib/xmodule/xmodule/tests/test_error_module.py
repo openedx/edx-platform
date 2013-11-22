@@ -119,7 +119,6 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor
         self.descriptor.xmodule_runtime.xmodule_instance = None
 
-    @unittest.expectedFailure
     def test_broken_module(self):
         """
         Test that when an XModule throws an error during __init__, we
@@ -136,7 +135,6 @@ class TestErrorModuleConstruction(unittest.TestCase):
         with self.assertRaises(TestException):
             module = self.descriptor._xmodule
 
-    @unittest.expectedFailure
     @patch.object(ErrorModule, '__init__', Mock(side_effect=TestException))
     def test_broken_error_module(self):
         """
