@@ -21,6 +21,10 @@ in the forum sidebar to improve accessibility.
 
 LMS: Add error recovery when a user loads more threads in the forum sidebar.
 
+LMS: Add feature for providing background grade report generation via Celery
+  instructor task, with reports uploaded to S3. Feature is visible on the beta
+  instructor dashboard. LMS-58
+
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 
 Blades: Add template for checkboxes response to studio. BLD-193.
