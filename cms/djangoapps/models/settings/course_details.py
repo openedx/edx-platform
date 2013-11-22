@@ -1,20 +1,25 @@
+import re
+import logging
+import datetime
+import json
+from json.encoder import JSONEncoder
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-import json
-from json.encoder import JSONEncoder
 from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading
 from contentstore.utils import update_item
 from xmodule.fields import Date
-import re
-import logging
-import datetime
+from xmodule.modulestore.django import loc_mapper
 
 
 class CourseDetails(object):
-    def __init__(self, location):
-        self.course_location = location  # a Location obj
+    def __init__(self, org, course_id, run):
+        # still need these for now b/c the client's screen shows these 3 fields
+        self.org = org
+        self.course_id = course_id
+        self.run = run
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -31,12 +36,9 @@ class CourseDetails(object):
         """
         Fetch the course details for the given course from persistence and return a CourseDetails model.
         """
-        if not isinstance(course_location, Location):
-            course_location = Location(course_location)
-
-        course = cls(course_location)
-
-        descriptor = get_modulestore(course_location).get_item(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        descriptor = get_modulestore(course_old_location).get_item(course_old_location)
+        course = cls(course_old_location.org, course_old_location.course, course_old_location.name)
 
         course.start_date = descriptor.start
         course.end_date = descriptor.end
@@ -45,7 +47,7 @@ class CourseDetails(object):
         course.course_image_name = descriptor.course_image
         course.course_image_asset_path = course_image_url(descriptor)
 
-        temploc = course_location.replace(category='about', name='syllabus')
+        temploc = course_old_location.replace(category='about', name='syllabus')
         try:
             course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
@@ -73,14 +75,12 @@ class CourseDetails(object):
         return course
 
     @classmethod
-    def update_from_json(cls, jsondict):
+    def update_from_json(cls, course_location, jsondict):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
-        course_location = Location(jsondict['course_location'])
-        # Will probably want to cache the inflight courses because every blur generates an update
-        descriptor = get_modulestore(course_location).get_item(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        descriptor = get_modulestore(course_old_location).get_item(course_old_location)
 
         dirty = False
 
@@ -134,11 +134,11 @@ class CourseDetails(object):
             # MongoKeyValueStore before we update the mongo datastore.
             descriptor.save()
 
-            get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
+            get_modulestore(course_old_location).update_metadata(course_old_location, own_metadata(descriptor))
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        temploc = Location(course_location).replace(category='about', name='syllabus')
+        temploc = Location(course_old_location).replace(category='about', name='syllabus')
         update_item(temploc, jsondict['syllabus'])
 
         temploc = temploc.replace(name='overview')
@@ -151,7 +151,7 @@ class CourseDetails(object):
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
 
-        # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
+        # Could just return jsondict w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
         return CourseDetails.fetch(course_location)
 
@@ -188,6 +188,9 @@ class CourseDetails(object):
 
 # TODO move to a more general util?
 class CourseSettingsEncoder(json.JSONEncoder):
+    """
+    Serialize CourseDetails, CourseGradingModel, datetime, and old Locations
+    """
     def default(self, obj):
         if isinstance(obj, (CourseDetails, course_grading.CourseGradingModel)):
             return obj.__dict__
