@@ -8,9 +8,10 @@ Tests of the Capa XModule
 #pylint: disable=C0302
 
 import datetime
-import unittest
-import random
 import json
+import random
+import textwrap
+import unittest
 
 from mock import Mock, patch
 from webob.multidict import MultiDict
@@ -33,42 +34,47 @@ class CapaFactory(object):
     A helper class to create problem modules with various parameters for testing.
     """
 
-    sample_problem_xml = """<?xml version="1.0"?>
-<problem>
-  <text>
-    <p>What is pi, to two decimal placs?</p>
-  </text>
-<numericalresponse answer="3.14">
-<textline math="1" size="30"/>
-</numericalresponse>
-</problem>
-"""
+    sample_problem_xml = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <problem>
+            <text>
+                <p>What is pi, to two decimal places?</p>
+            </text>
+        <numericalresponse answer="3.14">
+        <textline math="1" size="30"/>
+        </numericalresponse>
+        </problem>
+    """)
 
     num = 0
 
-    @staticmethod
-    def next_num():
-        CapaFactory.num += 1
-        return CapaFactory.num
+    @classmethod
+    def next_num(cls):
+        cls.num += 1
+        return cls.num
 
-    @staticmethod
-    def input_key():
+    @classmethod
+    def input_key(cls, input_num=2):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + CapaFactory.answer_key())
+        return ("input_" + cls.answer_key(input_num))
 
-    @staticmethod
-    def answer_key():
+    @classmethod
+    def answer_key(cls, input_num=2):
         """
         Return the key stored in the capa problem answer dict
         """
-        return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
-                         'SampleProblem%d' % CapaFactory.num]) +
-                "_2_1")
+        return (
+            "%s_%d_1" % (
+                "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
+                input_num,
+            )
+        )
 
-    @staticmethod
-    def create(graceperiod=None,
+    @classmethod
+    def create(cls,
+               graceperiod=None,
                due=None,
                max_attempts=None,
                showanswer=None,
@@ -97,8 +103,8 @@ class CapaFactory(object):
             attempts: also added to instance state.  Will be converted to an int.
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(CapaFactory.next_num())])
-        field_data = {'data': CapaFactory.sample_problem_xml}
+                             "SampleProblem{0}".format(cls.next_num())])
+        field_data = {'data': cls.sample_problem_xml}
 
         if graceperiod is not None:
             field_data['graceperiod'] = graceperiod
