@@ -9,6 +9,10 @@ LMS: Add feature for providing background grade report generation via Celery
   instructor task, with reports uploaded to S3. Feature is visible on the beta
   instructor dashboard. LMS-58
 
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being valid
+  across all runs with the same course name. Old group membership will still work
+  across runs, but new beta-testers will only be added to a single course run.
+
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 
 Blades: Add template for checkboxes response to studio. BLD-193.
