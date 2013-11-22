@@ -199,6 +199,8 @@ define([
 
     "js/spec/utils/module_spec",
     "js/spec/models/explicit_url_spec"
+    "js/spec/views/baseview_spec",
+    "js/spec/utils/handle_iframe_binding_spec",
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js
