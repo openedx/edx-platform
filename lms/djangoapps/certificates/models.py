@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
+from model_utils import Choices
 
 """
 Certificates are created for a student and an offering of a course.
@@ -62,11 +63,6 @@ class CertificateStatuses(object):
     restricted   = 'restricted'
     unavailable  = 'unavailable'
 
-class CertificateModes(object):
-    verified  = 'verified'
-    honor     = 'honor'
-    audit     = 'audit'
-
 class CertificateWhitelist(models.Model):
     """
     Tracks students who are whitelisted, all users
@@ -90,7 +86,8 @@ class GeneratedCertificate(models.Model):
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
-    mode = models.CharField(max_length=32, default=CertificateModes.honor)
+    MODES = Choices('verified', 'honor', 'audit')
+    mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(
         auto_now_add=True, default=datetime.now)
@@ -144,4 +141,4 @@ def certificate_status_for_student(student, course_id):
         return d
     except GeneratedCertificate.DoesNotExist:
         pass
-    return {'status': CertificateStatuses.unavailable, 'mode': CertificateModes.honor}
+    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
