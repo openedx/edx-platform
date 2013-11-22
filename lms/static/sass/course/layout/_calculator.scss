@@ -120,39 +120,48 @@ div.calc-main {
              display: block;
           }
 
-          dl {
+          .help {
             background: #fff;
             border-radius: 3px;
             box-shadow: 0 0 3px #999;
             color: #333;
-            opacity: 0;
             padding: 10px;
             position: absolute;
             right: -40px;
-            top: -122px;
+            bottom: 57px;
             @include transition(none);
             width: 600px;
-            height: 0;
             overflow: hidden;
             pointer-events: none;
+            display: none;
 
             &.shown {
-              height: auto;
-              opacity: 1;
-              overflow: visible;
+              display: block;
               pointer-events: auto;
             }
 
-            dt {
-              clear: both;
-              float: left;
+            .bold {
               font-weight: bold;
-              padding-right: 12px;
             }
 
-            dd {
-              float: left;
-              margin-left: 0;
+            p, p+p {
+              margin: 0;
+            }
+
+            table {
+              margin: 10px 0;
+
+              td, th {
+                padding: 2px 5px;
+              }
+            }
+
+            .calc-postfixes {
+              margin: 10px auto;
+
+              td, th {
+                padding: 2px 15px;
+              }
             }
           }
         }
