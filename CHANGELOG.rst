@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix transcripts 500 error in studio (BLD-530)
+
 Blades: Allow multiple strings as the correct answer to a string response question. BLD-474.
 
 Blades: a11y - Videos will alert screenreaders when the video is over.

@@ -249,9 +249,12 @@ def edit_unit(request, location):
         )
 
     components = [
-        loc_mapper().translate_location(
-            course.location.course_id, component.location, False, True
-        )
+        [
+            component.location.url(),
+            loc_mapper().translate_location(
+                course.location.course_id, component.location, False, True
+            )
+        ]
         for component
         in item.get_children()
     ]
