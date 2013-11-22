@@ -87,6 +87,11 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status"
     }[name]
 
+  @activateOnEnter: (event, func) ->
+    if event.which == 13
+      e.preventDefault()
+      func(event)
+
   @makeFocusTrap: (elem) ->
     elem.keydown(
       (event) ->
