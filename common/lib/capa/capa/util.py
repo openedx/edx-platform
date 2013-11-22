@@ -53,8 +53,8 @@ def contextualize_text(text, context):  # private
 
 def convert_files_to_filenames(answers):
     '''
-    Check for File objects in the dict of submitted answers,
-        convert File objects to their filename (string)
+    Check for WebOb File objects in the dict of submitted answers,
+        convert them to their filename (string).
     '''
     new_answers = dict()
     for answer_id in answers.keys():
