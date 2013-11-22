@@ -4,6 +4,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
   @numberInputTemplate: "= answer +- x%\n"
+  @mathInputTemplate: "= \\(answer\\)\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
@@ -75,6 +76,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       when "multiple-choice-button" then revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(selection)
       when "string-button" then revisedSelection = MarkdownEditingDescriptor.insertStringInput(selection)
       when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
+      when "math-button" then revisedSelection = MarkdownEditingDescriptor.insertMathInput(selection)
       when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
       when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
       when "header-button" then revisedSelection = MarkdownEditingDescriptor.insertHeader(selection)
@@ -159,6 +161,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @insertNumberInput: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.numberInputTemplate)
 
+  @insertMathInput: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= \\(', '\\)', MarkdownEditingDescriptor.mathInputTemplate)
+
   @insertSelect: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]', MarkdownEditingDescriptor.selectTemplate)
 
@@ -227,32 +232,100 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return groupString;
       });
 
-      // replace string and numerical
-      xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
-        var string,
-            answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
-            floatValue = parseFloat(answersList[0]);
+// replace string and numerical, formularesponse
+    xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
+      // Split answers
+      var answersList = p.replace(/^(or)?=\s*/gm, '').split('\n');
 
-        if(!isNaN(floatValue)) {
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]);
-          if(params) {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
-            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-          } else {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
-          }
-          string += '  <formulaequationinput />\n';
-          string += '</numericalresponse>\n\n';
-        } else {
-            var answers = [];
+      var processNumericalResponse = function (value) {
+        var floatValue = parseFloat(value),
+            params, string;
 
-            for(var i = 0; i < answersList.length; i++) {
-                answers.push(answersList[i])
-            }
-
-            string = '<stringresponse answer="' + answers.join('_or_') + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
+        if (isNaN(floatValue)) {
+          return false;
         }
+
+        params = /(.*?)\+\-\s*(.*?$)/.exec(value);
+        if(params) {
+          string = '<numericalresponse answer="' + floatValue + '">\n';
+          string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+        } else {
+          string = '<numericalresponse answer="' + floatValue + '">\n';
+        }
+
+        string += '  <formulaequationinput />\n';
+        string += '</numericalresponse>\n\n';
+
         return string;
+      };
+
+      var processFormulaResponse = function (value) {
+        // Handles variables passed in. They must start with
+        // letters/underscores/$ and may contain numbers afterward.
+        var varsRegExp = /[A-Za-z_]+\d*/g,
+            // Catches suffixes.
+            suffixesRegExp = /(\d+[A-Za-z%]+)/g,
+            // Catches \( ... \)
+            mathRegExp = /^\\\((.+)\\\)$/,
+            answer = mathRegExp.exec(value.replace(/\s+/g,'')),
+            varsList;
+
+        if (!answer) {
+          return false;
+        } else {
+          answer = answer[1];
+        }
+
+        // Gets a list of unique variables.
+        varsList = _.uniq(
+          // Cleans answer from suffixes.
+          answer.replace(suffixesRegExp, '')
+                .match(varsRegExp)
+        );
+
+        if (!varsList.length) {
+          return false;
+        }
+
+        // Returns ranges for formularesponse.
+        // If len=3, it returns string '-10,-10,-10:10,10,10'.
+        // If len=0 server-side error occurs.
+        var getRanges = function(len) {
+          var start = [], end = [],
+              separator = ':';
+
+          while (len--) {
+            start.push('-10');
+            end.push('10');
+          }
+
+          return start.join(',') + separator + end.join(',')
+        };
+
+        return [
+          '<formularesponse type="ci" ',
+          'samples="', varsList.join(','), '@', getRanges(varsList.length), '#10" ',
+          'answer="', answer,
+          '">\n',
+          '  <responseparam type="tolerance" default="0.00001"/>\n',
+          '  <formulaequationinput size="40" />\n',
+          '</formularesponse>\n\n'
+        ].join('');
+      };
+
+      var processStringResponse = function (value) {
+        return [
+          '<stringresponse ',
+          'answer="', value.join('_or_'), '" ',
+          'type="ci">\n',
+          '  <textline size="20"/>\n',
+          '</stringresponse>\n\n'
+        ].join('');
+      };
+
+      return processNumericalResponse(answersList[0]) ||
+             processFormulaResponse(answersList[0]) ||
+             processStringResponse(answersList);
     });
 
       // replace selects
