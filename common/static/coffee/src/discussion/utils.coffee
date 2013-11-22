@@ -2,9 +2,12 @@ $ ->
   if !window.$$contents
     window.$$contents = {}
   $.fn.extend
-    loading: ->
-      @$_loading = $("<div class='loading-animation'><span class='sr'>Loading content</span></div>")
+    loading: (takeFocus) ->
+      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>Loading content</span></div>")
       $(this).after(@$_loading)
+      if takeFocus
+        DiscussionUtil.makeFocusTrap(@$_loading)
+        @$_loading.focus()
     loaded: ->
       @$_loading.remove()
 
@@ -132,7 +135,7 @@ class @DiscussionUtil
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
-          params["$loading"].loading()
+          params["$loading"].loading(params["takeFocus"])
     if !params["error"]
       params["error"] = =>
         @discussionAlert(

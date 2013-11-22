@@ -2,6 +2,8 @@ if Backbone?
   class @DiscussionModuleView extends Backbone.View
     events:
       "click .discussion-show": "toggleDiscussion"
+      "keypress .discussion-show":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleDiscussion)
       "click .new-post-btn": "toggleNewPost"
       "click .new-post-cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
@@ -70,6 +72,7 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         $loading: $elem
+        takeFocus: true
         url: url
         type: "GET"
         dataType: 'json'
@@ -77,6 +80,7 @@ if Backbone?
         error: error
 
     renderDiscussion: ($elem, response, textStatus, discussionId) =>
+      $elem.focus()
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
       DiscussionUtil.loadRoles(response.roles)
