@@ -14,9 +14,7 @@ logger = getLogger(__name__)
 def setup_mock_lti_server():
 
     server_host = '127.0.0.1'
-
-    # Add +1 to XQUEUE random port number
-    server_port = settings.XQUEUE_PORT + 1
+    server_port = settings.LTI_PORT
 
     address = (server_host, server_port)
 

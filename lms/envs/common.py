@@ -911,6 +911,11 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 
+############################## Video ##########################################
+
+# URL to test YouTube availability
+YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+
 
 ################################### APPS ######################################
 INSTALLED_APPS = (

@@ -359,6 +359,13 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+
+############################## Video ##########################################
+
+# URL to test YouTube availability
+YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+
+
 ############################ APPS #####################################
 
 INSTALLED_APPS = (

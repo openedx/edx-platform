@@ -73,7 +73,7 @@ def set_external_grader_response(step, correctness):
 
     # Set the fake xqueue server to always respond
     # correct/incorrect when asked to grade a problem
-    world.xqueue_server.set_grade_response(response_dict)
+    world.xqueue.set_config('grade_response', response_dict)
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')

@@ -49,25 +49,18 @@ TRANSCRIPTS_BUTTONS = {
 }
 
 
-def _clear_field(index):
-    world.css_fill(SELECTORS['url_inputs'], '', index)
-    # In some reason chromeDriver doesn't trigger 'input' event after filling
-    # field by an empty value. That's why we trigger it manually via jQuery.
-    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
-
-
 @step('I clear fields$')
 def clear_fields(_step):
-    js_str = '''
+
+    # Clear the input fields and trigger an 'input' event
+    script = """
         $('{selector}')
-            .eq({index})
             .prop('disabled', false)
-            .removeClass('is-disabled');
-    '''
-    for index in range(1, 4):
-        js = js_str.format(selector=SELECTORS['url_inputs'], index=index - 1)
-        world.browser.execute_script(js)
-        _clear_field(index)
+            .removeClass('is-disabled')
+            .val('')
+            .trigger('input');
+    """.format(selector=SELECTORS['url_inputs'])
+    world.browser.execute_script(script)
 
     world.wait(DELAY)
     world.wait_for_ajax_complete()
@@ -76,7 +69,12 @@ def clear_fields(_step):
 @step('I clear field number (.+)$')
 def clear_field(_step, index):
     index = int(index) - 1
-    _clear_field(index)
+    world.css_fill(SELECTORS['url_inputs'], '', index)
+
+    # For some reason ChromeDriver doesn't trigger an 'input' event after filling
+    # the field with an empty value. That's why we trigger it manually via jQuery.
+    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
+
     world.wait(DELAY)
     world.wait_for_ajax_complete()
 
