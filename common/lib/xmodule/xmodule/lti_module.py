@@ -41,7 +41,7 @@ class LTIFields(object):
     Fields to define and obtain LTI tool from provider are set here,
     except credentials, which should be set in course settings::
 
-    `lti_id` is id to connect tool with credentials in course settings.
+    `lti_id` is id to connect tool with credentials in course settings. It should not contain :: (double semicolon)
     `launch_url` is launch url of tool.
     `custom_parameters` are additional parameters to navigate to proper book and book page.
 
@@ -60,7 +60,7 @@ class LTIFields(object):
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
     open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
-    is_graded = Boolean(help="The LTI provider will grade student's results.", default=False, scope=Scope.settings)
+    graded = Boolean(help="Grades will be considered in overall score.", default=False, scope=Scope.settings)
     weight = Float(help="Weight for student grades.", default=1.0, scope=Scope.settings)
 
 
@@ -248,15 +248,6 @@ class LTIModule(LTIFields, XModule):
         assert user_id is not None
         return user_id
 
-    def get_base_url(self):
-        """
-        Return url for storing grades
-        """
-        return 'http://{host}{path}'.format(
-                host=self.system.hostname,
-                path=self.system.get_handler_url('custom_handler'),
-            )
-
     def get_outcome_service_url(self):
         """
         Return url for storing grades
@@ -265,15 +256,7 @@ class LTIModule(LTIFields, XModule):
                 host=self.system.hostname,
                 path=self.system.get_handler_url('custom_handler'),
             )
-        return '{}/replaceResult'.format(uri) if self.is_graded else ''
-
-
-    def get_context_id(self):
-        # This is an opaque identifier that uniquely identifies the context that contains
-        # the link being launched. This parameter is recommended.
-
-        # so context_id is lti_id
-        return self.lti_id
+        return '{}/replaceResult'.format(uri)
 
     def get_resource_link_id(self):
         """
@@ -295,27 +278,19 @@ class LTIModule(LTIFields, XModule):
         This value may change for a particular resource_link_id / user_id  from one launch to the next.
         The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
         This field is generally optional, but is required for grading.
-        """
-        if self.is_graded:  # lti_id should be context_id by meaning.
-            return '{}::{}::{}'.format(self.lti_id, self.get_resource_link_id(), self.get_user_id())
-        else:
-            return ''
 
-    # Optional, do not use it for now.
-    # def get_lis_person_sourcedid(self):
-    #     # This field contains the LIS identifier for the user account that is performing this launch.
-    #     # The example syntax of "school:user" is not the required format - lis_person_sourcedid
-    #     # is simply a unique identifier (i.e., a normalized string).
-    #     # This field is optional and its content and meaning are defined by LIS.
-    #     school = 'EdX'
-    #     return '{}:{}:{}'.format(school, self.get_user_id(), uuid4().hex) if self.is_graded else ''
+        context_id is - is an opaque identifier that uniquely identifies the context that contains
+        the link being launched.
+        lti_id should be context_id by meaning
+        """
+        return ':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
+
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
         Signs request and returns signature and oauth parameters.
 
         `custom_paramters` is dict of parsed `custom_parameter` field
-
         `client_key` and `client_secret` are LTI tool credentials.
 
         Also *anonymous student id* is passed to template and therefore to LTI provider.
@@ -339,7 +314,6 @@ class LTIModule(LTIFields, XModule):
             u'resource_link_id': self.get_resource_link_id(),
             u'lis_outcome_service_url': self.get_outcome_service_url(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
-            # u'lis_person_sourcedid': self.get_lis_person_sourcedid(),  # optional, do not use for now.
 
         }
 
@@ -384,27 +358,46 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         params.update(body)
         return params
 
-    def get_maxscore(self):
+    def max_score(self):
         return self.weight
 
     def custom_handler(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
-        Used only for grading.
+        Used only for grading. Returns XML reponse
 
-        Returns json in following format:
-        {'status_code': HTTP status code, 'content': proper XML defined in LTI v.1.1}
+        Example of request body from LTI provider::
 
-        Uses http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html::
+        <?xml version = "1.0" encoding = "UTF-8"?>
+            <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
+              <imsx_POXHeader>
+                <imsx_POXRequestHeaderInfo>
+                  <imsx_version>V1.0</imsx_version>
+                  <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
+                </imsx_POXRequestHeaderInfo>
+              </imsx_POXHeader>
+              <imsx_POXBody>
+                <replaceResultRequest>
+                  <resultRecord>
+                    <sourcedGUID>
+                      <sourcedId>feb-123-456-2929::28883</sourcedId>
+                    </sourcedGUID>
+                    <result>
+                      <resultScore>
+                        <language>en-us</language>
+                        <textString>0.4</textString>
+                      </resultScore>
+                    </result>
+                  </resultRecord>
+                </replaceResultRequest>
+              </imsx_POXBody>
+            </imsx_POXEnvelopeRequest>
 
-            This specification extends the OAuth signature to include integrity checks on HTTP request bodies
-            with content types other than application/x-www-form-urlencoded.
+        Example of correct/incorrect answer xml body:: see response_xml_template
+
+        TODO: add test for xml escaping
         """
-
-        # verify oauth signing
-
-        # Beware: xmlns is broken link, as it is from LTI spec page, where it is broken.
         response_xml_template = textwrap.dedent("""
             <?xml version="1.0" encoding="UTF-8"?>
             <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -424,67 +417,24 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 <imsx_POXBody>{response}</imsx_POXBody>
             </imsx_POXEnvelopeResponse>
         """)
-
         unsupported_values = {
             'imsx_codeMajor': 'unsupported',
             'imsx_description': 'Only replaceResult is supported',
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
-
-        # what should come from LTI provider:
-        """
-        data_example = textwrap.dedent(\"""
-            <?xml version = "1.0" encoding = "UTF-8"?>
-                <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
-                  <imsx_POXHeader>
-                    <imsx_POXRequestHeaderInfo>
-                      <imsx_version>V1.0</imsx_version>
-                      <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
-                    </imsx_POXRequestHeaderInfo>
-                  </imsx_POXHeader>
-                  <imsx_POXBody>
-                    <replaceResultRequest>
-                      <resultRecord>
-                        <sourcedGUID>
-                          <sourcedId>feb-123-456-2929::28883</sourcedId>
-                        </sourcedGUID>
-                        <result>
-                          <resultScore>
-                            <language>en-us</language>
-                            <textString>0.4</textString>
-                          </resultScore>
-                        </result>
-                      </resultRecord>
-                    </replaceResultRequest>
-                  </imsx_POXBody>
-                </imsx_POXEnvelopeRequest>
-        \""")
-        """
-        data = request.body.strip().encode('utf-8')
-        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-        try:  # get data from request
-            root = etree.fromstring(data, parser=parser)
-            if root.nsmap:
-                namespaces = {'def': root.nsmap.values()[0]}
-                imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
-                sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
-                score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-            else:
-                imsx_messageIdentifier = root.xpath("//imsx_messageIdentifier")[0].text
-                sourcedId = root.xpath("//sourcedId")[0].text
-                score = root.xpath("//textString")[0].text
+        try:
+            imsx_messageIdentifier, sourcedId, score, action =  self.descriptor.parse_grade_xml_body(request.body)
         except:
             return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
 
-        real_user = self.system.get_real_user(sourcedId.split('::')[-1])
-        action = dispatch.lower()
-        if action == 'replaceresult':
+        real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        if action == 'replaceResultRequest':
             self.system.publish(
                 event={
                     'event_name': 'grade',
-                    'value': score,
-                    'max_value': self.get_maxscore(),
+                    'value': float(score) * self.max_score(),
+                    'max_value': self.max_score(),
                 },
                 custom_user=real_user
             )
@@ -497,7 +447,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             }
             return Response(response_xml_template.format(**values), content_type="application/xml")
 
-        # return "unsupported" response
         unsupported_values['imsx_messageIdentifier'] = imsx_messageIdentifier
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
@@ -507,18 +456,45 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
     Descriptor for LTI Xmodule.
     """
     has_score = True
-    graded = True
-
     module_class = LTIModule
-
     custom_handler = module_attr('custom_handler')
 
+    @classmethod
+    def parse_grade_xml_body(cls, body):
+        """
+        Parses XML from request.body and returns parsed data
+
+        XML body should contain nsmap (see specs).
+
+        Returns tuple: imsx_messageIdentifier, sourcedId, score, action
+
+        Raises Exception if can't parse.
+        """
+        data = body.strip().encode('utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        # get data from request,
+        root = etree.fromstring(data, parser=parser)
+        namespaces = {'def': root.nsmap.values()[0]}
+        imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+        sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
+        score = root.xpath("//def:textString", namespaces=namespaces)[0].text
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+root.nsmap.values()[0]+'}', '')
+        return imsx_messageIdentifier, sourcedId, score, action
+
+
     def authenticate(self, request, course):
+        """
+        Verify request using OAuth body signing.
+
+        Uses http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html::
+
+            This specification extends the OAuth signature to include integrity checks on HTTP request bodies
+            with content types other than application/x-www-form-urlencoded.
+        """
         # self course_id produces runtime assertion error
 
         # Obtains client_key and client_secret credentials from current course:
         client_key = client_secret = ''
-
         for lti_passport in course.lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
@@ -528,36 +504,6 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
             if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
-
-        # what should come from LTI provider:
-        """
-        data_example = textwrap.dedent(\"""
-            <?xml version = "1.0" encoding = "UTF-8"?>
-                <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
-                  <imsx_POXHeader>
-                    <imsx_POXRequestHeaderInfo>
-                      <imsx_version>V1.0</imsx_version>
-                      <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
-                    </imsx_POXRequestHeaderInfo>
-                  </imsx_POXHeader>
-                  <imsx_POXBody>
-                    <replaceResultRequest>
-                      <resultRecord>
-                        <sourcedGUID>
-                          <sourcedId>feb-123-456-2929::28883::5afe5d9bb03796557ee2614f5c9611fb</sourcedId>
-                        </sourcedGUID>
-                        <result>
-                          <resultScore>
-                            <language>en-us</language>
-                            <textString>0.4</textString>
-                          </resultScore>
-                        </result>
-                      </resultRecord>
-                    </replaceResultRequest>
-                  </imsx_POXBody>
-                </imsx_POXEnvelopeRequest>
-        \""")
-        """
 
         #verify oauth signing
         mock_request = mock.Mock()
@@ -579,7 +525,7 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
 
         mock_request.params = signature.collect_parameters(headers=headers)
 
-        oauth_headers = {i[0]:i[1] for i in mock_request.params}
+        oauth_headers = dict(mock_request.params)
 
         #compare hash from request body and body hash from Authorization header
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
@@ -589,31 +535,20 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         mock_request.http_method = unicode(request.method)
 
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
-        oauth_headers = {i[0]:i[1] for i in oauth_params}
+        oauth_headers =dict(oauth_params)
         client_signature = oauth_headers.get('oauth_signature')
         mock_request.signature = unicode(client_signature)
 
         correct_request = signature.verify_hmac_sha1(mock_request, client_secret)
         if correct_request:
-            data = request.body.strip().encode('utf-8')
-            parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-            try:  # get data from request
-                root = etree.fromstring(data, parser=parser)
-                if root.nsmap:
-                    namespaces = {'def': root.nsmap.values()[0]}
-                    imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
-                    sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
-                    score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-                else:
-                    imsx_messageIdentifier = root.xpath("//imsx_messageIdentifier")[0].text
-                    sourcedId = root.xpath("//sourcedId")[0].text
-                    score = root.xpath("//textString")[0].text
-            except:
-                # return response_xml_template.format(**unsupported_values), "application/xml"
+            try:
+                __, sourcedId, __, __ = self.parse_grade_xml_body(request.body)
+                anonymous_user_id  = urllib.unquote(sourcedId.split(':')[-1])
+            except Exception:
+                # should return response_xml_template.format(**unsupported_values), "application/xml"
                 return None, False
-
-            anonymous_user_id  = sourcedId.split('::')[-1]
             return anonymous_user_id, True
         else:
+            # should return response_xml_template.format(**unsupported_values), "application/xml"
             return None, False
 

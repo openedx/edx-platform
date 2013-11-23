@@ -98,7 +98,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             # what need to be stored as server data
             self.server.grade_data = {
                 'callback_url': self.post_dict["lis_outcome_service_url"],
-                'user_id': self.post_dict['user_id']
+                'sourcedId': self.post_dict['lis_result_sourcedid']
             }
         else:
             status_message = "Invalid request URL"
@@ -151,13 +151,13 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
         values = {
             'textString': 0.5,
-            'sourcedId': self.server.grade_data['user_id'],
+            'sourcedId': self.server.grade_data['sourcedId'],
             'imsx_messageIdentifier': uuid4().hex,
         }
 
         payload = textwrap.dedent("""
             <?xml version = "1.0" encoding = "UTF-8"?>
-                <imsx_POXEnvelopeRequest>
+                <imsx_POXEnvelopeRequest  xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
                   <imsx_POXHeader>
                     <imsx_POXRequestHeaderInfo>
                       <imsx_version>V1.0</imsx_version>
