@@ -101,7 +101,46 @@
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
-  <%static:js group='module-js'/>
+
+	<script type="text/javascript" src="/static/xmodule/modules/js/000-0e1a74833c0206962d495523b3147dc1.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-224d365aed3a968d6876b75a9e39d877.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-2cd7ae0d5fa2a9984b59cef5a2280e0f.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-46084de125ca839459f25db81219dd24.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-6f89a6fecd42ad443889b2a42f0cba64.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-a32214814d3b59d60c4ed7bd0a40957b.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/000-af111f211312d70325129ec128562a4c.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-0b45db8d4ae67b439cff8d0c38d807a8.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-149e5f80fb129c93207c19c2cb17b45a.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-222009e8c24f5628677581995d2488d9.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-2e55a7856b776e9acad11e5914fecb1b.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-4b06b565ce07b7ec692a835beb968b0c.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-4e789164fb697a2e6e6180f9f8255659.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-53c44c016974a4e7b767192c8fa16fe0.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-79f612baa84fbd910e40cb230715ccb1.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-831bfa7f0550106cead1942d7485d9b2.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/xmodule/modules/js/001-bc117318f008b8d41ac8e331dcc56715.js" charset="utf-8"></script>
+<link rel="stylesheet" href="/static/player/videoplayer.css"></link>
+<script type="text/javascript" src="/static/player/videoplayer.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    var video_div = $('.video');
+    video_div.html('');
+    var video_source = video_div.attr('data-mp4-source');
+    var caption_source = video_div.attr('data-caption-data-dir');
+    var video_s = '<video><source src="'+ video_source + '" type="video/mp4"/>';
+    if(caption_source!=null && caption_source!='None'){
+        video_s += '<track kind="subtitles" src="'+ caption_source + '" srclang="en" lable="english"></track>'
+    }
+    video_s += '</video>';
+    var player = $(video_s);
+    video_div.append(player);
+    player.mediaelementplayer({
+        startLanguage: "ch",
+        displayCaptionWhenOnlyOne: true
+    });
+console.log('lalala');
+});
+</script>
 
   <%block name="js_extra"/>
 </body>
