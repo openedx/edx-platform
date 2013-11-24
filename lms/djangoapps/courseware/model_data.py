@@ -226,10 +226,13 @@ class FieldDataCache(object):
         if field_object is not None:
             return field_object
 
+        if not self.user.is_anonymous():
+            assert key.user_id == self.user.id
+
         if key.scope == Scope.user_state:
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=self.user,
+                student=key.user_id,
                 module_state_key=key.block_scope_id.url(),
                 defaults={
                     'state': json.dumps({}),
@@ -245,12 +248,12 @@ class FieldDataCache(object):
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
-                student=self.user,
+                student=key.user_id,
             )
         elif key.scope == Scope.user_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=self.user,
+                student=key.user_id,
             )
 
         cache_key = self._cache_key_from_kvs_key(key)
