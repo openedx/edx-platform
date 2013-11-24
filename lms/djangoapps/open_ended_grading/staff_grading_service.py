@@ -14,7 +14,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
 from mitxmako.shortcuts import render_to_string
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user
 from util.json_request import expect_json
 
 from open_ended_grading.utils import does_location_exist
@@ -235,7 +235,7 @@ def get_next(request, course_id):
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
-    grader_id = unique_id_for_user(request.user, course_id)
+    grader_id = anonymous_id_for_user(request.user, course_id)
     p = request.POST
     location = p['location']
 
@@ -267,7 +267,7 @@ def get_problem_list(request, course_id):
     """
     _check_access(request.user, course_id)
     try:
-        response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user, course_id))
+        response = staff_grading_service().get_problem_list(course_id, anonymous_id_for_user(request.user, course_id))
         response = json.loads(response)
 
         # If 'problem_list' is in the response, then we got a list of problems from the ORA server.
@@ -352,7 +352,7 @@ def save_grade(request, course_id):
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
-    grader_id = unique_id_for_user(request.user, course_id)
+    grader_id = anonymous_id_for_user(request.user, course_id)
 
 
     location = p['location']

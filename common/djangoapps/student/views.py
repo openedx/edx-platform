@@ -41,7 +41,7 @@ from course_modes.models import CourseMode
 from student.models import (
     Registration, UserProfile, TestCenterUser, TestCenterUserForm,
     TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
-    PendingEmailChange, CourseEnrollment, unique_id_for_user,
+    PendingEmailChange, CourseEnrollment, anonymous_id_for_user,
     get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
 )
 from student.forms import PasswordResetFormNoActive
@@ -154,7 +154,7 @@ def process_survey_link(survey_link, user, course_id):
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
     Currently, this is sha1(user.username).  Otherwise, return survey_link.
     """
-    return survey_link.format(UNIQUE_ID=unique_id_for_user(user, course_id))
+    return survey_link.format(UNIQUE_ID=anonymous_id_for_user(user, course_id))
 
 
 def cert_info(user, course):

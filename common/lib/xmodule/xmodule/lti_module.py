@@ -25,7 +25,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
-from xblock.core import String, Scope, List
+from xblock.core import String, Scope, List, XBlock
 from xblock.fields import Boolean, Float
 
 
@@ -254,9 +254,10 @@ class LTIModule(LTIFields, XModule):
         """
         uri = 'http://{host}{path}'.format(
                 host=self.system.hostname,
-                path=self.system.get_handler_url('custom_handler'),
+                # path=self.system.get_handler_url('custom_handler'),
+                path=self.runtime.handler_url(self, 'grade_handler').rstrip('/?')
             )
-        return '{}/replaceResult'.format(uri)
+        return uri
 
     def get_resource_link_id(self):
         """
@@ -361,7 +362,10 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
     def max_score(self):
         return self.weight
 
-    def custom_handler(self, request, dispatch):
+
+    @XBlock.handler
+    @XBlock.unauthenticated
+    def grade_handler(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
@@ -424,7 +428,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             'response': ''
         }
         try:
-            imsx_messageIdentifier, sourcedId, score, action =  self.descriptor.parse_grade_xml_body(request.body)
+            imsx_messageIdentifier, sourcedId, score, action = self.descriptor.parse_grade_xml_body(request.body)
         except:
             return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
 
@@ -457,7 +461,7 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
     """
     has_score = True
     module_class = LTIModule
-    custom_handler = module_attr('custom_handler')
+    grade_handler = module_attr('grade_handler')
 
     @classmethod
     def parse_grade_xml_body(cls, body):

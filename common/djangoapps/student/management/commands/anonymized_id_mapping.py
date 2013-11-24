@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Dump username,unique_id_for_user pairs as CSV.
+"""Dump username,anonymous_id_for_user pairs as CSV.
 
 Give instructors easy access to the mapping from anonymized IDs to user IDs
 with a simple Django management command to generate a CSV mapping. To run, use
@@ -15,7 +15,7 @@ import csv
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user
 
 
 class Command(BaseCommand):
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 csv_writer = csv.writer(output_file)
                 csv_writer.writerow(("User ID", "Anonymized user ID"))
                 for student in students:
-                    csv_writer.writerow((student.id, unique_id_for_user(student, course_id)))
+                    csv_writer.writerow((student.id, anonymous_id_for_user(student, course_id)))
         except IOError:
             raise CommandError("Error writing to file: %s" % output_filename)
 

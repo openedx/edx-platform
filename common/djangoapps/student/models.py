@@ -57,11 +57,11 @@ class AnonymousUsers(models.Model):
     course_id = models.CharField(db_index=True, max_length=255)
 
 
-def unique_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id):
     """
     Return a unique id for a (user, course) pair, suitable for inserting into e.g. personalized survey links.
     """
-    def _unique_id_for_user(user, course_id):
+    def _anonymous_id_for_user(user, course_id):
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         h = hashlib.md5()
         h.update(settings.SECRET_KEY)
@@ -69,11 +69,14 @@ def unique_id_for_user(user, course_id):
         h.update(course_id)
         return h.hexdigest()
 
+    if user.is_anonymous():
+        return 'Anonymous'
+
     # import ipdb; ipdb.set_trace()
     return AnonymousUsers.objects.get_or_create(
         user=user,
         course_id=course_id,
-        anonymous_user_id=_unique_id_for_user(user, course_id)
+        anonymous_user_id=_anonymous_id_for_user(user, course_id)
     )[0].anonymous_user_id
 
 
@@ -92,7 +95,7 @@ def user_by_anonymous_id(id):
     return obj.user
 
 
-def simple_unique_id_for_user(user):
+def simple_anonymous_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into foldit module table
     or into unit tests.
@@ -819,7 +822,7 @@ class CourseEnrollment(models.Model):
             activation_changed = True
 
         mode_changed = False
-        # if mode is None, the call to update_enrollment didn't specify a new 
+        # if mode is None, the call to update_enrollment didn't specify a new
         # mode, so leave as-is
         if self.mode != mode and mode is not None:
             self.mode = mode

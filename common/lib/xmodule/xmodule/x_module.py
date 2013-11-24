@@ -1070,11 +1070,11 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         """
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
-    def get_handler_url(self, handler_name):
-        """
-        The url prefix to be used by XModules to call into handler_name
-        """
-        return self.handler_url(self.xmodule_instance, handler_name, '', '').rstrip('/?')
+    # def get_handler_url(self, handler_name):
+    #     """
+    #     The url prefix to be used by XModules to call into handler_name
+    #     """
+    #     return self.handler_url(self.xmodule_instance, handler_name, '', '').rstrip('/?')
 
 
 class DoNothingCache(object):

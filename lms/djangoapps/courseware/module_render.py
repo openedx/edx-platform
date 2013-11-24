@@ -24,7 +24,7 @@ from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
 from mitxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user, user_by_anonymous_id
+from student.models import anonymous_id_for_user, user_by_anonymous_id
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.fields import Scope
@@ -302,7 +302,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             block_scope_id=descriptor.location,
             field_name='grade'
         )
-
+        import ipdb; ipdb.set_trace()
         student_module = field_data_cache.find_or_create(key)
         # Update the grades
         student_module.grade = event.get('value')
@@ -397,7 +397,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=unique_id_for_user(user, course_id),
+        anonymous_student_id=anonymous_id_for_user(user, course_id),
         course_id=course_id,
         open_ended_grading_interface=open_ended_grading_interface,
         s3_interface=s3_interface,
@@ -493,7 +493,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
     """
     Entry point for unauthenticated XBlock handlers.
     """
-    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix)
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
@@ -514,10 +514,10 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix)
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 
-def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
+def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     """
     Invoke an XBlock handler, either authenticated or not.
 
@@ -544,16 +544,14 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
             )
         )
         raise Http404
-    # import ipdb; ipdb.set_trace()
 
-    if handler == 'custom_handler':
-        from courseware.courses import get_course_by_id
-        course = get_course_by_id(course_id)
-        anonymous_user_id, status = descriptor.authenticate(request, course)
-        if not status:
-            raise PermissionDenied
-        from student.models import user_by_anonymous_id
-        user = user_by_anonymous_id(anonymous_user_id)
+    from courseware.courses import get_course_by_id
+    course = get_course_by_id(course_id)
+    anonymous_user_id, status = descriptor.authenticate(request, course)
+    if not status:
+        raise PermissionDenied
+    from student.models import user_by_anonymous_id
+    user = user_by_anonymous_id(anonymous_user_id)
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,

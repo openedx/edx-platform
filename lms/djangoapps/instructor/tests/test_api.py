@@ -782,7 +782,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test the CSV output for the anonymized user ids.
         """
         url = reverse('get_anon_ids', kwargs={'course_id': self.course.id})
-        with patch('instructor.views.api.unique_id_for_user') as mock_unique:
+        with patch('instructor.views.api.anonymous_id_for_user') as mock_unique:
             mock_unique.return_value = '42'
             response = self.client.get(url, {})
         self.assertEqual(response['Content-Type'], 'text/csv')
