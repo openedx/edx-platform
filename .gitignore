@@ -17,6 +17,7 @@ cms/envs/private.py
 /nbproject
 .idea/
 .redcar/
+codekit-config.json
 
 ### OS X artifacts
 *.DS_Store
