@@ -69,10 +69,11 @@ def anonymous_id_for_user(user, course_id):
         h.update(course_id)
         return h.hexdigest()
 
+    # This part is for ability to get xblock instance in noauth xblock handlers,
+    # where user is anauthenticated.
     if user.is_anonymous():
         return 'Anonymous'
 
-    # import ipdb; ipdb.set_trace()
     return AnonymousUsers.objects.get_or_create(
         user=user,
         course_id=course_id,

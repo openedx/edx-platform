@@ -152,7 +152,7 @@ def press(request):
 def process_survey_link(survey_link, user, course_id):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
-    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    Currently, this is sha1() updated with secret_key, user.id and course.id. Otherwise, return survey_link.
     """
     return survey_link.format(UNIQUE_ID=anonymous_id_for_user(user, course_id))
 
