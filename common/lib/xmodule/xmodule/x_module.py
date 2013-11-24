@@ -371,7 +371,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         See the HTML module for a simple example.
     """
 
-
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -402,6 +401,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
             data is a dictionary-like object with the content of the request"""
         return u""
 
+    @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
