@@ -302,7 +302,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             block_scope_id=descriptor.location,
             field_name='grade'
         )
-        import ipdb; ipdb.set_trace()
         student_module = field_data_cache.find_or_create(key)
         # Update the grades
         student_module.grade = event.get('value')
@@ -544,14 +543,6 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
             )
         )
         raise Http404
-
-    from courseware.courses import get_course_by_id
-    course = get_course_by_id(course_id)
-    anonymous_user_id, status = descriptor.authenticate(request, course)
-    if not status:
-        raise PermissionDenied
-    from student.models import user_by_anonymous_id
-    user = user_by_anonymous_id(anonymous_user_id)
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,

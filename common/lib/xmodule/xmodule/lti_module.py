@@ -399,8 +399,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             </imsx_POXEnvelopeRequest>
 
         Example of correct/incorrect answer xml body:: see response_xml_template
-
-        TODO: add test for xml escaping
         """
         response_xml_template = textwrap.dedent("""
             <?xml version="1.0" encoding="UTF-8"?>
@@ -428,9 +426,16 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             'response': ''
         }
         try:
-            imsx_messageIdentifier, sourcedId, score, action = self.descriptor.parse_grade_xml_body(request.body)
-        except:
+            imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
+        except Exception:
             return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+
+        # verify oauth signing
+        try:
+            self.verify_oauth_body_sign(request)
+        except LTIError:
+            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+
 
         real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
         if action == 'replaceResultRequest':
@@ -455,14 +460,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
 
-class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
-    """
-    Descriptor for LTI Xmodule.
-    """
-    has_score = True
-    module_class = LTIModule
-    grade_handler = module_attr('grade_handler')
-
     @classmethod
     def parse_grade_xml_body(cls, body):
         """
@@ -476,7 +473,6 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         """
         data = body.strip().encode('utf-8')
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-        # get data from request,
         root = etree.fromstring(data, parser=parser)
         namespaces = {'def': root.nsmap.values()[0]}
         imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
@@ -485,74 +481,64 @@ class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRaw
         action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+root.nsmap.values()[0]+'}', '')
         return imsx_messageIdentifier, sourcedId, score, action
 
-
-    def authenticate(self, request, course):
+    def verify_oauth_body_sign(self, request):
         """
-        Verify request using OAuth body signing.
+        Verify grade request from LTI provider using OAuth body signing.
 
         Uses http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html::
 
             This specification extends the OAuth signature to include integrity checks on HTTP request bodies
             with content types other than application/x-www-form-urlencoded.
+
+        Args:
+        request: DjangoWebobRequest.
+
+        Raises: LTIError if request is incorrect.
         """
-        # self course_id produces runtime assertion error
+        # this part will be removed as Inheritance PR will be meged
+        from courseware.courses import get_course_by_id
+        course = get_course_by_id(self.course_id)
 
         # Obtains client_key and client_secret credentials from current course:
         client_key = client_secret = ''
         for lti_passport in course.lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
-            except ValueError:
+            except ValueError:  # do log here instead of raising exception
                 raise LTIError('Could not parse LTI passport: {0!r}. \
                     Should be "id:key:secret" string.'.format(lti_passport))
             if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
 
-        #verify oauth signing
-        mock_request = mock.Mock()
-
-        try:
-            authorization_header = request.META['HTTP_AUTHORIZATION']
-        except KeyError:
-            return None, False
-
         headers = {
-            'Authorization':unicode(authorization_header),
+            'Authorization':unicode(request.headers.get('Authorization')),
             'Content-Type': 'application/x-www-form-urlencoded',
         }
 
-        #get request body and calculate body hash
         sha1 = hashlib.sha1()
         sha1.update(request.body)
         oauth_body_hash = base64.b64encode(sha1.hexdigest())
 
-        mock_request.params = signature.collect_parameters(headers=headers)
-
-        oauth_headers = dict(mock_request.params)
-
-        #compare hash from request body and body hash from Authorization header
-        if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
-            return None, False
-
-        mock_request.uri = unicode(request.build_absolute_uri())
-        mock_request.http_method = unicode(request.method)
-
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
         oauth_headers =dict(oauth_params)
-        client_signature = oauth_headers.get('oauth_signature')
-        mock_request.signature = unicode(client_signature)
+        oauth_signature = oauth_headers.pop('oauth_signature')
 
-        correct_request = signature.verify_hmac_sha1(mock_request, client_secret)
-        if correct_request:
-            try:
-                __, sourcedId, __, __ = self.parse_grade_xml_body(request.body)
-                anonymous_user_id  = urllib.unquote(sourcedId.split(':')[-1])
-            except Exception:
-                # should return response_xml_template.format(**unsupported_values), "application/xml"
-                return None, False
-            return anonymous_user_id, True
-        else:
-            # should return response_xml_template.format(**unsupported_values), "application/xml"
-            return None, False
+        mock_request = mock.Mock(
+            uri=unicode(request.url),
+            http_method=unicode(request.method),
+            params=oauth_headers.items(),
+            signature=oauth_signature
+        )
+        if (oauth_body_hash != oauth_headers.get('oauth_body_hash') or
+            not signature.verify_hmac_sha1(mock_request, client_secret)):
+            raise LTIError
 
+
+class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
+    """
+    Descriptor for LTI Xmodule.
+    """
+    has_score = True
+    module_class = LTIModule
+    grade_handler = module_attr('grade_handler')
