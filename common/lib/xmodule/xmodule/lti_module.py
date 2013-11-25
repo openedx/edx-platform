@@ -423,16 +423,14 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         }
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
-        except (ValueError, LTIError):
-            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
         except Exception:
-            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
         # verify oauth signing
         try:
             self.verify_oauth_body_sign(request)
-        except LTIError:
-            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+        except (ValueError, LTIError):
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
 
         real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
