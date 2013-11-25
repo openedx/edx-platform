@@ -71,7 +71,7 @@ class LTIModule(LTIFields, XModule):
     '''
     Module provides LTI integration to course.
 
-    Except usual xmodule structure it proceeds with oauth signing.
+    Except usual Xmodule structure it proceeds with OAuth signing.
     How it works::
 
     1. Get credentials from course settings.
@@ -88,14 +88,14 @@ class LTIModule(LTIFields, XModule):
             role
             *+ all custom parameters*
 
-        These parameters should be encoded and signed by *oauth1* together with
+        These parameters should be encoded and signed by *OAuth1* together with
         `launch_url` and *POST* request type.
 
     3. Signing proceeds with client key/secret pair obtained from course settings.
         That pair should be obtained from LTI provider and set into course settings by course author.
-        After that signature and other oauth data are generated.
+        After that signature and other OAuth data are generated.
 
-         Oauth data which is generated after signing is usual::
+         OAuth data which is generated after signing is usual::
 
             oauth_callback
             oauth_nonce
@@ -106,7 +106,7 @@ class LTIModule(LTIFields, XModule):
 
 
     4. All that data is passed to form and sent to LTI provider server by browser via
-        autosubmit via javascript.
+        autosubmit via JavaScript.
 
         Form example::
 
@@ -140,7 +140,7 @@ class LTIModule(LTIFields, XModule):
                     <input type="submit" value="Press to Launch" />
                 </form>
 
-    5. LTI provider has same secret key and it signs data string via *oauth1* and compares signatures.
+    5. LTI provider has same secret key and it signs data string via *OAuth1* and compares signatures.
 
         If signatures are correct, LTI provider redirects iframe source to LTI tool web page,
         and LTI tool is rendered to iframe inside course.
@@ -292,7 +292,7 @@ class LTIModule(LTIFields, XModule):
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
-        Signs request and returns signature and oauth parameters.
+        Signs request and returns signature and OAuth parameters.
 
         `custom_paramters` is dict of parsed `custom_parameter` field
         `client_key` and `client_secret` are LTI tool credentials.
@@ -372,7 +372,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
-        Used only for grading. Returns XML reponse
+        Used only for grading. Returns XML response.
 
         Example of request body from LTI provider::
 
@@ -401,7 +401,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
               </imsx_POXBody>
             </imsx_POXEnvelopeRequest>
 
-        Example of correct/incorrect answer xml body:: see response_xml_template
+        Example of correct/incorrect answer XML body:: see response_xml_template
         """
         response_xml_template = textwrap.dedent("""
             <?xml version="1.0" encoding="UTF-8"?>
