@@ -469,20 +469,24 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         """
         Parses XML from request.body and returns parsed data
 
-        XML body should contain nsmap (see specs).
+        XML body should contain nsmap with namespace, that is specified in LTI specs.
 
         Returns tuple: imsx_messageIdentifier, sourcedId, score, action
 
         Raises Exception if can't parse.
         """
+        lti_spec_namespace = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"
+        namespaces = {'def': lti_spec_namespace}
+
         data = body.strip().encode('utf-8')
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         root = etree.fromstring(data, parser=parser)
-        namespaces = {'def': root.nsmap.values()[0]}
+
         imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+root.nsmap.values()[0]+'}', '')
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
+
         return imsx_messageIdentifier, sourcedId, score, action
 
     def verify_oauth_body_sign(self, request):
