@@ -422,6 +422,8 @@ class CertificateItem(OrderItem):
             return
         target_cert.status = 'refunded'
         target_cert.save()
+        target_cert.order.status = 'refunded'
+        target_cert.order.save()
 
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
