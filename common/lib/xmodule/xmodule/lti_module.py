@@ -22,6 +22,7 @@ from lxml import etree
 from webob import Response
 import mock
 import re
+from xml.sax.saxutils import escape
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -454,12 +455,12 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             values = {
                 'imsx_codeMajor': 'Success',
                 'imsx_description': 'Score for {sourced_id} is now {score}'.format(sourced_id=sourcedId, score=score),
-                'imsx_messageIdentifier': imsx_messageIdentifier,
+                'imsx_messageIdentifier': escape(imsx_messageIdentifier),
                 'response': '<replaceResultResponse/>'
             }
             return Response(response_xml_template.format(**values), content_type="application/xml")
 
-        unsupported_values['imsx_messageIdentifier'] = imsx_messageIdentifier
+        unsupported_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
 
