@@ -19,7 +19,7 @@ class LTIModuleTest(LogicTest):
     def setUp(self):
          super(TestAssetIndex, self).setUp()
          self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-         self.xml_template = textwrap.dedent("""
+         self.requet_body_xml_template = textwrap.dedent("""
             <?xml version = "1.0" encoding = "UTF-8"?>
                 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
                   <imsx_POXHeader>
@@ -63,7 +63,7 @@ class LTIModuleTest(LogicTest):
         """
         incorrect_request = Request(self.environ)
         good_value = {'grade': '0.5'}
-        incorrect_request.body = self.xml_template.format(**good_value)
+        incorrect_request.body = self.requet_body_xml_template.format(**good_value)
         response = self.xmodule.grade_handler(incorrect_request, '')
         code_major = self.get_code_major(response)
         self.assertEqual(response.status_code, 200)
@@ -76,38 +76,24 @@ class LTIModuleTest(LogicTest):
         """
         incorrect_request = Request(self.environ)
         incorrect_request.authorization = "bad authorization header"
-
         good_value = {'grade': '0.5'}
-        incorrect_request.body = self.xml_template.format(**good_value)
+        incorrect_request.body = self.requet_body_xml_template.format(**good_value)
         response = self.xmodule.grade_handler(incorrect_request, '')
-
         code_major = self.get_code_major(response)
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(code_major, 'unsupported', code_major)
 
-    def test_bad_grade_range(self):
+    def test_grade_not_in_range(self):
         """
         Grade returned from Tool Provider is outside the range 0.0-1.0.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-        self.system.get_real_user = Mock()
-
-        from webob.request import Request
-        environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-
-        incorrect_request = Request(environ)
-
-        #grade not in range
-        bad_value = {'grade': '10'}
+        incorrect_request = Request(self.environ)
+        bad_value = {'grade': '10'}  #grade not in range
         incorrect_request.body = self.xml_template.format(**bad_value)
-        dispatch = 'test'
-
-        response = self.xmodule.grade_handler(incorrect_request, dispatch)
-
-        code_major = self.get_code_major(response)
-
+        response = self.xmodule.grade_handler(incorrect_request, '')
         self.assertEqual(response.status_code, 200)
+        code_major = self.get_code_major(response)
         self.assertEqual(code_major, 'failure', code_major)
 
     def test_bad_grade_decimal(self):
@@ -115,31 +101,23 @@ class LTIModuleTest(LogicTest):
         Grade returned from Tool Provider doesn't use a period as the decimal point.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-
         incorrect_request = Request(self.environ)
         bad_value = {'grade': '0,5'}
-        incorrect_request.body = self.xml_template.format(**bad_value)
-        dispatch = 'test'
-        response = self.xmodule.grade_handler(incorrect_request, dispatch)
+        incorrect_request.body = self.requet_body_xml_template.format(**bad_value)
+        response = self.xmodule.grade_handler(incorrect_request, '')
         code_major = self.get_code_major(response)
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(code_major, 'failure', code_major)
-
 
     @unittest.skip("not implemented")
     def test_good_request(self):
         self.system.get_real_user = Mock()
         incorrect_request = Request(self.environ)
         incorrect_request.authorization = "bad authorization header"
-
         good_value = {'grade': '0.5'}
-        incorrect_request.body = self.xml_template.format(**good_value)
-        dispatch = 'test'
-        response = self.xmodule.grade_handler(incorrect_request, dispatch)
-
+        incorrect_request.body = self.requet_body_xml_template.format(**good_value)
+        response = self.xmodule.grade_handler(incorrect_request, '')
         code_major = self.get_code_major(response)
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(code_major, 'unsupported', code_major)
 
