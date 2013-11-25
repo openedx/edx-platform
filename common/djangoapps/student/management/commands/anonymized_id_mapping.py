@@ -55,7 +55,7 @@ class Command(BaseCommand):
         try:
             with open(output_filename, 'wb') as output_file:
                 csv_writer = csv.writer(output_file)
-                csv_writer.writerow(("User ID", "Anonymized user ID"))
+                csv_writer.writerow(("User ID", "Anonymized user ID", "Simple anonymized user ID"))
                 for student in students:
                     csv_writer.writerow((student.id, anonymous_id_for_user(student, course_id), simple_anonymous_id_for_user(student)))
         except IOError:
