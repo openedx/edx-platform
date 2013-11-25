@@ -541,7 +541,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                     Should be "id:key:secret" string.'.format(lti_passport))
             if lti_id == self.lti_id.strip():
                 return key, secret
-
+        return '', ''
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
