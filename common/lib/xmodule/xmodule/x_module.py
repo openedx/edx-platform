@@ -393,6 +393,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None
         self.system = self.runtime
+        self.runtime.xmodule_instance = self
 
     def __unicode__(self):
         return u'<x_module(id={0})>'.format(self.id)
@@ -762,7 +763,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:
-                self.xmodule_runtime.xmodule_instance = self.xmodule_runtime.construct_xblock_from_class(
+                self.xmodule_runtime.construct_xblock_from_class(
                     self.module_class,
                     descriptor=self,
                     scope_ids=self.scope_ids,
@@ -770,6 +771,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 )
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
+                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
+                # we need to clean it out so that we can set up the ErrorModule instead
+                self.xmodule_runtime.xmodule_instance = None
+
                 if isinstance(self, self.xmodule_runtime.error_descriptor_class):
                     log.exception('Error creating an ErrorModule from an ErrorDescriptor')
                     raise
@@ -1066,6 +1071,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         """
         The url prefix to be used by XModules to call into handle_ajax
         """
+        assert self.xmodule_instance is not None
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
 

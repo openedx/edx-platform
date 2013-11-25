@@ -187,6 +187,6 @@ class OrgStaffRole(OrgRole):
 
 
 class OrgInstructorRole(OrgRole):
-    """An organization staff member"""
+    """An organization instructor"""
     def __init__(self, *args, **kwargs):
-        super(OrgInstructorRole, self).__init__('staff', *args, **kwargs)
+        super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
