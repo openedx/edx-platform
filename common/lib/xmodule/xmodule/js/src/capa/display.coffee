@@ -179,7 +179,7 @@ class @Problem
   ###
   check_fd: =>
     # If there are no file inputs in the problem, we can fall back on @check
-    if $('input:file').length == 0
+    if $(@element).find("input:file").length == 0
       @check()
       return
 
