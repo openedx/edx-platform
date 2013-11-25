@@ -53,7 +53,9 @@ DEBUG_TOOLBAR_CONFIG = {
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+########################### INSIGHTS #################################
 
+# set up tracking logs to output to the Insights server:
 TRACKING_BACKENDS.update({
     'insights': {
         'ENGINE': 'track.backends.logger.LoggerBackend',
@@ -67,6 +69,12 @@ from logging.handlers import HTTPHandler
 logger=logging.getLogger('sendevent')
 logger.addHandler(HTTPHandler("localhost:8002", "/httpevent"))
 
+# Set up analytics requests from the instructor dash to also
+# go to Insights.  (Note that analytics requests add
+#    "get?aname={}&course_id={}&apikey={}"
+# to the URL.
+
+ANALYTICS_SERVER_URL = "http://localhost:8002/query/analytics_"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
