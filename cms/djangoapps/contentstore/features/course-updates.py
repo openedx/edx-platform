@@ -123,6 +123,7 @@ def change_text(text):
     type_in_codemirror(0, text)
     save_css = 'a.save-button'
     world.css_click(save_css)
+    world.wait_for_invisible('form.new-update-form')
 
 
 def verify_text_in_editor_and_update(button_css, before, after):
