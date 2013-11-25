@@ -58,7 +58,7 @@ def unquote_slashes(text):
     return re.sub(r'(;;|;_)', _unquote_slashes, text)
 
 
-def handler_url(course_id, block, handler, suffix='', query=''):
+def handler_url(course_id, block, handler, suffix='', query='', thirdparty=False):
     """
     Return an XBlock handler url for the specified course, block and handler.
 
@@ -79,8 +79,8 @@ def handler_url(course_id, block, handler, suffix='', query=''):
         if not getattr(func, "_is_xblock_handler", False):
             raise ValueError("{!r} is not a handler name".format(handler))
 
-        if getattr(func, "_is_unauthenticated", False):
-            view_name = 'xblock_handler_noauth'
+    if thirdparty:
+        view_name = 'xblock_handler_noauth'
 
     return reverse(view_name, kwargs={
         'course_id': course_id,
@@ -109,10 +109,11 @@ class LmsHandlerUrls(object):
     This must be mixed in to a runtime that already accepts and stores
     a course_id
     """
-
-    def handler_url(self, block, handler_name, suffix='', query=''):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    # pylint: disable=no-member
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         """See :method:`xblock.runtime:Runtime.handler_url`"""
-        return handler_url(self.course_id, block, handler_name, suffix='', query='')  # pylint: disable=no-member
+        return handler_url(self.course_id, block, handler_name, suffix='', query='', thirdparty=thirdparty)
 
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method

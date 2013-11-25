@@ -244,8 +244,7 @@ class LTIModule(LTIFields, XModule):
         """
         uri = 'http://{host}{path}'.format(
                 host=self.system.hostname,
-                # path=self.system.get_handler_url('custom_handler'),
-                path=self.runtime.handler_url(self, 'grade_handler').rstrip('/?')
+                path=self.runtime.handler_url(self, 'grade_handler', thirdparty=True).rstrip('/?')
             )
         return uri
 
@@ -354,7 +353,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
 
     @XBlock.handler
-    @XBlock.unauthenticated
     def grade_handler(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.
