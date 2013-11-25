@@ -424,13 +424,21 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             </imsx_POXEnvelopeResponse>
         """)
         unsupported_values = {
-            'imsx_codeMajor': 'Unsupported',
+            'imsx_codeMajor': 'unsupported',
             'imsx_description': 'Target does not support the requested operation.',
+            'imsx_messageIdentifier': 'unknown',
+            'response': ''
+        }
+        failure_values = {
+            'imsx_codeMajor': 'failure',
+            'imsx_description': 'The request has failed.',
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
+        except (ValueError, LTIError):
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
         except Exception:
             return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
 
@@ -446,7 +454,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             self.system.publish(
                 event={
                     'event_name': 'grade',
-                    'value': float(score) * self.max_score(),
+                    'value': score * self.max_score(),
                     'max_value': self.max_score(),
                 },
                 custom_user=real_user
@@ -486,6 +494,10 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
         action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
+        #Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
+        score = float(score)
+        if not 0 <= score <= 1:
+            raise LTIError
 
         return imsx_messageIdentifier, sourcedId, score, action
 
@@ -503,6 +515,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         Raises: LTIError if request is incorrect.
         """
+        
+        '''
         # this part will be removed as Inheritance PR will be meged
         from courseware.courses import get_course_by_id
         course = get_course_by_id(self.course_id)
@@ -518,6 +532,9 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             if lti_id == self.lti_id.strip():
                 client_key, client_secret = key, secret
                 break
+        '''
+
+        client_key, client_secret = self.get_client_key_secret()
 
         headers = {
             'Authorization':unicode(request.headers.get('Authorization')),
@@ -541,6 +558,23 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         if (oauth_body_hash != oauth_headers.get('oauth_body_hash') or
             not signature.verify_hmac_sha1(mock_request, client_secret)):
             raise LTIError
+
+    def get_client_key_secret(self):
+        """
+         Obtains client_key and client_secret credentials from current course.
+        """
+        course_id = self.course_id
+        course_location = CourseDescriptor.id_to_location(course_id)
+        course = self.descriptor.runtime.modulestore.get_item(course_location)
+
+        for lti_passport in course.lti_passports:
+            try:
+                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
+            except ValueError:
+                raise LTIError('Could not parse LTI passport: {0!r}. \
+                    Should be "id:key:secret" string.'.format(lti_passport))
+            if lti_id == self.lti_id.strip():
+                return key, secret
 
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
