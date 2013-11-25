@@ -423,8 +423,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             </imsx_POXEnvelopeResponse>
         """)
         unsupported_values = {
-            'imsx_codeMajor': 'unsupported',
-            'imsx_description': 'Only replaceResult is supported',
+            'imsx_codeMajor': 'Unsupported',
+            'imsx_description': 'Target does not support the requested operation.',
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
@@ -452,7 +452,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             )
 
             values = {
-                'imsx_codeMajor': 'success',
+                'imsx_codeMajor': 'Success',
                 'imsx_description': 'Score for {sourced_id} is now {score}'.format(sourced_id=sourcedId, score=score),
                 'imsx_messageIdentifier': imsx_messageIdentifier,
                 'response': '<replaceResultResponse/>'
