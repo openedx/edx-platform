@@ -45,7 +45,8 @@ class HtmlModule(HtmlFields, XModule):
             resource_string(__name__, 'js/src/html/display.coffee')
         ],
         'js': [
-            resource_string(__name__, 'js/src/html/imageModal.js')
+            resource_string(__name__, 'js/src/html/imageModal.js'),
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js')
         ]
     }
     js_module_name = "HTMLModule"

@@ -156,24 +156,26 @@ th {
 }
 
 .imageModal-link i,
-.imageModal .imageModal-content i{
-  font-style: normal;
-  color: $black;
+.imageModal .imageModal-content i {
   position: absolute;
+  display: block;
+  padding: 5px;
   cursor: pointer;
+  line-height: .9;
+  font-style: normal;
+  color: #2e2d29;
+  background: #fbfbf9;
+  border-radius: 10px;
+}
+.imageModal-link .icon-fullscreen {
   opacity: 0;
+  height: 41px;
+  width: 41px;
+  top: 5px;
+  left: 5px;
 }
-.imageModal-link i {
-  top: 0;
-  left: 10px;
-}
-.imageModal .imageModal-content i{
-  top: -10px;
-  right: 5px;
-}
-.imageModal-link:hover i,
-.imageModal .imageModal-content:hover i{
-  opacity: 1;
+.imageModal-link:hover .icon-fullscreen {
+  opacity: .9;
 }
 
 .imageModal {
@@ -192,18 +194,61 @@ th {
   width: 95%;
   display: block;
   position: relative;
+  margin: auto;
   overflow: hidden;
-  cursor: default;
   top: 2.5%;
-  bottom: 2.5%;
-  left: 2.5%;
-  right: 2.5%;
 }
-.imageModal .imageModal-content img {
-  width: auto;
-  height: auto;
+.imageModal .imageModal-content .imageModal-imgWrapper {
+  position: relative;
+}
+.imageModal .imageModal-content .imageModal-imgWrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  margin: auto;
+  display: block;
+  opacity: 1;
+  cursor: default;
+}
+.imageModal .imageModal-content .imageModal-imgWrapper img.zoomed {
   max-width: none;
   max-height: none;
+  margin: 0;
+  cursor: move;
+}
+
+.imageModal .imageModal-content .icon-remove {
+  position: absolute;
+  height: 37px;
+  width: 37px;
+  top: 10px;
+  right: 10px;
+  line-height: .75;
+}
+
+.imageModal .imageModal-content .imageModal-zoom {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  height: 50px;
+  width: 110px;
+  padding: 5px 10px;
+  background: $white;
+  border-radius: 10px;
+  opacity: .9;
+}
+.imageModal .imageModal-content .imageModal-zoom i {
+  position: relative;
+  height: 50px;
+  padding: 0;
+  background: transparent;
+  line-height: 1;
+}
+.imageModal .imageModal-content .imageModal-zoom i.icon-zoom-in {
+  float: right;
+}
+.imageModal .imageModal-content .imageModal-zoom i.icon-zoom-out {
+  float: left;
 }
 
 //--------------------------------------- /Image Modal Styling ----------------------------------------//
