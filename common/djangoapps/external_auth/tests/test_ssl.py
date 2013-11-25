@@ -115,6 +115,7 @@ class SSLClientTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    @unittest.skip
     def test_ssl_login_without_signup_cms(self):
         """
         Test IMMEDIATE_SIGNUP feature flag and ensure the user account is
