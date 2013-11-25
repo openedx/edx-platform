@@ -93,7 +93,6 @@ class CombinedOpenEndedV1Module():
         Definition file should have one or many task blocks, a rubric block, and a prompt block.  See DEFAULT_DATA in combined_open_ended_module for a sample.
 
         """
-
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
 
