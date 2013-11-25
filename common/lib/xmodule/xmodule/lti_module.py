@@ -4,6 +4,9 @@ Module that allows to insert LTI tools to page.
 Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 
+CodeMajor/Severity Interpretation Matrix
+http://www.imsglobal.org/es/esv1p0/imscommon_infov1p0.html#1589069
+
 play and test:
 http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 """
