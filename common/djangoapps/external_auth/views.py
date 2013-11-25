@@ -177,10 +177,10 @@ def _external_login_or_signup(request,
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info('SHIB: No user for %s yet, doing signup', eamap.external_email)
-                return _signup(request, eamap)
+                return _signup(request, eamap, retfun)
         else:
             log.info('No user for %s yet. doing signup', eamap.external_email)
-            return _signup(request, eamap)
+            return _signup(request, eamap, retfun)
 
     # We trust shib's authentication, so no need to authenticate using the password again
     uname = internal_user.username
@@ -198,7 +198,7 @@ def _external_login_or_signup(request,
     if user is None:
         # we want to log the failure, but don't want to log the password attempted:
         AUDIT_LOG.warning('External Auth Login failed for "%s"', uname)
-        return _signup(request, eamap)
+        return _signup(request, eamap, retfun)
 
     if not user.is_active:
         AUDIT_LOG.warning('User "%s" is not active after external login', uname)
@@ -237,7 +237,7 @@ def _flatten_to_ascii(txt):
 
 
 @ensure_csrf_cookie
-def _signup(request, eamap):
+def _signup(request, eamap, retfun=None):
     """
     Present form to complete for signup via external authentication.
     Even though the user has external credentials, he/she still needs
@@ -246,9 +246,29 @@ def _signup(request, eamap):
 
     eamap is an ExternalAuthMap object, specifying the external user
     for which to complete the signup.
+    
+    retfun is a function to execute for the return value, if immediate
+    signup is used.  That allows @ssl_login_shortcut() to work.
     """
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
+
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', False):
+        # do signin immediately, by calling create_account, instead of asking
+        # student to fill in form.  MIT students already have information filed.
+        username = eamap.external_email.split('@',1)[0]
+        username = username.replace('.','_')
+        post_vars = dict(username = username,
+                         honor_code = u'true',
+                         terms_of_service = u'true',
+                         )
+        ret = student.views.create_account(request, post_vars)
+        log.debug('doing immediate signup for %s, ret=%s' % (username, ret))
+        # should check return content for successful completion before continuing
+        if retfun is not None:
+            return retfun()
+        else:
+            return ret
 
     # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
     # but this only affects username, not fullname
@@ -340,8 +360,15 @@ def ssl_login_shortcut(fn):
         if not settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
+
+        if request.user and request.user.is_authenticated():	# don't re-authenticate
+            return fn(*args, **kwargs)
+
         cert = _ssl_get_cert_from_request(request)
         if not cert:		# no certificate information - show normal login window
+            return fn(*args, **kwargs)
+
+        def retfun():
             return fn(*args, **kwargs)
 
         (_user, email, fullname) = _ssl_dn_extract_info(cert)
@@ -351,7 +378,8 @@ def ssl_login_shortcut(fn):
             external_domain="ssl:MIT",
             credentials=cert,
             email=email,
-            fullname=fullname
+            fullname=fullname,
+            retfun=retfun,
         )
     return wrapped
 
@@ -902,6 +930,9 @@ def test_center_login(request):
     '''
     # Imports from lms/djangoapps/courseware -- these should not be
     # in a common djangoapps.
+    # Required for Pearson
+    # this import must be here because the test center code imports this file (can't have import loops)
+    # also, the test center code really needs refactoring - it is a huge kludge
     from courseware.views import get_module_for_descriptor, jump_to
     from courseware.model_data import FieldDataCache
 
