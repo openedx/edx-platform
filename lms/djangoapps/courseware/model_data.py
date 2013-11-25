@@ -14,6 +14,7 @@ from .models import (
 import logging
 
 from django.db import DatabaseError
+from django.contrib.auth.models import User
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
@@ -226,10 +227,13 @@ class FieldDataCache(object):
         if field_object is not None:
             return field_object
 
+        if not self.user.is_anonymous():
+            assert key.user_id == self.user.id
+
         if key.scope == Scope.user_state:
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=self.user,
+                student=User.objects.get(id=key.user_id),
                 module_state_key=key.block_scope_id.url(),
                 defaults={
                     'state': json.dumps({}),
@@ -245,12 +249,12 @@ class FieldDataCache(object):
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
-                student=self.user,
+                student=User.objects.get(id=key.user_id),
             )
         elif key.scope == Scope.user_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=self.user,
+                student=User.objects.get(id=key.user_id),
             )
 
         cache_key = self._cache_key_from_kvs_key(key)
@@ -347,7 +351,7 @@ class DjangoKeyValueStore(KeyValueStore):
                 # the list of successful saves
                 saved_fields.extend([field.field_name for field in field_objects[field_object]])
             except DatabaseError:
-                log.error('Error saving fields %r', field_objects[field_object])
+                log.exception('Error saving fields %r', field_objects[field_object])
                 raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):

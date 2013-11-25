@@ -58,7 +58,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         course = self.toy
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
 
-        with patch('instructor.views.legacy.unique_id_for_user') as mock_unique:
+        with patch('instructor.views.legacy.anonymous_id_for_user') as mock_unique:
             mock_unique.return_value = 42
             response = self.client.post(url, {'action': 'Download CSV of all student anonymized IDs'})
 

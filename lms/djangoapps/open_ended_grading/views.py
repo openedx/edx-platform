@@ -5,12 +5,12 @@ from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user
 from courseware.courses import get_course_with_access
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user
 
 import open_ended_notifications
 
@@ -149,7 +149,7 @@ def student_problem_list(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
 
     # The anonymous student id is needed for communication with ORA.
-    student_id = unique_id_for_user(request.user)
+    student_id = anonymous_id_for_user(request.user, course_id)
     base_course_url = reverse('courses')
     error_text = ""
 
@@ -186,7 +186,7 @@ def flagged_problem_list(request, course_id):
     Show a student problem list
     '''
     course = get_course_with_access(request.user, course_id, 'staff')
-    student_id = unique_id_for_user(request.user)
+    student_id = anonymous_id_for_user(request.user, course_id)
 
     # call problem list service
     success = False

@@ -28,7 +28,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
 from courseware.roles import CourseStaffRole
 from mitxmako.shortcuts import render_to_string
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user
 
 from open_ended_grading import staff_grading_service, views, utils
 
@@ -455,7 +455,7 @@ class TestStudentProblemList(ModuleStoreTestCase):
         Mock the get_grading_status_list function using StudentProblemListMockQuery.
         """
         # Initialize a StudentProblemList object.
-        student_problem_list = utils.StudentProblemList(self.course.id, unique_id_for_user(self.user))
+        student_problem_list = utils.StudentProblemList(self.course.id, anonymous_id_for_user(self.user, self.course.id))
         # Get the initial problem list from ORA.
         success = student_problem_list.fetch_from_grading_service()
         # Should be successful, and we should have three problems.  See mock class for details.

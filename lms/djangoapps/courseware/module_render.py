@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
@@ -24,7 +24,7 @@ from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
 from mitxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
+from student.models import anonymous_id_for_user, user_by_anonymous_id
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.fields import Scope
@@ -285,15 +285,20 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def publish(event):
+    def publish(event, custom_user=None):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
             return
 
+        if custom_user:
+            user_id = custom_user.id
+        else:
+            user_id = user.id
+
         # Construct the key for the module
         key = KeyValueStore.Key(
             scope=Scope.user_state,
-            user_id=user.id,
+            user_id=user_id,
             block_scope_id=descriptor.location,
             field_name='grade'
         )
@@ -392,7 +397,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=unique_id_for_user(user),
+        anonymous_student_id=anonymous_id_for_user(user, course_id),
         course_id=course_id,
         open_ended_grading_interface=open_ended_grading_interface,
         s3_interface=s3_interface,
@@ -401,6 +406,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
+        get_real_user=user_by_anonymous_id,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -482,6 +488,14 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
+@csrf_exempt
+def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
+    """
+    Entry point for unauthenticated XBlock handlers.
+    """
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
+
+
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -497,14 +511,22 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
+
+
+def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
+    """
+    Invoke an XBlock handler, either authenticated or not.
+
+    """
     location = unquote_slashes(usage_id)
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
         raise Http404("Invalid location")
-
-    if not request.user.is_authenticated():
-        raise PermissionDenied
 
     # Check submitted files
     files = request.FILES or {}
@@ -525,15 +547,14 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
-        request.user,
+        user,
         descriptor
     )
-
-    instance = get_module(request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", location, request.user)
+        log.debug("No module %s for user %s -- access denied?", location, user)
         raise Http404
 
     req = django_to_webob_request(request)

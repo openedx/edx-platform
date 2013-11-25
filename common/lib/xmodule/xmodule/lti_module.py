@@ -3,19 +3,35 @@ Module that allows to insert LTI tools to page.
 
 Protocol is oauth1, LTI version is 1.1.1:
 http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
+
+CodeMajor/Severity Interpretation Matrix
+http://www.imsglobal.org/es/esv1p0/imscommon_infov1p0.html#1589069
+
+play and test:
+http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
 """
 
 import logging
 import oauthlib.oauth1
+from oauthlib.oauth1.rfc5849 import signature
+import hashlib
+import base64
 import urllib
+import textwrap
+from lxml import etree
+from webob import Response
+import mock
+import re
+from xml.sax.saxutils import escape
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.course_module import CourseDescriptor
 from pkg_resources import resource_string
-from xblock.core import String, Scope, List
-from xblock.fields import Boolean
+from xblock.core import String, Scope, List, XBlock
+from xblock.fields import Boolean, Float
+
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +45,7 @@ class LTIFields(object):
     Fields to define and obtain LTI tool from provider are set here,
     except credentials, which should be set in course settings::
 
-    `lti_id` is id to connect tool with credentials in course settings.
+    `lti_id` is id to connect tool with credentials in course settings. It should not contain :: (double semicolon)
     `launch_url` is launch url of tool.
     `custom_parameters` are additional parameters to navigate to proper book and book page.
 
@@ -48,13 +64,15 @@ class LTIFields(object):
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
     open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
+    graded = Boolean(help="Grades will be considered in overall score.", default=False, scope=Scope.settings)
+    weight = Float(help="Weight for student grades.", default=1.0, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
     '''
     Module provides LTI integration to course.
 
-    Except usual xmodule structure it proceeds with oauth signing.
+    Except usual Xmodule structure it proceeds with OAuth signing.
     How it works::
 
     1. Get credentials from course settings.
@@ -71,14 +89,14 @@ class LTIModule(LTIFields, XModule):
             role
             *+ all custom parameters*
 
-        These parameters should be encoded and signed by *oauth1* together with
+        These parameters should be encoded and signed by *OAuth1* together with
         `launch_url` and *POST* request type.
 
     3. Signing proceeds with client key/secret pair obtained from course settings.
         That pair should be obtained from LTI provider and set into course settings by course author.
-        After that signature and other oauth data are generated.
+        After that signature and other OAuth data are generated.
 
-         Oauth data which is generated after signing is usual::
+         OAuth data which is generated after signing is usual::
 
             oauth_callback
             oauth_nonce
@@ -89,7 +107,7 @@ class LTIModule(LTIFields, XModule):
 
 
     4. All that data is passed to form and sent to LTI provider server by browser via
-        autosubmit via javascript.
+        autosubmit via JavaScript.
 
         Form example::
 
@@ -123,7 +141,7 @@ class LTIModule(LTIFields, XModule):
                     <input type="submit" value="Press to Launch" />
                 </form>
 
-    5. LTI provider has same secret key and it signs data string via *oauth1* and compares signatures.
+    5. LTI provider has same secret key and it signs data string via *OAuth1* and compares signatures.
 
         If signatures are correct, LTI provider redirects iframe source to LTI tool web page,
         and LTI tool is rendered to iframe inside course.
@@ -214,7 +232,7 @@ class LTIModule(LTIFields, XModule):
         input_fields = self.oauth_params(
             custom_parameters,
             client_key,
-            client_secret
+            client_secret,
         )
         context = {
             'input_fields': input_fields,
@@ -229,12 +247,55 @@ class LTIModule(LTIFields, XModule):
 
         return self.system.render_template('lti.html', context)
 
+    def get_user_id(self):
+        user_id = self.runtime.anonymous_student_id
+        assert user_id is not None
+        return unicode(urllib.quote(user_id))
+
+    def get_outcome_service_url(self):
+        """
+        Return url for storing grades
+        """
+        uri = 'http://{host}{path}'.format(
+                host=self.system.hostname,
+                # path=self.system.get_handler_url('custom_handler'),
+                path=self.runtime.handler_url(self, 'grade_handler').rstrip('/?')
+            )
+        return uri
+
+    def get_resource_link_id(self):
+        """
+        This is an opaque unique identifier that the TC guarantees will be unique
+        within the TC for every placement of the link.
+        If the tool / activity is placed multiple times in the same context,
+        each of those placements will be distinct.
+        This value will also change if the item is exported from one system or
+        context and imported into another system or context.
+        This parameter is required.
+        """
+        return unicode(urllib.quote(self.id))
+
+    def get_lis_result_sourcedid(self):
+        """
+        This field contains an identifier that indicates the LIS Result Identifier (if any)
+        associated with this launch.  This field identifies a unique row and column within the
+        TC gradebook.  This field is unique for every combination of context_id / resource_link_id / user_id.
+        This value may change for a particular resource_link_id / user_id  from one launch to the next.
+        The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
+        This field is generally optional, but is required for grading.
+
+        context_id is - is an opaque identifier that uniquely identifies the context that contains
+        the link being launched.
+        lti_id should be context_id by meaning
+        """
+        return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
+
+
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
-        Signs request and returns signature and oauth parameters.
+        Signs request and returns signature and OAuth parameters.
 
         `custom_paramters` is dict of parsed `custom_parameter` field
-
         `client_key` and `client_secret` are LTI tool credentials.
 
         Also *anonymous student id* is passed to template and therefore to LTI provider.
@@ -245,19 +306,20 @@ class LTIModule(LTIFields, XModule):
             client_secret=unicode(client_secret)
         )
 
-        user_id = self.runtime.anonymous_student_id
-        assert user_id is not None
-
         # must have parameters for correct signing from LTI:
         body = {
-            u'user_id': user_id,
+            u'user_id': self.get_user_id(),
             u'oauth_callback': u'about:blank',
-            u'lis_outcome_service_url': '',
-            u'lis_result_sourcedid': '',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
-            u'role': u'student'
+            u'role': u'student',
+
+            # Parameters required for grading:
+            u'resource_link_id': self.get_resource_link_id(),
+            u'lis_outcome_service_url': self.get_outcome_service_url(),
+            u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
+
         }
 
         # appending custom parameter for signing
@@ -301,9 +363,190 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         params.update(body)
         return params
 
+    def max_score(self):
+        return self.weight
+
+
+    @XBlock.handler
+    @XBlock.unauthenticated
+    def grade_handler(self, request, dispatch):
+        """
+        This is called by courseware.module_render, to handle an AJAX call.
+
+        Used only for grading. Returns XML response.
+
+        Example of request body from LTI provider::
+
+        <?xml version = "1.0" encoding = "UTF-8"?>
+            <imsx_POXEnvelopeRequest xmlns = "some_link (may be not required)">
+              <imsx_POXHeader>
+                <imsx_POXRequestHeaderInfo>
+                  <imsx_version>V1.0</imsx_version>
+                  <imsx_messageIdentifier>528243ba5241b</imsx_messageIdentifier>
+                </imsx_POXRequestHeaderInfo>
+              </imsx_POXHeader>
+              <imsx_POXBody>
+                <replaceResultRequest>
+                  <resultRecord>
+                    <sourcedGUID>
+                      <sourcedId>feb-123-456-2929::28883</sourcedId>
+                    </sourcedGUID>
+                    <result>
+                      <resultScore>
+                        <language>en-us</language>
+                        <textString>0.4</textString>
+                      </resultScore>
+                    </result>
+                  </resultRecord>
+                </replaceResultRequest>
+              </imsx_POXBody>
+            </imsx_POXEnvelopeRequest>
+
+        Example of correct/incorrect answer XML body:: see response_xml_template
+        """
+        response_xml_template = textwrap.dedent("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                <imsx_POXHeader>
+                    <imsx_POXResponseHeaderInfo>
+                        <imsx_version>V1.0</imsx_version>
+                        <imsx_messageIdentifier>{imsx_messageIdentifier}</imsx_messageIdentifier>
+                        <imsx_statusInfo>
+                            <imsx_codeMajor>{imsx_codeMajor}</imsx_codeMajor>
+                            <imsx_severity>status</imsx_severity>
+                            <imsx_description>{imsx_description}</imsx_description>
+                            <imsx_messageRefIdentifier>
+                            </imsx_messageRefIdentifier>
+                        </imsx_statusInfo>
+                    </imsx_POXResponseHeaderInfo>
+                </imsx_POXHeader>
+                <imsx_POXBody>{response}</imsx_POXBody>
+            </imsx_POXEnvelopeResponse>
+        """)
+        unsupported_values = {
+            'imsx_codeMajor': 'Unsupported',
+            'imsx_description': 'Target does not support the requested operation.',
+            'imsx_messageIdentifier': 'unknown',
+            'response': ''
+        }
+        try:
+            imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
+        except Exception:
+            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+
+        # verify oauth signing
+        try:
+            self.verify_oauth_body_sign(request)
+        except LTIError:
+            return Response(response_xml_template.format(**unsupported_values), content_type="application/xml")
+
+
+        real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        if action == 'replaceResultRequest':
+            self.system.publish(
+                event={
+                    'event_name': 'grade',
+                    'value': float(score) * self.max_score(),
+                    'max_value': self.max_score(),
+                },
+                custom_user=real_user
+            )
+
+            values = {
+                'imsx_codeMajor': 'Success',
+                'imsx_description': 'Score for {sourced_id} is now {score}'.format(sourced_id=sourcedId, score=score),
+                'imsx_messageIdentifier': escape(imsx_messageIdentifier),
+                'response': '<replaceResultResponse/>'
+            }
+            return Response(response_xml_template.format(**values), content_type="application/xml")
+
+        unsupported_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+        return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
+
+
+    @classmethod
+    def parse_grade_xml_body(cls, body):
+        """
+        Parses XML from request.body and returns parsed data
+
+        XML body should contain nsmap with namespace, that is specified in LTI specs.
+
+        Returns tuple: imsx_messageIdentifier, sourcedId, score, action
+
+        Raises Exception if can't parse.
+        """
+        lti_spec_namespace = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"
+        namespaces = {'def': lti_spec_namespace}
+
+        data = body.strip().encode('utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        root = etree.fromstring(data, parser=parser)
+
+        imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+        sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
+        score = root.xpath("//def:textString", namespaces=namespaces)[0].text
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
+
+        return imsx_messageIdentifier, sourcedId, score, action
+
+    def verify_oauth_body_sign(self, request):
+        """
+        Verify grade request from LTI provider using OAuth body signing.
+
+        Uses http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html::
+
+            This specification extends the OAuth signature to include integrity checks on HTTP request bodies
+            with content types other than application/x-www-form-urlencoded.
+
+        Args:
+        request: DjangoWebobRequest.
+
+        Raises: LTIError if request is incorrect.
+        """
+        # this part will be removed as Inheritance PR will be meged
+        from courseware.courses import get_course_by_id
+        course = get_course_by_id(self.course_id)
+
+        # Obtains client_key and client_secret credentials from current course:
+        client_key = client_secret = ''
+        for lti_passport in course.lti_passports:
+            try:
+                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
+            except ValueError:  # do log here instead of raising exception
+                raise LTIError('Could not parse LTI passport: {0!r}. \
+                    Should be "id:key:secret" string.'.format(lti_passport))
+            if lti_id == self.lti_id.strip():
+                client_key, client_secret = key, secret
+                break
+
+        headers = {
+            'Authorization':unicode(request.headers.get('Authorization')),
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+        sha1 = hashlib.sha1()
+        sha1.update(request.body)
+        oauth_body_hash = base64.b64encode(sha1.hexdigest())
+
+        oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
+        oauth_headers =dict(oauth_params)
+        oauth_signature = oauth_headers.pop('oauth_signature')
+
+        mock_request = mock.Mock(
+            uri=unicode(urllib.unquote(request.url)),
+            http_method=unicode(request.method),
+            params=oauth_headers.items(),
+            signature=oauth_signature
+        )
+        if (oauth_body_hash != oauth_headers.get('oauth_body_hash') or
+            not signature.verify_hmac_sha1(mock_request, client_secret)):
+            raise LTIError
+
 
 class LTIModuleDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
     Descriptor for LTI Xmodule.
     """
+    has_score = True
     module_class = LTIModule
+    grade_handler = module_attr('grade_handler')

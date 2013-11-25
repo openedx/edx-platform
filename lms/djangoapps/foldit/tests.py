@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 
 from foldit.views import foldit_ops, verify_code
 from foldit.models import PuzzleComplete, Score
-from student.models import unique_id_for_user
+from student.models import simple_anonymous_id_for_user
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 
 from datetime import datetime, timedelta
@@ -346,7 +346,7 @@ class FolditTestCase(TestCase):
                          self.set_puzzle_complete_response([13, 14, 15, 53524]))
 
         is_complete = partial(
-            PuzzleComplete.is_level_complete, unique_id_for_user(self.user))
+            PuzzleComplete.is_level_complete, simple_anonymous_id_for_user(self.user))
 
         self.assertTrue(is_complete(1, 1))
         self.assertTrue(is_complete(1, 3))

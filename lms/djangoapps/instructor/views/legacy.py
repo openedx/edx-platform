@@ -52,7 +52,7 @@ from instructor_task.api import (get_running_instructor_tasks,
 from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response, render_to_string
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.views import course_from_id
 import track.views
 from xblock.field_data import DictFieldData
@@ -547,7 +547,7 @@ def instructor_dashboard(request, course_id):
         ).order_by('id')
 
         datatable = {'header': ['User ID', 'Anonymized user ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s)] for s in students]
+        datatable['data'] = [[s.id, anonymous_id_for_user(s, course_id)] for s in students]
         return return_csv(course_id.replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------

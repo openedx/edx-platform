@@ -5,6 +5,9 @@ from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 
 class TestLTI(BaseTestXmodule):
     """
@@ -15,6 +18,28 @@ class TestLTI(BaseTestXmodule):
     of `oauthlib` library.
     """
     CATEGORY = "lti"
+    grading_policy = None
+
+    def set_up_course(self, **course_kwargs):
+        """
+        Create a stock coursecourse with a specific due date.
+
+        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
+        """
+
+        course = CourseFactory(**course_kwargs)
+        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = self.section = ItemFactory(
+            category='sequential',
+            parent_location=chapter.location,
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+        vertical = ItemFactory(category='vertical', parent_location=section.location)
+        ItemFactory(category=self.CATEGORY, parent_location=vertical.location)
+
+        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+
+        return course
 
     def setUp(self):
         """

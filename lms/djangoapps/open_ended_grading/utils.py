@@ -89,7 +89,7 @@ class StudentProblemList(object):
     def __init__(self, course_id, user_id):
         """
         @param course_id: The id of a course object.  Get using course.id.
-        @param user_id: The anonymous id of the user, from the unique_id_for_user function.
+        @param user_id: The anonymous id of the user, from the anonymous_id_for_user function.
         """
         self.course_id = course_id
         self.user_id = user_id

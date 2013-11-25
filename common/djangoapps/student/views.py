@@ -41,7 +41,7 @@ from course_modes.models import CourseMode
 from student.models import (
     Registration, UserProfile, TestCenterUser, TestCenterUserForm,
     TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
-    PendingEmailChange, CourseEnrollment, unique_id_for_user,
+    PendingEmailChange, CourseEnrollment, anonymous_id_for_user,
     get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
 )
 from student.forms import PasswordResetFormNoActive
@@ -149,12 +149,12 @@ def press(request):
     return render_to_response('static_templates/press.html', {'articles': articles})
 
 
-def process_survey_link(survey_link, user):
+def process_survey_link(survey_link, user, course_id):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
-    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    Currently, this is sha1() updated with secret_key, user.id and course.id. Otherwise, return survey_link.
     """
-    return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
+    return survey_link.format(UNIQUE_ID=anonymous_id_for_user(user, course_id))
 
 
 def cert_info(user, course):
@@ -209,7 +209,7 @@ def _cert_info(user, course, cert_status):
             course.end_of_course_survey_url is not None):
         d.update({
             'show_survey_button': True,
-            'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+            'survey_url': process_survey_link(course.end_of_course_survey_url, user, course.id)})
     else:
         d['show_survey_button'] = False
 
@@ -296,7 +296,7 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # Build our (course, enorllment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []
