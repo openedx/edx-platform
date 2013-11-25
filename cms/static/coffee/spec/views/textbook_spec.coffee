@@ -81,9 +81,11 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 @savingSpies = spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
                 @savingSpies.show.andReturn(@savingSpies)
+                CMS.URL.TEXTBOOKS = "/textbooks"
 
             afterEach ->
                 @xhr.restore()
+                delete CMS.URL.TEXTBOOKS
 
             it "should destroy itself on confirmation", ->
                 @view.render().$(".delete").click()
