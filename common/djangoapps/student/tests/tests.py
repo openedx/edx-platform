@@ -15,7 +15,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
@@ -138,18 +138,18 @@ class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
 
     def test_process_survey_link(self):
-        course = Mock(id="test_id")
-        user = Mock(username="fred", id="test_user_id")
+        course_id = "test_id"
+        user = UserFactory()
 
         link1 = "http://www.mysurvey.com"
-        self.assertEqual(process_survey_link(link1, user, course.id), link1)
+        self.assertEqual(process_survey_link(link1, user, course_id), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
 
-        # anonymous_id_for_user returns 'Anonymous' because user is not authenticated.
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID='Anonymous')
+        expected_id = anonymous_id_for_user(user, course_id)
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=expected_id)
 
-        self.assertEqual(process_survey_link(link2, user, course.id), link2_expected)
+        self.assertEqual(process_survey_link(link2, user, course_id), link2_expected)
 
     def test_cert_info(self):
         """
@@ -529,7 +529,7 @@ class AnonymousLookupTable(TestCase):
     def setUp(self):
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
-        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        self.user = UserFactory()
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='honor',
@@ -539,10 +539,9 @@ class AnonymousLookupTable(TestCase):
         self.mock_server_track = patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_for_unregistered_user(self ):  # same path as for logged out user
-        self.user.is_anonymous = lambda : True
-        self.assertEqual('Anonymous', anonymous_id_for_user(self.user, self.course.id))
-        self.assertIsNone(user_by_anonymous_id('Anonymous'))
+    def test_for_unregistered_user(self):  # same path as for logged out user
+        self.assertEqual(None, anonymous_id_for_user(AnonymousUser(), self.course.id))
+        self.assertIsNone(user_by_anonymous_id(None))
 
     def test_roundtrip_for_logged_user(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
