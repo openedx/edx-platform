@@ -37,6 +37,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
+from xmodule.capa_module import CapaModule
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.html_module import HtmlModule
+from xmodule.foldit_module import FolditModule
 
 
 log = logging.getLogger(__name__)
@@ -366,6 +370,18 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if has_access(user, descriptor, 'staff', course_id):
             block_wrappers.append(partial(add_histogram, user))
 
+    # These modules store data using the anonymous_student_id as a key.
+    # To prevent loss of data, we will continue to provide these modules
+    # with the per-student anonymized id (as we have in the past),
+    # while giving all other modules a per-course anonymized id
+    if issubclass(
+        getattr(descriptor, 'module_class', None),
+        (CapaModule, HtmlModule, CombinedOpenEndedModule, FolditModule)
+    ):
+        anonymous_student_id = anonymous_id_for_user(user, '')
+    else:
+        anonymous_student_id = anonymous_id_for_user(user, course_id)
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -397,7 +413,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
-        anonymous_student_id=anonymous_id_for_user(user, course_id),
+        anonymous_student_id=anonymous_student_id,
         course_id=course_id,
         open_ended_grading_interface=open_ended_grading_interface,
         s3_interface=s3_interface,
@@ -459,7 +475,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
     # Test xqueue package, which we expect to be:
     #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
-    #               'xqueue_body'  : 'Message from grader'}
+    #               'xqueue_body'  : 'Messa/ge from grader'}
     for key in ['xqueue_header', 'xqueue_body']:
         if key not in data:
             raise Http404
