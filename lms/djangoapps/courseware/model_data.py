@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope
+from xblock.fields import Scope, UserScope
 
 log = logging.getLogger(__name__)
 
@@ -227,7 +227,9 @@ class FieldDataCache(object):
         if field_object is not None:
             return field_object
 
-        if not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+            # If we're getting user data, we expect that the key matches the
+            # user we were constructed for.
             assert key.user_id == self.user.id
 
         if key.scope == Scope.user_state:
