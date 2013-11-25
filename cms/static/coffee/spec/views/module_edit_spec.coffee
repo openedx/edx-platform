@@ -1,12 +1,9 @@
-define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
+define ["coffee/src/views/module_edit", "js/models/module_info", "xmodule"], (ModuleEdit, ModuleModel) ->
 
     describe "ModuleEdit", ->
       beforeEach ->
-        @stubModule = jasmine.createSpy("Module")
-        @stubModule.id = 'stub-id'
-        @stubModule.get = (param)->
-            if param == 'old_id'
-              return 'stub-old-id'
+        @stubModule = new ModuleModel
+            id: "stub-id"
 
         setFixtures """
         <li class="component" id="stub-id">
@@ -62,7 +59,7 @@ define ["coffee/src/views/module_edit", "xmodule"], (ModuleEdit) ->
             @moduleEdit.render()
 
           it "loads the module preview and editor via ajax on the view element", ->
-            expect(@moduleEdit.$el.load).toHaveBeenCalledWith("/preview_component/#{@moduleEdit.model.get('old_id')}", jasmine.any(Function))
+            expect(@moduleEdit.$el.load).toHaveBeenCalledWith("/xblock/#{@moduleEdit.model.id}", jasmine.any(Function))
             @moduleEdit.$el.load.mostRecentCall.args[1]()
             expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()

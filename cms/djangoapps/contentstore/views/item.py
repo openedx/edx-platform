@@ -3,7 +3,9 @@
 import logging
 from uuid import uuid4
 
+from functools import partial
 from static_replace import replace_static_urls
+from xmodule_modifiers import wrap_xblock
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -27,6 +29,10 @@ from xmodule.modulestore.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 from django.http import HttpResponseBadRequest
 from xblock.fields import Scope
+from preview import handler_prefix, get_preview_html
+from mitxmako.shortcuts import render_to_response, render_to_string
+from django.views.decorators.csrf import ensure_csrf_cookie
+from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
@@ -51,17 +57,20 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         all children and "all_versions" to delete from all (mongo) versions.
     GET
         json: returns representation of the xblock (locator id, data, and metadata).
+          if ?fields=graderType, it returns the graderType for the unit instead of the above.
+        html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
     PUT or POST
-        json: if xblock location is specified, update the xblock instance. The json payload can contain
+        json: if xblock locator is specified, update the xblock instance. The json payload can contain
               these fields, all optional:
                 :data: the new value for the data.
                 :children: the locator ids of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
+                :graderType: change how this unit is graded
               The JSON representation on the updated xblock (minus children) is returned.
 
-              if xblock location is not specified, create a new xblock instance. The json playload can contain
+              if xblock locator is not specified, create a new xblock instance. The json playload can contain
               these fields:
                 :parent_locator: parent for new xblock, required
                 :category: type of xblock, required
@@ -70,14 +79,38 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
     if course_id is not None:
-        location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
-        if not has_access(request.user, location):
+        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        if not has_access(request.user, locator):
             raise PermissionDenied()
-        old_location = loc_mapper().translate_locator_to_location(location)
+        old_location = loc_mapper().translate_locator_to_location(locator)
 
         if request.method == 'GET':
-            rsp = _get_module_info(location)
-            return JsonResponse(rsp)
+            if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+                fields = request.REQUEST.get('fields', '').split(',')
+                if 'graderType' in fields:
+                    # right now can't combine output of this w/ output of _get_module_info, but worthy goal
+                    return JsonResponse(CourseGradingModel.get_section_grader_type(locator))
+                # TODO: pass fields to _get_module_info and only return those
+                rsp = _get_module_info(locator)
+                return JsonResponse(rsp)
+            else:
+                component = modulestore().get_item(old_location)
+                # Wrap the generated fragment in the xmodule_editor div so that the javascript
+                # can bind to it correctly
+                component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
+
+                try:
+                    content = component.render('studio_view').content
+                # catch exceptions indiscriminately, since after this point they escape the
+                # dungeon and surface as uneditable, unsaveable, and undeletable
+                # component-goblins.
+                except Exception as exc:                          # pylint: disable=W0703
+                    content = render_to_string('html_error.html', {'message': str(exc)})
+
+                return render_to_response('component.html', {
+                    'preview': get_preview_html(request, component),
+                    'editor': content
+                })
         elif request.method == 'DELETE':
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
@@ -85,12 +118,13 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
             return _delete_item_at_location(old_location, delete_children, delete_all_versions)
         else:  # Since we have a course_id, we are updating an existing xblock.
             return _save_item(
-                location,
+                locator,
                 old_location,
                 data=request.json.get('data'),
                 children=request.json.get('children'),
                 metadata=request.json.get('metadata'),
-                nullout=request.json.get('nullout')
+                nullout=request.json.get('nullout'),
+                grader_type=request.json.get('graderType')
             )
     elif request.method in ('PUT', 'POST'):
         return _create_item(request)
@@ -101,11 +135,15 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         )
 
 
-def _save_item(usage_loc, item_location, data=None, children=None, metadata=None, nullout=None):
+def _save_item(usage_loc, item_location, data=None, children=None, metadata=None, nullout=None,
+        grader_type=None
+    ):
     """
-    Saves certain properties (data, children, metadata, nullout) for a given xblock item.
+    Saves xblock w/ its fields. Has special processing for grader_type and nullout and Nones in metadata.
+    nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
+    to default).
 
-    The item_location is still the old-style location.
+    The item_location is still the old-style location whereas usage_loc is a BlockUsageLocator
     """
     store = get_modulestore(item_location)
 
@@ -170,12 +208,16 @@ def _save_item(usage_loc, item_location, data=None, children=None, metadata=None
         if existing_item.category == 'video':
             manage_video_subtitles_save(existing_item, existing_item)
 
-    # Note that children aren't being returned until we have a use case.
-    return JsonResponse({
+    result = {
         'id': unicode(usage_loc),
         'data': data,
         'metadata': own_metadata(existing_item)
-    })
+    }
+    if grader_type is not None:
+        result.update(CourseGradingModel.update_section_grader_type(existing_item, grader_type))
+
+    # Note that children aren't being returned until we have a use case.
+    return JsonResponse(result)
 
 
 @login_required

@@ -49,7 +49,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id, locator in components:
-            <li class="component" data-id="${id}" data-locator="${locator}"/>
+            <li class="component" data-locator="${locator}" data-id="${id}" />
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">

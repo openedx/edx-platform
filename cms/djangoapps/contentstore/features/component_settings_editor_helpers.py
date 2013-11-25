@@ -6,14 +6,6 @@ from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 
 
-def _is_expected_element_count(css, expected_number):
-    """
-    Returns whether the number of elements found on the page by css locator
-    the same number that you expected.
-    """
-    return len(world.css_find(css)) == expected_number
-
-
 @world.absorb
 def create_component_instance(step, category, component_type=None, is_advanced=False):
     """
@@ -47,8 +39,11 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
         world.wait_for_invisible(component_button_css)
         click_component_from_menu(category, component_type, is_advanced)
 
-    world.wait_for(lambda _: _is_expected_element_count(module_css,
-        module_count_before + 1))
+    expected_count = module_count_before + 1
+    world.wait_for(
+        lambda _: len(world.css_find(module_css)) == expected_count,
+        timeout=20
+    )
 
 
 @world.absorb
