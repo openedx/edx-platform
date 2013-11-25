@@ -825,7 +825,7 @@ class CourseEnrollment(models.Model):
         verified the user authentication and access.
         """
         enrollment = cls.get_or_create_enrollment(user, course_id)
-        enrollment.update_enrollment(is_active=True)
+        enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment
 
     @classmethod
