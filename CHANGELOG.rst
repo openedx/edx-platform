@@ -5,6 +5,15 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Add feature for providing background grade report generation via Celery
+  instructor task, with reports uploaded to S3. Feature is visible on the beta
+  instructor dashboard. LMS-58
+
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being
+  valid across all runs with the same course name. Old group membership will
+  still work across runs, but new beta-testers will only be added to a single
+  course run.
+
 Blades: Put 2nd "Hide output" button at top of test box & increase text size for
 code response questions. BLD-126.
 
@@ -12,7 +21,8 @@ Blades: Update the calculator hints tooltip with full information. BLD-400.
 
 Blades: Fix transcripts 500 error in studio (BLD-530)
 
-Blades: Allow multiple strings as the correct answer to a string response question. BLD-474.
+Blades: Allow multiple strings as the correct answer to a string response
+question. BLD-474.
 
 Blades: a11y - Videos will alert screenreaders when the video is over.
 
@@ -20,6 +30,7 @@ LMS: Trap focus on the loading element when a user loads more threads
 in the forum sidebar to improve accessibility.
 
 LMS: Add error recovery when a user loads more threads in the forum sidebar.
+
 
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 
@@ -40,7 +51,8 @@ text like with bold or italics. (BLD-449)
 LMS: Beta instructor dashboard will only count actively enrolled students for
 course enrollment numbers.
 
-Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
+Blades: Fix speed menu that is not rendered correctly when YouTube is
+unavailable. (BLD-457).
 
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.

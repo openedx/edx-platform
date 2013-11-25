@@ -26,6 +26,13 @@
     @include font-size(16);
   }
 
+  .file-download-link a {
+    font-size: 15px;
+    color: $link-color;
+    text-decoration: underline;
+    padding: 5px;
+  }
+
   // system feedback - messages
   .msg {
     border-radius: 1px;
@@ -117,7 +124,7 @@ section.instructor-dashboard-content-2 {
   .slickgrid {
     margin-left: 1px;
     color:#333333;
-    font-size:11px;
+    font-size:12px;
     font-family: verdana,arial,sans-serif;
 
     .slick-header-column {
@@ -428,10 +435,23 @@ section.instructor-dashboard-content-2 {
     line-height: 1.3em;
   }
 
-  .data-display {
+  .data-download-container {
     .data-display-table {
       .slickgrid {
         height: 400px;
+      }
+    }
+  }
+
+  .grades-download-container {
+    .grade-downloads-table {
+      .slickgrid {
+        height: 300px;
+        padding: 5px;
+      }
+      // Disable horizontal scroll bar when grid only has 1 column. Remove this CSS class when more columns added.
+      .slick-viewport {
+        overflow-x: hidden !important;
       }
     }
   }
