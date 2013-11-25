@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
+
 Blades: Put 2nd "Hide output" button at top of test box & increase text size for
 code response questions. BLD-126.
 

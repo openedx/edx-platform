@@ -63,7 +63,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         # Respond to grade request
         if 'grade' in self.path and self._send_graded_result().status_code == 200:
-            status_message = "I have stored grades."
+            status_message = 'LTI consumer (edX) responsed with XML content:<br>' + self.server.grade_data['TC answer']
             self.server.grade_data['callback_url'] = None
         # Respond to request with correct lti endpoint:
         elif self._is_correct_lti_request():
@@ -196,7 +196,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             data=data,
             headers=headers
         )
-        # assert response.status_code == 200
+        self.server.grade_data['TC answer'] = response.content
         return response
 
     def _send_response(self, message):
