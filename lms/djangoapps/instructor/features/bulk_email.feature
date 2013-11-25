@@ -1,5 +1,5 @@
 @shard_2
-Feature: LMS.Bulk Email
+Feature: LMS.Instructor Dash Bulk Email
     As an instructor or course staff,
     In order to communicate with students and staff
     I want to send email to staff and students in a course.

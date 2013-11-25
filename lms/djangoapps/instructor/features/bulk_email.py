@@ -11,6 +11,8 @@ from nose.tools import assert_in, assert_true, assert_equal  # pylint: disable=E
 from django.core.management import call_command
 from django.conf import settings
 
+from courseware.tests.factories import StaffFactory, InstructorFactory
+
 
 @step(u'Given I am "([^"]*)" for a course')
 def i_am_an_instructor(step, role):  # pylint: disable=W0613
@@ -27,47 +29,53 @@ def i_am_an_instructor(step, role):  # pylint: disable=W0613
         number='999',
         display_name='Test Course'
     )
+    world.course_id = 'edx/999/Test_Course'
 
-    # Register the instructor as staff for the course
-    world.register_by_course_id(
-        'edx/999/Test_Course',
-        username='instructor',
-        password='password',
-        is_staff=True
-    )
-    world.add_to_course_staff('instructor', '999')
+    try:
+        # See if we've defined the instructor & staff user yet
+        world.instructor
+    except AttributeError:
+        # Make & register an instructor for the course
+        world.instructor = InstructorFactory(course=course.location)
+        world.enroll_user(world.instructor, world.course_id)
 
-    # Register another staff member
-    world.register_by_course_id(
-        'edx/999/Test_Course',
-        username='staff',
-        password='password',
-        is_staff=True
-    )
-    world.add_to_course_staff('staff', '999')
+        # Make & register a staff member
+        world.staff = StaffFactory(course=course.location)
+        world.enroll_user(world.staff, world.course_id)
 
-    # Register a student
+    # Make & register a student
     world.register_by_course_id(
         'edx/999/Test_Course',
         username='student',
-        password='password',
+        password='test',
         is_staff=False
     )
 
     # Log in as the an instructor or staff for the course
-    world.log_in(
-        username=role,
-        password='password',
-        email="instructor@edx.org",
-        name="Instructor"
-    )
+    my_email = None
+    if role == 'instructor':
+        my_email = world.instructor.email
+        world.log_in(
+            username=world.instructor.username,
+            password='test',
+            email=my_email,
+            name=world.instructor.profile.name
+        )
+    else:
+        my_email = world.staff.email
+        world.log_in(
+            username=world.staff.username,
+            password='test',
+            email=world.staff.email,
+            name=world.staff.profile.name
+        )
 
     # Store the expected recipients
     # given each "send to" option
     world.expected_addresses = {
-        'myself': [role + '@edx.org'],
-        'course staff': ['instructor@edx.org', 'staff@edx.org'],
-        'students, staff, and instructors': ['instructor@edx.org', 'staff@edx.org', 'student@edx.org']
+        'myself': [my_email],
+        'course staff': [world.staff.email, world.instructor.email],
+        'students, staff, and instructors': [world.staff.email, world.instructor.email, 'student@edx.org']
     }
 
 
@@ -131,7 +139,6 @@ UNSUBSCRIBE_MSG = 'To stop receiving email like this'
 
 @step(u'Email is sent to "([^"]*)"')
 def then_the_email_is_sent(step, recipient):
-
     # Check that the recipient is valid
     assert_in(
         recipient, SEND_TO_OPTIONS,

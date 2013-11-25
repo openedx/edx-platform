@@ -44,6 +44,8 @@ def log_in(username='robot', password='test', email='robot@edx.org', name='Robot
 def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
     create_user(username, password)
     user = User.objects.get(username=username)
+    # Note: this flag makes the user global staff - that is, an edX employee - not a course staff.
+    # See courseware.tests.factories for StaffFactory and InstructorFactory.
     if is_staff:
         user.is_staff = True
         user.save()
@@ -51,18 +53,8 @@ def register_by_course_id(course_id, username='robot', password='test', is_staff
 
 
 @world.absorb
-def add_to_course_staff(username, course_num):
-    """
-    Add the user with `username` to the course staff group
-    for `course_num`.
-    """
-    # Based on code in lms/djangoapps/courseware/access.py
-    group_name = "instructor_{}".format(course_num)
-    group, _ = Group.objects.get_or_create(name=group_name)
-    group.save()
-
-    user = User.objects.get(username=username)
-    user.groups.add(group)
+def enroll_user(user, course_id):
+    CourseEnrollment.enroll(user, course_id)
 
 
 @world.absorb
