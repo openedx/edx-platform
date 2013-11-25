@@ -45,7 +45,7 @@ class SSLClientTest(TestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(TestCase, self).setUp()
+        super(SSLClientTest, self).setUp()
         self.client = Client()
         self.factory = RequestFactory()
 
@@ -62,7 +62,7 @@ class SSLClientTest(TestCase):
         # auth should not have a user
         self.assertIn('<form role="form" id="register-form" method="post"', response.content)
         try:
-            eamap_user = ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
+            ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
@@ -80,10 +80,13 @@ class SSLClientTest(TestCase):
         some point.  using skip here instead of expectFailure because
         of an issue with nose.
         """
-        response = external_auth.views.ssl_login(self._create_ssl_request(reverse('contentstore.views.login_page')))
+        self.client.get(
+            reverse('contentstore.views.login_page'),
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+        )
 
         try:
-            eamap_user = ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
+            ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
@@ -98,21 +101,20 @@ class SSLClientTest(TestCase):
         and the user is redirected to slash.
         """
 
-        response = external_auth.views.ssl_login(self._create_ssl_request('/'))
+        external_auth.views.ssl_login(self._create_ssl_request('/'))
 
         # Assert our user exists in both eamap and Users, and that we are logged in
         try:
-            eamap_user = ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
+            ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
-            user = User.objects.get(email=self.USER_EMAIL)
+            User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
-    @unittest.skip
     def test_ssl_login_without_signup_cms(self):
         """
         Test IMMEDIATE_SIGNUP feature flag and ensure the user account is
@@ -123,16 +125,17 @@ class SSLClientTest(TestCase):
         of an issue with nose.
         """
 
-        response = external_auth.views.ssl_login(
-            self._create_ssl_request(reverse('contentstore.views.login_page'))
+        self.client.get(
+            reverse('contentstore.views.login_page'),
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
 
         # Assert our user exists in both eamap and Users, and that we are logged in
         try:
-            eamap_user = ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
+            ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
-            user = User.objects.get(email=self.USER_EMAIL)
+            User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))

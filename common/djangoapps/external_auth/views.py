@@ -258,7 +258,7 @@ def _signup(request, eamap):
         post_vars = dict(username=username,
                          honor_code=u'true',
                          terms_of_service=u'true')
-        log.info('doing immediate signup for %s, params=%s' % (username, post_vars))
+        log.info('doing immediate signup for %s, params=%s', username, post_vars)
         student.views.create_account(request, post_vars)
         return redirect('/')
 

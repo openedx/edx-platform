@@ -385,6 +385,9 @@ INSTALLED_APPS = (
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
+    # External auth (OpenID, shib, SSL)
+    'external_auth',
+
     # Tracking
     'track',
     'eventtracking.django',
