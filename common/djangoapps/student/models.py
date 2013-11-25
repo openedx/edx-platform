@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -33,7 +33,7 @@ from track.views import server_track
 from eventtracking import tracker
 
 
-unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
+unenroll_done = Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
