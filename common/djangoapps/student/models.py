@@ -76,9 +76,9 @@ def anonymous_id_for_user(user, course_id):
         return 'Anonymous'
 
     return AnonymousUsers.objects.get_or_create(
+        defaults={'anonymous_user_id': _anonymous_id_for_user(user, course_id)},
         user=user,
-        course_id=course_id,
-        anonymous_user_id=_anonymous_id_for_user(user, course_id)
+        course_id=course_id
     )[0].anonymous_user_id
 
 
