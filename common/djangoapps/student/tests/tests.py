@@ -342,6 +342,14 @@ class EnrollInCourseTest(TestCase):
         )
         self.assertFalse(enrollment_record.is_active)
 
+        # Make sure mode is updated properly if user unenrolls & re-enrolls
+        enrollment = CourseEnrollment.enroll(user, course_id, "verified")
+        self.assertEquals(enrollment.mode, "verified")
+        CourseEnrollment.unenroll(user, course_id)
+        enrollment = CourseEnrollment.enroll(user, course_id, "audit")
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertEquals(enrollment.mode, "audit")
+
     def assert_no_events_were_emitted(self):
         """Ensures no events were emitted since the last event related assertion"""
         self.assertFalse(self.mock_server_track.called)
