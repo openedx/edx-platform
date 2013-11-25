@@ -246,7 +246,7 @@ class LTIModule(LTIFields, XModule):
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
         assert user_id is not None
-        return user_id
+        return unicode(urllib.quote(user_id))
 
     def get_outcome_service_url(self):
         """
@@ -269,7 +269,7 @@ class LTIModule(LTIFields, XModule):
         context and imported into another system or context.
         This parameter is required.
         """
-        return unicode(self.id)
+        return unicode(urllib.quote(self.id))
 
     def get_lis_result_sourcedid(self):
         """
@@ -284,7 +284,7 @@ class LTIModule(LTIFields, XModule):
         the link being launched.
         lti_id should be context_id by meaning
         """
-        return ':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
+        return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
 
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
