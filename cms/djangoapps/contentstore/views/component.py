@@ -81,7 +81,7 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
         if len(parent_locs) != 1:
             logging.error(
                 'Multiple (or none) parents have been found for %s',
-                old_location
+                unicode(locator)
             )
 
         # this should blow up if we don't find any parents, which would be erroneous

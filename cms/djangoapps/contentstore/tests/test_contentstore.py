@@ -1352,8 +1352,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(len(items), 0)
         for descriptor in items:
             unit_locator = loc_mapper().translate_location(course_id, descriptor.location, False, True)
-            print "Checking {0}....".format(unicode(unit_locator))
-            print descriptor.__class__, descriptor.location
             resp = self.client.get_html(unit_locator.url_reverse('unit'))
             self.assertEqual(resp.status_code, 200)
             # TODO: uncomment when video transcripts no longer require IDs.
@@ -2035,8 +2033,5 @@ def _test_no_locations(test, resp, status_code=200, html=True):
         # it checks that the HTML properly parses. However, it won't find i4x usages
         # in JavaScript blocks.
         content = resp.content
-        num_jump_to_preview = len(re.findall(r"/preview/(\S)*jump_to/i4x", content))
-        num_jump_to_live = len(re.findall(r":8000/(\S)*jump_to/i4x", content))
-        hits = len(re.findall(r"i4x", content)) - num_jump_to_preview - num_jump_to_live
-
+        hits = len(re.findall(r"(?<!jump_to/)i4x://", content))
         test.assertEqual(hits, 0, "i4x found outside of LMS jump-to links")
