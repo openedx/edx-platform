@@ -55,6 +55,7 @@ class AnonymousUsers(models.Model):
     user = models.ForeignKey(User, db_index=True, related_name='anonymous')
     anonymous_user_id = models.CharField(unique=True, max_length=16)
     course_id = models.CharField(db_index=True, max_length=255)
+    unique_together = (user, course_id)
 
 
 def anonymous_id_for_user(user, course_id):

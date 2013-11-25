@@ -351,7 +351,7 @@ class DjangoKeyValueStore(KeyValueStore):
                 # the list of successful saves
                 saved_fields.extend([field.field_name for field in field_objects[field_object]])
             except DatabaseError:
-                log.error('Error saving fields %r', field_objects[field_object])
+                log.exception('Error saving fields %r', field_objects[field_object])
                 raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):
