@@ -54,6 +54,11 @@ def register_by_course_id(course_id, username='robot', password='test', is_staff
 
 @world.absorb
 def enroll_user(user, course_id):
+    # Activate user
+    registration = world.RegistrationFactory(user=user)
+    registration.register(user)
+    registration.activate()
+    # Enroll them in the course
     CourseEnrollment.enroll(user, course_id)
 
 
