@@ -198,21 +198,7 @@ class LTIModule(LTIFields, XModule):
             "tool_consumer_instance_contact_email",
         ]
 
-        # Obtains client_key and client_secret credentials from current course:
-        course_id = self.course_id
-        course_location = CourseDescriptor.id_to_location(course_id)
-        course = self.descriptor.runtime.modulestore.get_item(course_location)
-        client_key = client_secret = ''
-
-        for lti_passport in course.lti_passports:
-            try:
-                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
-            except ValueError:
-                raise LTIError('Could not parse LTI passport: {0!r}. \
-                    Should be "id:key:secret" string.'.format(lti_passport))
-            if lti_id == self.lti_id.strip():
-                client_key, client_secret = key, secret
-                break
+        client_key, client_secret = self.get_client_key_secret()
 
         # parsing custom parameters to dict
         custom_parameters = {}
@@ -515,24 +501,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         Raises: LTIError if request is incorrect.
         """
-        
-        '''
-        # this part will be removed as Inheritance PR will be meged
-        from courseware.courses import get_course_by_id
-        course = get_course_by_id(self.course_id)
-
-        # Obtains client_key and client_secret credentials from current course:
-        client_key = client_secret = ''
-        for lti_passport in course.lti_passports:
-            try:
-                lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
-            except ValueError:  # do log here instead of raising exception
-                raise LTIError('Could not parse LTI passport: {0!r}. \
-                    Should be "id:key:secret" string.'.format(lti_passport))
-            if lti_id == self.lti_id.strip():
-                client_key, client_secret = key, secret
-                break
-        '''
 
         client_key, client_secret = self.get_client_key_secret()
 
