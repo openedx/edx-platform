@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Dump username,anonymous_id_for_user pairs as CSV.
+"""Dump username, anonymous_id_for_user, simple_anonymous_id_for_user triples as CSV.
+
+Dumping of simple_anonymous_id_for_user in addition to anonymous_id_for_user is to
+enable people that use it, to have a way to correlate w/ the historical data.
 
 Give instructors easy access to the mapping from anonymized IDs to user IDs
 with a simple Django management command to generate a CSV mapping. To run, use
