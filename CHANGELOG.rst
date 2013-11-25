@@ -7,6 +7,10 @@ the top.  Include a label indicating the component affected.
 
 Blades: Enabled several Video Jasmine tests. BLD-463.
 
+Studio: Continued modification of Studio pages to follow a RESTful framework.
+includes Settings pages, edit page for Subsection and Unit, and interfaces
+for updating xblocks (xmodules) and getting their editing HTML.
+
 Blades: Put 2nd "Hide output" button at top of test box & increase text size for
 code response questions. BLD-126.
 

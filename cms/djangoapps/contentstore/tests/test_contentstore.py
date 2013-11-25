@@ -42,6 +42,7 @@ from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from xmodule.exceptions import NotFoundError
@@ -133,10 +134,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
-
-        resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+        locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, False, True)
+        resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment after edit_unit no longer using locations.
+        # TODO: uncomment when video transcripts no longer require IDs.
         # _test_no_locations(self, resp)
 
         for expected in expected_types:
@@ -155,29 +156,22 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
-        import_from_xml(store, 'common/test/data/', ['simple'])
+        _, course_items = import_from_xml(store, 'common/test/data/', ['simple'])
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
         location = descriptor.location.replace(name='.' + descriptor.location.name)
+        locator = loc_mapper().translate_location(course_items[0].location.course_id, location, False, True)
 
-        resp = self.client.get_html(reverse('edit_unit', kwargs={'location': location.url()}))
+        resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 400)
         _test_no_locations(self, resp, status_code=400)
 
     def check_edit_unit(self, test_course_name):
-        import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
+        _, course_items = import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
         items = modulestore().get_items(Location('i4x', 'edX', test_course_name, 'vertical', None, None))
-        # Assert is here to make sure that the course being tested actually has verticals.
-        self.assertGreater(len(items), 0)
-        for descriptor in items:
-            print "Checking ", descriptor.location.url()
-            print descriptor.__class__, descriptor.location
-            resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
-            self.assertEqual(resp.status_code, 200)
-            # TODO: uncomment after edit_unit not using locations.
-            # _test_no_locations(self, resp)
+        self._check_verticals(items, course_items[0].location.course_id)
 
     def _lock_an_asset(self, content_store, course_location):
         """
@@ -1065,14 +1059,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             target_location_namespace=course_location
         )
 
+        # Unit test fails in Jenkins without this.
+        loc_mapper().translate_location(course_location.course_id, course_location, False, True)
+
         items = module_store.get_items(stub_location.replace(category='vertical', name=None))
-        self.assertGreater(len(items), 0)
-        for descriptor in items:
-            print "Checking {0}....".format(descriptor.location.url())
-            resp = self.client.get_html(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
-            self.assertEqual(resp.status_code, 200)
-            # TODO: uncomment when edit_unit no longer has locations.
-            # _test_no_locations(self, resp)
+        self._check_verticals(items, course_location.course_id)
 
         # verify that we have the content in the draft store as well
         vertical = draft_store.get_item(
@@ -1355,6 +1346,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(stub_location)
         self.assertEqual(len(items), 1)
 
+    def _check_verticals(self, items, course_id):
+        """ Test getting the editing HTML for each vertical. """
+        # Assert is here to make sure that the course being tested actually has verticals (units) to check.
+        self.assertGreater(len(items), 0)
+        for descriptor in items:
+            unit_locator = loc_mapper().translate_location(course_id, descriptor.location, False, True)
+            resp = self.client.get_html(unit_locator.url_reverse('unit'))
+            self.assertEqual(resp.status_code, 200)
+            # TODO: uncomment when video transcripts no longer require IDs.
+            # _test_no_locations(self, resp)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
@@ -1598,12 +1600,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         }
 
         resp = self.client.ajax_post('/xblock', section_data)
+        _test_no_locations(self, resp, html=False)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertRegexpMatches(
-            data['id'],
-            r"^i4x://MITx/999/chapter/([0-9]|[a-f]){32}$"
+            data['locator'],
+            r"^MITx.999.Robot_Super_Course/branch/draft/block/chapter([0-9]|[a-f]){3}$"
         )
 
     def test_capa_module(self):
@@ -1619,7 +1622,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
-        problem_loc = Location(payload['id'])
+        problem_loc = loc_mapper().translate_locator_to_location(BlockUsageLocator(payload['locator']))
         problem = get_modulestore(problem_loc).get_item(problem_loc)
         # should be a CapaDescriptor
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
@@ -1677,19 +1680,17 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.get_html(
-            reverse('edit_subsection', kwargs={'location': subsection_location.url()})
-        )
+        subsection_locator = loc_mapper().translate_location(loc.course_id, subsection_location, False, True)
+        resp = self.client.get_html(subsection_locator.url_reverse('subsection'))
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment when grading and outline not using old locations.
-        # _test_no_locations(self, resp)
+        _test_no_locations(self, resp)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.get_html(
-            reverse('edit_unit', kwargs={'location': unit_location.url()}))
+        unit_locator = loc_mapper().translate_location(loc.course_id, unit_location, False, True)
+        resp = self.client.get_html(unit_locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment when edit_unit not using old locations.
+        # TODO: uncomment when video transcripts no longer require IDs.
         # _test_no_locations(self, resp)
 
         def delete_item(category, name):
@@ -1899,8 +1900,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         new_location = loc_mapper().translate_location(location.course_id, location, False, True)
         resp = self.client.get_html(new_location.url_reverse('course/', ''))
-        # TODO: uncomment when i4x no longer in overview.
-        # _test_no_locations(self, resp)
+        _test_no_locations(self, resp)
         return resp
 
 
@@ -2033,7 +2033,5 @@ def _test_no_locations(test, resp, status_code=200, html=True):
         # it checks that the HTML properly parses. However, it won't find i4x usages
         # in JavaScript blocks.
         content = resp.content
-        num_jump_to = len(re.findall(r"8000(\S)*jump_to/i4x", content))
-        total_i4x = len(re.findall(r"i4x", content))
-
-        test.assertEqual(total_i4x - num_jump_to, 0, "i4x found outside of LMS jump-to links")
+        hits = len(re.findall(r"(?<!jump_to/)i4x://", content))
+        test.assertEqual(hits, 0, "i4x found outside of LMS jump-to links")
