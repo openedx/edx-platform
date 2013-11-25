@@ -525,7 +525,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         oauth_signature = oauth_headers.pop('oauth_signature')
 
         mock_request = mock.Mock(
-            uri=unicode(request.url),
+            uri=unicode(urllib.unquote(request.url)),
             http_method=unicode(request.method),
             params=oauth_headers.items(),
             signature=oauth_signature
