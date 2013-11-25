@@ -57,30 +57,31 @@ class AnonymousUsers(models.Model):
     course_id = models.CharField(db_index=True, max_length=255)
     unique_together = (user, course_id)
 
+def simple_anonymous_id_for_user(user, course_id=''):
+    """
+    Return a unique id for a user, suitable for inserting into foldit module table
+    or into unit tests.
+    """
+    # include the secret key as a salt, and to make the ids unique across different LMS installs.
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    h.update(course_id)
+    return h.hexdigest()
 
 def anonymous_id_for_user(user, course_id):
     """
     Return a unique id for a (user, course) pair, suitable for inserting into e.g. personalized survey links.
     """
-    def _anonymous_id_for_user(user, course_id):
-        # include the secret key as a salt, and to make the ids unique across different LMS installs.
-        h = hashlib.md5()
-        h.update(settings.SECRET_KEY)
-        h.update(str(user.id))
-        h.update(course_id)
-        return h.hexdigest()
-
-    # This part is for ability to get xblock instance in noauth xblock handlers,
-    # where user is anauthenticated.
+    # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     if user.is_anonymous():
         return 'Anonymous'
 
     return AnonymousUsers.objects.get_or_create(
-        defaults={'anonymous_user_id': _anonymous_id_for_user(user, course_id)},
+        defaults={'anonymous_user_id': simple_anonymous_id_for_user(user, course_id)},
         user=user,
         course_id=course_id
     )[0].anonymous_user_id
-
 
 def user_by_anonymous_id(id):
     """
@@ -95,19 +96,6 @@ def user_by_anonymous_id(id):
     except ObjectDoesNotExist:
         return None
     return obj.user
-
-
-def simple_anonymous_id_for_user(user):
-    """
-    Return a unique id for a user, suitable for inserting into foldit module table
-    or into unit tests.
-    """
-    # include the secret key as a salt, and to make the ids unique across
-    # different LMS installs.
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    return h.hexdigest()
 
 
 class UserStanding(models.Model):
