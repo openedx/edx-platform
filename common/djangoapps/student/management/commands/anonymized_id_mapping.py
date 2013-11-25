@@ -15,7 +15,7 @@ import csv
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, simple_anonymous_id_for_user
 
 
 class Command(BaseCommand):
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 csv_writer = csv.writer(output_file)
                 csv_writer.writerow(("User ID", "Anonymized user ID"))
                 for student in students:
-                    csv_writer.writerow((student.id, anonymous_id_for_user(student, course_id)))
+                    csv_writer.writerow((student.id, anonymous_id_for_user(student, course_id), simple_anonymous_id_for_user(student)))
         except IOError:
             raise CommandError("Error writing to file: %s" % output_filename)
 
