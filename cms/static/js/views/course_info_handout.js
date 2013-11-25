@@ -30,6 +30,7 @@ define(["backbone", "underscore", "codemirror", "js/views/feedback_notification"
                     model: this.model
                 }))
             );
+            $('.handouts-content').html(this.model.get('data'));
             this.$preview = this.$el.find('.handouts-content');
             this.$form = this.$el.find(".edit-handouts-form");
             this.$editor = this.$form.find('.handouts-content-editor');
@@ -50,32 +51,43 @@ define(["backbone", "underscore", "codemirror", "js/views/feedback_notification"
         },
 
         onSave: function(event) {
-            this.model.set('data', this.$codeMirror.getValue());
-            var saving = new NotificationView.Mini({
-                title: gettext('Saving&hellip;')
-            });
-            saving.show();
-            this.model.save({}, {
-                success: function() {
-                    saving.hide();
-                }
-            });
-            this.render();
-            this.$form.hide();
-            this.closeEditor();
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
+            if ($('.CodeMirror-lines').find('.cm-error').length == 0){
+                this.model.set('data', this.$codeMirror.getValue());
+                var saving = new NotificationView.Mini({
+                    title: gettext('Saving&hellip;')
+                });
+                saving.show();
+                this.model.save({}, {
+                    success: function() {
+                        saving.hide();
+                    }
+                });
+                this.render();
+                this.$form.hide();
+                this.closeEditor();
 
-            analytics.track('Saved Course Handouts', {
-                'course': course_location_analytics
-            });
-
+                analytics.track('Saved Course Handouts', {
+                    'course': course_location_analytics
+                });
+            }else{
+                $('#handout_error').addClass('is-shown');
+                $('.save-button').addClass('is-disabled');
+                event.preventDefault();
+            }
         },
 
         onCancel: function(event) {
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
             this.$form.hide();
             this.closeEditor();
         },
 
         closeEditor: function() {
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
             this.$form.hide();
             ModalUtils.hideModalCover();
             this.$form.find('.CodeMirror').remove();

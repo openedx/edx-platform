@@ -88,7 +88,7 @@ class SplitMigrator(object):
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
         versions['draft'] = versions['published']
-        self.split_modulestore.update_course_index(course_version_locator, {'versions': versions}, update_versions=True)
+        self.split_modulestore.update_course_index(index_info)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'

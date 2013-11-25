@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
+from model_utils import Choices
 
 """
 Certificates are created for a student and an offering of a course.
@@ -62,7 +63,6 @@ class CertificateStatuses(object):
     restricted   = 'restricted'
     unavailable  = 'unavailable'
 
-
 class CertificateWhitelist(models.Model):
     """
     Tracks students who are whitelisted, all users
@@ -86,11 +86,13 @@ class GeneratedCertificate(models.Model):
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
+    MODES = Choices('verified', 'honor', 'audit')
+    mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(
-            auto_now_add=True, default=datetime.now)
+        auto_now_add=True, default=datetime.now)
     modified_date = models.DateTimeField(
-            auto_now=True, default=datetime.now)
+        auto_now=True, default=datetime.now)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     class Meta:
@@ -128,8 +130,9 @@ def certificate_status_for_student(student, course_id):
 
     try:
         generated_certificate = GeneratedCertificate.objects.get(
-                user=student, course_id=course_id)
-        d = {'status': generated_certificate.status}
+            user=student, course_id=course_id)
+        d = {'status': generated_certificate.status,
+             'mode': generated_certificate.mode}
         if generated_certificate.grade:
             d['grade'] = generated_certificate.grade
         if generated_certificate.status == CertificateStatuses.downloadable:
@@ -138,4 +141,4 @@ def certificate_status_for_student(student, course_id):
         return d
     except GeneratedCertificate.DoesNotExist:
         pass
-    return {'status': CertificateStatuses.unavailable}
+    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}

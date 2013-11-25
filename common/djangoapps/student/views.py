@@ -185,7 +185,8 @@ def _cert_info(user, course, cert_status):
     default_info = {'status': default_status,
                     'show_disabled_download_button': False,
                     'show_download_url': False,
-                    'show_survey_button': False}
+                    'show_survey_button': False,
+                    }
 
     if cert_status is None:
         return default_info
@@ -203,7 +204,8 @@ def _cert_info(user, course, cert_status):
 
     d = {'status': status,
          'show_download_url': status == 'ready',
-         'show_disabled_download_button': status == 'generating', }
+         'show_disabled_download_button': status == 'generating',
+         'mode': cert_status.get('mode', None)}
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
             course.end_of_course_survey_url is not None):
@@ -296,7 +298,7 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []
@@ -1229,11 +1231,8 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-        return HttpResponse(json.dumps({'success': True,
+    return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
-    else:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Invalid e-mail or user')}))
 
 
 def password_reset_confirm_wrapper(

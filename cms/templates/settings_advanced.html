@@ -96,8 +96,8 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${course_locator.url_reverse('settings/details/')}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${course_locator.url_reverse('settings/grading/')}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
           </ul>
         </nav>

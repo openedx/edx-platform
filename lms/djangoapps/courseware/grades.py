@@ -335,7 +335,6 @@ def _progress_summary(student, request, course):
                 module_creator = section_module.xmodule_runtime.get_module
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
-
                     course_id = course.id
                     (correct, total) = get_score(course_id, student, module_descriptor, module_creator)
                     if correct is None and total is None:

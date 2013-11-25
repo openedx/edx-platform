@@ -154,7 +154,17 @@
             });
 
             // Turned off test due to flakiness (30.10.2013).
-            xit('trigger seek event', function() {
+            //
+            // Update: Turned on test back again. Passing locally and on
+            // Jenkins in a large number of runs.
+            //
+            // Will observe for a little while to see if any failures arise.
+            // Most probable cause of test passing is:
+            //
+            //     https://github.com/edx/edx-platform/pull/1642
+            //
+            // : )
+            it('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 20 }
@@ -220,7 +230,17 @@
             });
 
             // Turned off test due to flakiness (30.10.2013).
-            xit('trigger seek event', function() {
+            //
+            // Update: Turned on test back again. Passing locally and on
+            // Jenkins in a large number of runs.
+            //
+            // Will observe for a little while to see if any failures arise.
+            // Most probable cause of test passing is:
+            //
+            //     https://github.com/edx/edx-platform/pull/1642
+            //
+            // : )
+            it('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onStop(
                         jQuery.Event('stop'), { value: 20 }
@@ -283,6 +303,55 @@
                     );
 
                 expect(params).toEqual(expectedParams);
+            });
+        });
+
+        describe('notifyThroughHandleEnd', function () {
+            beforeEach(function () {
+                initialize();
+
+                spyOnEvent(videoProgressSlider.handle, 'focus');
+                spyOn(videoProgressSlider, 'notifyThroughHandleEnd')
+                    .andCallThrough();
+            });
+
+            it('params.end = true', function () {
+                videoProgressSlider.notifyThroughHandleEnd({end: true});
+
+                expect(videoProgressSlider.handle.attr('title'))
+                    .toBe('video ended');
+
+                expect('focus').toHaveBeenTriggeredOn(videoProgressSlider.handle);
+            });
+
+            it('params.end = false', function () {
+                videoProgressSlider.notifyThroughHandleEnd({end: false});
+
+                expect(videoProgressSlider.handle.attr('title'))
+                    .toBe('video position');
+
+                expect('focus').not.toHaveBeenTriggeredOn(videoProgressSlider.handle);
+            });
+
+            it('is called when video plays', function () {
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    var duration = videoPlayer.duration(),
+                        currentTime = videoPlayer.currentTime;
+
+                    return (
+                        isFinite(duration) &&
+                        duration > 0 &&
+                        isFinite(currentTime) &&
+                        currentTime > 0
+                    );
+                }, 'duration is set, video is playing', 5000);
+
+                runs(function () {
+                    expect(videoProgressSlider.notifyThroughHandleEnd)
+                        .toHaveBeenCalledWith({end: false});
+                });
             });
         });
     });

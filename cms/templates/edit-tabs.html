@@ -9,12 +9,15 @@
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) {
+require(["js/models/explicit_url", "coffee/src/views/tabs"], function(TabsModel, TabsEditView) {
+    var model = new TabsModel({
+        id: "${course_locator}",
+        explicit_url: "${course_locator.url_reverse('tabs')}"
+    });
+
     new TabsEditView({
       el: $('.main-wrapper'),
-      model: new Backbone.Model({
-        id: '${locator}'
-      }),
+      model: model,
       mast: $('.wrapper-mast')
     });
 });
@@ -61,8 +64,8 @@ require(["backbone", "coffee/src/views/tabs"], function(Backbone, TabsEditView) 
 
       <div class="tab-list">
         <ol class='components'>
-          % for id, locator in components:
-          <li class="component" data-id="${id}" data-locator="${locator}"/>
+          % for locator in components:
+          <li class="component" data-locator="${locator}"/>
           % endfor
 
           <li class="new-component-item">

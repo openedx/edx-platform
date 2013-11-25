@@ -87,6 +87,13 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status"
     }[name]
 
+  @makeFocusTrap: (elem) ->
+    elem.keydown(
+      (event) ->
+        if event.which == 9 # Tab
+          event.preventDefault()
+    )
+
   @discussionAlert: (header, body) ->
     if $("#discussion-alert").length == 0
       alertDiv = $("<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'/>").css("display", "none")
@@ -99,12 +106,7 @@ class @DiscussionUtil
         "  <button class='dismiss'>OK</button>" +
         "</div>"
       )
-      # Capture focus
-      alertDiv.find("button").keydown(
-        (event) ->
-          if event.which == 9 # Tab
-            event.preventDefault()
-      )
+      @makeFocusTrap(alertDiv.find("button"))
       alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css("display", "none")
       alertTrigger.leanModal({closeButton: "#discussion-alert .dismiss", overlay: 1, top: 200})
       $("body").append(alertDiv).append(alertTrigger)

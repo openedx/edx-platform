@@ -457,7 +457,17 @@
                 });
 
                 // Disabled 10/25/13 due to flakiness in master
-                xit('scroll caption to new position', function () {
+                //
+                // Update: Turned on test back again. Passing locally and on
+                // Jenkins in a large number of runs.
+                //
+                // Will observe for a little while to see if any failures arise.
+                // Most probable cause of test passing is:
+                //
+                // https://github.com/edx/edx-platform/pull/1642
+                //
+                // : )
+                it('scroll caption to new position', function () {
                     expect($.fn.scrollTo).toHaveBeenCalled();
                 });
             });
@@ -538,7 +548,17 @@
         });
 
         // Disabled 10/23/13 due to flakiness in master
-        xdescribe('scrollCaption', function () {
+        //
+        // Update: Turned on test back again. Passing locally and on
+        // Jenkins in a large number of runs.
+        //
+        // Will observe for a little while to see if any failures arise.
+        // Most probable cause of test passing is:
+        //
+        // https://github.com/edx/edx-platform/pull/1642
+        //
+        // : )
+        describe('scrollCaption', function () {
             beforeEach(function () {
                 initialize();
             });
@@ -683,7 +703,17 @@
                 });
 
                 // Test turned off due to flakiness (30.10.2013).
-                xit('scroll the caption', function () {
+                //
+                // Update: Turned on test back again. Passing locally and on
+                // Jenkins in a large number of runs.
+                //
+                // Will observe for a little while to see if any failures arise.
+                // Most probable cause of test passing is:
+                //
+                // https://github.com/edx/edx-platform/pull/1642
+                //
+                // : )
+                it('scroll the caption', function () {
                     // After transcripts are shown, and the video plays for a
                     // bit.
                     jasmine.Clock.tick(1000);
