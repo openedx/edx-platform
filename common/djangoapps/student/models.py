@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
 
-class AnonymousUsers(models.Model):
+class AnonymousUserId(models.Model):
     """
     This table contains user, course_Id and anonymous_user_id
 
@@ -52,50 +52,52 @@ class AnonymousUsers(models.Model):
     We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
     http://docs.python.org/2/library/md5.html#md5.digest_size
     """
-    user = models.ForeignKey(User, db_index=True, related_name='anonymous')
+    user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=16)
     course_id = models.CharField(db_index=True, max_length=255)
     unique_together = (user, course_id)
 
-def simple_anonymous_id_for_user(user, course_id=''):
-    """
-    Return a unique id for a user, suitable for inserting into foldit module table
-    or into unit tests.
-    """
-    # include the secret key as a salt, and to make the ids unique across different LMS installs.
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    h.update(course_id)
-    return h.hexdigest()
 
 def anonymous_id_for_user(user, course_id):
     """
-    Return a unique id for a (user, course) pair, suitable for inserting into e.g. personalized survey links.
+    Return a unique id for a (user, course) pair, suitable for inserting
+    into e.g. personalized survey links.
+
+    If user is an `AnonymousUser`, returns `None`
     """
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     if user.is_anonymous():
-        return 'Anonymous'
+        return None
 
-    return AnonymousUsers.objects.get_or_create(
-        defaults={'anonymous_user_id': simple_anonymous_id_for_user(user, course_id)},
+    # include the secret key as a salt, and to make the ids unique across different LMS installs.
+    hasher = hashlib.md5()
+    hasher.update(settings.SECRET_KEY)
+    hasher.update(str(user.id))
+    hasher.update(course_id)
+
+    return AnonymousUserId.objects.get_or_create(
+        defaults={'anonymous_user_id': hasher.hexdigest()},
         user=user,
         course_id=course_id
     )[0].anonymous_user_id
 
+
 def user_by_anonymous_id(id):
     """
-    Return user by anonymous_user_id using AnonymousUsers lookup table.
+    Return user by anonymous_user_id using AnonymousUserId lookup table.
 
     Do not raise `django.ObjectDoesNotExist` exception,
     if there is no user for anonymous_student_id,
     because this function will be used inside xmodule w/o django access.
     """
+
+    if id is None:
+        return None
+
     try:
-        obj = AnonymousUsers.objects.get(anonymous_user_id=id)
+        return User.objects.get(anonymoususerid__anonymous_user_id=id)
     except ObjectDoesNotExist:
         return None
-    return obj.user
 
 
 class UserStanding(models.Model):

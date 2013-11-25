@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 from foldit.models import Score, PuzzleComplete
-from student.models import simple_anonymous_id_for_user
+from student.models import anonymous_id_for_user
 
 import re
 
@@ -124,7 +124,9 @@ def save_scores(user, puzzle_scores):
         try:
             obj = Score.objects.get(
                 user=user,
-                unique_user_id=simple_anonymous_id_for_user(user),
+                # For historical reasons, the foldit module uses a per-student
+                # anonymized user id for storage
+                unique_user_id=anonymous_id_for_user(user, ''),
                 puzzle_id=puzzle_id,
                 score_version=score_version)
             obj.current_score = current_score
@@ -133,7 +135,9 @@ def save_scores(user, puzzle_scores):
         except Score.DoesNotExist:
             obj = Score(
                 user=user,
-                unique_user_id=simple_anonymous_id_for_user(user),
+                # For historical reasons, the foldit module uses a per-student
+                # anonymized user id for storage
+                unique_user_id=anonymous_id_for_user(user, ''),
                 puzzle_id=puzzle_id,
                 current_score=current_score,
                 best_score=best_score,
@@ -160,7 +164,9 @@ def save_complete(user, puzzles_complete):
         # create if not there
         PuzzleComplete.objects.get_or_create(
             user=user,
-            unique_user_id=simple_anonymous_id_for_user(user),
+            # For historical reasons, the foldit module uses a per-student
+            # anonymized user id for storage
+            unique_user_id=anonymous_id_for_user(user, ''),
             puzzle_id=puzzle_id,
             puzzle_set=puzzle_set,
             puzzle_subset=puzzle_subset)
