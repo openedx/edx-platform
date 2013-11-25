@@ -28,7 +28,7 @@ from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from mock import Mock, patch, sentinel
 from textwrap import dedent
 
-from student.models import anonymous_id_for_user, simple_anonymous_id_for_user, CourseEnrollment
+from student.models import anonymous_id_for_user, CourseEnrollment
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
@@ -137,27 +137,27 @@ class ResetPasswordTests(TestCase):
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
 
-    @patch('student.views.anonymous_id_for_user')
-    def test_process_survey_link(self, mock_anonymous_id_for_user):
+    def test_process_survey_link(self):
         course = Mock(id="test_id")
         user = Mock(username="fred", id="test_user_id")
-        mock_anonymous_id_for_user.return_value = simple_anonymous_id_for_user(user)
 
         link1 = "http://www.mysurvey.com"
         self.assertEqual(process_survey_link(link1, user, course.id), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=simple_anonymous_id_for_user(user))
+
+        # anonymous_id_for_user returns 'Anonymous' because user is not authenticated.
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID='Anonymous')
 
         self.assertEqual(process_survey_link(link2, user, course.id), link2_expected)
 
-    # patching student.views.anonymous_id_for_user, not student.models.anonymous_id_for_user,
-    # look at http://www.voidspace.org.uk/python/mock/patch.html#where-to-patch for explanation.
-    @patch('student.views.anonymous_id_for_user')
-    def test_cert_info(self, mock_anonymous_id_for_user):
+    def test_cert_info(self):
+        """
+        _cert_info() calls process_survey_link(), process_survey_link() calls anonymous_id_for_user()
+        anonymous_id_for_user() returns 'Anonymous' because user is not authenticated.
+        """
         user = Mock(username="fred", id="test_user_id")
         survey_url = "http://a_survey.com"
-        mock_anonymous_id_for_user.return_value = simple_anonymous_id_for_user(user)
 
         course = Mock(end_of_course_survey_url=survey_url, id="test_id")
 
