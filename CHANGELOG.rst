@@ -5,8 +5,6 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-Blades: Enabled several Video Jasmine tests. BLD-463.
-
 Studio: Continued modification of Studio pages to follow a RESTful framework.
 includes Settings pages, edit page for Subsection and Unit, and interfaces
 for updating xblocks (xmodules) and getting their editing HTML.
