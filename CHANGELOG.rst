@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
+  through the hints via arrow keys. BLD-533.
+
 LMS: Add feature for providing background grade report generation via Celery
   instructor task, with reports uploaded to S3. Feature is visible on the beta
   instructor dashboard. LMS-58
