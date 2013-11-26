@@ -4,7 +4,6 @@
 from mock import Mock
 import textwrap
 from lxml import etree
-import unittest
 from webob.request import Request
 from copy import copy
 import urllib
@@ -73,7 +72,8 @@ class LTIModuleTest(LogicTest):
     def get_response_values(self, response):
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         root = etree.fromstring(response.body.strip(), parser=parser)
-        namespaces = {'def': root.nsmap.values()[0]}
+        lti_spec_namespace = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"
+        namespaces = {'def': lti_spec_namespace}
 
         code_major = root.xpath("//def:imsx_codeMajor", namespaces=namespaces)[0].text
         description = root.xpath("//def:imsx_description", namespaces=namespaces)[0].text
@@ -81,7 +81,7 @@ class LTIModuleTest(LogicTest):
         imsx_POXBody = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0]
 
         try:
-            action = imsx_POXBody.getchildren()[0].tag.replace('{'+root.nsmap.values()[0]+'}', '')
+            action = imsx_POXBody.getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
         except Exception:
             action = None
 
