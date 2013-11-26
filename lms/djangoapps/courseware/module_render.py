@@ -475,7 +475,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
     # Test xqueue package, which we expect to be:
     #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
-    #               'xqueue_body'  : 'Messa/ge from grader'}
+    #               'xqueue_body'  : 'Message from grader'}
     for key in ['xqueue_header', 'xqueue_body']:
         if key not in data:
             raise Http404
