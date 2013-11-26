@@ -133,7 +133,6 @@ class LTIModuleTest(LogicTest):
         """
         self.xmodule.verify_oauth_body_sign = Mock()
         incorrect_request = Request(self.environ)
-        # incorrect_request.authorization = "bad authorization header"
         incorrect_request.body = self.get_request_body()
         response = self.xmodule.grade_handler(incorrect_request, '')
         code_major = self.get_code_major(response)

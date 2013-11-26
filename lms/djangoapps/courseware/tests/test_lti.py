@@ -5,9 +5,6 @@ from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 
 class TestLTI(BaseTestXmodule):
     """
@@ -18,28 +15,6 @@ class TestLTI(BaseTestXmodule):
     of `oauthlib` library.
     """
     CATEGORY = "lti"
-    grading_policy = None
-
-    def set_up_course(self, **course_kwargs):
-        """
-        Create a stock coursecourse with a specific due date.
-
-        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
-        """
-
-        course = CourseFactory(**course_kwargs)
-        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
-        section = self.section = ItemFactory(
-            category='sequential',
-            parent_location=chapter.location,
-            metadata={'graded': True, 'format': 'Homework'}
-        )
-        vertical = ItemFactory(category='vertical', parent_location=section.location)
-        ItemFactory(category=self.CATEGORY, parent_location=vertical.location)
-
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
-
-        return course
 
     def setUp(self):
         """
@@ -52,20 +27,22 @@ class TestLTI(BaseTestXmodule):
         mocked_decoded_signature = u'my_signature='
 
         self.correct_headers = {
+            u'user_id': unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id),
             u'oauth_callback': u'about:blank',
-            u'lis_outcome_service_url': '',
-            u'lis_result_sourcedid': '',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
+            u'role': u'student',
+
+            u'resource_link_id': u'i4x%3A//MITx/999/lti/lti_3',
+            u'lis_outcome_service_url': 'http://edx.orgi4x://MITx/999/lti/lti_3/grade_handler',
+            u'lis_result_sourcedid': u':i4x%253A//MITx/999/lti/lti_3:student',
 
             u'oauth_nonce': mocked_nonce,
             u'oauth_timestamp': mocked_timestamp,
             u'oauth_consumer_key': u'',
             u'oauth_signature_method': u'HMAC-SHA1',
             u'oauth_version': u'1.0',
-            u'user_id': self.item_descriptor.xmodule_runtime.anonymous_student_id,
-            u'role': u'student',
             u'oauth_signature': mocked_decoded_signature
         }
 
@@ -95,14 +72,16 @@ class TestLTI(BaseTestXmodule):
         Makes sure that all parameters extracted.
         """
         generated_context = self.item_module.render('student_view').content
+
         expected_context = {
-            'input_fields': self.correct_headers,
             'display_name': self.item_module.display_name,
-            'element_class': self.item_module.location.category,
+            'input_fields': self.correct_headers,
+            'element_class': self.item_module.category,
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
         }
+
         self.assertEqual(
             generated_context,
             self.runtime.render_template('lti.html', expected_context),
